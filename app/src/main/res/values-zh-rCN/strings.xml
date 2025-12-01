@@ -517,6 +517,9 @@
     <string name="use_selector">使用选择器</string>
     <string name="front_proxy">前端代理</string>
     <string name="landing_proxy">着陆代理</string>
+    <string name="auto_switch_timeout">超时自动切换</string>
+    <string name="auto_switch_timeout_summary">如果超时，则自动切换到下一个配置</string>
+    <string name="auto_switch_timeout_duration">超时时长 (秒)</string>
     <string name="protocol_version">协议版本</string>
     <string name="share_subscription">分享订阅</string>
     <string name="show_group_in_notification">通知中显示组名称</string>

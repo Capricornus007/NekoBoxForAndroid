@@ -56,6 +56,7 @@ class BaseService {
         var state = State.Stopped
         var proxy: ProxyInstance? = null
         var notification: ServiceNotification? = null
+        var timeoutMonitorJob: Job? = null
 
         val receiver = broadcastReceiverWithSelf { self, ctx, intent ->
             when (intent.action) {
@@ -307,6 +308,104 @@ class BaseService {
             val newSelectorGroupId = if (group.isSelector) group.id else -1L
             return newSelectorGroupId == running
         }
+        fun startTimeoutMonitor() {
+            if (!DataStore.enableAutoSwitchTimeout) return
+
+            data.timeoutMonitorJob?.cancel()
+            data.timeoutMonitorJob = data.binder.launch {
+                while (isActive) {
+                    val timeoutSeconds = DataStore.autoSwitchTimeoutDuration.toLong().takeIf { it > 0 } ?: 10L
+                    delay(timeoutSeconds * 1000L)
+
+                    if (!isActive) break
+
+                    // 检查连接是否存活
+                    if (isConnectionAlive()) {
+                        continue // 连接存活，进入下次循环
+                    }
+
+                    // 未存活，切换到下一个可用代理并测试
+                    val found = switchToNextAvailableProxy()
+                    if (!found) {
+                        Logs.d("所有代理均不可用，停止超时自动切换监控。")
+                        break
+                    }
+                    // 切换可用代理后，监控继续（回到循环起点）
+                }
+            }
+        }
+
+        private fun isConnectionAlive(): Boolean {
+            return try {
+                data.proxy?.box?.let { box ->
+                    val result = Libcore.urlTest(
+                        box,
+                        DataStore.connectionTestURL,
+                        3000
+                    )
+                    result > 0
+                } ?: false
+            } catch (e: Exception) {
+                Logs.d("Timeout check error: ${e.readableMessage}")
+                false
+            }
+        }
+
+        /**
+         * 只轮回一圈尝试所有代理，每切换一次就 reload 并检测，找到可用就返回 true。
+         * 全部代理都不可用才返回 false。
+         * 如果代理数量小于等于1，则不做测试直接返回 false。
+         */
+        private suspend fun switchToNextAvailableProxy(): Boolean {
+            val currentProfile = SagerDatabase.proxyDao.getById(DataStore.selectedProxy) ?: return false
+            val groupProxies = SagerDatabase.proxyDao.getByGroup(currentProfile.groupId)
+
+            if (groupProxies.size <= 1) return false
+
+            val proxyCount = groupProxies.size
+            var nextIndex = groupProxies.indexOfFirst { it.id == currentProfile.id }
+
+            // 只试一圈
+            var tried = 0
+            do {
+                nextIndex = (nextIndex + 1) % proxyCount
+                DataStore.selectedProxy = groupProxies[nextIndex].id
+                runOnMainDispatcher { reload() }
+                delay(200) // 等待 reload 生效，实际可根据情况调整
+
+                tried++
+                if (isConnectionAlive()) {
+                    Logs.d("切换到可用代理: ${groupProxies[nextIndex].id}")
+                    return true
+                } else {
+                    Logs.d("代理不可用: ${groupProxies[nextIndex].id}，继续尝试下一个。")
+                }
+            } while (tried < proxyCount)
+
+            Logs.d("一圈轮询后所有代理均不可用。")
+            return false
+        }
+
+        fun switchToNextProxy() {
+            val currentProfile = SagerDatabase.proxyDao.getById(DataStore.selectedProxy) ?: return
+            val groupProxies = SagerDatabase.proxyDao.getByGroup(currentProfile.groupId)
+
+            if (groupProxies.isEmpty()) return
+
+            val currentIndex = groupProxies.indexOfFirst { it.id == currentProfile.id }
+            val nextIndex = if (currentIndex >= 0 && currentIndex < groupProxies.size - 1) {
+                currentIndex + 1
+            } else {
+                0
+            }
+
+            if (nextIndex < groupProxies.size) {
+                DataStore.selectedProxy = groupProxies[nextIndex].id
+                runOnMainDispatcher {
+                    reload()
+                }
+            }
+        }
 
         suspend fun startProcesses() {
             data.proxy!!.launch()
@@ -323,6 +422,8 @@ class BaseService {
         }
 
         suspend fun killProcesses() {
+            data.timeoutMonitorJob?.cancel()
+            data.timeoutMonitorJob = null
             runServiceTeardown(
                 after = {
                     wakeLock?.apply {
@@ -635,6 +736,7 @@ class BaseService {
 
                     startProcesses()
                     data.changeState(State.Connected)
+                    startTimeoutMonitor()
 
                     lateInit()
                 } catch (_: CancellationException) {

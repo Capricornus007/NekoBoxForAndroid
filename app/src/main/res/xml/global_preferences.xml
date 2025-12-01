@@ -306,6 +306,20 @@
             app:title="@string/connection_test_url"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_cast_connected_24"
+            app:key="enableAutoSwitchTimeout"
+            app:summary="@string/auto_switch_timeout_summary"
+            app:title="@string/auto_switch_timeout" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:defaultValue="10"
+            app:entries="@array/auto_switch_timeout_values"
+            app:entryValues="@array/auto_switch_timeout_values"
+            app:icon="@drawable/ic_baseline_shutter_speed_24"
+            app:key="autoSwitchTimeoutDuration"
+            app:title="@string/auto_switch_timeout_duration"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
             app:icon="@drawable/baseline_construction_24"
             app:key="enableClashAPI"
             app:summary="@string/enable_clash_api_summary"

@@ -86,6 +86,9 @@ object Key {
     const val RULES_GEOSITE_URL = "rulesGeositeUrl"
     const val RULES_GEOIP_URL = "rulesGeoipUrl"
     const val RULES_UPDATE_INTERVAL = "rulesUpdateInterval"
+    // Auto-switch timeout settings
+    const val ENABLE_AUTO_SWITCH_TIMEOUT = "enableAutoSwitchTimeout"
+    const val AUTO_SWITCH_TIMEOUT_DURATION = "autoSwitchTimeoutDuration"
 
     // Protocol Settings
     const val GLOBAL_ALLOW_INSECURE = "globalAllowInsecure"
