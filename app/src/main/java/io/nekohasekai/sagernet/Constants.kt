@@ -270,6 +270,9 @@ object Key {
     const val WEBDAV_PATH = "webdavPath"
 
     const val GLOBAL_MODE = "globalMode"
+
+    const val VPN_WATCHDOG_ENABLED = "vpnWatchdogEnabled"
+    const val VPN_WATCHDOG_INTERVAL = "vpnWatchdogInterval"
 }
 
 object TunImplementation {

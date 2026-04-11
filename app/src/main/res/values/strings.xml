@@ -835,4 +835,11 @@
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
+
+    <string name="vpn_watchdog">Auto-reconnect</string>
+    <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
+    <string name="vpn_watchdog_test">🧪 Test watchdog</string>
+    <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
+    <string name="vpn_watchdog_interval">Check interval (sec)</string>
+
 </resources>

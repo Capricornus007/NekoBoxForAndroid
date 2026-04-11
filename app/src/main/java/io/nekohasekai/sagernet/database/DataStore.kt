@@ -124,6 +124,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     ) { true }
     var wakeResetConnections by configurationStore.boolean(Key.WAKE_RESET_CONNECTIONS)
 
+    var vpnWatchdogEnabled by configurationStore.boolean(Key.VPN_WATCHDOG_ENABLED) { false }
+    var vpnWatchdogInterval by configurationStore.stringToInt(Key.VPN_WATCHDOG_INTERVAL) { 7 }
+
     var isExpert by configurationStore.boolean(Key.APP_EXPERT)
     var appTheme by configurationStore.stringToInt(Key.APP_THEME) { 0 }
     var useSystemTheme by configurationStore.boolean(Key.USE_SYSTEM_THEME)

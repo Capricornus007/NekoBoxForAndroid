@@ -18,10 +18,14 @@ import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.ui.VpnRequestActivity
 import io.nekohasekai.sagernet.utils.Subnet
 import android.net.VpnService as BaseVpnService
+import kotlinx.coroutines.GlobalScope
 
 class VpnService :
     BaseVpnService(),
     BaseService.Interface {
+
+    private val watchdog = VpnWatchdog(this)
+
 
     companion object {
 
@@ -52,7 +56,8 @@ class VpnService :
 
     override suspend fun startProcesses() {
         DataStore.vpnService = this
-        super.startProcesses() // launch proxy instance
+        super.startProcesses()
+        watchdog.start(GlobalScope)
     }
 
     override var wakeLock: PowerManager.WakeLock? = null
@@ -66,10 +71,11 @@ class VpnService :
     @Suppress("EXPERIMENTAL_API_USAGE")
     override suspend fun killProcesses() {
         RootLanSharing.stopClientSharing(this)
+        watchdog.stop()
         conn?.close()
         conn = null
         super.killProcesses()
-    }
+}
 
     override fun onBind(intent: Intent) = when (intent.action) {
         SERVICE_INTERFACE -> super<BaseVpnService>.onBind(intent)

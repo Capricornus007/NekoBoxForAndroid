@@ -372,4 +372,28 @@
             app:title="@string/create_shortcut"
             app:summary="@string/create_clear_cache_shortcut_summary" />
     </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/vpn_watchdog">
+        <SwitchPreference
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_flip_camera_android_24"
+            app:key="vpnWatchdogEnabled"
+            app:title="@string/vpn_watchdog"
+            app:summary="@string/vpn_watchdog_summary" />
+
+        <EditTextPreference
+            app:defaultValue="7"
+            app:dependency="vpnWatchdogEnabled"
+            app:icon="@drawable/ic_baseline_shutter_speed_24"
+            app:key="vpnWatchdogInterval"
+            app:title="@string/vpn_watchdog_interval"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            app:dependency="vpnWatchdogEnabled"
+            app:icon="@drawable/ic_baseline_bug_report_24"
+            app:key="vpnWatchdogTest"
+            app:title="@string/vpn_watchdog_test"
+            app:summary="@string/vpn_watchdog_test_summary" />
+    </PreferenceCategory>
 </PreferenceScreen>

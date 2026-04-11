@@ -6,4 +6,26 @@
         app:title="@string/profile_name"
         app:useSimpleSummaryProvider="true" />
 
+    <SwitchPreference
+        app:defaultValue="false"
+        app:icon="@drawable/ic_baseline_flip_camera_android_24"
+        app:key="vpnWatchdogEnabled"
+        app:title="@string/vpn_watchdog"
+        app:summary="@string/vpn_watchdog_summary" />
+
+    <Preference
+        app:dependency="vpnWatchdogEnabled"
+        app:icon="@drawable/ic_baseline_bug_report_24"
+        app:key="vpnWatchdogTest"
+        app:title="@string/vpn_watchdog_test"
+        app:summary="@string/vpn_watchdog_test_summary" />
+
+    <EditTextPreference
+        app:defaultValue="7"
+        app:dependency="vpnWatchdogEnabled"
+        app:icon="@drawable/ic_baseline_shutter_speed_24"
+        app:key="vpnWatchdogInterval"
+        app:title="Интервал проверок (сек)"
+        app:useSimpleSummaryProvider="true" />
+
 </PreferenceScreen>
