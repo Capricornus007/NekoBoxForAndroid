@@ -5,10 +5,14 @@
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_marginBottom="8dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardElevation="2dp">
+    app:cardBackgroundColor="@color/zybc_surface"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/zybc_surface_border"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:id="@+id/content_lin"
@@ -21,7 +25,7 @@
             android:id="@+id/selected_view"
             android:layout_width="4dp"
             android:layout_height="match_parent"
-            android:background="?selectedColorPrimary"
+            android:background="@color/zybc_teal"
             android:orientation="horizontal"
             android:visibility="invisible"
             tools:visibility="visible" />
@@ -45,8 +49,8 @@
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:paddingLeft="12dp"
-                    android:paddingTop="8dp"
+                    android:paddingLeft="14dp"
+                    android:paddingTop="12dp"
                     android:paddingBottom="8dp">
 
                     <TextView
@@ -54,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="?android:attr/textColorPrimary"
+                        android:textColor="@color/white"
                         android:textStyle="bold"
                         tools:text="@string/profile_name" />
                 </LinearLayout>
@@ -68,6 +72,7 @@
                     android:contentDescription="@string/edit"
                     android:focusable="true"
                     android:padding="12dp"
+                    app:tint="@color/zybc_text_muted"
                     app:srcCompat="@drawable/ic_image_edit" />
 
                 <LinearLayout
@@ -90,6 +95,7 @@
                             android:id="@+id/shareIcon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            app:tint="@color/zybc_text_muted"
                             app:srcCompat="@drawable/ic_social_share" />
                     </LinearLayout>
 
@@ -105,6 +111,7 @@
                     android:focusable="true"
                     android:padding="12dp"
                     android:visibility="gone"
+                    app:tint="@color/zybc_text_muted"
                     app:srcCompat="@drawable/ic_action_delete" />
 
             </LinearLayout>
@@ -125,7 +132,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/server_address"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textColor="@color/zybc_text_muted" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -138,7 +145,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/traffic"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textColor="@color/zybc_text_muted" />
 
             </LinearLayout>
 
@@ -155,7 +162,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?attr/accentOrTextSecondary" />
+                    android:textColor="@color/zybc_text_muted" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -168,7 +175,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?attr/accentOrTextSecondary" />
+                    android:textColor="@color/zybc_text_muted" />
 
             </LinearLayout>
 

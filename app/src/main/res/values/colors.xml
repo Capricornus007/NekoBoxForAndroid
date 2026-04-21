@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <color name="zybc_bg_start">#04131B</color>
+    <color name="zybc_bg_end">#071E28</color>
+    <color name="zybc_surface">#0C2430</color>
+    <color name="zybc_surface_alt">#113342</color>
+    <color name="zybc_surface_border">#1B5062</color>
+    <color name="zybc_teal">#16D7D9</color>
+    <color name="zybc_teal_soft">#7AF2E2</color>
+    <color name="zybc_text_muted">#9FB9C4</color>
+    <color name="zybc_danger">#FF7A8A</color>
+
     <integer-array name="material_colors">
         <item>@color/material_red_500</item>
         <item>@color/color_pink_ssr</item>

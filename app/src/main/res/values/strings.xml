@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">NekoBox</string>
-    <string name="app_name_long" translatable="false">NekoBox for Android</string>
+    <string name="app_name" translatable="false">ZYBC VPN</string>
+    <string name="app_name_long" translatable="false">ZYBC VPN</string>
     <string name="app_desc">The universal proxy toolchain for Android, written in Kotlin.</string>
     <string name="project">Project</string>
     <string name="github">Source code</string>
@@ -65,7 +65,7 @@
     <string name="ws_max_early_data" translatable="false">Max early data</string>
     <string name="ws_browser_forwarding">Browser Forwarding</string>
     <string name="ws_browser_forwarding_sum">Forward corresponding WebSockets through the browser.</string>
-    <string name="speed_interval">Speed Notification Update Interval</string>
+    <string name="speed_interval">Update speed in notification</string>
     <string name="cag_misc">Misc Settings</string>
     <string name="show_stop">Show Stop Button</string>
     <string name="show_stop_sum">If you don’t want to use Quick Tile as the switch</string>
@@ -86,8 +86,8 @@
     <string name="connection_test_fail">Internet Unavailable</string>
     <string name="connection_test_error_status_code">Error code: #%d</string>
     <string name="cag_dns">DNS Settings</string>
-    <string name="remote_dns">Remote DNS</string>
-    <string name="direct_dns">Direct DNS</string>
+    <string name="remote_dns">DNS for VPN traffic</string>
+    <string name="direct_dns">DNS for direct traffic</string>
     <string name="enable_dns_routing">Enable DNS Routing</string>
     <string name="dns_routing_message">Resolve domains in bypass routes with Direct DNS. Be aware of
         potential DNS leaks</string>
@@ -160,7 +160,7 @@
     <string name="route_asset_no_update">No update</string>
     <string name="route_asset_updated">Updated</string>
     <string name="route_not_asset">Not an asset file: excepted .db, but %s</string>
-    <string name="route_opt_bypass_lan">Bypass LAN</string>
+    <string name="route_opt_bypass_lan">Do not route local network</string>
     <string name="route_opt_block_ads">Block ADs</string>
     <string name="route_opt_block_analysis">Block analysis</string>
     <string name="route_opt_block_quic">Block QUIC</string>
@@ -172,43 +172,45 @@
         productive. If the server does not support it, you will not be able to access the Internet.</string>
     <string name="mux_concurrency">Mux Concurrent Connections</string>
     <string name="tcp_keep_alive_interval">TCP keep active packet delivery interval</string>
-    <string name="proxied_apps">Apps handled by NekoBox</string>
+    <string name="proxied_apps">Apps handled by ZYBC VPN</string>
     <string name="proxied_apps_summary">Choose which apps are included in the Android VPN tunnel</string>
-    <string name="proxied_apps_summary_disabled">NekoBox is not limiting apps yet. For the simplest scenario, switch to On and select only the apps that should be handled by NekoBox. All others will work directly.</string>
+    <string name="proxied_apps_summary_disabled">ZYBC VPN is not limiting apps yet. For the simplest scenario, switch to On and select only the apps that should be handled by ZYBC VPN. All others will work directly.</string>
     <string name="proxied_apps_summary_bypass_mode">Bypass mode includes almost all apps in the VPN. For the simplest scenario, switch to On and select only the apps that should use VPN or ByeDPI. All others will work directly.</string>
-    <string name="proxied_apps_summary_on_selected">Step 1: NekoBox handles %1$d selected apps only. Apps not selected here work directly outside VPN.</string>
+    <string name="proxied_apps_summary_on_selected">Step 1: ZYBC VPN handles %1$d selected apps only. Apps not selected here work directly outside VPN.</string>
     <string name="proxied_apps_summary_legacy_ignored">Legacy app filter. While app traffic rules are configured, apps without a rule work directly and this switch is not used.</string>
     <string name="default_traffic_mode">Default mode for selected apps</string>
     <string name="byedpi_port">ByeDPI local port</string>
-    <string name="traffic_mode_protocol_support">Apps without a rule work directly. DPI bypass routes TCP through the embedded ByeDPI backend and leaves UDP on the normal direct path.</string>
-    <string name="app_traffic_rules">Selected apps: VPN or DPI bypass</string>
-    <string name="app_traffic_rules_summary">Choose how selected apps are handled inside NekoBox</string>
-    <string name="app_traffic_rules_summary_direct_default">Choose apps that should use VPN or DPI bypass. Apps without a rule work directly.</string>
+    <string name="traffic_mode_protocol_support">Apps without a rule work directly. DPI bypass is used only for the apps you choose.</string>
+    <string name="app_traffic_rules">Apps with VPN or DPI bypass</string>
+    <string name="app_traffic_rules_summary">Choose exceptions. Apps without a rule work directly.</string>
+    <string name="app_traffic_rules_summary_direct_default">Choose which apps should use VPN or DPI bypass. Everything else works directly.</string>
     <string name="app_traffic_rules_summary_explicit_only">%1$d apps configured • %2$d via VPN • %3$d via DPI bypass • all other apps direct</string>
     <string name="app_traffic_rules_summary_configured">%1$d rules configured: %2$d REMOTE_VPN, %3$d DPI_BYPASS</string>
     <string name="app_traffic_rules_empty">No app rules yet. Apps without a rule work directly.</string>
-    <string name="app_traffic_rule_for">How should %1$s work?</string>
+    <string name="app_traffic_rule_for">How should %1$s connect?</string>
     <string name="app_traffic_rules_validation_summary">Saved traffic rules have issues: %1$d duplicate, %2$d invalid, %3$d missing apps.</string>
     <string name="app_traffic_rules_conflict_summary">%1$d app rules are ineffective because Apps VPN mode excludes them.</string>
     <string name="app_traffic_rules_summary_full">Default %1$s • %2$d exceptions: %3$d VPN, %4$d ByeDPI</string>
     <string name="app_traffic_rules_summary_conflicted">Default %1$s • %2$d exceptions: %3$d VPN, %4$d ByeDPI • %5$d excluded by Apps VPN mode</string>
     <string name="default_traffic_mode_summary_remote">All apps use VPN by default. Mark selected apps as DPI bypass only if they should bypass the remote VPN path.</string>
     <string name="default_traffic_mode_summary_bypass">All apps use DPI bypass by default. Mark selected apps as VPN to send only those apps through the remote VPN path.</string>
-    <string name="default_traffic_mode_summary_remote_selected">For apps handled by NekoBox: VPN is the default. Apps without an app rule go through VPN.</string>
-    <string name="default_traffic_mode_summary_bypass_selected">For apps handled by NekoBox: DPI bypass is the default. Apps without an app rule go through DPI bypass.</string>
+    <string name="default_traffic_mode_summary_remote_selected">For apps handled by ZYBC VPN: VPN is the default. Apps without an app rule go through VPN.</string>
+    <string name="default_traffic_mode_summary_bypass_selected">For apps handled by ZYBC VPN: DPI bypass is the default. Apps without an app rule go through DPI bypass.</string>
     <string name="default_traffic_mode_summary_legacy">Legacy global mode. It is used only when no per-app traffic rules are configured.</string>
     <string name="default_traffic_mode_summary_rules_override">Per-app traffic rules are active. Apps without a rule work directly, so this setting is currently ignored.</string>
-    <string name="app_traffic_rules_scenario_direct_default">Current scenario: only apps with a rule are handled by NekoBox. Apps without a rule work directly.</string>
-    <string name="app_traffic_rules_scenario_explicit_only">Current scenario: %1$d apps handled by NekoBox • %2$d via VPN • %3$d via DPI bypass • all other apps direct.</string>
+    <string name="app_traffic_rules_scenario_direct_default">Current scenario: only apps with a rule are handled by ZYBC VPN. Apps without a rule work directly.</string>
+    <string name="app_traffic_rules_scenario_explicit_only">Current scenario: %1$d apps handled by ZYBC VPN • %2$d via VPN • %3$d via DPI bypass • all other apps direct.</string>
     <string name="app_traffic_rule_default_remote">Default: VPN</string>
     <string name="app_traffic_rule_default_bypass">Default: DPI bypass</string>
     <string name="app_traffic_rule_default_direct">Direct</string>
-    <string name="app_traffic_rule_force_remote">Via VPN</string>
-    <string name="app_traffic_rule_force_bypass">Via DPI bypass</string>
+    <string name="app_traffic_rule_force_remote">VPN</string>
+    <string name="app_traffic_rule_force_bypass">DPI bypass</string>
     <string name="traffic_mode_remote_vpn_choice">Use VPN</string>
     <string name="traffic_mode_dpi_bypass_choice">Use DPI bypass</string>
+    <string name="traffic_mode_direct_choice">Use direct connection</string>
     <string name="traffic_mode_remote_vpn">VPN</string>
     <string name="traffic_mode_dpi_bypass">DPI bypass</string>
+    <string name="loading_apps">Loading apps…</string>
     <string name="remove_traffic_mode_rule">Remove rule</string>
     <string name="runtime_backend_running">running</string>
     <string name="runtime_backend_off">off</string>
@@ -218,16 +220,33 @@
     <string name="runtime_backend_failed">failed</string>
     <string name="runtime_summary_connected">Remote %1$s • ByeDPI %2$s • Apps R:%3$d D:%4$d</string>
     <string name="runtime_summary_disconnected">Ready: Remote %1$s • ByeDPI %2$s • Apps R:%3$d D:%4$d</string>
+    <string name="home_title">VPN and DPI bypass for apps</string>
+    <string name="home_subtitle">Choose which apps use VPN or DPI bypass.</string>
+    <string name="home_routing_summary_empty">No exceptions yet. All apps work directly.</string>
+    <string name="home_routing_summary_format">%1$d apps use VPN • %2$d apps use DPI bypass • all others work directly.</string>
+    <string name="home_vpn_badge_format">VPN %1$d</string>
+    <string name="home_bypass_badge_format">DPI %1$d</string>
+    <string name="home_direct_badge">Direct by default</string>
+    <string name="home_action_apps">App rules</string>
+    <string name="home_action_route">Routes</string>
+    <string name="home_action_settings">Settings</string>
+    <string name="home_profiles_caption">Profiles and subscriptions below provide the connections used in your app rules.</string>
+    <string name="nav_header_subtitle">VPN, DPI bypass and direct routing in one place.</string>
+    <string name="settings_hero_title">Simple settings for everyday use</string>
+    <string name="settings_hero_subtitle">Choose appearance, app exceptions and DNS. The rest stays out of the way.</string>
+    <string name="profile_settings_hero_title">Profile details without the clutter</string>
+    <string name="profile_settings_hero_subtitle">Edit only what matters for this connection. Advanced fields stay inside the profile where they belong.</string>
     <string name="on">On</string>
     <string name="off">Off</string>
-    <string name="search_apps">Search…</string>
+    <string name="search_apps">Search apps…</string>
     <string name="scanning">Scanning…</string>
     <string name="invert_selections">Invert selections</string>
     <string name="clear_selections">Clear selections</string>
     <string name="bypass_apps">Bypass</string>
     <string name="show_system_apps">Show system apps</string>
+    <string name="show_system_apps_summary">Include Android system apps in the list of app rules.</string>
     <string name="auto_connect">Auto Connect</string>
-    <string name="auto_connect_summary">Enable proxy on startup/app update if it was running before</string>
+    <string name="auto_connect_summary">Reconnect automatically if it was active before</string>
     <string name="direct_boot_aware">Allow Toggling in Lock Screen</string>
     <string name="direct_boot_aware_summary">Your selected profile information will be less
         protected</string>
@@ -345,8 +364,7 @@
     <string name="apply">Apply</string>
     <string name="need_reload">Reload proxy service to apply changes</string>
     <string name="license">License</string>
-    <string name="route_warn">Make sure you have read the documentation before adding custom rules,
-        otherwise you may not be able to connect to the Internet.</string>
+    <string name="route_warn">Custom route rules can affect connectivity. Change them only if you know what they do.</string>
     <string name="lines">%d Lines</string>
     <string name="night_mode">Night Mode</string>
     <string name="follow_system">Follow System</string>
@@ -563,7 +581,7 @@
     <string name="domain_strategy_for_remote">Domain strategy for Remote</string>
     <string name="domain_strategy_for_direct">Domain strategy for Direct</string>
     <string name="domain_strategy_for_server">Domain strategy for Server address</string>
-    <string name="show_bottom_bar">Show bottom bar like SagerNet</string>
+    <string name="show_bottom_bar">Show bottom navigation</string>
     <string name="utls_fingerprint">uTLS fingerprint</string>
     <string name="custom_outbound_json">Custom outbound JSON</string>
     <string name="custom_config_json">Custom config JSON</string>
@@ -623,4 +641,9 @@
     <string name="minimize">Minimize</string>
     <string name="app_list_permission_denied">Unable to read installed apps.\nThis is usually because the system has restricted app read permissions.\nPlease grant permissions in the system settings.</string>
     <string name="open_app_settings">Open System Settings</string>
+
+    <plurals name="home_profiles_caption_groups">
+        <item quantity="one">%d group of profiles is ready below. Open app rules from the home actions when needed.</item>
+        <item quantity="other">%d groups of profiles are ready below. Open app rules from the home actions when needed.</item>
+    </plurals>
 </resources>

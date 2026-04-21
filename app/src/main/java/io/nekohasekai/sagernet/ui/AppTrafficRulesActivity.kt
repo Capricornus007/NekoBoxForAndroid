@@ -3,8 +3,10 @@ package io.nekohasekai.sagernet.ui
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.widget.ImageView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
@@ -16,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import io.nekohasekai.sagernet.BuildConfig
@@ -74,6 +77,16 @@ class AppTrafficRulesActivity : ThemedActivity() {
             binding.desc.text = "${app.packageName} (${app.uid})"
             val mode = ruleModes[app.packageName]
             binding.modeChip.text = modeLabel(mode)
+            val (chipBg, chipStroke, chipText) = when (mode) {
+                TrafficMode.REMOTE_VPN -> Triple(R.color.zybc_teal, R.color.zybc_teal, android.R.color.white)
+                TrafficMode.DPI_BYPASS -> Triple(R.color.zybc_surface_border, R.color.zybc_teal_soft, android.R.color.white)
+                null -> Triple(R.color.zybc_surface_alt, R.color.zybc_surface_border, android.R.color.white)
+            }
+            binding.modeChip.chipBackgroundColor =
+                ColorStateList.valueOf(getColor(chipBg))
+            binding.modeChip.chipStrokeColor =
+                ColorStateList.valueOf(getColor(chipStroke))
+            binding.modeChip.setTextColor(getColor(chipText))
             binding.modeChip.visibility = View.VISIBLE
         }
 
@@ -205,6 +218,18 @@ class AppTrafficRulesActivity : ThemedActivity() {
         updateEmptyState()
     }
 
+    private fun updateShowSystemAppsState() {
+        val check = binding.showSystemAppsCheck
+        val card: MaterialCardView = binding.showSystemAppsCard
+        check.visibility = if (showSystemApps) View.VISIBLE else View.GONE
+        card.setCardBackgroundColor(
+            getColor(if (showSystemApps) R.color.zybc_surface else R.color.zybc_surface_alt)
+        )
+        card.strokeColor = getColor(
+            if (showSystemApps) R.color.zybc_teal else R.color.zybc_surface_border
+        )
+    }
+
     private fun showValidationDiagnostics() {
         val report = DataStore.appTrafficRulesValidationReport
         AppTrafficRuleValidator.logReport("uiLoad", report)
@@ -233,20 +258,27 @@ class AppTrafficRulesActivity : ThemedActivity() {
     }
 
     private fun showModeDialog(app: InstalledApp) {
-        val options = buildList {
-            add(getString(R.string.traffic_mode_remote_vpn_choice))
-            add(getString(R.string.traffic_mode_dpi_bypass_choice))
-            if (ruleModes.containsKey(app.packageName)) {
-                add(getString(R.string.remove_traffic_mode_rule))
-            }
+        val options = arrayOf(
+            getString(R.string.traffic_mode_remote_vpn_choice),
+            getString(R.string.traffic_mode_dpi_bypass_choice),
+            getString(R.string.traffic_mode_direct_choice)
+        )
+        val currentSelection = when (ruleModes[app.packageName]) {
+            TrafficMode.REMOTE_VPN -> 0
+            TrafficMode.DPI_BYPASS -> 1
+            null -> 2
         }
+        var pendingSelection = currentSelection
 
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.app_traffic_rule_for, app.name))
-            .setItems(options.toTypedArray()) { _, which ->
-                when {
-                    which == 0 -> ruleModes[app.packageName] = TrafficMode.REMOTE_VPN
-                    which == 1 -> ruleModes[app.packageName] = TrafficMode.DPI_BYPASS
+            .setSingleChoiceItems(options, currentSelection) { _, which ->
+                pendingSelection = which
+            }
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                when (pendingSelection) {
+                    0 -> ruleModes[app.packageName] = TrafficMode.REMOTE_VPN
+                    1 -> ruleModes[app.packageName] = TrafficMode.DPI_BYPASS
                     else -> ruleModes.remove(app.packageName)
                 }
                 persistRules()
@@ -271,6 +303,7 @@ class AppTrafficRulesActivity : ThemedActivity() {
         }
 
         setSupportActionBar(binding.toolbar)
+        applyStatusBarInsetToToolbar(binding.toolbar)
         supportActionBar?.apply {
             setTitle(R.string.app_traffic_rules)
             setDisplayHomeAsUpEnabled(true)
@@ -290,9 +323,10 @@ class AppTrafficRulesActivity : ThemedActivity() {
             appsAdapter.filter.filter(it?.toString() ?: "")
         }
 
-        binding.showSystemApps.isChecked = showSystemApps
-        binding.showSystemApps.setOnCheckedChangeListener { _, isChecked ->
-            showSystemApps = isChecked
+        updateShowSystemAppsState()
+        binding.showSystemApps.setOnClickListener {
+            showSystemApps = !showSystemApps
+            updateShowSystemAppsState()
             appsAdapter.filter.filter(binding.search.text?.toString() ?: "")
         }
 

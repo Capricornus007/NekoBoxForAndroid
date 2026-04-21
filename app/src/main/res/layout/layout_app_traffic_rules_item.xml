@@ -6,23 +6,28 @@
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    app:cardElevation="2dp"
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="@color/zybc_surface"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/zybc_surface_border"
+    app:strokeWidth="1dp"
     tools:ignore="SelectableText">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginEnd="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:paddingStart="14dp"
+        android:paddingTop="11dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="11dp">
 
         <ImageView
             android:id="@+id/itemicon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="8dp"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
             android:importantForAccessibility="no"
             android:scaleType="fitCenter"
             tools:src="@android:drawable/sym_def_app_icon" />
@@ -30,10 +35,8 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginStart="14dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -42,18 +45,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="18sp"
+                android:maxLines="1"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 tools:text="Package label" />
 
             <TextView
                 android:id="@+id/desc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:breakStrategy="high_quality"
                 android:ellipsize="end"
-                android:textColor="?android:attr/textColorTertiary"
-                android:textSize="12sp"
+                android:maxLines="1"
+                android:textColor="@color/zybc_text_muted"
+                android:textSize="11sp"
                 tools:text="com.package.name (10000)" />
 
         </LinearLayout>
@@ -64,6 +71,13 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            app:chipCornerRadius="14dp"
+            app:chipBackgroundColor="@color/zybc_surface_alt"
+            app:chipStrokeColor="@color/zybc_surface_border"
+            app:chipStrokeWidth="1dp"
+            app:ensureMinTouchTargetSize="false"
             tools:text="Default: REMOTE_VPN" />
 
     </LinearLayout>

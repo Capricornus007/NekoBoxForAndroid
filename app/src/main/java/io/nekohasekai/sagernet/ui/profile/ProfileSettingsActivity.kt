@@ -9,6 +9,7 @@ import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.graphics.Color
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.Toast
@@ -21,6 +22,7 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.updatePadding
 import androidx.core.view.isVisible
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
@@ -92,13 +94,14 @@ abstract class ProfileSettingsActivity<T : AbstractBean>(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        applyStatusBarInsetToToolbar(toolbar)
         supportActionBar?.apply {
             setTitle(R.string.profile_config)
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_navigation_close)
         }
-
         if (savedInstanceState == null) {
             val editingId = intent.getLongExtra(EXTRA_PROFILE_ID, 0L)
             isSubscription = intent.getBooleanExtra(EXTRA_IS_SUBSCRIPTION, false)
@@ -231,6 +234,9 @@ abstract class ProfileSettingsActivity<T : AbstractBean>(
             super.onViewCreated(view, savedInstanceState)
 
             ViewCompat.setOnApplyWindowInsetsListener(listView, ListListener)
+            listView.setBackgroundColor(Color.TRANSPARENT)
+            listView.clipToPadding = false
+            listView.updatePadding(left = dp2px(12), top = dp2px(4), right = dp2px(12), bottom = dp2px(24))
 
             activity?.apply {
                 viewCreated(view, savedInstanceState)

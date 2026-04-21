@@ -62,7 +62,9 @@ class ConfigEditActivity : ThemedActivity() {
         binding = LayoutEditConfigBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(findViewById(R.id.toolbar))
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        applyStatusBarInsetToToolbar(toolbar)
         supportActionBar?.apply {
             setTitle(R.string.config_settings)
             setDisplayHomeAsUpEnabled(true)

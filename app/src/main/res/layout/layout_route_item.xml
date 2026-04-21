@@ -5,8 +5,12 @@
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    app:cardElevation="2dp">
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="@color/zybc_surface"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/zybc_surface_border"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:id="@+id/content_lin"
@@ -28,16 +32,16 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:paddingStart="12dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp">
+                android:paddingStart="16dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="10dp">
 
                 <TextView
                     android:id="@+id/profile_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@color/white"
                     android:textStyle="bold"
                     tools:text="@string/profile_name" />
             </LinearLayout>
@@ -53,6 +57,7 @@
                 android:focusable="true"
                 android:padding="12dp"
                 android:visibility="gone"
+                app:tint="@color/zybc_text_muted"
                 app:srcCompat="@drawable/ic_file_cloud_queue" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -64,6 +69,7 @@
                 android:contentDescription="@string/edit"
                 android:focusable="true"
                 android:padding="12dp"
+                app:tint="@color/zybc_text_muted"
                 app:srcCompat="@drawable/ic_image_edit" />
 
             <LinearLayout
@@ -87,6 +93,7 @@
                         android:id="@+id/shareIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        app:tint="@color/zybc_text_muted"
                         app:srcCompat="@drawable/ic_social_share" />
                 </LinearLayout>
 
@@ -99,7 +106,7 @@
             android:layout_height="wrap_content"
             android:gravity="bottom"
             android:orientation="horizontal"
-            android:paddingStart="12dp"
+            android:paddingStart="16dp"
             android:paddingEnd="8dp">
 
             <LinearLayout
@@ -113,7 +120,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?attr/accentOrTextSecondary" />
+                    android:textColor="@color/zybc_text_muted" />
 
                 <TextView
                     android:layout_marginTop="4dp"
@@ -122,7 +129,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?attr/accentOrTextSecondary" />
+                    android:textColor="@color/zybc_text_muted" />
 
             </LinearLayout>
 

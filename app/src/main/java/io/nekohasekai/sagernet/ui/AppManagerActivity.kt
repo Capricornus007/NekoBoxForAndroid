@@ -209,6 +209,7 @@ class AppManagerActivity : ThemedActivity() {
         }
 
         setSupportActionBar(binding.toolbar)
+        applyStatusBarInsetToToolbar(binding.toolbar)
         supportActionBar?.apply {
             setTitle(R.string.proxied_apps)
             setDisplayHomeAsUpEnabled(true)

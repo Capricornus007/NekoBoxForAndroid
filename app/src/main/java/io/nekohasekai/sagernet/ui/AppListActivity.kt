@@ -203,6 +203,7 @@ class AppListActivity : ThemedActivity() {
         }
 
         setSupportActionBar(binding.toolbar)
+        applyStatusBarInsetToToolbar(binding.toolbar)
         supportActionBar?.apply {
             setTitle(R.string.select_apps)
             setDisplayHomeAsUpEnabled(true)

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_zybc_main_gradient"
     android:duplicateParentState="false"
     android:orientation="vertical">
 
@@ -11,7 +12,8 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary">
+        android:background="@android:color/transparent"
+        android:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
@@ -23,12 +25,13 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                android:elevation="4dp"
+                android:background="@android:color/transparent"
+                android:elevation="0dp"
                 android:theme="?actionBarTheme"
                 android:touchscreenBlocksFocus="false"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
+                app:titleTextColor="@color/white"
                 app:title="@string/app_name" />
 
             <LinearLayout
@@ -40,8 +43,11 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    app:cardElevation="2dp">
+                    android:layout_margin="8dp"
+                    app:cardBackgroundColor="@color/zybc_surface"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/zybc_surface_border"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -62,12 +68,16 @@
                                 android:id="@+id/appProxyModeDisable"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                app:chipBackgroundColor="@color/nav_item_bg_zybc"
+                                android:textColor="@color/white"
                                 android:text="@string/off" />
 
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/appProxyModeOn"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                app:chipBackgroundColor="@color/nav_item_bg_zybc"
+                                android:textColor="@color/white"
                                 android:text="@string/route_proxy" />
 
                             <com.google.android.material.chip.Chip
@@ -75,6 +85,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checked="true"
+                                app:chipBackgroundColor="@color/nav_item_bg_zybc"
+                                android:textColor="@color/white"
                                 android:text="@string/bypass_apps" />
 
                         </com.google.android.material.chip.ChipGroup>
@@ -91,6 +103,9 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="8dp"
                                 android:layout_marginBottom="4dp"
+                                app:checkedIconTint="@color/zybc_teal"
+                                app:chipBackgroundColor="@color/nav_item_bg_zybc"
+                                android:textColor="@color/white"
                                 android:text="@string/show_system_apps" />
 
                             <com.google.android.material.chip.Chip
@@ -98,6 +113,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checkable="false"
+                                app:chipBackgroundColor="@color/nav_item_bg_zybc"
+                                android:textColor="@color/white"
                                 android:text="@string/auto_select_proxy_apps" />
 
                         </LinearLayout>
@@ -105,12 +122,17 @@
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/search_apps">
+                            android:hint="@string/search_apps"
+                            app:boxBackgroundColor="@color/zybc_surface_alt"
+                            app:boxStrokeColor="@color/zybc_surface_border"
+                            app:hintTextColor="@color/zybc_text_muted">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/search"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:textColorHint="@color/zybc_text_muted" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -129,6 +151,7 @@
         android:id="@+id/loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#6604131B"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -147,9 +170,9 @@
         android:scrollbarSize="0dp"
         android:visibility="gone"
         app:fastScrollAutoHide="true"
-        app:fastScrollPopupTextColor="?colorPrimary"
-        app:fastScrollThumbColor="?colorPrimary"
-        app:fastScrollThumbInactiveColor="?colorPrimary"
+        app:fastScrollPopupTextColor="@color/zybc_teal"
+        app:fastScrollThumbColor="@color/zybc_teal"
+        app:fastScrollThumbInactiveColor="@color/zybc_surface_border"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/layout_apps_item" />
 
