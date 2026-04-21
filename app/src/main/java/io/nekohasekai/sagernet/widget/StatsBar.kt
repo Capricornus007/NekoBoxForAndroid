@@ -13,7 +13,10 @@ import androidx.lifecycle.whenStarted
 import com.google.android.material.bottomappbar.BottomAppBar
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.bg.BaseService
+import io.nekohasekai.sagernet.bg.UnifiedTunnelStatus
+import io.nekohasekai.sagernet.bg.byedpi.ByeDpiStatus
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.TrafficMode
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +28,7 @@ class StatsBar @JvmOverloads constructor(
     defStyleAttr: Int = R.attr.bottomAppBarStyle,
 ) : BottomAppBar(context, attrs, defStyleAttr) {
     private lateinit var statusText: TextView
+    private lateinit var runtimeSummaryText: TextView
     private lateinit var txText: TextView
     private lateinit var rxText: TextView
     private lateinit var behavior: YourBehavior
@@ -70,6 +74,7 @@ class StatsBar @JvmOverloads constructor(
 
     override fun setOnClickListener(l: OnClickListener?) {
         statusText = findViewById(R.id.status)
+        runtimeSummaryText = findViewById(R.id.runtimeSummary)
         txText = findViewById(R.id.tx)
         rxText = findViewById(R.id.rx)
         super.setOnClickListener(l)
@@ -78,6 +83,41 @@ class StatsBar @JvmOverloads constructor(
     private fun setStatus(text: CharSequence) {
         statusText.text = text
         TooltipCompat.setTooltipText(this, text)
+    }
+
+    fun setRuntimeSummary(
+        serviceState: BaseService.State,
+        tunnelStatus: UnifiedTunnelStatus,
+    ) {
+        val remoteState = if (tunnelStatus.remoteRunning) {
+            context.getString(R.string.runtime_backend_running)
+        } else {
+            context.getString(R.string.runtime_backend_off)
+        }
+        val byeDpiState = context.getString(
+            when (tunnelStatus.byeDpiStatus) {
+                ByeDpiStatus.RUNNING -> R.string.runtime_backend_running
+                ByeDpiStatus.STARTING -> R.string.runtime_backend_starting
+                ByeDpiStatus.STOPPING -> R.string.runtime_backend_stopping
+                ByeDpiStatus.FAILED -> R.string.runtime_backend_failed
+                ByeDpiStatus.IDLE -> R.string.runtime_backend_idle
+            }
+        )
+        val rules = DataStore.appTrafficRules
+        val remoteCount = rules.count { it.trafficMode == TrafficMode.REMOTE_VPN }
+        val dpiBypassCount = rules.size - remoteCount
+        val formatRes = if (serviceState.started) {
+            R.string.runtime_summary_connected
+        } else {
+            R.string.runtime_summary_disconnected
+        }
+        runtimeSummaryText.text = context.getString(
+            formatRes,
+            remoteState,
+            byeDpiState,
+            remoteCount,
+            dpiBypassCount
+        )
     }
 
     fun changeState(state: BaseService.State) {

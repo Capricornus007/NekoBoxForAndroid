@@ -14,6 +14,9 @@ import androidx.activity.addCallback
 import androidx.annotation.IdRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.Lifecycle
 import androidx.preference.PreferenceDataStore
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
@@ -28,6 +31,7 @@ import io.nekohasekai.sagernet.aidl.SpeedDisplayData
 import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.SagerConnection
+import io.nekohasekai.sagernet.bg.UnifiedTunnelController
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.GroupManager
 import io.nekohasekai.sagernet.database.ProfileManager
@@ -49,6 +53,7 @@ import io.nekohasekai.sagernet.ktx.parseProxies
 import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import moe.matsuri.nb4a.utils.Util
+import kotlinx.coroutines.launch
 
 class MainActivity : ThemedActivity(),
     SagerConnection.Callback,
@@ -95,6 +100,13 @@ class MainActivity : ThemedActivity(),
 
         setContentView(binding.root)
         changeState(BaseService.State.Idle)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                UnifiedTunnelController.status.collect {
+                    refreshRuntimeSummary()
+                }
+            }
+        }
         connection.connect(this, this)
         DataStore.configurationStore.registerChangeListener(this)
         GroupManager.userInterface = GroupInterfaceAdapter(this)
@@ -362,11 +374,20 @@ class MainActivity : ThemedActivity(),
         msg: String? = null,
         animate: Boolean = false,
     ) {
+        val previousState = DataStore.serviceState
         DataStore.serviceState = state
 
-        binding.fab.changeState(state, DataStore.serviceState, animate)
+        binding.fab.changeState(state, previousState, animate)
         binding.stats.changeState(state)
+        refreshRuntimeSummary()
         if (msg != null) snackbar(getString(R.string.vpn_error, msg)).show()
+    }
+
+    private fun refreshRuntimeSummary() {
+        binding.stats.setRuntimeSummary(
+            DataStore.serviceState,
+            UnifiedTunnelController.statusSnapshot()
+        )
     }
 
     override fun snackbarInternal(text: CharSequence): Snackbar {
@@ -426,7 +447,9 @@ class MainActivity : ThemedActivity(),
     override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {
         when (key) {
             Key.SERVICE_MODE -> onBinderDied()
-            Key.PROXY_APPS, Key.BYPASS_MODE, Key.INDIVIDUAL -> {
+            Key.PROXY_APPS, Key.BYPASS_MODE, Key.INDIVIDUAL,
+            Key.APP_TRAFFIC_RULES, Key.DEFAULT_TRAFFIC_MODE -> {
+                refreshRuntimeSummary()
                 if (DataStore.serviceState.canStop) {
                     snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {
                         SagerNet.reloadService()

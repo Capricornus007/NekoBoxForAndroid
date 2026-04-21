@@ -45,6 +45,7 @@ class BaseService {
         var state = State.Stopped
         var proxy: ProxyInstance? = null
         var notification: ServiceNotification? = null
+        var unifiedController: UnifiedTunnelController? = null
 
         val receiver = broadcastReceiver { ctx, intent ->
             when (intent.action) {
@@ -212,7 +213,16 @@ class BaseService {
         }
 
         suspend fun startProcesses() {
-            data.proxy!!.launch()
+            val controller = data.unifiedController ?: UnifiedTunnelController().also {
+                data.unifiedController = it
+            }
+            val started = controller.start(DataStore.defaultTrafficMode, data.proxy)
+            if (!started) {
+                throw IllegalStateException(
+                    controller.lastErrorMessage()
+                        ?: "Failed to start unified runtime for ${DataStore.defaultTrafficMode}"
+                )
+            }
         }
 
         fun startRunner() {
@@ -222,6 +232,9 @@ class BaseService {
         }
 
         fun killProcesses() {
+            Logs.i("BaseService[killProcesses]: begin")
+            data.unifiedController?.stop()
+            data.unifiedController = null
             data.proxy?.close()
             wakeLock?.apply {
                 release()
@@ -230,6 +243,7 @@ class BaseService {
             runOnDefaultDispatcher {
                 DefaultNetworkListener.stop(this)
             }
+            Logs.i("BaseService[killProcesses]: complete")
         }
 
         fun stopRunner(restart: Boolean = false, msg: String? = null) {
@@ -358,6 +372,7 @@ class BaseService {
             data.changeState(State.Connecting)
             runOnMainDispatcher {
                 try {
+                    Logs.i("BaseService[startup]: profileId=${profile.id}, defaultMode=${DataStore.defaultTrafficMode}, selectedProxy=${DataStore.selectedProxy}")
                     data.notification = createNotification(ServiceNotification.genTitle(profile))
 
                     Executable.killAll()    // clean up old processes
@@ -372,6 +387,7 @@ class BaseService {
 
                     startProcesses()
                     data.changeState(State.Connected)
+                    Logs.i("BaseService[startup]: connected")
 
                     lateInit()
                 } catch (_: CancellationException) { // if the job was cancelled, it is canceller's responsibility to call stopRunner

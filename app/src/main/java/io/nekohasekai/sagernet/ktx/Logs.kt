@@ -6,6 +6,15 @@ import java.io.OutputStream
 
 object Logs {
 
+    private fun write(level: String, message: String) {
+        val formatted = "[$level] [${mkTag()}] $message"
+        runCatching {
+            Libcore.nekoLogPrintln(formatted)
+        }.onFailure {
+            System.err.println(formatted)
+        }
+    }
+
     private fun mkTag(): String {
         val stackTrace = Thread.currentThread().stackTrace
         return stackTrace[4].className.substringAfterLast(".")
@@ -14,43 +23,43 @@ object Logs {
     // level int use logrus.go
 
     fun d(message: String) {
-        Libcore.nekoLogPrintln("[Debug] [${mkTag()}] $message")
+        write("Debug", message)
     }
 
     fun d(message: String, exception: Throwable) {
-        Libcore.nekoLogPrintln("[Debug] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
+        write("Debug", message + "\n" + exception.stackTraceToString())
     }
 
     fun i(message: String) {
-        Libcore.nekoLogPrintln("[Info] [${mkTag()}] $message")
+        write("Info", message)
     }
 
     fun i(message: String, exception: Throwable) {
-        Libcore.nekoLogPrintln("[Info] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
+        write("Info", message + "\n" + exception.stackTraceToString())
     }
 
     fun w(message: String) {
-        Libcore.nekoLogPrintln("[Warning] [${mkTag()}] $message")
+        write("Warning", message)
     }
 
     fun w(message: String, exception: Throwable) {
-        Libcore.nekoLogPrintln("[Warning] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
+        write("Warning", message + "\n" + exception.stackTraceToString())
     }
 
     fun w(exception: Throwable) {
-        Libcore.nekoLogPrintln("[Warning] [${mkTag()}] " + exception.stackTraceToString())
+        write("Warning", exception.stackTraceToString())
     }
 
     fun e(message: String) {
-        Libcore.nekoLogPrintln("[Error] [${mkTag()}] $message")
+        write("Error", message)
     }
 
     fun e(message: String, exception: Throwable) {
-        Libcore.nekoLogPrintln("[Error] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
+        write("Error", message + "\n" + exception.stackTraceToString())
     }
 
     fun e(exception: Throwable) {
-        Libcore.nekoLogPrintln("[Error] [${mkTag()}] " + exception.stackTraceToString())
+        write("Error", exception.stackTraceToString())
     }
 
 }

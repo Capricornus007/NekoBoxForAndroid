@@ -3,10 +3,12 @@ package io.nekohasekai.sagernet.fmt
 import android.widget.Toast
 import io.nekohasekai.sagernet.*
 import io.nekohasekai.sagernet.bg.VpnService
+import io.nekohasekai.sagernet.bg.TrafficModePolicyResolver
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.ProxyEntity.Companion.TYPE_CONFIG
 import io.nekohasekai.sagernet.database.SagerDatabase
+import io.nekohasekai.sagernet.database.TrafficMode
 import io.nekohasekai.sagernet.fmt.ConfigBuildResult.IndexEntity
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.buildSingBoxOutboundHysteriaBean
@@ -23,6 +25,7 @@ import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean
 import io.nekohasekai.sagernet.fmt.v2ray.buildSingBoxOutboundStandardV2RayBean
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.fmt.wireguard.buildSingBoxOutboundWireguardBean
+import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.isIpAddress
 import io.nekohasekai.sagernet.ktx.mkPort
 import io.nekohasekai.sagernet.utils.PackageCache
@@ -45,6 +48,9 @@ const val TAG_PROXY = "proxy"
 const val TAG_DIRECT = "direct"
 const val TAG_BYPASS = "bypass"
 const val TAG_BLOCK = "block"
+const val TAG_BYEDPI = "byedpi-out"
+val TAG_BYEDPI_TCP_NETWORKS = listOf("tcp")
+val TAG_DIRECT_UDP_NETWORKS = listOf("udp")
 
 const val LOCALHOST = "127.0.0.1"
 
@@ -144,6 +150,9 @@ fun buildConfig(
     val needSniffOverride = DataStore.trafficSniffing == 2
     val externalIndexMap = ArrayList<IndexEntity>()
     val ipv6Mode = if (forTest) IPv6Mode.ENABLE else DataStore.ipv6Mode
+    val effectiveTrafficRules = TrafficModePolicyResolver.effectiveRules()
+    val hasByeDpiPolicies = DataStore.defaultTrafficMode == TrafficMode.DPI_BYPASS ||
+        effectiveTrafficRules.any { it.decision.mode == TrafficMode.DPI_BYPASS }
 
     fun genDomainStrategy(noAsIs: Boolean): String {
         return when {
@@ -479,6 +488,16 @@ fun buildConfig(
             tagMap[key] = buildChain(key, p)
         }
 
+        if (hasByeDpiPolicies) {
+            outbounds.add(Outbound_SocksOptions().apply {
+                type = "socks"
+                tag = TAG_BYEDPI
+                server = LOCALHOST
+                server_port = DataStore.byeDpiPort
+            })
+            Logs.i("Traffic split config: added ByeDPI local SOCKS outbound $TAG_BYEDPI at $LOCALHOST:${DataStore.byeDpiPort}")
+        }
+
         // apply user rules
         for (rule in extraRules) {
             if (rule.packages.isNotEmpty()) {
@@ -600,6 +619,50 @@ fun buildConfig(
                     route.rules.add(ruleObj)
                     route.rule_set.addAll(ruleSets)
                 }
+            }
+        }
+
+        if (isVPN && effectiveTrafficRules.isNotEmpty()) {
+            val groupedRules = effectiveTrafficRules.groupBy { it.decision.mode }
+
+            groupedRules.forEach { (mode, rulesForMode) ->
+                Logs.i(
+                    "Traffic split policy: mode=$mode packages=${rulesForMode.map { it.packageName }} uids=${rulesForMode.map { it.uid }}"
+                )
+            }
+
+            val explicitDpiUids = groupedRules[TrafficMode.DPI_BYPASS].orEmpty()
+                .map { it.uid }
+                .distinct()
+            val explicitRemoteUids = groupedRules[TrafficMode.REMOTE_VPN].orEmpty()
+                .map { it.uid }
+                .distinct()
+
+            if (explicitRemoteUids.isNotEmpty()) {
+                route.rules.add(Rule_DefaultOptions().apply {
+                    inbound = listOf("tun-in")
+                    network = listOf("tcp", "udp")
+                    user_id = explicitRemoteUids
+                    outbound = TAG_PROXY
+                })
+                Logs.i("Traffic split route: explicit REMOTE_VPN TCP+UDP uids=$explicitRemoteUids -> $TAG_PROXY")
+            }
+
+            if (explicitDpiUids.isNotEmpty()) {
+                route.rules.add(Rule_DefaultOptions().apply {
+                    inbound = listOf("tun-in")
+                    network = TAG_BYEDPI_TCP_NETWORKS
+                    user_id = explicitDpiUids
+                    outbound = TAG_BYEDPI
+                })
+                Logs.i("Traffic split route: explicit DPI_BYPASS TCP uids=$explicitDpiUids -> $TAG_BYEDPI")
+                route.rules.add(Rule_DefaultOptions().apply {
+                    inbound = listOf("tun-in")
+                    network = TAG_DIRECT_UDP_NETWORKS
+                    user_id = explicitDpiUids
+                    outbound = TAG_BYPASS
+                })
+                Logs.i("Traffic split route: explicit DPI_BYPASS UDP uids=$explicitDpiUids -> $TAG_BYPASS")
             }
         }
 

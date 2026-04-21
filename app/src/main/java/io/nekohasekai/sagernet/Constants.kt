@@ -15,6 +15,8 @@ object Key {
     const val SERVICE_MODE = "serviceMode"
     const val MODE_VPN = "vpn"
     const val MODE_PROXY = "proxy"
+    const val APP_TRAFFIC_RULES = "appTrafficRules"
+    const val DEFAULT_TRAFFIC_MODE = "defaultTrafficMode"
 
     const val GLOBAL_CUSTOM_CONFIG = "globalCustomConfig"
 
@@ -37,6 +39,7 @@ object Key {
     const val BYPASS_LAN_IN_CORE = "bypassLanInCore"
 
     const val MIXED_PORT = "mixedPort"
+    const val BYEDPI_PORT = "byeDpiPort"
     const val ALLOW_ACCESS = "allowAccess"
     const val SPEED_INTERVAL = "speedInterval"
     const val SHOW_DIRECT_SPEED = "showDirectSpeed"

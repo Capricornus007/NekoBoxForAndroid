@@ -13,6 +13,8 @@ import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.TrafficMode
+import io.nekohasekai.sagernet.database.TrafficRoutingDiagnosticsResolver
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.utils.Theme
@@ -21,6 +23,8 @@ import moe.matsuri.nb4a.ui.*
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private lateinit var isProxyApps: SwitchPreference
+    private lateinit var appTrafficRulesPreference: Preference
+    private lateinit var defaultTrafficModePreference: SimpleMenuPreference
 
     private lateinit var globalCustomConfig: EditConfigPreference
 
@@ -62,6 +66,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
         val mixedPort = findPreference<EditTextPreference>(Key.MIXED_PORT)!!
+        val byeDpiPort = findPreference<EditTextPreference>(Key.BYEDPI_PORT)!!
         val serviceMode = findPreference<Preference>(Key.SERVICE_MODE)!!
         val allowAccess = findPreference<Preference>(Key.ALLOW_ACCESS)!!
         val appendHttpProxy = findPreference<SwitchPreference>(Key.APPEND_HTTP_PROXY)!!
@@ -111,6 +116,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
 
         mixedPort.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
+        byeDpiPort.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
 
         val metedNetwork = findPreference<Preference>(Key.METERED_NETWORK)!!
         if (Build.VERSION.SDK_INT < 28) {
@@ -122,6 +128,15 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             if (newValue as Boolean) DataStore.dirty = true
             newValue
         }
+        updateProxyAppsSummary()
+        defaultTrafficModePreference = findPreference(Key.DEFAULT_TRAFFIC_MODE)!!
+        defaultTrafficModePreference.onPreferenceChangeListener = reloadListener
+        appTrafficRulesPreference = findPreference("appTrafficRulesScreen")!!
+        appTrafficRulesPreference.setOnPreferenceClickListener {
+            startActivity(Intent(activity, AppTrafficRulesActivity::class.java))
+            true
+        }
+        updateAppTrafficRulesSummary()
 
         val profileTrafficStatistics =
             findPreference<SwitchPreference>(Key.PROFILE_TRAFFIC_STATISTICS)!!
@@ -149,6 +164,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
 
         mixedPort.onPreferenceChangeListener = reloadListener
+        byeDpiPort.onPreferenceChangeListener = reloadListener
         appendHttpProxy.onPreferenceChangeListener = reloadListener
         showDirectSpeed.onPreferenceChangeListener = reloadListener
         trafficSniffing.onPreferenceChangeListener = reloadListener
@@ -175,9 +191,50 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         if (::isProxyApps.isInitialized) {
             isProxyApps.isChecked = DataStore.proxyApps
+            updateProxyAppsSummary()
+        }
+        if (::appTrafficRulesPreference.isInitialized) {
+            updateAppTrafficRulesSummary()
         }
         if (::globalCustomConfig.isInitialized) {
             globalCustomConfig.notifyChanged()
+        }
+    }
+
+    private fun updateAppTrafficRulesSummary() {
+        val diagnostics = TrafficRoutingDiagnosticsResolver.snapshot()
+        if (::defaultTrafficModePreference.isInitialized) {
+            defaultTrafficModePreference.isEnabled = diagnostics.ruleCount == 0
+            defaultTrafficModePreference.summary = if (diagnostics.ruleCount == 0) {
+                getString(R.string.default_traffic_mode_summary_legacy)
+            } else {
+                getString(R.string.default_traffic_mode_summary_rules_override)
+            }
+        }
+        val baseSummary = if (diagnostics.ruleCount == 0) {
+            getString(R.string.app_traffic_rules_summary_direct_default)
+        } else {
+            getString(
+                R.string.app_traffic_rules_summary_explicit_only,
+                diagnostics.ruleCount,
+                diagnostics.remoteRuleCount,
+                diagnostics.dpiBypassRuleCount
+            )
+        }
+        appTrafficRulesPreference.summary = baseSummary + "\n" + getString(R.string.traffic_mode_protocol_support)
+    }
+
+    private fun updateProxyAppsSummary() {
+        val hasExplicitTrafficRules = DataStore.appTrafficRulesValidationReport.normalizedRules.isNotEmpty()
+        isProxyApps.isEnabled = !hasExplicitTrafficRules
+        isProxyApps.summary = when {
+            hasExplicitTrafficRules -> getString(R.string.proxied_apps_summary_legacy_ignored)
+            !DataStore.proxyApps -> getString(R.string.proxied_apps_summary_disabled)
+            !DataStore.bypass -> getString(
+                R.string.proxied_apps_summary_on_selected,
+                DataStore.individual.lineSequence().count { it.isNotBlank() }
+            )
+            else -> getString(R.string.proxied_apps_summary_bypass_mode)
         }
     }
 

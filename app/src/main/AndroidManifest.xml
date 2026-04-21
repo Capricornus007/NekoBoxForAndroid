@@ -247,6 +247,13 @@
             android:launchMode="singleTask"
             android:parentActivityName=".ui.MainActivity" />
         <activity
+            android:name="io.nekohasekai.sagernet.ui.AppTrafficRulesActivity"
+            android:configChanges="uiMode"
+            android:excludeFromRecents="true"
+            android:label="@string/app_traffic_rules"
+            android:launchMode="singleTask"
+            android:parentActivityName=".ui.MainActivity" />
+        <activity
             android:name="io.nekohasekai.sagernet.ui.ScannerActivity"
             android:configChanges="uiMode"
             android:excludeFromRecents="true"

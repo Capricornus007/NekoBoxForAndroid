@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Build.VERSION_CODES
 import androidx.annotation.RequiresApi
 import io.nekohasekai.sagernet.SagerNet
+import io.nekohasekai.sagernet.bg.TrafficModePolicyResolver
 import io.nekohasekai.sagernet.bg.ServiceNotification
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.SagerDatabase
@@ -42,9 +43,18 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
     override fun findConnectionOwner(
         ipProto: Int, srcIp: String, srcPort: Int, destIp: String, destPort: Int
     ): Int {
-        return SagerNet.connectivity.getConnectionOwnerUid(
+        val uid = SagerNet.connectivity.getConnectionOwnerUid(
             ipProto, InetSocketAddress(srcIp, srcPort), InetSocketAddress(destIp, destPort)
         )
+        if (uid > 0) {
+            TrafficModePolicyResolver.logDecision(
+                "findConnectionOwner",
+                TrafficModePolicyResolver.resolve(uid = uid)
+            )
+        } else {
+            Logs.d("Traffic policy[findConnectionOwner]: uid unavailable for $srcIp:$srcPort -> $destIp:$destPort")
+        }
+        return uid
     }
 
     override fun packageNameByUid(uid: Int): String {
@@ -56,6 +66,10 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
 
         val packageNames = PackageCache.uidMap[uid]
         if (!packageNames.isNullOrEmpty()) for (packageName in packageNames) {
+            TrafficModePolicyResolver.logDecision(
+                "packageNameByUid",
+                TrafficModePolicyResolver.resolve(packageName = packageName, uid = uid)
+            )
             return packageName
         }
 

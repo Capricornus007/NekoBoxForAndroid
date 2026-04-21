@@ -221,6 +221,15 @@
         -->
     </string-array>
 
+    <string-array name="traffic_mode_entries">
+        <item>@string/traffic_mode_remote_vpn</item>
+        <item>@string/traffic_mode_dpi_bypass</item>
+    </string-array>
+    <string-array name="traffic_mode_values">
+        <item>REMOTE_VPN</item>
+        <item>DPI_BYPASS</item>
+    </string-array>
+
     <string-array name="route_protocol_entry">
         <item>TCP and UDP</item>
         <item>TCP</item>

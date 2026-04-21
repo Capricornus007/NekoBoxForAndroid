@@ -98,6 +98,24 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var appTheme by configurationStore.int(Key.APP_THEME)
     var nightTheme by configurationStore.stringToInt(Key.NIGHT_THEME)
     var serviceMode by configurationStore.string(Key.SERVICE_MODE) { Key.MODE_VPN }
+    var defaultTrafficModeName by configurationStore.string(Key.DEFAULT_TRAFFIC_MODE) { TrafficMode.REMOTE_VPN.name }
+    private var appTrafficRulesJson by configurationStore.string(Key.APP_TRAFFIC_RULES) { "" }
+
+    var defaultTrafficMode: TrafficMode
+        get() = runCatching { TrafficMode.valueOf(defaultTrafficModeName) }
+            .getOrDefault(TrafficMode.REMOTE_VPN)
+        set(value) {
+            defaultTrafficModeName = value.name
+        }
+
+    var appTrafficRules: List<AppTrafficRule>
+        get() = AppTrafficRuleSerializer.deserialize(appTrafficRulesJson)
+        set(value) {
+            appTrafficRulesJson = AppTrafficRuleSerializer.serialize(value)
+        }
+
+    val appTrafficRulesValidationReport: AppTrafficRuleValidationReport
+        get() = AppTrafficRuleValidator.validateSerialized(appTrafficRulesJson)
 
     var trafficSniffing by configurationStore.stringToInt(Key.TRAFFIC_SNIFFING) { 1 }
     var resolveDestination by configurationStore.boolean(Key.RESOLVE_DESTINATION)
@@ -129,9 +147,16 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         get() = getLocalPort(Key.MIXED_PORT, 2080)
         set(value) = saveLocalPort(Key.MIXED_PORT, value)
 
+    var byeDpiPort: Int
+        get() = parsePort(configurationStore.getString(Key.BYEDPI_PORT), 2080)
+        set(value) = configurationStore.putString(Key.BYEDPI_PORT, "$value")
+
     fun initGlobal() {
         if (configurationStore.getString(Key.MIXED_PORT) == null) {
             mixedPort = mixedPort
+        }
+        if (configurationStore.getString(Key.BYEDPI_PORT) == null) {
+            byeDpiPort = byeDpiPort
         }
     }
 

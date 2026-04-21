@@ -94,6 +94,17 @@
                     android:textSize="16sp"
                     tools:text="@string/connection_test_available" />
 
+                <TextView
+                    android:id="@+id/runtimeSummary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="fill_horizontal"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="?whiteOrTextPrimary"
+                    android:textSize="13sp"
+                    tools:text="@string/runtime_summary_disconnected" />
+
             </LinearLayout>
 
         </io.nekohasekai.sagernet.widget.StatsBar>

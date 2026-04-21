@@ -11,6 +11,7 @@ import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import io.nekohasekai.sagernet.*
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.TrafficMode
 import io.nekohasekai.sagernet.fmt.LOCALHOST
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.ktx.*
@@ -130,12 +131,27 @@ class VpnService : BaseVpnService(),
         val packageName = packageName
         val proxyApps = DataStore.proxyApps
         var bypass = DataStore.bypass
+        val explicitTrafficPackages = DataStore.appTrafficRulesValidationReport.normalizedRules
+            .filter { it.trafficMode == TrafficMode.REMOTE_VPN || it.trafficMode == TrafficMode.DPI_BYPASS }
+            .map { it.packageName }
+            .toSet()
         val workaroundSYSTEM = false /* DataStore.tunImplementation == TunImplementation.SYSTEM */
         val needBypassRootUid = workaroundSYSTEM || data.proxy!!.config.trafficMap.values.any {
             it[0].hysteriaBean?.protocol == HysteriaBean.PROTOCOL_FAKETCP
         }
 
-        if (proxyApps || needBypassRootUid) {
+        if (explicitTrafficPackages.isNotEmpty()) {
+            val added = mutableListOf<String>()
+            (explicitTrafficPackages + packageName).forEach {
+                try {
+                    builder.addAllowedApplication(it)
+                    added.add(it)
+                } catch (ex: PackageManager.NameNotFoundException) {
+                    Logs.w(ex)
+                }
+            }
+            Logs.d("Add allow by traffic rules: ${added.joinToString(", ")}")
+        } else if (proxyApps || needBypassRootUid) {
             val individual = mutableSetOf<String>()
             val allApps by lazy {
                 packageManager.getInstalledPackages(PackageManager.GET_PERMISSIONS).filter {
