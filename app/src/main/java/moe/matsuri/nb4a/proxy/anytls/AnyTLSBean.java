@@ -7,8 +7,8 @@ import com.esotericsoftware.kryo.io.ByteBufferOutput;
 
 import org.jetbrains.annotations.NotNull;
 
-import io.nekohasekai.sagernet.fmt.AbstractBean;
-import io.nekohasekai.sagernet.fmt.KryoConverters;
+import com.boristul.zybcvpn.fmt.AbstractBean;
+import com.boristul.zybcvpn.fmt.KryoConverters;
 
 public class AnyTLSBean extends AbstractBean {
 

@@ -1,11 +1,11 @@
 package moe.matsuri.nb4a
 
 import android.content.Context
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.database.ProxyEntity.Companion.TYPE_NEKO
-import io.nekohasekai.sagernet.fmt.AbstractBean
-import io.nekohasekai.sagernet.ktx.app
-import io.nekohasekai.sagernet.ktx.getColorAttr
+import com.boristul.zybcvpn.R
+import com.boristul.zybcvpn.database.ProxyEntity.Companion.TYPE_NEKO
+import com.boristul.zybcvpn.fmt.AbstractBean
+import com.boristul.zybcvpn.ktx.app
+import com.boristul.zybcvpn.ktx.getColorAttr
 import moe.matsuri.nb4a.proxy.config.ConfigBean
 
 // Settings for all protocols, built-in or plugin

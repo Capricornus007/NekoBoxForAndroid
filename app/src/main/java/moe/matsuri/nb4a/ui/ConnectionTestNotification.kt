@@ -2,9 +2,9 @@ package moe.matsuri.nb4a.ui
 
 import android.content.Context
 import androidx.core.app.NotificationCompat
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.SagerNet
-import io.nekohasekai.sagernet.ktx.Logs
+import com.boristul.zybcvpn.R
+import com.boristul.zybcvpn.SagerNet
+import com.boristul.zybcvpn.ktx.Logs
 
 class ConnectionTestNotification(val context: Context, val title: String) {
     private val channelId = "connection-test"

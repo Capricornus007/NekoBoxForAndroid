@@ -33,7 +33,7 @@ android {
         viewBinding = true
         aidl = true
     }
-    namespace = "io.nekohasekai.sagernet"
+    namespace = "com.boristul.zybcvpn"
     packaging {
         jniLibs {
             useLegacyPackaging = true

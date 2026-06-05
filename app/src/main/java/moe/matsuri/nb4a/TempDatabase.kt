@@ -3,8 +3,8 @@ package moe.matsuri.nb4a
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import io.nekohasekai.sagernet.SagerNet
-import io.nekohasekai.sagernet.database.preference.KeyValuePair
+import com.boristul.zybcvpn.SagerNet
+import com.boristul.zybcvpn.database.preference.KeyValuePair
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 

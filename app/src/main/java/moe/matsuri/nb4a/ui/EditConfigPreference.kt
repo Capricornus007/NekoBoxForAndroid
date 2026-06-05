@@ -4,12 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
 import androidx.preference.Preference
-import io.nekohasekai.sagernet.Key
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.ktx.Logs
-import io.nekohasekai.sagernet.ktx.app
-import io.nekohasekai.sagernet.ui.profile.ConfigEditActivity
+import com.boristul.zybcvpn.Key
+import com.boristul.zybcvpn.R
+import com.boristul.zybcvpn.database.DataStore
+import com.boristul.zybcvpn.ktx.Logs
+import com.boristul.zybcvpn.ktx.app
+import com.boristul.zybcvpn.ui.profile.ConfigEditActivity
 
 class EditConfigPreference : Preference {
 

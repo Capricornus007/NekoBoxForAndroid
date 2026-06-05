@@ -5,9 +5,9 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.system.ErrnoException
 import androidx.annotation.RequiresApi
-import io.nekohasekai.sagernet.SagerNet
-import io.nekohasekai.sagernet.ktx.Logs
-import io.nekohasekai.sagernet.ktx.runOnIoDispatcher
+import com.boristul.zybcvpn.SagerNet
+import com.boristul.zybcvpn.ktx.Logs
+import com.boristul.zybcvpn.ktx.runOnIoDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import libcore.ExchangeContext

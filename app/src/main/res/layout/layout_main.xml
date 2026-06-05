@@ -29,11 +29,11 @@
             app:indicatorColor="@color/zybc_teal_soft"
             app:layout_anchor="@+id/fab"
             app:layout_anchorGravity="center"
-            app:layout_behavior="io.nekohasekai.sagernet.widget.FabProgressBehavior"
+            app:layout_behavior="com.boristul.zybcvpn.widget.FabProgressBehavior"
             app:trackCornerRadius="@dimen/mtrl_progress_track_thickness"
             app:trackThickness="8dp" />
 
-        <io.nekohasekai.sagernet.widget.ServiceButton
+        <com.boristul.zybcvpn.widget.ServiceButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
             app:pressedTranslationZ="6dp"
             app:srcCompat="@drawable/ic_service_idle" />
 
-        <io.nekohasekai.sagernet.widget.StatsBar
+        <com.boristul.zybcvpn.widget.StatsBar
             android:id="@+id/stats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -128,7 +128,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-        </io.nekohasekai.sagernet.widget.StatsBar>
+        </com.boristul.zybcvpn.widget.StatsBar>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

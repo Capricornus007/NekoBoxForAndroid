@@ -25,8 +25,8 @@ import android.widget.Spinner
 import androidx.core.content.ContextCompat
 import androidx.preference.DropDownPreference
 import androidx.preference.PreferenceViewHolder
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.ktx.getColorAttr
+import com.boristul.zybcvpn.R
+import com.boristul.zybcvpn.ktx.getColorAttr
 
 /**
  * Bend [DropDownPreference] to support

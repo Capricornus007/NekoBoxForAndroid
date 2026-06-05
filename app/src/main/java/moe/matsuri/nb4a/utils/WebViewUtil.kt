@@ -5,7 +5,7 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import io.nekohasekai.sagernet.ktx.Logs
+import com.boristul.zybcvpn.ktx.Logs
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 

@@ -32,15 +32,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingStart="16dp"
-            android:paddingTop="8dp"
+            android:paddingTop="6dp"
             android:paddingEnd="16dp"
-            android:paddingBottom="10dp">
+            android:paddingBottom="8dp">
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/zybc_surface"
-                app:cardCornerRadius="24dp"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/zybc_surface_border"
                 app:strokeWidth="1dp">
@@ -49,85 +49,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingStart="18dp"
-                    android:paddingTop="18dp"
-                    android:paddingEnd="18dp"
-                    android:paddingBottom="18dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/app_traffic_rules"
-                        android:textAllCaps="true"
-                        android:textColor="@color/zybc_teal_soft"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/app_traffic_rules"
-                        android:textColor="@color/white"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:lineSpacingExtra="2dp"
-                        android:text="@string/app_traffic_rules_summary_direct_default"
-                        android:textColor="@color/zybc_text_muted"
-                        android:textSize="14sp" />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/rules_empty_card"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="14dp"
-                        android:visibility="gone"
-                        app:cardBackgroundColor="@color/zybc_surface_alt"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/zybc_surface_border"
-                        app:strokeWidth="1dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="14dp"
-                            android:text="@string/app_traffic_rules_empty"
-                            android:textColor="@color/zybc_text_muted" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/rules_scenario_card"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:cardBackgroundColor="@color/zybc_surface_alt"
-                        app:cardCornerRadius="18dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="@color/zybc_surface_border"
-                        app:strokeWidth="1dp">
-
-                        <TextView
-                            android:id="@+id/rules_scenario_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:padding="14dp"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
-                            tools:text="@string/app_traffic_rules_scenario_direct_default" />
-
-                    </com.google.android.material.card.MaterialCardView>
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="16dp">
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/show_system_apps_card"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
                         app:cardBackgroundColor="@color/zybc_surface_alt"
                         app:cardCornerRadius="18dp"
                         app:cardElevation="0dp"
@@ -189,7 +119,7 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="12dp"
                         android:hint="@string/search_apps"
                         app:boxBackgroundColor="@color/zybc_surface_alt"
                         app:boxBackgroundMode="filled"

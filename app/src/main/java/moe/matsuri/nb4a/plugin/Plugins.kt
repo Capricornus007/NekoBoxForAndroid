@@ -7,18 +7,18 @@ import android.content.pm.ProviderInfo
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
-import io.nekohasekai.sagernet.SagerNet
-import io.nekohasekai.sagernet.plugin.PluginManager.loadString
-import io.nekohasekai.sagernet.utils.PackageCache
+import com.boristul.zybcvpn.SagerNet
+import com.boristul.zybcvpn.plugin.PluginManager.loadString
+import com.boristul.zybcvpn.utils.PackageCache
 
 object Plugins {
-    const val AUTHORITIES_PREFIX_SEKAI_EXE = "io.nekohasekai.sagernet.plugin."
+    const val AUTHORITIES_PREFIX_SEKAI_EXE = "com.boristul.zybcvpn.plugin."
     const val AUTHORITIES_PREFIX_NEKO_EXE = "moe.matsuri.exe."
 
-    const val ACTION_NATIVE_PLUGIN = "io.nekohasekai.sagernet.plugin.ACTION_NATIVE_PLUGIN"
+    const val ACTION_NATIVE_PLUGIN = "com.boristul.zybcvpn.plugin.ACTION_NATIVE_PLUGIN"
 
-    const val METADATA_KEY_ID = "io.nekohasekai.sagernet.plugin.id"
-    const val METADATA_KEY_EXECUTABLE_PATH = "io.nekohasekai.sagernet.plugin.executable_path"
+    const val METADATA_KEY_ID = "com.boristul.zybcvpn.plugin.id"
+    const val METADATA_KEY_EXECUTABLE_PATH = "com.boristul.zybcvpn.plugin.executable_path"
 
     fun isExe(pkg: PackageInfo): Boolean {
         if (pkg.providers?.isEmpty() == true) return false
@@ -107,7 +107,7 @@ object Plugins {
                 flags or PackageManager.MATCH_DIRECT_BOOT_UNAWARE or PackageManager.MATCH_DIRECT_BOOT_AWARE
         }
         val list1 = SagerNet.application.packageManager.queryIntentContentProviders(
-            Intent(ACTION_NATIVE_PLUGIN, buildUri(pluginId, "io.nekohasekai.sagernet")), flags
+            Intent(ACTION_NATIVE_PLUGIN, buildUri(pluginId, "com.boristul.zybcvpn")), flags
         )
         val list2 = SagerNet.application.packageManager.queryIntentContentProviders(
             Intent(ACTION_NATIVE_PLUGIN, buildUri(pluginId, "moe.matsuri.lite")), flags

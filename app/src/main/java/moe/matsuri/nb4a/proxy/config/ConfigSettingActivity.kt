@@ -3,11 +3,11 @@ package moe.matsuri.nb4a.proxy.config
 import android.os.Bundle
 import androidx.preference.PreferenceDataStore
 import androidx.preference.PreferenceFragmentCompat
-import io.nekohasekai.sagernet.Key
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
-import io.nekohasekai.sagernet.ui.profile.ProfileSettingsActivity
+import com.boristul.zybcvpn.Key
+import com.boristul.zybcvpn.R
+import com.boristul.zybcvpn.database.DataStore
+import com.boristul.zybcvpn.database.preference.OnPreferenceDataStoreChangeListener
+import com.boristul.zybcvpn.ui.profile.ProfileSettingsActivity
 import moe.matsuri.nb4a.ui.EditConfigPreference
 
 class ConfigSettingActivity :

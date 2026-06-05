@@ -7,8 +7,8 @@ import com.esotericsoftware.kryo.io.ByteBufferOutput;
 
 import org.jetbrains.annotations.NotNull;
 
-import io.nekohasekai.sagernet.fmt.KryoConverters;
-import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean;
+import com.boristul.zybcvpn.fmt.KryoConverters;
+import com.boristul.zybcvpn.fmt.v2ray.StandardV2RayBean;
 
 public class ShadowTLSBean extends StandardV2RayBean {
 

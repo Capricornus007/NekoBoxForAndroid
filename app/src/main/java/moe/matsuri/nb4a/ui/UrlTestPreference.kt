@@ -7,8 +7,8 @@ import android.widget.LinearLayout
 import androidx.core.content.res.TypedArrayUtils
 import androidx.core.view.isVisible
 import androidx.preference.EditTextPreference
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.database.DataStore
+import com.boristul.zybcvpn.R
+import com.boristul.zybcvpn.database.DataStore
 
 class UrlTestPreference
 @JvmOverloads

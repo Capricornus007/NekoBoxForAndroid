@@ -2,9 +2,9 @@ package moe.matsuri.nb4a.proxy
 
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.ktx.Logs
-import io.nekohasekai.sagernet.ktx.readableMessage
+import com.boristul.zybcvpn.database.DataStore
+import com.boristul.zybcvpn.ktx.Logs
+import com.boristul.zybcvpn.ktx.readableMessage
 
 object Type {
     const val Text = 0

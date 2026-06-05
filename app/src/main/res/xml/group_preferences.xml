@@ -29,13 +29,13 @@
         app:key="groupIsSelector"
         app:title="@string/use_selector" />
 
-    <io.nekohasekai.sagernet.widget.OutboundPreference
+    <com.boristul.zybcvpn.widget.OutboundPreference
         app:icon="@drawable/ic_hardware_router"
         app:key="groupFrontProxy"
         app:title="@string/front_proxy"
         app:useSimpleSummaryProvider="true" />
 
-    <io.nekohasekai.sagernet.widget.OutboundPreference
+    <com.boristul.zybcvpn.widget.OutboundPreference
         app:icon="@drawable/baseline_public_24"
         app:key="groupLandingProxy"
         app:title="@string/landing_proxy"
@@ -45,7 +45,7 @@
         app:key="groupSubscription"
         app:title="@string/subscription_settings">
 
-        <io.nekohasekai.sagernet.widget.LinkOrContentPreference
+        <com.boristul.zybcvpn.widget.LinkOrContentPreference
             app:icon="@drawable/ic_baseline_link_24"
             app:key="subscriptionLink"
             app:title="@string/group_subscription_link"
@@ -73,7 +73,7 @@
             app:key="subscriptionUpdateWhenConnectedOnly"
             app:summary="@string/update_when_connected_only_sum"
             app:title="@string/update_when_connected_only" />
-        <io.nekohasekai.sagernet.widget.UserAgentPreference
+        <com.boristul.zybcvpn.widget.UserAgentPreference
             app:icon="@drawable/ic_baseline_grid_3x3_24"
             app:key="subscriptionUserAgent"
             app:title="@string/subscription_user_agent"

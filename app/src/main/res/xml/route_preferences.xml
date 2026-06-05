@@ -12,7 +12,7 @@
         app:title="@string/custom_config"
         app:useSimpleSummaryProvider="true" />
     <PreferenceCategory app:title="@string/cag_route">
-        <io.nekohasekai.sagernet.widget.AppListPreference
+        <com.boristul.zybcvpn.widget.AppListPreference
             app:icon="@drawable/ic_baseline_legend_toggle_24"
             app:key="routePackages"
             app:title="@string/apps" />
@@ -55,7 +55,7 @@
             app:key="routeProtocol"
             app:title="protocol"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.OutboundPreference
+        <com.boristul.zybcvpn.widget.OutboundPreference
             app:icon="@drawable/ic_hardware_router"
             app:key="routeOutbound"
             app:title="outbound"

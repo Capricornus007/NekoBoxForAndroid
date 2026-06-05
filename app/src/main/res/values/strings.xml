@@ -180,6 +180,7 @@
     <string name="proxied_apps_summary_legacy_ignored">Legacy app filter. While app traffic rules are configured, apps without a rule work directly and this switch is not used.</string>
     <string name="default_traffic_mode">Default mode for selected apps</string>
     <string name="byedpi_port">ByeDPI local port</string>
+    <string name="mixed_port">Local proxy port</string>
     <string name="traffic_mode_protocol_support">Apps without a rule work directly. DPI bypass is used only for the apps you choose.</string>
     <string name="app_traffic_rules">Apps with VPN or DPI bypass</string>
     <string name="app_traffic_rules_summary">Choose exceptions. Apps without a rule work directly.</string>

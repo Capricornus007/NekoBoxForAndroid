@@ -33,7 +33,7 @@ void reset_params(void) {
 }
 
 JNIEXPORT jint JNICALL
-Java_io_nekohasekai_sagernet_bg_byedpi_ByeDpiNativeProxy_jniStartProxy(
+Java_com_boristul_zybcvpn_bg_byedpi_ByeDpiNativeProxy_jniStartProxy(
         JNIEnv *env,
         __attribute__((unused)) jobject thiz,
         jobjectArray args
@@ -89,7 +89,7 @@ Java_io_nekohasekai_sagernet_bg_byedpi_ByeDpiNativeProxy_jniStartProxy(
 }
 
 JNIEXPORT jint JNICALL
-Java_io_nekohasekai_sagernet_bg_byedpi_ByeDpiNativeProxy_jniStopProxy(
+Java_com_boristul_zybcvpn_bg_byedpi_ByeDpiNativeProxy_jniStopProxy(
         __attribute__((unused)) JNIEnv *env,
         __attribute__((unused)) jobject thiz
 ) {
@@ -107,7 +107,7 @@ Java_io_nekohasekai_sagernet_bg_byedpi_ByeDpiNativeProxy_jniStopProxy(
 }
 
 JNIEXPORT jint JNICALL
-Java_io_nekohasekai_sagernet_bg_byedpi_ByeDpiNativeProxy_jniForceClose(
+Java_com_boristul_zybcvpn_bg_byedpi_ByeDpiNativeProxy_jniForceClose(
         __attribute__((unused)) JNIEnv *env,
         __attribute__((unused)) jobject thiz
 ) {

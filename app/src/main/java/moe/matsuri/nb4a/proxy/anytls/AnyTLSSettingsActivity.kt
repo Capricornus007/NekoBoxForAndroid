@@ -3,11 +3,11 @@ package moe.matsuri.nb4a.proxy.anytls
 import android.os.Bundle
 import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
-import io.nekohasekai.sagernet.Key
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
-import io.nekohasekai.sagernet.ktx.applyDefaultValues
-import io.nekohasekai.sagernet.ui.profile.ProfileSettingsActivity
+import com.boristul.zybcvpn.Key
+import com.boristul.zybcvpn.R
+import com.boristul.zybcvpn.database.preference.EditTextPreferenceModifiers
+import com.boristul.zybcvpn.ktx.applyDefaultValues
+import com.boristul.zybcvpn.ui.profile.ProfileSettingsActivity
 import moe.matsuri.nb4a.proxy.PreferenceBinding
 import moe.matsuri.nb4a.proxy.PreferenceBindingManager
 import moe.matsuri.nb4a.proxy.Type

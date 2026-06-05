@@ -22,8 +22,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.nekohasekai.sagernet.BuildConfig;
-import io.nekohasekai.sagernet.ktx.Logs;
+import com.boristul.zybcvpn.BuildConfig;
+import com.boristul.zybcvpn.ktx.Logs;
 import kotlin.text.StringsKt;
 
 public class JavaUtil {

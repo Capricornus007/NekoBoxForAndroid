@@ -8,7 +8,7 @@ import android.widget.EditText
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceViewHolder
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import io.nekohasekai.sagernet.R
+import com.boristul.zybcvpn.R
 
 class MTUPreference
 @JvmOverloads constructor(

@@ -18,8 +18,8 @@ import androidx.core.view.setPadding
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.ktx.getColorAttr
+import com.boristul.zybcvpn.R
+import com.boristul.zybcvpn.ktx.getColorAttr
 import kotlin.math.roundToInt
 
 class ColorPickerPreference

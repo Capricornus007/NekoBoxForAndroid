@@ -1,6 +1,6 @@
 package moe.matsuri.nb4a.proxy.shadowtls
 
-import io.nekohasekai.sagernet.fmt.v2ray.buildSingBoxOutboundTLS
+import com.boristul.zybcvpn.fmt.v2ray.buildSingBoxOutboundTLS
 import moe.matsuri.nb4a.SingBoxOptions
 
 fun buildSingBoxOutboundShadowTLSBean(bean: ShadowTLSBean): SingBoxOptions.Outbound_ShadowTLSOptions {

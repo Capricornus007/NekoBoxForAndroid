@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import io.nekohasekai.sagernet.databinding.ItemKeyboardKeyBinding
+import com.boristul.zybcvpn.databinding.ItemKeyboardKeyBinding
 
 class ExtendedKeyboard @JvmOverloads constructor(
     context: Context,

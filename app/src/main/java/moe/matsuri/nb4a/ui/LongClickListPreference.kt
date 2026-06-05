@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceViewHolder
-import io.nekohasekai.sagernet.R
+import com.boristul.zybcvpn.R
 
 class LongClickListPreference
 @JvmOverloads constructor(

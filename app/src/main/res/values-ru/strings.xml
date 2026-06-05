@@ -371,6 +371,8 @@
 <string name="route_opt_block_analysis">Блокировать аналитику</string>
 <string name="route_opt_block_quic">Блокировать QUIC</string>
 <string name="route_opt_bypass_lan">Не пропускать локальную сеть через VPN</string>
+<string name="mixed_port">Порт локального прокси</string>
+<string name="byedpi_port">Локальный порт ByeDPI</string>
 <string name="route_play_store">Правило Play Store для %s</string>
 <string name="route_profile">Выбрать профиль…</string>
 <string name="route_proxy">Прокси</string>

@@ -1,6 +1,6 @@
 package moe.matsuri.nb4a
 
-import io.nekohasekai.sagernet.database.DataStore
+import com.boristul.zybcvpn.database.DataStore
 import moe.matsuri.nb4a.SingBoxOptions.RuleSet
 
 object SingBoxOptionsUtil {

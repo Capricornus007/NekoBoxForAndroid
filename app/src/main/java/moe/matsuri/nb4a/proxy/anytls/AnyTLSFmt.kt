@@ -1,9 +1,9 @@
 package moe.matsuri.nb4a.proxy.anytls
 
-import io.nekohasekai.sagernet.ktx.blankAsNull
-import io.nekohasekai.sagernet.ktx.linkBuilder
-import io.nekohasekai.sagernet.ktx.toLink
-import io.nekohasekai.sagernet.ktx.urlSafe
+import com.boristul.zybcvpn.ktx.blankAsNull
+import com.boristul.zybcvpn.ktx.linkBuilder
+import com.boristul.zybcvpn.ktx.toLink
+import com.boristul.zybcvpn.ktx.urlSafe
 import moe.matsuri.nb4a.SingBoxOptions
 import moe.matsuri.nb4a.utils.listByLineOrComma
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull

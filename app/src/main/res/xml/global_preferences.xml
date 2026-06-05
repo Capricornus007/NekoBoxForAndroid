@@ -24,6 +24,18 @@
             app:key="appTrafficRulesScreen"
             app:summary="@string/app_traffic_rules_summary"
             app:title="@string/app_traffic_rules" />
+        <EditTextPreference
+            app:defaultValue="2080"
+            app:icon="@drawable/ic_navigation_apps"
+            app:key="mixedPort"
+            app:title="@string/mixed_port"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="1080"
+            app:icon="@drawable/ic_notification_enhanced_encryption"
+            app:key="byeDpiPort"
+            app:title="@string/byedpi_port"
+            app:useSimpleSummaryProvider="true" />
         <SwitchPreference
             app:icon="@drawable/ic_baseline_compare_arrows_24"
             app:key="bypassLan"
