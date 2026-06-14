@@ -82,6 +82,20 @@ object Util {
             if (ret != null) return ret
         }
 
+        // If it failed because of missing padding, try manually padding it
+        val stripped = str.replace("\\s".toRegex(), "")
+        val padCount = (4 - stripped.length % 4) % 4
+        if (padCount > 0) {
+            val paddedStr = str + "=".repeat(padCount)
+            for (flag in flags) {
+                try {
+                    ret = Base64.decode(paddedStr, flag)
+                } catch (_: Exception) {
+                }
+                if (ret != null) return ret
+            }
+        }
+
         throw IllegalStateException("Cannot decode base64")
     }
 
