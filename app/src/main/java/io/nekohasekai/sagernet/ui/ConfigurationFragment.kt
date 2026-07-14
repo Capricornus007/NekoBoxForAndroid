@@ -1963,12 +1963,26 @@ class ConfigurationFragment @JvmOverloads constructor(
                             val cached = configurationList[update.id] ?: continue
                             if (cached.tx == update.tx && cached.rx == update.rx) continue
 
+                            val previouslyShowedTraffic = cached.tx + cached.rx != 0L
+
                             cached.tx = update.tx
                             cached.rx = update.rx
-                            if (configurationListView.scrollState != RecyclerView.SCROLL_STATE_IDLE) {
-                                pendingTrafficUpdates.add(update.id)
-                            } else {
-                                updateVisibleTraffic(update.id)
+                            val holder = configurationListView.findViewHolderForItemId(update.id)
+                                as? ConfigurationHolder ?: continue
+                            val index = holder.bindingAdapterPosition
+                            val previous = holder.lastSelfHasMiddleRow
+                            val showTraffic = cached.tx + cached.rx != 0L
+
+                            if (previous == null || previouslyShowedTraffic != showTraffic) {
+                                holder.bind(cached)
+                            } else if (showTraffic) {
+                                holder.bindTraffic(cached)
+                            }
+
+                            if (index != RecyclerView.NO_POSITION && previous != null &&
+                                previous != holder.lastSelfHasMiddleRow
+                            ) {
+                                refreshSameRowNeighbours(index)
                             }
                         }
                     }
