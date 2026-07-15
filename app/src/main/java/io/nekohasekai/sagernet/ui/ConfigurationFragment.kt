@@ -1687,11 +1687,20 @@ class ConfigurationFragment @JvmOverloads constructor(
                 val profileId = holder.itemId
                 val cached = configurationList[profileId] ?: return
                 if (holder.lastBoundTx == cached.tx && holder.lastBoundRx == cached.rx) return
-                if (configurationListView.scrollState != RecyclerView.SCROLL_STATE_IDLE) {
-                    pendingTrafficUpdates.add(profileId)
-                    return
+                configurationListView.post {
+                    if (!holder.itemView.isAttachedToWindow || holder.itemId != profileId) {
+                        return@post
+                    }
+                    val latest = configurationList[profileId] ?: return@post
+                    if (holder.lastBoundTx == latest.tx && holder.lastBoundRx == latest.rx) {
+                        return@post
+                    }
+                    if (configurationListView.scrollState != RecyclerView.SCROLL_STATE_IDLE) {
+                        pendingTrafficUpdates.add(profileId)
+                    } else {
+                        updateVisibleTraffic(profileId, holder)
+                    }
                 }
-                updateVisibleTraffic(profileId, holder)
             }
 
             private fun updateVisibleTraffic(
@@ -1963,26 +1972,12 @@ class ConfigurationFragment @JvmOverloads constructor(
                             val cached = configurationList[update.id] ?: continue
                             if (cached.tx == update.tx && cached.rx == update.rx) continue
 
-                            val previouslyShowedTraffic = cached.tx + cached.rx != 0L
-
                             cached.tx = update.tx
                             cached.rx = update.rx
-                            val holder = configurationListView.findViewHolderForItemId(update.id)
-                                as? ConfigurationHolder ?: continue
-                            val index = holder.bindingAdapterPosition
-                            val previous = holder.lastSelfHasMiddleRow
-                            val showTraffic = cached.tx + cached.rx != 0L
-
-                            if (previous == null || previouslyShowedTraffic != showTraffic) {
-                                holder.bind(cached)
-                            } else if (showTraffic) {
-                                holder.bindTraffic(cached)
-                            }
-
-                            if (index != RecyclerView.NO_POSITION && previous != null &&
-                                previous != holder.lastSelfHasMiddleRow
-                            ) {
-                                refreshSameRowNeighbours(index)
+                            if (configurationListView.scrollState != RecyclerView.SCROLL_STATE_IDLE) {
+                                pendingTrafficUpdates.add(update.id)
+                            } else {
+                                updateVisibleTraffic(update.id)
                             }
                         }
                     }
