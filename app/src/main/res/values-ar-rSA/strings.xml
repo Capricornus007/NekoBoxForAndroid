@@ -608,11 +608,13 @@
     <string name="open_app_settings">فتح إعدادات النظام</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">المفتاح السري</string>
+    <string name="snell_psk">Pre-shared Key</string>
+    <string name="snell_userkey">User Key</string>
     <string name="snell_version">الإصدار</string>
-    <string name="snell_network">البروتوكول</string>
-    <string name="snell_obfs_mode">وضع Obfs</string>
-    <string name="snell_obfs_host">مضيف Obfs</string>
+    <string name="snell_network">الشبكة</string>
+    <string name="snell_obfs_mode">Obfs Mode</string>
+    <string name="snell_obfs_host">Obfs Host</string>
+    <string name="snell_mode">الوضع</string>
     <string name="snell_reuse">إعادة الاستخدام</string>
-    <string name="snell_reuse_summary">v4/v5 فقط</string>
+    <string name="snell_reuse_summary">v4-v6 only</string>
 </resources>
