@@ -12,6 +12,8 @@
     <string name="menu_group">グループ</string>
     <string name="menu_about">概要</string>
     <string name="theme">テーマ</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
     <string name="document">ドキュメント</string>
     <string name="group_default">未グループ化</string>
     <string name="quick_toggle">トグル</string>
@@ -600,11 +602,13 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="open_app_settings">システム設定を開く</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">鍵</string>
+    <string name="snell_psk">事前共有鍵</string>
+    <string name="snell_userkey">ユーザー鍵</string>
     <string name="snell_version">バージョン</string>
-    <string name="snell_network">プロトコル</string>
-    <string name="snell_obfs_mode">Obfs モード</string>
-    <string name="snell_obfs_host">Obfs ホスト</string>
+    <string name="snell_network">ネットワーク</string>
+    <string name="snell_obfs_mode">Obfsモード</string>
+    <string name="snell_obfs_host">Obfsホスト</string>
+    <string name="snell_mode">モード</string>
     <string name="snell_reuse">再利用</string>
-    <string name="snell_reuse_summary">v4/v5のみ</string>
+    <string name="snell_reuse_summary">v4-v6のみ</string>
 </resources>

@@ -12,6 +12,8 @@
     <string name="menu_group">Grup</string>
     <string name="menu_about">Hakkında</string>
     <string name="theme">Tema</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
     <string name="document">Belge</string>
     <string name="group_default">Gruplanmamış</string>
     <string name="quick_toggle">Aç/Kapat</string>
@@ -604,11 +606,13 @@
     <string name="open_app_settings">Sistem Ayarlarını Aç</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">Anahtar</string>
+    <string name="snell_psk">Ön Paylaşımlı Anahtar</string>
+    <string name="snell_userkey">Kullanıcı Anahtarı</string>
     <string name="snell_version">Sürüm</string>
-    <string name="snell_network">Protokol</string>
+    <string name="snell_network">Ağ</string>
     <string name="snell_obfs_mode">Obfs Modu</string>
-    <string name="snell_obfs_host">Obfs Sunucu</string>
+    <string name="snell_obfs_host">Obfs Sunucusu</string>
+    <string name="snell_mode">Mod</string>
     <string name="snell_reuse">Tekrar Kullan</string>
-    <string name="snell_reuse_summary">Sadece v4/v5</string>
+    <string name="snell_reuse_summary">Yalnızca v4-v6</string>
 </resources>

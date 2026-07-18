@@ -12,6 +12,8 @@
     <string name="menu_group">Gruppe</string>
     <string name="menu_about">Om</string>
     <string name="theme">Tema</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
     <string name="document">Dokument</string>
     <string name="group_default">Ugruppert</string>
     <string name="quick_toggle">Veksle</string>
@@ -606,11 +608,13 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="open_app_settings">Åpne systeminnstillinger</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">Nøkkel</string>
+    <string name="snell_psk">Forhåndsdelt nøkkel</string>
+    <string name="snell_userkey">Brukernøkkel</string>
     <string name="snell_version">Versjon</string>
-    <string name="snell_network">Protokoll</string>
+    <string name="snell_network">Nettverk</string>
     <string name="snell_obfs_mode">Obfs-modus</string>
-    <string name="snell_obfs_host">Obfs-host</string>
+    <string name="snell_obfs_host">Obfs-vert</string>
+    <string name="snell_mode">Modus</string>
     <string name="snell_reuse">Gjenbruk</string>
-    <string name="snell_reuse_summary">kun v4/v5</string>
+    <string name="snell_reuse_summary">kun v4-v6</string>
 </resources>

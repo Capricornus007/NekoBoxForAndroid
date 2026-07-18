@@ -12,6 +12,8 @@
     <string name="menu_group">Grup</string>
     <string name="menu_about">Tentang</string>
     <string name="theme">Tema</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
     <string name="document">Dokumen</string>
     <string name="group_default">Tanpa grup</string>
     <string name="quick_toggle">Alihkan</string>
@@ -615,11 +617,13 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="open_app_settings">Buka Pengaturan Sistem</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">Kunci</string>
+    <string name="snell_psk">Kunci Pra-berbagi</string>
+    <string name="snell_userkey">Kunci Pengguna</string>
     <string name="snell_version">Versi</string>
-    <string name="snell_network">Protokol</string>
+    <string name="snell_network">Jaringan</string>
     <string name="snell_obfs_mode">Mode Obfs</string>
     <string name="snell_obfs_host">Host Obfs</string>
+    <string name="snell_mode">Mode</string>
     <string name="snell_reuse">Gunakan Ulang</string>
-    <string name="snell_reuse_summary">hanya v4/v5</string>
+    <string name="snell_reuse_summary">hanya v4-v6</string>
 </resources>
