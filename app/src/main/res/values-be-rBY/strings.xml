@@ -12,8 +12,8 @@
     <string name="menu_group">Група</string>
     <string name="menu_about">Пра праграму</string>
     <string name="theme">Тэма</string>
-    <string name="use_system_theme">Use system theme</string>
-    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
+    <string name="use_system_theme">Выкарыстоўваць сістэмную тэму</string>
+    <string name="use_system_theme_summary">Выкарыстоўваць сістэмныя колеры Monet (Android 12+)</string>
     <string name="document">Дакумент</string>
     <string name="group_default">Без групы</string>
     <string name="quick_toggle">Пераключыць</string>
