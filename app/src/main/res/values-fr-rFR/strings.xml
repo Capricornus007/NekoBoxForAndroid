@@ -12,6 +12,8 @@
     <string name="menu_group">Groupe</string>
     <string name="menu_about">À propos</string>
     <string name="theme">Thème</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
     <string name="document">Document</string>
     <string name="group_default">Non groupé</string>
     <string name="quick_toggle">Basculer</string>
@@ -620,13 +622,13 @@
     <string name="open_app_settings">Ouvrir les paramètres système</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">Pre-shared Key</string>
-    <string name="snell_userkey">User Key</string>
+    <string name="snell_psk">Clé pré-partagée</string>
+    <string name="snell_userkey">Clé utilisateur</string>
     <string name="snell_version">Version</string>
     <string name="snell_network">Réseau</string>
-    <string name="snell_obfs_mode">Obfs Mode</string>
-    <string name="snell_obfs_host">Obfs Host</string>
+    <string name="snell_obfs_mode">Mode Obfs</string>
+    <string name="snell_obfs_host">Hôte Obfs</string>
     <string name="snell_mode">Mode</string>
     <string name="snell_reuse">Réutiliser</string>
-    <string name="snell_reuse_summary">v4-v6 only</string>
+    <string name="snell_reuse_summary">v4-v6 uniquement</string>
 </resources>
