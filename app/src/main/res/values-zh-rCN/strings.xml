@@ -12,6 +12,8 @@
     <string name="menu_group">分组</string>
     <string name="menu_about">关于</string>
     <string name="theme">主题</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
     <string name="document">文档</string>
     <string name="group_default">未分组</string>
     <string name="quick_toggle">切换</string>
@@ -604,13 +606,13 @@
     <string name="open_app_settings">打开系统设置</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">Pre-shared Key</string>
-    <string name="snell_userkey">User Key</string>
+    <string name="snell_psk">预共享密钥</string>
+    <string name="snell_userkey">用户密钥</string>
     <string name="snell_version">版本</string>
     <string name="snell_network">网络</string>
-    <string name="snell_obfs_mode">Obfs Mode</string>
-    <string name="snell_obfs_host">Obfs Host</string>
+    <string name="snell_obfs_mode">混淆模式</string>
+    <string name="snell_obfs_host">混淆主机</string>
     <string name="snell_mode">模式</string>
     <string name="snell_reuse">复用</string>
-    <string name="snell_reuse_summary">v4-v6 only</string>
+    <string name="snell_reuse_summary">仅v4-v6</string>
 </resources>
