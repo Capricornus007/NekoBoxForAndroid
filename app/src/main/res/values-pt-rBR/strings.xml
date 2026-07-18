@@ -607,11 +607,13 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="open_app_settings">Abrir Configurações do Sistema</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">Chave</string>
+    <string name="snell_psk">Pre-shared Key</string>
+    <string name="snell_userkey">User Key</string>
     <string name="snell_version">Versão</string>
-    <string name="snell_network">Protocolo</string>
-    <string name="snell_obfs_mode">Modo Obfs</string>
-    <string name="snell_obfs_host">Host Obfs</string>
+    <string name="snell_network">Rede</string>
+    <string name="snell_obfs_mode">Obfs Mode</string>
+    <string name="snell_obfs_host">Obfs Host</string>
+    <string name="snell_mode">Modo</string>
     <string name="snell_reuse">Reuso</string>
-    <string name="snell_reuse_summary">Somente v4/v5</string>
+    <string name="snell_reuse_summary">v4-v6 only</string>
 </resources>
