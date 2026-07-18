@@ -12,6 +12,8 @@
     <string name="menu_group">المجموعة</string>
     <string name="menu_about">حول</string>
     <string name="theme">السمة</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
     <string name="document">المستند</string>
     <string name="group_default">غير مجمعة</string>
     <string name="quick_toggle">تبديل</string>
@@ -608,13 +610,13 @@
     <string name="open_app_settings">فتح إعدادات النظام</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">Pre-shared Key</string>
-    <string name="snell_userkey">User Key</string>
+    <string name="snell_psk">مفتاح مشترك مسبق</string>
+    <string name="snell_userkey">مفتاح المستخدم</string>
     <string name="snell_version">الإصدار</string>
     <string name="snell_network">الشبكة</string>
-    <string name="snell_obfs_mode">Obfs Mode</string>
-    <string name="snell_obfs_host">Obfs Host</string>
+    <string name="snell_obfs_mode">وضع التمويه</string>
+    <string name="snell_obfs_host">مضيف التمويه</string>
     <string name="snell_mode">الوضع</string>
     <string name="snell_reuse">إعادة الاستخدام</string>
-    <string name="snell_reuse_summary">v4-v6 only</string>
+    <string name="snell_reuse_summary">v4-v6 فقط</string>
 </resources>
