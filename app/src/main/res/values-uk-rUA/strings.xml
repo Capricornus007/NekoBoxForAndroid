@@ -12,6 +12,8 @@
     <string name="menu_group">Група</string>
     <string name="menu_about">Про програму</string>
     <string name="theme">Тема</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
     <string name="document">Документ</string>
     <string name="group_default">Без групи</string>
     <string name="quick_toggle">Переключити</string>
@@ -609,13 +611,13 @@
     <string name="open_app_settings">Відкрити налаштування системи</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">Pre-shared Key</string>
-    <string name="snell_userkey">User Key</string>
+    <string name="snell_psk">Попередньо розподілений ключ</string>
+    <string name="snell_userkey">Ключ користувача</string>
     <string name="snell_version">Версія</string>
     <string name="snell_network">Мережа</string>
-    <string name="snell_obfs_mode">Obfs Mode</string>
-    <string name="snell_obfs_host">Obfs Host</string>
+    <string name="snell_obfs_mode">Режим обфускації</string>
+    <string name="snell_obfs_host">Хост обфускації</string>
     <string name="snell_mode">Режим</string>
     <string name="snell_reuse">Reuse</string>
-    <string name="snell_reuse_summary">v4-v6 only</string>
+    <string name="snell_reuse_summary">лише v4-v6</string>
 </resources>
