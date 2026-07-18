@@ -12,8 +12,8 @@
     <string name="menu_group">Gruppe</string>
     <string name="menu_about">Om</string>
     <string name="theme">Tema</string>
-    <string name="use_system_theme">Use system theme</string>
-    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
+    <string name="use_system_theme">Bruk systemtema</string>
+    <string name="use_system_theme_summary">Bruk system Monet-farger (Android 12+)</string>
     <string name="document">Dokument</string>
     <string name="group_default">Ugruppert</string>
     <string name="quick_toggle">Veksle</string>
