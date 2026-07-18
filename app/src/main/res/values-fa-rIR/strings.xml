@@ -601,11 +601,13 @@
     <string name="open_app_settings">باز کردن تنظیمات سیستم</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">کلید</string>
+    <string name="snell_psk">Pre-shared Key</string>
+    <string name="snell_userkey">User Key</string>
     <string name="snell_version">نسخه</string>
-    <string name="snell_network">پروتکل</string>
-    <string name="snell_obfs_mode">حالت Obfs</string>
-    <string name="snell_obfs_host">Obfs میزبان</string>
+    <string name="snell_network">شبکه</string>
+    <string name="snell_obfs_mode">Obfs Mode</string>
+    <string name="snell_obfs_host">Obfs Host</string>
+    <string name="snell_mode">حالت</string>
     <string name="snell_reuse">استفاده مجدد</string>
-    <string name="snell_reuse_summary">فقط v4/v5</string>
+    <string name="snell_reuse_summary">v4-v6 only</string>
 </resources>
