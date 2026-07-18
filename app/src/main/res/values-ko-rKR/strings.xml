@@ -12,8 +12,8 @@
     <string name="menu_group">그룹</string>
     <string name="menu_about">정보</string>
     <string name="theme">테마</string>
-    <string name="use_system_theme">Use system theme</string>
-    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
+    <string name="use_system_theme">시스템 테마 사용</string>
+    <string name="use_system_theme_summary">시스템 Monet 색상 사용 (Android 12+)</string>
     <string name="document">문서</string>
     <string name="group_default">미분류</string>
     <string name="quick_toggle">전환</string>
