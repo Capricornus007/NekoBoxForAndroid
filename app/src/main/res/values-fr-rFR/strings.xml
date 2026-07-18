@@ -620,11 +620,13 @@
     <string name="open_app_settings">Ouvrir les paramètres système</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">PSK</string>
+    <string name="snell_psk">Pre-shared Key</string>
+    <string name="snell_userkey">User Key</string>
     <string name="snell_version">Version</string>
-    <string name="snell_network">Protocole</string>
-    <string name="snell_obfs_mode">Mode Obfs</string>
-    <string name="snell_obfs_host">Obfs hôte</string>
+    <string name="snell_network">Réseau</string>
+    <string name="snell_obfs_mode">Obfs Mode</string>
+    <string name="snell_obfs_host">Obfs Host</string>
+    <string name="snell_mode">Mode</string>
     <string name="snell_reuse">Réutiliser</string>
-    <string name="snell_reuse_summary">v4/v5 uniquement</string>
+    <string name="snell_reuse_summary">v4-v6 only</string>
 </resources>
