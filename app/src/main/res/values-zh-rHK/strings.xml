@@ -12,6 +12,8 @@
     <string name="menu_group">群組</string>
     <string name="menu_about">關於</string>
     <string name="theme">主題</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
     <string name="document">文件</string>
     <string name="group_default">未分組</string>
     <string name="quick_toggle">切換</string>
@@ -603,13 +605,13 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="open_app_settings">開啟系統設定</string>
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">Pre-shared Key</string>
-    <string name="snell_userkey">User Key</string>
+    <string name="snell_psk">預先共享金鑰</string>
+    <string name="snell_userkey">用戶金鑰</string>
     <string name="snell_version">版本</string>
     <string name="snell_network">網絡</string>
-    <string name="snell_obfs_mode">Obfs Mode</string>
-    <string name="snell_obfs_host">Obfs Host</string>
+    <string name="snell_obfs_mode">混淆模式</string>
+    <string name="snell_obfs_host">混淆主機</string>
     <string name="snell_mode">模式</string>
     <string name="snell_reuse">重用</string>
-    <string name="snell_reuse_summary">v4-v6 only</string>
+    <string name="snell_reuse_summary">僅 v4-v6</string>
 </resources>
