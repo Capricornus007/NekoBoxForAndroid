@@ -12,8 +12,8 @@
     <string name="menu_group">المجموعة</string>
     <string name="menu_about">حول</string>
     <string name="theme">السمة</string>
-    <string name="use_system_theme">Use system theme</string>
-    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
+    <string name="use_system_theme">استخدام سمة النظام</string>
+    <string name="use_system_theme_summary">استخدام ألوان Monet النظام (أندرويد 12+)</string>
     <string name="document">المستند</string>
     <string name="group_default">غير مجمعة</string>
     <string name="quick_toggle">تبديل</string>
