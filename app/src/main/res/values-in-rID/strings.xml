@@ -12,8 +12,8 @@
     <string name="menu_group">Grup</string>
     <string name="menu_about">Tentang</string>
     <string name="theme">Tema</string>
-    <string name="use_system_theme">Use system theme</string>
-    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
+    <string name="use_system_theme">Gunakan tema sistem</string>
+    <string name="use_system_theme_summary">Gunakan warna Monet sistem (Android 12+)</string>
     <string name="document">Dokumen</string>
     <string name="group_default">Tanpa grup</string>
     <string name="quick_toggle">Alihkan</string>
