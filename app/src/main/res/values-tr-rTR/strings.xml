@@ -12,8 +12,8 @@
     <string name="menu_group">Grup</string>
     <string name="menu_about">Hakkında</string>
     <string name="theme">Tema</string>
-    <string name="use_system_theme">Use system theme</string>
-    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
+    <string name="use_system_theme">Sistem temasını kullan</string>
+    <string name="use_system_theme_summary">Sistem Monet renklerini kullan (Android 12+)</string>
     <string name="document">Belge</string>
     <string name="group_default">Gruplanmamış</string>
     <string name="quick_toggle">Aç/Kapat</string>
