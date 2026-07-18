@@ -12,6 +12,8 @@
     <string name="menu_group">Groep</string>
     <string name="menu_about">Over</string>
     <string name="theme">Thema</string>
+    <string name="use_system_theme">Use system theme</string>
+    <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
     <string name="document">Document</string>
     <string name="group_default">Niet-gegroepeerd</string>
     <string name="quick_toggle">Schakelen</string>
@@ -622,5 +624,5 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="snell_obfs_host">Obfs Host</string>
     <string name="snell_mode">Modus</string>
     <string name="snell_reuse">Hergebruik</string>
-    <string name="snell_reuse_summary">v4-v6 only</string>
+    <string name="snell_reuse_summary">Alleen v4-v6</string>
 </resources>
