@@ -450,6 +450,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         auto_route = true
                         // sing-box known issue on Android: DNS hijack may fail with Private DNS when strict_route is disabled.
                         strict_route = DataStore.strictRoute || SagerNet.isPrivateDnsActiveOnUnderlyingNetwork()
+                        // sing-box >= 1.12.0: use unified 'address' (legacy inet4_address/inet6_address removed)
                         when (ipv6Mode) {
                             IPv6Mode.DISABLE -> {
                                 address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
