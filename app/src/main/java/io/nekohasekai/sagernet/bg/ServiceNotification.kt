@@ -8,7 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
 import android.text.format.Formatter
 import android.widget.Toast
@@ -225,7 +225,7 @@ class ServiceNotification(
                 (service as Service).startForeground(
                     notificationId,
                     it.build(),
-                    FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
+                    FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
                 )
             } else {
                 (service as Service).startForeground(notificationId, it.build())

@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -322,19 +322,26 @@
         <service
             android:name="io.nekohasekai.sagernet.bg.ProxyService"
             android:exported="false"
-            android:foregroundServiceType="systemExempted"
+            android:foregroundServiceType="specialUse"
             android:process=":bg"
-            tools:ignore="ForegroundServicePermission" />
+            tools:ignore="ForegroundServicePermission">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="@string/fgs_special_use_explanation" />
+        </service>
 
         <service
             android:name="io.nekohasekai.sagernet.bg.VpnService"
             android:exported="false"
-            android:foregroundServiceType="systemExempted"
+            android:foregroundServiceType="specialUse"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":bg"
             tools:ignore="ForegroundServicePermission">
 
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="@string/fgs_special_use_explanation" />
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
@@ -343,13 +350,16 @@
         <service
             android:name="io.nekohasekai.sagernet.bg.TileService"
             android:exported="true"
-            android:foregroundServiceType="systemExempted"
+            android:foregroundServiceType="specialUse"
             android:icon="@drawable/ic_service_active"
             android:label="@string/tile_title"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:process=":bg"
             tools:ignore="ForegroundServicePermission"
             tools:targetApi="n">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="@string/fgs_special_use_explanation" />
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
