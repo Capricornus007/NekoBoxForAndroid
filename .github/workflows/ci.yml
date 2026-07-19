@@ -321,7 +321,7 @@ jobs:
           sleep 3
 
       - name: Release APK
-        uses: softprops/action-gh-release@c06260a2be1c12e467c7a7a6f7f3348f1a6e7a55 # v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: nightly
           name: Nightly Build
