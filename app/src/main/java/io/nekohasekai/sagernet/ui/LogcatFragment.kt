@@ -43,7 +43,8 @@ class LogcatFragment :
     }
 
     private fun getColorForLine(line: String): ForegroundColorSpan {
-        var color = ForegroundColorSpan(requireContext().getColorAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+        var color =
+            ForegroundColorSpan(requireContext().getColorAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
         when {
             line.contains("INFO[") || line.contains(" [Info]") -> {
                 color = ForegroundColorSpan(requireContext().getColour(R.color.ui_success))
@@ -125,5 +126,4 @@ class LogcatFragment :
         }
         return true
     }
-
 }

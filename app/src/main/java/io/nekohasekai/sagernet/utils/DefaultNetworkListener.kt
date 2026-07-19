@@ -94,9 +94,11 @@ object DefaultNetworkListener {
     suspend fun get() = if (fallback) {
         SagerNet.connectivity.activeNetwork
             ?: throw UnknownHostException() // failed to listen, return current if available
-    } else NetworkMessage.Get().run {
-        networkActor.send(this)
-        response.await()
+    } else {
+        NetworkMessage.Get().run {
+            networkActor.send(this)
+            response.await()
+        }
     }
 
     suspend fun stop(key: Any) = networkActor.send(NetworkMessage.Stop(key))

@@ -179,7 +179,7 @@ private val ANDROID_DNS_PACKAGES = listOf(
     "com.android.networkstack.tethering",
     "com.google.android.networkstack.tethering",
     "com.android.tethering",
-    "com.google.android.tethering"
+    "com.google.android.tethering",
 )
 
 class ConfigBuildResult(
@@ -281,7 +281,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 proxy.id,
                 mapOf(tagProxy to listOf(proxy)),
                 mapOf(proxy.id to tagProxy),
-                -1L
+                -1L,
             )
         }
     }
@@ -360,7 +360,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     val nonCustomFinalHosts = hashSetOf<String>()
     val groupCache = HashMap<Long, ProxyGroup?>()
     val isVPN = DataStore.serviceMode == Key.MODE_VPN
-    val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST// Whether the local proxy (SOCKS/HTTP) inbounds are present in the final config.
+    val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST // Whether the local proxy (SOCKS/HTTP) inbounds are present in the final config.
     // In VPN/TUN mode they are omitted unless the user opts in (requireProxyInVPN),
     // LAN access is allowed, or the system HTTP proxy needs it. See issue #1197 / PR #1154.
     val needLocalProxyInbounds = !forTest && (
@@ -434,88 +434,96 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         inbounds = mutableListOf()
 
         if (!forTest) {
-            if (isVPN) inbounds.add(Inbound_TunOptions().apply {
-                type = "tun"
-                tag = "tun-in"
-                interface_name = "tun0"
-                stack = when (DataStore.tunImplementation) {
-                    TunImplementation.GVISOR -> "gvisor"
-                    TunImplementation.SYSTEM -> "system"
-                    else -> "mixed"
-                }
-                endpoint_independent_nat = true
-                mtu = DataStore.mtu
-                domain_strategy = genDomainStrategy(DataStore.resolveDestination)
-                auto_route = true
-                // sing-box known issue on Android: DNS hijack may fail with Private DNS when strict_route is disabled.
-                strict_route = DataStore.strictRoute || SagerNet.isPrivateDnsActiveOnUnderlyingNetwork()
-                sniff = needSniff
-                sniff_override_destination = needSniffOverride
-                when (ipv6Mode) {
-                    IPv6Mode.DISABLE -> {
-                        inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
-                    }
+            if (isVPN) {
+                inbounds.add(
+                    Inbound_TunOptions().apply {
+                        type = "tun"
+                        tag = "tun-in"
+                        interface_name = "tun0"
+                        stack = when (DataStore.tunImplementation) {
+                            TunImplementation.GVISOR -> "gvisor"
+                            TunImplementation.SYSTEM -> "system"
+                            else -> "mixed"
+                        }
+                        endpoint_independent_nat = true
+                        mtu = DataStore.mtu
+                        domain_strategy = genDomainStrategy(DataStore.resolveDestination)
+                        auto_route = true
+                        // sing-box known issue on Android: DNS hijack may fail with Private DNS when strict_route is disabled.
+                        strict_route = DataStore.strictRoute || SagerNet.isPrivateDnsActiveOnUnderlyingNetwork()
+                        sniff = needSniff
+                        sniff_override_destination = needSniffOverride
+                        when (ipv6Mode) {
+                            IPv6Mode.DISABLE -> {
+                                inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
+                            }
 
                             IPv6Mode.ONLY -> {
                                 address = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
                             }
 
-                    else -> {
-                        inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
-                        inet6_address = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
-                    }
-                }
-                if (DataStore.proxyApps) {
-                    val selectedPackages = DataStore.individual
-                        .lineSequence()
-                        .map { it.trim() }
-                        .filter { it.isNotEmpty() }
-                        .toMutableList()
-                    if (DataStore.bypass) {
-                        if (!selectedPackages.contains("android")) {
-                            selectedPackages.add("android")
-                        }
-                        exclude_package = selectedPackages
-                        tunBypassPackages.addAll(selectedPackages)
-                        PackageCache.awaitLoadSync()
-                        selectedPackages.forEach {
-                            PackageCache[it]?.takeIf { uid -> uid >= 1000 }?.let { uid ->
-                                tunBypassUserIds.add(uid)
+                            else -> {
+                                inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
+                                inet6_address = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
                             }
                         }
-                        tunBypassUserIds.add(1000)
-                    }
-                }
-            })
+                        if (DataStore.proxyApps) {
+                            val selectedPackages = DataStore.individual
+                                .lineSequence()
+                                .map { it.trim() }
+                                .filter { it.isNotEmpty() }
+                                .toMutableList()
+                            if (DataStore.bypass) {
+                                if (!selectedPackages.contains("android")) {
+                                    selectedPackages.add("android")
+                                }
+                                exclude_package = selectedPackages
+                                tunBypassPackages.addAll(selectedPackages)
+                                PackageCache.awaitLoadSync()
+                                selectedPackages.forEach {
+                                    PackageCache[it]?.takeIf { uid -> uid >= 1000 }?.let { uid ->
+                                        tunBypassUserIds.add(uid)
+                                    }
+                                }
+                                tunBypassUserIds.add(1000)
+                            }
+                        }
+                    },
+                )
+            }
 
             fun buildInboundUsers(): List<User> = listOf(
                 User().apply {
                     username = DataStore.mixedUsername
                     password = DataStore.mixedPassword
-                }
+                },
             )
 
             if (needLocalProxyInbounds) {
-                inbounds.add(Inbound_SocksOptions().apply {
-                    type = "socks"
-                    tag = TAG_SOCKS_IN
-                    listen = bind
-                    listen_port = DataStore.socksPort
-                    domain_strategy = genDomainStrategy(DataStore.resolveDestination)
-                    sniff = needSniff
-                    sniff_override_destination = needSniffOverride
-                    users = buildInboundUsers()
-                })
-                inbounds.add(Inbound_HTTPOptions().apply {
-                    type = "http"
-                    tag = TAG_HTTP_IN
-                    listen = bind
-                    listen_port = DataStore.httpPort
-                    domain_strategy = genDomainStrategy(DataStore.resolveDestination)
-                    sniff = needSniff
-                    sniff_override_destination = needSniffOverride
-                    users = buildInboundUsers()
-                })
+                inbounds.add(
+                    Inbound_SocksOptions().apply {
+                        type = "socks"
+                        tag = TAG_SOCKS_IN
+                        listen = bind
+                        listen_port = DataStore.socksPort
+                        domain_strategy = genDomainStrategy(DataStore.resolveDestination)
+                        sniff = needSniff
+                        sniff_override_destination = needSniffOverride
+                        users = buildInboundUsers()
+                    },
+                )
+                inbounds.add(
+                    Inbound_HTTPOptions().apply {
+                        type = "http"
+                        tag = TAG_HTTP_IN
+                        listen = bind
+                        listen_port = DataStore.httpPort
+                        domain_strategy = genDomainStrategy(DataStore.resolveDestination)
+                        sniff = needSniff
+                        sniff_override_destination = needSniffOverride
+                        users = buildInboundUsers()
+                    },
+                )
             }
         }
 
@@ -848,11 +856,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             return chainTagOut
         }
 
-        fun buildProfile(
-            profileId: Long,
-            entity: ProxyEntity,
-            managedByParent: Boolean = false,
-        ): String {
+        fun buildProfile(profileId: Long, entity: ProxyEntity, managedByParent: Boolean = false): String {
             if (entity.type != ProxyEntity.TYPE_WATERFALL &&
                 entity.type != ProxyEntity.TYPE_FASTEST
             ) {
@@ -884,23 +888,25 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
 
             val groupTag = readableTag(entity.displayName())
-            outbounds.add(Outbound_URLTestOptions().apply {
-                type = "urltest"
-                tag = groupTag
-                outbounds = candidateTags
-                url = DataStore.connectionTestURL
-                interval = "10m"
-                idle_timeout = "30m"
-                timeout = "${DataStore.connectionTestTimeout}ms"
-                tolerance = if (entity.type == ProxyEntity.TYPE_FASTEST) 50 else 0
-                strategy = if (entity.type == ProxyEntity.TYPE_WATERFALL) {
-                    "priority"
-                } else {
-                    "fastest"
-                }
-                managed_by_parent = managedByParent
-                wait_for_initial = true
-            })
+            outbounds.add(
+                Outbound_URLTestOptions().apply {
+                    type = "urltest"
+                    tag = groupTag
+                    outbounds = candidateTags
+                    url = DataStore.connectionTestURL
+                    interval = "10m"
+                    idle_timeout = "30m"
+                    timeout = "${DataStore.connectionTestTimeout}ms"
+                    tolerance = if (entity.type == ProxyEntity.TYPE_FASTEST) 50 else 0
+                    strategy = if (entity.type == ProxyEntity.TYPE_WATERFALL) {
+                        "priority"
+                    } else {
+                        "fastest"
+                    }
+                    managed_by_parent = managedByParent
+                    wait_for_initial = true
+                },
+            )
 
             trafficMap[groupTag] = buildList {
                 add(entity)
@@ -954,25 +960,31 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             return buildList {
                 if (DataStore.bypass) {
                     if (selectedUids.isNotEmpty()) {
-                        add(Rule_DefaultOptions().apply {
-                            inbound = listOf("tun-in")
-                            user_id = selectedUids.toList()
-                            action = "reject"
-                        })
+                        add(
+                            Rule_DefaultOptions().apply {
+                                inbound = listOf("tun-in")
+                                user_id = selectedUids.toList()
+                                action = "reject"
+                            },
+                        )
                     }
                 } else {
                     if (selectedUids.isEmpty()) {
-                        add(Rule_DefaultOptions().apply {
-                            inbound = listOf("tun-in")
-                            action = "reject"
-                        })
+                        add(
+                            Rule_DefaultOptions().apply {
+                                inbound = listOf("tun-in")
+                                action = "reject"
+                            },
+                        )
                     } else {
-                        add(Rule_DefaultOptions().apply {
-                            inbound = listOf("tun-in")
-                            user_id = selectedUids.toList()
-                            invert = true
-                            action = "reject"
-                        })
+                        add(
+                            Rule_DefaultOptions().apply {
+                                inbound = listOf("tun-in")
+                                user_id = selectedUids.toList()
+                                invert = true
+                                action = "reject"
+                            },
+                        )
                     }
                 }
             }
@@ -1008,15 +1020,19 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     outbound = mainProxyTag
                 },
             )
-        if (needLocalProxyInbounds) {
-                route.rules.add(Rule_DefaultOptions().apply {
-                    inbound = listOf(TAG_SOCKS_IN)
-                    outbound = mainProxyTag
-                })
-                route.rules.add(Rule_DefaultOptions().apply {
-                    inbound = listOf(TAG_HTTP_IN)
-                    outbound = mainProxyTag
-                })
+            if (needLocalProxyInbounds) {
+                route.rules.add(
+                    Rule_DefaultOptions().apply {
+                        inbound = listOf(TAG_SOCKS_IN)
+                        outbound = mainProxyTag
+                    },
+                )
+                route.rules.add(
+                    Rule_DefaultOptions().apply {
+                        inbound = listOf(TAG_HTTP_IN)
+                        outbound = mainProxyTag
+                    },
+                )
             }
 
             route.final_ = mainProxyTag
@@ -1107,7 +1123,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     fun makeDnsRuleObj(): DNSRule_DefaultOptions {
                         return DNSRule_DefaultOptions().apply {
                             if (uidList.isNotEmpty()) user_id = uidList
-                            domainList?.let { makeSingBoxRule(it) }}
+                            domainList?.let { makeSingBoxRule(it) }
+                        }
                     }
 
                     val hasDomainCriteria = !domainList.isNullOrEmpty()
@@ -1149,10 +1166,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
                         0L -> {
                             if (shouldAddDnsRule) {
-                                if (useFakeDns) userDNSRuleList += makeDnsRuleObj().apply {
-                                    server = "dns-fake"
-                                    inbound = listOf("tun-in")
-                                    query_type = listOf("A", "AAAA")
+                                if (useFakeDns) {
+                                    userDNSRuleList += makeDnsRuleObj().apply {
+                                        server = "dns-fake"
+                                        inbound = listOf("tun-in")
+                                        query_type = listOf("A", "AAAA")
+                                    }
                                 } else {
                                     userDNSRuleList += makeDnsRuleObj().apply {
                                         server = "dns-remote"
@@ -1241,18 +1260,24 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             route.rule_set = route.rule_set.distinctBy { it.tag }
         }
         if (isVPN && DataStore.proxyApps && DataStore.bypass && tunBypassPackages.isNotEmpty()) {
-            route.rules.add(0, Rule_DefaultOptions().apply {
-                inbound = listOf("tun-in")
-                package_name = tunBypassPackages.toList()
-                action = "reject"
-            })
+            route.rules.add(
+                0,
+                Rule_DefaultOptions().apply {
+                    inbound = listOf("tun-in")
+                    package_name = tunBypassPackages.toList()
+                    action = "reject"
+                },
+            )
         }
         if (isVPN && DataStore.proxyApps && DataStore.bypass && tunBypassUserIds.isNotEmpty()) {
-            route.rules.add(0, Rule_DefaultOptions().apply {
-                inbound = listOf("tun-in")
-                user_id = tunBypassUserIds.toList()
-                action = "reject"
-            })
+            route.rules.add(
+                0,
+                Rule_DefaultOptions().apply {
+                    inbound = listOf("tun-in")
+                    user_id = tunBypassUserIds.toList()
+                    action = "reject"
+                },
+            )
         }
 
         for (freedom in arrayOf(TAG_DIRECT, TAG_BYPASS)) outbounds.add(
@@ -1356,11 +1381,13 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
         }
         if (dnsHosts.isNotEmpty()) {
-            dns.servers.add(DNSServerOptions().apply {
-                tag = TAG_DNS_HOSTS
-                _hack_config_map["type"] = "hosts"
-                _hack_config_map["predefined"] = dnsHosts
-            })
+            dns.servers.add(
+                DNSServerOptions().apply {
+                    tag = TAG_DNS_HOSTS
+                    _hack_config_map["type"] = "hosts"
+                    _hack_config_map["predefined"] = dnsHosts
+                },
+            )
         }
 
         dns.final_ = if (forTest) "dns-direct" else "dns-remote"
@@ -1459,10 +1486,13 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 )
             }
             if (dnsHosts.isNotEmpty()) {
-                dns.rules.add(0, DNSRule_DefaultOptions().apply {
-                    server = TAG_DNS_HOSTS
-                    _hack_config_map["ip_accept_any"] = true
-                })
+                dns.rules.add(
+                    0,
+                    DNSRule_DefaultOptions().apply {
+                        server = TAG_DNS_HOSTS
+                        _hack_config_map["ip_accept_any"] = true
+                    },
+                )
             }
             // avoid loopback
             dns.rules.add(

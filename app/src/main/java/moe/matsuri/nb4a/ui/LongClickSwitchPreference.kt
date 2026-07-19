@@ -10,11 +10,19 @@ import androidx.preference.SwitchPreferenceCompat
 
 class LongClickSwitchPreference
 @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = TypedArrayUtils.getAttr(
-        context, R.attr.switchPreferenceCompatStyle, R.attr.switchPreferenceStyle
-    ), defStyleRes: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = TypedArrayUtils.getAttr(
+        context,
+        R.attr.switchPreferenceCompatStyle,
+        R.attr.switchPreferenceStyle,
+    ),
+    defStyleRes: Int = 0,
 ) : SwitchPreferenceCompat(
-    context, attrs, defStyleAttr, defStyleRes
+    context,
+    attrs,
+    defStyleAttr,
+    defStyleRes,
 ) {
     private var mLongClickListener: View.OnLongClickListener? = null
 
@@ -29,5 +37,4 @@ class LongClickSwitchPreference
     fun setOnLongClickListener(longClickListener: View.OnLongClickListener) {
         this.mLongClickListener = longClickListener
     }
-
 }

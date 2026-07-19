@@ -16,7 +16,6 @@ import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.VpnRequestActivity
 import io.nekohasekai.sagernet.utils.Subnet
-import org.json.JSONObject
 import android.net.VpnService as BaseVpnService
 
 class VpnService :
@@ -40,9 +39,8 @@ class VpnService :
             "com.android.networkstack.tethering",
             "com.google.android.networkstack.tethering",
             "com.android.tethering",
-            "com.google.android.tethering"
+            "com.google.android.tethering",
         )
-
     }
 
     var conn: ParcelFileDescriptor? = null
@@ -210,7 +208,7 @@ class VpnService :
                 }
             }
         }
-if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && DataStore.appendHttpProxy) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && DataStore.appendHttpProxy) {
             if (DataStore.allowAccess) {
                 // When LAN access is enabled the mixed inbound requires authentication
                 // (see DataStore.mixedInboundNeedsAuth). Android's system HTTP proxy

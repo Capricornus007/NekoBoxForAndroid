@@ -27,7 +27,7 @@ fun recoverVlessTlsStateAndRestart(activity: Activity) {
                 Toast.makeText(
                     activity,
                     R.string.clear_cache_success,
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT,
                 ).show()
                 ProcessPhoenix.triggerRebirth(activity)
             }
@@ -36,7 +36,7 @@ fun recoverVlessTlsStateAndRestart(activity: Activity) {
                 Toast.makeText(
                     activity,
                     activity.getString(R.string.clear_cache_failed, e.message),
-                    Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT,
                 ).show()
                 activity.finish()
             }
@@ -51,7 +51,7 @@ private fun clearSingBoxPersistentCacheDb() {
         app.cacheDir.parentFile?.let { File(it, "cache") },
         File(app.cacheDir, "cache"),
         File(app.filesDir, "cache"),
-        File(app.noBackupFilesDir, "cache")
+        File(app.noBackupFilesDir, "cache"),
     ).distinctBy { it.absolutePath }
 
     val cacheDbCandidates = buildList {

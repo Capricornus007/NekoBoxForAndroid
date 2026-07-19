@@ -65,5 +65,4 @@ class WireGuardSettingsActivity : ProfileSettingsActivity<WireGuardBean>() {
         (s3.preference as EditTextPreference).setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
         (s4.preference as EditTextPreference).setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
     }
-
 }

@@ -37,10 +37,10 @@ import io.nekohasekai.sagernet.ui.profile.JuicitySettingsActivity
 import io.nekohasekai.sagernet.ui.profile.MieruSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.NaiveSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ProfileSettingsActivity
+import io.nekohasekai.sagernet.ui.profile.SSHSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ShadowsocksRSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ShadowsocksSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.SocksSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.SSHSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TrojanGoSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TrojanSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TuicSettingsActivity
@@ -204,7 +204,7 @@ data class ProxyEntity(
 
         dirty = input.readBoolean()
     }
-fun putByteArray(byteArray: ByteArray) {
+    fun putByteArray(byteArray: ByteArray) {
         // Registry routes each persisted type id to the same KryoConverters.*Deserialize the
         // historical when(type) ladder used and stores it in the matching typed field. An
         // unknown/dead id is a no-op, matching the old ladder's absent else-branch.
@@ -560,7 +560,7 @@ fun putByteArray(byteArray: ByteArray) {
         return this
     }
 
-fun settingIntent(ctx: Context, isSubscription: Boolean): Intent {
+    fun settingIntent(ctx: Context, isSubscription: Boolean): Intent {
         val activityClass = ProtocolRegistry.forType(type)?.settingsActivityClass
             ?: when (type) {
                 TYPE_SOCKS -> SocksSettingsActivity::class.java
@@ -651,6 +651,7 @@ fun settingIntent(ctx: Context, isSubscription: Boolean): Intent {
 
         @Query("UPDATE proxy_entities SET rx = 0, tx = 0 WHERE id IN (:profileIds)")
         fun resetTraffic(profileIds: LongArray): Int
+
         // Additive lifetime accumulation (schema v12). Callers pass the per-session DELTA since
         // the last flush (never absolute totals) so re-entrant persist() cannot double-count.
         @Query(

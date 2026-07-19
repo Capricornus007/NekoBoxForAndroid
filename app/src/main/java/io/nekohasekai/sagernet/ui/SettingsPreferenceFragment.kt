@@ -3,8 +3,6 @@ package io.nekohasekai.sagernet.ui
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.InputType
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -20,7 +18,6 @@ import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.utils.AppLocale
-import io.nekohasekai.sagernet.ui.requestPinClearCacheShortcut
 import io.nekohasekai.sagernet.utils.Theme
 import moe.matsuri.nb4a.ui.*
 import java.io.File
@@ -66,14 +63,17 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = DataStore.configurationStore
         DataStore.initGlobal()
         addPreferencesFromResource(R.xml.global_preferences)
-val appTheme = findPreference<ThemePickerPreference>(Key.APP_THEME)!!
+        val appTheme = findPreference<ThemePickerPreference>(Key.APP_THEME)!!
         val nightTheme = findPreference<SimpleMenuPreference>(Key.NIGHT_THEME)!!
         val dynamicColors = findPreference<SwitchPreferenceCompat>(Key.DYNAMIC_COLORS)!!
 
         dynamicColors.isEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         dynamicColors.summary = getString(
-            if (dynamicColors.isEnabled) R.string.dynamic_colors_summary
-            else R.string.dynamic_colors_unavailable
+            if (dynamicColors.isEnabled) {
+                R.string.dynamic_colors_summary
+            } else {
+                R.string.dynamic_colors_unavailable
+            },
         )
         dynamicColors.setOnPreferenceChangeListener { _, _ ->
             recreateActivityAfterPreferencePersisted()
@@ -234,7 +234,7 @@ val appTheme = findPreference<ThemePickerPreference>(Key.APP_THEME)!!
             rulesGeoipUrl.isVisible = provider == 4
             true
         }
-socksPort.onPreferenceChangeListener = reloadListener
+        socksPort.onPreferenceChangeListener = reloadListener
         httpPort.onPreferenceChangeListener = reloadListener
         mixedUsername.onPreferenceChangeListener = reloadListener
         mixedPassword.onPreferenceChangeListener = reloadListener
@@ -387,7 +387,7 @@ socksPort.onPreferenceChangeListener = reloadListener
             Toast.makeText(
                 requireContext(),
                 if (pinned) R.string.shortcut_pin_requested else R.string.shortcut_pin_not_supported,
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_SHORT,
             ).show()
             true
         }
@@ -429,7 +429,7 @@ socksPort.onPreferenceChangeListener = reloadListener
                     Toast.makeText(
                         requireContext(),
                         R.string.clear_cache_success,
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                     triggerFullRestart(requireContext())
                 }
@@ -438,7 +438,7 @@ socksPort.onPreferenceChangeListener = reloadListener
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.clear_cache_failed, e.message),
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT,
                     ).show()
                 }
                 e.printStackTrace()

@@ -21,13 +21,13 @@ import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.MainActivity
-import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class StatsBar @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null,
+    context: Context,
+    attrs: AttributeSet? = null,
     defStyleAttr: Int = com.google.android.material.R.attr.materialCardViewStyle,
 ) : MaterialCardView(context, attrs, defStyleAttr), CoordinatorLayout.AttachedBehavior {
 
@@ -91,13 +91,24 @@ class StatsBar @JvmOverloads constructor(
             nestedScrollAxes: Int,
             type: Int,
         ): Boolean = child.hideOnScroll && super.onStartNestedScroll(
-            coordinatorLayout, child, directTargetChild, target, nestedScrollAxes, type
+            coordinatorLayout,
+            child,
+            directTargetChild,
+            target,
+            nestedScrollAxes,
+            type,
         )
 
         override fun onNestedScroll(
-            coordinatorLayout: CoordinatorLayout, child: StatsBar, target: View,
-            dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int,
-            type: Int, consumed: IntArray,
+            coordinatorLayout: CoordinatorLayout,
+            child: StatsBar,
+            target: View,
+            dxConsumed: Int,
+            dyConsumed: Int,
+            dxUnconsumed: Int,
+            dyUnconsumed: Int,
+            type: Int,
+            consumed: IntArray,
         ) {
             super.onNestedScroll(
                 coordinatorLayout,
@@ -221,8 +232,8 @@ class StatsBar @JvmOverloads constructor(
                             BaseService.State.Connecting -> R.string.connecting
                             BaseService.State.Stopping -> R.string.stopping
                             else -> R.string.not_connected
-                        }
-                    )
+                        },
+                    ),
                 )
             }
         }

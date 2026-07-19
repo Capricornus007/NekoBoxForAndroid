@@ -321,7 +321,7 @@ class BaseService {
             }
         }
 
-       suspend fun killProcesses() {
+        suspend fun killProcesses() {
             runServiceTeardown(
                 after = {
                     wakeLock?.apply {
@@ -434,12 +434,14 @@ class BaseService {
                 val oldName = upstreamInterfaceName
                 val newName = link.interfaceName ?: return@start
                 upstreamInterfaceName = newName
-                when (networkChangeAction(
-                    oldName,
-                    newName,
-                    DataStore.restartProfileOnNetworkChange,
-                    DataStore.networkChangeResetConnections,
-                )) {
+                when (
+                    networkChangeAction(
+                        oldName,
+                        newName,
+                        DataStore.restartProfileOnNetworkChange,
+                        DataStore.networkChangeResetConnections,
+                    )
+                ) {
                     NetworkChangeAction.RESTART_PROFILE -> {
                         Logs.d("Network changed: $oldName -> $newName")
                         scheduleNetworkProfileRestart(requireNotNull(oldName), newName)
@@ -594,14 +596,14 @@ class BaseService {
                             filter,
                             "$packageName.SERVICE",
                             null,
-                            Context.RECEIVER_EXPORTED
+                            Context.RECEIVER_EXPORTED,
                         )
                     } else {
                         registerReceiver(
                             data.receiver,
                             filter,
                             "$packageName.SERVICE",
-                            null
+                            null,
                         )
                     }
                     data.closeReceiverRegistered = true

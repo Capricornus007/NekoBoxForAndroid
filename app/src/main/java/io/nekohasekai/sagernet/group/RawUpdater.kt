@@ -44,7 +44,7 @@ import org.yaml.snakeyaml.error.YAMLException
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 object RawUpdater : GroupUpdater() {
-internal data class ReconciliationResult(
+    internal data class ReconciliationResult(
         val contentChanged: Boolean,
         val orderChanged: Boolean,
     )
@@ -78,7 +78,7 @@ internal data class ReconciliationResult(
                 "osversion" to Build.VERSION.RELEASE.orEmpty(),
                 "model" to listOf(Build.MANUFACTURER, Build.MODEL)
                     .filter { it.isNotBlank() }
-                    .joinToString(" ")
+                    .joinToString(" "),
             )
         } else {
             buildMap {
@@ -1096,7 +1096,8 @@ internal data class ReconciliationResult(
                 // through to the JSON/base64/plain-text branches.
                 Logs.w(e)
                 if (proxies.isNotEmpty()) return proxies
-            }} else if (text.contains("[Interface]")) {
+            }
+        } else if (text.contains("[Interface]")) {
             // amneziawg (wireguard with obfuscation params) or plain wireguard
             try {
                 val parsed = if (isAmneziaWGConf(text)) {

@@ -50,9 +50,8 @@ internal fun normalizeWireGuardLocalAddress(value: String): String {
     return "$normalizedHost/$prefix"
 }
 
-private fun isValidIpv4Octet(value: String): Boolean =
-    value.isNotEmpty() && value.all(Char::isDigit) &&
-        value.toIntOrNull()?.let { it in 0..255 } == true
+private fun isValidIpv4Octet(value: String): Boolean = value.isNotEmpty() && value.all(Char::isDigit) &&
+    value.toIntOrNull()?.let { it in 0..255 } == true
 
 private fun isIpv6Address(value: String): Boolean = try {
     InetAddress.getByName(value) is Inet6Address

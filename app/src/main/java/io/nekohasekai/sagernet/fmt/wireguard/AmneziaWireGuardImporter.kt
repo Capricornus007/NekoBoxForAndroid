@@ -32,19 +32,16 @@ object AmneziaWireGuardImporter {
 
         fun get(key: String): String? = values[key.lowercase(Locale.ROOT)]?.lastOrNull()
 
-        fun getAll(key: String): List<String> =
-            values[key.lowercase(Locale.ROOT)].orEmpty()
+        fun getAll(key: String): List<String> = values[key.lowercase(Locale.ROOT)].orEmpty()
 
         fun contains(key: String): Boolean = values.containsKey(key.lowercase(Locale.ROOT))
     }
 
     private data class Endpoint(val host: String, val port: Int)
 
-    fun isAmneziaVpn(text: String): Boolean =
-        normalizeText(text).startsWith(AMNEZIA_SCHEME, ignoreCase = true)
+    fun isAmneziaVpn(text: String): Boolean = normalizeText(text).startsWith(AMNEZIA_SCHEME, ignoreCase = true)
 
-    fun isWireGuardConfig(text: String): Boolean =
-        INTERFACE_SECTION_REGEX.containsMatchIn(normalizeText(text))
+    fun isWireGuardConfig(text: String): Boolean = INTERFACE_SECTION_REGEX.containsMatchIn(normalizeText(text))
 
     fun parseWireGuard(conf: String): List<WireGuardBean> {
         val sections = parseIni(conf)
@@ -275,7 +272,9 @@ object AmneziaWireGuardImporter {
             val closingBracket = endpoint.indexOf(']')
             if (closingBracket <= 1 || closingBracket + 1 >= endpoint.length ||
                 endpoint[closingBracket + 1] != ':'
-            ) return null
+            ) {
+                return null
+            }
             host = endpoint.substring(1, closingBracket)
             portText = endpoint.substring(closingBracket + 2)
         } else {
@@ -299,8 +298,7 @@ object AmneziaWireGuardImporter {
     private fun JsonObject.intValue(key: String): Int? =
         get(key)?.takeIf { it.isJsonPrimitive }?.asString?.toIntOrNull()
 
-    private fun ByteArray.firstNonWhitespace(): Byte? =
-        firstOrNull { !it.toInt().toChar().isWhitespace() }
+    private fun ByteArray.firstNonWhitespace(): Byte? = firstOrNull { !it.toInt().toChar().isWhitespace() }
 
     private fun normalizeText(text: String): String = text.trim().removePrefix("\uFEFF")
 

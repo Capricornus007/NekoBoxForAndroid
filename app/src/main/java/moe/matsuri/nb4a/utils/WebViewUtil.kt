@@ -8,9 +8,7 @@ import io.nekohasekai.sagernet.ktx.Logs
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
-fun onReceivedError(
-    view: WebView?, request: WebResourceRequest?, error: WebResourceError?
-) {
+fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
     if (error != null) {
         Logs.e("WebView error description: ${error.description}")
     }

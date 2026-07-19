@@ -40,34 +40,34 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
         mWebView = binding.webview
         mWebView.settings.apply {
-    // The Clash/yacd dashboard is a JS SPA talking to the local Clash API, so JS
-    // and DOM storage are required. Everything else is locked down: the dashboard
-    // (a user-editable URL) must never be able to read the device filesystem or
-    // content providers, escalate from file:// origins, or downgrade to cleartext
-    // resources on an https page.
-    javaScriptEnabled = true
-    domStorageEnabled = true
+            // The Clash/yacd dashboard is a JS SPA talking to the local Clash API, so JS
+            // and DOM storage are required. Everything else is locked down: the dashboard
+            // (a user-editable URL) must never be able to read the device filesystem or
+            // content providers, escalate from file:// origins, or downgrade to cleartext
+            // resources on an https page.
+            javaScriptEnabled = true
+            domStorageEnabled = true
 
-    // 嚴格限制檔案與 Content Provider 存取
-    allowFileAccess = false
-    allowContentAccess = false
-    databaseEnabled = false
+            // 嚴格限制檔案與 Content Provider 存取
+            allowFileAccess = false
+            allowContentAccess = false
+            databaseEnabled = false
 
-    @Suppress("DEPRECATION")
-    allowFileAccessFromFileURLs = false
-    @Suppress("DEPRECATION")
-    allowUniversalAccessFromFileURLs = false
+            @Suppress("DEPRECATION")
+            allowFileAccessFromFileURLs = false
+            @Suppress("DEPRECATION")
+            allowUniversalAccessFromFileURLs = false
 
-    // 混合內容安全性與彈出視窗控制
-    mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
-    javaScriptCanOpenWindowsAutomatically = false
-    setSupportMultipleWindows(false)
+            // 混合內容安全性與彈出視窗控制
+            mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
+            javaScriptCanOpenWindowsAutomatically = false
+            setSupportMultipleWindows(false)
 
-    // 啟用 Google 安全瀏覽功能（API 26+）
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-        safeBrowsingEnabled = true
-    }
-}
+            // 啟用 Google 安全瀏覽功能（API 26+）
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                safeBrowsingEnabled = true
+            }
+        }
         mWebView.webViewClient = object : WebViewClient() {
             override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
                 onReceivedError(view, request, error)
@@ -113,11 +113,13 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
                 MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.set_panel_url)
                     .setView(view)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                val candidateUrl = view.text.toString()
+                        val candidateUrl = view.text.toString()
                         val safeUrl = normalizePanelUrl(candidateUrl)
                         if (safeUrl == null) {
                             Toast.makeText(
-                                requireContext(), R.string.invalid_panel_url, Toast.LENGTH_SHORT
+                                requireContext(),
+                                R.string.invalid_panel_url,
+                                Toast.LENGTH_SHORT,
                             ).show()
                             return@setPositiveButton
                         }

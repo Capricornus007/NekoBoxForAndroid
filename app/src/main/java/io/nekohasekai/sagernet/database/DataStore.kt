@@ -119,7 +119,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var allowInsecureOnRequest by configurationStore.boolean(Key.ALLOW_INSECURE_ON_REQUEST)
     var networkChangeResetConnections by configurationStore.boolean(Key.NETWORK_CHANGE_RESET_CONNECTIONS) { true }
     var restartProfileOnNetworkChange by configurationStore.boolean(
-        Key.RESTART_PROFILE_ON_NETWORK_CHANGE
+        Key.RESTART_PROFILE_ON_NETWORK_CHANGE,
     ) { true }
     var wakeResetConnections by configurationStore.boolean(Key.WAKE_RESET_CONNECTIONS)
 

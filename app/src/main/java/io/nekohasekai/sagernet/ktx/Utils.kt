@@ -10,7 +10,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Resources
-import android.graphics.Color
 import android.os.Build
 import android.system.Os
 import android.system.OsConstants
@@ -19,7 +18,6 @@ import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
-import com.google.android.material.color.MaterialColors
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
@@ -27,6 +25,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.preference.Preference
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.color.MaterialColors
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore

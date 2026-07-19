@@ -188,5 +188,4 @@ object Theme {
     fun applyNightTheme() {
         AppCompatDelegate.setDefaultNightMode(getNightMode())
     }
-
 }

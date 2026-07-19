@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.ui
 
 import android.annotation.SuppressLint
-import android.content.res.ColorStateList
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,28 +14,19 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewConfiguration
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.net.toUri
 import androidx.core.view.isGone
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceDataStore
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.nekohasekai.sagernet.GroupType
@@ -57,14 +47,12 @@ import io.nekohasekai.sagernet.databinding.LayoutGroupListBinding
 import io.nekohasekai.sagernet.databinding.LayoutProgressListBinding
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
-import io.nekohasekai.sagernet.fmt.toUniversalLink
 import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
 import io.nekohasekai.sagernet.ktx.SubscriptionFoundException
 import io.nekohasekai.sagernet.ktx.app
-import io.nekohasekai.sagernet.ktx.dp2px
 import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.ktx.getColour
 import io.nekohasekai.sagernet.ktx.isIpAddress
@@ -96,21 +84,12 @@ import io.nekohasekai.sagernet.ui.profile.TrojanSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TuicSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.VMessSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.WireGuardSettingsActivity
-import io.nekohasekai.sagernet.widget.QRCodeDialog
-import io.nekohasekai.sagernet.widget.UndoSnackbarManager
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CompletableDeferred
-import io.nekohasekai.sagernet.utils.Theme
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import moe.matsuri.nb4a.Protocols
 import moe.matsuri.nb4a.Protocols.getProtocolColor
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSSettingsActivity
@@ -127,8 +106,6 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import java.util.zip.ZipInputStream
 import kotlin.collections.set
-import androidx.appcompat.app.AlertDialog
-import kotlin.math.abs
 
 class ConfigurationFragment @JvmOverloads constructor(
     val select: Boolean = false,
@@ -274,7 +251,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
             }
         }
-val groupListBinding = LayoutGroupListBinding.bind(view)
+        val groupListBinding = LayoutGroupListBinding.bind(view)
         groupPager = groupListBinding.groupPager
         tabLayout = groupListBinding.groupTab
         syncProfileState()
@@ -282,7 +259,10 @@ val groupListBinding = LayoutGroupListBinding.bind(view)
         val recyclerView = groupPager.getChildAt(0) as? androidx.recyclerview.widget.RecyclerView
         recyclerView?.addOnItemTouchListener(object : androidx.recyclerview.widget.RecyclerView.OnItemTouchListener {
             private var startX = 0f
-            override fun onInterceptTouchEvent(rv: androidx.recyclerview.widget.RecyclerView, e: android.view.MotionEvent): Boolean {
+            override fun onInterceptTouchEvent(
+                rv: androidx.recyclerview.widget.RecyclerView,
+                e: android.view.MotionEvent,
+            ): Boolean {
                 when (e.action) {
                     android.view.MotionEvent.ACTION_DOWN -> {
                         startX = e.x
@@ -675,21 +655,27 @@ val groupListBinding = LayoutGroupListBinding.bind(view)
             }
 
             R.id.action_new_chain -> {
-                startActivity(Intent(requireActivity(), ChainSettingsActivity::class.java).apply {
-                    putExtra(ChainSettingsActivity.EXTRA_STRATEGY, ChainBean.STRATEGY_CHAIN)
-                })
+                startActivity(
+                    Intent(requireActivity(), ChainSettingsActivity::class.java).apply {
+                        putExtra(ChainSettingsActivity.EXTRA_STRATEGY, ChainBean.STRATEGY_CHAIN)
+                    },
+                )
             }
 
             R.id.action_new_waterfall -> {
-                startActivity(Intent(requireActivity(), ChainSettingsActivity::class.java).apply {
-                    putExtra(ChainSettingsActivity.EXTRA_STRATEGY, ChainBean.STRATEGY_WATERFALL)
-                })
+                startActivity(
+                    Intent(requireActivity(), ChainSettingsActivity::class.java).apply {
+                        putExtra(ChainSettingsActivity.EXTRA_STRATEGY, ChainBean.STRATEGY_WATERFALL)
+                    },
+                )
             }
 
             R.id.action_new_fastest -> {
-                startActivity(Intent(requireActivity(), ChainSettingsActivity::class.java).apply {
-                    putExtra(ChainSettingsActivity.EXTRA_STRATEGY, ChainBean.STRATEGY_FASTEST)
-                })
+                startActivity(
+                    Intent(requireActivity(), ChainSettingsActivity::class.java).apply {
+                        putExtra(ChainSettingsActivity.EXTRA_STRATEGY, ChainBean.STRATEGY_FASTEST)
+                    },
+                )
             }
 
             R.id.action_update_subscription -> {
@@ -905,12 +891,16 @@ val groupListBinding = LayoutGroupListBinding.bind(view)
                 when (profile.status) {
                     -1 -> {
                         profileStatusText = profile.error
-                        profileStatusColor = context.getColorAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
+                        profileStatusColor = context.getColorAttr(
+                            com.google.android.material.R.attr.colorOnSurfaceVariant,
+                        )
                     }
 
                     0 -> {
                         profileStatusText = getString(R.string.connection_test_testing)
-                        profileStatusColor = context.getColorAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
+                        profileStatusColor = context.getColorAttr(
+                            com.google.android.material.R.attr.colorOnSurfaceVariant,
+                        )
                     }
 
                     1 -> {
@@ -1252,23 +1242,24 @@ val groupListBinding = LayoutGroupListBinding.bind(view)
 
                 val runFunc = if (now) activity?.let { it::runOnUiThread } else groupPager::post
                 if (runFunc != null) {
-                    val reloadAdapter = this@GroupPagerAdapter
-                    if (!disposed) {
-                        val liveIds = newGroupList.mapTo(HashSet()) { it.id }
-                        groupFragments.keys.retainAll(liveIds)
-                        groupList = newGroupList
-                        notifyDataSetChanged()
-                        if (set) groupPager.setCurrentItem(selectedGroupIndex, false)
-                        val hideTab = groupList.size < 2
-                        tabLayout.isGone = hideTab
-                        if (!select) {
-                            toolbar.title = if (hideTab) getString(R.string.app_name) else ""
-                            groupPager.registerOnPageChangeCallback(updateSelectedCallback)
+                    runFunc {
+                        if (!disposed) {
+                            val liveIds = newGroupList.mapTo(HashSet()) { it.id }
+                            groupFragments.keys.retainAll(liveIds)
+                            groupList = newGroupList
+                            notifyDataSetChanged()
+                            if (set) groupPager.setCurrentItem(selectedGroupIndex, false)
+                            val hideTab = groupList.size < 2
+                            tabLayout.isGone = hideTab
+                            if (!select) {
+                                toolbar.title = if (hideTab) getString(R.string.app_name) else ""
+                                groupPager.registerOnPageChangeCallback(updateSelectedCallback)
+                            }
                         }
-                    }
                         toolbar.elevation = 0F
                     }
                 }
+            }
         }
 
         init {

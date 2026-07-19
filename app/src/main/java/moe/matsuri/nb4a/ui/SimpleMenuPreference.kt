@@ -127,7 +127,7 @@ open class SimpleMenuPreference
                 }
             } else {
                 view.setBackgroundColor(
-                    context.getColorAttr(com.google.android.material.R.attr.colorSurfaceContainer)
+                    context.getColorAttr(com.google.android.material.R.attr.colorSurfaceContainer),
                 )
             }
             return view

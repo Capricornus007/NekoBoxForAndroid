@@ -70,10 +70,7 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         super.saveAndExit()
     }
 
-    override fun PreferenceFragmentCompat.createPreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-    ) {
+    override fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.name_preferences)
     }
 
@@ -91,7 +88,7 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
                 ChainBean.STRATEGY_WATERFALL -> R.string.waterfall_settings
                 ChainBean.STRATEGY_FASTEST -> R.string.fastest_settings
                 else -> R.string.chain_settings
-            }
+            },
         )
         configurationList = findViewById(R.id.configuration_list)
         layoutManager = FixedLinearLayoutManager(configurationList)
@@ -219,7 +216,10 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         if (profile.id == DataStore.editingId) return false
         if (proxyList.withIndex().any { (index, entity) ->
                 index != replacing - 1 && entity.id == profile.id
-            }) return false
+            }
+        ) {
+            return false
+        }
 
         if (profile.type == ProxyEntity.TYPE_CHAIN && chainContainsDynamicProfile(profile)) {
             return false
@@ -229,7 +229,9 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             ChainBean.STRATEGY_CHAIN, ChainBean.STRATEGY_FASTEST -> {
                 if (profile.type == ProxyEntity.TYPE_WATERFALL ||
                     profile.type == ProxyEntity.TYPE_FASTEST
-                ) return false
+                ) {
+                    return false
+                }
             }
 
             ChainBean.STRATEGY_WATERFALL -> {
@@ -240,25 +242,20 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         return DataStore.editingId == 0L || !testProfileContains(profile, DataStore.editingId)
     }
 
-    fun chainContainsDynamicProfile(
-        profile: ProxyEntity,
-        visited: MutableSet<Long> = HashSet(),
-    ): Boolean {
+    fun chainContainsDynamicProfile(profile: ProxyEntity, visited: MutableSet<Long> = HashSet()): Boolean {
         if (!visited.add(profile.id)) return false
         if (profile.type == ProxyEntity.TYPE_WATERFALL ||
             profile.type == ProxyEntity.TYPE_FASTEST
-        ) return true
+        ) {
+            return true
+        }
         if (profile.type != ProxyEntity.TYPE_CHAIN) return false
         return ProfileManager.getProfiles(profile.chainBean?.proxies.orEmpty()).any {
             chainContainsDynamicProfile(it, visited)
         }
     }
 
-    fun testProfileContains(
-        profile: ProxyEntity,
-        profileId: Long,
-        visited: MutableSet<Long> = HashSet(),
-    ): Boolean {
+    fun testProfileContains(profile: ProxyEntity, profileId: Long, visited: MutableSet<Long> = HashSet()): Boolean {
         if (!visited.add(profile.id)) return false
         if (profile.id == profileId) return true
         val proxies = profile.chainBean?.proxies ?: return false
@@ -284,23 +281,23 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
                         ),
                     )!!
 
-                if (!testProfileAllowed(profile)) {
-                    onMainDispatcher {
-                        MaterialAlertDialogBuilder(this@ChainSettingsActivity).setTitle(R.string.circular_reference)
-                            .setMessage(R.string.profile_reference_not_allowed)
-                            .setPositiveButton(android.R.string.ok, null).show()
-                    }
-                } else {
-                    configurationList.post {
-                        if (replacing != 0) {
-                            proxyList[replacing - 1] = profile
-                            configurationAdapter.notifyItemChanged(replacing)
-                        } else {
-                            proxyList.add(profile)
-                            configurationAdapter.notifyItemInserted(proxyList.size)
+                    if (!testProfileAllowed(profile)) {
+                        onMainDispatcher {
+                            MaterialAlertDialogBuilder(this@ChainSettingsActivity).setTitle(R.string.circular_reference)
+                                .setMessage(R.string.profile_reference_not_allowed)
+                                .setPositiveButton(android.R.string.ok, null).show()
+                        }
+                    } else {
+                        configurationList.post {
+                            if (replacing != 0) {
+                                proxyList[replacing - 1] = profile
+                                configurationAdapter.notifyItemChanged(replacing)
+                            } else {
+                                proxyList.add(profile)
+                                configurationAdapter.notifyItemInserted(proxyList.size)
+                            }
                         }
                     }
-                }
                 }
             }
         }
@@ -362,5 +359,4 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             shareButton.isVisible = false
         }
     }
-
 }

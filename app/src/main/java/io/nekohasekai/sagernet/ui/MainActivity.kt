@@ -56,8 +56,6 @@ import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.plugin.PluginTrust
 import moe.matsuri.nb4a.plugin.Plugins
-import io.nekohasekai.sagernet.ui.MessageStore
-import io.nekohasekai.sagernet.ui.publishClearCacheShortcut
 import moe.matsuri.nb4a.utils.Util
 import java.util.Locale
 

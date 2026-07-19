@@ -85,8 +85,7 @@ class FixedGridLayoutManager(val recyclerView: RecyclerView, spanCount: Int) :
         return false
     }
 
-    fun rowIndexOf(position: Int): Int =
-        position / spanCount
+    fun rowIndexOf(position: Int): Int = position / spanCount
 
     override fun scrollVerticallyBy(dx: Int, recycler: RecyclerView.Recycler, state: RecyclerView.State): Int {
         // Matsuri style

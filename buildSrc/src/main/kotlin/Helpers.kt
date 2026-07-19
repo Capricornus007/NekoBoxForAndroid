@@ -15,8 +15,6 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Base64
 import java.util.Properties
 

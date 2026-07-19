@@ -40,7 +40,7 @@ abstract class ThemedActivity : AppCompatActivity {
         if (!isDialog) applyDynamicColors()
 
         super.onCreate(savedInstanceState)
-    uiMode = resources.configuration.uiMode
+        uiMode = resources.configuration.uiMode
 
         // WindowCompat 內部已內建相容性處理，無需手動包 Build.VERSION 判斷
         WindowCompat.setDecorFitsSystemWindows(window, false)
