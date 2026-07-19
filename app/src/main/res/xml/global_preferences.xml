@@ -30,6 +30,14 @@
             app:key="amoledTheme"
             app:summary="@string/amoled_theme_summary"
             app:title="@string/amoled_theme" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:defaultValue=""
+            app:entries="@array/language_entries"
+            app:entryValues="@array/language_values"
+            app:icon="@drawable/ic_baseline_public_24"
+            app:key="appLanguage"
+            app:title="@string/language"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/general_settings">
         <SwitchPreferenceCompat
@@ -275,6 +283,14 @@
         <EditTextPreference
             app:key="mixedPassword"
             app:title="Proxy Password" />
+        <EditTextPreference
+            app:defaultValue=""
+            app:dialogMessage="@string/http_proxy_bypass_dialog_message"
+            app:icon="@drawable/ic_baseline_public_24"
+            app:key="httpProxyBypass"
+            app:title="@string/http_proxy_bypass"
+            app:summary="@string/http_proxy_bypass_sum"
+            app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
             app:defaultValue="false"
             app:key="appendHttpProxy"
