@@ -387,7 +387,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         if (!forTest) {
             experimental = ExperimentalOptions().apply {
                 cache_file = CacheFile().apply {
-                    enabled = true
+                    enabled = false
                     path = "../cache/cache_${proxy.id.coerceAtLeast(0)}.db"
                     store_fakeip = true
                 }
