@@ -63,7 +63,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = DataStore.configurationStore
         DataStore.initGlobal()
         addPreferencesFromResource(R.xml.global_preferences)
-        val appTheme = findPreference<ThemePickerPreference>(Key.APP_THEME)!!
+        val appTheme = findPreference<SimpleMenuPreference>(Key.APP_THEME)!!
         val nightTheme = findPreference<SimpleMenuPreference>(Key.NIGHT_THEME)!!
         val dynamicColors = findPreference<SwitchPreferenceCompat>(Key.DYNAMIC_COLORS)!!
 
@@ -84,7 +84,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             if (DataStore.serviceState.started) {
                 SagerNet.reloadService()
             }
-            val themeId = newTheme as Int
+            val themeId = (newTheme as String).toInt()
             val previousTheme = DataStore.appTheme
             val enteringDarkOnly = themeId in Theme.DARK_ONLY_THEMES
             val leavingDarkOnly = previousTheme in Theme.DARK_ONLY_THEMES

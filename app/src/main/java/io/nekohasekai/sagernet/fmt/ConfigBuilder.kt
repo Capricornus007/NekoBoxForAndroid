@@ -1381,13 +1381,11 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
         }
         if (dnsHosts.isNotEmpty()) {
-            dns.servers.add(
-                DNSServerOptions().apply {
-                    tag = TAG_DNS_HOSTS
-                    _hack_config_map["type"] = "hosts"
-                    _hack_config_map["predefined"] = dnsHosts
-                },
-            )
+            dns.servers.add(DNSServerOptions().apply {
+                tag = TAG_DNS_HOSTS
+                _hack_config_map["type"] = "hosts"
+                _hack_config_map["predefined"] = dnsHosts
+            })
         }
 
         dns.final_ = if (forTest) "dns-direct" else "dns-remote"

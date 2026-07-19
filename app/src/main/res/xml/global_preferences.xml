@@ -4,12 +4,6 @@
     <PreferenceCategory app:title="@string/interface_settings">
         <SwitchPreferenceCompat
             app:defaultValue="false"
-            app:icon="@drawable/ic_communication_phonelink_ring"
-            app:key="isAutoConnect"
-            app:summary="@string/auto_connect_summary"
-            app:title="@string/auto_connect" />
-        <moe.matsuri.nb4a.ui.ThemePickerPreference
-            android:title="@string/theme"
             app:icon="@drawable/ic_baseline_color_lens_24"
             app:key="dynamicColors"
             app:summary="@string/dynamic_colors_summary"

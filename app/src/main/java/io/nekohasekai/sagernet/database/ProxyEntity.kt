@@ -550,6 +550,26 @@ data class ProxyEntity(
                 chainBean = bean
             }
 
+            is SnellBean -> {
+                type = TYPE_SNELL
+                snellBean = bean
+            }
+
+            is MasterDnsVpnBean -> {
+                type = TYPE_MASTERDNSVPN
+                masterDnsVpnBean = bean
+            }
+
+            is AmneziaWGBean -> {
+                type = TYPE_AWG
+                awgBean = bean
+            }
+
+            is OlcrtcBean -> {
+                type = TYPE_OLCRTC
+                olcrtcBean = bean
+            }
+
             is ConfigBean -> {
                 type = TYPE_CONFIG
                 configBean = bean
