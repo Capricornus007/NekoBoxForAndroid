@@ -12,7 +12,7 @@ env:
   OLCRTC_REPO: https://github.com/hawkff/olcrtc.git
   OLCRTC_COMMIT: ad5cc1e3d60b657b15ccd26f8db91395bf9630d0
 permissions:
-  contents: read
+  contents: write
 jobs:
   guard:
     name: Repo Guards
@@ -225,6 +225,13 @@ jobs:
     needs:
       - libcore
       - sidecars
+      - test
+      - lint
+      - instrumented
+    if: |
+      !cancelled() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
@@ -303,3 +310,13 @@ jobs:
         with:
           name: APKs
           path: ${{ env.APK }}
+
+      - name: Release APK
+        uses: softprops/action-gh-release@c06260a2be1c12e467c7a7a6f7f3348f1a6e7a55 # v2
+        with:
+          tag_name: nightly
+          name: Nightly Build
+          body: Automated build from main branch. Updated on every push.
+          files: ${{ env.APK }}/*.apk
+          prerelease: true
+          make_latest: true
