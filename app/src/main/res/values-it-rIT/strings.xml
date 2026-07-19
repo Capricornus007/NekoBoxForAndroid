@@ -218,6 +218,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <!-- notification category -->
     <string name="service_vpn">Servizio VPN</string>
     <string name="service_proxy">Servizio Proxy</string>
+    <string name="fgs_special_use_explanation">This app runs a VPN or proxy service in the foreground to maintain network connections and route traffic securely.</string>
     <string name="forward_success">Proxy avviato.</string>
     <string name="invalid_server">Nome server non valido</string>
     <string name="service_failed">Fallito: </string>
