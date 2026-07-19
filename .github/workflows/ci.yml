@@ -311,6 +311,15 @@ jobs:
           name: APKs
           path: ${{ env.APK }}
 
+      - name: Delete old nightly release
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete nightly --yes --cleanup-tag 2>/dev/null || true
+          # Wait a moment for GitHub to process the deletion
+          sleep 3
+
       - name: Release APK
         uses: softprops/action-gh-release@c06260a2be1c12e467c7a7a6f7f3348f1a6e7a55 # v2
         with:
