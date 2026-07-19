@@ -211,6 +211,7 @@
     <!-- notification category -->
     <string name="service_vpn">VPN 서비스</string>
     <string name="service_proxy">프록시 서비스</string>
+    <string name="fgs_special_use_explanation">This app runs a VPN or proxy service in the foreground to maintain network connections and route traffic securely.</string>
     <string name="forward_success">프록시가 시작되었습니다.</string>
     <string name="invalid_server">잘못된 서버 이름</string>
     <string name="service_failed">실패: </string>
