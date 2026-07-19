@@ -119,7 +119,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
             subText = SagerNet.appVersionNameForDisplay,
             onClick = {
                 requireContext().launchCustomTab(
-                    "https://github.com/hawkff/NekoBoxForAndroid/releases",
+                    "https://github.com/Capricornus007/NekoBoxForAndroid/releases",
                 )
             },
         )
@@ -184,9 +184,9 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                 }
                 val response = client.newRequest().apply {
                     if (checkPreview) {
-                        setURL("https://api.github.com/repos/hawkff/NekoBoxForAndroid/releases/tags/preview")
+                        setURL("https://api.github.com/repos/Capricornus007/NekoBoxForAndroid/releases/tags/preview")
                     } else {
-                        setURL("https://api.github.com/repos/hawkff/NekoBoxForAndroid/releases/latest")
+                        setURL("https://api.github.com/repos/Capricornus007/NekoBoxForAndroid/releases/latest")
                     }
                 }.execute()
                 val release = JSONObject(Util.getStringBox(response.getContentStringLimited(10L * 1024 * 1024)))
