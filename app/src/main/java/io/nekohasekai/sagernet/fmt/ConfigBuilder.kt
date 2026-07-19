@@ -1132,6 +1132,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                                 userDNSRuleList += makeDnsRuleObj().apply { server = "dns-direct" }
                             }
 
+                            val nonIpRulesets = mutableListOf<String>()
                             if (rule_set != null && rulesetTags.isNotEmpty()) {
                                 for (tag in rule_set) {
                                     // only handle ruleset tags, and they must be non-IP type
@@ -1144,12 +1145,6 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                             if (nonIpRulesets.isNotEmpty()) {
                                 rule_set = nonIpRulesets
                             }
-                        }
-                    }
-
-      when (rule.outbound) {
-                        -1L -> {
-                            userDNSRuleList += makeDnsRuleObj().apply { server = "dns-direct" }
                         }
 
                         0L -> {
