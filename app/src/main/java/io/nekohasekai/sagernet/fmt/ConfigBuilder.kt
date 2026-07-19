@@ -1380,13 +1380,6 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 )
             }
         }
-        if (dnsHosts.isNotEmpty()) {
-            dns.servers.add(DNSServerOptions().apply {
-                tag = TAG_DNS_HOSTS
-                _hack_config_map["type"] = "hosts"
-                _hack_config_map["predefined"] = dnsHosts
-            })
-        }
 
         dns.final_ = if (forTest) "dns-direct" else "dns-remote"
 
@@ -1480,15 +1473,6 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         makeSingBoxRule(dnsHosts.keys.map { "full:$it" })
                         query_type = listOf("A", "AAAA")
                         server = TAG_DNS_HOSTS
-                    },
-                )
-            }
-            if (dnsHosts.isNotEmpty()) {
-                dns.rules.add(
-                    0,
-                    DNSRule_DefaultOptions().apply {
-                        server = TAG_DNS_HOSTS
-                        _hack_config_map["ip_accept_any"] = true
                     },
                 )
             }
