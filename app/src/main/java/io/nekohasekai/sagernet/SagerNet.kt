@@ -202,6 +202,12 @@ class SagerNet :
             if (Build.VERSION.SDK_INT >= 26) {
                 @RequiresApi(26)
                 {
+                    // Force-recreate channels so Android picks up changed importance levels.
+                    // createNotificationChannel is a no-op for existing channels, so we must
+                    // delete first. The delete+create window is microseconds on the same
+                    // thread — :bg process cannot start a service in that gap.
+                    notification.deleteNotificationChannel("service-vpn")
+                    notification.deleteNotificationChannel("service-proxy")
                     notification.createNotificationChannels(
                         listOf(
                             NotificationChannel(
