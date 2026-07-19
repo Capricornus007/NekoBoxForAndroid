@@ -447,12 +447,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         }
                         endpoint_independent_nat = true
                         mtu = DataStore.mtu
-                        domain_strategy = genDomainStrategy(DataStore.resolveDestination)
                         auto_route = true
                         // sing-box known issue on Android: DNS hijack may fail with Private DNS when strict_route is disabled.
                         strict_route = DataStore.strictRoute || SagerNet.isPrivateDnsActiveOnUnderlyingNetwork()
-                        sniff = needSniff
-                        sniff_override_destination = needSniffOverride
                         when (ipv6Mode) {
                             IPv6Mode.DISABLE -> {
                                 address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
@@ -508,9 +505,6 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         tag = TAG_SOCKS_IN
                         listen = bind
                         listen_port = DataStore.socksPort
-                        domain_strategy = genDomainStrategy(DataStore.resolveDestination)
-                        sniff = needSniff
-                        sniff_override_destination = needSniffOverride
                         users = buildInboundUsers()
                     },
                 )
@@ -520,9 +514,6 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         tag = TAG_HTTP_IN
                         listen = bind
                         listen_port = DataStore.httpPort
-                        domain_strategy = genDomainStrategy(DataStore.resolveDestination)
-                        sniff = needSniff
-                        sniff_override_destination = needSniffOverride
                         users = buildInboundUsers()
                     },
                 )
