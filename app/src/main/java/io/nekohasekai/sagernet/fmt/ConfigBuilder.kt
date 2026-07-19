@@ -266,23 +266,23 @@ fun buildConfig(
                 }
                 endpoint_independent_nat = true
                 mtu = DataStore.mtu
-                domain_strategy = genDomainStrategy(DataStore.resolveDestination)
                 auto_route = true
                 strict_route = DataStore.strictRoute
-                sniff = needSniff
-                sniff_override_destination = needSniffOverride
+                // sing-box >= 1.12.0: use unified 'address' (legacy inet4_address/inet6_address removed)
                 when (ipv6Mode) {
                     IPv6Mode.DISABLE -> {
-                        inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
+                        address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
                     }
 
                     IPv6Mode.ONLY -> {
-                        inet6_address = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
+                        address = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
                     }
 
                     else -> {
-                        inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
-                        inet6_address = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
+                        address = listOf(
+                            VpnService.PRIVATE_VLAN4_CLIENT + "/28",
+                            VpnService.PRIVATE_VLAN6_CLIENT + "/126",
+                        )
                     }
                 }
             })
@@ -291,9 +291,6 @@ fun buildConfig(
                 tag = TAG_MIXED
                 listen = bind
                 listen_port = DataStore.mixedPort
-                domain_strategy = genDomainStrategy(DataStore.resolveDestination)
-                sniff = needSniff
-                sniff_override_destination = needSniffOverride
                 if (DataStore.mixedInboundNeedsAuth) {
                     users = listOf(User().also { u ->
                         u.username = Key.MIXED_USERNAME
@@ -314,6 +311,24 @@ fun buildConfig(
 
             // 添加并发拨号设置
              concurrent_dial = DataStore.concurrentDial
+
+            // sing-box 1.13: sniff + domain_strategy are route rule actions
+            if (needSniff) {
+                rules.add(
+                    Rule_DefaultOptions().apply {
+                        action = "sniff"
+                    },
+                )
+            }
+            val resolveStrategy = genDomainStrategy(DataStore.resolveDestination)
+            if (resolveStrategy.isNotEmpty()) {
+                rules.add(
+                    Rule_DefaultOptions().apply {
+                        action = "resolve"
+                        strategy = resolveStrategy
+                    },
+                )
+            }
         }
 
         // returns outbound tag
