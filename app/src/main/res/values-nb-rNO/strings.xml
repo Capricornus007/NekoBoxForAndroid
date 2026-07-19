@@ -214,6 +214,7 @@
     <!-- notification category -->
     <string name="service_vpn">VPN-tjeneste</string>
     <string name="service_proxy">Proxy-tjeneste</string>
+    <string name="fgs_special_use_explanation">This app runs a VPN or proxy service in the foreground to maintain network connections and route traffic securely.</string>
     <string name="forward_success">Proxy startet.</string>
     <string name="invalid_server">Ugyldig servernavn</string>
     <string name="service_failed">Mislyktes: </string>
