@@ -228,7 +228,7 @@ Only nodes are parsed; routing rules and other non-node fields are ignored.
 
 Core:
 
-- [SagerNet/sing-box](https://github.com/SagerNet/sing-box)
+- [Capricornus007/sing-box](https://github.com/Capricornus007/sing-box)
 
 ### Android GUI
 
@@ -241,4 +241,4 @@ Core:
 
 ## Contributors
 
-![Contributors](https://contrib.rocks/image?repo=starifly/NekoBoxForAndroid)
+![Contributors](https://contrib.rocks/image?repo=Capricornus007/NekoBoxForAndroid)
