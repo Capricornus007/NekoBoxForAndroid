@@ -75,10 +75,6 @@ private fun sanitizeDnsEntry(value: String): String {
     return value.filterNot { it.isISOControl() }.trim()
 }
 
-private fun sanitizeDnsEntry(value: String): String {
-    return value.filterNot { it.isISOControl() }.trim()
-}
-
 // Validate a hosts address token strictly enough for sing-box's netip-based
 // parser: the app-wide isIpAddress() regex is looser (it allows IPv4 leading
 // zeros and malformed IPv6 forms) and one bad value would fail the whole config
