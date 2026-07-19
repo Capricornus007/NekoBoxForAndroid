@@ -216,6 +216,7 @@
     <!-- notification category -->
     <string name="service_vpn">VPN Сервіс</string>
     <string name="service_proxy">Проксі Сервіс</string>
+    <string name="fgs_special_use_explanation">This app runs a VPN or proxy service in the foreground to maintain network connections and route traffic securely.</string>
     <string name="forward_success">Проксі запущено.</string>
     <string name="invalid_server">Недійсне ім\'я сервера</string>
     <string name="service_failed">Помилка: </string>
