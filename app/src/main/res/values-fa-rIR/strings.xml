@@ -216,6 +216,7 @@
     <!-- notification category -->
     <string name="service_vpn">سرویس VPN</string>
     <string name="service_proxy">سرویس پروکسی</string>
+    <string name="fgs_special_use_explanation">This app runs a VPN or proxy service in the foreground to maintain network connections and route traffic securely.</string>
     <string name="forward_success">پروکسی شروع شد.</string>
     <string name="invalid_server">نام سرور نامعتبر</string>
     <string name="service_failed">ناموفق: </string>
