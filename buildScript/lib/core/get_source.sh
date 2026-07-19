@@ -9,10 +9,10 @@ pushd .. >/dev/null
 
 #### sing-box ####
 if [ ! -d "sing-box" ]; then
-  git clone --no-checkout https://github.com/hawkff/sing-box.git
+  git clone --no-checkout https://github.com/Capricornus007/sing-box.git
 fi
 pushd sing-box >/dev/null
-git remote set-url origin https://github.com/hawkff/sing-box.git
+git remote set-url origin https://github.com/Capricornus007/sing-box.git
 git fetch origin --tags --force
 git checkout "$COMMIT_SING_BOX"
 # python3 ../NekoBoxForAndroid/buildScript/lib/core/patch_sing_box_awg.py "$(pwd)"
