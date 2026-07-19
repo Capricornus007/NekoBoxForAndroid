@@ -13,7 +13,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -332,9 +331,7 @@ class ConfigBuilderGoldenTest {
 
         assertEquals("hosts", hostsServer.getString("type"))
         assertEquals(listOf("192.0.2.70", "2001:db8::70"), strings(predefined))
-        val actualQueryType = hostsRule.optJSONArray("query_type")
-        assertNotNull("query_type missing from rule JSON: $hostsRule", actualQueryType)
-        assertEquals(listOf("A", "AAAA"), strings(actualQueryType))
+        assertEquals(listOf("A", "AAAA"), strings(hostsRule.getJSONArray("query_type")))
         assertTrue(strings(hostsRule.getJSONArray("domain")).contains("node.example"))
         val directRuleIndex = rules.indexOfFirst { it.optString("server") == "dns-direct" }
         assertTrue(directRuleIndex >= 0)

@@ -1106,7 +1106,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 dns.rules.add(
                     0,
                     DNSRule_DefaultOptions().apply {
-                        domain = dnsHosts.keys.map { "full:$it" }
+                        domain = dnsHosts.keys.map { it.lowercase() }
                         query_type = listOf("A", "AAAA")
                         server = TAG_DNS_HOSTS
                     },
