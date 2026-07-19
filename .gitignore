@@ -28,6 +28,7 @@ jniLibs/
 /library/libcore_build/
 /libcore/.build/
 /libcore/version_gen.go
+local.properties
 /.masterdnsvpn-build/
 /.olcrtc-build/
 /.olcrtc-gomobile/

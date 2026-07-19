@@ -331,7 +331,9 @@ class ConfigBuilderGoldenTest {
 
         assertEquals("hosts", hostsServer.getString("type"))
         assertEquals(listOf("192.0.2.70", "2001:db8::70"), strings(predefined))
-        assertEquals(listOf("A", "AAAA"), strings(hostsRule.getJSONArray("query_type")))
+        val actualQueryType = hostsRule.optJSONArray("query_type")
+        assertNotNull("query_type missing from rule JSON: $hostsRule", actualQueryType)
+        assertEquals(listOf("A", "AAAA"), strings(actualQueryType))
         assertTrue(strings(hostsRule.getJSONArray("domain")).contains("node.example"))
         val directRuleIndex = rules.indexOfFirst { it.optString("server") == "dns-direct" }
         assertTrue(directRuleIndex >= 0)
