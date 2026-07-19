@@ -213,7 +213,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <!-- notification category -->
     <string name="service_vpn">VPN サービス</string>
     <string name="service_proxy">プロキシ サービス</string>
-    <string name="fgs_special_use_explanation">このアプリはネットワーク接続を維持し、トラフィックを安全にルーティングするために、VPNまたはプロキシサービスをフォアグラウンドで実行します。</string>
     <string name="forward_success">プロキシを開始しました。</string>
     <string name="invalid_server">無効なサーバー名</string>
     <string name="service_failed">失敗: </string>

@@ -73,7 +73,7 @@ private fun sanitizeDnsEntry(value: String): String {
     return value.filterNot { it.isISOControl() }.trim()
 }
 
-private fun parseDnsHosts(value: String): Map<String, List<String>> {
+internal fun parseDnsHosts(value: String): Map<String, List<String>> {
     val hosts = linkedMapOf<String, MutableList<String>>()
     value.lineSequence().forEach { line ->
         val trimmed = line.trim()
