@@ -16,7 +16,7 @@ import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.databinding.LayoutWebviewBinding
-import moe.matsuri.nb4a.utils.WebViewUtil
+import moe.matsuri.nb4a.utils.onReceivedError
 
 // Fragment must have a no-argument public constructor, otherwise it will crash during data restoration
 
@@ -70,7 +70,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
 }
         mWebView.webViewClient = object : WebViewClient() {
             override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-                WebViewUtil.onReceivedError(view, request, error)
+                onReceivedError(view, request, error)
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
