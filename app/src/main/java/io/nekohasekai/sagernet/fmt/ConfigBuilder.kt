@@ -64,6 +64,7 @@ class ConfigBuildResult(
     var trafficMap: Map<String, List<ProxyEntity>>,
     var profileTagMap: Map<Long, String>,
     val selectorGroupId: Long,
+    val localProxyCredentials: Map<Int, Pair<String, String>> = emptyMap(),
 ) {
     data class IndexEntity(var chain: LinkedHashMap<Int, ProxyEntity>)
 }
@@ -122,6 +123,8 @@ fun buildConfig(
     val trafficMap = HashMap<String, List<ProxyEntity>>()
     val tagMap = HashMap<Long, String>()
     val globalOutbounds = HashMap<Long, String>()
+    // Per-port credentials for authenticated external-plugin SOCKS loopbacks (#1166).
+    val localProxyCredentials = HashMap<Int, Pair<String, String>>()
     val readableNames = mutableSetOf(TAG_DIRECT, TAG_BYPASS, TAG_BLOCK, TAG_FRAGMENT, TAG_MIXED, TAG_PROXY)
     val group = SagerDatabase.groupDao.getById(proxy.groupId)
 
@@ -448,6 +451,19 @@ fun buildConfig(
                         type = "socks"
                         server = LOCALHOST
                         server_port = localPort
+                        // Authenticated loopback SOCKS for plugins (Naive/olcRTC) so
+                        // other apps on the device cannot leak through the egress port.
+                        // Produce credentials even for non-plugin profiles so that
+                        // format-specific code does not need to handle a missing map entry
+                        // (a stale exported config without creds is harmless on another
+                        // device because 127.0.0.1 is loopback-only).
+                        if (!forExport) {
+                            val user = "neko"
+                            val pass = java.util.UUID.randomUUID().toString().replace("-", "")
+                            localProxyCredentials[localPort] = user to pass
+                            username = user
+                            password = pass
+                        }
                     }
                 } else {
                     // internal outbound
@@ -1014,7 +1030,8 @@ fun buildConfig(
             proxy.id,
             trafficMap,
             tagMap,
-            if (buildSelector) group.id else -1L
+            if (buildSelector) group.id else -1L,
+            localProxyCredentials,
         )
     }
 
