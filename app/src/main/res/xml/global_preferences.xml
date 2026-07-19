@@ -34,7 +34,7 @@
             app:defaultValue=""
             app:entries="@array/language_entries"
             app:entryValues="@array/language_values"
-            app:icon="@drawable/ic_baseline_public_24"
+            app:icon="@drawable/baseline_public_24"
             app:key="appLanguage"
             app:title="@string/language"
             app:useSimpleSummaryProvider="true" />
@@ -286,7 +286,7 @@
         <EditTextPreference
             app:defaultValue=""
             app:dialogMessage="@string/http_proxy_bypass_dialog_message"
-            app:icon="@drawable/ic_baseline_public_24"
+            app:icon="@drawable/baseline_public_24"
             app:key="httpProxyBypass"
             app:title="@string/http_proxy_bypass"
             app:summary="@string/http_proxy_bypass_sum"
