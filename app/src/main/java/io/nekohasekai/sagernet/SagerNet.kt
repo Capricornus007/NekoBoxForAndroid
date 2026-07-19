@@ -202,6 +202,9 @@ class SagerNet :
             if (Build.VERSION.SDK_INT >= 26) {
                 @RequiresApi(26)
                 {
+                    // Delete old channel to force-recreate with new importance level
+                    // (Android caches channel settings across app updates)
+                    notification.deleteNotificationChannel("service-vpn")
                     notification.createNotificationChannels(
                         listOf(
                             NotificationChannel(

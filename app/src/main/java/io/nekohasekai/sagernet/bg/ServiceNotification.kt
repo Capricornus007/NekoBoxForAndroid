@@ -134,6 +134,7 @@ class ServiceNotification(
         .setWhen(0)
         .setTicker(service.getString(R.string.forward_success))
         .setContentTitle(title)
+        .setContentText(service.getString(R.string.forward_success))
         .setOnlyAlertOnce(true)
         .setContentIntent(SagerNet.configureIntent(service))
         .setSmallIcon(R.drawable.ic_service_active)
