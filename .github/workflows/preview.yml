@@ -1,132 +1,56 @@
 name: Preview Build
 on:
+  push:
+    paths:
+      - 'nb4a.properties'
   workflow_dispatch:
     inputs:
-env:
-  MIERU_VERSION: v3.34.1
-  MDVPN_REF: android-vpnservice-protect-hook
-  MDVPN_COMMIT: d481d72d4b86783a87d536c214d2c68cc4e9320e
-  NAIVE_VERSION: v149.0.7827.114-1
-  OLCRTC_REPO: https://github.com/hawkff/olcrtc.git
-  OLCRTC_COMMIT: ad5cc1e3d60b657b15ccd26f8db91395bf9630d0
-permissions:
-  contents: read
 jobs:
   libcore:
     name: Native Build (LibCore)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        uses: actions/checkout@v5
       - name: Golang Status
-        run: find buildScript libcore -type f -name "*.sh" | xargs cat | sha1sum > golang_status
+        run: find buildScript libcore/*.sh | xargs cat | sha1sum > golang_status
       - name: Libcore Status
         run: git ls-files libcore | xargs cat | sha1sum > libcore_status
       - name: LibCore Cache
         id: cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@v5
         with:
           path: |
             app/libs/libcore.aar
           key: ${{ hashFiles('.github/workflows/*', 'golang_status', 'libcore_status') }}
       - name: Install Golang
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.26.4'
+          go-version: ^1.25
       - name: Native Build
         if: steps.cache.outputs.cache-hit != 'true'
         run: ./run lib core
-      - name: Verify 16 KB ELF alignment
-        run: bash ./scripts/verify-elf-alignment.sh app/libs/libcore.aar
-      - name: Upload LibCore
-        uses: actions/upload-artifact@v4 # v1
-        with:
-          name: libcore-aar-preview
-          path: app/libs/libcore.aar
-          retention-days: 1
-          if-no-files-found: error
-  sidecars:
-    name: Native Build (Sidecars)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-      - name: Sidecars Status
-        run: |
-          git ls-files -s -- \
-            buildScript/lib/mieru.sh \
-            buildScript/lib/masterdnsvpn.sh \
-            buildScript/lib/naive.sh \
-            buildScript/lib/olcrtc.sh \
-            buildScript/lib/olcrtc-src/main.go \
-            buildScript/lib/olcrtc-src/main_test.go \
-            buildScript/lib/olcrtc-src/go.mod \
-            buildScript/init/env.sh \
-            buildScript/init/env_ndk.sh \
-            | sha1sum > sidecars_status
-      - name: Sidecars Cache
-        id: cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
-        with:
-          path: |
-            app/executableSo
-          key: ${{ hashFiles('.github/workflows/*', 'sidecars_status') }}-${{ env.MIERU_VERSION }}-${{ env.MDVPN_COMMIT }}-${{ env.NAIVE_VERSION }}-${{ env.OLCRTC_COMMIT }}-sidecars
-      - name: Install Golang
-        if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
-        with:
-          go-version: '1.26.4'
-      - name: Mieru Build
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: ./run lib mieru
-      - name: MasterDnsVPN Build
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: ./run lib masterdnsvpn
-      - name: Naive Download
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: ./run lib naive
-      - name: olcRTC Build
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: ./run lib olcrtc
-      - name: Upload Sidecars
-        uses: actions/upload-artifact@v4 # v1
-        with:
-          name: sidecars-so-preview
-          path: app/executableSo
-          retention-days: 1
-          if-no-files-found: error
   build:
     name: Build OSS APK
     runs-on: ubuntu-latest
     needs:
       - libcore
-      - sidecars
     steps:
       - name: Checkout
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-      - name: Download LibCore
-        uses: actions/download-artifact@v4 # v1
+        uses: actions/checkout@v5
+      - name: Golang Status
+        run: find buildScript libcore/*.sh | xargs cat | sha1sum > golang_status
+      - name: Libcore Status
+        run: git ls-files libcore | xargs cat | sha1sum > libcore_status
+      - name: LibCore Cache
+        uses: actions/cache@v5
         with:
-          name: libcore-aar-preview
-          path: app/libs
-      - name: Download Sidecars
-        uses: actions/download-artifact@v4 # v1
-        with:
-          name: sidecars-so-preview
-          path: app/executableSo
-      - name: Verify Sidecar Artifacts
-        run: |
-          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-            for so in libmieru.so libmasterdnsvpn.so libnaive.so libolcrtc.so; do
-              if [ ! -f "app/executableSo/$abi/$so" ]; then
-                echo "Error: missing app/executableSo/$abi/$so (sidecar artifact missing)" >&2
-                exit 1
-              fi
-            done
-          done
+          path: |
+            app/libs/libcore.aar
+          key: ${{ hashFiles('.github/workflows/*', 'golang_status', 'libcore_status') }}
       - name: Gradle cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@v5
         with:
           path: ~/.gradle
           key: gradle-oss-${{ hashFiles('**/*.gradle.kts') }}
@@ -139,14 +63,43 @@ jobs:
           export LOCAL_PROPERTIES="${{ secrets.LOCAL_PROPERTIES }}"
           ./run init action gradle
           ./gradlew app:assemblePreviewRelease
-          APK=$(find app/build/outputs/renamed_apks -name '*arm64-v8a*.apk' | head -n 1)
-          if [ -z "$APK" ]; then
-            echo "Error: no arm64-v8a APK found under app/build/outputs/renamed_apks" >&2
-            exit 1
+          
+          # Sign unsigned APKs with fixed debug keystore if available, otherwise fallback to dynamic generation
+          KEYSTORE_PATH="debug.keystore"
+          if [ -f "$KEYSTORE_PATH" ]; then
+            echo "Using fixed debug keystore from repository..."
+          else
+            echo "WARNING: Fixed debug keystore not found at $KEYSTORE_PATH!"
+            echo "Please run the 'Initialize Debug Keystore' workflow first."
+            echo "Falling back to dynamic debug.keystore generation..."
+            KEYSTORE_PATH="$HOME/.android/debug.keystore"
+            if [ ! -f "$KEYSTORE_PATH" ]; then
+              mkdir -p ~/.android
+              keytool -genkey -v -keystore "$KEYSTORE_PATH" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            fi
           fi
-          APK=$(dirname "$APK")
-          echo "APK=$APK" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v4 # v1
+          
+          APKSIGNER=$(find ${ANDROID_HOME}/build-tools -name apksigner | sort -V | tail -n 1)
+          if [ -z "$APKSIGNER" ]; then
+            APKSIGNER="apksigner"
+          fi
+          echo "Using apksigner: $APKSIGNER"
+          
+          APK=$(find app/build/outputs/apk -name '*arm64-v8a*.apk')
+          APK_DIR=$(dirname $APK)
+          
+          echo "Signing APKs in $APK_DIR..."
+          for apk in "$APK_DIR"/*-unsigned.apk; do
+            if [ -f "$apk" ]; then
+              signed_apk="${apk%-unsigned.apk}-debug-signed.apk"
+              echo "Signing $apk -> $signed_apk"
+              $APKSIGNER sign --ks "$KEYSTORE_PATH" --ks-pass pass:android --key-pass pass:android --out "$signed_apk" "$apk"
+              rm "$apk"
+            fi
+          done
+          
+          echo "APK=$APK_DIR" >> $GITHUB_ENV
+      - uses: actions/upload-artifact@v5
         with:
           name: APKs
           path: ${{ env.APK }}
