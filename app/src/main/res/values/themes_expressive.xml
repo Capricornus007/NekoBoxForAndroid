@@ -106,7 +106,7 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="ThemeOverlay.SagerNet.Amoled" parent="ThemeOverlay.MaterialComponents">
+    <style name="ThemeOverlay.SagerNet.Amoled" parent="ThemeOverlay.Material3">
         <item name="android:colorBackground">@android:color/black</item>
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:navigationBarColor">@android:color/black</item>
