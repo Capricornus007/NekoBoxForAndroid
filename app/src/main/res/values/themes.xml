@@ -187,6 +187,8 @@
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.SagerNet.Input</item>
     </style>
 
+    <style name="ThemeOverlay.SagerNet.Toolbar.Popup" parent="ThemeOverlay.Material3" />
+
     <style name="PopupMenuAnimation">
         <item name="android:windowEnterAnimation">@anim/popup_enter</item>
         <item name="android:windowExitAnimation">@anim/popup_exit</item>
