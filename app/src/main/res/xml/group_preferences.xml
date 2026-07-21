@@ -80,6 +80,13 @@
 
         <EditTextPreference
             app:icon="@drawable/ic_action_dns"
+            app:key="subscriptionServerDns"
+            app:summary="@string/server_dns_subscription_sum"
+            app:title="@string/server_dns"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_action_dns"
             app:key="subscriptionCustomDns"
             app:summary="@string/subscription_custom_dns_sum"
             app:title="@string/subscription_custom_dns"
