@@ -143,7 +143,7 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.scrollView)) { v, insets ->
             val bars = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars()
-                        or WindowInsetsCompat.Type.displayCutout(),
+                    or WindowInsetsCompat.Type.displayCutout(),
             )
             v.updatePadding(
                 left = bars.left + dp2px(4),
@@ -158,40 +158,44 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         configurationAdapter = ProxiesAdapter()
         configurationList.adapter = configurationAdapter
 
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.START,
-        ) {
-            override fun getSwipeDirs(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-            ) = if (viewHolder is ProfileHolder) {
-                super.getSwipeDirs(recyclerView, viewHolder)
-            } else 0
+        ItemTouchHelper(
+            object : ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+                ItemTouchHelper.START,
+            ) {
+                override fun getSwipeDirs(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                ) = if (viewHolder is ProfileHolder) {
+                    super.getSwipeDirs(recyclerView, viewHolder)
+                } else 0
 
-            override fun getDragDirs(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-            ) = if (viewHolder is ProfileHolder) {
-                super.getDragDirs(recyclerView, viewHolder)
-            } else 0
+                override fun getDragDirs(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                ) = if (viewHolder is ProfileHolder) {
+                    super.getDragDirs(recyclerView, viewHolder)
+                } else 0
 
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder,
-            ): Boolean {
-                return if (target !is ProfileHolder) false else {
-                    configurationAdapter.move(
-                        viewHolder.bindingAdapterPosition, target.bindingAdapterPosition,
-                    )
-                    true
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder,
+                ): Boolean {
+                    return if (target !is ProfileHolder) false else {
+                        configurationAdapter.move(
+                            viewHolder.bindingAdapterPosition,
+                            target.bindingAdapterPosition,
+                        )
+                        true
+                    }
                 }
-            }
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                configurationAdapter.remove(viewHolder.bindingAdapterPosition)
-            }
-        }).attachToRecyclerView(configurationList)
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    configurationAdapter.remove(viewHolder.bindingAdapterPosition)
+                }
+            },
+        ).attachToRecyclerView(configurationList)
         savedInstanceState?.getString(KEY_PROXY_LIST)?.let {
             proxyListInSavedInstance = it
         }
@@ -206,7 +210,7 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         ViewCompat.setOnApplyWindowInsetsListener(listView) { v, insets ->
             val bars = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars()
-                        or WindowInsetsCompat.Type.displayCutout(),
+                    or WindowInsetsCompat.Type.displayCutout(),
             )
             v.updatePadding()
             insets
@@ -231,9 +235,9 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         suspend fun reload() {
             var idList = DataStore.serverProtocol.split(",")
                 .mapNotNull { it.takeIf { it.isNotBlank() }?.toLong() }
-            proxyListInSavedInstance.takeIf { it.isNotEmpty() }?.let {
-                idList = it.split(",")
-                    .mapNotNull { it.takeIf { it.isNotBlank() }?.toLong() }
+            proxyListInSavedInstance.takeIf { it.isNotEmpty() }?.let { saved ->
+                idList = saved.split(",")
+                    .mapNotNull { s -> s.takeIf { it.isNotBlank() }?.toLong() }
             }
             if (idList.isNotEmpty()) {
                 val profiles = ProfileManager.getProfiles(idList).map { it.id to it }.toMap()
@@ -295,19 +299,23 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
 
     var replacing = 0
 
-    val selectProfileForAdd = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { (resultCode, data) ->
+    val selectProfileForAdd = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { (resultCode, data) ->
         if (resultCode == RESULT_OK) runOnDefaultDispatcher {
             DataStore.dirty = true
 
             val profile = ProfileManager.getProfile(
                 data!!.getLongExtra(
-                    ProfileSelectActivity.EXTRA_PROFILE_ID, 0,
+                    ProfileSelectActivity.EXTRA_PROFILE_ID,
+                    0,
                 ),
             )!!
 
             if (!testProfileAllowed(profile)) {
                 onMainDispatcher {
-                    MaterialAlertDialogBuilder(this@BalancerSettingsActivity).setTitle(R.string.circular_reference)
+                    MaterialAlertDialogBuilder(this@BalancerSettingsActivity)
+                        .setTitle(R.string.circular_reference)
                         .setMessage(R.string.circular_reference_sum)
                         .setPositiveButton(android.R.string.ok, null)
                         .show()
@@ -332,7 +340,8 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
                 replacing = 0
                 selectProfileForAdd.launch(
                     Intent(
-                        this@BalancerSettingsActivity, ProfileSelectActivity::class.java,
+                        this@BalancerSettingsActivity,
+                        ProfileSelectActivity::class.java,
                     ),
                 )
             }
@@ -361,8 +370,16 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
             if (showTraffic) {
                 trafficText.text = itemView.context.getString(
                     R.string.traffic,
-                    FormatFileSizeCompat.formatFileSize(itemView.context, tx, DataStore.useIECUnit),
-                    FormatFileSizeCompat.formatFileSize(itemView.context, rx, DataStore.useIECUnit),
+                    FormatFileSizeCompat.formatFileSize(
+                        itemView.context,
+                        tx,
+                        DataStore.useIECUnit,
+                    ),
+                    FormatFileSizeCompat.formatFileSize(
+                        itemView.context,
+                        rx,
+                        DataStore.useIECUnit,
+                    ),
                 )
             }
 
@@ -370,11 +387,13 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
 
             editButton.setOnClickListener {
                 replacing = bindingAdapterPosition
-                selectProfileForAdd.launch(Intent(
-                    this@BalancerSettingsActivity, ProfileSelectActivity::class.java,
+                val intent = Intent(
+                    this@BalancerSettingsActivity,
+                    ProfileSelectActivity::class.java,
                 ).apply {
                     putExtra(ProfileSelectActivity.EXTRA_SELECTED, proxyEntity)
-                })
+                }
+                selectProfileForAdd.launch(intent)
             }
 
             deleteButton.setOnClickListener {
