@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.nekohasekai.sagernet.fmt.KryoConverters;
+import io.nekohasekai.sagernet.fmt.Serializable;
 
 public class BalancerBean extends InternalBean {
 
@@ -124,7 +125,7 @@ public class BalancerBean extends InternalBean {
         return KryoConverters.deserialize(new BalancerBean(), KryoConverters.serialize(this));
     }
 
-    public static final Creator<BalancerBean> CREATOR = new Creator<BalancerBean>() {
+    public static final Serializable.CREATOR<BalancerBean> CREATOR = new Serializable.CREATOR<BalancerBean>() {
         @NonNull
         @Override
         public BalancerBean newInstance() {

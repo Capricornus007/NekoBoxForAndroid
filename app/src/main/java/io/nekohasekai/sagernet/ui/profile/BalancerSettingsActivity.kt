@@ -182,14 +182,14 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
             ): Boolean {
                 return if (target !is ProfileHolder) false else {
                     configurationAdapter.move(
-                        viewHolder.adapterPosition, target.adapterPosition,
+                        viewHolder.bindingAdapterPosition, target.bindingAdapterPosition,
                     )
                     true
                 }
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                configurationAdapter.remove(viewHolder.adapterPosition)
+                configurationAdapter.remove(viewHolder.bindingAdapterPosition)
             }
         }).attachToRecyclerView(configurationList)
         savedInstanceState?.getString(KEY_PROXY_LIST)?.let {
@@ -369,7 +369,7 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
             deleteButton.isVisible = true
 
             editButton.setOnClickListener {
-                replacing = adapterPosition
+                replacing = bindingAdapterPosition
                 selectProfileForAdd.launch(Intent(
                     this@BalancerSettingsActivity, ProfileSelectActivity::class.java,
                 ).apply {
@@ -381,7 +381,7 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
                 MaterialAlertDialogBuilder(this@BalancerSettingsActivity)
                     .setTitle(getString(R.string.delete_confirm_prompt))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        configurationAdapter.remove(adapterPosition)
+                        configurationAdapter.remove(bindingAdapterPosition)
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
