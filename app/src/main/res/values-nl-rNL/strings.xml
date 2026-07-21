@@ -361,7 +361,11 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="random">Willekeurig</string>
     <string name="api_port">API-poort</string>
     <string name="probe_interval">Balancer observatie-interval</string>
-    <string name="standard">Standaard</string>
+    <string name="probe_url">Probe URL</string>
+    <string name="regular_expression_filter">Regular expression filter</string>
+    <string name="regular_expression_filter1">Regular expression include filter</string>
+    <string name="balancer_use_landing_proxy">Use group landing proxy</string>
+    <string name="balancer_use_front_proxy">Use group front proxy</string>    <string name="standard">Standaard</string>
     <string name="unavailable">Niet beschikbaar</string>
     <string name="always_show_address">Altijd adres tonen</string>
     <string name="always_show_address_sum">Altijd het serveradres weergeven op de

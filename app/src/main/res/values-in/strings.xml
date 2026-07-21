@@ -354,7 +354,11 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="random">Acak</string>
     <string name="api_port">Port API</string>
     <string name="probe_interval">Interval pengamatan Balancer</string>
-    <string name="standard">Standar</string>
+    <string name="probe_url">Probe URL</string>
+    <string name="regular_expression_filter">Regular expression filter</string>
+    <string name="regular_expression_filter1">Regular expression include filter</string>
+    <string name="balancer_use_landing_proxy">Use group landing proxy</string>
+    <string name="balancer_use_front_proxy">Use group front proxy</string>    <string name="standard">Standar</string>
     <string name="unavailable">Tidak tersedia</string>
     <string name="always_show_address">Selalu Tampilkan Alamat</string>
     <string name="always_show_address_sum">Selalu tampilkan alamat server pada kartu konfigurasi</string>

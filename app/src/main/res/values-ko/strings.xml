@@ -349,7 +349,11 @@
     <string name="random">랜덤</string>
     <string name="api_port">API 포트</string>
     <string name="probe_interval">밸런서 관찰 간격</string>
-    <string name="standard">표준</string>
+    <string name="probe_url">Probe URL</string>
+    <string name="regular_expression_filter">Regular expression filter</string>
+    <string name="regular_expression_filter1">Regular expression include filter</string>
+    <string name="balancer_use_landing_proxy">Use group landing proxy</string>
+    <string name="balancer_use_front_proxy">Use group front proxy</string>    <string name="standard">표준</string>
     <string name="unavailable">사용 불가</string>
     <string name="always_show_address">항상 주소 표시</string>
     <string name="always_show_address_sum">구성 카드에 항상 서버 주소 표시</string>

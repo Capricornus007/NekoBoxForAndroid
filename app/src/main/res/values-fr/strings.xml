@@ -360,7 +360,11 @@
     <string name="random">Aléatoire</string>
     <string name="api_port">Port API</string>
     <string name="probe_interval">Intervalle d\'observation du répartiteur</string>
-    <string name="standard">Standard</string>
+    <string name="probe_url">Probe URL</string>
+    <string name="regular_expression_filter">Regular expression filter</string>
+    <string name="regular_expression_filter1">Regular expression include filter</string>
+    <string name="balancer_use_landing_proxy">Use group landing proxy</string>
+    <string name="balancer_use_front_proxy">Use group front proxy</string>    <string name="standard">Standard</string>
     <string name="unavailable">Indisponible</string>
     <string name="always_show_address">Toujours afficher l\'adresse</string>
     <string name="always_show_address_sum">Toujours afficher l\'adresse du serveur sur la carte

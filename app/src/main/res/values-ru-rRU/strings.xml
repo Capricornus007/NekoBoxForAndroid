@@ -364,7 +364,11 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="random">Случайный</string>
     <string name="api_port">Порт API</string>
     <string name="probe_interval">Интервал проверки балансировщика</string>
-    <string name="standard">Стандартный</string>
+    <string name="probe_url">Probe URL</string>
+    <string name="regular_expression_filter">Regular expression filter</string>
+    <string name="regular_expression_filter1">Regular expression include filter</string>
+    <string name="balancer_use_landing_proxy">Use group landing proxy</string>
+    <string name="balancer_use_front_proxy">Use group front proxy</string>    <string name="standard">Стандартный</string>
     <string name="unavailable">Недоступно</string>
     <string name="always_show_address">Всегда показывать адрес</string>
     <string name="always_show_address_sum">Всегда отображать адрес сервера на карточке

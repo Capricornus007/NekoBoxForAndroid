@@ -10,6 +10,7 @@ import io.nekohasekai.sagernet.fmt.*
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.hysteria.*
+import io.nekohasekai.sagernet.fmt.internal.BalancerBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.masterdnsvpn.MasterDnsVpnBean
@@ -30,6 +31,7 @@ import io.nekohasekai.sagernet.fmt.tuic.TuicBean
 import io.nekohasekai.sagernet.fmt.v2ray.*
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.ktx.app
+import io.nekohasekai.sagernet.ui.profile.BalancerSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ChainSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.HttpSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.HysteriaSettingsActivity
@@ -95,6 +97,7 @@ data class ProxyEntity(
     var shadowTLSBean: ShadowTLSBean? = null,
     var anyTLSBean: AnyTLSBean? = null,
     var chainBean: ChainBean? = null,
+    var balancerBean: BalancerBean? = null,
     var configBean: ConfigBean? = null,
     var snellBean: SnellBean? = null,
     var masterDnsVpnBean: MasterDnsVpnBean? = null,
@@ -134,6 +137,8 @@ data class ProxyEntity(
         const val TYPE_WATERFALL = 28
         const val TYPE_FASTEST = 29
 
+        const val TYPE_BALANCER = 30
+
         const val TYPE_CONFIG = 998
 
         // 999 was the Matsuri "Neko Plugin" protocol (removed). Reserved: do not
@@ -145,6 +150,7 @@ data class ProxyEntity(
         val chainName by lazy { app.getString(R.string.proxy_chain) }
         val waterfallName by lazy { app.getString(R.string.proxy_waterfall) }
         val fastestName by lazy { app.getString(R.string.proxy_fastest) }
+        val balancerName by lazy { app.getString(R.string.balancer) }
 
         @JvmField
         val CREATOR = object : CREATOR<ProxyEntity>() {
@@ -230,6 +236,7 @@ data class ProxyEntity(
                 TYPE_SHADOWTLS -> shadowTLSBean = KryoConverters.shadowTLSDeserialize(byteArray)
                 TYPE_ANYTLS -> anyTLSBean = KryoConverters.anyTLSDeserialize(byteArray)
                 TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST -> chainBean = KryoConverters.chainDeserialize(byteArray)
+                TYPE_BALANCER -> balancerBean = KryoConverters.balancerBeanDeserialize(byteArray)
                 TYPE_CONFIG -> configBean = KryoConverters.configDeserialize(byteArray)
             }
         }
@@ -256,6 +263,7 @@ data class ProxyEntity(
             TYPE_CHAIN -> chainName
             TYPE_WATERFALL -> waterfallName
             TYPE_FASTEST -> fastestName
+            TYPE_BALANCER -> balancerName
             TYPE_CONFIG -> configBean?.displayType() ?: "Config"
             else -> "Undefined type $type"
         }
@@ -287,6 +295,7 @@ data class ProxyEntity(
             TYPE_SHADOWTLS -> shadowTLSBean
             TYPE_ANYTLS -> anyTLSBean
             TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST -> chainBean
+            TYPE_BALANCER -> balancerBean
             TYPE_CONFIG -> configBean
             else -> error("Undefined type $type")
         } ?: error("Null ${displayType()} profile")
@@ -294,7 +303,7 @@ data class ProxyEntity(
 
     fun haveLink(): Boolean {
         return when (type) {
-            TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST -> false
+            TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST, TYPE_BALANCER -> false
             else -> true
         }
     }
@@ -458,6 +467,7 @@ data class ProxyEntity(
         shadowTLSBean = null
         anyTLSBean = null
         chainBean = null
+        balancerBean = null
         configBean = null
 
         when (bean) {
@@ -570,6 +580,11 @@ data class ProxyEntity(
                 olcrtcBean = bean
             }
 
+            is BalancerBean -> {
+                type = TYPE_BALANCER
+                balancerBean = bean
+            }
+
             is ConfigBean -> {
                 type = TYPE_CONFIG
                 configBean = bean
@@ -600,6 +615,7 @@ data class ProxyEntity(
                 TYPE_SHADOWTLS -> ShadowTLSSettingsActivity::class.java
                 TYPE_ANYTLS -> AnyTLSSettingsActivity::class.java
                 TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST -> ChainSettingsActivity::class.java
+                TYPE_BALANCER -> BalancerSettingsActivity::class.java
                 TYPE_CONFIG -> ConfigSettingActivity::class.java
                 else -> throw IllegalArgumentException("No settings activity for type $type")
             }

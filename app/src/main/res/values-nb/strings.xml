@@ -354,7 +354,11 @@
     <string name="random">Tilfeldig</string>
     <string name="api_port">API-port</string>
     <string name="probe_interval">Balanserobservasjonsintervall</string>
-    <string name="standard">Standard</string>
+    <string name="probe_url">Probe URL</string>
+    <string name="regular_expression_filter">Regular expression filter</string>
+    <string name="regular_expression_filter1">Regular expression include filter</string>
+    <string name="balancer_use_landing_proxy">Use group landing proxy</string>
+    <string name="balancer_use_front_proxy">Use group front proxy</string>    <string name="standard">Standard</string>
     <string name="unavailable">Utilgjengelig</string>
     <string name="always_show_address">Vis alltid adresse</string>
     <string name="always_show_address_sum">Vis alltid serveradressen på konfigurasjonskortet</string>

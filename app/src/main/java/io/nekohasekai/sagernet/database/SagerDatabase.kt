@@ -16,7 +16,7 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 12,
+    version = 13,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
@@ -26,9 +26,9 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
         AutoMigration(from = 8, to = 9),
         AutoMigration(from = 9, to = 10),
         AutoMigration(from = 10, to = 11, spec = SagerDatabase.RemoveNekoColumn::class),
-        // v12: additive lifetimeRx/lifetimeTx columns on proxy_entities (default 0). Pure column
-        // adds are auto-migratable without a spec; never destructive.
         AutoMigration(from = 11, to = 12),
+        // v13: additive balancerBean column on proxy_entities
+        AutoMigration(from = 12, to = 13),
     ],
 )
 @TypeConverters(value = [KryoConverters::class, GsonConverters::class])

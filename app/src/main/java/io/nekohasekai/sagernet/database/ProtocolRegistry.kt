@@ -9,6 +9,7 @@ import io.nekohasekai.sagernet.fmt.http.toUri
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.canUseSingBox
 import io.nekohasekai.sagernet.fmt.hysteria.toUri
+import io.nekohasekai.sagernet.fmt.internal.BalancerBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.juicity.toUri
@@ -262,6 +263,16 @@ object ProtocolRegistry {
             setBean = { e, b -> e.chainBean = b as ChainBean? },
             displayType = { ProxyEntity.chainName },
             settingsActivityClass = ChainSettingsActivity::class.java,
+        ),
+        ProtocolDescriptor(
+            type = ProxyEntity.TYPE_BALANCER,
+            deserialize = { KryoConverters.balancerBeanDeserialize(it) },
+            beanClass = BalancerBean::class.java,
+            getBean = { it.balancerBean },
+            setBean = { e, b -> e.balancerBean = b as BalancerBean? },
+            displayType = { ProxyEntity.balancerName },
+            settingsActivityClass = BalancerSettingsActivity::class.java,
+            hasStandardLink = false,
         ),
         ProtocolDescriptor(
             type = ProxyEntity.TYPE_CONFIG,
