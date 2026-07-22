@@ -81,6 +81,9 @@ class TrafficLooper
     var selectorNowId = -114514L
     var selectorNowFakeTag = ""
 
+    // For balancer: track the previously selected child tag
+    private var balancerLastChildTag = ""
+
     suspend fun selectMain(id: Long) = withStateLock {
         selectMainLocked(id)
     }
@@ -203,6 +206,22 @@ class TrafficLooper
                         box = proxy.box, items = idMap.values.toList()
                     )
                     proxy.box.setV2rayStats(tags.joinToString("\n"))
+                }
+
+                // For balancer: set child's tag to "proxy" so updateAll() adds delta to both
+                try {
+                    val balancerNow = proxy.box.getBalancerNow()
+                    if (balancerNow.isNotEmpty()) {
+                        // Restore previous child's tag first
+                        if (balancerLastChildTag.isNotEmpty()) {
+                            tagMap[balancerLastChildTag]?.tag = balancerLastChildTag
+                        }
+                        // Set current child's tag to "proxy" to share the same delta
+                        tagMap[balancerNow]?.tag = TAG_PROXY
+                        balancerLastChildTag = balancerNow
+                    }
+                } catch (_: Exception) {
+                    // getBalancerNow may not be available
                 }
 
                 trafficUpdater!!.updateAll()

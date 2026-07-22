@@ -76,6 +76,7 @@ type BoxInstance struct {
 
 	v2api        *boxapi.SbV2rayServer
 	selector     *group.Selector
+	urlTest      *group.URLTest
 	pauseManager pause.Manager
 }
 
@@ -119,6 +120,8 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 	if proxy, ok := b.Outbound().Outbound("proxy"); ok {
 		if selector, ok := proxy.(*group.Selector); ok {
 			b.selector = selector
+		} else if urlTest, ok := proxy.(*group.URLTest); ok {
+			b.urlTest = urlTest
 		}
 	}
 
@@ -211,6 +214,20 @@ func (b *BoxInstance) SelectOutbound(tag string) bool {
 		return b.selector.SelectOutbound(tag)
 	}
 	return false
+}
+
+func (b *BoxInstance) GetBalancerNow() string {
+	if b.urlTest != nil {
+		return b.urlTest.Now()
+	}
+	return ""
+}
+
+func (b *BoxInstance) GetBalancerAll() []string {
+	if b.urlTest != nil {
+		return b.urlTest.All()
+	}
+	return nil
 }
 
 func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err error) {
