@@ -83,10 +83,7 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
     lateinit var balancerUseFrontProxy: SwitchPreference
     lateinit var probeInterval: EditTextPreference
 
-    override fun PreferenceFragmentCompat.createPreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-    ) {
+    override fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.balancer_preferences)
 
         balancerType = findPreference(Key.BALANCER_TYPE)!!
@@ -163,26 +160,28 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
                 ItemTouchHelper.UP or ItemTouchHelper.DOWN,
                 ItemTouchHelper.START,
             ) {
-                override fun getSwipeDirs(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                ) = if (viewHolder is ProfileHolder) {
-                    super.getSwipeDirs(recyclerView, viewHolder)
-                } else 0
+                override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) =
+                    if (viewHolder is ProfileHolder) {
+                        super.getSwipeDirs(recyclerView, viewHolder)
+                    } else {
+                        0
+                    }
 
-                override fun getDragDirs(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                ) = if (viewHolder is ProfileHolder) {
-                    super.getDragDirs(recyclerView, viewHolder)
-                } else 0
+                override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) =
+                    if (viewHolder is ProfileHolder) {
+                        super.getDragDirs(recyclerView, viewHolder)
+                    } else {
+                        0
+                    }
 
                 override fun onMove(
                     recyclerView: RecyclerView,
                     viewHolder: RecyclerView.ViewHolder,
                     target: RecyclerView.ViewHolder,
                 ): Boolean {
-                    return if (target !is ProfileHolder) false else {
+                    return if (target !is ProfileHolder) {
+                        false
+                    } else {
                         configurationAdapter.move(
                             viewHolder.bindingAdapterPosition,
                             target.bindingAdapterPosition,
@@ -302,32 +301,34 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
     val selectProfileForAdd = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) { (resultCode, data) ->
-        if (resultCode == RESULT_OK) runOnDefaultDispatcher {
-            DataStore.dirty = true
+        if (resultCode == RESULT_OK) {
+            runOnDefaultDispatcher {
+                DataStore.dirty = true
 
-            val profile = ProfileManager.getProfile(
-                data!!.getLongExtra(
-                    ProfileSelectActivity.EXTRA_PROFILE_ID,
-                    0,
-                ),
-            )!!
+                val profile = ProfileManager.getProfile(
+                    data!!.getLongExtra(
+                        ProfileSelectActivity.EXTRA_PROFILE_ID,
+                        0,
+                    ),
+                )!!
 
-            if (!testProfileAllowed(profile)) {
-                onMainDispatcher {
-                    MaterialAlertDialogBuilder(this@BalancerSettingsActivity)
-                        .setTitle(R.string.circular_reference)
-                        .setMessage(R.string.circular_reference_sum)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show()
-                }
-            } else {
-                configurationList.post {
-                    if (replacing != 0) {
-                        proxyList[replacing - 1] = profile
-                        configurationAdapter.notifyItemChanged(replacing)
-                    } else {
-                        proxyList.add(profile)
-                        configurationAdapter.notifyItemInserted(proxyList.size)
+                if (!testProfileAllowed(profile)) {
+                    onMainDispatcher {
+                        MaterialAlertDialogBuilder(this@BalancerSettingsActivity)
+                            .setTitle(R.string.circular_reference)
+                            .setMessage(R.string.circular_reference_sum)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show()
+                    }
+                } else {
+                    configurationList.post {
+                        if (replacing != 0) {
+                            proxyList[replacing - 1] = profile
+                            configurationAdapter.notifyItemChanged(replacing)
+                        } else {
+                            proxyList.add(profile)
+                            configurationAdapter.notifyItemInserted(proxyList.size)
+                        }
                     }
                 }
             }
@@ -358,7 +359,6 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         val shareButton = binding.shareIcon
 
         fun bind(proxyEntity: ProxyEntity) {
-
             profileName.text = proxyEntity.displayName()
             profileType.text = proxyEntity.displayType()
 
