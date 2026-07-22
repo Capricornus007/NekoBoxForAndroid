@@ -41,6 +41,7 @@ import io.nekohasekai.sagernet.ktx.mkPort
 import io.nekohasekai.sagernet.ktx.unwrapIPV6Host
 import io.nekohasekai.sagernet.utils.PackageCache
 import moe.matsuri.nb4a.*
+import moe.matsuri.nb4a.SingBoxOptions.*
 import moe.matsuri.nb4a.SingBoxOptionsUtil
 import moe.matsuri.nb4a.plugin.Plugins
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSBean
