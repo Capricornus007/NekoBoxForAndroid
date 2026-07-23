@@ -252,6 +252,18 @@ object Key {
     //
     const val APP_TLS_VERSION = "appTLSVersion"
     const val ENABLE_CLASH_API = "enableClashAPI"
+    const val USE_IEC_UNIT = "useIECUnit"
+
+    const val BALANCER_TYPE = "balancerType"
+    const val BALANCER_GROUP = "balancerGroup"
+    const val BALANCER_STRATEGY = "balancerStrategy"
+    const val BALANCER_NAME_FILTER = "balancerNameFilter"
+    const val BALANCER_NAME_FILTER1 = "balancerNameFilter1"
+    const val BALANCER_USE_LANDING_PROXY = "balancerUseLandingProxy"
+    const val BALANCER_USE_FRONT_PROXY = "balancerUseFrontProxy"
+
+    const val PROBE_URL = "probeUrl"
+    const val PROBE_INTERVAL = "probeInterval"
 
     const val ENABLE_TLS_FRAGMENT = "enableTLSFragment"
 
@@ -307,5 +319,5 @@ object Action {
     const val EXTRA_PROFILE_ID = "io.nekohasekai.sagernet.EXTRA_PROFILE_ID"
 
     // const val SWITCH_WAKE_LOCK = "io.nekohasekai.sagernet.SWITCH_WAKELOCK"
-    const val RESET_UPSTREAM_CONNECTIONS = "moe.nb4a.RESET_UPSTREAM_CONNECTIONS"
+    const val RESET_UPSTREAM_CONNECTIONS = "moe.sb4a.RESET_UPSTREAM_CONNECTIONS"
 }
