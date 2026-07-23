@@ -227,12 +227,6 @@ public class KryoConverters {
     }
 
     @TypeConverter
-    public static BalancerBean balancerBeanDeserialize(byte[] bytes) {
-        if (JavaUtil.isEmpty(bytes)) return null;
-        return deserialize(new BalancerBean(), bytes);
-    }
-
-    @TypeConverter
     public static SubscriptionBean subscriptionDeserialize(byte[] bytes) {
         if (JavaUtil.isEmpty(bytes)) return null;
         return deserialize(new SubscriptionBean(), bytes);

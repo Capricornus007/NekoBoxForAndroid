@@ -23,7 +23,7 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
         AutoMigration(from = 5, to = 6),
         AutoMigration(from = 6, to = 7),
         AutoMigration(from = 7, to = 8),
-        AutoMigration(from = 8, to = 9),
+        AutoMigration(from = 8, to = 9, spec = SagerDatabase.RemoveBalancerColumn::class),
         AutoMigration(from = 9, to = 10),
         AutoMigration(from = 10, to = 11, spec = SagerDatabase.RemoveNekoColumn::class),
         AutoMigration(from = 11, to = 12),
@@ -42,6 +42,9 @@ abstract class SagerDatabase : RoomDatabase() {
             db.execSQL("DELETE FROM proxy_entities WHERE type = 999")
         }
     }
+
+    @DeleteColumn(tableName = "proxy_entities", columnName = "balancerBean")
+    class RemoveBalancerColumn : AutoMigrationSpec
 
     companion object {
         val instance by lazy {
