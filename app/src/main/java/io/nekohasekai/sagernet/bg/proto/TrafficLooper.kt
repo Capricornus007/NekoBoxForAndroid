@@ -132,6 +132,9 @@ class TrafficLooper(
     var selectorNowId = -114514L
     var selectorNowFakeTag = ""
 
+    // For balancer: track the previously selected child tag
+    private var balancerLastChildTag = ""
+
     // Non-blocking entry for the JNI selector callback (NativeInterface). Posts the request;
     // it is applied on the loop coroutine via applySelect(). Never touches the maps directly.
     fun selectMain(id: Long) {
@@ -264,6 +267,22 @@ class TrafficLooper(
                     items = idMap.values.toList(),
                 )
                 proxy.box.setV2rayStats(tags.joinToString("\n"))
+
+                // For balancer: set child's tag to "proxy" so updateAll() adds delta to both
+                try {
+                    val balancerNow = proxy.box.getBalancerNow()
+                    if (balancerNow.isNotEmpty()) {
+                        // Restore previous child's tag first
+                        if (balancerLastChildTag.isNotEmpty()) {
+                            tagMap[balancerLastChildTag]?.tag = balancerLastChildTag
+                        }
+                        // Set current child's tag to "proxy" to share the same delta
+                        tagMap[balancerNow]?.tag = TAG_PROXY
+                        balancerLastChildTag = balancerNow
+                    }
+                } catch (_: Exception) {
+                    // getBalancerNow may not be available in older libcore builds
+                }
             }
 
             // Apply any selector switches posted from the JNI callback, on THIS coroutine, so
