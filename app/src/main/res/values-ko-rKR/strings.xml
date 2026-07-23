@@ -213,7 +213,6 @@
     <!-- notification category -->
     <string name="service_vpn">VPN 서비스</string>
     <string name="service_proxy">프록시 서비스</string>
-    <string name="fgs_special_use_explanation">이 앱은 네트워크 연결을 유지하고 트래픽을 안전하게 라우팅하기 위해 포그라운드에서 VPN 또는 프록시 서비스를 실행합니다.</string>
     <string name="forward_success">프록시가 시작되었습니다.</string>
     <string name="invalid_server">잘못된 서버 이름</string>
     <string name="service_failed">실패: </string>

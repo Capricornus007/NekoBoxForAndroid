@@ -214,7 +214,6 @@
     <!-- notification category -->
     <string name="service_vpn">VPN-Dienst</string>
     <string name="service_proxy">Proxy-Dienst</string>
-    <string name="fgs_special_use_explanation">Diese App führt einen VPN- oder Proxy-Dienst im Vordergrund aus, um Netzwerkverbindungen aufrechtzuerhalten und Datenverkehr sicher zu leiten.</string>
     <string name="forward_success">Proxy gestartet.</string>
     <string name="invalid_server">Ungültiger Servername</string>
     <string name="service_failed">Fehlgeschlagen: </string>

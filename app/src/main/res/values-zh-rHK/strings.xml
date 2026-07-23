@@ -218,7 +218,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <!-- notification category -->
     <string name="service_vpn">VPN 服務</string>
     <string name="service_proxy">代理服務</string>
-    <string name="fgs_special_use_explanation">此應用程式在前台執行 VPN 或代理服務，以維持網路連線並安全地路由流量。</string>
     <string name="forward_success">代理已啟動。</string>
     <string name="invalid_server">無效的伺服器名稱</string>
     <string name="service_failed">失敗：</string>

@@ -218,7 +218,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <!-- notification category -->
     <string name="service_vpn">Layanan VPN</string>
     <string name="service_proxy">Layanan Proxy</string>
-    <string name="fgs_special_use_explanation">Aplikasi ini menjalankan layanan VPN atau proksi di latar depan untuk menjaga koneksi jaringan dan merutekan lalu lintas dengan aman.</string>
     <string name="forward_success">Proxy dimulai.</string>
     <string name="invalid_server">Nama server tidak valid</string>
     <string name="service_failed">Gagal: </string>

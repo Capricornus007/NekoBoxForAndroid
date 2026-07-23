@@ -214,7 +214,6 @@
     <!-- notification category -->
     <string name="service_vpn">خدمة VPN</string>
     <string name="service_proxy">خدمة بروكسي</string>
-    <string name="fgs_special_use_explanation">يُشغِّل هذا التطبيق خدمة VPN أو بروكسي في الواجهة الأمامية للحفاظ على اتصالات الشبكة وتوجيه حركة المرور بأمان.</string>
     <string name="forward_success">تم بدء البروكسي.</string>
     <string name="invalid_server">اسم الخادم غير صالح</string>
     <string name="service_failed">فشل: </string>

@@ -215,7 +215,6 @@
     <!-- notification category -->
     <string name="service_vpn">VPN Hizmeti</string>
     <string name="service_proxy">Proxy Hizmeti</string>
-    <string name="fgs_special_use_explanation">Bu uygulama, ağ bağlantılarını sürdürmek ve trafiği güvenli şekilde yönlendirmek için ön planda bir VPN veya proxy hizmeti çalıştırır.</string>
     <string name="forward_success">Proxy başlatıldı.</string>
     <string name="invalid_server">Geçersiz sunucu adı</string>
     <string name="service_failed">Başarısız: </string>

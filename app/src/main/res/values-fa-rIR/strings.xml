@@ -218,7 +218,6 @@
     <!-- notification category -->
     <string name="service_vpn">سرویس VPN</string>
     <string name="service_proxy">سرویس پروکسی</string>
-    <string name="fgs_special_use_explanation">این برنامه یک سرویس VPN یا پروکسی را در پیش‌زمینه اجرا می‌کند تا ارتباطات شبکه را حفظ کرده و ترافیک را به‌طور امن مسیریابی کند.</string>
     <string name="forward_success">پروکسی شروع شد.</string>
     <string name="invalid_server">نام سرور نامعتبر</string>
     <string name="service_failed">ناموفق: </string>

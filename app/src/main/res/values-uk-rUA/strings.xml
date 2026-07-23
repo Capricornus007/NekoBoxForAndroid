@@ -218,7 +218,7 @@
     <!-- notification category -->
     <string name="service_vpn">VPN Сервіс</string>
     <string name="service_proxy">Проксі Сервіс</string>
-    <string name="fgs_special_use_explanation">Цей додаток запускає службу VPN або проксі на передньому плані для підтримки мережевих з\'єднань та безпечного спрямування трафіку.</string>
+
     <string name="forward_success">Проксі запущено.</string>
     <string name="invalid_server">Недійсне ім\'я сервера</string>
     <string name="service_failed">Помилка: </string>

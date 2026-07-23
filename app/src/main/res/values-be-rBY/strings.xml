@@ -213,7 +213,6 @@
     <!-- notification category -->
     <string name="service_vpn">VPN Служба</string>
     <string name="service_proxy">Проксі Служба</string>
-    <string name="fgs_special_use_explanation">Гэта праграма запускае VPN або проксі-службу ў рэжыме перадняга плану для падтрымання сеткавых злучэнняў і бяспечнай маршрутызацыі трафіку.</string>
     <string name="forward_success">Проксі запушчана.</string>
     <string name="invalid_server">Няправільнае імя сервера</string>
     <string name="service_failed">Памылка: </string>

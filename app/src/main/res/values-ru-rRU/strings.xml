@@ -217,7 +217,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <!-- notification category -->
     <string name="service_vpn">VPN-сервис</string>
     <string name="service_proxy">Прокси-сервис</string>
-    <string name="fgs_special_use_explanation">Это приложение запускает службу VPN или прокси на переднем плане для поддержания сетевых соединений и безопасной маршрутизации трафика.</string>
     <string name="forward_success">Прокси запущен.</string>
     <string name="invalid_server">Недопустимое имя сервера</string>
     <string name="service_failed">Ошибка: </string>

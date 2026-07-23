@@ -218,7 +218,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <!-- notification category -->
     <string name="service_vpn">VPN-service</string>
     <string name="service_proxy">Proxy-service</string>
-    <string name="fgs_special_use_explanation">Deze app draait een VPN- of proxyservice op de voorgrond om netwerkverbindingen te onderhouden en verkeer veilig te routeren.</string>
     <string name="forward_success">Proxy gestart.</string>
     <string name="invalid_server">Ongeldige servernaam</string>
     <string name="service_failed">Mislukt: </string>

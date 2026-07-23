@@ -218,7 +218,6 @@
     <!-- notification category -->
     <string name="service_vpn">Servicio VPN</string>
     <string name="service_proxy">Servicio Proxy</string>
-    <string name="fgs_special_use_explanation">Esta aplicación ejecuta un servicio VPN o proxy en primer plano para mantener las conexiones de red y enrutar el tráfico de forma segura.</string>
     <string name="forward_success">Proxy iniciado.</string>
     <string name="invalid_server">Nombre de servidor no válido</string>
     <string name="service_failed">Falló: </string>

@@ -217,7 +217,6 @@
     <!-- notification category -->
     <string name="service_vpn">VPN 服务</string>
     <string name="service_proxy">代理服务</string>
-    <string name="fgs_special_use_explanation">此应用在前台运行 VPN 或代理服务，以维持网络连接并安全路由流量。</string>
     <string name="forward_success">代理已启动。</string>
     <string name="invalid_server">无效的服务器名称</string>
     <string name="service_failed">失败：</string>
