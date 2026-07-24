@@ -19,6 +19,8 @@ object Key {
     const val MODE_VPN = "vpn"
     const val MODE_PROXY = "proxy"
 
+    const val LAN_SHARING = "lanSharing"
+
     const val GLOBAL_CUSTOM_CONFIG = "globalCustomConfig"
 
     const val REMOTE_DNS = "remoteDns"

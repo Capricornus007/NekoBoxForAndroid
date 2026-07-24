@@ -18,6 +18,7 @@ import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.plugin.PluginManager
+import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.utils.DefaultNetworkListener
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -304,6 +305,7 @@ class BaseService {
         fun acquireWakeLock()
 
         suspend fun lateInit() {
+            Logs.d("BaseService.lateInit: this is VpnService=${this is VpnService}")
             wakeLock?.apply {
                 release()
                 wakeLock = null
@@ -314,6 +316,14 @@ class BaseService {
                 data.notification?.postNotificationWakeLockStatus(true)
             } else {
                 data.notification?.postNotificationWakeLockStatus(false)
+            }
+
+            // Start root-based LAN sharing (hotspot/USB tethering)
+            if (this is VpnService) {
+                val context = this.applicationContext
+                runOnDefaultDispatcher {
+                    RootLanSharing.startClientSharing(context)
+                }
             }
         }
 

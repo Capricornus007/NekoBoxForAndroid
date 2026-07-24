@@ -28,14 +28,20 @@
             app:key="appLanguage"
             app:title="@string/language"
             app:useSimpleSummaryProvider="true" />
-        <moe.matsuri.nb4a.ui.SimpleMenuPreference
-            app:defaultValue="vpn"
-            app:entries="@array/service_modes"
-            app:entryValues="@array/service_mode_values"
-            app:icon="@drawable/ic_device_developer_mode"
-            app:key="serviceMode"
-            app:title="@string/service_mode"
-            app:useSimpleSummaryProvider="true" />
+    <moe.matsuri.nb4a.ui.SimpleMenuPreference
+        app:defaultValue="vpn"
+        app:entries="@array/service_modes"
+        app:entryValues="@array/service_mode_values"
+        app:icon="@drawable/ic_device_developer_mode"
+        app:key="serviceMode"
+        app:title="@string/service_mode"
+        app:useSimpleSummaryProvider="true" />
+    <SwitchPreference
+        app:defaultValue="false"
+        app:icon="@drawable/ic_communication_phonelink_ring"
+        app:key="lanSharing"
+        app:summary="@string/lan_sharing_summary"
+        app:title="@string/lan_sharing" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="0"
             app:entries="@array/tun_implementation"
