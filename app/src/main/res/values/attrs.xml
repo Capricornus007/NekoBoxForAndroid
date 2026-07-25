@@ -43,4 +43,8 @@
     <attr name="uiStatsForeground" format="color" />
     <attr name="uiTabBackground" format="color" />
     <attr name="uiNavigationItemFill" format="color" />
+
+    <!-- Theme style switch: card view styles for mod/original themes -->
+    <attr name="elevatedCardViewStyle" format="reference" />
+    <attr name="tintedCardViewStyle" format="reference" />
 </resources>
