@@ -6,7 +6,6 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.ProxyInfo
-import android.net.VpnService as BaseVpnService
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.PowerManager
@@ -18,6 +17,7 @@ import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.ui.VpnRequestActivity
 import io.nekohasekai.sagernet.utils.Subnet
+import android.net.VpnService as BaseVpnService
 
 class VpnService :
     BaseVpnService(),

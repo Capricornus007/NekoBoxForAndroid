@@ -82,11 +82,11 @@ object RootLanSharing {
             // MSS clamp
             appendLine(
                 "iptables -t mangle -D FORWARD -o \$TUN -p tcp --tcp-flags SYN,RST SYN" +
-                    " -j TCPMSS --set-mss 1350 2>/dev/null || true"
+                    " -j TCPMSS --set-mss 1350 2>/dev/null || true",
             )
             appendLine(
                 "iptables -t mangle -A FORWARD -o \$TUN -p tcp --tcp-flags SYN,RST SYN" +
-                    " -j TCPMSS --set-mss 1350"
+                    " -j TCPMSS --set-mss 1350",
             )
 
             // DNS DNAT
@@ -140,27 +140,32 @@ object RootLanSharing {
 
     private fun teardown(context: Context) {
         val tunName = getVpnTunName() ?: "tun0"
-        RootShell.exec(buildString {
-            appendLine("TUN=$tunName")
-            // Remove routing rules
-            for (pref in listOf(5010, 5020, 5030, 5040, 5050)) {
-                appendLine("ip rule del pref $pref 2>/dev/null || true")
+        RootShell.exec(
+            buildString {
+                appendLine("TUN=$tunName")
+                // Remove routing rules
+                for (pref in listOf(5010, 5020, 5030, 5040, 5050)) {
+                    appendLine("ip rule del pref $pref 2>/dev/null || true")
+                }
+                // Remove iptables chains
+                appendLine("iptables -D FORWARD -j CORE_FWD 2>/dev/null || true")
+                appendLine("iptables -F CORE_FWD 2>/dev/null || true")
+                appendLine("iptables -X CORE_FWD 2>/dev/null || true")
+                appendLine(
+                    "iptables -t mangle -D FORWARD -o \$TUN -p tcp" +
+                        " --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1350 2>/dev/null || true"
+                )
+                appendLine("iptables -t nat -D PREROUTING -j CORE_DNS 2>/dev/null || true")
+                appendLine("iptables -t nat -F CORE_DNS 2>/dev/null || true")
+                appendLine("iptables -t nat -X CORE_DNS 2>/dev/null || true")
+                appendLine("ip6tables -D FORWARD -j CORE6_FWD 2>/dev/null || true")
+                appendLine("ip6tables -F CORE6_FWD 2>/dev/null || true")
+                appendLine("ip6tables -X CORE6_FWD 2>/dev/null || true")
+                appendLine("ip6tables -t mangle -D PREROUTING -j CORE6_PRE 2>/dev/null || true")
+                appendLine("ip6tables -t mangle -F CORE6_PRE 2>/dev/null || true")
+                appendLine("ip6tables -t mangle -X CORE6_PRE 2>/dev/null || true")
             }
-            // Remove iptables chains
-            appendLine("iptables -D FORWARD -j CORE_FWD 2>/dev/null || true")
-            appendLine("iptables -F CORE_FWD 2>/dev/null || true")
-            appendLine("iptables -X CORE_FWD 2>/dev/null || true")
-            appendLine("iptables -t mangle -D FORWARD -o \$TUN -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1350 2>/dev/null || true")
-            appendLine("iptables -t nat -D PREROUTING -j CORE_DNS 2>/dev/null || true")
-            appendLine("iptables -t nat -F CORE_DNS 2>/dev/null || true")
-            appendLine("iptables -t nat -X CORE_DNS 2>/dev/null || true")
-            appendLine("ip6tables -D FORWARD -j CORE6_FWD 2>/dev/null || true")
-            appendLine("ip6tables -F CORE6_FWD 2>/dev/null || true")
-            appendLine("ip6tables -X CORE6_FWD 2>/dev/null || true")
-            appendLine("ip6tables -t mangle -D PREROUTING -j CORE6_PRE 2>/dev/null || true")
-            appendLine("ip6tables -t mangle -F CORE6_PRE 2>/dev/null || true")
-            appendLine("ip6tables -t mangle -X CORE6_PRE 2>/dev/null || true")
-        })
+        )
     }
 
     private fun getVpnTunName(): String? {
