@@ -23,6 +23,9 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Legacy colors…</string>
     <string name="theme_classic_color_swatch">Color theme %1$d</string>
+    <string name="theme_style">Theme style</string>
+    <string name="theme_style_mod">Mod style</string>
+    <string name="theme_style_original">Original style</string>
     <string name="document">Dokument</string>
     <string name="group_default">Ugruppert</string>
     <string name="quick_toggle">Veksle</string>
