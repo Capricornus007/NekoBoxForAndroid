@@ -21,9 +21,9 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Alte Farben …</string>
     <string name="theme_classic_color_swatch">Farbthema %1$d</string>
-    <string name="theme_style">テーマスタイル</string>
-    <string name="theme_style_mod">Mod style</string>
-    <string name="theme_style_original">Original style</string>
+    <string name="theme_style">Themenstil</string>
+    <string name="theme_style_mod">Mod-Stil</string>
+    <string name="theme_style_original">Originalstil</string>
     <string name="document">Dokument</string>
     <string name="group_default">Nicht gruppiert</string>
     <string name="quick_toggle">Umschalten</string>

@@ -21,9 +21,9 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Устаревшие цвета…</string>
     <string name="theme_classic_color_swatch">Цветовая тема %1$d</string>
-    <string name="theme_style">テーマスタイル</string>
-    <string name="theme_style_mod">Mod style</string>
-    <string name="theme_style_original">Original style</string>
+    <string name="theme_style">Стиль темы</string>
+    <string name="theme_style_mod">Mod стиль</string>
+    <string name="theme_style_original">Оригинальный стиль</string>
     <string name="document">Документ</string>
     <string name="group_default">Без группы</string>
     <string name="quick_toggle">Переключить</string>

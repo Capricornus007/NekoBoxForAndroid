@@ -22,8 +22,8 @@
     <string name="theme_classic_colors">従来の色…</string>
     <string name="theme_classic_color_swatch">カラーテーマ %1$d</string>
     <string name="theme_style">テーマスタイル</string>
-    <string name="theme_style_mod">Mod style</string>
-    <string name="theme_style_original">Original style</string>
+    <string name="theme_style_mod">Mod スタイル</string>
+    <string name="theme_style_original">オリジナルスタイル</string>
     <string name="document">ドキュメント</string>
     <string name="group_default">未グループ化</string>
     <string name="quick_toggle">トグル</string>
