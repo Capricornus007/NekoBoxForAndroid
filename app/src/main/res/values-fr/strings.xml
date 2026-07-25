@@ -769,5 +769,5 @@
     <string name="more_options">Plus</string>
     <string name="amoled_theme">Thème sombre AMOLED</string>
     <string name="amoled_theme_summary">Fond noir pur en mode sombre</string>
-    <string name="app_theme">Couleur d'accent</string>
+    <string name="app_theme">Couleur d\'accent</string>
 </resources>
