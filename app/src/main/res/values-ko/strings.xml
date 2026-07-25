@@ -72,6 +72,9 @@
     <string name="cag_route">경로 설정</string>
     <string name="allow_access">LAN 연결 허용</string>
     <string name="allow_access_sum">인바운드 서버를 0.0.0.0에 바인딩</string>
+    <string name="lan_sharing">LAN / 핫스팟 공유 (Root 전용)</string>
+    <string name="lan_sharing_summary">Wi-Fi/USB 기기를 VPN으로 라우팅</string>
+    <string name="lan_sharing_requires_root">Root 권한 필요하지만 사용 불가</string>
     <string name="require_proxy_in_vpn">VPN 모드에서 로컬 프록시 유지</string>
     <string name="require_proxy_in_vpn_sum">VPN 모드 시 로컬 SOCKS/HTTP 프록시 포트를 열어 둡니다. 기본값은 꺼짐: VPN 모드에서는 포트가 일반적으로 불필요하며 열어 두면 다른 앱이 접근할 수 있습니다.</string>
     <string name="proxy_mode_inbound_auth">프록시 모드에서 로컬 프록시 인증</string>

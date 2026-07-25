@@ -74,6 +74,9 @@
     <string name="cag_route">Configurações de Rota</string>
     <string name="allow_access">Permitir conexões da LAN</string>
     <string name="allow_access_sum">Vincular servidores de entrada a 0.0.0.0</string>
+    <string name="lan_sharing">LAN / Compartilhar (Root)</string>
+    <string name="lan_sharing_summary">Roteamento Wi-Fi/USB via VPN</string>
+    <string name="lan_sharing_requires_root">Root necessario, indisponivel</string>
     <string name="require_proxy_in_vpn">Keep local proxy in VPN mode</string>
     <string name="require_proxy_in_vpn_sum">Keep the local SOCKS/HTTP proxy port open while in VPN mode. Off by default: in VPN mode the port is usually unneeded and leaving it open lets other apps reach it.</string>
     <string name="proxy_mode_inbound_auth">Authenticate local proxy in Proxy mode</string>

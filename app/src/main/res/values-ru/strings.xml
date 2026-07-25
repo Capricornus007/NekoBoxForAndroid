@@ -72,6 +72,9 @@
     <string name="cag_route">Настройки маршрутизации</string>
     <string name="allow_access">Разрешить подключения из локальной сети</string>
     <string name="allow_access_sum">Привязать входящие серверы к 0.0.0.0</string>
+    <string name="lan_sharing">LAN / общий доступ (Root)</string>
+    <string name="lan_sharing_summary">Маршрутизация Wi-Fi/USB через VPN</string>
+    <string name="lan_sharing_requires_root">Требуется root, но недоступен</string>
     <string name="require_proxy_in_vpn">Оставлять локальный прокси в режиме VPN</string>
     <string name="require_proxy_in_vpn_sum">Оставлять порт локального SOCKS/HTTP-прокси открытым в режиме VPN. По умолчанию выключено: в режиме VPN порт обычно не нужен, и его открытие позволяет другим приложениям подключаться к нему.</string>
     <string name="proxy_mode_inbound_auth">Аутентификация локального прокси в режиме прокси</string>

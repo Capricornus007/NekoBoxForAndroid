@@ -72,6 +72,9 @@
     <string name="cag_route">ルート設定</string>
     <string name="allow_access">LANからの接続を許可</string>
     <string name="allow_access_sum">インバウンドサーバーを0.0.0.0にバインド</string>
+    <string name="lan_sharing">LAN / ホットスポット共有 (Root のみ)</string>
+    <string name="lan_sharing_summary">Wi-Fi/USB 機器を VPN 経由で転送</string>
+    <string name="lan_sharing_requires_root">Root 権限が必要ですが利用不可</string>
     <string name="require_proxy_in_vpn">VPNモードでローカルプロキシを維持</string>
     <string name="require_proxy_in_vpn_sum">VPNモード中にローカルSOCKS/HTTPプロキシポートを開いたままにします。デフォルトではオフ：VPNモードでは通常ポートは不要で、開いたままにすると他のアプリがアクセスできるようになります。</string>
     <string name="proxy_mode_inbound_auth">プロキシモードでローカルプロキシを認証</string>

@@ -72,6 +72,9 @@
     <string name="cag_route">إعدادات التوجيه</string>
     <string name="allow_access">السماح بالاتصالات من الشبكة المحلية</string>
     <string name="allow_access_sum">ربط الخوادم الواردة بـ 0.0.0.0</string>
+    <string name="lan_sharing">مشاركة LAN (Root فقط)</string>
+    <string name="lan_sharing_summary">توجيه Wi-Fi و USB عبر VPN</string>
+    <string name="lan_sharing_requires_root">صلاحية Root غير متوفرة</string>
     <string name="require_proxy_in_vpn">إبقاء الوكيل المحلي في وضع VPN</string>
     <string name="require_proxy_in_vpn_sum">إبقاء منفذ وكيل SOCKS/HTTP المحلي مفتوحًا أثناء وضع VPN. مُعطّل افتراضيًا: في وضع VPN لا يُحتاج للمنفذ عادةً وتركه مفتوحًا يسمح للتطبيقات الأخرى بالوصول إليه.</string>
     <string name="proxy_mode_inbound_auth">مصادقة الوكيل المحلي في وضع الوكيل</string>

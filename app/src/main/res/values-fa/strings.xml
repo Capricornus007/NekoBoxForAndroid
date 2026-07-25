@@ -72,6 +72,9 @@
     <string name="cag_route">تنظیمات مسیریابی</string>
     <string name="allow_access">اجازه اتصال از شبکه محلی</string>
     <string name="allow_access_sum">اتصال سرورهای ورودی به 0.0.0.0</string>
+    <string name="lan_sharing">اشتراک LAN (فقط Root)</string>
+    <string name="lan_sharing_summary">مسیریابی Wi-Fi و USB از طریق VPN</string>
+    <string name="lan_sharing_requires_root">دسترسی Root لازم ولی در دسترس نیست</string>
     <string name="require_proxy_in_vpn">حفظ پروکسی محلی در حالت VPN</string>
     <string name="require_proxy_in_vpn_sum">باز نگه داشتن پورت پروکسی محلی SOCKS/HTTP در حالت VPN. به‌طور پیش‌فرض خاموش: در حالت VPN معمولاً پورت غیرضروری است و باز گذاشتن آن اجازه دسترسی سایر برنامه‌ها را می‌دهد.</string>
     <string name="proxy_mode_inbound_auth">احراز هویت پروکسی محلی در حالت پروکسی</string>

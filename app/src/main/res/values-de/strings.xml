@@ -72,6 +72,9 @@
     <string name="cag_route">Route-Einstellungen</string>
     <string name="allow_access">Verbindungen aus dem LAN zulassen</string>
     <string name="allow_access_sum">Eingehende Server an 0.0.0.0 binden</string>
+    <string name="lan_sharing">LAN / Hotspot (Nur Root)</string>
+    <string name="lan_sharing_summary">WLAN/USB uber VPN routen</string>
+    <string name="lan_sharing_requires_root">Root erforderlich, nicht verfugbar</string>
     <string name="require_proxy_in_vpn">Lokalen Proxy im VPN-Modus beibehalten</string>
     <string name="require_proxy_in_vpn_sum">Den lokalen SOCKS-/HTTP-Proxy-Port im VPN-Modus offen lassen. Standardmäßig deaktiviert: Im VPN-Modus wird der Port normalerweise nicht benötigt, und offen gelassen könnten andere Apps darauf zugreifen.</string>
     <string name="proxy_mode_inbound_auth">Lokalen Proxy im Proxy-Modus authentifizieren</string>
