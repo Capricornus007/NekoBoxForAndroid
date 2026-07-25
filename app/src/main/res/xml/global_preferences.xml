@@ -13,6 +13,14 @@
             app:icon="@drawable/ic_baseline_color_lens_24"
             app:key="appTheme" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            android:title="@string/theme_style"
+            app:defaultValue="0"
+            app:entries="@array/theme_style_entries"
+            app:entryValues="@array/theme_style_values"
+            app:icon="@drawable/ic_baseline_color_lens_24"
+            app:key="themeStyle"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="0"
             app:entries="@array/night_mode"
             app:entryValues="@array/int_array_4"

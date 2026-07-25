@@ -66,6 +66,14 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             Theme.applyNightTheme()
             true
         }
+
+        val themeStyle = findPreference<SimpleMenuPreference>(Key.THEME_STYLE)!!
+        themeStyle.setOnPreferenceChangeListener { _, _ ->
+            requireActivity().apply {
+                ActivityCompat.recreate(this)
+            }
+            true
+        }
         val appLanguage = findPreference<SimpleMenuPreference>(Key.APP_LANGUAGE)!!
         appLanguage.setOnPreferenceChangeListener { _, newValue ->
             AppLocale.apply(newValue as String)

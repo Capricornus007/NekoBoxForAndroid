@@ -2102,6 +2102,7 @@ class ConfigurationFragment @JvmOverloads constructor(
             val shareLayer: LinearLayout = view.findViewById(R.id.share_layer)
             val shareButton: ImageView = view.findViewById(R.id.shareIcon)
             val removeButton: ImageView = view.findViewById(R.id.remove)
+            val selectedView: LinearLayout = view.findViewById(R.id.selected_view)
 
             init {
                 view.setOnClickListener {
@@ -2220,6 +2221,10 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
 
             private fun applySelected(selected: Boolean) {
+                if (DataStore.themeStyle == 1) {
+                    selectedView.visibility = if (selected) View.VISIBLE else View.INVISIBLE
+                    return
+                }
                 val ctx = card.context
                 val primary = ctx.getColorAttr(R.attr.colorPrimary)
                 val surface = ctx.getColorAttr(R.attr.colorSurface)

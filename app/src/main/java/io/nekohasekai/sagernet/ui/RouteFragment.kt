@@ -286,14 +286,15 @@ class RouteFragment : ToolbarFragment(R.layout.layout_route), Toolbar.OnMenuItem
                 profileType.text = rule.mkSummary()
                 routeOutbound.text = rule.displayOutbound()
 
-                // 根据路由类型设置文字颜色
-                val colorRes = when (rule.outbound) {
-                    -2L -> R.color.color_route_block   // 屏蔽：红色
-                    -1L -> R.color.color_route_direct  // 直连：绿色
-                    0L -> R.color.color_route_proxy    // 代理：蓝色
-                    else -> R.color.color_route_config // 配置：紫色
+                if (DataStore.themeStyle == 0) {
+                    val colorRes = when (rule.outbound) {
+                        -2L -> R.color.color_route_block
+                        -1L -> R.color.color_route_direct
+                        0L -> R.color.color_route_proxy
+                        else -> R.color.color_route_config
+                    }
+                    routeOutbound.setTextColor(ContextCompat.getColor(itemView.context, colorRes))
                 }
-                routeOutbound.setTextColor(ContextCompat.getColor(itemView.context, colorRes))
 
                 itemView.setOnClickListener(null)
                 itemView.isClickable = false

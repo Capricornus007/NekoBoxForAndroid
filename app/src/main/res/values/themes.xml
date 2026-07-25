@@ -55,6 +55,8 @@
         <item name="actionOverflowMenuStyle">@style/Widget.SagerNet.PopupMenu.Overflow</item>
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.SagerNet.BottomSheetDialog</item>
         <item name="materialButtonStyle">@style/Widget.SagerNet.Button</item>
+        <item name="elevatedCardViewStyle">@style/Widget.SagerNet.CardView.Elevated</item>
+        <item name="tintedCardViewStyle">@style/Widget.SagerNet.CardView.Tinted</item>
 
     </style>
 
@@ -113,6 +115,8 @@
         <item name="actionOverflowMenuStyle">@style/Widget.SagerNet.PopupMenu.Overflow</item>
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.SagerNet.BottomSheetDialog</item>
         <item name="materialButtonStyle">@style/Widget.SagerNet.Button</item>
+        <item name="elevatedCardViewStyle">@style/Widget.SagerNet.CardView.Elevated</item>
+        <item name="tintedCardViewStyle">@style/Widget.SagerNet.CardView.Tinted</item>
 
         <item name="android:dialogCornerRadius">@dimen/dialog_corner_radius</item>
 

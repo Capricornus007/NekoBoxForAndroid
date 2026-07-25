@@ -18,6 +18,15 @@
         android:orientation="horizontal">
 
         <LinearLayout
+            android:id="@+id/selected_view"
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:background="?selectedColorPrimary"
+            android:orientation="horizontal"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+
+        <LinearLayout
 
             android:layout_width="match_parent"
             android:layout_height="match_parent"
