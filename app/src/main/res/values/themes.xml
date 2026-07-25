@@ -580,6 +580,15 @@
         <item name="cardElevatedSurfaceColor">@color/card_elevated_verdant_mint</item>
     </style>
 
+    <style name="Theme.SagerNet.Dialog.VerdantMint" parent="Theme.SagerNet.Dialog">
+        <item name="colorPrimary">@color/color_verdant_mint</item>
+        <item name="colorPrimaryDark">@color/color_verdant_mint_dark</item>
+        <item name="colorAccent">@color/color_verdant_mint_accent</item>
+        <item name="colorMaterial100">@color/color_verdant_mint_100</item>
+        <item name="colorMaterial300">@color/color_verdant_mint_300</item>
+        <item name="cardElevatedSurfaceColor">@color/card_elevated_verdant_mint</item>
+    </style>
+
     <!-- Dracula: purple primary, pink accent. Accent colors apply in any mode;
          the true #282a36 dark canvas (colorSurface/colorBackground/colorOnSurface)
          is layered on in values-night/themes.xml. Selecting this theme forces
