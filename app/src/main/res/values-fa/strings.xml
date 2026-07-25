@@ -98,8 +98,8 @@
     <string name="speed_detail">پروکسی: %1$s↑ %2$s↓\nمستقیم: %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">در حال آزمایش…</string>
-    <string name="connection_test_available">تأخیر: %d میلی‌ثانیه</string>
-    <string name="connection_test_available_http">تأخیر: %d میلی‌ثانیه</string>
+    <string name="connection_test_available">آزمایش موجود</string>
+    <string name="connection_test_available_http">آزمایش HTTP موجود</string>
     <string name="connection_test_error">ناموفق: %s</string>
     <string name="connection_test_fail">اینترنت در دسترس نیست</string>
     <string name="connection_test_error_status_code">کد خطا: #%d</string>
@@ -167,7 +167,7 @@
     <string name="delete_route_prompt">آیا مطمئن هستید که می‌خواهید این مسیر را حذف کنید؟</string>
     <string name="route_name">نام مسیر</string>
     <string name="route_proxy">پروکسی</string>
-    <string name="route_bypass">عبور مستقیم</string>
+    <string name="route_bypass">عبور</string>
     <string name="route_block">مسدود</string>
     <string name="route_profile">انتخاب پروفایل…</string>
     <string name="empty_route">مسیر خالی</string>
@@ -212,7 +212,7 @@
     <string name="scanning">در حال اسکن…</string>
     <string name="invert_selections">برعکس کردن انتخاب‌ها</string>
     <string name="clear_selections">پاک کردن انتخاب‌ها</string>
-    <string name="bypass_apps">عبور مستقیم</string>
+    <string name="bypass_apps">مستثنی کردن</string>
     <string name="show_system_apps">نمایش برنامه‌های سیستمی</string>
     <string name="auto_connect">اتصال خودکار</string>
     <string name="auto_connect_summary">فعال‌سازی پروکسی هنگام راه‌اندازی/به‌روزرسانی برنامه در صورت اجرا بودن قبلی</string>
@@ -227,7 +227,7 @@
     <string name="service_failed">ناموفق: </string>
     <string name="stop">توقف</string>
     <string name="stopping">در حال خاموش کردن…</string>
-    <string name="vpn_error">%s</string>
+    <string name="vpn_error">خطای VPN</string>
     <string name="vpn_permission_denied">مجوز ایجاد سرویس VPN رد شد</string>
     <string name="reboot_required">شروع سرویس VPN ناموفق بود. ممکن است نیاز به راه‌اندازی مجدد
         دستگاه خود داشته باشید.</string>
@@ -316,8 +316,8 @@
     <string name="donate_info">من عاشق پول هستم</string>
     <string name="ignore_battery_optimizations">نادیده گرفتن بهینه‌سازی باتری</string>
     <string name="ignore_battery_optimizations_sum">حذف برخی محدودیت‌ها</string>
-    <string name="battery_optimization_enabled">فعال - برنامه می‌تواند بدون محدودیت در پس‌زمینه اجرا شود</string>
-    <string name="battery_optimization_disabled">غیرفعال - برای اجازه فعالیت پس‌زمینه ضربه بزنید</string>
+    <string name="battery_optimization_enabled">بهینه‌سازی: روشن</string>
+    <string name="battery_optimization_disabled">بهینه‌سازی: خاموش</string>
     <!-- plugin -->
     <string name="plugin">پلاگین</string>
     <string name="plugin_configure">پیکربندی…</string>
@@ -540,7 +540,7 @@
     <string name="ssh_private_key_passphrase">عبارت عبور کلید خصوصی</string>
     <string name="translate_platform">پلتفرم ترجمه</string>
     <string name="menu_tools">ابزارها</string>
-    <string name="menu_log">گزارش‌ها</string>
+    <string name="menu_log">گزارش</string>
     <string name="clear_logcat">پاک کردن Logcat</string>
     <string name="wireguard_local_address">آدرس محلی</string>
     <string name="wireguard_public_key">کلید عمومی همتا</string>
@@ -582,7 +582,7 @@
     <string name="nat_stun_server_hint">سرور STUN</string>
     <string name="nat_result_hint">نتیجه بررسی NAT</string>
     <string name="tools_network">شبکه</string>
-    <string name="backup">پشتیبان‌گیری</string>
+    <string name="backup">پشتیبان</string>
     <string name="backup_groups_and_configurations">گروه‌ها و تنظیمات</string>
     <string name="backup_rules">قوانین مسیریابی</string>
     <string name="backup_settings">تنظیمات</string>
@@ -700,7 +700,7 @@
     <string name="mux_preference">مالتی‌پلکس</string>
     <string name="padding">پدینگ</string>
     <string name="network_change_reset_connections">بازنشانی اتصالات خروجی هنگام تغییر شبکه</string>
-    <string name="restart_profile_on_network_change">راه‌اندازی مجدد پروفایل فعال هنگام تغییر شبکه</string>
+    <string name="restart_profile_on_network_change">راه‌اندازی مجدد با تغییر شبکه</string>
     <string name="wake_reset_connections">بازنشانی اتصالات خروجی هنگام بیدار شدن دستگاه از خواب</string>
     <string name="backup_in_progress">پشتیبان‌گیری در حال انجام است</string>
     <string name="restore_in_progress">بازیابی در حال انجام است</string>
@@ -755,8 +755,8 @@
     <string name="dynamic_colors_summary">استفاده از پالت Material You سیستم</string>
     <string name="dynamic_colors_unavailable">در اندروید ۱۲ و جدیدتر در دسترس است</string>
     <string name="dynamic_colors_classic">با رابط کاربری جدید در دسترس است</string>
-    <string name="theme_fallback_summary">زمانی که رنگ‌های پویا در دسترس نیستند یا غیرفعال شده‌اند استفاده می‌شود</string>
-    <string name="more_options">گزینه‌های بیشتر</string>
+    <string name="theme_fallback_summary">رنگ در صورت غیرفعال بودن پویا</string>
+    <string name="more_options">بیشتر</string>
     <string name="amoled_theme">تم تاریک AMOLED</string>
     <string name="amoled_theme_summary">پس‌زمینه کاملاً سیاه در حالت تاریک</string>
     <string name="app_theme">رنگ تأکیدی</string>

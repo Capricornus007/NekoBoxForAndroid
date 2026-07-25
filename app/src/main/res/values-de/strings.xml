@@ -19,7 +19,7 @@
     <string name="theme_monokai">Monokai</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
-    <string name="theme_classic_colors">Alte Farben …</string>
+    <string name="theme_classic_colors">Alte Farben…</string>
     <string name="theme_classic_color_swatch">Farbthema %1$d</string>
     <string name="theme_style">Themenstil</string>
     <string name="theme_style_mod">Mod-Stil</string>
@@ -98,8 +98,8 @@
     <string name="speed_detail">Proxy: %1$s↑ %2$s↓\nDirekt: %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Testen…</string>
-    <string name="connection_test_available">Verzögerung: %d ms</string>
-    <string name="connection_test_available_http">Verzögerung: %d ms</string>
+    <string name="connection_test_available">Test verfügbar</string>
+    <string name="connection_test_available_http">HTTP-Test verfügbar</string>
     <string name="connection_test_error">Fehlgeschlagen: %s</string>
     <string name="connection_test_fail">Internet nicht verfügbar</string>
     <string name="connection_test_error_status_code">Fehlercode: #%d</string>
@@ -165,7 +165,7 @@
     <string name="delete_route_prompt">Sind Sie sicher, dass Sie diese Route entfernen möchten?</string>
     <string name="route_name">Routenname</string>
     <string name="route_proxy">Proxy</string>
-    <string name="route_bypass">Bypass</string>
+    <string name="route_bypass">Umgehung</string>
     <string name="route_block">Blockieren</string>
     <string name="route_profile">Profil auswählen…</string>
     <string name="empty_route">Leere Route</string>
@@ -208,7 +208,7 @@
     <string name="scanning">Scannen…</string>
     <string name="invert_selections">Auswahl umkehren</string>
     <string name="clear_selections">Auswahl löschen</string>
-    <string name="bypass_apps">Bypass</string>
+    <string name="bypass_apps">Apps ausschließen</string>
     <string name="show_system_apps">System-Apps anzeigen</string>
     <string name="auto_connect">Automatisch verbinden</string>
     <string name="auto_connect_summary">Proxy beim Start/App-Update aktivieren, wenn er zuvor ausgeführt wurde</string>
@@ -223,7 +223,7 @@
     <string name="service_failed">Fehlgeschlagen: </string>
     <string name="stop">Stopp</string>
     <string name="stopping">Wird heruntergefahren…</string>
-    <string name="vpn_error">%s</string>
+    <string name="vpn_error">VPN-Fehler</string>
     <string name="vpn_permission_denied">Keine Berechtigung zum Erstellen eines VPN-Dienstes</string>
     <string name="reboot_required">Fehler beim Starten des VPN-Dienstes. Möglicherweise müssen Sie Ihr
         Gerät neu starten.</string>
@@ -313,8 +313,8 @@
     <string name="donate_info">Ich liebe Geld</string>
     <string name="ignore_battery_optimizations">Batterieoptimierungen ignorieren</string>
     <string name="ignore_battery_optimizations_sum">Einige Einschränkungen entfernen</string>
-    <string name="battery_optimization_enabled">Aktiviert – die App kann uneingeschränkt im Hintergrund laufen</string>
-    <string name="battery_optimization_disabled">Deaktiviert – tippen, um Hintergrundaktivität zu erlauben</string>
+    <string name="battery_optimization_enabled">Akku-Optimierung: an</string>
+    <string name="battery_optimization_disabled">Akku-Optimierung: aus</string>
     <!-- plugin -->
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Konfigurieren…</string>
@@ -345,7 +345,7 @@
         <item quantity="one">%d Zeile</item>
         <item quantity="other">%d Zeilen</item>
     </plurals>
-    <string name="not_set">Nicht festgelegt</string>
+    <string name="not_set">Nicht gesetzt</string>
     <string name="night_mode">Nachtmodus</string>
     <string name="language">Sprache</string>
     <string name="follow_system">System folgen</string>
@@ -534,7 +534,7 @@
     <string name="ssh_private_key_passphrase">Passphrase für privaten Schlüssel</string>
     <string name="translate_platform">Übersetzungsplattform</string>
     <string name="menu_tools">Werkzeuge</string>
-    <string name="menu_log">Protokolle</string>
+    <string name="menu_log">Protokoll</string>
     <string name="clear_logcat">Logcat leeren</string>
     <string name="wireguard_local_address">Lokale Adresse</string>
     <string name="wireguard_public_key">Öffentlicher Schlüssel des Peers</string>
@@ -691,7 +691,7 @@
     <string name="mux_preference">Multiplex</string>
     <string name="padding">Padding</string>
     <string name="network_change_reset_connections">Ausgehende Verbindungen zurücksetzen, wenn sich das Netzwerk ändert</string>
-    <string name="restart_profile_on_network_change">Aktives Profil bei Netzwerkänderungen neu starten</string>
+    <string name="restart_profile_on_network_change">Neustart bei Netzwerkwechsel</string>
     <string name="wake_reset_connections">Ausgehende Verbindungen zurücksetzen, wenn das Gerät aus dem Ruhezustand aufwacht</string>
     <string name="backup_in_progress">Ein Backup wird bereits durchgeführt</string>
     <string name="restore_in_progress">Eine Wiederherstellung wird bereits durchgeführt</string>
@@ -744,8 +744,8 @@
     <string name="dynamic_colors_summary">Die System-Material-You-Palette verwenden</string>
     <string name="dynamic_colors_unavailable">Verfügbar ab Android 12 und neuer</string>
     <string name="dynamic_colors_classic">Verfügbar mit der neuen Oberfläche</string>
-    <string name="theme_fallback_summary">Verwendet, wenn dynamische Farben nicht verfügbar oder deaktiviert sind</string>
-    <string name="more_options">Weitere Optionen</string>
+    <string name="theme_fallback_summary">Farbe wenn Dynamik deaktiviert</string>
+    <string name="more_options">Mehr</string>
     <string name="amoled_theme">AMOLED-Dunkelthema</string>
     <string name="amoled_theme_summary">Rein schwarzer Hintergrund im Dunkelmodus</string>
     <string name="app_theme">Akzentfarbe</string>

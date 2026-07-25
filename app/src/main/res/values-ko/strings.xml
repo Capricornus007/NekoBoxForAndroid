@@ -98,8 +98,8 @@
     <string name="speed_detail">프록시: %1$s↑ %2$s↓\n직접: %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">테스트 중…</string>
-    <string name="connection_test_available">지연: %d ms</string>
-    <string name="connection_test_available_http">지연: %d ms</string>
+    <string name="connection_test_available">연결 테스트 가능</string>
+    <string name="connection_test_available_http">HTTP 연결 테스트 가능</string>
     <string name="connection_test_error">실패: %s</string>
     <string name="connection_test_fail">인터넷 사용 불가</string>
     <string name="connection_test_error_status_code">오류 코드: #%d</string>
@@ -165,7 +165,7 @@
     <string name="delete_route_prompt">이 경로를 삭제하시겠습니까?</string>
     <string name="route_name">경로 이름</string>
     <string name="route_proxy">프록시</string>
-    <string name="route_bypass">우회</string>
+    <string name="route_bypass">바이패스</string>
     <string name="route_block">차단</string>
     <string name="route_profile">프로필 선택…</string>
     <string name="empty_route">빈 경로</string>
@@ -208,7 +208,7 @@
     <string name="scanning">스캔 중…</string>
     <string name="invert_selections">선택 반전</string>
     <string name="clear_selections">선택 해제</string>
-    <string name="bypass_apps">우회</string>
+    <string name="bypass_apps">제외 앱</string>
     <string name="show_system_apps">시스템 앱 표시</string>
     <string name="auto_connect">자동 연결</string>
     <string name="auto_connect_summary">이전에 실행 중이었으면 시작/앱 업데이트 시 프록시 활성화</string>
@@ -222,7 +222,7 @@
     <string name="service_failed">실패: </string>
     <string name="stop">중지</string>
     <string name="stopping">종료 중…</string>
-    <string name="vpn_error">%s</string>
+    <string name="vpn_error">VPN 오류</string>
     <string name="vpn_permission_denied">VPN 서비스를 생성할 권한이 없습니다</string>
     <string name="reboot_required">VPN 서비스를 시작하지 못했습니다. 기기를 다시 시작해야 할 수 있습니다.</string>
     <!-- alert category -->
@@ -237,7 +237,7 @@
     <string name="select_profile">프로필 선택</string>
     <string name="proxy_chain">프록시 체인</string>
     <string name="proxy_waterfall">워터폴</string>
-    <string name="proxy_fastest">가장 빠름</string>
+    <string name="proxy_fastest">최속</string>
     <string name="custom_config">사용자 설정</string>
     <string name="balancer">밸런서</string>
     <string name="balancer_settings">밸런서 설정</string>
@@ -309,8 +309,8 @@
     <string name="donate_info">나는 돈을 사랑합니다</string>
     <string name="ignore_battery_optimizations">배터리 최적화 무시</string>
     <string name="ignore_battery_optimizations_sum">일부 제한 제거</string>
-    <string name="battery_optimization_enabled">활성화됨 - 앱이 백그라운드에서 제한 없이 실행될 수 있습니다</string>
-    <string name="battery_optimization_disabled">비활성화됨 - 탭하여 백그라운드 활동 허용</string>
+    <string name="battery_optimization_enabled">배터리 최적화: 켜짐</string>
+    <string name="battery_optimization_disabled">배터리 최적화: 꺼짐</string>
     <!-- plugin -->
     <string name="plugin">플러그인</string>
     <string name="plugin_configure">설정…</string>
@@ -342,7 +342,7 @@
     <plurals name="dns_hosts_lines">
         <item quantity="other">%d줄</item>
     </plurals>
-    <string name="not_set">설정 안 됨</string>
+    <string name="not_set">설정 안 함</string>
     <string name="night_mode">야간 모드</string>
     <string name="language">언어</string>
     <string name="follow_system">시스템 따르기</string>
@@ -490,7 +490,7 @@
     <string name="hysteria_auth_payload">인증 페이로드</string>
     <string name="hysteria_upload_mbps">최대 업로드 속도 (Mbps)</string>
     <string name="hysteria_download_mbps">최대 다운로드 속도 (Mbps)</string>
-    <string name="experimental_settings">실험적</string>
+    <string name="experimental_settings">실험적 설정</string>
     <string name="hysteria_stream_receive_window">QUIC 스트림 수신 윈도우</string>
     <string name="hysteria_connection_receive_window">QUIC 연결 수신 윈도우</string>
     <string name="hysteria_disable_mtu_discovery">경로 MTU 검색 비활성화</string>
@@ -686,7 +686,7 @@
     <string name="mux_preference">멀티플렉스</string>
     <string name="padding">패딩</string>
     <string name="network_change_reset_connections">네트워크 변경 시 아웃바운드 연결 재설정</string>
-    <string name="restart_profile_on_network_change">네트워크 변경 시 활성 프로필 다시 시작</string>
+    <string name="restart_profile_on_network_change">네트워크 변경 시 재연결</string>
     <string name="wake_reset_connections">디바이스가 절전 모드에서 깨어날 때 아웃바운드 연결 재설정</string>
     <string name="backup_in_progress">백업이 이미 진행 중입니다</string>
     <string name="restore_in_progress">복원이 이미 진행 중입니다</string>
@@ -731,7 +731,7 @@
     <string name="snell_mode">모드</string>
     <string name="snell_reuse">재사용</string>
     <string name="snell_reuse_summary">v4-v6 전용</string>
-    <string name="interface_settings">인터페이스</string>
+    <string name="interface_settings">인터페이스 설정</string>
     <string name="ui_style">인터페이스 스타일</string>
     <string name="ui_style_expressive">새로운</string>
     <string name="ui_style_classic">클래식</string>
@@ -739,9 +739,9 @@
     <string name="dynamic_colors_summary">시스템 Material You 팔레트 사용</string>
     <string name="dynamic_colors_unavailable">Android 12 이상에서 사용 가능</string>
     <string name="dynamic_colors_classic">새 인터페이스에서 사용 가능</string>
-    <string name="theme_fallback_summary">다이나믹 색상을 사용할 수 없거나 비활성화된 경우 사용됨</string>
-    <string name="more_options">더 많은 옵션</string>
+    <string name="theme_fallback_summary">동적 색상 비활성 시 이 색상 사용</string>
+    <string name="more_options">더 보기</string>
     <string name="amoled_theme">AMOLED 다크 테마</string>
     <string name="amoled_theme_summary">다크 모드에서 순수 검은색 배경</string>
-    <string name="app_theme">강조 색상</string>
+    <string name="app_theme">액센트 색상</string>
 </resources>

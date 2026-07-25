@@ -19,7 +19,7 @@
     <string name="theme_monokai">Monokai</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
-    <string name="theme_classic_colors">Устаревшие цвета…</string>
+    <string name="theme_classic_colors">Старые цвета…</string>
     <string name="theme_classic_color_swatch">Цветовая тема %1$d</string>
     <string name="theme_style">Стиль темы</string>
     <string name="theme_style_mod">Mod стиль</string>
@@ -98,8 +98,8 @@
     <string name="speed_detail">Прокси: %1$s↑ %2$s↓\nПрямое: %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Тестирование…</string>
-    <string name="connection_test_available">Задержка: %d мс</string>
-    <string name="connection_test_available_http">Задержка: %d мс</string>
+    <string name="connection_test_available">Тест соединения</string>
+    <string name="connection_test_available_http">HTTP тест соединения</string>
     <string name="connection_test_error">Не удалось: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
@@ -212,7 +212,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="scanning">Сканирование…</string>
     <string name="invert_selections">Инвертировать выбор</string>
     <string name="clear_selections">Очистить выбор</string>
-    <string name="bypass_apps">Обход</string>
+    <string name="bypass_apps">Исключения</string>
     <string name="show_system_apps">Показать системные приложения</string>
     <string name="auto_connect">Автоподключение</string>
     <string name="auto_connect_summary">Включать прокси при запуске или обновлении приложения, если он был активен</string>
@@ -226,7 +226,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="service_failed">Ошибка: </string>
     <string name="stop">Остановить</string>
     <string name="stopping">Завершение работы…</string>
-    <string name="vpn_error">%s</string>
+    <string name="vpn_error">Ошибка VPN</string>
     <string name="vpn_permission_denied">Отказано в разрешении на создание VPN-сервиса</string>
     <string name="reboot_required">Не удалось запустить VPN-сервис. Возможно, потребуется перезагрузить устройство.</string>
     <!-- alert category -->
@@ -240,7 +240,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="add_profile">Добавить профиль</string>
     <string name="select_profile">Выбрать профиль</string>
     <string name="proxy_chain">Прокси-цепь</string>
-    <string name="proxy_waterfall">Каскад</string>
+    <string name="proxy_waterfall">Водопад</string>
     <string name="proxy_fastest">Самый быстрый</string>
     <string name="custom_config">Пользовательская конфигурация</string>
     <string name="balancer">Балансировщик</string>
@@ -319,8 +319,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="donate_info">Я люблю деньги</string>
     <string name="ignore_battery_optimizations">Игнорировать оптимизацию батареи</string>
     <string name="ignore_battery_optimizations_sum">Убрать некоторые ограничения</string>
-    <string name="battery_optimization_enabled">Включено — приложение может работать в фоне без ограничений</string>
-    <string name="battery_optimization_disabled">Выключено — нажмите, чтобы разрешить фоновую активность</string>
+    <string name="battery_optimization_enabled">Оптимизация: вкл</string>
+    <string name="battery_optimization_disabled">Оптимизация: выкл</string>
     <!-- plugin -->
     <string name="plugin">Плагин</string>
     <string name="plugin_configure">Настроить…</string>
@@ -506,7 +506,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="hysteria_auth_payload">Payload аутентификации</string>
     <string name="hysteria_upload_mbps">Макс. скорость отправки (Мбит/с)</string>
     <string name="hysteria_download_mbps">Макс. скорость получения (Мбит/с)</string>
-    <string name="experimental_settings">Экспериментальные</string>
+    <string name="experimental_settings">Эксперимент.</string>
     <string name="hysteria_stream_receive_window">Окно приема потока QUIC</string>
     <string name="hysteria_connection_receive_window">Окно приема соединения QUIC</string>
     <string name="hysteria_disable_mtu_discovery">Отключить обнаружение MTU пути</string>
@@ -544,7 +544,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="ssh_private_key_passphrase">Парольная фраза закрытого ключа</string>
     <string name="translate_platform">Платформа перевода</string>
     <string name="menu_tools">Инструменты</string>
-    <string name="menu_log">Логи</string>
+    <string name="menu_log">Журнал</string>
     <string name="clear_logcat">Очистить Logcat</string>
     <string name="wireguard_local_address">Локальный адрес</string>
     <string name="wireguard_public_key">Открытый ключ пира</string>
@@ -585,7 +585,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="nat_stun_server_hint">STUN сервер</string>
     <string name="nat_result_hint">Результат проверки NAT</string>
     <string name="tools_network">Сеть</string>
-    <string name="backup">Резервное копирование</string>
+    <string name="backup">Резерв</string>
     <string name="backup_groups_and_configurations">Группы и конфигурации</string>
     <string name="backup_rules">Правила маршрутизации</string>
     <string name="backup_settings">Настройки</string>
@@ -704,7 +704,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="mux_preference">Multiplex</string>
     <string name="padding">Padding</string>
     <string name="network_change_reset_connections">Сбрасывать исходящие соединения при смене сети</string>
-    <string name="restart_profile_on_network_change">Перезапускать активный профиль при смене сети</string>
+    <string name="restart_profile_on_network_change">Перезапуск при смене сети</string>
     <string name="wake_reset_connections">Сбрасывать исходящие соединения при пробуждении устройства</string>
     <string name="backup_in_progress">Резервное копирование уже выполняется</string>
     <string name="restore_in_progress">Восстановление уже выполняется</string>
@@ -759,9 +759,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dynamic_colors_summary">Использовать системную палитру Material You</string>
     <string name="dynamic_colors_unavailable">Доступно на Android 12 и новее</string>
     <string name="dynamic_colors_classic">Доступно с новым интерфейсом</string>
-    <string name="theme_fallback_summary">Используется, когда динамические цвета недоступны или отключены</string>
-    <string name="more_options">Дополнительные параметры</string>
+    <string name="theme_fallback_summary">Цвет при отключённой динамике</string>
+    <string name="more_options">Ещё</string>
     <string name="amoled_theme">Темная тема AMOLED</string>
     <string name="amoled_theme_summary">Чисто черный фон в темном режиме</string>
-    <string name="app_theme">Акцентный цвет</string>
+    <string name="app_theme">Цвет акцента</string>
 </resources>

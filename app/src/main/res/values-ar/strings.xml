@@ -98,8 +98,8 @@
     <string name="speed_detail">الوكيل: %1$s↑ %2$s↓\nمباشر: %3$s↑ %4$s↓</string>
     <string name="speed">%s/ث</string>
     <string name="connection_test_testing">اختبار...</string>
-    <string name="connection_test_available">التأخير: %d ميلي ثانية</string>
-    <string name="connection_test_available_http">التأخير: %d ميلي ثانية</string>
+    <string name="connection_test_available">الاختبار متاح</string>
+    <string name="connection_test_available_http">اختبار HTTP متاح</string>
     <string name="connection_test_error">فشل: %s</string>
     <string name="connection_test_fail">الإنترنت غير متاح</string>
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
@@ -208,7 +208,7 @@
     <string name="scanning">جاري المسح…</string>
     <string name="invert_selections">عكس التحديدات</string>
     <string name="clear_selections">مسح التحديدات</string>
-    <string name="bypass_apps">تجاوز</string>
+    <string name="bypass_apps">استثناء التطبيقات</string>
     <string name="show_system_apps">إظهار تطبيقات النظام</string>
     <string name="auto_connect">اتصال تلقائي</string>
     <string name="auto_connect_summary">تمكين الوكيل عند بدء التشغيل أو تحديث التطبيق إذا كان قيد التشغيل من قبل</string>
@@ -223,7 +223,7 @@
     <string name="service_failed">فشل: </string>
     <string name="stop">إيقاف</string>
     <string name="stopping">جارٍ الإيقاف…</string>
-    <string name="vpn_error">%s</string>
+    <string name="vpn_error">خطأ VPN</string>
     <string name="vpn_permission_denied">تم رفض الإذن لإنشاء خدمة VPN</string>
     <string name="reboot_required">فشل بدء خدمة VPN. قد تحتاج إلى إعادة تشغيل
 جهازك.</string>
@@ -238,7 +238,7 @@
     <string name="add_profile">إضافة ملف شخصي</string>
     <string name="select_profile">تحديد ملف شخصي</string>
     <string name="proxy_chain">سلسلة الوكيل</string>
-    <string name="proxy_waterfall">تسلسلي</string>
+    <string name="proxy_waterfall">شلال</string>
     <string name="proxy_fastest">الأسرع</string>
     <string name="custom_config">تكوين مخصص</string>
     <string name="balancer">موازن</string>
@@ -320,8 +320,8 @@
     <string name="donate_info">أنا أحب المال</string>
     <string name="ignore_battery_optimizations">تجاهل تحسينات البطارية</string>
     <string name="ignore_battery_optimizations_sum">إزالة بعض القيود</string>
-    <string name="battery_optimization_enabled">مُمكّن - يمكن للتطبيق العمل دون قيود في الخلفية</string>
-    <string name="battery_optimization_disabled">معطّل - انقر للسماح بنشاط الخلفية</string>
+    <string name="battery_optimization_enabled">تحسين البطارية: مفعل</string>
+    <string name="battery_optimization_disabled">تحسين البطارية: معطل</string>
     <!-- plugin -->
     <string name="plugin">إضافة</string>
     <string name="plugin_configure">تكوين...</string>
@@ -544,7 +544,7 @@
     <string name="ssh_private_key_passphrase">عبارة مرور المفتاح الخاص</string>
     <string name="translate_platform">منصة الترجمة</string>
     <string name="menu_tools">الأدوات</string>
-    <string name="menu_log">السجلات</string>
+    <string name="menu_log">السجل</string>
     <string name="clear_logcat">مسح سجل Logcat</string>
     <string name="wireguard_local_address">العنوان المحلي</string>
     <string name="wireguard_public_key">المفتاح العام للنظير</string>
@@ -709,7 +709,7 @@
     <string name="mux_preference">Mux</string>
     <string name="padding">الحشو</string>
     <string name="network_change_reset_connections">إعادة تعيين الاتصالات الصادرة عند تغيير الشبكة</string>
-    <string name="restart_profile_on_network_change">إعادة تشغيل الملف الشخصي النشط عند تغيير الشبكة</string>
+    <string name="restart_profile_on_network_change">إعادة التشغيل عند تغير الشبكة</string>
     <string name="wake_reset_connections">إعادة تعيين الاتصالات الصادرة عند استيقاظ الجهاز من السكون</string>
     <string name="backup_in_progress">النسخ الاحتياطي قيد التقدم بالفعل</string>
     <string name="restore_in_progress">الاستعادة قيد التقدم بالفعل</string>
@@ -762,8 +762,8 @@
     <string name="dynamic_colors_summary">استخدام لوحة ألوان Material You للنظام</string>
     <string name="dynamic_colors_unavailable">متاح على Android 12 والإصدارات الأحدث</string>
     <string name="dynamic_colors_classic">متاح مع الواجهة الجديدة</string>
-    <string name="theme_fallback_summary">يُستخدم عندما تكون الألوان الديناميكية غير متاحة أو معطلة</string>
-    <string name="more_options">المزيد من الخيارات</string>
+    <string name="theme_fallback_summary">اللون عند تعطيل الديناميكي</string>
+    <string name="more_options">المزيد</string>
     <string name="amoled_theme">السمة الداكنة AMOLED</string>
     <string name="amoled_theme_summary">خلفية سوداء نقية في الوضع الداكن</string>
     <string name="app_theme">لون التمييز</string>

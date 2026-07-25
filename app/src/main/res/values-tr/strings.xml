@@ -19,8 +19,8 @@
     <string name="theme_monokai">Monokai</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
-    <string name="theme_classic_colors">Eski renkler…</string>
-    <string name="theme_classic_color_swatch">Renk teması %1$d</string>
+    <string name="theme_classic_colors">Eski Renkler…</string>
+    <string name="theme_classic_color_swatch">Renk Teması %1$d</string>
     <string name="theme_style">Tema stili</string>
     <string name="theme_style_mod">Mod stili</string>
     <string name="theme_style_original">Orijinal stil</string>
@@ -98,8 +98,8 @@
     <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirect： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Test ediliyor…</string>
-    <string name="connection_test_available">Gecikme: %d ms</string>
-    <string name="connection_test_available_http">Gecikme: %d ms</string>
+    <string name="connection_test_available">Test Mevcut</string>
+    <string name="connection_test_available_http">HTTP Test Mevcut</string>
     <string name="connection_test_error">Başarısız: %s</string>
     <string name="connection_test_fail">İnternet Kullanılamıyor</string>
     <string name="connection_test_error_status_code">Hata kodu: #%d</string>
@@ -166,7 +166,7 @@
     <string name="delete_route_prompt">Bu rotayı kaldırmak istediğinizden emin misiniz?</string>
     <string name="route_name">Rota Adı</string>
     <string name="route_proxy">Proxy</string>
-    <string name="route_bypass">Atla</string>
+    <string name="route_bypass">Atlatma</string>
     <string name="route_block">Engelle</string>
     <string name="route_profile">Profil Seç…</string>
     <string name="empty_route">Boş Rota</string>
@@ -209,7 +209,7 @@
     <string name="scanning">Taranıyor…</string>
     <string name="invert_selections">Seçimleri ters çevir</string>
     <string name="clear_selections">Seçimleri temizle</string>
-    <string name="bypass_apps">Atla</string>
+    <string name="bypass_apps">Uygulamaları Hariç Tut</string>
     <string name="show_system_apps">Sistem uygulamalarını göster</string>
     <string name="auto_connect">Otomatik Bağlan</string>
     <string name="auto_connect_summary">Daha önce çalışıyorsa başlangıçta/uygulama güncellemesinde proxy\'yi etkinleştir</string>
@@ -224,7 +224,7 @@
     <string name="service_failed">Başarısız: </string>
     <string name="stop">Durdur</string>
     <string name="stopping">Kapatılıyor…</string>
-    <string name="vpn_error">%s</string>
+    <string name="vpn_error">VPN Hatası</string>
     <string name="vpn_permission_denied">VPN hizmeti oluşturma izni reddedildi</string>
     <string name="reboot_required">Failed to start VPN service. You might need to reboot your
         device.</string>
@@ -314,8 +314,8 @@
     <string name="donate_info">Parayı seviyorum</string>
     <string name="ignore_battery_optimizations">Pil optimizasyonlarını yoksay</string>
     <string name="ignore_battery_optimizations_sum">Bazı kısıtlamaları kaldır</string>
-    <string name="battery_optimization_enabled">Etkin - uygulama arka planda kısıtlamasız çalışabilir</string>
-    <string name="battery_optimization_disabled">Devre dışı - arka plan etkinliğine izin vermek için dokunun</string>
+    <string name="battery_optimization_enabled">Pil Optimizasyonu: açık</string>
+    <string name="battery_optimization_disabled">Pil Optimizasyonu: kapalı</string>
     <!-- plugin -->
     <string name="plugin">Eklenti</string>
     <string name="plugin_configure">Yapılandır…</string>
@@ -539,7 +539,7 @@
     <string name="ssh_private_key_passphrase">Özel Anahtar Parolası</string>
     <string name="translate_platform">Çeviri Platformu</string>
     <string name="menu_tools">Araçlar</string>
-    <string name="menu_log">Günlükler</string>
+    <string name="menu_log">Günlük</string>
     <string name="clear_logcat">Logcat\'i Temizle</string>
     <string name="wireguard_local_address">Yerel Adres</string>
     <string name="wireguard_public_key">Eş Genel Anahtarı</string>
@@ -579,7 +579,7 @@
     <string name="nat_stun_server_hint">STUN sunucusu</string>
     <string name="nat_result_hint">NAT kontrol sonucu</string>
     <string name="tools_network">Ağ</string>
-    <string name="backup">Yedekleme</string>
+    <string name="backup">Yedek</string>
     <string name="backup_groups_and_configurations">Gruplar ve yapılandırmalar</string>
     <string name="backup_rules">Yönlendirme kuralları</string>
     <string name="backup_settings">Ayarlar</string>
@@ -698,7 +698,7 @@
     <string name="mux_preference">Multipleks</string>
     <string name="padding">Dolgu</string>
     <string name="network_change_reset_connections">Ağ değiştiğinde giden bağlantıları sıfırla</string>
-    <string name="restart_profile_on_network_change">Ağ değiştiğinde etkin profili yeniden başlat</string>
+    <string name="restart_profile_on_network_change">Ağ Değişiminde Yeniden Başlat</string>
     <string name="wake_reset_connections">Cihaz uykudan uyandığında giden bağlantıları sıfırla</string>
     <string name="backup_in_progress">Yedekleme zaten devam ediyor</string>
     <string name="restore_in_progress">Geri yükleme zaten devam ediyor</string>
@@ -751,8 +751,8 @@
     <string name="dynamic_colors_summary">Sistem Material You paletini kullan</string>
     <string name="dynamic_colors_unavailable">Android 12 ve daha yenisinde kullanılabilir</string>
     <string name="dynamic_colors_classic">Yeni arayüzle kullanılabilir</string>
-    <string name="theme_fallback_summary">Dinamik renkler kullanılamadığında veya devre dışı bırakıldığında kullanılır</string>
-    <string name="more_options">Daha fazla seçenek</string>
+    <string name="theme_fallback_summary">Dinamik devre dışıyken bu renk</string>
+    <string name="more_options">Daha Fazla</string>
     <string name="amoled_theme">AMOLED Koyu Tema</string>
     <string name="amoled_theme_summary">Koyu modda saf siyah arka plan</string>
     <string name="app_theme">Vurgu Rengi</string>

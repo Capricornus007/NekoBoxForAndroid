@@ -19,7 +19,7 @@
     <string name="theme_monokai">モノカイ</string>
     <string name="theme_ayu">アユ</string>
     <string name="theme_catppuccin">キャットプッチーノ</string>
-    <string name="theme_classic_colors">従来の色…</string>
+    <string name="theme_classic_colors">レガシーカラー…</string>
     <string name="theme_classic_color_swatch">カラーテーマ %1$d</string>
     <string name="theme_style">テーマスタイル</string>
     <string name="theme_style_mod">Mod スタイル</string>
@@ -98,8 +98,8 @@
     <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirect： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">テスト中…</string>
-    <string name="connection_test_available">遅延: %d ms</string>
-    <string name="connection_test_available_http">遅延: %d ms</string>
+    <string name="connection_test_available">接続テスト利用可</string>
+    <string name="connection_test_available_http">HTTP接続テスト利用可</string>
     <string name="connection_test_error">失敗: %s</string>
     <string name="connection_test_fail">インターネットが利用できません</string>
     <string name="connection_test_error_status_code">エラーコード: #%d</string>
@@ -210,7 +210,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="scanning">スキャン中…</string>
     <string name="invert_selections">選択を反転</string>
     <string name="clear_selections">選択をクリア</string>
-    <string name="bypass_apps">バイパス</string>
+    <string name="bypass_apps">除外アプリ</string>
     <string name="show_system_apps">システムアプリを表示</string>
     <string name="auto_connect">自動接続</string>
     <string name="auto_connect_summary">起動時やアプリアップデート時に、以前実行中だった場合はプロキシを有効にする</string>
@@ -224,7 +224,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="service_failed">失敗: </string>
     <string name="stop">停止</string>
     <string name="stopping">シャットダウン中…</string>
-    <string name="vpn_error">%s</string>
+    <string name="vpn_error">VPNエラー</string>
     <string name="vpn_permission_denied">VPN サービスを作成する権限がありません</string>
     <string name="reboot_required">VPN サービスの開始に失敗しました。デバイスを再起動する必要があるかもしれません。</string>
     <!-- alert category -->
@@ -311,8 +311,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="donate_info">お金が大好き</string>
     <string name="ignore_battery_optimizations">バッテリー最適化を無視</string>
     <string name="ignore_battery_optimizations_sum">一部の制限を解除</string>
-    <string name="battery_optimization_enabled">有効 - アプリはバックグラウンドで制限なく実行できます</string>
-    <string name="battery_optimization_disabled">無効 - タップしてバックグラウンドアクティビティを許可する</string>
+    <string name="battery_optimization_enabled">電池最適化: 有効</string>
+    <string name="battery_optimization_disabled">電池最適化: 無効</string>
     <!-- plugin -->
     <string name="plugin">プラグイン</string>
     <string name="plugin_configure">設定…</string>
@@ -495,7 +495,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="hysteria_auth_payload">認証ペイロード</string>
     <string name="hysteria_upload_mbps">最大アップロード速度 (Mbps)</string>
     <string name="hysteria_download_mbps">最大ダウンロード速度 (Mbps)</string>
-    <string name="experimental_settings">実験的</string>
+    <string name="experimental_settings">実験的設定</string>
     <string name="hysteria_stream_receive_window">QUICストリーム受信ウィンドウ</string>
     <string name="hysteria_connection_receive_window">QUIC接続受信ウィンドウ</string>
     <string name="hysteria_disable_mtu_discovery">パスMTU探索を無効にする</string>
@@ -691,7 +691,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="mux_preference">マルチプレックス</string>
     <string name="padding">パディング</string>
     <string name="network_change_reset_connections">ネットワーク変更時に送信接続をリセットする</string>
-    <string name="restart_profile_on_network_change">ネットワーク変更時にアクティブプロファイルを再起動</string>
+    <string name="restart_profile_on_network_change">ネットワーク変更時に再接続</string>
     <string name="wake_reset_connections">デバイスがスリープから復帰したときに送信接続をリセットする</string>
     <string name="backup_in_progress">バックアップは既に進行中です</string>
     <string name="restore_in_progress">復元は既に進行中です</string>
@@ -736,7 +736,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="snell_mode">モード</string>
     <string name="snell_reuse">再利用</string>
     <string name="snell_reuse_summary">v4-v6のみ</string>
-    <string name="interface_settings">インターフェース</string>
+    <string name="interface_settings">インターフェース設定</string>
     <string name="ui_style">インターフェーススタイル</string>
     <string name="ui_style_expressive">新規</string>
     <string name="ui_style_classic">クラシック</string>
@@ -744,8 +744,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dynamic_colors_summary">システムのMaterial Youパレットを使用</string>
     <string name="dynamic_colors_unavailable">Android 12以降で利用可能</string>
     <string name="dynamic_colors_classic">新しいインターフェースで利用可能</string>
-    <string name="theme_fallback_summary">ダイナミックカラーが利用不可または無効の場合に使用されます</string>
-    <string name="more_options">その他のオプション</string>
+    <string name="theme_fallback_summary">動的色が無効の時この色を使用</string>
+    <string name="more_options">その他</string>
     <string name="amoled_theme">AMOLEDダークテーマ</string>
     <string name="amoled_theme_summary">ダークモードで純粋な黒の背景</string>
     <string name="app_theme">アクセントカラー</string>

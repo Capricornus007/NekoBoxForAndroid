@@ -19,8 +19,8 @@
     <string name="theme_monokai">Monokai</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
-    <string name="theme_classic_colors">Couleurs héritées…</string>
-    <string name="theme_classic_color_swatch">Thème de couleur %1$d</string>
+    <string name="theme_classic_colors">Couleurs legacy…</string>
+    <string name="theme_classic_color_swatch">Thème couleur %1$d</string>
     <string name="theme_style">Style du thème</string>
     <string name="theme_style_mod">Style Mod</string>
     <string name="theme_style_original">Style original</string>
@@ -102,8 +102,8 @@
     <string name="speed_detail">Proxy : %1$s↑ %2$s↓\nDirect : %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Test en cours...</string>
-    <string name="connection_test_available">Délai : %d ms</string>
-    <string name="connection_test_available_http">Délai : %d ms</string>
+    <string name="connection_test_available">Test dispo.</string>
+    <string name="connection_test_available_http">Test HTTP dispo.</string>
     <string name="connection_test_error">Échec : %s</string>
     <string name="connection_test_fail">Internet indisponible</string>
     <string name="connection_test_error_status_code">Code d\'erreur : #%d</string>
@@ -169,7 +169,7 @@
     <string name="delete_route_prompt">Êtes-vous sûr de vouloir supprimer cette route ?</string>
     <string name="route_name">Nom de la route</string>
     <string name="route_proxy">Proxy</string>
-    <string name="route_bypass">Contournement</string>
+    <string name="route_bypass">Contourner</string>
     <string name="route_block">Bloquer</string>
     <string name="route_profile">Sélectionner un profil…</string>
     <string name="empty_route">Route vide</string>
@@ -214,7 +214,7 @@
     <string name="scanning">Analyse en cours…</string>
     <string name="invert_selections">Inverser la sélection</string>
     <string name="clear_selections">Effacer la sélection</string>
-    <string name="bypass_apps">Contournement</string>
+    <string name="bypass_apps">Exclure apps</string>
     <string name="show_system_apps">Afficher les applications système</string>
     <string name="auto_connect">Connexion automatique</string>
     <string name="auto_connect_summary">Activer le proxy au démarrage/mise à jour de l\'application s\'il était en cours d\'exécution avant</string>
@@ -229,7 +229,7 @@
     <string name="service_failed">Échec : </string>
     <string name="stop">Arrêter</string>
     <string name="stopping">Arrêt en cours…</string>
-    <string name="vpn_error">%s</string>
+    <string name="vpn_error">Erreur VPN</string>
     <string name="vpn_permission_denied">Permission refusée pour créer un service VPN</string>
     <string name="reboot_required">Échec du démarrage du service VPN. Vous devrez peut-être redémarrer votre
         appareil.</string>
@@ -244,8 +244,8 @@
     <string name="add_profile">Ajouter un profil</string>
     <string name="select_profile">Sélectionner un profil</string>
     <string name="proxy_chain">Chaîne de proxy</string>
-    <string name="proxy_waterfall">Waterfall</string>
-    <string name="proxy_fastest">Le plus rapide</string>
+    <string name="proxy_waterfall">Cascade</string>
+    <string name="proxy_fastest">Plus rapide</string>
     <string name="custom_config">Configuration personnalisée</string>
     <string name="balancer">Équilibreur</string>
     <string name="balancer_settings">Paramètres de l\'équilibreur</string>
@@ -319,8 +319,8 @@
     <string name="donate_info">J\'aime l\'argent</string>
     <string name="ignore_battery_optimizations">Ignorer les optimisations de la batterie</string>
     <string name="ignore_battery_optimizations_sum">Supprimer certaines restrictions</string>
-    <string name="battery_optimization_enabled">Activé - l\'application peut s\'exécuter sans restriction en arrière-plan</string>
-    <string name="battery_optimization_disabled">Désactivé - appuyez pour autoriser l\'activité en arrière-plan</string>
+    <string name="battery_optimization_enabled">Batterie optimisée: oui</string>
+    <string name="battery_optimization_disabled">Batterie optimisée: non</string>
     <!-- plugin -->
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Configurer…</string>
@@ -543,7 +543,7 @@
     <string name="ssh_private_key_passphrase">Phrase de passe de la clé privée</string>
     <string name="translate_platform">Plateforme de traduction</string>
     <string name="menu_tools">Outils</string>
-    <string name="menu_log">Journaux</string>
+    <string name="menu_log">Journal</string>
     <string name="clear_logcat">Effacer Logcat</string>
     <string name="wireguard_local_address">Adresse locale</string>
     <string name="wireguard_public_key">Clé publique du pair</string>
@@ -712,7 +712,7 @@
     <string name="mux_preference">Multiplex</string>
     <string name="padding">Remplissage</string>
     <string name="network_change_reset_connections">Réinitialiser les connexions sortantes lors d\'un changement de réseau</string>
-    <string name="restart_profile_on_network_change">Redémarrer le profil actif lors des changements de réseau</string>
+    <string name="restart_profile_on_network_change">Redémarrer au changement réseau</string>
     <string name="wake_reset_connections">Réinitialiser les connexions sortantes lors du réveil de l\'appareil</string>
     <string name="backup_in_progress">Une sauvegarde est déjà en cours</string>
     <string name="restore_in_progress">Une restauration est déjà en cours</string>
@@ -765,9 +765,9 @@
     <string name="dynamic_colors_summary">Utiliser la palette Material You du système</string>
     <string name="dynamic_colors_unavailable">Disponible sur Android 12 et versions ultérieures</string>
     <string name="dynamic_colors_classic">Disponible avec la nouvelle interface</string>
-    <string name="theme_fallback_summary">Utilisé lorsque les couleurs dynamiques sont indisponibles ou désactivées</string>
-    <string name="more_options">Plus d\'options</string>
+    <string name="theme_fallback_summary">Couleur si dynamique désactivé</string>
+    <string name="more_options">Plus</string>
     <string name="amoled_theme">Thème sombre AMOLED</string>
     <string name="amoled_theme_summary">Fond noir pur en mode sombre</string>
-    <string name="app_theme">Couleur d\'accentuation</string>
+    <string name="app_theme">Couleur d'accent</string>
 </resources>

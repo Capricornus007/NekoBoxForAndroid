@@ -19,7 +19,7 @@
     <string name="theme_monokai">Monokai</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
-    <string name="theme_classic_colors">Colores clásicos…</string>
+    <string name="theme_classic_colors">Colores legado…</string>
     <string name="theme_classic_color_swatch">Tema de color %1$d</string>
     <string name="theme_style">Estilo del tema</string>
     <string name="theme_style_mod">Estilo Mod</string>
@@ -98,8 +98,8 @@
     <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirecto： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Probando…</string>
-    <string name="connection_test_available">Retraso: %d ms</string>
-    <string name="connection_test_available_http">Retraso: %d ms</string>
+    <string name="connection_test_available">Test disponible</string>
+    <string name="connection_test_available_http">Test HTTP disponible</string>
     <string name="connection_test_error">Falló: %s</string>
     <string name="connection_test_fail">Internet no disponible</string>
     <string name="connection_test_error_status_code">Código de error: #%d</string>
@@ -212,7 +212,7 @@
     <string name="scanning">Escaneando…</string>
     <string name="invert_selections">Invertir selecciones</string>
     <string name="clear_selections">Limpiar selecciones</string>
-    <string name="bypass_apps">Bypass</string>
+    <string name="bypass_apps">Excluir apps</string>
     <string name="show_system_apps">Mostrar aplicaciones del sistema</string>
     <string name="auto_connect">Conexión automática</string>
     <string name="auto_connect_summary">Habilitar proxy al inicio/actualización de la app si estaba ejecutándose antes</string>
@@ -227,7 +227,7 @@
     <string name="service_failed">Falló: </string>
     <string name="stop">Detener</string>
     <string name="stopping">Apagando…</string>
-    <string name="vpn_error">%s</string>
+    <string name="vpn_error">Error de VPN</string>
     <string name="vpn_permission_denied">Permiso denegado para crear un servicio VPN</string>
     <string name="reboot_required">No se pudo iniciar el servicio VPN. Es posible que necesite reiniciar su
         dispositivo.</string>
@@ -317,8 +317,8 @@
     <string name="donate_info">Amo el dinero</string>
     <string name="ignore_battery_optimizations">Ignorar optimizaciones de batería</string>
     <string name="ignore_battery_optimizations_sum">Eliminar algunas restricciones</string>
-    <string name="battery_optimization_enabled">Activado - la aplicación puede ejecutarse sin restricciones en segundo plano</string>
-    <string name="battery_optimization_disabled">Desactivado - toca para permitir actividad en segundo plano</string>
+    <string name="battery_optimization_enabled">Batería optimizada: sí</string>
+    <string name="battery_optimization_disabled">Batería optimizada: no</string>
     <!-- plugin -->
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Configurar…</string>
@@ -539,7 +539,7 @@
     <string name="ssh_private_key_passphrase">Frase de contraseña de clave privada</string>
     <string name="translate_platform">Plataforma de traducción</string>
     <string name="menu_tools">Herramientas</string>
-    <string name="menu_log">Registros</string>
+    <string name="menu_log">Registro</string>
     <string name="clear_logcat">Limpiar Logcat</string>
     <string name="wireguard_local_address">Dirección local</string>
     <string name="wireguard_public_key">Clave pública del par</string>
@@ -587,7 +587,7 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="nat_stun_server_hint">Servidor STUN</string>
     <string name="nat_result_hint">Resultado de verificación NAT</string>
     <string name="tools_network">Red</string>
-    <string name="backup">Copia de seguridad</string>
+    <string name="backup">Respaldo</string>
     <string name="backup_groups_and_configurations">Grupos y configuraciones</string>
     <string name="backup_rules">Reglas de enrutamiento</string>
     <string name="backup_settings">Ajustes</string>
@@ -706,7 +706,7 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="mux_preference">Multiplex</string>
     <string name="padding">Relleno</string>
     <string name="network_change_reset_connections">Restablecer conexiones salientes cuando cambie la red</string>
-    <string name="restart_profile_on_network_change">Reiniciar perfil activo al cambiar la red</string>
+    <string name="restart_profile_on_network_change">Reiniciar al cambiar red</string>
     <string name="wake_reset_connections">Restablecer conexiones salientes cuando el dispositivo se despierte</string>
     <string name="backup_in_progress">La copia de seguridad ya está en curso</string>
     <string name="restore_in_progress">La restauración ya está en curso</string>
@@ -759,8 +759,8 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="dynamic_colors_summary">Usar la paleta Material You del sistema</string>
     <string name="dynamic_colors_unavailable">Disponible en Android 12 y versiones posteriores</string>
     <string name="dynamic_colors_classic">Disponible con la nueva interfaz</string>
-    <string name="theme_fallback_summary">Se usa cuando los colores dinámicos no están disponibles o están desactivados</string>
-    <string name="more_options">Más opciones</string>
+    <string name="theme_fallback_summary">Usar este color sin dinámico</string>
+    <string name="more_options">Más</string>
     <string name="amoled_theme">Tema oscuro AMOLED</string>
     <string name="amoled_theme_summary">Fondo negro puro en modo oscuro</string>
     <string name="app_theme">Color de acento</string>
