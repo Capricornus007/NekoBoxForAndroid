@@ -80,8 +80,14 @@ object RootLanSharing {
             appendLine("iptables -I FORWARD -j CORE_FWD")
 
             // MSS clamp
-            appendLine("iptables -t mangle -D FORWARD -o \$TUN -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1350 2>/dev/null || true")
-            appendLine("iptables -t mangle -A FORWARD -o \$TUN -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1350")
+            appendLine(
+                "iptables -t mangle -D FORWARD -o \$TUN -p tcp --tcp-flags SYN,RST SYN" +
+                    " -j TCPMSS --set-mss 1350 2>/dev/null || true"
+            )
+            appendLine(
+                "iptables -t mangle -A FORWARD -o \$TUN -p tcp --tcp-flags SYN,RST SYN" +
+                    " -j TCPMSS --set-mss 1350"
+            )
 
             // DNS DNAT
             appendLine("iptables -t nat -N CORE_DNS 2>/dev/null || true")
