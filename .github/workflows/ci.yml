@@ -238,29 +238,33 @@ jobs:
       - name: Gradle Build
         env:
           BUILD_PLUGIN: none
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          ALIAS_NAME: ${{ secrets.ALIAS_NAME }}
+          ALIAS_PASS: ${{ secrets.ALIAS_PASS }}
         run: |
           echo "sdk.dir=${ANDROID_HOME}" > local.properties
           echo "ndk.dir=${ANDROID_HOME}/ndk/25.0.8775105" >> local.properties
           
-          # 從 GitHub Secrets 讀取簽名配置（上傳至 LOCAL_PROPERTIES secret）
-          echo "${{ secrets.LOCAL_PROPERTIES }}" >> local.properties
-          
-          # 提取簽名憑證（由用戶自訂，非隨機生成）
-          KEYSTORE_PASS=$(grep '^KEYSTORE_PASS=' local.properties | cut -d= -f2-)
-          ALIAS_NAME=$(grep '^ALIAS_NAME=' local.properties | cut -d= -f2-)
-          ALIAS_PASS=$(grep '^ALIAS_PASS=' local.properties | cut -d= -f2-)
-          
-          if [ -z "$KEYSTORE_PASS" ] || [ -z "$ALIAS_NAME" ]; then
-            echo "::error:: 未設定簽名憑證！請在 GitHub Secrets 中設定 LOCAL_PROPERTIES"
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASS" ] || [ -z "$ALIAS_NAME" ]; then
+            echo "::error:: 未設定簽名憑證！請在 GitHub Secrets 中設定 KEYSTORE_BASE64 / KEYSTORE_PASS / ALIAS_NAME / ALIAS_PASS"
             exit 1
           fi
           
           echo "::notice:: 使用用戶自訂簽名 (alias=$ALIAS_NAME)"
           
+          # 從 GitHub Secrets 還原 keystore 檔案
+          echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+          
           # 執行初始化腳本
           ./run init action gradle
           
-          # 使用 repo 中的 debug.keystore + GitHub Secrets 密碼進行簽名
+          # 寫入簽名配置到 local.properties 供 Gradle 讀取
+          echo "KEYSTORE_PASS=$KEYSTORE_PASS" >> local.properties
+          echo "ALIAS_NAME=$ALIAS_NAME" >> local.properties
+          echo "ALIAS_PASS=$ALIAS_PASS" >> local.properties
+          
+          # 使用用戶自訂 keystore 簽名打包
           KEYSTORE_PASS="$KEYSTORE_PASS" ALIAS_NAME="$ALIAS_NAME" ALIAS_PASS="$ALIAS_PASS" \
             ./gradlew app:assembleOssRelease
           
