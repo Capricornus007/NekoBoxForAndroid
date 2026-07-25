@@ -23,6 +23,9 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">舊版顏色…</string>
     <string name="theme_classic_color_swatch">色彩主題 %1$d</string>
+    <string name="theme_style">主題風格</string>
+    <string name="theme_style_mod">Mod 風格</string>
+    <string name="theme_style_original">原始風格</string>
     <string name="document">文檔</string>
     <string name="group_default">未分組</string>
     <string name="quick_toggle">切換</string>
