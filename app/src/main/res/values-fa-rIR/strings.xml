@@ -65,6 +65,9 @@
     <!-- misc -->
     <string name="service_mode">حالت سرویس</string>
     <string name="service_mode_proxy">فقط پراکسی</string>
+    <string name="lan_sharing">LAN / Hotspot Sharing (Root Only)</string>
+    <string name="lan_sharing_summary">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
+    <string name="lan_sharing_requires_root">Root access is required but not available</string>
     <string name="port_proxy">پورت پراکسی</string>
     <string name="port_http">پورت پراکسی HTTP</string>
     <string name="port_transproxy">پورت انتقال‌پروکسی</string>
