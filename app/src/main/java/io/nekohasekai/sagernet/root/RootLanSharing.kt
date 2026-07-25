@@ -153,7 +153,7 @@ object RootLanSharing {
                 appendLine("iptables -X CORE_FWD 2>/dev/null || true")
                 appendLine(
                     "iptables -t mangle -D FORWARD -o \$TUN -p tcp" +
-                        " --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1350 2>/dev/null || true"
+                        " --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1350 2>/dev/null || true",
                 )
                 appendLine("iptables -t nat -D PREROUTING -j CORE_DNS 2>/dev/null || true")
                 appendLine("iptables -t nat -F CORE_DNS 2>/dev/null || true")
@@ -164,7 +164,7 @@ object RootLanSharing {
                 appendLine("ip6tables -t mangle -D PREROUTING -j CORE6_PRE 2>/dev/null || true")
                 appendLine("ip6tables -t mangle -F CORE6_PRE 2>/dev/null || true")
                 appendLine("ip6tables -t mangle -X CORE6_PRE 2>/dev/null || true")
-            }
+            },
         )
     }
 
