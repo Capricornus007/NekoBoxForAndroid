@@ -21,7 +21,9 @@ object RootManager {
 
     fun isRootAvailable(forceRefresh: Boolean = false): Boolean {
         if (!forceRefresh) cached?.let { return it }
-        return probe()
+        val result = probe()
+        cached = result
+        return result
     }
 
     private fun probe(): Boolean {

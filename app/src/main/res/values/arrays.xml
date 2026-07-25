@@ -816,4 +816,13 @@
         <item>datachannel</item>
     </string-array>
 
+    <string-array name="theme_style_entries">
+        <item>@string/theme_style_mod</item>
+        <item>@string/theme_style_original</item>
+    </string-array>
+    <string-array name="theme_style_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
 </resources>

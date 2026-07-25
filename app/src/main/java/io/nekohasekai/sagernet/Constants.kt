@@ -30,6 +30,7 @@ object Key {
     const val MODE_PROXY = "proxy"
 
     const val LAN_SHARING = "lanSharing"
+    const val THEME_STYLE = "themeStyle"
 
     const val GLOBAL_CUSTOM_CONFIG = "globalCustomConfig"
 
