@@ -68,6 +68,9 @@
     <string name="service_mode">Service Mode</string>
     <string name="service_mode_proxy">Proxy only</string>
     <string name="service_mode_vpn" translatable="false">VPN</string>
+    <string name="lan_sharing">LAN / Hotspot Sharing (Root Only)</string>
+    <string name="lan_sharing_summary">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
+    <string name="lan_sharing_requires_root">Root access is required but not available</string>
     <string name="port_proxy">Proxy Port</string>
     <string name="port_http">HTTP Proxy Port</string>
     <string name="port_transproxy">Transproxy Port</string>

@@ -1,22 +1,23 @@
-package io.nekohasekai.sagernet.bg
+    package io.nekohasekai.sagernet.bg
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.app.Service
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.ProxyInfo
-import android.os.Build
-import android.os.ParcelFileDescriptor
-import android.os.PowerManager
-import io.nekohasekai.sagernet.*
-import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.fmt.LOCALHOST
-import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
-import io.nekohasekai.sagernet.ktx.*
-import io.nekohasekai.sagernet.ui.VpnRequestActivity
-import io.nekohasekai.sagernet.utils.Subnet
-import android.net.VpnService as BaseVpnService
+    import android.Manifest
+    import android.annotation.SuppressLint
+    import android.app.Service
+    import android.content.Intent
+    import android.content.pm.PackageManager
+    import android.net.ProxyInfo
+    import android.os.Build
+    import android.os.ParcelFileDescriptor
+    import android.os.PowerManager
+    import io.nekohasekai.sagernet.*
+    import io.nekohasekai.sagernet.database.DataStore
+    import io.nekohasekai.sagernet.fmt.LOCALHOST
+    import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
+    import io.nekohasekai.sagernet.ktx.*
+    import io.nekohasekai.sagernet.root.RootLanSharing
+    import io.nekohasekai.sagernet.ui.VpnRequestActivity
+    import io.nekohasekai.sagernet.utils.Subnet
+    import android.net.VpnService as BaseVpnService
 
 class VpnService :
     BaseVpnService(),
@@ -64,6 +65,7 @@ class VpnService :
 
     @Suppress("EXPERIMENTAL_API_USAGE")
     override suspend fun killProcesses() {
+        RootLanSharing.stopClientSharing(this)
         conn?.close()
         conn = null
         super.killProcesses()

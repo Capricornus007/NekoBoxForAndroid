@@ -138,6 +138,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var amoledTheme by configurationStore.boolean(Key.AMOLED_THEME)
     var uiDesignVersion by configurationStore.int(Key.UI_DESIGN_VERSION)
     var serviceMode by configurationStore.string(Key.SERVICE_MODE) { Key.MODE_VPN }
+    var lanSharing by configurationStore.boolean(Key.LAN_SHARING)
 
     var trafficSniffing by configurationStore.stringToInt(Key.TRAFFIC_SNIFFING) { 1 }
     var resolveDestination by configurationStore.boolean(Key.RESOLVE_DESTINATION)
