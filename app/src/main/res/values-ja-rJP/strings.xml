@@ -65,6 +65,9 @@
     <!-- misc -->
     <string name="service_mode">サービスモード</string>
     <string name="service_mode_proxy">プロキシのみ</string>
+    <string name="lan_sharing">LAN / Hotspot Sharing (Root Only)</string>
+    <string name="lan_sharing_summary">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
+    <string name="lan_sharing_requires_root">Root access is required but not available</string>
     <string name="port_proxy">プロキシポート</string>
     <string name="port_http">HTTPプロキシポート</string>
     <string name="port_transproxy">Transproxyポート</string>
