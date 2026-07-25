@@ -1,4 +1,64 @@
-# NekoBox for Android
+## 编译环境（Windows）
+
+### 必需环境
+- **Go**: 1.26.5（系统 Go 目录需替换）
+- **Android SDK**: `C:\Users\19816\AppData\Local\Android\Sdk`
+- **Android NDK**: 28.2.13676358
+- **Java**: Android Studio JBR (Java 21)
+- **Git**
+
+### 编译步骤
+1. 克隆依赖仓库（必须使用 starifly 的 fork）：
+   ```powershell
+   cd C:\Users\19816\Desktop\nekobox
+   git clone --no-checkout https://github.com/starifly/sing-box.git
+   git -C sing-box checkout 03d936e502173c909cf8a2e609da177bd01964d8
+   git clone --no-checkout https://github.com/starifly/libneko.git
+   git -C libneko checkout 1c47a3af71990a7b2192e03292b4d246c308ef0b
+   ```
+
+2. 编译 libcore：
+   ```powershell
+   cd C:\Users\19816\Desktop\nekobox\NekoBoxForAndroid\libcore
+   $env:ANDROID_HOME = "C:\Users\19816\AppData\Local\Android\Sdk"
+   $env:ANDROID_NDK_HOME = "$env:ANDROID_HOME\ndk\28.2.13676358"
+   $env:CGO_ENABLED = "1"
+   $env:GO386 = "softfloat"
+   $env:GOBIND = "gobind-matsuri"
+   $env:GOPATH = "C:\Users\19816\go"
+   
+   .\build.sh
+   # 编译成功后，libcore.aar 会生成在当前目录
+   # 复制到 app\libs\
+   ```
+
+3. 设置环境变量（**不要使用 local.properties**，会导致 Invalid file path 错误）：
+   ```powershell
+   $env:ANDROID_HOME = "C:\Users\19816\AppData\Local\Android\Sdk"
+   $env:ANDROID_SDK_ROOT = "C:\Users\19816\AppData\Local\Android\Sdk"
+   $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+   ```
+
+4. 编译 APK：
+   ```powershell
+   cd C:\Users\19816\Desktop\nekobox\NekoBoxForAndroid
+   .\gradlew.bat :app:assembleOssDebug
+   ```
+
+### ⚠️ 重要：编译后清理
+Gradle 守护进程会占用 3GB+ 内存，编译完后必须清理：
+```powershell
+.\gradlew.bat --stop
+```
+如果还有残留进程：
+```powershell
+Get-Process java -ErrorAction SilentlyContinue | Stop-Process -Force
+```
+
+### 常见问题
+- **Invalid file path 错误**：删除 `local.properties`，使用 `ANDROID_HOME` 环境变量
+- **Go 版本不兼容**：需要 Go 1.26.5+，替换系统 Go 目录
+- **依赖仓库**：必须使用 `starifly` 的 `sing-box` 和 `libneko`，不能用官方仓库
 
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 [![Releases](https://img.shields.io/github/v/release/MatsuriDayo/NekoBoxForAndroid)](https://github.com/MatsuriDayo/NekoBoxForAndroid/releases)
