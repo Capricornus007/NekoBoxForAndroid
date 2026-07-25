@@ -21,7 +21,7 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">레거시 색상…</string>
     <string name="theme_classic_color_swatch">색상 테마 %1$d</string>
-    <string name="theme_style">Theme style</string>
+    <string name="theme_style">テーマスタイル</string>
     <string name="theme_style_mod">Mod style</string>
     <string name="theme_style_original">Original style</string>
     <string name="document">문서</string>
