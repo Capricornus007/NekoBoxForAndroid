@@ -116,13 +116,6 @@ object Theme {
     }
 
     private fun applyOverlays(context: Context) {
-        if (!DataStore.dynamicColors) {
-            when (DataStore.appTheme) {
-                1 -> context.theme.applyStyle(R.style.ThemeOverlay_SagerNet_Accent_Blue, true)
-                2 -> context.theme.applyStyle(R.style.ThemeOverlay_SagerNet_Accent_Green, true)
-                3 -> context.theme.applyStyle(R.style.ThemeOverlay_SagerNet_Accent_Pink, true)
-            }
-        }
         if (DataStore.amoledTheme && usingNightMode()) {
             context.theme.applyStyle(R.style.ThemeOverlay_SagerNet_Amoled, true)
         }
@@ -130,37 +123,81 @@ object Theme {
 
     fun getTheme(): Int = getTheme(DataStore.appTheme)
 
-    fun getTheme(themeId: Int): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.dynamicColors) {
-        R.style.Theme_SagerNet_Expressive_Dynamic
-    } else {
-        when (themeId) {
+    fun getTheme(themeId: Int): Int {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.dynamicColors) {
+            return R.style.Theme_SagerNet_Expressive_Dynamic
+        }
+        val isOriginal = DataStore.themeStyle == 1
+        return when (themeId) {
+            RED -> if (isOriginal) R.style.Theme_SagerNet_Original_Red else R.style.Theme_SagerNet_Red
+            PINK_SSR -> if (isOriginal) R.style.Theme_SagerNet_Original_Pink_SSR else R.style.Theme_SagerNet_Pink_SSR
+            PINK -> if (isOriginal) R.style.Theme_SagerNet_Original else R.style.Theme_SagerNet
+            PURPLE -> if (isOriginal) R.style.Theme_SagerNet_Original_Purple else R.style.Theme_SagerNet_Purple
+            DEEP_PURPLE -> if (isOriginal) R.style.Theme_SagerNet_Original_DeepPurple else R.style.Theme_SagerNet_DeepPurple
+            INDIGO -> if (isOriginal) R.style.Theme_SagerNet_Original_Indigo else R.style.Theme_SagerNet_Indigo
+            BLUE -> if (isOriginal) R.style.Theme_SagerNet_Original_Blue else R.style.Theme_SagerNet_Blue
+            LIGHT_BLUE -> if (isOriginal) R.style.Theme_SagerNet_Original_LightBlue else R.style.Theme_SagerNet_LightBlue
+            CYAN -> if (isOriginal) R.style.Theme_SagerNet_Original_Cyan else R.style.Theme_SagerNet_Cyan
+            TEAL -> if (isOriginal) R.style.Theme_SagerNet_Original_Teal else R.style.Theme_SagerNet_Teal
+            GREEN -> if (isOriginal) R.style.Theme_SagerNet_Original_Green else R.style.Theme_SagerNet_Green
+            LIGHT_GREEN -> if (isOriginal) R.style.Theme_SagerNet_Original_LightGreen else R.style.Theme_SagerNet_LightGreen
+            LIME -> if (isOriginal) R.style.Theme_SagerNet_Original_Lime else R.style.Theme_SagerNet_Lime
+            YELLOW -> if (isOriginal) R.style.Theme_SagerNet_Original_Yellow else R.style.Theme_SagerNet_Yellow
+            AMBER -> if (isOriginal) R.style.Theme_SagerNet_Original_Amber else R.style.Theme_SagerNet_Amber
+            ORANGE -> if (isOriginal) R.style.Theme_SagerNet_Original_Orange else R.style.Theme_SagerNet_Orange
+            DEEP_ORANGE -> if (isOriginal) R.style.Theme_SagerNet_Original_DeepOrange else R.style.Theme_SagerNet_DeepOrange
+            BROWN -> if (isOriginal) R.style.Theme_SagerNet_Original_Brown else R.style.Theme_SagerNet_Brown
+            GREY -> if (isOriginal) R.style.Theme_SagerNet_Original_Grey else R.style.Theme_SagerNet_Grey
+            BLUE_GREY -> if (isOriginal) R.style.Theme_SagerNet_Original_BlueGrey else R.style.Theme_SagerNet_BlueGrey
+            BLACK -> if (isOriginal) R.style.Theme_SagerNet_Original_Black else R.style.Theme_SagerNet_Black
+            VERDANT_MINT -> if (isOriginal) R.style.Theme_SagerNet_Original_VerdantMint else R.style.Theme_SagerNet_VerdantMint
             DRACULA -> R.style.Theme_SagerNet_Dracula
             DRACULA_M3 -> R.style.Theme_SagerNet_DraculaM3
             NORD -> R.style.Theme_SagerNet_Nord
             MONOKAI -> R.style.Theme_SagerNet_Monokai
             AYU -> R.style.Theme_SagerNet_Ayu
             CATPPUCCIN -> R.style.Theme_SagerNet_Catppuccin
-            BLACK -> R.style.Theme_SagerNet_Black
             DARK_HIGH_CONTRAST -> R.style.Theme_SagerNet_DarkHighContrast
             else -> R.style.Theme_SagerNet_Expressive
         }
     }
 
     fun getDialogTheme(): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.dynamicColors) {
-            R.style.Theme_SagerNet_Dialog_Monet // 或者是遠端對應的 M3 動態對話框樣式
-        } else {
-            when (DataStore.appTheme) {
-                DRACULA -> R.style.Theme_SagerNet_Dialog_Dracula
-                DRACULA_M3 -> R.style.Theme_SagerNet_Dialog_DraculaM3
-                NORD -> R.style.Theme_SagerNet_Dialog_Nord
-                MONOKAI -> R.style.Theme_SagerNet_Dialog_Monokai
-                AYU -> R.style.Theme_SagerNet_Dialog_Ayu
-                CATPPUCCIN -> R.style.Theme_SagerNet_Dialog_Catppuccin
-                BLACK -> R.style.Theme_SagerNet_Dialog_Black
-                DARK_HIGH_CONTRAST -> R.style.Theme_SagerNet_Dialog_DarkHighContrast
-                else -> R.style.Theme_SagerNet_Dialog // 或者是遠端定義的預設對話框樣式
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.dynamicColors) {
+            return R.style.Theme_SagerNet_Dialog_Monet
+        }
+        val isOriginal = DataStore.themeStyle == 1
+        return when (DataStore.appTheme) {
+            RED -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Red else R.style.Theme_SagerNet_Dialog_Red
+            PINK_SSR -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Pink_SSR else R.style.Theme_SagerNet_Dialog_Pink_SSR
+            PINK -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original else R.style.Theme_SagerNet_Dialog
+            PURPLE -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Purple else R.style.Theme_SagerNet_Dialog_Purple
+            DEEP_PURPLE -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_DeepPurple else R.style.Theme_SagerNet_Dialog_DeepPurple
+            INDIGO -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Indigo else R.style.Theme_SagerNet_Dialog_Indigo
+            BLUE -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Blue else R.style.Theme_SagerNet_Dialog_Blue
+            LIGHT_BLUE -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_LightBlue else R.style.Theme_SagerNet_Dialog_LightBlue
+            CYAN -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Cyan else R.style.Theme_SagerNet_Dialog_Cyan
+            TEAL -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Teal else R.style.Theme_SagerNet_Dialog_Teal
+            GREEN -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Green else R.style.Theme_SagerNet_Dialog_Green
+            LIGHT_GREEN -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_LightGreen else R.style.Theme_SagerNet_Dialog_LightGreen
+            LIME -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Lime else R.style.Theme_SagerNet_Dialog_Lime
+            YELLOW -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Yellow else R.style.Theme_SagerNet_Dialog_Yellow
+            AMBER -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Amber else R.style.Theme_SagerNet_Dialog_Amber
+            ORANGE -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Orange else R.style.Theme_SagerNet_Dialog_Orange
+            DEEP_ORANGE -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_DeepOrange else R.style.Theme_SagerNet_Dialog_DeepOrange
+            BROWN -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Brown else R.style.Theme_SagerNet_Dialog_Brown
+            GREY -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Grey else R.style.Theme_SagerNet_Dialog_Grey
+            BLUE_GREY -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_BlueGrey else R.style.Theme_SagerNet_Dialog_BlueGrey
+            BLACK -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_Black else R.style.Theme_SagerNet_Dialog_Black
+            VERDANT_MINT -> if (isOriginal) R.style.Theme_SagerNet_Dialog_Original_VerdantMint else R.style.Theme_SagerNet_Dialog_VerdantMint
+            DRACULA -> R.style.Theme_SagerNet_Dialog_Dracula
+            DRACULA_M3 -> R.style.Theme_SagerNet_Dialog_DraculaM3
+            NORD -> R.style.Theme_SagerNet_Dialog_Nord
+            MONOKAI -> R.style.Theme_SagerNet_Dialog_Monokai
+            AYU -> R.style.Theme_SagerNet_Dialog_Ayu
+            CATPPUCCIN -> R.style.Theme_SagerNet_Dialog_Catppuccin
+            DARK_HIGH_CONTRAST -> R.style.Theme_SagerNet_Dialog_DarkHighContrast
+            else -> R.style.Theme_SagerNet_Dialog
         }
     }
 
