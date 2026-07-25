@@ -758,21 +758,16 @@ fun buildConfig(
 
                             if (rule_set != null && rulesetTags.isNotEmpty()) {
                                 for (tag in rule_set) {
+                                    // 只处理ruleset标签，且必须是非IP类型
                                     val tagInfo = rulesetTags.find { it.first == tag }
                                     if (tag.startsWith("ruleset-") && tagInfo != null && !tagInfo.second) {
-                                        nonIpRulesets.add(tag)
+                                        userDNSRuleList += DNSRule_DefaultOptions().apply {
+                                            rule_set = mutableListOf(tag)
+                                            server = "dns-direct"
+                                        }
                                     }
                                 }
                             }
-                            if (nonIpRulesets.isNotEmpty()) {
-                                rule_set = nonIpRulesets
-                            }
-                        }
-                    }
-
-      when (rule.outbound) {
-                        -1L -> {
-                            userDNSRuleList += makeDnsRuleObj().apply { server = "dns-direct" }
                         }
 
                         0L -> {
