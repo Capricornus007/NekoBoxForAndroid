@@ -543,7 +543,10 @@
     <string name="layout">چیدمان</string>
     <string name="layout_single_column">تک‌ستونه</string>
     <string name="layout_double_column">دوستونه</string>
-    <string name="sort_and_layout">مرتب‌سازی و چیدمان</string>
+    <string name="sort_and_layout">مرتب‌سازی و ظاهر</string>
+    <string name="card_style">کارت</string>
+    <string name="card_style_classic">کلاسیک</string>
+    <string name="card_style_stroke">حاشیه</string>
     <string name="kcp_seed">mKCP Seed</string>
     <string name="kcp_header_type">نوع هدر</string>
     <string name="kcp_mtu">mKCP MTU</string>

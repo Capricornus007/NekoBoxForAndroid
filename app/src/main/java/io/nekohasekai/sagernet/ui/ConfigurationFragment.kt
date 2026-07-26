@@ -278,6 +278,14 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
     }
 
+    fun refreshAllGroupFragmentsCardStyle() {
+        adapter.groupFragments.values.forEach { fragment ->
+            if (fragment.isAdded && fragment.view != null) {
+                fragment.adapter?.notifyDataSetChanged()
+            }
+        }
+    }
+
     val updateSelectedCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageScrolled(
             position: Int, positionOffset: Float, positionOffsetPixels: Int
@@ -1497,8 +1505,31 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
                 true
             }
+
+            val cardClassic = menu.findItem(R.id.action_card_style_classic)
+            val cardStroke = menu.findItem(R.id.action_card_style_stroke)
+            when (DataStore.profileCardStyle) {
+                1 -> cardStroke.isChecked = true
+                else -> cardClassic.isChecked = true
+            }
+            cardClassic.setOnMenuItemClickListener {
+                it.isChecked = true
+                if (DataStore.profileCardStyle != 0) {
+                    DataStore.profileCardStyle = 0
+                    (parentFragment as? ConfigurationFragment)?.refreshAllGroupFragmentsCardStyle()
+                }
+                true
+            }
+            cardStroke.setOnMenuItemClickListener {
+                it.isChecked = true
+                if (DataStore.profileCardStyle != 1) {
+                    DataStore.profileCardStyle = 1
+                    (parentFragment as? ConfigurationFragment)?.refreshAllGroupFragmentsCardStyle()
+                }
+                true
+            }
         }
-        
+
         private fun setupLayoutManager() {
             layoutManager = if (DataStore.groupLayoutMode == 1) {
                 FixedGridLayoutManager(configurationListView, 2)
@@ -2091,6 +2122,7 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             val trafficText: TextView = view.findViewById(R.id.traffic_text)
             private val card = view as MaterialCardView
+            private val selectedIndicator: View = view.findViewById(R.id.selected_indicator)
             val editButton: ImageView = view.findViewById(R.id.edit)
             val doubleColumnMenuButton: ImageView = view.findViewById(R.id.double_column_menu)
             val shareLayout: LinearLayout = view.findViewById(R.id.share)
@@ -2216,22 +2248,42 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             private fun applySelected(selected: Boolean) {
                 val ctx = card.context
-                val primary = ctx.getColorAttr(R.attr.colorPrimary)
                 val surface = ctx.getColorAttr(R.attr.colorSurface)
-                card.strokeWidth = ctx.resources.getDimensionPixelSize(
-                    if (selected) R.dimen.card_stroke_width_selected else R.dimen.card_stroke_width
-                )
-                card.strokeColor =
-                    if (selected) primary else ctx.getColour(R.color.card_stroke)
-                card.setCardBackgroundColor(
-                    if (selected) {
-                        ColorUtils.compositeColors(
-                            ColorUtils.setAlphaComponent(primary, 26), surface
-                        )
-                    } else {
-                        surface
-                    }
-                )
+                if (DataStore.profileCardStyle == 1) {
+                    val primary = ctx.getColorAttr(R.attr.colorPrimary)
+                    selectedIndicator.isVisible = false
+                    card.cardElevation = 0f
+                    card.strokeWidth = ctx.resources.getDimensionPixelSize(
+                        if (selected) R.dimen.card_stroke_width_selected
+                        else R.dimen.card_stroke_width
+                    )
+                    card.strokeColor =
+                        if (selected) primary else ctx.getColour(R.color.card_stroke)
+                    card.setCardBackgroundColor(
+                        if (selected) {
+                            ColorUtils.compositeColors(
+                                ColorUtils.setAlphaComponent(primary, 26), surface
+                            )
+                        } else {
+                            surface
+                        }
+                    )
+                } else {
+                    val primary = ctx.getColorAttr(R.attr.selectedColorPrimary)
+                    selectedIndicator.isVisible = selected
+                    card.strokeWidth = 0
+                    card.cardElevation =
+                        ctx.resources.getDimension(R.dimen.profile_card_elevation_classic)
+                    card.setCardBackgroundColor(
+                        if (selected) {
+                            ColorUtils.compositeColors(
+                                ColorUtils.setAlphaComponent(primary, 20), surface
+                            )
+                        } else {
+                            surface
+                        }
+                    )
+                }
             }
 
             fun bind(proxyEntity: ProxyEntity) {

@@ -505,7 +505,10 @@
     <string name="layout">Макет</string>
     <string name="layout_single_column">Один столбец</string>
     <string name="layout_double_column">Два столбца</string>
-    <string name="sort_and_layout">Сортировка и макет</string>
+    <string name="sort_and_layout">Сортировка и внешний вид</string>
+    <string name="card_style">Карточка</string>
+    <string name="card_style_classic">Классический</string>
+    <string name="card_style_stroke">Обводка</string>
     <string name="require_http">Включить входящий HTTP</string>
     <string name="show_stop">Показывать кнопку остановки</string>
     <string name="show_stop_sum">Если вы не хотите использовать быструю плитку как переключатель</string>

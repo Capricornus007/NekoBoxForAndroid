@@ -112,7 +112,10 @@
     <string name="layout">レイアウト</string>
     <string name="layout_single_column">1列</string>
     <string name="layout_double_column">2列</string>
-    <string name="sort_and_layout">並べ替えとレイアウト</string>
+    <string name="sort_and_layout">並べ替えと外観</string>
+    <string name="card_style">カード</string>
+    <string name="card_style_classic">クラシック</string>
+    <string name="card_style_stroke">枠線</string>
     <string name="ws_browser_forwarding_sum">対応する WebSocket をブラウザ経由で転送します。</string>
     <string name="allow_insecure">安全でない接続を許可</string>
     <string name="connection_test_available_http">成功: HTTP ハンドシェイクに %dms かかりました</string>

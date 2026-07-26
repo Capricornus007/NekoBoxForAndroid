@@ -10,18 +10,15 @@
     android:focusable="true"
     app:cardCornerRadius="@dimen/profile_card_corner_radius">
 
-    <LinearLayout
-        android:id="@+id/content_lin"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:focusable="true"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
         <LinearLayout
-
+            android:id="@+id/content_lin"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:nextFocusRight="@+id/edit"
+            android:layout_height="wrap_content"
+            android:focusable="true"
             android:orientation="vertical">
 
             <LinearLayout
@@ -40,20 +37,20 @@
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp">
 
-                <TextView
-                    android:id="@+id/profile_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="2"
-                    android:ellipsize="end"
-                    android:breakStrategy="simple"
-                    android:hyphenationFrequency="none"
-                    android:lineBreakStyle="loose"
-                    android:lineBreakWordStyle="phrase"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textStyle="bold"
-                    tools:text="@string/profile_name" />
+                    <TextView
+                        android:id="@+id/profile_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:breakStrategy="simple"
+                        android:hyphenationFrequency="none"
+                        android:lineBreakStyle="loose"
+                        android:lineBreakWordStyle="phrase"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textStyle="bold"
+                        tools:text="@string/profile_name" />
                 </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -187,6 +184,15 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+        <View
+            android:id="@+id/selected_indicator"
+            android:layout_width="@dimen/profile_card_selected_bar_width"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="?attr/selectedColorPrimary"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </FrameLayout>
 
 </com.google.android.material.card.MaterialCardView>
