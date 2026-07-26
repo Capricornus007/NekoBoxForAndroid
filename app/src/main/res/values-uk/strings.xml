@@ -276,8 +276,6 @@
     <string name="no_proxies_found_in_file">У файлі не знайдено проксі</string>
     <string name="no_proxies_found_in_clipboard">У буфері обміну не знайдено проксі</string>
     <string name="deduplication">Дедуплікація</string>
-    <string name="donate">Пожертвувати</string>
-    <string name="donate_info">Я люблю гроші</string>
     <string name="ignore_battery_optimizations">Ігнорувати оптимізацію батареї</string>
     <string name="ignore_battery_optimizations_sum">Зняти деякі обмеження</string>
     <!-- plugin -->

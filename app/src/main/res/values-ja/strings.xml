@@ -263,8 +263,6 @@
     <string name="no_proxies_found_in_file">ファイル内にプロキシが見つかりません</string>
     <string name="no_proxies_found_in_clipboard">クリップボード内にプロキシが見つかりません</string>
     <string name="deduplication">重複排除</string>
-    <string name="donate">寄付</string>
-    <string name="donate_info">お金が大好きです</string>
     <string name="ignore_battery_optimizations">バッテリー最適化を無視</string>
     <string name="ignore_battery_optimizations_sum">一部の制限を解除</string>
     <string name="plugin">プラグイン</string>

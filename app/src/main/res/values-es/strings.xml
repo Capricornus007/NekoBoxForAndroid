@@ -252,8 +252,6 @@
     <string name="no_proxies_found_in_file">No se encontraron proxys en el archivo</string> 
     <string name="no_proxies_found_in_clipboard">No se encontraron proxys en el portapapeles</string> 
     <string name="deduplication">Deduplicación</string> 
-    <string name="donate">Donar</string> 
-    <string name="donate_info">Amo el dinero</string> 
     <string name="ignore_battery_optimizations">Ignorar optimizaciones de batería</string> 
     <string name="ignore_battery_optimizations_sum">Eliminar algunas restricciones</string> 
     <!-- plugin --> 
