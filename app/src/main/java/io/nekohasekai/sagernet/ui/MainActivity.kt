@@ -516,10 +516,18 @@ class MainActivity : ThemedActivity(),
     override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {
         when (key) {
             Key.SERVICE_MODE -> onBinderDied()
-            Key.SHOW_BOTTOM_BAR -> syncMainControls(
-                showWhenConnected = DataStore.showBottomBar,
-                animate = true,
-            )
+            Key.SHOW_BOTTOM_BAR -> {
+                syncMainControls(
+                    showWhenConnected = DataStore.showBottomBar,
+                    animate = true,
+                )
+                when (val fragment = currentMainFragment
+                    ?: supportFragmentManager.findFragmentById(R.id.fragment_holder)
+                ) {
+                    is GroupFragment -> fragment.updateBottomPadding()
+                    is RouteFragment -> fragment.updateBottomPadding()
+                }
+            }
             Key.PROXY_APPS, Key.BYPASS_MODE, Key.INDIVIDUAL -> {
                 if (DataStore.serviceState.canStop) {
                     snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {
