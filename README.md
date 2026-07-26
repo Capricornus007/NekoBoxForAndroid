@@ -5,7 +5,11 @@
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Contributors](https://img.shields.io/github/contributors/dsfkjlweuyr/ThroneForAndroid)](https://github.com/dsfkjlweuyr/ThroneForAndroid/graphs/contributors)
 
-## 免责声明
+## 使用前须知
+
+> 非官方项目：截至2026.07.26，[Throne](https://github.com/throneproj/Throne)官方只有维护电脑版。本项目尚未获得Throne官方点头，正在积极沟通中。
+>
+> Unofficial project: As of July 26, 2026, the official [Throne](https://github.com/throneproj/Throne) project only maintains a desktop version. This project has not yet received official approval from Throne and is currently in active communication.
 
 > 免责声明：本项目仅用于技术研究与代码学习之目的，不提供任何形式的网络代理服务。请勿将本项目用于违反当地法律法规的任何活动。请勿在生产环境中使用本项目，使用者应自行承担使用本项目可能带来的全部风险。若您下载或引用本项目，请在 24 小时内自行删除相关内容，并避免长期存储、分享或传播本项目的任何部分。**作者保留随时修改、更新或移除本项目及其内容的权利，恕不另行通知。**
 > 
