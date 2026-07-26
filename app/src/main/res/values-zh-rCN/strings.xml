@@ -342,6 +342,8 @@
     <string name="update_when_connected_only">仅在连接时更新</string>
     <string name="update_when_connected_only_sum">防止 IP 地址泄漏</string>
     <string name="subscription_user_agent">用户代理</string>
+    <string name="extra_subscription_links">额外订阅链接</string>
+    <string name="extra_subscription_links_hint">额外订阅 URL</string>
     <string name="confirm">确认</string>
     <string name="missing_plugin">缺少插件</string>
     <string name="profile_requiring_plugin">配置 %1$s 需要插件 %2$s, 但找不到.</string>

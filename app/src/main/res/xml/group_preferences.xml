@@ -45,7 +45,7 @@
         app:key="groupSubscription"
         app:title="@string/subscription_settings">
 
-        <io.nekohasekai.sagernet.widget.LinkOrContentPreference
+        <io.nekohasekai.sagernet.widget.LinkWithExtraPreference
             app:icon="@drawable/ic_baseline_link_24"
             app:key="subscriptionLink"
             app:title="@string/group_subscription_link"

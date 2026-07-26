@@ -50,13 +50,13 @@ object RawUpdater : GroupUpdater() {
     ) {
 
         val link = subscription.link
-        var proxies: List<AbstractBean>
+        var proxies: MutableList<AbstractBean>
         if (link.startsWith("content://")) {
             val contentText = app.contentResolver.openInputStream(link.toUri())
                 ?.bufferedReader()
                 ?.readText()
 
-            proxies = contentText?.let { parseRaw(contentText) }
+            proxies = contentText?.let { parseRaw(contentText)?.toMutableList() }
                 ?: error(app.getString(R.string.no_proxies_found_in_subscription))
         } else {
 
@@ -77,7 +77,7 @@ object RawUpdater : GroupUpdater() {
                 setURL(subscription.link)
                 setUserAgent(subscription.customUserAgent.takeIf { it.isNotBlank() } ?: USER_AGENT)
             }.execute()
-            proxies = parseRaw(Util.getStringBox(response.contentString))
+            proxies = parseRaw(Util.getStringBox(response.contentString))?.toMutableList()
                 ?: error(app.getString(R.string.no_proxies_found))
 
             subscription.subscriptionUserinfo =
@@ -95,6 +95,42 @@ object RawUpdater : GroupUpdater() {
             }
         }
 
+        // Process extra links
+        val extraLinks = subscription.extraLinks
+        if (!extraLinks.isNullOrEmpty()) {
+            for (extraLink in extraLinks) {
+                if (extraLink.isBlank()) continue
+                try {
+                    Logs.d("Fetching extra link: $extraLink")
+                    val extraResponse = Libcore.newHttpClient().apply {
+                        trySocks5(
+                            DataStore.mixedPort,
+                            DataStore.mixedInboundUser,
+                            DataStore.mixedInboundPass
+                        )
+                        tryH3Direct()
+                        when (DataStore.appTLSVersion) {
+                            "1.3" -> restrictedTLS()
+                        }
+                    }.newRequest().apply {
+                        if (DataStore.allowInsecureOnRequest) {
+                            allowInsecure()
+                        }
+                        setURL(extraLink)
+                        setUserAgent(subscription.customUserAgent.takeIf { it.isNotBlank() } ?: USER_AGENT)
+                    }.execute()
+                    val extraProxies = parseRaw(Util.getStringBox(extraResponse.contentString))
+                    if (extraProxies != null) {
+                        proxies.addAll(extraProxies)
+                        Logs.d("Extra link yielded ${extraProxies.size} proxies")
+                    }
+                } catch (e: Exception) {
+                    Logs.w(e)
+                    Logs.d("Failed to fetch extra link: $extraLink - ${e.message}")
+                }
+            }
+        }
+
         val proxiesMap = LinkedHashMap<String, AbstractBean>()
         for (proxy in proxies) {
             var index = 0
@@ -108,7 +144,7 @@ object RawUpdater : GroupUpdater() {
             }
             proxiesMap[proxy.displayName()] = proxy
         }
-        proxies = proxiesMap.values.toList()
+        proxies = proxiesMap.values.toMutableList()
 
         if (subscription.forceResolve) forceResolve(proxies, proxyGroup.id)
 
@@ -117,8 +153,8 @@ object RawUpdater : GroupUpdater() {
         if (filterMode != SubscriptionFilterMode.DISABLED && filterRegex.isNotBlank()) {
             val regex = filterRegex.toRegex()
             proxies = when (filterMode) {
-                SubscriptionFilterMode.INCLUDE -> proxies.filter { regex.containsMatchIn(it.displayName()) }
-                SubscriptionFilterMode.EXCLUDE -> proxies.filterNot { regex.containsMatchIn(it.displayName()) }
+                SubscriptionFilterMode.INCLUDE -> proxies.filter { regex.containsMatchIn(it.displayName()) }.toMutableList()
+                SubscriptionFilterMode.EXCLUDE -> proxies.filterNot { regex.containsMatchIn(it.displayName()) }.toMutableList()
                 else -> proxies
             }
             Logs.d("After filter (mode=$filterMode): ${proxies.size}")
@@ -147,7 +183,7 @@ object RawUpdater : GroupUpdater() {
                 }
             }
             uniqueProxies.retainAll(uniqueNames.keys)
-            proxies = uniqueProxies.toList().map { it.bean }
+            proxies = uniqueProxies.toList().map { it.bean }.toMutableList()
         }
 
         Logs.d("New profiles: ${proxies.size}")

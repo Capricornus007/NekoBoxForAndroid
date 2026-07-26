@@ -42,12 +42,15 @@ public class SubscriptionBean extends Serializable {
 
     public String subscriptionUserinfo;
 
+    // v4: extra subscription links
+    public List<String> extraLinks;
+
     public SubscriptionBean() {
     }
 
     @Override
     public void serializeToBuffer(ByteBufferOutput output) {
-        output.writeInt(3);
+        output.writeInt(4);
 
         output.writeInt(type);
 
@@ -69,6 +72,16 @@ public class SubscriptionBean extends Serializable {
 
         // v3
         output.writeString(serverDnsResolver);
+
+        // v4
+        if (extraLinks != null) {
+            output.writeInt(extraLinks.size());
+            for (String link : extraLinks) {
+                output.writeString(link);
+            }
+        } else {
+            output.writeInt(0);
+        }
     }
 
     public void serializeForShare(ByteBufferOutput output) {
@@ -108,6 +121,15 @@ public class SubscriptionBean extends Serializable {
         if (version >= 3) {
             serverDnsResolver = input.readString();
         }
+
+        // v4
+        if (version >= 4) {
+            int extraCount = input.readInt();
+            extraLinks = new ArrayList<>(extraCount);
+            for (int i = 0; i < extraCount; i++) {
+                extraLinks.add(input.readString());
+            }
+        }
     }
 
     public void deserializeFromShare(ByteBufferInput input) {
@@ -143,6 +165,7 @@ public class SubscriptionBean extends Serializable {
         if (username == null) username = "";
         if (expiryDate == null) expiryDate = 0;
         if (protocols == null) protocols = new ArrayList<>();
+        if (extraLinks == null) extraLinks = new ArrayList<>();
     }
 
     public static final Creator<SubscriptionBean> CREATOR = new CREATOR<SubscriptionBean>() {
