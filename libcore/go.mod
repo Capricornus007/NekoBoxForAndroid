@@ -62,7 +62,7 @@ require (
 	github.com/sagernet/sing-shadowsocks v0.2.8 // indirect
 	github.com/sagernet/sing-shadowsocks2 v0.2.1 // indirect
 	github.com/sagernet/sing-shadowtls v0.2.1-0.20250503051639-fcd445d33c11 // indirect
-	github.com/sagernet/sing-snell v0.0.0-20260710094516-a4e97ee24beb // indirect
+	github.com/sagernet/sing-snell v0.0.0-20260719094200-c43fbee0e839 // indirect
 	github.com/sagernet/sing-vmess v0.2.7 // indirect
 	github.com/sagernet/smux v1.5.50-sing-box-mod.1 // indirect
 	github.com/sagernet/wireguard-go v0.0.1-beta.7 // indirect
@@ -96,7 +96,7 @@ replace github.com/sagernet/sing-box => ../../sing-box
 
 replace github.com/sagernet/sing-vmess => github.com/starifly/sing-vmess v0.2.8-mod.1
 
-replace github.com/sagernet/sing-snell => github.com/reF1nd/sing-snell v0.0.0-20260713132549-9711346e2b35
+replace github.com/sagernet/sing-snell => github.com/reF1nd/sing-snell v0.0.0-20260719154503-b398d6497cc0
 
 // replace github.com/sagernet/sing-quic => github.com/matsuridayo/sing-quic v0.0.0-20241009042333-b49ce60d9b36
 // replace github.com/sagernet/sing-quic => ../../sing-quic
