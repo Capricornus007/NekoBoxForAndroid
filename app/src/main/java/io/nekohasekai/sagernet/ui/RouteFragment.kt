@@ -19,6 +19,7 @@ import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.databinding.LayoutEmptyRouteBinding
 import io.nekohasekai.sagernet.databinding.LayoutRouteItemBinding
 import io.nekohasekai.sagernet.ktx.*
+import io.nekohasekai.sagernet.utils.Theme
 import io.nekohasekai.sagernet.widget.ListListener
 import io.nekohasekai.sagernet.widget.UndoSnackbarManager
 
@@ -286,7 +287,7 @@ class RouteFragment : ToolbarFragment(R.layout.layout_route), Toolbar.OnMenuItem
                 profileType.text = rule.mkSummary()
                 routeOutbound.text = rule.displayOutbound()
 
-                if (DataStore.themeStyle == 0) {
+                if (!Theme.usingOriginalStyle()) {
                     val colorRes = when (rule.outbound) {
                         -2L -> R.color.color_route_block
                         -1L -> R.color.color_route_direct

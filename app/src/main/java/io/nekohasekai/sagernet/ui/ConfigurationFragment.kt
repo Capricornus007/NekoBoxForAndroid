@@ -103,6 +103,7 @@ import io.nekohasekai.sagernet.ui.profile.TrojanSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TuicSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.VMessSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.WireGuardSettingsActivity
+import io.nekohasekai.sagernet.utils.Theme
 import io.nekohasekai.sagernet.widget.QRCodeDialog
 import io.nekohasekai.sagernet.widget.UndoSnackbarManager
 import kotlinx.coroutines.CancellationException
@@ -2221,7 +2222,7 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
 
             private fun applySelected(selected: Boolean) {
-                if (DataStore.themeStyle == 1) {
+                if (Theme.usingOriginalStyle()) {
                     selectedView.visibility = if (selected) View.VISIBLE else View.INVISIBLE
                     return
                 }

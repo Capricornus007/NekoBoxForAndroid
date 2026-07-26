@@ -16,6 +16,7 @@
         <item name="cardElevatedSurfaceColor">@color/card_elevated_pink</item>
 
         <item name="accentOrTextSecondary">?colorAccent</item>
+        <item name="cardSubTextColor">?android:textColorSecondary</item>
         <item name="accentOrTextPrimary">?colorAccent</item>
         <item name="primaryOrTextSecondary">?colorPrimary</item>
         <item name="primaryOrTextPrimary">?colorPrimary</item>
@@ -76,6 +77,7 @@
         <item name="cardElevatedSurfaceColor">@color/card_elevated_pink</item>
 
         <item name="accentOrTextSecondary">?colorAccent</item>
+        <item name="cardSubTextColor">?android:textColorSecondary</item>
         <item name="accentOrTextPrimary">?colorAccent</item>
         <item name="primaryOrTextSecondary">?colorPrimary</item>
         <item name="primaryOrTextPrimary">?colorPrimary</item>

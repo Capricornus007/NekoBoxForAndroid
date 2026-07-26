@@ -14,4 +14,6 @@
     <attr name="cardElevatedSurfaceColor" format="color" />
     <attr name="elevatedCardViewStyle" format="reference" />
     <attr name="tintedCardViewStyle" format="reference" />
+    <!-- 卡片次要小字：mod 风格为灰色，原版风格跟随官方（accentOrTextSecondary）-->
+    <attr name="cardSubTextColor" format="color" />
 </resources>

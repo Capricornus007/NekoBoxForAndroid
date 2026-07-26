@@ -51,10 +51,10 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             if (DataStore.serviceState.started) {
                 SagerNet.reloadService()
             }
-            val theme = Theme.getTheme(newTheme as Int)
-            app.setTheme(theme)
+            DataStore.appTheme = newTheme as Int
+            Theme.apply(app)
             requireActivity().apply {
-                setTheme(theme)
+                Theme.apply(this)
                 ActivityCompat.recreate(this)
             }
             true
@@ -68,8 +68,13 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
 
         val themeStyle = findPreference<SimpleMenuPreference>(Key.THEME_STYLE)!!
-        themeStyle.setOnPreferenceChangeListener { _, _ ->
+        themeStyle.setOnPreferenceChangeListener { _, newValue ->
+            val style = (newValue as String).toInt()
+            DataStore.themeStyle = style
+            Theme.currentThemeStyle = style
+            Theme.apply(app)
             requireActivity().apply {
+                Theme.apply(this)
                 ActivityCompat.recreate(this)
             }
             true
