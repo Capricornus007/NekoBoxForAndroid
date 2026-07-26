@@ -99,7 +99,7 @@ class RouteFragment : ToolbarFragment(R.layout.layout_route), Toolbar.OnMenuItem
     fun updateBottomPadding() {
         if (!::ruleListView.isInitialized) return
         ruleListView.clipToPadding = false
-        ruleListView.updatePadding(bottom = dp2px(if (DataStore.showBottomBar) 48 else 4))
+        ruleListView.updatePadding(bottom = dp2px(if (DataStore.showBottomBar) 80 else 4))
     }
 
     override fun onDestroy() {

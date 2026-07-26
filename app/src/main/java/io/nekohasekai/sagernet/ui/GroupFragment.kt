@@ -111,7 +111,7 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
     fun updateBottomPadding() {
         if (!::groupListView.isInitialized) return
         groupListView.clipToPadding = false
-        groupListView.updatePadding(bottom = dp2px(if (DataStore.showBottomBar) 48 else 4))
+        groupListView.updatePadding(bottom = dp2px(if (DataStore.showBottomBar) 80 else 4))
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
