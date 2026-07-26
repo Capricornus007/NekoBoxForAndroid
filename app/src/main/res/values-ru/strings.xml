@@ -35,8 +35,8 @@
 <string name="always_show_address">Всегда показывать адрес</string>
 <string name="always_show_address_sum">Всегда отображать адрес сервера на карте конфигурации</string>
 <string name="app_desc">Универсальный набор инструментов прокси для Android, написанный на Kotlin.</string>
-<string name="app_name">NekoBox</string>
-<string name="app_name_long">NekoBox для Android</string>
+<string name="app_name">Throne</string>
+<string name="app_name_long">Throne для Android</string>
 <string name="app_tls_version">Минимальная версия TLS протокола</string>
 <string name="app_version">Версия</string>
 <string name="append_http_proxy">Добавить HTTP-прокси к VPN</string>

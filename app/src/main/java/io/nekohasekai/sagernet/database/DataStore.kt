@@ -317,7 +317,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         set(value) = configurationStore.putString("webdavPassword", value)
 
     var webdavPath: String?
-        get() = configurationStore.getString("webdavPath") ?: "NekoBox"  // 设置默认值
+        get() = configurationStore.getString("webdavPath") ?: "Throne"  // 设置默认值
         set(value) = configurationStore.putString("webdavPath", value)
 
     var globalMode by configurationStore.boolean(Key.GLOBAL_MODE)

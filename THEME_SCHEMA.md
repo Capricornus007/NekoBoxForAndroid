@@ -1,4 +1,4 @@
-# NekoBoxForAndroid (nb4a) 主题色系统设计与实现指南
+# ThroneForAndroid (nb4a) 主题色系统设计与实现指南
 
 本项目实现了一套优雅、灵活且支持动态切换的主题色系统。该系统不仅支持 22 种不同的主题配色，还完美融合了 Android 系统的深色模式（夜间模式）以及全面屏沉浸式体验（Edge-to-Edge）。
 

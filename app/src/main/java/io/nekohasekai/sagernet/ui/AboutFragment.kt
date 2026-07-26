@@ -224,9 +224,9 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                     }
                     val response = client.newRequest().apply {
                         if (checkPreview) {
-                            setURL("https://api.github.com/repos/starifly/NekoBoxForAndroid/releases/tags/preview")
+                            setURL("https://api.github.com/repos/dsfkjlweuyr/ThroneForAndroid/releases/tags/preview")
                         } else {
-                            setURL("https://api.github.com/repos/starifly/NekoBoxForAndroid/releases/latest")
+                            setURL("https://api.github.com/repos/dsfkjlweuyr/ThroneForAndroid/releases/latest")
                         }
                     }.execute()
                     val release = JSONObject(Util.getStringBox(response.contentString))
