@@ -55,7 +55,10 @@ Go 语言编写的底层核心，负责高性能的网络处理：
 - [`libcore/nb4a.go`](libcore/nb4a.go): Go 核心的入口，导出 `InitCore` 等函数，供 Android 端通过 JNI 调用。
 - [`libcore/box.go`](libcore/box.go) / [`box_include.go`](libcore/box_include.go): 与 `sing-box` 核心的集成与初始化。
 - [`libcore/build.sh`](libcore/build.sh): 编译 Go 核心的本地脚本。
-- [`libcore/device/`](libcore/device/), [`ech/`](libcore/ech/), [`procfs/`](libcore/procfs/), [`protocol/`](libcore/protocol/), [`stun/`](libcore/stun/): Go 核心的子模块，处理设备、ECH、进程文件系统、自定义协议和 STUN 测试。
+- [`libcore/device/`](libcore/device/), [`ech/`](libcore/ech/), [`procfs/`](libcore/procfs/), [`stun/`](libcore/stun/): Go 核心的子模块，处理设备、ECH、进程文件系统和 STUN 测试。
+- [`libcore/protocol/`](libcore/protocol/): libcore 侧自定义/覆盖的 sing-box 协议实现，在 [`libcore/box_include.go`](libcore/box_include.go) 中注册。
+  - `juicity/`: Juicity outbound。
+  - `http/`: 对 sing-box `http` outbound 的**覆盖实现**（在 sing-box 自身注册之后再次注册同名 `"http"` 类型，registry 后注册生效）。行为差异：TLS 启用且用户未显式配置 ALPN 时默认提供 `["h2", "http/1.1"]`，TLS 握手后按 ALPN 协商结果分流——协商到 `h2` 走 HTTP/2 CONNECT（基于 `golang.org/x/net/http2`，上行流为 `io.Pipe` 请求体、响应体为下行流），否则保持原有 HTTP/1.1 CONNECT。用于兼容 h2-only 的 HTTPS 代理节点（对齐 v2ray 系核心行为）；用户可在节点配置中显式填写 ALPN=`http/1.1` 回退旧行为。
 
 ---
 
