@@ -9,8 +9,6 @@
             app:summary="@string/dynamic_colors_summary"
             app:title="@string/dynamic_colors" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
-            app:useSimpleSummaryProvider="true" />
-        <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="0"
             app:entries="@array/night_mode"
             app:entryValues="@array/int_array_4"
