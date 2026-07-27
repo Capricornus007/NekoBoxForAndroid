@@ -757,7 +757,6 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="dynamic_colors_classic">Tilgjengelig med det nye grensesnittet</string>
     <string name="theme_fallback_summary">Brukes når dynamiske farger er utilgjengelige eller deaktivert</string>
     <string name="more_options">Flere alternativer</string>
-    <string name="app_theme">Aksentfarge</string>
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="donate">Donate</string>
     <string name="donate_info">Support the development of this app.</string>
