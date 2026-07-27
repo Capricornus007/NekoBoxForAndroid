@@ -763,7 +763,6 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="dynamic_colors_classic">Disponible con la nueva interfaz</string>
     <string name="theme_fallback_summary">Se usa cuando los colores dinámicos no están disponibles o están deshabilitados</string>
     <string name="more_options">Más opciones</string>
-    <string name="app_theme">Color de acento</string>
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="donate">Donate</string>
     <string name="donate_info">Support the development of this app.</string>
