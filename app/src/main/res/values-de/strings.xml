@@ -21,9 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Alte Farben…</string>
     <string name="theme_classic_color_swatch">Farbthema %1$d</string>
-    <string name="theme_style">Themenstil</string>
-    <string name="theme_style_mod">Mod-Stil</string>
-    <string name="theme_style_original">Originalstil</string>
     <string name="document">Dokument</string>
     <string name="group_default">Nicht gruppiert</string>
     <string name="quick_toggle">Umschalten</string>
@@ -746,7 +743,5 @@
     <string name="dynamic_colors_classic">Verfügbar mit der neuen Oberfläche</string>
     <string name="theme_fallback_summary">Farbe wenn Dynamik deaktiviert</string>
     <string name="more_options">Mehr</string>
-    <string name="amoled_theme">AMOLED-Dunkelthema</string>
-    <string name="amoled_theme_summary">Rein schwarzer Hintergrund im Dunkelmodus</string>
     <string name="app_theme">Akzentfarbe</string>
 </resources>

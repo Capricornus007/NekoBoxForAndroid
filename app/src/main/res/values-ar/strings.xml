@@ -21,9 +21,6 @@
     <string name="theme_catppuccin">كاتبوتشين</string>
     <string name="theme_classic_colors">ألوان قديمة…</string>
     <string name="theme_classic_color_swatch">نظام ألوان %1$d</string>
-    <string name="theme_style">نمط السمة</string>
-    <string name="theme_style_mod">نمط Mod</string>
-    <string name="theme_style_original">النمط الأصلي</string>
     <string name="document">المستند</string>
     <string name="group_default">غير مجمعة</string>
     <string name="quick_toggle">تبديل</string>
@@ -764,7 +761,5 @@
     <string name="dynamic_colors_classic">متاح مع الواجهة الجديدة</string>
     <string name="theme_fallback_summary">اللون عند تعطيل الديناميكي</string>
     <string name="more_options">المزيد</string>
-    <string name="amoled_theme">السمة الداكنة AMOLED</string>
-    <string name="amoled_theme_summary">خلفية سوداء نقية في الوضع الداكن</string>
     <string name="app_theme">لون التمييز</string>
 </resources>

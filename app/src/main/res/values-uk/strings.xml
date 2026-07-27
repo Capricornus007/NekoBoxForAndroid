@@ -751,7 +751,5 @@
     <string name="dynamic_colors_classic">Доступно з новим інтерфейсом</string>
     <string name="theme_fallback_summary">Використовується, коли динамічні кольори недоступні або вимкнені</string>
     <string name="more_options">Більше опцій</string>
-    <string name="amoled_theme">Темна тема AMOLED</string>
-    <string name="amoled_theme_summary">Чисто чорний фон у темному режимі</string>
     <string name="app_theme">Акцентний колір</string>
 </resources>

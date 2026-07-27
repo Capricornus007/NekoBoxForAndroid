@@ -745,7 +745,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dynamic_colors_classic">僅適用於新介面</string>
     <string name="theme_fallback_summary">當動態色彩不可用或已停用時使用</string>
     <string name="more_options">更多選項</string>
-    <string name="amoled_theme">AMOLED 深色主題</string>
-    <string name="amoled_theme_summary">深色模式下的純黑背景</string>
     <string name="app_theme">強調色</string>
 </resources>

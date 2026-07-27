@@ -755,7 +755,5 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="dynamic_colors_classic">Beschikbaar met de nieuwe interface</string>
     <string name="theme_fallback_summary">Gebruikt wanneer dynamische kleuren niet beschikbaar of uitgeschakeld zijn</string>
     <string name="more_options">Meer opties</string>
-    <string name="amoled_theme">AMOLED donker thema</string>
-    <string name="amoled_theme_summary">Zuiver zwarte achtergrond in donkere modus</string>
     <string name="app_theme">Accentkleur</string>
 </resources>

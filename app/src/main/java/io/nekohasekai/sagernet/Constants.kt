@@ -30,7 +30,6 @@ object Key {
     const val MODE_PROXY = "proxy"
 
     const val LAN_SHARING = "lanSharing"
-    const val THEME_STYLE = "themeStyle"
 
     const val GLOBAL_CUSTOM_CONFIG = "globalCustomConfig"
 
@@ -94,7 +93,6 @@ object Key {
     const val ACQUIRE_WAKE_LOCK = "acquireWakeLock"
     const val HIDE_FROM_RECENT_APPS = "hideFromRecentApps"
     const val SHOW_BOTTOM_BAR = "showBottomBar"
-    const val AMOLED_THEME = "amoledTheme"
     const val CONFIRM_PROFILE_DELETE = "confirmProfileDelete"
     const val GROUP_LAYOUT_MODE = "groupLayoutMode"
     const val PROFILE_CARD_STYLE = "profileCardStyle"

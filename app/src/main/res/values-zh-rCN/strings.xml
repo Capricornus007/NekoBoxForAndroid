@@ -23,9 +23,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">旧版颜色…</string>
     <string name="theme_classic_color_swatch">颜色主题 %1$d</string>
-    <string name="theme_style">主题样式</string>
-    <string name="theme_style_mod">Mod 风格</string>
-    <string name="theme_style_original">原始风格</string>
     <string name="document">文档</string>
     <string name="group_default">未分组</string>
     <string name="quick_toggle">切换</string>
@@ -754,7 +751,5 @@
     <string name="dynamic_colors_classic">新界面下可用</string>
     <string name="theme_fallback_summary">动态颜色不可用或禁用时使用</string>
     <string name="more_options">更多选项</string>
-    <string name="amoled_theme">AMOLED 深色主题</string>
-    <string name="amoled_theme_summary">深色模式下纯黑色背景</string>
     <string name="app_theme">强调色</string>
 </resources>

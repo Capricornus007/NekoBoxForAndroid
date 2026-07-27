@@ -80,11 +80,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
-        val themeStyle = findPreference<SimpleMenuPreference>(Key.THEME_STYLE)!!
-        themeStyle.setOnPreferenceChangeListener { _, _ ->
-            recreateActivityAfterPreferencePersisted()
-            true
-        }
 
         appTheme.setOnPreferenceChangeListener { _, newTheme ->
             if (DataStore.serviceState.started) {

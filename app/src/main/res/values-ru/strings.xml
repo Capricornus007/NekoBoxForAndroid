@@ -21,9 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Старые цвета…</string>
     <string name="theme_classic_color_swatch">Цветовая тема %1$d</string>
-    <string name="theme_style">Стиль темы</string>
-    <string name="theme_style_mod">Mod стиль</string>
-    <string name="theme_style_original">Оригинальный стиль</string>
     <string name="document">Документ</string>
     <string name="group_default">Без группы</string>
     <string name="quick_toggle">Переключить</string>
@@ -761,7 +758,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dynamic_colors_classic">Доступно с новым интерфейсом</string>
     <string name="theme_fallback_summary">Цвет при отключённой динамике</string>
     <string name="more_options">Ещё</string>
-    <string name="amoled_theme">Темная тема AMOLED</string>
-    <string name="amoled_theme_summary">Чисто черный фон в темном режиме</string>
     <string name="app_theme">Цвет акцента</string>
 </resources>

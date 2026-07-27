@@ -21,9 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Eski Renkler…</string>
     <string name="theme_classic_color_swatch">Renk Teması %1$d</string>
-    <string name="theme_style">Tema stili</string>
-    <string name="theme_style_mod">Mod stili</string>
-    <string name="theme_style_original">Orijinal stil</string>
     <string name="document">Belge</string>
     <string name="group_default">Gruplanmamış</string>
     <string name="quick_toggle">Aç/Kapat</string>
@@ -753,7 +750,5 @@
     <string name="dynamic_colors_classic">Yeni arayüzle kullanılabilir</string>
     <string name="theme_fallback_summary">Dinamik devre dışıyken bu renk</string>
     <string name="more_options">Daha Fazla</string>
-    <string name="amoled_theme">AMOLED Koyu Tema</string>
-    <string name="amoled_theme_summary">Koyu modda saf siyah arka plan</string>
     <string name="app_theme">Vurgu Rengi</string>
 </resources>

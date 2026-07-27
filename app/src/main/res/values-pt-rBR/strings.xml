@@ -23,9 +23,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Cores legado…</string>
     <string name="theme_classic_color_swatch">Tema de cor %1$d</string>
-    <string name="theme_style">Estilo do tema</string>
-    <string name="theme_style_mod">Estilo Mod</string>
-    <string name="theme_style_original">Estilo original</string>
     <string name="document">Documento</string>
     <string name="group_default">Não agrupado</string>
     <string name="quick_toggle">Alternar</string>
@@ -756,7 +753,5 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="dynamic_colors_classic">Clássico</string>
     <string name="theme_fallback_summary">Cor quando dinâmico desativado</string>
     <string name="more_options">Mais</string>
-    <string name="amoled_theme">Tema AMOLED</string>
-    <string name="amoled_theme_summary">Fundo preto puro para telas OLED</string>
     <string name="app_theme">Cor de destaque</string>
 </resources>

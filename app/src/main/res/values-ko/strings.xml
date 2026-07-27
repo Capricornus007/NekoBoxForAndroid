@@ -21,9 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">레거시 색상…</string>
     <string name="theme_classic_color_swatch">색상 테마 %1$d</string>
-    <string name="theme_style">테마 스타일</string>
-    <string name="theme_style_mod">Mod 스타일</string>
-    <string name="theme_style_original">오리지널 스타일</string>
     <string name="document">문서</string>
     <string name="group_default">미분류</string>
     <string name="quick_toggle">전환</string>
@@ -744,7 +741,5 @@
     <string name="dynamic_colors_classic">새 인터페이스에서 사용 가능</string>
     <string name="theme_fallback_summary">동적 색상 비활성 시 이 색상 사용</string>
     <string name="more_options">더 보기</string>
-    <string name="amoled_theme">AMOLED 다크 테마</string>
-    <string name="amoled_theme_summary">다크 모드에서 순수 검은색 배경</string>
     <string name="app_theme">액센트 색상</string>
 </resources>

@@ -755,7 +755,5 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="dynamic_colors_classic">Disponibile con la nuova interfaccia</string>
     <string name="theme_fallback_summary">Usato quando i colori dinamici non sono disponibili o sono disabilitati</string>
     <string name="more_options">Altre opzioni</string>
-    <string name="amoled_theme">Tema scuro AMOLED</string>
-    <string name="amoled_theme_summary">Sfondo nero puro nella modalità scura</string>
     <string name="app_theme">Colore accento</string>
 </resources>

@@ -21,9 +21,6 @@
     <string name="theme_catppuccin">キャットプッチーノ</string>
     <string name="theme_classic_colors">レガシーカラー…</string>
     <string name="theme_classic_color_swatch">カラーテーマ %1$d</string>
-    <string name="theme_style">テーマスタイル</string>
-    <string name="theme_style_mod">Mod スタイル</string>
-    <string name="theme_style_original">オリジナルスタイル</string>
     <string name="document">ドキュメント</string>
     <string name="group_default">未グループ化</string>
     <string name="quick_toggle">トグル</string>
@@ -746,7 +743,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dynamic_colors_classic">新しいインターフェースで利用可能</string>
     <string name="theme_fallback_summary">動的色が無効の時この色を使用</string>
     <string name="more_options">その他</string>
-    <string name="amoled_theme">AMOLEDダークテーマ</string>
-    <string name="amoled_theme_summary">ダークモードで純粋な黒の背景</string>
     <string name="app_theme">アクセントカラー</string>
 </resources>
