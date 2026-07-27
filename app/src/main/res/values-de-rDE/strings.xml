@@ -753,7 +753,6 @@
     <string name="dynamic_colors_classic">Verfügbar mit der neuen Oberfläche</string>
     <string name="theme_fallback_summary">Wird verwendet, wenn dynamische Farben nicht verfügbar oder deaktiviert sind</string>
     <string name="more_options">Weitere Optionen</string>
-    <string name="app_theme">Akzentfarbe</string>
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="donate">Donate</string>
     <string name="donate_info">Support the development of this app.</string>
