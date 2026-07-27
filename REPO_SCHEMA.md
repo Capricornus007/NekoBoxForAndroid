@@ -1,4 +1,4 @@
-# NekoBoxForAndroid (nb4a) 项目架构与开发指南
+# ThroneForAndroid (nb4a) 项目架构与开发指南
 
 本项目是一个基于 SagerNet 框架的 Android 代理客户端，底层核心是 `libcore`（基于 Go 语言的 `sing-box` 核心）。项目采用 `gomobile` 技术，将 Go 语言编写的底层核心编译为 Android AAR 库，供 Android 端的 Java/Kotlin 代码调用。
 
@@ -36,7 +36,7 @@ Android 端的代码主要分为两个核心包：
 - [`io/nekohasekai/sagernet/widget/`](app/src/main/java/io/nekohasekai/sagernet/widget): 自定义 UI 控件。
 
 #### 1.2.2 `moe.matsuri.nb4a` (NekoBox 专属扩展)
-这是 NekoBox 专属的扩展和定制代码：
+这是 NekoBox 专属的扩展和定制代码，Nekobox是Throne的前生，故兼容之：
 - [`moe/matsuri/nb4a/NativeInterface.kt`](app/src/main/java/moe/matsuri/nb4a/NativeInterface.kt): 与底层 Go 核心 (`libcore`) 交互的 JNI 接口，实现了 `libcore.BoxPlatformInterface` 和 `libcore.NB4AInterface`。
 - [`moe/matsuri/nb4a/SingBoxOptions.java`](app/src/main/java/moe/matsuri/nb4a/SingBoxOptions.java) / [`SingBoxOptionsUtil.kt`](app/src/main/java/moe/matsuri/nb4a/SingBoxOptionsUtil.kt): Sing-box 相关的配置选项和工具类。
 - [`moe/matsuri/nb4a/proxy/`](app/src/main/java/moe/matsuri/nb4a/proxy): 额外的代理协议（如 AnyTLS, ShadowTLS, NekoBean 等）和配置绑定。
@@ -79,7 +79,7 @@ Go 语言编写的底层核心，负责高性能的网络处理：
   - 核心构建工作流定义在 [`.github/workflows/build.yml`](.github/workflows/build.yml) 中。
   - 每次向 `main` 分支提交代码或手动触发（`workflow_dispatch`）时，GitHub Actions 会自动运行构建。
   - 工作流会先检查并缓存 `libcore.aar`（基于 `libcore` 目录和构建脚本的哈希值），避免重复编译 Go 核心以节省时间。
-  - 随后，工作流会使用 Gradle 编译生成 OSS 版本的 APK，并将生成的 APK 上传为 Artifact（命名为 `NekoBoxs`）。
+  - 随后，工作流会使用 Gradle 编译生成 OSS 版本的 APK，并将生成的 APK 上传为 Artifact（命名为 `APKs`）。
 - **开发建议**：
   - 开发者在修改代码时，应尽量保持**小步快跑**，每次完成一个微小的、自洽的修改后即提交代码。
   - 提交后，通过 GitHub Actions 自动验证编译是否通过，并下载生成的测试 APK 进行真机测试。
