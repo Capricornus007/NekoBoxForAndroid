@@ -2,6 +2,7 @@ package io.nekohasekai.sagernet.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -9,15 +10,24 @@ import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.preference.*
 import com.github.shadowsocks.plugin.Empty
 import com.github.shadowsocks.plugin.fragment.AlertDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
@@ -30,10 +40,12 @@ import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
+import io.nekohasekai.sagernet.widget.LinkWithExtraPreference
 import io.nekohasekai.sagernet.widget.ListListener
 import io.nekohasekai.sagernet.widget.OutboundPreference
 import kotlinx.parcelize.Parcelize
 import moe.matsuri.nb4a.ui.SimpleMenuPreference
+import org.json.JSONArray
 
 @Suppress("UNCHECKED_CAST")
 class GroupSettingsActivity(
@@ -59,6 +71,9 @@ class GroupSettingsActivity(
 
         val subscription = subscription ?: SubscriptionBean().applyDefaultValues()
         DataStore.subscriptionLink = subscription.link
+        DataStore.subscriptionExtraLinks = subscription.extraLinks?.let {
+            JSONArray(it).toString()
+        } ?: ""
         DataStore.subscriptionForceResolve = subscription.forceResolve
         DataStore.subscriptionDeduplication = subscription.deduplication
         DataStore.subscriptionUpdateWhenConnectedOnly = subscription.updateWhenConnectedOnly
@@ -96,6 +111,16 @@ class GroupSettingsActivity(
         if (isSubscription) {
             subscription = (subscription ?: SubscriptionBean().applyDefaultValues()).apply {
                 link = DataStore.subscriptionLink
+                extraLinks = try {
+                    val jsonArray = JSONArray(DataStore.subscriptionExtraLinks ?: "")
+                    val list = ArrayList<String>(jsonArray.length())
+                    for (i in 0 until jsonArray.length()) {
+                        list.add(jsonArray.getString(i))
+                    }
+                    list
+                } catch (e: Exception) {
+                    ArrayList()
+                }
                 forceResolve = DataStore.subscriptionForceResolve
                 deduplication = DataStore.subscriptionDeduplication
                 updateWhenConnectedOnly = DataStore.subscriptionUpdateWhenConnectedOnly
@@ -120,6 +145,11 @@ class GroupSettingsActivity(
 
     fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.group_preferences)
+
+        val subscriptionLink = findPreference<LinkWithExtraPreference>(Key.SUBSCRIPTION_LINK)!!
+        subscriptionLink.onExtraLinksClick = {
+            showExtraLinksDialog()
+        }
 
         frontProxyPreference = findPreference(Key.GROUP_FRONT_PROXY)!!
         frontProxyPreference.apply {
@@ -304,6 +334,130 @@ class GroupSettingsActivity(
         const val EXTRA_GROUP_ID = "id"
         const val EXTRA_FROM_CLIPBOARD = "fromClipboard"
         const val EXTRA_GROUP_SUBSCRIPTION_LINK = "subscription_link"
+    }
+
+    private fun extraLinksToList(): MutableList<String> {
+        val raw = DataStore.subscriptionExtraLinks ?: ""
+        return try {
+            val arr = JSONArray(raw)
+            val list = mutableListOf<String>()
+            for (i in 0 until arr.length()) {
+                list.add(arr.getString(i))
+            }
+            list
+        } catch (e: Exception) {
+            mutableListOf()
+        }
+    }
+
+    private fun saveExtraLinksList(list: List<String>) {
+        DataStore.subscriptionExtraLinks = JSONArray(list).toString()
+        DataStore.dirty = true
+    }
+
+    private fun showExtraLinksDialog() {
+        val links = extraLinksToList()
+        val context = this@GroupSettingsActivity
+
+        val scrollView = ScrollView(context)
+        val container = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+        scrollView.addView(container)
+
+        if (links.isEmpty()) links.add("")
+        rebuildRows(container, links)
+
+        val dialog = MaterialAlertDialogBuilder(context)
+            .setTitle(R.string.extra_subscription_links)
+            .setView(scrollView)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val nonEmpty = links.filter { it.isNotBlank() }
+                saveExtraLinksList(nonEmpty)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+
+        dialog.show()
+    }
+
+    private fun rebuildRows(
+        container: LinearLayout,
+        links: MutableList<String>,
+    ) {
+        container.removeAllViews()
+        for (i in links.indices) {
+            val row = LinearLayout(container.context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply { setMargins(0, 8, 0, 8) }
+            }
+
+            val inputLayout = TextInputLayout(row.context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f
+                )
+                hint = row.context.getString(R.string.extra_subscription_links_hint)
+            }
+
+            val editText = TextInputEditText(row.context).apply {
+                setText(links.getOrElse(i) { "" })
+                inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                        android.text.InputType.TYPE_TEXT_VARIATION_URI
+                maxLines = 2
+                addTextChangedListener { editable ->
+                    if (i < links.size) {
+                        links[i] = editable?.toString() ?: ""
+                    }
+                }
+            }
+            inputLayout.addView(editText)
+
+            val btn = ImageButton(row.context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    48.dpToPx(), 48.dpToPx()
+                )
+                setBackgroundResource(row.context.resolveSelectableItemBackground())
+            }
+
+            if (i == links.size - 1) {
+                btn.setImageResource(R.drawable.ic_baseline_add_24)
+                btn.contentDescription = "Add"
+                btn.setOnClickListener {
+                    links.add("")
+                    rebuildRows(container, links)
+                }
+            } else {
+                btn.setImageResource(R.drawable.ic_baseline_remove_24)
+                btn.contentDescription = "Remove"
+                btn.setOnClickListener {
+                    if (i < links.size) {
+                        links.removeAt(i)
+                    }
+                    rebuildRows(container, links)
+                }
+            }
+
+            row.addView(inputLayout)
+            row.addView(btn)
+            container.addView(row)
+        }
+    }
+
+    private fun Context.resolveSelectableItemBackground(): Int {
+        val outValue = android.util.TypedValue()
+        theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, outValue, true)
+        return outValue.resourceId
+    }
+
+    private fun Int.dpToPx(): Int {
+        return (this * resources.displayMetrics.density).toInt()
     }
 
     @SuppressLint("CommitTransaction")
