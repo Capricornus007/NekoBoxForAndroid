@@ -763,7 +763,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="dynamic_colors_classic">Disponibile con la nuova interfaccia</string>
     <string name="theme_fallback_summary">Usato quando i colori dinamici non sono disponibili o disabilitati</string>
     <string name="more_options">Altre opzioni</string>
-    <string name="app_theme">Colore accento</string>
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="donate">Donate</string>
     <string name="donate_info">Support the development of this app.</string>
