@@ -398,8 +398,8 @@ class GroupSettingsActivity(
             val inputLayout = TextInputLayout(row.context).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     0,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        1f,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    1f,
                 )
                 hint = row.context.getString(R.string.extra_subscription_links_hint)
             }
@@ -419,7 +419,8 @@ class GroupSettingsActivity(
 
             val btn = ImageButton(row.context).apply {
                 layoutParams = LinearLayout.LayoutParams(
-                    48.dpToPx(), 48.dpToPx()
+                    48.dpToPx(),
+                    48.dpToPx(),
                 )
                 setBackgroundResource(row.context.resolveSelectableItemBackground())
             }
