@@ -765,7 +765,6 @@
     <string name="dynamic_colors_classic">متاح مع الواجهة الجديدة</string>
     <string name="theme_fallback_summary">يُستخدم عند عدم توفر الألوان الديناميكية أو تعطيلها</string>
     <string name="more_options">المزيد من الخيارات</string>
-    <string name="app_theme">اللون التمييزي</string>
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="donate">Donate</string>
     <string name="donate_info">Support the development of this app.</string>
