@@ -770,4 +770,10 @@
     <string name="theme_fallback_summary">Utilisé lorsque les couleurs dynamiques sont indisponibles ou désactivées</string>
     <string name="more_options">Plus d\'options</string>
     <string name="app_theme">Couleur d\'accentuation</string>
+    <string name="extra_subscription_links">Extra Subscription Links</string>
+    <string name="donate">Donate</string>
+    <string name="donate_info">Support the development of this app.</string>
+    <string name="extra_subscription_links_hint">Extra subscription URL</string>
+    <string name="service_mode_transproxy">Transproxy</string>
+    <string name="copy_toast_msg">Copied to clipboard</string>
 </resources>
