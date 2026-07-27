@@ -48,10 +48,10 @@
     <string name="layout">布局</string>
     <string name="layout_single_column">单列</string>
     <string name="layout_double_column">双列</string>
-    <string name="sort_and_layout">Sort and Appearance</string>
-    <string name="card_style">Card</string>
+    <string name="sort_and_layout">排序与外观</string>
+    <string name="card_style">卡片</string>
     <string name="card_style_classic">经典</string>
-    <string name="card_style_stroke">Stroke</string>
+    <string name="card_style_stroke">描边</string>
     <string name="group_status_empty">空组</string>
     <string name="group_status_empty_subscription">尚未更新</string>
     <string name="group_status_proxies">%d 个代理</string>
