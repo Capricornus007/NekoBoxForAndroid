@@ -63,7 +63,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = DataStore.configurationStore
         DataStore.initGlobal()
         addPreferencesFromResource(R.xml.global_preferences)
-        val appTheme = findPreference<SimpleMenuPreference>(Key.APP_THEME)!!
         val nightTheme = findPreference<SimpleMenuPreference>(Key.NIGHT_THEME)!!
         val dynamicColors = findPreference<SwitchPreferenceCompat>(Key.DYNAMIC_COLORS)!!
 
@@ -80,40 +79,11 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
-        appTheme.setOnPreferenceChangeListener { _, newTheme ->
-            if (DataStore.serviceState.started) {
-                SagerNet.reloadService()
-            }
-            val themeId = (newTheme as String).toInt()
-            val previousTheme = DataStore.appTheme
-            val enteringDarkOnly = themeId in Theme.DARK_ONLY_THEMES
-            val leavingDarkOnly = previousTheme in Theme.DARK_ONLY_THEMES
-            if (enteringDarkOnly) {
-                if (!leavingDarkOnly && DataStore.nightTheme != 1) {
-                    DataStore.nightThemeBeforeDracula = DataStore.nightTheme
-                    Theme.currentNightMode = 1
-                    nightTheme.value = "1"
-                    Theme.applyNightTheme()
-                }
-            } else if (leavingDarkOnly) {
-                val restore = DataStore.nightThemeBeforeDracula
-                if (restore != -1) {
-                    DataStore.nightThemeBeforeDracula = -1
-                    Theme.currentNightMode = restore
-                    nightTheme.value = restore.toString()
-                    Theme.applyNightTheme()
-                }
-            }
-            val theme = Theme.getTheme(themeId)
-            app.setTheme(theme)
-            recreateActivityAfterPreferencePersisted()
-            true
-        }
-
         nightTheme.setOnPreferenceChangeListener { _, newTheme ->
             Theme.currentNightMode = (newTheme as String).toInt()
             DataStore.nightThemeBeforeDracula = -1
             Theme.applyNightTheme()
+            activity?.recreate()
             true
         }
 

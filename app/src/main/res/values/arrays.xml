@@ -59,8 +59,8 @@
 
     <string-array name="int_array_4">
         <item>0</item>
-        <item>7</item>
-        <item>11</item>
+        <item>1</item>
+        <item>2</item>
         <item>3</item>
     </string-array>
 
@@ -743,12 +743,6 @@
         <item>@string/off</item>
         <item>@string/sniff_routing</item>
         <item>@string/sniff_override</item>
-    </string-array>
-    <string-array name="app_theme">
-        <item>Default (Lilac)</item>
-        <item>Blue</item>
-        <item>Green</item>
-        <item>Pink</item>
     </string-array>
 
     <!-- Snell Protocol -->

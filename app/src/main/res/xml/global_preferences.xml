@@ -17,14 +17,6 @@
             app:title="@string/night_mode"
             app:useSimpleSummaryProvider="true" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
-            app:defaultValue="0"
-            app:entries="@array/app_theme"
-            app:entryValues="@array/int_array_4"
-            app:icon="@drawable/ic_baseline_color_lens_24"
-            app:key="appTheme"
-            app:title="@string/app_theme"
-            app:useSimpleSummaryProvider="true" />
-        <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue=""
             app:entries="@array/language_entries"
             app:entryValues="@array/language_values"
