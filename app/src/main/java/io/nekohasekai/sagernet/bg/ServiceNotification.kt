@@ -138,7 +138,7 @@ class ServiceNotification(
         .setOnlyAlertOnce(true)
         .setOngoing(true)
         .setContentIntent(SagerNet.configureIntent(service))
-        .setSmallIcon(R.drawable.ic_throne_tile)
+        .setSmallIcon(R.drawable.ic_service_active)
         .setCategory(NotificationCompat.CATEGORY_SERVICE)
         .setPriority(NotificationCompat.PRIORITY_LOW)
         .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)

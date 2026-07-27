@@ -17,7 +17,7 @@ class ConnectionTestNotification(val context: Context, val title: String) {
                 return
             }
             val builder = NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.drawable.ic_throne_tile)
+                .setSmallIcon(R.drawable.ic_service_active)
                 .setContentTitle(title)
                 .setOnlyAlertOnce(true)
                 .setContentText("$progress / $max").setProgress(max, progress, false)
