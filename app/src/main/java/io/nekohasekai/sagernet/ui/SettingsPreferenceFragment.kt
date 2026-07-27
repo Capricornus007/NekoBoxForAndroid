@@ -80,7 +80,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
-
         appTheme.setOnPreferenceChangeListener { _, newTheme ->
             if (DataStore.serviceState.started) {
                 SagerNet.reloadService()

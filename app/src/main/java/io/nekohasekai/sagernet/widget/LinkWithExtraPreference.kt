@@ -19,8 +19,9 @@ constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = TypedArrayUtils.getAttr(
-        context, R.attr.editTextPreferenceStyle,
-        android.R.attr.editTextPreferenceStyle
+        context,
+        R.attr.editTextPreferenceStyle,
+        android.R.attr.editTextPreferenceStyle,
     ),
     defStyleRes: Int = 0
 ) : EditTextPreference(context, attrs, defStyleAttr, defStyleRes) {

@@ -113,7 +113,6 @@ object Theme {
         context.setTheme(getDialogTheme())
     }
 
-
     fun getTheme(): Int = getTheme(DataStore.appTheme)
 
     fun getTheme(themeId: Int): Int {
