@@ -97,6 +97,7 @@ object Key {
     const val AMOLED_THEME = "amoledTheme"
     const val CONFIRM_PROFILE_DELETE = "confirmProfileDelete"
     const val GROUP_LAYOUT_MODE = "groupLayoutMode"
+    const val PROFILE_CARD_STYLE = "profileCardStyle"
 
     const val ALLOW_INSECURE_ON_REQUEST = "allowInsecureOnRequest"
 

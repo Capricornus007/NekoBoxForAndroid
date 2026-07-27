@@ -49,7 +49,10 @@
     <string name="layout">레이아웃</string>
     <string name="layout_single_column">단일 열</string>
     <string name="layout_double_column">이중 열</string>
-    <string name="sort_and_layout">정렬 및 레이아웃</string>
+    <string name="sort_and_layout">정렬 및 모양</string>
+    <string name="card_style">카드</string>
+    <string name="card_style_classic">클래식</string>
+    <string name="card_style_stroke">외곽선</string>
     <string name="group_status_empty">빈 그룹</string>
     <string name="group_status_empty_subscription">아직 업데이트되지 않음</string>
     <string name="group_status_proxies">%d 프록시</string>
