@@ -363,7 +363,7 @@ class GroupSettingsActivity(
             orientation = LinearLayout.VERTICAL
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                ViewGroup.LayoutParams.WRAP_CONTENT,
             )
         }
         scrollView.addView(container)
@@ -384,23 +384,22 @@ class GroupSettingsActivity(
         dialog.show()
     }
 
-    private fun rebuildRows(
-        container: LinearLayout,
-        links: MutableList<String>,
-    ) {
+    private fun rebuildRows(container: LinearLayout, links: MutableList<String>) {
         container.removeAllViews()
         for (i in links.indices) {
             val row = LinearLayout(container.context).apply {
                 orientation = LinearLayout.HORIZONTAL
                 layoutParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
                 ).apply { setMargins(0, 8, 0, 8) }
             }
 
             val inputLayout = TextInputLayout(row.context).apply {
                 layoutParams = LinearLayout.LayoutParams(
-                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f
+                    0,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        1f,
                 )
                 hint = row.context.getString(R.string.extra_subscription_links_hint)
             }
@@ -408,7 +407,7 @@ class GroupSettingsActivity(
             val editText = TextInputEditText(row.context).apply {
                 setText(links.getOrElse(i) { "" })
                 inputType = android.text.InputType.TYPE_CLASS_TEXT or
-                        android.text.InputType.TYPE_TEXT_VARIATION_URI
+                    android.text.InputType.TYPE_TEXT_VARIATION_URI
                 maxLines = 2
                 addTextChangedListener { editable ->
                     if (i < links.size) {
