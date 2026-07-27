@@ -763,4 +763,10 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="theme_fallback_summary">Gebruikt wanneer dynamische kleuren niet beschikbaar of uitgeschakeld zijn</string>
     <string name="more_options">Meer opties</string>
     <string name="app_theme">Accentkleur</string>
+    <string name="extra_subscription_links">Extra Subscription Links</string>
+    <string name="donate">Donate</string>
+    <string name="donate_info">Support the development of this app.</string>
+    <string name="extra_subscription_links_hint">Extra subscription URL</string>
+    <string name="service_mode_transproxy">Transproxy</string>
+    <string name="copy_toast_msg">Copied to clipboard</string>
 </resources>
