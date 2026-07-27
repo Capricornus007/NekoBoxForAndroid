@@ -831,4 +831,6 @@
     <string name="donate">Donate</string>
     <string name="donate_info">Support the development of this app.</string>
     <string name="extra_subscription_links_hint">Extra subscription URL</string>
+    <string name="service_mode_transproxy">Transproxy</string>
+    <string name="copy_toast_msg">Copied to clipboard</string>
 </resources>
