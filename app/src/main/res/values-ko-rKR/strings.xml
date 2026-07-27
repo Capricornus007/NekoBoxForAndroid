@@ -740,7 +740,6 @@ Android를 변조하여 플러그인을 사용할 수 없게 만들었습니다.
     <string name="dynamic_colors_classic">새 인터페이스에서 사용 가능</string>
     <string name="theme_fallback_summary">다이내믹 컬러를 사용할 수 없거나 비활성화된 경우 사용됩니다.</string>
     <string name="more_options">더 많은 옵션</string>
-    <string name="app_theme">강조색</string>
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="donate">Donate</string>
     <string name="donate_info">Support the development of this app.</string>
