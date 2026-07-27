@@ -29,4 +29,5 @@
     <color name="ui_on_error_container">#F9DEDC</color>
     <color name="ui_success">#81C784</color>
     <color name="ui_warning">#FFB74D</color>
+    <color name="translucent_primary_container">#CC4F4296</color>
 </resources>
