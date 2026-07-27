@@ -83,7 +83,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             Theme.currentNightMode = (newTheme as String).toInt()
             DataStore.nightThemeBeforeDracula = -1
             Theme.applyNightTheme()
-            activity?.recreate()
+            recreateActivityAfterPreferencePersisted()
             true
         }
 
