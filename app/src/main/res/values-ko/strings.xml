@@ -741,5 +741,4 @@
     <string name="dynamic_colors_classic">새 인터페이스에서 사용 가능</string>
     <string name="theme_fallback_summary">동적 색상 비활성 시 이 색상 사용</string>
     <string name="more_options">더 보기</string>
-    <string name="app_theme">액센트 색상</string>
 </resources>

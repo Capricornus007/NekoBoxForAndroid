@@ -743,5 +743,4 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dynamic_colors_classic">新しいインターフェースで利用可能</string>
     <string name="theme_fallback_summary">動的色が無効の時この色を使用</string>
     <string name="more_options">その他</string>
-    <string name="app_theme">アクセントカラー</string>
 </resources>
