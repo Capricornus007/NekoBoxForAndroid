@@ -955,7 +955,9 @@ class ConfigurationFragment @JvmOverloads constructor(
                         var address = profile.requireBean().serverAddress
                         if (!address.isIpAddress()) {
                             try {
-                                SagerNet.underlyingNetwork!!.getAllByName(address).apply {
+                                // underlyingNetwork 可能因默认网络丢失/冷启动尚未回调而为 null，
+                                // 此时跳过预解析，交给 socket.connect 自行解析域名
+                                SagerNet.underlyingNetwork?.getAllByName(address)?.apply {
                                     if (isNotEmpty()) {
                                         address = this[0].hostAddress
                                     }
@@ -1000,22 +1002,22 @@ class ConfigurationFragment @JvmOverloads constructor(
 
                             if (icmpPing) {
                                 profile.status = 2
-                                profile.error = getString(R.string.connection_test_unreachable)
+                                profile.error = app.getString(R.string.connection_test_unreachable)
                             } else {
                                 profile.status = 2
                                 when {
                                     !message.contains("failed:") -> profile.error =
-                                        getString(R.string.connection_test_timeout_error)
+                                        app.getString(R.string.connection_test_timeout_error)
 
                                     else -> when {
                                         message.contains("ECONNREFUSED") -> {
                                             profile.error =
-                                                getString(R.string.connection_test_refused)
+                                                app.getString(R.string.connection_test_refused)
                                         }
 
                                         message.contains("ENETUNREACH") -> {
                                             profile.error =
-                                                getString(R.string.connection_test_unreachable)
+                                                app.getString(R.string.connection_test_unreachable)
                                         }
 
                                         else -> {
@@ -1039,7 +1041,8 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
         test.cancel = {
             test.dialogStatus.set(2)
-            dialog.dismiss()
+            // 测试跑完时界面可能已销毁：dismiss 失败不应中断后续 runningTest 复位
+            if (dialog.isShowing) runCatching { dialog.dismiss() }
             runOnDefaultDispatcher {
                 mainJob.cancel()
                 testJobs.forEach { it.cancel() }
@@ -1108,7 +1111,8 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
         test.cancel = {
             test.dialogStatus.set(2)
-            dialog.dismiss()
+            // 测试跑完时界面可能已销毁：dismiss 失败不应中断后续 runningTest 复位
+            if (dialog.isShowing) runCatching { dialog.dismiss() }
             runOnDefaultDispatcher {
                 mainJob.cancel()
                 testJobs.forEach { it.cancel() }

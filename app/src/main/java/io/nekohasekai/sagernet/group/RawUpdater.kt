@@ -301,7 +301,10 @@ object RawUpdater : GroupUpdater() {
                 ))) {
                     // Note: YAML numbers parsed as "Long"
 
-                    when (proxy["type"] as String) {
+                    // 单个畸形节点（缺字段/类型不符/端口非数字）不应中止整份订阅：
+                    // 强制转换/toInt 抛出的 NPE/CCE/NFE 不是 YAMLException，故就地捕获并跳过该节点
+                    try {
+                    when (proxy["type"] as? String) {
                         "socks5" -> {
                             proxies.add(SOCKSBean().apply {
                                 serverAddress = proxy["server"] as String
@@ -901,6 +904,9 @@ object RawUpdater : GroupUpdater() {
                             val bean = parseClashSnell(proxy)
                             proxies.add(bean)
                         }
+                    }
+                    } catch (e: Exception) {
+                        Logs.w("Skip malformed clash proxy: ${proxy["name"] ?: proxy["server"]}", e)
                     }
                 }
 

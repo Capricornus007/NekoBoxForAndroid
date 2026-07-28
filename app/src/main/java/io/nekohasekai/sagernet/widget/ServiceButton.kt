@@ -121,7 +121,9 @@ class ServiceButton @JvmOverloads constructor(
         val description = context.getText(if (state.canStop) R.string.stop else R.string.connect)
         contentDescription = description
         TooltipCompat.setTooltipText(this, description)
-        val enabled = state.canStop || state == BaseService.State.Stopped
+        // Idle 也可点：冷启动时 :bg 进程尚未就绪，此时点击走纯 Intent 启动，
+        // 不依赖 binder；若服务实际在运行，重复 start 会被 onStartCommand 忽略
+        val enabled = state.canStop || state == BaseService.State.Stopped || state == BaseService.State.Idle
         isEnabled = enabled
         if (Build.VERSION.SDK_INT >= 24) pointerIcon = PointerIcon.getSystemIcon(
             context,
