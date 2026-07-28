@@ -119,8 +119,8 @@
 在 [`values-v26/themes.xml`](app/src/main/res/values-v26/themes.xml) 中，针对 Android 8.0+ (API 26+) 进行了沉浸式适配：
 - 将 `android:statusBarColor` 和 `android:navigationBarColor` 设置为 `@android:color/transparent`。
 - 在 [`ThemedActivity.kt`](app/src/main/java/io/nekohasekai/sagernet/ui/ThemedActivity.kt:40) 中，通过 `WindowCompat.setDecorFitsSystemWindows(window, false)` 开启全面屏沉浸式。
-- 使用 `WindowCompat.getInsetsController` 动态控制状态栏和导航栏图标的亮色/暗色外观：
-  - 导航栏图标：`insetController.isAppearanceLightNavigationBars = !Theme.usingNightMode()`。
+- 使用 `WindowCompat.getInsetsController` 控制状态栏和导航栏图标的亮色/暗色外观：
+  - 导航栏按钮：固定为白色（深色款），`insetController.isAppearanceLightNavigationBars = false`，不随夜间模式切换；底色仍为主题 `colorPrimaryDark`。
   - 状态栏图标：对于黑色主题（`Theme.BLACK`），在非夜间模式下将状态栏图标设为亮色（深色图标），其他主题默认保持暗色（白色图标）。
 
 ---

@@ -206,6 +206,12 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         get() = getLocalPort(Key.MIXED_PORT, 2080)
         set(value) = saveLocalPort(Key.MIXED_PORT, value)
 
+    var disableMixedInbound by configurationStore.boolean(Key.DISABLE_MIXED_INBOUND)
+
+    // 仅在 TUN 模式下真正生效；系统代理模式必须保留 mixed 入栈
+    val mixedInboundDisabled: Boolean
+        get() = disableMixedInbound && serviceMode == Key.MODE_VPN
+
     val mixedInboundNeedsAuth: Boolean
         get() =
             // When the inbound is exposed to the LAN (bind 0.0.0.0 via allowAccess),

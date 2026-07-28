@@ -25,6 +25,7 @@ Android 端的代码主要分为两个核心包：
   - `VpnService.kt`: Android VPN 服务的核心实现，负责拦截流量并传递给底层核心。
   - `ProxyService.kt`: 代理服务。
   - `BaseService.kt`: 基础服务。
+  - `SubscriptionUpdater.kt`: 订阅自动更新。通过 WorkManager（`RemoteWorkManager`）注册周期任务；`UpdateTask` 是 `RemoteCoroutineWorker`，借助清单中声明在 `:bg` 进程的 `androidx.work.multiprocess.RemoteWorkerService` 在 `:bg` 进程执行（该进程的 `DataStore.serviceState` 由 `BaseService` 实时维护，保证"仅连接时更新"判断正确）。
 - [`io/nekohasekai/sagernet/database/`](app/src/main/java/io/nekohasekai/sagernet/database): 数据库与偏好设置模块。
   - `SagerDatabase.kt`: Room 数据库定义，存储代理配置、分组、规则等。
   - `ProfileManager.kt` / `GroupManager.kt`: 配置和分组管理器。
@@ -32,7 +33,8 @@ Android 端的代码主要分为两个核心包：
   - 支持 Shadowsocks, VMess, Trojan, Hysteria, Juicity, Naive, WireGuard 等协议的配置解析与转换。
 - [`io/nekohasekai/sagernet/ui/`](app/src/main/java/io/nekohasekai/sagernet/ui): 各种 Activity 和 Fragment 界面。
   - `MainActivity.kt`: 应用主界面。
-  - `SettingsFragment.kt`: 设置界面。
+  - `SettingsFragment.kt`: 设置界面。「入站设置」中含「禁用混合入栈」开关（`disableMixedInbound`，见 `SettingsPreferenceFragment.kt`）：仅在 TUN 模式下真正生效（`DataStore.mixedInboundDisabled`），开启后 `ConfigBuilder` 不再生成 mixed 入栈及其专属的 `inbound = [mixed-in]` 路由规则、不再监听本地代理端口，`VpnService` 同时跳过 `appendHttpProxy`；此时「代理端口」设置项变灰且摘要显示「已禁用」。在系统代理模式下开启该开关会 Toast 提示"禁用只在TUN模式有效，当前监听端口：xxx"且不影响混合入栈。
+  - `AboutFragment.kt`: 关于界面。版本更新检查：「检查正式版更新」为灰色禁用项（Throne 尚未发布正式版，点击仅弹出 toast `release_not_available`）；「检查预览版更新」请求 GitHub `releases/latest` API，将远端 release 名（即 git tag，形如 `v1.4.2-m20-10`）与本地 `BuildConfig.VERSION_NAME` 按 `-` 分段、逐段提取数字组从左到右比较（左侧段优先级高于右侧，如 `v1.2.3-m21-1` > `v1.2.3-m20-100`），见 `compareVersionNames()`。
 - [`io/nekohasekai/sagernet/widget/`](app/src/main/java/io/nekohasekai/sagernet/widget): 自定义 UI 控件。
 
 #### 1.2.2 `moe.matsuri.nb4a` (NekoBox 专属扩展)
@@ -55,7 +57,10 @@ Go 语言编写的底层核心，负责高性能的网络处理：
 - [`libcore/nb4a.go`](libcore/nb4a.go): Go 核心的入口，导出 `InitCore` 等函数，供 Android 端通过 JNI 调用。
 - [`libcore/box.go`](libcore/box.go) / [`box_include.go`](libcore/box_include.go): 与 `sing-box` 核心的集成与初始化。
 - [`libcore/build.sh`](libcore/build.sh): 编译 Go 核心的本地脚本。
-- [`libcore/device/`](libcore/device/), [`ech/`](libcore/ech/), [`procfs/`](libcore/procfs/), [`protocol/`](libcore/protocol/), [`stun/`](libcore/stun/): Go 核心的子模块，处理设备、ECH、进程文件系统、自定义协议和 STUN 测试。
+- [`libcore/device/`](libcore/device/), [`ech/`](libcore/ech/), [`procfs/`](libcore/procfs/), [`stun/`](libcore/stun/): Go 核心的子模块，处理设备、ECH、进程文件系统和 STUN 测试。
+- [`libcore/protocol/`](libcore/protocol/): libcore 侧自定义/覆盖的 sing-box 协议实现，在 [`libcore/box_include.go`](libcore/box_include.go) 中注册。
+  - `juicity/`: Juicity outbound。
+  - `http/`: 对 sing-box `http` outbound 的**覆盖实现**（在 sing-box 自身注册之后再次注册同名 `"http"` 类型，registry 后注册生效）。行为差异：TLS 启用且用户未显式配置 ALPN 时默认提供 `["h2", "http/1.1"]`，TLS 握手后按 ALPN 协商结果分流——协商到 `h2` 走 HTTP/2 CONNECT（基于 `golang.org/x/net/http2`，上行流为 `io.Pipe` 请求体、响应体为下行流），否则保持原有 HTTP/1.1 CONNECT。用于兼容 h2-only 的 HTTPS 代理节点（对齐 v2ray 系核心行为）；用户可在节点配置中显式填写 ALPN=`http/1.1` 回退旧行为。
 
 ---
 
