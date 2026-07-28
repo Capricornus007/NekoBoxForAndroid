@@ -73,6 +73,10 @@
     <string name="lan_sharing_requires_root">루트 액세스가 필요하지만 사용할 수 없음</string>
     <string name="port_proxy">프록시 포트</string>
     <string name="port_http">HTTP 프록시 포트</string>
+    <string name="disable_mixed_inbound">Disable Mixed Inbound</string>
+    <string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string>
+    <string name="mixed_inbound_disabled">비활성화됨</string>
+    <string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string>
     <string name="port_transproxy">투명 프록시 포트</string>
     <string name="cag_route">경로 설정</string>
     <string name="allow_access">LAN 연결 허용</string>
@@ -704,6 +708,7 @@ Android를 변조하여 플러그인을 사용할 수 없게 만들었습니다.
     <string name="preview_version_hint">이 애플리케이션은 프리뷰 버전이며 많은 문제가 포함될 수 있습니다. 테스트를 원하지 않으시면 GitHub에서 릴리스 버전을 다운로드하세요!</string>
     <string name="check_update_preview">프리뷰 버전 업데이트 확인</string>
     <string name="check_update_release">릴리스 버전 업데이트 확인</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">새 버전 사용 가능</string>
     <string name="update_dialog_message">현재 버전: %1$s\n사용 가능한 버전: %2$s\n다운로드하시겠습니까?</string>
     <string name="check_update_no">확인 성공, 업데이트 없음.</string>
