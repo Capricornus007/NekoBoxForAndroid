@@ -357,6 +357,13 @@
             android:name="androidx.room.MultiInstanceInvalidationService"
             android:process=":bg" />
 
+        <!-- Hosts RemoteCoroutineWorker (e.g. SubscriptionUpdater.UpdateTask) in the :bg process,
+             where DataStore.serviceState is maintained by BaseService -->
+        <service
+            android:name="androidx.work.multiprocess.RemoteWorkerService"
+            android:exported="false"
+            android:process=":bg" />
+
     </application>
 
 </manifest>

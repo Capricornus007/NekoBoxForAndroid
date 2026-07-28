@@ -25,6 +25,7 @@ Android 端的代码主要分为两个核心包：
   - `VpnService.kt`: Android VPN 服务的核心实现，负责拦截流量并传递给底层核心。
   - `ProxyService.kt`: 代理服务。
   - `BaseService.kt`: 基础服务。
+  - `SubscriptionUpdater.kt`: 订阅自动更新。通过 WorkManager（`RemoteWorkManager`）注册周期任务；`UpdateTask` 是 `RemoteCoroutineWorker`，借助清单中声明在 `:bg` 进程的 `androidx.work.multiprocess.RemoteWorkerService` 在 `:bg` 进程执行（该进程的 `DataStore.serviceState` 由 `BaseService` 实时维护，保证"仅连接时更新"判断正确）。
 - [`io/nekohasekai/sagernet/database/`](app/src/main/java/io/nekohasekai/sagernet/database): 数据库与偏好设置模块。
   - `SagerDatabase.kt`: Room 数据库定义，存储代理配置、分组、规则等。
   - `ProfileManager.kt` / `GroupManager.kt`: 配置和分组管理器。
