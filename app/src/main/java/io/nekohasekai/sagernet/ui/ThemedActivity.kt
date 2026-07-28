@@ -41,7 +41,8 @@ abstract class ThemedActivity : AppCompatActivity {
             WindowCompat.setDecorFitsSystemWindows(window, false)
             
             val insetController = WindowCompat.getInsetsController(window, window.decorView)
-            insetController.isAppearanceLightNavigationBars = !Theme.usingNightMode()
+            // 三大金刚（系统导航栏）按钮固定为白色（深色款），底色仍为主题 colorPrimaryDark
+            insetController.isAppearanceLightNavigationBars = false
             insetController.isAppearanceLightStatusBars = 
                 if (DataStore.appTheme == Theme.BLACK) !Theme.usingNightMode() else false
         }
