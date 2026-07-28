@@ -73,6 +73,10 @@
     <string name="lan_sharing_requires_root">ルートアクセスが必要ですが利用できません</string>
     <string name="port_proxy">プロキシポート</string>
     <string name="port_http">HTTPプロキシポート</string>
+    <string name="disable_mixed_inbound">Disable Mixed Inbound</string>
+    <string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string>
+    <string name="mixed_inbound_disabled">無効</string>
+    <string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string>
     <string name="port_transproxy">Transproxyポート</string>
     <string name="cag_route">ルート設定</string>
     <string name="allow_access">LANからの接続を許可</string>
@@ -711,6 +715,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="preview_version_hint">このアプリケーションはプレビューバージョンであり、多くの問題が含まれている可能性があります。テストしたくない場合は、GitHubからリリースバージョンをダウンロードしてください。</string>
     <string name="check_update_preview">プレビューバージョンのアップデートを確認</string>
     <string name="check_update_release">リリースバージョンのアップデートを確認</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">新しいバージョンがあります</string>
     <string name="update_dialog_message">現在のバージョン: %1$s\n利用可能なバージョン: %2$s\nダウンロードしますか？</string>
     <string name="check_update_no">確認しましたが、アップデートはありません。</string>
