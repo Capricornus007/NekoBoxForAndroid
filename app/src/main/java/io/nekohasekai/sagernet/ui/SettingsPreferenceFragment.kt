@@ -208,6 +208,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             // httpProxyBypass 通过 dependency 级联随 appendHttpProxy 一起变灰
             appendHttpProxy.isEnabled = !disabled
             if (disabled) {
+                appendHttpProxy.isChecked = false
                 mixedPort.summaryProvider = null
                 mixedPort.summary = getString(R.string.mixed_inbound_disabled)
             } else {
