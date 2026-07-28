@@ -41,7 +41,7 @@ object SubscriptionUpdater {
     suspend fun reconfigureUpdater() {
         val workManager = RemoteWorkManager.getInstance(app)
         try {
-            workManager.cancelUniqueWork(WORK_NAME).result.awaitResult()
+            workManager.cancelUniqueWork(WORK_NAME).awaitResult()
         } catch (e: Throwable) {
             Logs.w("SubscriptionUpdater: cancel work failed", e)
         }
@@ -88,7 +88,7 @@ object SubscriptionUpdater {
                         if (minInitDelay > 0) setInitialDelay(minInitDelay, TimeUnit.SECONDS)
                     }
                     .build()
-            ).result.awaitResult()
+            ).awaitResult()
             Logs.d("SubscriptionUpdater: work enqueued")
         } catch (e: Throwable) {
             Logs.w("SubscriptionUpdater: enqueue work failed", e)
