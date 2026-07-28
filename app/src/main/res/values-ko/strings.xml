@@ -705,7 +705,7 @@
     <string name="preview_version_hint">이 애플리케이션은 프리뷰 버전이며 많은 문제가 포함될 수 있습니다. 테스트를 원하지 않으시면 GitHub에서 릴리스 버전을 다운로드하세요!</string>
     <string name="check_update_preview">프리뷰 버전 업데이트 확인</string>
     <string name="check_update_release">릴리스 버전 업데이트 확인</string>
-    <string name="release_not_available">Throne은 아직 정식 버전을 출시하지 않았습니다</string>
+    <string name="release_not_available">NekoBox은 아직 정식 버전을 출시하지 않았습니다</string>
     <string name="update_dialog_title">새 버전 사용 가능</string>
     <string name="update_dialog_message">현재 버전: %1$s\n사용 가능한 버전: %2$s\n다운로드하시겠습니까?</string>
     <string name="check_update_no">확인 성공, 업데이트 없음.</string>
