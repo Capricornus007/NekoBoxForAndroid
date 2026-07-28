@@ -73,6 +73,10 @@
     <string name="lan_sharing_requires_root">دسترسی روت نیاز است اما در دسترس نیست</string>
     <string name="port_proxy">پورت پراکسی</string>
     <string name="port_http">پورت پراکسی HTTP</string>
+    <string name="disable_mixed_inbound">Disable Mixed Inbound</string>
+    <string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string>
+    <string name="mixed_inbound_disabled">غیرفعال</string>
+    <string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string>
     <string name="port_transproxy">پورت انتقال‌پروکسی</string>
     <string name="cag_route">تنظیمات مسیریابی</string>
     <string name="allow_access">اجازه اتصال از شبکه محلی</string>
@@ -711,6 +715,7 @@
     <string name="preview_version_hint">این برنامه یک نسخه پیش‌نمایش است و ممکن است مشکلات زیادی داشته باشد. اگر نمی‌خواهید آن را آزمایش کنید، لطفاً به GitHub رفته و نسخه Release را دانلود کنید!</string>
     <string name="check_update_preview">بررسی به‌روزرسانی نسخه پیش‌نمایش</string>
     <string name="check_update_release">بررسی به‌روزرسانی نسخه انتشار</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">نسخه جدید موجود است</string>
     <string name="update_dialog_message">نسخه فعلی: %1$s\nنسخه موجود: %2$s\nآیا می‌خواهید آن را دانلود کنید؟</string>
     <string name="check_update_no">بررسی موفقیت‌آمیز بود، اما به‌روزرسانی وجود ندارد.</string>
