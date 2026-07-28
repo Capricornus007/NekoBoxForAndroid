@@ -286,7 +286,7 @@ fun buildConfig(
                     }
                 }
             })
-            inbounds.add(Inbound_MixedOptions().apply {
+            if (!DataStore.mixedInboundDisabled) inbounds.add(Inbound_MixedOptions().apply {
                 type = "mixed"
                 tag = TAG_MIXED
                 listen = bind
@@ -636,7 +636,8 @@ fun buildConfig(
                 outbound = mainProxyTag
             })
 
-            route.rules.add(Rule_DefaultOptions().apply {
+            // 禁用混合入栈时不生成入栈系的规则
+            if (!DataStore.mixedInboundDisabled) route.rules.add(Rule_DefaultOptions().apply {
                 inbound = listOf(TAG_MIXED)
                 outbound = mainProxyTag
             })

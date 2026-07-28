@@ -42,6 +42,10 @@
     <string name="service_mode_proxy">仅代理</string>
     <string name="port_proxy">代理端口</string>
     <string name="port_http">HTTP 代理端口</string>
+    <string name="disable_mixed_inbound">禁用混合入栈</string>
+    <string name="disable_mixed_inbound_sum">纯 TUN 入栈，不在本地监听代理端口</string>
+    <string name="mixed_inbound_disabled">已禁用</string>
+    <string name="disable_mixed_inbound_proxy_toast">禁用只在TUN模式有效，当前监听端口：%1$d</string>
     <string name="port_local_dns">本地 DNS 端口</string>
     <string name="allow_access">允许来自局域网的连接</string>
     <string name="allow_access_sum">将入站绑定至 0.0.0.0</string>

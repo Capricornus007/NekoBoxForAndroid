@@ -93,6 +93,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
         val mixedPort = findPreference<EditTextPreference>(Key.MIXED_PORT)!!
+        val disableMixedInbound = findPreference<SwitchPreference>(Key.DISABLE_MIXED_INBOUND)!!
         val serviceMode = findPreference<Preference>(Key.SERVICE_MODE)!!
         val allowAccess = findPreference<Preference>(Key.ALLOW_ACCESS)!!
         val appendHttpProxy = findPreference<SwitchPreference>(Key.APPEND_HTTP_PROXY)!!
@@ -201,6 +202,30 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
+        // 禁用混合入栈：开启时代理端口设置项变灰并显示「已禁用」
+        fun updateMixedPortState(disabled: Boolean = DataStore.disableMixedInbound) {
+            mixedPort.isEnabled = !disabled
+            if (disabled) {
+                mixedPort.summaryProvider = null
+                mixedPort.summary = getString(R.string.mixed_inbound_disabled)
+            } else {
+                mixedPort.summaryProvider = EditTextPreference.SimpleSummaryProvider.getInstance()
+            }
+        }
+        updateMixedPortState()
+        disableMixedInbound.setOnPreferenceChangeListener { _, newValue ->
+            val disabled = newValue as Boolean
+            if (disabled && DataStore.serviceMode == Key.MODE_PROXY) {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.disable_mixed_inbound_proxy_toast, DataStore.mixedPort),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            updateMixedPortState(disabled)
+            needReload()
+            true
+        }
         mixedPort.onPreferenceChangeListener = reloadListener
         appendHttpProxy.setOnPreferenceChangeListener { _, newValue ->
             if (newValue as Boolean) {

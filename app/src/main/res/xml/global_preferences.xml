@@ -255,6 +255,12 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/inbound_settings">
+        <SwitchPreference
+            app:defaultValue="false"
+            app:icon="@drawable/ic_maps_directions_boat"
+            app:key="disableMixedInbound"
+            app:summary="@string/disable_mixed_inbound_sum"
+            app:title="@string/disable_mixed_inbound" />
         <EditTextPreference
             app:icon="@drawable/ic_maps_directions_boat"
             app:key="mixedPort"

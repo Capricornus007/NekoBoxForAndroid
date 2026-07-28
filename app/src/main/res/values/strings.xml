@@ -63,6 +63,10 @@
     <string name="service_mode_vpn" translatable="false">VPN</string>
     <string name="port_proxy">Proxy Port</string>
     <string name="port_http">HTTP Proxy Port</string>
+    <string name="disable_mixed_inbound">Disable Mixed Inbound</string>
+    <string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string>
+    <string name="mixed_inbound_disabled">Disabled</string>
+    <string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string>
     <string name="port_transproxy">Transproxy Port</string>
     <string name="cag_route">Route Settings</string>
     <string name="allow_access">Allow Connections from the LAN</string>
