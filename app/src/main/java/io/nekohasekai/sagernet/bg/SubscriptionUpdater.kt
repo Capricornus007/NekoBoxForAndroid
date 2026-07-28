@@ -11,21 +11,14 @@ import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy.UPDATE
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
-import androidx.work.multiprocess.RemoteCoroutineWorker
-import androidx.work.multiprocess.RemoteListenableWorker
 import androidx.work.multiprocess.RemoteWorkManager
-import androidx.work.multiprocess.RemoteWorkerService
-import com.google.common.util.concurrent.ListenableFuture
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 internal data class SubscriptionWorkSchedule(
     val intervalMinutes: Long,
@@ -59,24 +52,8 @@ object SubscriptionUpdater {
 
     private const val WORK_NAME = "SubscriptionUpdater"
 
-    private suspend fun <T> ListenableFuture<T>.awaitResult(): T =
-        suspendCancellableCoroutine { cont ->
-            addListener({
-                try {
-                    cont.resume(get())
-                } catch (e: Throwable) {
-                    cont.resumeWithException(e)
-                }
-            }, { it.run() })
-        }
-
     suspend fun reconfigureUpdater() {
-        val workManager = RemoteWorkManager.getInstance(app)
-        try {
-            workManager.cancelUniqueWork(WORK_NAME).awaitResult()
-        } catch (e: Throwable) {
-            Logs.w("SubscriptionUpdater: cancel work failed", e)
-        }
+        RemoteWorkManager.getInstance(app).cancelUniqueWork(WORK_NAME)
 
         val subscriptions = SagerDatabase.groupDao.subscriptions()
             .mapNotNull { group -> group.subscription?.let { group to it } }
@@ -91,8 +68,6 @@ object SubscriptionUpdater {
                 )
             },
         ) ?: return
-
-        Logs.d("SubscriptionUpdater: scheduling ${subscriptions.size} subscription(s), period=${minDelay}min, initDelay=${minInitDelay}s")
 
         // main process
         RemoteWorkManager.getInstance(app).enqueueUniquePeriodicWork(
@@ -122,8 +97,7 @@ object SubscriptionUpdater {
             .setSmallIcon(R.drawable.ic_service_active)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
 
-        override suspend fun doRemoteWork(): Result {
-            Logs.d("SubscriptionUpdater: work started, serviceState=${DataStore.serviceState}")
+        override suspend fun doWork(): Result {
             var subscriptions =
                 SagerDatabase.groupDao.subscriptions()
                     .mapNotNull { group -> group.subscription?.let { group to it } }
