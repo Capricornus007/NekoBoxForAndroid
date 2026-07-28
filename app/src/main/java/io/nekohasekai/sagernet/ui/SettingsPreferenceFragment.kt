@@ -202,7 +202,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
-        // 禁用混合入栈：开启时代理端口/追加HTTP代理设置项变灰，端口摘要显示「已禁用」
+        // 禁用混合入站：开启时代理端口/追加HTTP代理设置项变灰，端口摘要显示「已禁用」
         fun updateMixedPortState(disabled: Boolean = DataStore.disableMixedInbound) {
             mixedPort.isEnabled = !disabled
             // httpProxyBypass 通过 dependency 级联随 appendHttpProxy 一起变灰

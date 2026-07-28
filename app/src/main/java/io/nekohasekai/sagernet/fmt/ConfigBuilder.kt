@@ -636,7 +636,7 @@ fun buildConfig(
                 outbound = mainProxyTag
             })
 
-            // 禁用混合入栈时不生成入栈系的规则
+            // 禁用混合入站时不生成入站系的规则
             if (!DataStore.mixedInboundDisabled) route.rules.add(Rule_DefaultOptions().apply {
                 inbound = listOf(TAG_MIXED)
                 outbound = mainProxyTag

@@ -156,7 +156,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     var disableMixedInbound by configurationStore.boolean(Key.DISABLE_MIXED_INBOUND)
 
-    // 仅在 TUN 模式下真正生效；系统代理模式必须保留 mixed 入栈
+    // 仅在 TUN 模式下真正生效；系统代理模式必须保留 mixed 入站
     val mixedInboundDisabled: Boolean
         get() = disableMixedInbound && serviceMode == Key.MODE_VPN
 
