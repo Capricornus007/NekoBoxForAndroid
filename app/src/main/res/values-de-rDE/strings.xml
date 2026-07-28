@@ -73,6 +73,10 @@
     <string name="lan_sharing_requires_root">Root-Zugriff ist erforderlich, aber nicht verfügbar</string>
     <string name="port_proxy">Proxy-Port</string>
     <string name="port_http">HTTP-Proxy-Port</string>
+    <string name="disable_mixed_inbound">Disable Mixed Inbound</string>
+    <string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string>
+    <string name="mixed_inbound_disabled">Deaktiviert</string>
+    <string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string>
     <string name="port_transproxy">Transproxy-Port</string>
     <string name="cag_route">Route-Einstellungen</string>
     <string name="allow_access">Verbindungen aus dem LAN zulassen</string>
@@ -717,6 +721,7 @@
     <string name="preview_version_hint">Diese Anwendung ist eine Vorschauversion und kann viele Probleme enthalten. Wenn Sie sie nicht testen möchten, gehen Sie bitte zu GitHub, um die Release-Version herunterzuladen!</string>
     <string name="check_update_preview">Nach Vorschauversions-Updates suchen</string>
     <string name="check_update_release">Nach Releaseversions-Updates suchen</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">Neue Version verfügbar</string>
     <string name="update_dialog_message">Aktuelle Version: %1$s\nVerfügbare Version: %2$s\nMöchten Sie sie herunterladen?</string>
     <string name="check_update_no">Suche erfolgreich, aber keine Updates.</string>
