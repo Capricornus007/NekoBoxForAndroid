@@ -73,6 +73,10 @@
     <string name="lan_sharing_requires_root">Akses Root diperlukan tetapi tidak tersedia</string>
     <string name="port_proxy">Port Proxy</string>
     <string name="port_http">Port HTTP Proxy</string>
+    <string name="disable_mixed_inbound">Disable Mixed Inbound</string>
+    <string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string>
+    <string name="mixed_inbound_disabled">Nonaktif</string>
+    <string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string>
     <string name="port_transproxy">Port Transproxy</string>
     <string name="cag_route">Pengaturan Rute</string>
     <string name="allow_access">Izinkan Koneksi dari LAN</string>
@@ -725,6 +729,7 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="preview_version_hint">Aplikasi ini adalah versi pratinjau dan mungkin mengandung banyak masalah. Jika Anda tidak ingin mengujinya, silakan kunjungi GitHub untuk mengunduh versi Rilis!</string>
     <string name="check_update_preview">Periksa pembaruan versi pratinjau</string>
     <string name="check_update_release">Periksa pembaruan versi rilis</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">Versi baru tersedia</string>
     <string name="update_dialog_message">Versi saat ini: %1$s\nVersi tersedia: %2$s\nApakah Anda ingin mengunduhnya?</string>
     <string name="check_update_no">Pemeriksaan berhasil, tetapi tidak ada pembaruan.</string>
