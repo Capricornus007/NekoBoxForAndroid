@@ -48,10 +48,10 @@
     <string name="layout">布局</string>
     <string name="layout_single_column">单列</string>
     <string name="layout_double_column">双列</string>
-    <string name="sort_and_layout">排序与外观</string>
-    <string name="card_style">卡片</string>
+    <string name="sort_and_layout">Sort and Appearance</string>
+    <string name="card_style">Card</string>
     <string name="card_style_classic">经典</string>
-    <string name="card_style_stroke">描边</string>
+    <string name="card_style_stroke">Stroke</string>
     <string name="group_status_empty">空组</string>
     <string name="group_status_empty_subscription">尚未更新</string>
     <string name="group_status_proxies">%d 个代理</string>
@@ -73,6 +73,10 @@
     <string name="lan_sharing_requires_root">需要 Root 权限但不可用</string>
     <string name="port_proxy">代理端口</string>
     <string name="port_http">HTTP 代理端口</string>
+    <string name="disable_mixed_inbound">Disable Mixed Inbound</string>
+    <string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string>
+    <string name="mixed_inbound_disabled">已禁用</string>
+    <string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string>
     <string name="port_transproxy">透明代理端口</string>
     <string name="cag_route">路由设置</string>
     <string name="allow_access">允许来自局域网的连接</string>
@@ -715,6 +719,7 @@
     <string name="preview_version_hint">此应用程序为预览版，可能包含许多问题。如果您不想测试，请前往GitHub下载Release版本！</string>
     <string name="check_update_preview">检查预览版更新</string>
     <string name="check_update_release">检查正式版更新</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">新版本可用</string>
     <string name="update_dialog_message">当前版本：%1$s\n可用版本：%2$s\n是否要下载？</string>
     <string name="check_update_no">检查成功，但无更新。</string>
