@@ -125,8 +125,9 @@ object RawUpdater : GroupUpdater() {
                         Logs.d("Extra link yielded ${extraProxies.size} proxies")
                     }
                 } catch (e: Exception) {
+                    // 与主链接失败一致：中止整轮更新，避免失败链接下的已有节点被当成“已删除”清掉
                     Logs.w(e)
-                    Logs.d("Failed to fetch extra link: $extraLink - ${e.message}")
+                    error("Failed to fetch extra link: $extraLink - ${e.message}")
                 }
             }
         }

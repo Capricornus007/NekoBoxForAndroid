@@ -603,7 +603,8 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
     }
 
     suspend fun startImport(file: Uri) {
-        val activity = requireActivity()
+        if (!isAdded) return
+        val appContext = requireContext().applicationContext
         val fileName = requireContext().contentResolver.query(file, null, null, null, null)
             ?.use { cursor ->
                 cursor.moveToFirst()
@@ -615,6 +616,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
         if (!fileName.endsWith(".json") && !fileName.endsWith(".zip")) {
             onMainDispatcher {
+                if (!isAdded) return@onMainDispatcher
                 snackbar(getString(R.string.backup_not_file, fileName)).show()
             }
             return
@@ -639,6 +641,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
             val json = JSONObject(content)
             onMainDispatcher {
+                if (!isAdded) return@onMainDispatcher
                 val import = LayoutImportBinding.inflate(layoutInflater)
                 if (!json.has("profiles")) {
                     import.backupConfigurations.isVisible = false
@@ -652,6 +655,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                 MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.backup_import)
                     .setView(import.root)
                     .setPositiveButton(R.string.backup_import) { _, _ ->
+                        if (!isAdded) return@setPositiveButton
                         SagerNet.stopService()
 
                         val binding = LayoutProgressBinding.inflate(layoutInflater)
@@ -668,12 +672,13 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                                     import.backupRules.isChecked,
                                     import.backupSettings.isChecked
                                 )
-                                triggerFullRestart(requireContext())
+                                triggerFullRestart(appContext)
                             }.onFailure {
                                 Logs.w(it)
                                 onMainDispatcher {
-                                    dialog.dismiss()
-                                    MessageStore.showMessage(activity, it.readableMessage)
+                                    if (dialog.isShowing) runCatching { dialog.dismiss() }
+                                    if (!isAdded) return@onMainDispatcher
+                                    MessageStore.showMessage(requireActivity(), it.readableMessage)
                                 }
                             }
                         }
@@ -684,7 +689,8 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         } catch (e: Exception) {
             Logs.w(e)
             onMainDispatcher {
-                MessageStore.showMessage(activity, e.readableMessage)
+                if (!isAdded) return@onMainDispatcher
+                MessageStore.showMessage(requireActivity(), e.readableMessage)
             }
         }
     }

@@ -51,6 +51,7 @@ import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.parseProxies
 import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
+import io.nekohasekai.sagernet.ktx.tryToShow
 import io.nekohasekai.sagernet.ui.MessageStore
 import io.nekohasekai.sagernet.ktx.Logs
 import moe.matsuri.nb4a.utils.Util
@@ -246,6 +247,7 @@ class MainActivity : ThemedActivity(),
             ?: ("Subscription #" + System.currentTimeMillis())
 
         onMainDispatcher {
+            if (isFinishing || isDestroyed) return@onMainDispatcher
 
             displayFragmentWithId(R.id.nav_group)
 
@@ -273,12 +275,14 @@ class MainActivity : ThemedActivity(),
             parseProxies(uri.toString()).getOrNull(0) ?: error(getString(R.string.no_proxies_found))
         } catch (e: Exception) {
             onMainDispatcher {
-                alert(e.readableMessage).show()
+                if (isFinishing || isDestroyed) return@onMainDispatcher
+                alert(e.readableMessage).tryToShow()
             }
             return
         }
 
         onMainDispatcher {
+            if (isFinishing || isDestroyed) return@onMainDispatcher
             MaterialAlertDialogBuilder(this@MainActivity).setTitle(R.string.profile_import)
                 .setMessage(getString(R.string.profile_import_message, profile.displayName()))
                 .setPositiveButton(R.string.yes) { _, _ ->

@@ -248,8 +248,9 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         haveUpdate && !releaseName.contains(BuildConfig.VERSION_NAME)
                     }
                     runOnMainDispatcher {
+                        if (!isAdded) return@runOnMainDispatcher
                         if (haveUpdate) {
-                            val context = requireContext()
+                            val context = context ?: return@runOnMainDispatcher
                             MaterialAlertDialogBuilder(context)
                                 .setTitle(R.string.update_dialog_title)
                                 .setMessage(
