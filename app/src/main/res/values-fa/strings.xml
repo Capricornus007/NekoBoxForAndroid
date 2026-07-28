@@ -620,6 +620,7 @@
     <string name="preview_version_hint">این برنامه نسخهٔ پیش‌نمایش است و ممکن است مشکلات زیادی داشته باشد. اگر نمی‌خواهید آن را آزمایش کنید، لطفاً برای دانلود نسخهٔ Release به GitHub بروید!</string>
     <string name="check_update_preview">بررسی به‌روزرسانی نسخهٔ پیش‌نمایش</string>
     <string name="check_update_release">بررسی به‌روزرسانی نسخهٔ Release</string>
+    <string name="release_not_available">Throne هنوز نسخهٔ پایدار منتشر نکرده است</string>
     <string name="update_dialog_title">نسخهٔ جدید در دسترس است</string>
     <string name="update_dialog_message">نسخهٔ فعلی: %1$s\nنسخهٔ موجود: %2$s\nآیا می‌خواهید آن را دانلود کنید؟</string>
     <string name="check_update_no">بررسی موفق بود، اما به‌روزرسانی‌ای نیست.</string>

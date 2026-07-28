@@ -555,6 +555,7 @@
     <string name="preview_version_hint">このアプリはプレビュー版であり、多くの問題が含まれている可能性があります。テストしたくない場合は、GitHub にアクセスして Release 版をダウンロードしてください！</string>
     <string name="check_update_preview">プレビュー版の更新を確認</string>
     <string name="check_update_release">リリース版の更新を確認</string>
+    <string name="release_not_available">Throne はまだ正式版を公開していません</string>
     <string name="update_dialog_title">新しいバージョンが利用可能です</string>
     <string name="update_dialog_message">現在のバージョン: %1$s\n利用可能なバージョン: %2$s\nダウンロードしますか？</string>
     <string name="check_update_no">確認に成功しましたが、更新はありません。</string>

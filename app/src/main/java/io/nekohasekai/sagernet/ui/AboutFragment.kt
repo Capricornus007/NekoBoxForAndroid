@@ -8,12 +8,16 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.component1
 import androidx.activity.result.component2
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.danielstone.materialaboutlibrary.MaterialAboutFragment
@@ -89,16 +93,35 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                                 .build())
                         .addItem(
                             MaterialAboutActionItem.Builder()
-                                .text(R.string.check_update_release)
+                                // Throne has no stable release yet: grey out the item
+                                .text(
+                                    SpannableString(getString(R.string.check_update_release)).apply {
+                                        setSpan(
+                                            ForegroundColorSpan(
+                                                ContextCompat.getColor(
+                                                    activityContext,
+                                                    android.R.color.darker_gray
+                                                )
+                                            ),
+                                            0,
+                                            length,
+                                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                                        )
+                                    }
+                                )
                                 .setOnClickAction {
-                                    checkUpdate(false)
+                                    Toast.makeText(
+                                        app,
+                                        R.string.release_not_available,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                                 .build())
                         .addItem(
                             MaterialAboutActionItem.Builder()
                                 .text(R.string.check_update_preview)
                                 .setOnClickAction {
-                                    checkUpdate(true)
+                                    checkUpdate()
                                 }
                                 .build())
                         .addItem(
@@ -200,7 +223,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
             }
         }
 
-        fun checkUpdate(checkPreview: Boolean) {
+        fun checkUpdate() {
             runOnIoDispatcher {
                 try {
                     val client = Libcore.newHttpClient().apply {
@@ -212,30 +235,15 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         )
                     }
                     val response = client.newRequest().apply {
-                        if (checkPreview) {
-                            setURL("https://api.github.com/repos/dsfkjlweuyr/ThroneForAndroid/releases/tags/preview")
-                        } else {
-                            setURL("https://api.github.com/repos/dsfkjlweuyr/ThroneForAndroid/releases/latest")
-                        }
+                        setURL("https://api.github.com/repos/dsfkjlweuyr/ThroneForAndroid/releases/latest")
                     }.execute()
                     val release = JSONObject(Util.getStringBox(response.contentString))
                     val releaseName = release.getString("name")
                     val releaseUrl = release.getString("html_url")
-                    var haveUpdate = releaseName.isNotBlank()
-                    haveUpdate = if (isPreview) {
-                        if (checkPreview) {
-                            haveUpdate && releaseName != BuildConfig.PRE_VERSION_NAME
-                        } else {
-                            // User: 1.3.9 pre-1.4.0 Stable: 1.3.9 -> No update
-                            haveUpdate && releaseName != BuildConfig.VERSION_NAME
-                        }
-                    } else {
-                        // User: 1.4.0 Preview: pre-1.4.0 -> No update
-                        // User: 1.4.0 Preview: pre-1.4.1 -> Update
-                        // User: 1.4.0 Stable: 1.4.0 -> No update
-                        // User: 1.4.0 Stable: 1.4.1 -> Update
-                        haveUpdate && !releaseName.contains(BuildConfig.VERSION_NAME)
-                    }
+                    // Release name is the git tag, e.g. "v1.4.2-m20-10".
+                    // Compare it with the local version name segment by segment.
+                    val haveUpdate = releaseName.isNotBlank() &&
+                            compareVersionNames(releaseName, BuildConfig.VERSION_NAME) > 0
                     runOnMainDispatcher {
                         if (haveUpdate) {
                             val context = requireContext()
@@ -265,6 +273,48 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                     }
                 }
             }
+        }
+
+        companion object {
+
+            private val numberRegex = Regex("\\d+")
+
+            /**
+             * Compares two version names segment by segment (split by "-").
+             * Each segment is compared by its numeric groups in order,
+             * and left segments dominate right ones, e.g.
+             * "v1.2.3-m21-1" > "v1.2.3-m20-100".
+             *
+             * Returns a positive value if [a] is newer than [b],
+             * a negative value if it is older, and 0 if they are equal.
+             */
+            fun compareVersionNames(a: String, b: String): Int {
+                val segmentsA = a.split("-")
+                val segmentsB = b.split("-")
+                for (i in 0 until maxOf(segmentsA.size, segmentsB.size)) {
+                    val segmentA = segmentsA.getOrNull(i).orEmpty()
+                    val segmentB = segmentsB.getOrNull(i).orEmpty()
+                    val numbersA = extractNumbers(segmentA)
+                    val numbersB = extractNumbers(segmentB)
+                    if (numbersA.isEmpty() && numbersB.isEmpty()) {
+                        val compared = segmentA.compareTo(segmentB)
+                        if (compared != 0) return compared
+                        continue
+                    }
+                    for (j in 0 until maxOf(numbersA.size, numbersB.size)) {
+                        val numberA = numbersA.getOrNull(j)
+                        val numberB = numbersB.getOrNull(j)
+                        if (numberA == null) return -1
+                        if (numberB == null) return 1
+                        if (numberA != numberB) return if (numberA < numberB) -1 else 1
+                    }
+                }
+                return 0
+            }
+
+            private fun extractNumbers(segment: String): List<Long> =
+                numberRegex.findAll(segment).mapNotNull { it.value.toLongOrNull() }.toList()
+
         }
 
     }

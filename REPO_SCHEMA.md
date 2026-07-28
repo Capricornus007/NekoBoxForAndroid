@@ -34,6 +34,7 @@ Android 端的代码主要分为两个核心包：
 - [`io/nekohasekai/sagernet/ui/`](app/src/main/java/io/nekohasekai/sagernet/ui): 各种 Activity 和 Fragment 界面。
   - `MainActivity.kt`: 应用主界面。
   - `SettingsFragment.kt`: 设置界面。
+  - `AboutFragment.kt`: 关于界面。版本更新检查：「检查正式版更新」为灰色禁用项（Throne 尚未发布正式版，点击仅弹出 toast `release_not_available`）；「检查预览版更新」请求 GitHub `releases/latest` API，将远端 release 名（即 git tag，形如 `v1.4.2-m20-10`）与本地 `BuildConfig.VERSION_NAME` 按 `-` 分段、逐段提取数字组从左到右比较（左侧段优先级高于右侧，如 `v1.2.3-m21-1` > `v1.2.3-m20-100`），见 `compareVersionNames()`。
 - [`io/nekohasekai/sagernet/widget/`](app/src/main/java/io/nekohasekai/sagernet/widget): 自定义 UI 控件。
 
 #### 1.2.2 `moe.matsuri.nb4a` (NekoBox 专属扩展)
