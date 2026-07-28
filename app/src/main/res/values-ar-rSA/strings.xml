@@ -73,6 +73,10 @@
     <string name="lan_sharing_requires_root">صلاحية الجذر مطلوبة ولكنها غير متوفرة</string>
     <string name="port_proxy">منفذ الوكيل</string>
     <string name="port_http">منفذ وكيل HTTP</string>
+    <string name="disable_mixed_inbound">Disable Mixed Inbound</string>
+    <string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string>
+    <string name="mixed_inbound_disabled">معطل</string>
+    <string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string>
     <string name="port_transproxy">منفذ الوكيل الشفاف</string>
     <string name="cag_route">إعدادات التوجيه</string>
     <string name="allow_access">السماح بالاتصالات من الشبكة المحلية</string>
@@ -729,6 +733,7 @@
     <string name="preview_version_hint">هذا التطبيق هو إصدار تجريبي وقد يحتوي على العديد من المشاكل. إذا كنت لا ترغب في اختباره، فيرجى زيارة GitHub لتنزيل إصدار الإصدار!</string>
     <string name="check_update_preview">التحقق من تحديثات الإصدار التجريبي</string>
     <string name="check_update_release">التحقق من تحديثات إصدار الإصدار</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">إصدار جديد متاح</string>
     <string name="update_dialog_message">الإصدار الحالي: %1$s\nالإصدار المتاح: %2$s\nهل تريد تنزيله؟</string>
     <string name="check_update_no">تم التحقق بنجاح، ولكن لا توجد تحديثات.</string>
