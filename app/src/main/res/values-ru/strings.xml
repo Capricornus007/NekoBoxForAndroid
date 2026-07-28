@@ -328,6 +328,10 @@
 <string name="port_http">Порт прокси HTTP</string>
 <string name="port_local_dns">Локальный порт DNS</string>
 <string name="port_proxy">Порт прокси SOCKS5</string>
+<string name="disable_mixed_inbound">Отключить смешанный вход (mixed)</string>
+<string name="disable_mixed_inbound_sum">Чистый вход TUN; не прослушивать локальный порт прокси</string>
+<string name="mixed_inbound_disabled">Отключено</string>
+<string name="disable_mixed_inbound_proxy_toast">Отключение действует только в режиме TUN; текущий порт прослушивания: %1$d</string>
 <string name="port_transproxy">Транспрокси-порт</string>
 <string name="prefer">Предпочитать</string>
 <string name="preference_copied">Текст "%1$s" скопирован в буфер обмена</string>

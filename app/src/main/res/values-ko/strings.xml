@@ -55,6 +55,10 @@
     <string name="service_mode_proxy">프록시만</string>
     <string name="port_proxy">프록시 포트</string>
     <string name="port_http">HTTP 프록시 포트</string>
+    <string name="disable_mixed_inbound">혼합 인바운드 비활성화</string>
+    <string name="disable_mixed_inbound_sum">순수 TUN 인바운드; 로컬 프록시 포트에서 수신하지 않음</string>
+    <string name="mixed_inbound_disabled">비활성화됨</string>
+    <string name="disable_mixed_inbound_proxy_toast">비활성화는 TUN 모드에서만 적용됩니다. 현재 수신 포트: %1$d</string>
     <string name="port_transproxy">Transproxy 포트</string>
     <string name="cag_route">라우팅 설정</string>
     <string name="allow_access">LAN에서의 연결 허용</string>

@@ -54,6 +54,10 @@
     <string name="service_mode_vpn" translatable="false">VPN</string>
     <string name="port_proxy">پورت پراکسی</string>
     <string name="port_http">پورت پراکسی HTTP</string>
+    <string name="disable_mixed_inbound">غیرفعال کردن ورودی ترکیبی</string>
+    <string name="disable_mixed_inbound_sum">ورودی خالص TUN؛ عدم گوش دادن روی پورت پراکسی محلی</string>
+    <string name="mixed_inbound_disabled">غیرفعال</string>
+    <string name="disable_mixed_inbound_proxy_toast">غیرفعال‌سازی فقط در حالت TUN اعمال می‌شود؛ پورت گوش دادن فعلی: %1$d</string>
     <string name="port_transproxy">پورت Transproxy</string>
     <string name="cag_route">تنظیمات مسیردهی</string>
     <string name="allow_access">اجازه اتصال از شبکه محلی</string>

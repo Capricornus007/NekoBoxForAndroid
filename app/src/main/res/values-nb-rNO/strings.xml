@@ -105,6 +105,10 @@
     <string name="uuid">Bruker-ID</string>
     <string name="port_http">HTTP-mellomtjenerport</string>
     <string name="port_proxy">SOCKS5-mellomtjenerport</string>
+    <string name="disable_mixed_inbound">Deaktiver blandet inngang</string>
+    <string name="disable_mixed_inbound_sum">Ren TUN-inngang; ikke lytt på lokal mellomtjenerport</string>
+    <string name="mixed_inbound_disabled">Deaktivert</string>
+    <string name="disable_mixed_inbound_proxy_toast">Deaktivering gjelder bare i TUN-modus; gjeldende lytteport: %1$d</string>
     <string name="service_mode_proxy">Kun mellomtjener</string>
     <string name="clear_profiles_message">Er du sikker på at du vil slette denne gruppen\?</string>
     <string name="profile_import_message">Bekreft at du vil importere profilen %s\?</string>

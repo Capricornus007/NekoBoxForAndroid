@@ -67,6 +67,10 @@
     <string name="group_duplicate">重複：
 \n%s</string>
     <string name="general_settings">應用程式設定</string>
+    <string name="disable_mixed_inbound">停用混合傳入</string>
+    <string name="disable_mixed_inbound_sum">純 TUN 傳入，不在本機監聽代理連接埠</string>
+    <string name="mixed_inbound_disabled">已停用</string>
+    <string name="disable_mixed_inbound_proxy_toast">停用僅在 TUN 模式有效，目前監聽連接埠：%1$d</string>
     <string name="cag_misc">其他設定</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_error">失敗：%s</string>

@@ -8,4 +8,8 @@
     <string name="github">Broncode</string>
     <string name="project">Project</string>
     <string name="app_desc">De universele proxy-toolchain voor Android, geschreven in Kotlin.</string>
+    <string name="disable_mixed_inbound">Gemengde inbound uitschakelen</string>
+    <string name="disable_mixed_inbound_sum">Pure TUN-inbound; niet luisteren op de lokale proxypoort</string>
+    <string name="mixed_inbound_disabled">Uitgeschakeld</string>
+    <string name="disable_mixed_inbound_proxy_toast">Uitschakelen werkt alleen in TUN-modus; huidige luisterpoort: %1$d</string>
 </resources>

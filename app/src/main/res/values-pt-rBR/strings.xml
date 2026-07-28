@@ -17,4 +17,8 @@
     <string name="app_desc">Um conjunto de ferramentas de proxy universal para Android, escrito em Kotlin.</string>
     <string name="group_subscription_link">Link de inscrição</string>
     <string name="group_update">Atualizar</string>
+    <string name="disable_mixed_inbound">Desativar entrada mista</string>
+    <string name="disable_mixed_inbound_sum">Entrada TUN pura; não escutar na porta proxy local</string>
+    <string name="mixed_inbound_disabled">Desativado</string>
+    <string name="disable_mixed_inbound_proxy_toast">A desativação só tem efeito no modo TUN; porta de escuta atual: %1$d</string>
 </resources>

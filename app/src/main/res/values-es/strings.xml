@@ -48,8 +48,12 @@
     <string name="service_mode">Modo de servicio</string> 
     <string name="service_mode_proxy">Solo proxy</string> 
     <string name="service_mode_vpn" translatable="false">VPN</string> 
-    <string name="port_proxy">Puerto proxy SOCKS5</string> 
-    <string name="port_http">Puerto proxy HTTP</string> 
+    <string name="port_proxy">Puerto proxy SOCKS5</string>
+    <string name="port_http">Puerto proxy HTTP</string>
+    <string name="disable_mixed_inbound">Desactivar entrada mixta</string>
+    <string name="disable_mixed_inbound_sum">Entrada TUN pura; no escuchar en el puerto proxy local</string>
+    <string name="mixed_inbound_disabled">Desactivado</string>
+    <string name="disable_mixed_inbound_proxy_toast">La desactivación solo surte efecto en modo TUN; puerto de escucha actual: %1$d</string>
     <string name="port_transproxy">Puerto transproxy</string> 
     <string name="cag_route">Ajustes de ruta</string> 
     <string name="allow_access">Permitir conexiones desde la LAN</string> 

@@ -54,6 +54,10 @@
     <string name="service_mode_vpn" translatable="false">VPN</string>
     <string name="port_proxy">Порт проксі-сервера SOCKS5</string>
     <string name="port_http">Проксі-порт HTTP</string>
+    <string name="disable_mixed_inbound">Вимкнути змішаний вхід</string>
+    <string name="disable_mixed_inbound_sum">Чистий вхід TUN; не прослуховувати локальний порт проксі</string>
+    <string name="mixed_inbound_disabled">Вимкнено</string>
+    <string name="disable_mixed_inbound_proxy_toast">Вимкнення діє лише в режимі TUN; поточний порт прослуховування: %1$d</string>
     <string name="port_transproxy">Транспроксі-порт</string>
     <string name="cag_route">Налаштування маршруту</string>
     <string name="allow_access">Дозволити підключення з локальної мережі</string>

@@ -33,6 +33,10 @@
     <string name="group_updated">%s: تم تحديث %d البروکسیز</string>
     <string name="port_http">منفذ بروکسی HTTP</string>
     <string name="port_proxy">منفذ بروکسی SOCKS5</string>
+    <string name="disable_mixed_inbound">تعطيل الوارد المختلط</string>
+    <string name="disable_mixed_inbound_sum">وارد TUN خالص؛ عدم الاستماع على منفذ البروکسي المحلي</string>
+    <string name="mixed_inbound_disabled">معطّل</string>
+    <string name="disable_mixed_inbound_proxy_toast">التعطيل يسري فقط في وضع TUN؛ منفذ الاستماع الحالي: %1$d</string>
     <string name="service_mode_proxy">البروکسی فقط</string>
     <string name="port_transproxy">منفذ ترانسبروكسى</string>
     <string name="service_mode">وضع الخدمة</string>

@@ -6,6 +6,10 @@
     <string name="port_transproxy">トランスプロキシポート</string>
     <string name="port_http">HTTPプロキシポート</string>
     <string name="port_proxy">プロキシポート</string>
+    <string name="disable_mixed_inbound">Mixed インバウンドを無効化</string>
+    <string name="disable_mixed_inbound_sum">純粋な TUN インバウンド。ローカルプロキシポートをリッスンしません</string>
+    <string name="mixed_inbound_disabled">無効</string>
+    <string name="disable_mixed_inbound_proxy_toast">無効化は TUN モードでのみ有効です。現在のリッスンポート: %1$d</string>
     <string name="service_mode_proxy">プロキシのみ</string>
     <string name="service_mode">サービスモード</string>
     <string name="group_duplicate">複製：

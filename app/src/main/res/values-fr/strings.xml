@@ -130,6 +130,10 @@
     <string name="cag_dns">Paramètres DNS</string>
     <string name="protocol">Protocole</string>
     <string name="port_proxy">Port du Proxy SOCKS5</string>
+    <string name="disable_mixed_inbound">Désactiver l\'entrée mixte</string>
+    <string name="disable_mixed_inbound_sum">Entrée TUN pure ; ne pas écouter sur le port proxy local</string>
+    <string name="mixed_inbound_disabled">Désactivé</string>
+    <string name="disable_mixed_inbound_proxy_toast">La désactivation ne prend effet qu\'en mode TUN ; port d\'écoute actuel : %1$d</string>
     <string name="connection_test_error_status_code">Code d\'erreur : #%d</string>
     <string name="route_asset_updated">Mis à jour</string>
     <string name="action_export_file">Exporter dans un fichier</string>

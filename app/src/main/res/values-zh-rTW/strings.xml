@@ -41,6 +41,10 @@
     <string name="service_mode_proxy">代理</string>
     <string name="port_proxy">代理連接埠</string>
     <string name="port_http">HTTP 代理連接埠</string>
+    <string name="disable_mixed_inbound">停用混合傳入</string>
+    <string name="disable_mixed_inbound_sum">純 TUN 傳入，不在本機監聽代理連接埠</string>
+    <string name="mixed_inbound_disabled">已停用</string>
+    <string name="disable_mixed_inbound_proxy_toast">停用僅在 TUN 模式有效，目前監聽連接埠：%1$d</string>
     <string name="port_local_dns">本地 DNS 連接埠</string>
     <string name="allow_access">允許來自區域網路的連線</string>
     <string name="allow_access_sum">繫結傳入伺服器至 0.0.0.0</string>

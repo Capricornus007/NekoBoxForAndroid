@@ -2,6 +2,10 @@
 <resources>
     <string name="port_http">Proksi Port HTTP</string>
     <string name="port_proxy">Proksi Port SOCKS5</string>
+    <string name="disable_mixed_inbound">Nonaktifkan Inbound Campuran</string>
+    <string name="disable_mixed_inbound_sum">Inbound TUN murni; tidak mendengarkan di port proksi lokal</string>
+    <string name="mixed_inbound_disabled">Dinonaktifkan</string>
+    <string name="disable_mixed_inbound_proxy_toast">Penonaktifan hanya berlaku dalam mode TUN; port yang sedang didengarkan: %1$d</string>
     <string name="group_status_proxies_subscription">%d Proksi | Diperbarui pada %s</string>
     <string name="group_status_proxies">%d Proksi</string>
     <string name="protocol_param">Param Protokol</string>

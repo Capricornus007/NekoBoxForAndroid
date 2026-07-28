@@ -42,6 +42,10 @@
     <string name="port_transproxy">Transproxy Portu</string>
     <string name="port_http">HTTP Vekil Sunucu Portu</string>
     <string name="port_proxy">SOCKS5 Vekil Sunucu Portu</string>
+    <string name="disable_mixed_inbound">Karışık Girişi Devre Dışı Bırak</string>
+    <string name="disable_mixed_inbound_sum">Saf TUN girişi; yerel vekil sunucu portunu dinleme</string>
+    <string name="mixed_inbound_disabled">Devre dışı</string>
+    <string name="disable_mixed_inbound_proxy_toast">Devre dışı bırakma yalnızca TUN modunda geçerlidir; mevcut dinleme portu: %1$d</string>
     <string name="service_mode_proxy">Sadece vekil sunucu</string>
     <string name="service_mode">Servis Modu</string>
     <string name="group_duplicate">%s
