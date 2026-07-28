@@ -257,7 +257,7 @@
     <PreferenceCategory app:title="@string/inbound_settings">
         <SwitchPreference
             app:defaultValue="false"
-            app:icon="@drawable/ic_maps_directions_boat"
+            app:icon="@drawable/ic_baseline_block_24"
             app:key="disableMixedInbound"
             app:summary="@string/disable_mixed_inbound_sum"
             app:title="@string/disable_mixed_inbound" />
