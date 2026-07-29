@@ -287,12 +287,14 @@ class MainActivity :
             parseProxies(uri.toString()).getOrNull(0) ?: error(getString(R.string.no_proxies_found))
         } catch (e: Exception) {
             onMainDispatcher {
-                alert(e.readableMessage).show()
+                if (isFinishing || isDestroyed) return@onMainDispatcher
+                alert(e.readableMessage).tryToShow()
             }
             return
         }
 
         onMainDispatcher {
+            if (isFinishing || isDestroyed) return@onMainDispatcher
             MaterialAlertDialogBuilder(this@MainActivity).setTitle(R.string.profile_import)
                 .setMessage(getString(R.string.profile_import_message, profile.displayName()))
                 .setPositiveButton(R.string.yes) { _, _ ->
