@@ -47,4 +47,7 @@
     <!-- Theme style switch: card view styles for mod/original themes -->
     <attr name="elevatedCardViewStyle" format="reference" />
     <attr name="tintedCardViewStyle" format="reference" />
+
+    <!-- behindflower: card subtitle text color (mod=textSecondary, original=accentOrTextSecondary) -->
+    <attr name="cardSubTextColor" format="color" />
 </resources>

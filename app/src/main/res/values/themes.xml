@@ -565,6 +565,7 @@
         <item name="uiNavigationItemFill">@color/color_ng_black_accent</item>
 
         <item name="accentOrTextSecondary">?android:textColorSecondary</item>
+        <item name="cardSubTextColor">?android:textColorSecondary</item>
         <item name="accentOrTextPrimary">?android:textColorPrimary</item>
         <item name="primaryOrTextSecondary">?android:textColorSecondary</item>
         <item name="primaryOrTextPrimary">?android:textColorPrimary</item>
@@ -665,6 +666,7 @@
         <!-- Semantic colors: green action accent reads on black, so primary text
              accents use it; status uses GitHub-style green/red/yellow. -->
         <item name="accentOrTextSecondary">@color/dhc_primary</item>
+        <item name="cardSubTextColor">?android:textColorSecondary</item>
         <item name="accentOrTextPrimary">@color/dhc_primary</item>
         <item name="primaryOrTextSecondary">@color/dhc_primary</item>
         <item name="primaryOrTextPrimary">@color/dhc_primary</item>
@@ -721,6 +723,7 @@
         <item name="colorOutline">@color/draculam3_outline</item>
         <item name="colorOutlineVariant">@color/draculam3_outline_variant</item>
         <item name="accentOrTextSecondary">@color/draculam3_accent</item>
+        <item name="cardSubTextColor">?android:textColorSecondary</item>
         <item name="accentOrTextPrimary">@color/draculam3_accent</item>
         <item name="primaryOrTextSecondary">@color/draculam3_primary</item>
         <item name="primaryOrTextPrimary">@color/draculam3_primary</item>
@@ -775,6 +778,7 @@
         <item name="colorOutline">@color/nord_outline</item>
         <item name="colorOutlineVariant">@color/nord_outline_variant</item>
         <item name="accentOrTextSecondary">@color/nord_accent</item>
+        <item name="cardSubTextColor">?android:textColorSecondary</item>
         <item name="accentOrTextPrimary">@color/nord_accent</item>
         <item name="primaryOrTextSecondary">@color/nord_primary</item>
         <item name="primaryOrTextPrimary">@color/nord_primary</item>
@@ -829,6 +833,7 @@
         <item name="colorOutline">@color/monokai_outline</item>
         <item name="colorOutlineVariant">@color/monokai_outline_variant</item>
         <item name="accentOrTextSecondary">@color/monokai_accent</item>
+        <item name="cardSubTextColor">?android:textColorSecondary</item>
         <item name="accentOrTextPrimary">@color/monokai_accent</item>
         <item name="primaryOrTextSecondary">@color/monokai_primary</item>
         <item name="primaryOrTextPrimary">@color/monokai_primary</item>
@@ -883,6 +888,7 @@
         <item name="colorOutline">@color/ayu_outline</item>
         <item name="colorOutlineVariant">@color/ayu_outline_variant</item>
         <item name="accentOrTextSecondary">@color/ayu_accent</item>
+        <item name="cardSubTextColor">?android:textColorSecondary</item>
         <item name="accentOrTextPrimary">@color/ayu_accent</item>
         <item name="primaryOrTextSecondary">@color/ayu_primary</item>
         <item name="primaryOrTextPrimary">@color/ayu_primary</item>
@@ -937,6 +943,7 @@
         <item name="colorOutline">@color/catppuccin_outline</item>
         <item name="colorOutlineVariant">@color/catppuccin_outline_variant</item>
         <item name="accentOrTextSecondary">@color/catppuccin_accent</item>
+        <item name="cardSubTextColor">?android:textColorSecondary</item>
         <item name="accentOrTextPrimary">@color/catppuccin_accent</item>
         <item name="primaryOrTextSecondary">@color/catppuccin_primary</item>
         <item name="primaryOrTextPrimary">@color/catppuccin_primary</item>
@@ -977,6 +984,7 @@
         <item name="colorOutline">@color/color_ng_black_accent</item>
 
         <item name="accentOrTextSecondary">?android:textColorSecondary</item>
+        <item name="cardSubTextColor">?android:textColorSecondary</item>
         <item name="accentOrTextPrimary">?android:textColorPrimary</item>
         <item name="primaryOrTextSecondary">?android:textColorSecondary</item>
         <item name="primaryOrTextPrimary">?android:textColorPrimary</item>
