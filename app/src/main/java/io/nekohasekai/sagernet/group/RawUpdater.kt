@@ -1069,9 +1069,6 @@ object RawUpdater : GroupUpdater() {
                         // rest of the subscription instead of failing the whole update.
                         Logs.w("skipping malformed Clash node: ${e.readableMessage}", e)
                     }
-                    } catch (e: Exception) {
-                        Logs.w("Skip malformed clash proxy: ${proxy["name"] ?: proxy["server"]}", e)
-                    }
                 }
 
                 // Fix ent

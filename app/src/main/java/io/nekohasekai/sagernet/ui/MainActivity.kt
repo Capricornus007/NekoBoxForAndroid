@@ -288,7 +288,7 @@ class MainActivity :
         } catch (e: Exception) {
             onMainDispatcher {
                 if (isFinishing || isDestroyed) return@onMainDispatcher
-                alert(e.readableMessage).tryToShow()
+                alert(e.readableMessage).show()
             }
             return
         }
