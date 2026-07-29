@@ -44,4 +44,8 @@
 -dontwarn org.openjsse.javax.net.ssl.SSLParameters
 -dontwarn org.openjsse.javax.net.ssl.SSLSocket
 -dontwarn org.openjsse.net.ssl.OpenJSSE
+
+# Gson TypeToken — R8 strips generic signatures
+-keepattributes Signature
+-keep class com.boristul.zybcvpn.database.AppTrafficRuleSerializer { *; }
 -dontwarn java.beans.PropertyVetoException
