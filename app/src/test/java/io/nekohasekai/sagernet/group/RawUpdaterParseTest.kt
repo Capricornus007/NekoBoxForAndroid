@@ -103,15 +103,12 @@ class RawUpdaterParseTest {
     }
 
     @Test
-    fun singboxOutbounds_wrapsOutboundAsConfigBean() = runTest {
-        val bean = RawUpdater.parseRaw(fixture("singbox-outbounds.json"))!!.single() as ConfigBean
-        val config = JSONObject(bean.config)
+    fun singboxOutbounds_parsesOutboundAsNativeBean() = runTest {
+        val bean = RawUpdater.parseRaw(fixture("singbox-outbounds.json"))!!.single() as SOCKSBean
 
-        assertEquals(1, bean.type)
         assertEquals("edge-one", bean.name)
-        assertEquals("socks", config.getString("type"))
-        assertEquals("192.0.2.9", config.getString("server"))
-        assertEquals(1080, config.getInt("server_port"))
+        assertEquals("192.0.2.9", bean.serverAddress)
+        assertEquals(1080, bean.serverPort)
     }
 
     @Test
