@@ -153,11 +153,14 @@ class MainActivity :
             }
         }
 
-        if (isPreview) {
+        if (isPreview && DataStore.previewHintDismissedVersion != BuildConfig.PRE_VERSION_NAME) {
             MaterialAlertDialogBuilder(this)
                 .setTitle(BuildConfig.PRE_VERSION_NAME)
                 .setMessage(R.string.preview_version_hint)
                 .setPositiveButton(android.R.string.ok, null)
+                .setNeutralButton(R.string.preview_hint_dont_show_again) { _, _ ->
+                    DataStore.previewHintDismissedVersion = BuildConfig.PRE_VERSION_NAME
+                }
                 .show()
         }
     }

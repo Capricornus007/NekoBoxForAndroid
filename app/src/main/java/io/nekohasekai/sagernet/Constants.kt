@@ -92,6 +92,7 @@ object Key {
 
     const val ACQUIRE_WAKE_LOCK = "acquireWakeLock"
     const val HIDE_FROM_RECENT_APPS = "hideFromRecentApps"
+    const val PREVIEW_HINT_DISMISSED_VERSION = "previewHintDismissedVersion"
     const val SHOW_BOTTOM_BAR = "showBottomBar"
     const val CONFIRM_PROFILE_DELETE = "confirmProfileDelete"
     const val GROUP_LAYOUT_MODE = "groupLayoutMode"
