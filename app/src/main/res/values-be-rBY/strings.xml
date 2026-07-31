@@ -717,6 +717,7 @@
     <string name="concurrent_dial_summary">Уключыце адначасовыя злучэнні для больш хуткага ўсталявання сеткі, можа павялічыць спажыванне батарэі</string>
     <string name="connection_test_timeout">Тайм-аўт тэсту (мс)</string>
     <string name="preview_version_hint">Гэта дадатак з\'яўляецца папярэдняй версіяй і можа ўтрымліваць шмат праблем. Калі вы не жадаеце тэставаць яго, калі ласка, перайдзіце на GitHub, каб спампаваць Release версію!</string>
+    <string name="preview_hint_dont_show_again">Don\'t show again</string>
     <string name="check_update_preview">Праверыць абнаўленні папярэдняй версіі</string>
     <string name="check_update_release">Праверыць абнаўленні Release версіі</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
