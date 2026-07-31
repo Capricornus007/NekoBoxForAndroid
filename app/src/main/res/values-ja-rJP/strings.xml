@@ -713,6 +713,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="concurrent_dial_summary">同時接続を有効にしてネットワーク確立を高速化します。バッテリー消費が増える可能性があります</string>
     <string name="connection_test_timeout">テストタイムアウト (ms)</string>
     <string name="preview_version_hint">このアプリケーションはプレビューバージョンであり、多くの問題が含まれている可能性があります。テストしたくない場合は、GitHubからリリースバージョンをダウンロードしてください。</string>
+    <string name="preview_hint_dont_show_again">Don\'t show again</string>
     <string name="check_update_preview">プレビューバージョンのアップデートを確認</string>
     <string name="check_update_release">リリースバージョンのアップデートを確認</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
