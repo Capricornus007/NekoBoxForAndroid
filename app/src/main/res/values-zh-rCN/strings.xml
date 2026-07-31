@@ -717,6 +717,7 @@
     <string name="concurrent_dial_summary">启用并发连接以加快网络建立，可能会增加电池消耗</string>
     <string name="connection_test_timeout">测试超时（毫秒）</string>
     <string name="preview_version_hint">此应用程序为预览版，可能包含许多问题。如果您不想测试，请前往GitHub下载Release版本！</string>
+    <string name="preview_hint_dont_show_again">Don\'t show again</string>
     <string name="check_update_preview">检查预览版更新</string>
     <string name="check_update_release">检查正式版更新</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
