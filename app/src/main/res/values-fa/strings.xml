@@ -622,6 +622,7 @@
     <string name="concurrent_dial_summary">فعال‌سازی اتصال‌های هم‌زمان برای برقراری سریع‌تر شبکه؛ ممکن است مصرف باتری را افزایش دهد</string>
     <string name="connection_test_timeout">مهلت آزمایش (ms)</string>
     <string name="preview_version_hint">این برنامه نسخهٔ پیش‌نمایش است و ممکن است مشکلات زیادی داشته باشد. اگر نمی‌خواهید آن را آزمایش کنید، لطفاً برای دانلود نسخهٔ Release به GitHub بروید!</string>
+    <string name="preview_hint_dont_show_again">دوباره نشان نده</string>
     <string name="check_update_preview">بررسی به‌روزرسانی نسخهٔ پیش‌نمایش</string>
     <string name="check_update_release">بررسی به‌روزرسانی نسخهٔ Release</string>
     <string name="release_not_available">Throne هنوز نسخهٔ پایدار منتشر نکرده است</string>

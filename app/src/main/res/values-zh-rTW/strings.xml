@@ -573,6 +573,7 @@
     <string name="concurrent_dial_summary">啟用併發連線以更快地建立網路，可能會增加電池使用量</string>
     <string name="connection_test_timeout">測試超時（ms）</string>
     <string name="preview_version_hint">本應用為預覽版，可能存在諸多問題。若您不願參與測試，請前往GitHub下載正式釋出版本！</string>
+    <string name="preview_hint_dont_show_again">不再顯示</string>
     <string name="check_update_preview">檢查預覽版更新</string>
     <string name="check_update_release">檢查正式版更新</string>
     <string name="release_not_available">Throne 目前尚未發佈正式版</string>

@@ -524,4 +524,5 @@
     <string name="padding">Заповнення (Padding)</string>
     <string name="network_change_reset_connections">Скидати вихідні з\'єднання при зміні мережі</string>
     <string name="wake_reset_connections">Скидати вихідні з\'єднання при виході пристрою зі сну</string>
+    <string name="preview_hint_dont_show_again">Більше не показувати</string>
 </resources>

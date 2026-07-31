@@ -380,4 +380,5 @@
     <string name="ssh_private_key">مفتاح خاص</string>
     <string name="ssh_public_key">المفتاح العمومي</string>
     <string name="ssh_auth_type_none">لا شيء</string>
+    <string name="preview_hint_dont_show_again">عدم الإظهار مرة أخرى</string>
 </resources>

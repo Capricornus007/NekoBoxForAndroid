@@ -12,4 +12,5 @@
     <string name="disable_mixed_inbound_sum">Pure TUN-inbound; niet luisteren op de lokale proxypoort</string>
     <string name="mixed_inbound_disabled">Uitgeschakeld</string>
     <string name="disable_mixed_inbound_proxy_toast">Uitschakelen werkt alleen in TUN-modus; huidige luisterpoort: %1$d</string>
+    <string name="preview_hint_dont_show_again">Niet opnieuw weergeven</string>
 </resources>

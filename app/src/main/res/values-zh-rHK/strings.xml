@@ -101,4 +101,5 @@
     <string name="card_style">卡片</string>
     <string name="card_style_classic">經典</string>
     <string name="card_style_stroke">描邊</string>
+    <string name="preview_hint_dont_show_again">不再顯示</string>
 </resources>

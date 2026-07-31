@@ -36,4 +36,5 @@
     <string name="list">Liste</string>
     <string name="random">Zufällig</string>
     <string name="enable_log_sum">Für Debugging-Zwecken</string>
+    <string name="preview_hint_dont_show_again">Nicht erneut anzeigen</string>
 </resources>

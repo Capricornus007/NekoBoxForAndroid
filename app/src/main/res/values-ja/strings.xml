@@ -557,6 +557,7 @@
     <string name="concurrent_dial_summary">ネットワーク確立を高速化するため同時接続を有効にします。バッテリー消費が増加する可能性があります</string>
     <string name="connection_test_timeout">テストタイムアウト (ms)</string>
     <string name="preview_version_hint">このアプリはプレビュー版であり、多くの問題が含まれている可能性があります。テストしたくない場合は、GitHub にアクセスして Release 版をダウンロードしてください！</string>
+    <string name="preview_hint_dont_show_again">今後表示しない</string>
     <string name="check_update_preview">プレビュー版の更新を確認</string>
     <string name="check_update_release">リリース版の更新を確認</string>
     <string name="release_not_available">Throne はまだ正式版を公開していません</string>

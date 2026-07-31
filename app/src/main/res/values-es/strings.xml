@@ -451,4 +451,5 @@
  
     <string name="connection_test_delete_unavailable">Borrado no disponible</string> 
 
-</resources> 
+    <string name="preview_hint_dont_show_again">No volver a mostrar</string>
+</resources>
