@@ -728,6 +728,7 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="concurrent_dial_summary">Schakel gelijktijdige verbindingen in voor snellere netwerkopbouw, kan batterijverbruik verhogen</string>
     <string name="connection_test_timeout">Testtime-out (ms)</string>
     <string name="preview_version_hint">Deze applicatie is een previewversie en bevat mogelijk veel problemen. Als u deze niet wilt testen, ga dan naar GitHub om de Release-versie te downloaden!</string>
+    <string name="preview_hint_dont_show_again">Don\'t show again</string>
     <string name="check_update_preview">Controleer op updates voor previewversie</string>
     <string name="check_update_release">Controleer op updates voor releaseversie</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
