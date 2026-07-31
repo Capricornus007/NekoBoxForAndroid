@@ -1260,12 +1260,15 @@ object RawUpdater : GroupUpdater() {
                                 it
                             }
                         }.map {
-                            ConfigBean().apply {
-                                applyDefaultValues()
-                                type = 1
-                                config = it.toStringPretty()
-                                name = it.getStr("tag")
-                            }
+                            // 优先将 sing-box outbound 还原为原生协议 Bean，
+                            // 不支持的类型或解析失败时回退为自定义 JSON
+                            runCatching { parseSingBoxOutbound(it) }.getOrNull()
+                                ?: ConfigBean().apply {
+                                    applyDefaultValues()
+                                    type = 1
+                                    config = it.toStringPretty()
+                                    name = it.getStr("tag")
+                                }
                         }
                 }
 

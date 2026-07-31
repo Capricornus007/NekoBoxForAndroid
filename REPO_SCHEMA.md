@@ -31,6 +31,7 @@ Android 端的代码主要分为两个核心包：
   - `ProfileManager.kt` / `GroupManager.kt`: 配置和分组管理器。
 - [`io/nekohasekai/sagernet/fmt/`](app/src/main/java/io/nekohasekai/sagernet/fmt): 各种代理协议的配置格式化与解析。
   - 支持 Shadowsocks, VMess, Trojan, Hysteria, Juicity, Naive, WireGuard 等协议的配置解析与转换。
+  - `SingBoxOutboundParser.kt`: 将 sing-box 配置中的单个 outbound JSON 还原为原生协议 Bean（支持 shadowsocks/vmess/vless/trojan/hysteria/hysteria2/tuic/socks/http/wireguard/anytls，含 TLS/transport/multiplex 子块解析）。用于订阅返回完整 sing-box 配置（含 `outbounds`）的场景：`RawUpdater.parseJSON` 的 `outbounds` 分支对每个 outbound 优先调用 `parseSingBoxOutbound()` 还原原生节点，不支持的类型或解析失败时回退为 `ConfigBean`（自定义 JSON）；`dns`/`block`/`direct`/`selector`/`urltest` 类型的 outbound 始终跳过。
 - [`io/nekohasekai/sagernet/ui/`](app/src/main/java/io/nekohasekai/sagernet/ui): 各种 Activity 和 Fragment 界面。
   - `MainActivity.kt`: 应用主界面。
   - `SettingsFragment.kt`: 设置界面。「入站设置」中含「禁用混合入站」开关（`disableMixedInbound`，见 `SettingsPreferenceFragment.kt`）：仅在 TUN 模式下真正生效（`DataStore.mixedInboundDisabled`），开启后 `ConfigBuilder` 不再生成 mixed 入站及其专属的 `inbound = [mixed-in]` 路由规则、不再监听本地代理端口，`VpnService` 同时跳过 `appendHttpProxy`；此时「代理端口」设置项变灰且摘要显示「已禁用」，「追加 HTTP 代理至 VPN」开关被强制关闭（持久化，避免置灰勾选态造成"锁定开启"错觉）并变灰（其依赖项 `httpProxyBypass` 经 dependency 级联一并变灰）。在系统代理模式下开启该开关会 Toast 提示"禁用只在TUN模式有效，当前监听端口：xxx"且不影响混合入站。
