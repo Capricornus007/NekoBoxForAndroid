@@ -712,6 +712,7 @@
     <string name="concurrent_dial_summary">啟用並行連線以加快網路建立速度，可能會增加電池用量</string>
     <string name="connection_test_timeout">測試逾時（毫秒）</string>
     <string name="preview_version_hint">此應用程式為預覽版本，可能包含許多問題。如果您不想測試，請前往 GitHub 下載正式版本！</string>
+    <string name="preview_hint_dont_show_again">Don\'t show again</string>
     <string name="check_update_preview">檢查預覽版本更新</string>
     <string name="check_update_release">檢查正式版本更新</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
