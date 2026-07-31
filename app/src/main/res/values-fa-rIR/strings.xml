@@ -713,6 +713,7 @@
     <string name="concurrent_dial_summary">فعال‌سازی اتصالات همزمان برای برقراری سریع‌تر شبکه، ممکن است مصرف باتری را افزایش دهد</string>
     <string name="connection_test_timeout">مهلت تست (میلی‌ثانیه)</string>
     <string name="preview_version_hint">این برنامه یک نسخه پیش‌نمایش است و ممکن است مشکلات زیادی داشته باشد. اگر نمی‌خواهید آن را آزمایش کنید، لطفاً به GitHub رفته و نسخه Release را دانلود کنید!</string>
+    <string name="preview_hint_dont_show_again">Don\'t show again</string>
     <string name="check_update_preview">بررسی به‌روزرسانی نسخه پیش‌نمایش</string>
     <string name="check_update_release">بررسی به‌روزرسانی نسخه انتشار</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
