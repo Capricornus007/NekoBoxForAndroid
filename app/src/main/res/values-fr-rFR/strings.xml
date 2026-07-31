@@ -735,6 +735,7 @@
     <string name="concurrent_dial_summary">Activer les connexions concurrentes pour un établissement réseau plus rapide, peut augmenter la consommation de la batterie</string>
     <string name="connection_test_timeout">Délai d\'attente du test (ms)</string>
     <string name="preview_version_hint">Cette application est une version preview et peut contenir de nombreux problèmes. Si vous ne souhaitez pas la tester, veuillez aller sur GitHub pour télécharger la version Release !</string>
+    <string name="preview_hint_dont_show_again">Don\'t show again</string>
     <string name="check_update_preview">Vérifier les mises à jour de la version preview</string>
     <string name="check_update_release">Vérifier les mises à jour de la version release</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
