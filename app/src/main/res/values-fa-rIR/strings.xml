@@ -710,7 +710,7 @@
     <string name="clear_cache_success">حافظه نهان پاک شد</string>
     <string name="clear_cache_failed">پاک کردن حافظه نهان ناموفق بود: %s</string>
     <string name="concurrent_dial">اتصال همزمان</string>
-    <string name="concurrent_dial_summary">فعال‌سازی اتصالات همزمان برای برقراری سریع‌تر شبکه، ممکن است مصرف باتری را افزایش دهد</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">مهلت تست (میلی‌ثانیه)</string>
     <string name="preview_version_hint">این برنامه یک نسخه پیش‌نمایش است و ممکن است مشکلات زیادی داشته باشد. اگر نمی‌خواهید آن را آزمایش کنید، لطفاً به GitHub رفته و نسخه Release را دانلود کنید!</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
