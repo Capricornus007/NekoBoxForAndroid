@@ -3,7 +3,9 @@ package moe.matsuri.nb4a
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
+import android.system.OsConstants
 import android.os.Build
 import android.os.Build.VERSION_CODES
 import androidx.annotation.RequiresApi
@@ -20,8 +22,13 @@ import libcore.BoxPlatformInterface
 import libcore.InterfaceUpdateListener
 import libcore.Libcore
 import libcore.NB4AInterface
+import libcore.NetworkInterfaceIterator
+import libcore.StringIterator
+import java.net.Inet6Address
 import java.net.InetSocketAddress
+import java.net.InterfaceAddress
 import java.net.NetworkInterface
+import libcore.NetworkInterface as LibcoreNetworkInterface
 
 class NativeInterface : BoxPlatformInterface, NB4AInterface {
 
@@ -123,6 +130,56 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         listener.updateDefaultInterface("", -1)
     }
 
+    // 平台网络接口枚举（sing-box 官方内核拨号路径强制要求，否则报 no available network interface）。
+    // 参考 husi AndroidPlatformInterface.getInterfaces。
+
+    override fun getInterfaces(): NetworkInterfaceIterator {
+        @Suppress("DEPRECATION") val networks = SagerNet.connectivity.allNetworks
+        val networkInterfaces = NetworkInterface.getNetworkInterfaces().toList()
+        val interfaces = mutableListOf<LibcoreNetworkInterface>()
+        for (network in networks) {
+            val linkProperties = SagerNet.connectivity.getLinkProperties(network) ?: continue
+            val networkCapabilities = SagerNet.connectivity.getNetworkCapabilities(network) ?: continue
+            val boxInterface = LibcoreNetworkInterface()
+            boxInterface.name = linkProperties.interfaceName
+            val networkInterface = networkInterfaces.find { it.name == boxInterface.name } ?: continue
+            boxInterface.dnsServer = linkProperties.dnsServers.mapNotNull { it.hostAddress }
+                .let { it.toStringIterator(it.size) }
+            boxInterface.type = when {
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> Libcore.InterfaceTypeWIFI
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> Libcore.InterfaceTypeCellular
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> Libcore.InterfaceTypeEthernet
+                else -> Libcore.InterfaceTypeOther
+            }
+            boxInterface.index = networkInterface.index
+            runCatching { boxInterface.mtu = networkInterface.mtu }
+                .onFailure { Logs.w("failed to get mtu for interface ${boxInterface.name}: $it") }
+            boxInterface.addresses = networkInterface.interfaceAddresses.map { it.toPrefix() }
+                .let { it.toStringIterator(it.size) }
+            var dumpFlags = 0
+            if (networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                dumpFlags = OsConstants.IFF_UP or OsConstants.IFF_RUNNING
+            }
+            if (networkInterface.isLoopback) dumpFlags = dumpFlags or OsConstants.IFF_LOOPBACK
+            if (networkInterface.isPointToPoint) dumpFlags = dumpFlags or OsConstants.IFF_POINTOPOINT
+            if (networkInterface.supportsMulticast()) dumpFlags = dumpFlags or OsConstants.IFF_MULTICAST
+            boxInterface.flags = dumpFlags
+            boxInterface.metered =
+                !networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+            interfaces.add(boxInterface)
+        }
+        return InterfaceArray(interfaces.iterator(), interfaces.size)
+    }
+
+    private class InterfaceArray(
+        private val iterator: Iterator<LibcoreNetworkInterface>,
+        private val size: Int,
+    ) : NetworkInterfaceIterator {
+        override fun hasNext(): Boolean = iterator.hasNext()
+        override fun next(): LibcoreNetworkInterface = iterator.next()
+        override fun length(): Int = size
+    }
+
     // nb4a interface
 
     override fun useOfficialAssets(): Boolean {
@@ -154,4 +211,21 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         }
     }
 
+}
+
+private fun Iterable<String>.toStringIterator(size: Int): StringIterator {
+    return object : StringIterator {
+        private val it = iterator()
+        override fun hasNext(): Boolean = it.hasNext()
+        override fun next(): String = it.next()
+        override fun length(): Int = size
+    }
+}
+
+private fun InterfaceAddress.toPrefix(): String {
+    return if (address is Inet6Address) {
+        "${Inet6Address.getByAddress(address.address).hostAddress}/${networkPrefixLength}"
+    } else {
+        "${address.hostAddress}/${networkPrefixLength}"
+    }
 }

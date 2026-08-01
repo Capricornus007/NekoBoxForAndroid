@@ -2,7 +2,6 @@ package libcore
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"libcore/procfs"
 	"log"
@@ -11,9 +10,12 @@ import (
 	"syscall"
 
 	"github.com/sagernet/sing-box/adapter"
+	C "github.com/sagernet/sing-box/constant"
 	sblog "github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	tun "github.com/sagernet/sing-tun"
+	"github.com/sagernet/sing/common"
+	"github.com/sagernet/sing/common/control"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
 	N "github.com/sagernet/sing/common/network"
@@ -23,9 +25,13 @@ import (
 // （旧的 experimental/libbox/platform 包已不存在）。
 var boxPlatformInterfaceInstance adapter.PlatformInterface = &boxPlatformInterfaceWrapper{}
 
-type boxPlatformInterfaceWrapper struct{}
+type boxPlatformInterfaceWrapper struct {
+	networkManager adapter.NetworkManager
+	myTunName      string
+}
 
 func (w *boxPlatformInterfaceWrapper) Initialize(n adapter.NetworkManager) error {
+	w.networkManager = n
 	return nil
 }
 
@@ -68,6 +74,7 @@ func (w *boxPlatformInterfaceWrapper) OpenInterface(options *tun.Options, platfo
 	}
 	//
 	options.FileDescriptor = int(tunFd)
+	w.myTunName = options.Name
 	return tun.New(*options)
 }
 
@@ -76,15 +83,46 @@ func (w *boxPlatformInterfaceWrapper) UsePlatformDefaultInterfaceMonitor() bool 
 }
 
 func (w *boxPlatformInterfaceWrapper) CreateDefaultInterfaceMonitor(l logger.Logger) tun.DefaultInterfaceMonitor {
-	return newInterfaceMonitor(l)
+	return newInterfaceMonitor(w, l)
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformNetworkInterfaces() bool {
-	return false
+	return true
 }
 
+// NetworkInterfaces 经 JNI 枚举平台网络接口。
+// 注意：这是官方内核拨号路径的硬性要求——注册 PlatformInterface 后拨号器恒走
+// 并行接口选择（selectInterfaces），而 NetworkManager 只在平台分支缓存接口列表；
+// 列表为空时所有拨号报 "no available network interface"。参考 husi platform_box.go。
 func (w *boxPlatformInterfaceWrapper) NetworkInterfaces() ([]adapter.NetworkInterface, error) {
-	return nil, errors.New("not implemented (UsePlatformNetworkInterfaces=false)")
+	interfaceIterator, err := intfBox.GetInterfaces()
+	if err != nil {
+		return nil, err
+	}
+	interfaces := make([]adapter.NetworkInterface, 0, interfaceIterator.Length())
+	for interfaceIterator.HasNext() {
+		netInterface := interfaceIterator.Next()
+		if netInterface == nil || netInterface.Name == "" || netInterface.Name == w.myTunName {
+			continue
+		}
+		interfaces = append(interfaces, adapter.NetworkInterface{
+			Interface: control.Interface{
+				Index:     int(netInterface.Index),
+				MTU:       int(netInterface.MTU),
+				Name:      netInterface.Name,
+				Addresses: common.Map(iteratorToArray[string](netInterface.Addresses), netip.MustParsePrefix),
+				Flags:     linkFlags(uint32(netInterface.Flags)),
+			},
+			Type:        C.InterfaceType(netInterface.Type),
+			DNSServers:  iteratorToArray[string](netInterface.DNSServer),
+			Expensive:   netInterface.Metered,
+			Constrained: false, // Android 无此概念
+		})
+	}
+	interfaces = common.UniqBy(interfaces, func(it adapter.NetworkInterface) string {
+		return it.Name
+	})
+	return interfaces, nil
 }
 
 func (w *boxPlatformInterfaceWrapper) UnderNetworkExtension() bool {

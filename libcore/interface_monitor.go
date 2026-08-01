@@ -27,6 +27,7 @@ var (
 // （route/network.go: usePlatformDefaultInterfaceMonitor = platformInterface != nil），
 // stub 的 DefaultInterface()=nil 会导致所有拨号报 "no available network interface"。
 type interfaceMonitor struct {
+	wrapper                     *boxPlatformInterfaceWrapper
 	access                      sync.Mutex
 	callbacks                   list.List[tun.DefaultInterfaceUpdateCallback]
 	logger                      logger.Logger
@@ -35,8 +36,11 @@ type interfaceMonitor struct {
 	defaultInterfaceInitialized bool
 }
 
-func newInterfaceMonitor(l logger.Logger) *interfaceMonitor {
-	return &interfaceMonitor{logger: l}
+// wrapper 指针延迟访问 networkManager：
+// CreateDefaultInterfaceMonitor 先于 PlatformInterface.Initialize 被调用（box.go），
+// 回调发生时 Initialize 已执行完毕。
+func newInterfaceMonitor(w *boxPlatformInterfaceWrapper, l logger.Logger) *interfaceMonitor {
+	return &interfaceMonitor{wrapper: w, logger: l}
 }
 
 func (m *interfaceMonitor) Start() error {
@@ -89,6 +93,12 @@ func (m *interfaceMonitor) MyInterfaces() []string {
 
 // UpdateDefaultInterface 实现 InterfaceUpdateListener（Kotlin 回调入口）。
 func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfaceIndex int32) {
+	// 先刷新平台接口列表（NetworkManager 仅在平台分支缓存，拨号路径依赖之）
+	if m.wrapper.networkManager != nil {
+		if err := m.wrapper.networkManager.UpdateInterfaces(); err != nil {
+			m.logger.Error(E.Cause(err, "update interfaces"))
+		}
+	}
 	if interfaceIndex == -1 {
 		m.access.Lock()
 		m.defaultInterface = nil
