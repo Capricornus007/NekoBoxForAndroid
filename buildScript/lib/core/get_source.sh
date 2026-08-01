@@ -8,24 +8,24 @@ source "buildScript/lib/core/get_source_env.sh"
 pushd .. >/dev/null
 
 #### sing-box ####
-SINGBOX_VERSION=$(grep '^SINGBOX_VERSION=' nb4a.properties | head -n1 | cut -d'=' -f2 | tr -d '\r[:space:]')
-if [ -z "$SINGBOX_VERSION" ]; then
-  SINGBOX_VERSION="v1.13.15"
+SINGBOX_BRANCH=$(grep '^SINGBOX_BRANCH=' nb4a.properties | head -n1 | cut -d'=' -f2 | tr -d '\r[:space:]')
+if [ -z "$SINGBOX_BRANCH" ]; then
+  SINGBOX_BRANCH="1.13.x"
 fi
-echo ">> Using official sing-box $SINGBOX_VERSION"
+echo ">> Using NekoBox sing-box fork, branch: $SINGBOX_BRANCH"
 
-OFFICIAL_REPO="https://github.com/SagerNet/sing-box.git"
+NEKO_SINGBOX_REPO="https://github.com/Capricornus007/sing-box.git"
 if [ ! -d "sing-box" ]; then
-  git clone --depth 1 --branch "$SINGBOX_VERSION" "$OFFICIAL_REPO" sing-box
+  git clone --depth 1 --branch "$SINGBOX_BRANCH" "$NEKO_SINGBOX_REPO" sing-box
 else
   pushd sing-box >/dev/null
-  if ! git remote get-url origin 2>/dev/null | grep -qE "(SagerNet|sagernet)/sing-box"; then
-    echo ">> Existing sing-box clone is not official, re-pointing to $OFFICIAL_REPO"
-    git remote set-url origin "$OFFICIAL_REPO"
+  if ! git remote get-url origin 2>/dev/null | grep -q "Capricornus007/sing-box"; then
+    echo ">> Existing sing-box clone is not NekoBox fork, re-pointing to $NEKO_SINGBOX_REPO"
+    git remote set-url origin "$NEKO_SINGBOX_REPO"
   fi
-  git fetch --depth 1 origin "refs/tags/$SINGBOX_VERSION:refs/tags/$SINGBOX_VERSION" || \
-    git fetch origin "refs/tags/$SINGBOX_VERSION:refs/tags/$SINGBOX_VERSION"
-  git checkout -f "$SINGBOX_VERSION"
+  git fetch --depth 1 origin "$SINGBOX_BRANCH" || git fetch origin "$SINGBOX_BRANCH"
+  git checkout -f "$SINGBOX_BRANCH"
+  git pull origin "$SINGBOX_BRANCH" || true
   popd >/dev/null
 fi
 
