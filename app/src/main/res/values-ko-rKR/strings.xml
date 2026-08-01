@@ -703,7 +703,7 @@ Android를 변조하여 플러그인을 사용할 수 없게 만들었습니다.
     <string name="clear_cache_success">캐시 지워짐</string>
     <string name="clear_cache_failed">캐시 지우기 실패: %s</string>
     <string name="concurrent_dial">동시 다이얼</string>
-    <string name="concurrent_dial_summary">더 빠른 네트워크 연결을 위해 동시 연결을 활성화합니다. 배터리 사용량이 증가할 수 있습니다.</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">테스트 시간 초과 (ms)</string>
     <string name="preview_version_hint">이 애플리케이션은 프리뷰 버전이며 많은 문제가 포함될 수 있습니다. 테스트를 원하지 않으시면 GitHub에서 릴리스 버전을 다운로드하세요!</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
