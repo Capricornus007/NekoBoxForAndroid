@@ -732,7 +732,7 @@
     <string name="clear_cache_success">Cache vidé</string>
     <string name="clear_cache_failed">Échec du vidage du cache : %s</string>
     <string name="concurrent_dial">Dial concurrent</string>
-    <string name="concurrent_dial_summary">Activer les connexions concurrentes pour un établissement réseau plus rapide, peut augmenter la consommation de la batterie</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">Délai d\'attente du test (ms)</string>
     <string name="preview_version_hint">Cette application est une version preview et peut contenir de nombreux problèmes. Si vous ne souhaitez pas la tester, veuillez aller sur GitHub pour télécharger la version Release !</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
