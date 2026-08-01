@@ -716,7 +716,7 @@
     <string name="clear_cache_success">Cache geleert</string>
     <string name="clear_cache_failed">Fehler beim Leeren des Caches: %s</string>
     <string name="concurrent_dial">Gleichzeitiger Aufbau</string>
-    <string name="concurrent_dial_summary">Gleichzeitige Verbindungen aktivieren für schnelleren Netzwerkaufbau, kann den Akkuverbrauch erhöhen</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">Test-Timeout (ms)</string>
     <string name="preview_version_hint">Diese Anwendung ist eine Vorschauversion und kann viele Probleme enthalten. Wenn Sie sie nicht testen möchten, gehen Sie bitte zu GitHub, um die Release-Version herunterzuladen!</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
