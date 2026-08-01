@@ -40,7 +40,9 @@ class TestInstance(profile: ProxyEntity, val link: String, private val timeout: 
                 }
                 // 删除本测试实例的独立临时 cache 文件（见 ConfigBuilder forTest 分支），
                 // 避免批量测速在 no_backup 下积累大量 urltest_*.db。
-                if (::config.isInitialized) {
+                // （父类 lateinit config 不能在此用 ::config.isInitialized 判断，
+                //  未初始化时访问抛 UninitializedPropertyAccessException，由 runCatching 兜底）
+                runCatching {
                     config.testCacheFile?.let { name ->
                         runCatching {
                             File(SagerNet.application.noBackupFilesDir, name).delete()
