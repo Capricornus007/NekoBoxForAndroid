@@ -23,7 +23,9 @@ import (
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
 
-	"github.com/dyhkwong/sing-juicity"
+	// dyhkwong/sing-juicity 已停更且与 quic-go v0.59 不兼容，
+	// 换用活跃维护的 exclavenetwork fork（与官方 sing-box v1.13.15 依赖树一致，husi 同款）。
+	"github.com/exclavenetwork/sing-juicity"
 	"github.com/gofrs/uuid/v5"
 )
 
