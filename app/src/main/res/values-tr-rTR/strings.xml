@@ -717,7 +717,7 @@
     <string name="clear_cache_success">Önbellek temizlendi</string>
     <string name="clear_cache_failed">Önbellek temizlenemedi: %s</string>
     <string name="concurrent_dial">Eşzamanlı Bağlantı</string>
-    <string name="concurrent_dial_summary">Daha hızlı ağ kurulumu için eşzamanlı bağlantıları etkinleştir, pil kullanımını artırabilir</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">Test Zaman Aşımı (ms)</string>
     <string name="preview_version_hint">Bu uygulama bir önizleme sürümüdür ve birçok sorun içerebilir. Test etmek istemiyorsanız, lütfen GitHub\'a giderek Sürüm sürümünü indirin!</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
