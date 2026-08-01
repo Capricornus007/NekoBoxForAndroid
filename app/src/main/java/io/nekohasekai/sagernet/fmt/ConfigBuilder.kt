@@ -32,6 +32,7 @@ import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.fmt.wireguard.buildSingBoxOutboundWireguardBean
 import io.nekohasekai.sagernet.ktx.isIpAddress
 import io.nekohasekai.sagernet.ktx.mkPort
+import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.utils.PackageCache
 import moe.matsuri.nb4a.*
 import moe.matsuri.nb4a.SingBoxOptions.*
@@ -205,7 +206,29 @@ fun buildConfig(
 
     // 旧 fork 的 "hosts" DNS 地址 = 系统解析器；官方内核无此 scheme，对应 "local"
     // （官方 legacy 升级会把裸 "hosts" 误判为 UDP 服务器域名，静默失败）。
+    // 仅用于 dns-direct / 订阅 resolver 等"本就应本机直解"的场景，远程 DNS 禁止走此函数。
     fun normalizeDnsAddress(address: String): String = if (address == "hosts") "local" else address
+
+    // 远程 DNS 必须由节点代访问（配合下方 detour=当前节点），绝不能归一化为本机直解的 local：
+    // 官方内核下 local/hosts/fakeip 都是本机解析占位符（Android 上 local 走平台接口经物理网卡
+    // 直连系统 DNS），用作远程即 DNS 泄露，与 fork 时代 hosts 语义不对齐。
+    // 统一回退为公共 DoH 并 Toast 提示用户修改设置。
+    fun normalizeRemoteDnsAddress(address: String): String {
+        return when (address) {
+            "hosts", "local", "localhost", "fakeip" -> {
+                runOnMainDispatcher {
+                    Toast.makeText(
+                        SagerNet.application,
+                        "Warning: \"$address\" is not supported as remote DNS and has been replaced with https://8.8.8.8/dns-query. Please update your remote DNS setting.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                "https://8.8.8.8/dns-query"
+            }
+
+            else -> address
+        }
+    }
 
     return MyOptions().apply {
 	if (!forTest) {
@@ -935,8 +958,10 @@ fun buildConfig(
         remoteDns.firstOrNull().let {
             // Always use direct DNS for urlTest
             if (!forTest) dns.servers.add(DNSServerOptions().apply {
-                address = normalizeDnsAddress(it ?: throw Exception("No remote DNS, check your settings!"))
+                address = normalizeRemoteDnsAddress(it ?: throw Exception("No remote DNS, check your settings!"))
                 tag = "dns-remote"
+                // 远程 DNS 交给当前节点代访问（对齐 Throne 桌面端 detour=proxy），本机直出即泄露。
+                detour = mainProxyTag
                 address_resolver = "dns-direct"
                 strategy = autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy(tag))
             })
