@@ -56,7 +56,7 @@ Android 端的代码主要分为两个核心包：
 ### 1.3 底层核心模块 (`libcore/`)
 Go 语言编写的底层核心，负责高性能的网络处理。**内核为官方 `SagerNet/sing-box`**（版本由 [`nb4a.properties`](nb4a.properties) 的 `SINGBOX_VERSION` 指定，构建时克隆官方源码，无任何 fork/魔改；原 starifly fork、`libneko`、`nekoutils`、`boxapi`、`conntrack` 依赖已全部摘除）：
 - [`libcore/nb4a.go`](libcore/nb4a.go): Go 核心的入口，导出 `InitCore` 等函数，供 Android 端通过 JNI 调用。
-- [`libcore/box.go`](libcore/box.go) / [`box_include.go`](libcore/box_include.go): 与 `sing-box` 核心的集成与初始化。流量统计使用官方 `experimental/v2rayapi.StatsService`；`UrlTest` 为自实现（经 box 默认 outbound 拨号的 HTTP GET 计时，替代 libneko/speedtest）；`ResetAllConnections` 因官方无 conntrack 暂为 debug 日志兜底。SSR/Snell 协议官方内核不支持，已摘除（配置含此类节点时 `box.New` 报错，待有具体案例再评估）。
+- [`libcore/box.go`](libcore/box.go) / [`box_include.go`](libcore/box_include.go): 与 `sing-box` 核心的集成与初始化。流量统计使用官方 `experimental/v2rayapi.StatsService`；`UrlTest` 为自实现（经 box 默认 outbound 拨号的 HTTP GET 计时，替代 libneko/speedtest）；`ResetAllConnections` 因官方无 conntrack 暂为 debug 日志兜底。SSR/Snell 协议官方内核不支持，已摘除（配置含此类节点时 `box.New` 报错，待有具体案例再评估）。WireGuard 官方 1.13 起仅支持 endpoint（outbound 已移除），`box_include.go` 镜像官方注册了报错 stub；Kotlin 侧 `WireGuardFmt` 的 outbound→endpoint 配置迁移待做（见 ROO_KERNEL_TODO 已知降级项）。
 - [`libcore/platform_box.go`](libcore/platform_box.go): 实现官方 `adapter.PlatformInterface`（旧 `experimental/libbox/platform` 包已不存在）：TUN 创建（`OpenInterface`）、fd protect、按应用分包（`FindConnectionOwner`）等；JNI 侧接口（`BoxPlatformInterface`）签名未变。
 - [`libcore/log.go`](libcore/log.go): `neko_log` 的自实现替代（带大小截断的文件日志 writer，接管标准库 log）。
 - [`libcore/protect.go`](libcore/protect.go): `libneko/protect_server` 的自实现替代（unix socket 接收主进程经 SCM_RIGHTS 发来的 fd 并回调 `VpnService.protect`）。
@@ -67,7 +67,7 @@ Go 语言编写的底层核心，负责高性能的网络处理。**内核为官
   - `juicity/`: Juicity outbound（官方内核无此协议，基于 `dyhkwong/sing-juicity`）。
   - `http/`: 对 sing-box `http` outbound 的**覆盖实现**（在 sing-box 自身注册之后再次注册同名 `"http"` 类型，registry 后注册生效）。行为差异：TLS 启用且用户未显式配置 ALPN 时默认提供 `["h2", "http/1.1"]`，TLS 握手后按 ALPN 协商结果分流——协商到 `h2` 走 HTTP/2 CONNECT（基于 `golang.org/x/net/http2`，上行流为 `io.Pipe` 请求体、响应体为下行流），否则保持原有 HTTP/1.1 CONNECT。用于兼容 h2-only 的 HTTPS 代理节点（对齐 v2ray 系核心行为）；用户可在节点配置中显式填写 ALPN=`http/1.1` 回退旧行为。
 
-> 内核迁移的完整调研与后续计划见 [`ROO_KERNEL_TODO.md`](ROO_KERNEL_TODO.md)。已知降级项（debug 日志兜底，待用户反馈后按案例修）：SSR/Snell 节点、`ResetAllConnections`（重置连接）、通过 Clash API（yacd 面板）切换 selector 节点不触发 `selector_OnProxySelected` 回调（app 内切换不受影响）。
+> 内核迁移的完整调研与后续计划见 [`ROO_KERNEL_TODO.md`](ROO_KERNEL_TODO.md)。已知降级项（debug 日志兜底，待用户反馈后按案例修）：SSR/Snell 节点、`ResetAllConnections`（重置连接）、通过 Clash API（yacd 面板）切换 selector 节点不触发 `selector_OnProxySelected` 回调（app 内切换不受影响）、WireGuard 节点（配置生成需从 outbound 迁移为 endpoint）。
 
 ---
 

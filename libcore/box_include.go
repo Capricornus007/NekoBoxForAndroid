@@ -5,6 +5,7 @@ import (
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/adapter/endpoint"
+	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/adapter/inbound"
 	"github.com/sagernet/sing-box/adapter/outbound"
 	"github.com/sagernet/sing-box/adapter/service"
@@ -43,6 +44,8 @@ import (
 
 	_ "github.com/sagernet/sing-box/experimental/clashapi"
 	_ "github.com/sagernet/sing-box/transport/v2rayquic"
+
+	E "github.com/sagernet/sing/common/exceptions"
 )
 
 func nekoboxAndroidInboundRegistry() *inbound.Registry {
@@ -93,7 +96,13 @@ func nekoboxAndroidOutboundRegistry() *outbound.Registry {
 	hysteria2.RegisterOutbound(registry)
 	juicity.RegisterOutbound(registry)
 
-	wireguard.RegisterOutbound(registry)
+	// 官方 sing-box 1.11 起废弃、1.13.0 移除 wireguard outbound（仅保留 endpoint，
+	// 见下方 nekoboxAndroidEndpointRegistry）；镜像官方 include/registry.go 的 stub，
+	// 让旧式 wireguard outbound 配置得到明确报错而非 "unknown outbound type"。
+	// TODO: Kotlin 侧 WireGuardFmt 仍生成 outbound 配置，需迁移为 endpoint（见 ROO_KERNEL_TODO 已知降级项）。
+	outbound.Register[option.StubOptions](registry, C.TypeWireGuard, func(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.StubOptions) (adapter.Outbound, error) {
+		return nil, E.New("WireGuard outbound is deprecated in sing-box 1.11.0 and removed in sing-box 1.13.0, use WireGuard endpoint instead")
+	})
 
 	return registry
 }

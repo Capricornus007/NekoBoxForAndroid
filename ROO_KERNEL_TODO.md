@@ -25,8 +25,9 @@
 - [x] `box_include.go` 摘除官方没有的 SSR/Snell 注册；`protocol/http`、`protocol/juicity` 适配官方 `tls.NewDialerFromOptions`/`tls.NewSTDClient` 新签名（多 logger 参数）；`interface_monitor.go` 适配 sing-tun v0.8.12（`MyInterfaces() []string`）。
 - [x] CI（ci.yml/preview.yml）libcore 缓存 key 纳入 `nb4a.properties`（SINGBOX_VERSION 变更触发内核重编）。
 - [x] 静态校验脚本：[`roo_check_imports.py`](roo_check_imports.py)（import 路径 + fork 残留）、[`roo_check_symbols.py`](roo_check_symbols.py)（官方符号存在性），`uv run` 执行，均通过。
+- [x] 首轮 CI 编译修复（2026-08-01）：① 官方 1.13.0 已移除 wireguard outbound（仅 endpoint），`box_include.go` 改为镜像官方 `include/registry.go` 的报错 stub（`option.StubOptions` + 明确错误信息）；② `adapter.DNSTransport` 接口 v1.13 新增 `Reset()`，`platformLocalDNSTransport` 补空实现（对齐官方 local transport，JNI 无持久连接）；③ `platform_box.go` 删除冗余 `context` import。
 
-**已知降级项**（debug 日志兜底，待用户反馈具体案例）：SSR/Snell 节点（官方无）、`ResetAllConnections`、Clash API（yacd）切换 selector 不触发 `selector_OnProxySelected` 回调。
+**已知降级项**（debug 日志兜底，待用户反馈具体案例）：SSR/Snell 节点（官方无）、`ResetAllConnections`、Clash API（yacd）切换 selector 不触发 `selector_OnProxySelected` 回调、**WireGuard 节点**（官方 1.13 仅支持 endpoint 形态，而 [`WireGuardFmt.kt`](app/src/main/java/io/nekohasekai/sagernet/fmt/wireguard/WireGuardFmt.kt) 仍生成 outbound 配置，`box.New` 会报 stub 错误；需做配置生成的 outbound→endpoint 迁移：`Outbound_WireGuardOptions` → `Endpoint_WireGuardOptions` 并写入 `endpoints` 数组，字段结构有差异需对照 `option/wireguard.go`）。
 
 **遗留风险**（只能 CI 验证）：quic-go v0.59 http3 API（`http.go` TryH3Direct）、`dyhkwong/sing-juicity` 与新 sing/sing-quic 的编译兼容、`option.DefaultRule`→`DefaultHeadlessRule` 字段类型。
 
