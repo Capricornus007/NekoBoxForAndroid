@@ -710,7 +710,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_cache_success">キャッシュをクリアしました</string>
     <string name="clear_cache_failed">キャッシュのクリアに失敗しました: %s</string>
     <string name="concurrent_dial">同時ダイアル</string>
-    <string name="concurrent_dial_summary">同時接続を有効にしてネットワーク確立を高速化します。バッテリー消費が増える可能性があります</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">テストタイムアウト (ms)</string>
     <string name="preview_version_hint">このアプリケーションはプレビューバージョンであり、多くの問題が含まれている可能性があります。テストしたくない場合は、GitHubからリリースバージョンをダウンロードしてください。</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
