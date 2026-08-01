@@ -727,7 +727,7 @@
     <string name="clear_cache_success">Кеш очищено</string>
     <string name="clear_cache_failed">Не вдалося очистити кеш: %s</string>
     <string name="concurrent_dial">Одночасне встановлення з\'єднання</string>
-    <string name="concurrent_dial_summary">Увімкнути одночасні з\'єднання для швидшого встановлення мережі, може збільшити споживання батареї</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">Тайм-аут тесту (мс)</string>
     <string name="preview_version_hint">Ця програма є попередньою версією і може містити багато проблем. Якщо ви не бажаєте тестувати її, перейдіть на GitHub, щоб завантажити стабільну версію!</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
