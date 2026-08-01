@@ -41,7 +41,7 @@ Android 端的代码主要分为两个核心包：
 #### 1.2.2 `moe.matsuri.nb4a` (NekoBox 专属扩展)
 这是 NekoBox 专属的扩展和定制代码，Nekobox是Throne的前生，故兼容之：
 - [`moe/matsuri/nb4a/NativeInterface.kt`](app/src/main/java/moe/matsuri/nb4a/NativeInterface.kt): 与底层 Go 核心 (`libcore`) 交互的 JNI 接口，实现了 `libcore.BoxPlatformInterface` 和 `libcore.NB4AInterface`。
-- [`moe/matsuri/nb4a/SingBoxOptions.java`](app/src/main/java/moe/matsuri/nb4a/SingBoxOptions.java) / [`SingBoxOptionsUtil.kt`](app/src/main/java/moe/matsuri/nb4a/SingBoxOptionsUtil.kt): Sing-box 相关的配置选项和工具类。
+- [`moe/matsuri/nb4a/SingBoxOptions.java`](app/src/main/java/moe/matsuri/nb4a/SingBoxOptions.java) / [`SingBoxOptionsUtil.kt`](app/src/main/java/moe/matsuri/nb4a/SingBoxOptionsUtil.kt): Sing-box 相关的配置选项和工具类。`makeSingBoxRule()` / `generateRuleSet()` 中 geo 引用同时接受老 nb4a 冒号格式（`geoip:cn`/`geosite:cn`）与 throne/官方连字符格式（`geoip-cn`/`geosite-cn`），均生成本地 rule-set 交由 libcore `ruleset.go` 解析；`geoip:private` 与 `geoip-private` 都映射为 `ip_is_private`。
 - [`moe/matsuri/nb4a/proxy/`](app/src/main/java/moe/matsuri/nb4a/proxy): 额外的代理协议（如 AnyTLS, ShadowTLS, NekoBean 等）和配置绑定。
 - [`moe/matsuri/nb4a/ui/`](app/src/main/java/moe/matsuri/nb4a/ui) / [`utils/`](app/src/main/java/moe/matsuri/nb4a/utils): 专属的 UI 控件和工具类。
 

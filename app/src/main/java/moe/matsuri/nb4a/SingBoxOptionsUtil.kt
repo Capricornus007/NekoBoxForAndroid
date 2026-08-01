@@ -37,7 +37,7 @@ fun SingBoxOptions.DNSRule_DefaultOptions.makeSingBoxRule(list: List<String>) {
     domain_regex = mutableListOf<String>()
     domain_keyword = mutableListOf<String>()
     list.forEach {
-        if (it.startsWith("geosite:")) {
+        if (it.startsWith("geosite:") || it.startsWith("geosite-")) {
             rule_set.plusAssign(it)
         } else if (it.startsWith("full:")) {
             domain.plusAssign(it.removePrefix("full:").lowercase())
@@ -76,7 +76,7 @@ fun SingBoxOptions.DNSRule_DefaultOptions.checkEmpty(): Boolean {
 fun generateRuleSet(ruleSetString: List<String>, ruleSet: MutableList<RuleSet>) {
     ruleSetString.forEach {
         when {
-            it.startsWith("geoip:") -> {
+            it.startsWith("geoip:") || it.startsWith("geoip-") -> {
                 ruleSet.add(RuleSet().apply {
                     type = "local"
                     tag = it
@@ -85,7 +85,7 @@ fun generateRuleSet(ruleSetString: List<String>, ruleSet: MutableList<RuleSet>) 
                 })
             }
 
-            it.startsWith("geosite:") -> {
+            it.startsWith("geosite:") || it.startsWith("geosite-") -> {
                 ruleSet.add(RuleSet().apply {
                     type = "local"
                     tag = it
@@ -110,8 +110,8 @@ fun SingBoxOptions.Rule_DefaultOptions.makeSingBoxRule(list: List<String>, isIP:
     }
     list.forEach {
         if (isIP) {
-            if (it.startsWith("geoip:")) {
-                if (it == "geoip:private") {
+            if (it.startsWith("geoip:") || it.startsWith("geoip-")) {
+                if (it == "geoip:private" || it == "geoip-private") {
                     ip_is_private = true
                 } else {
                     rule_set.plusAssign(it)
@@ -121,7 +121,7 @@ fun SingBoxOptions.Rule_DefaultOptions.makeSingBoxRule(list: List<String>, isIP:
             }
             return@forEach
         }
-        if (it.startsWith("geosite:")) {
+        if (it.startsWith("geosite:") || it.startsWith("geosite-")) {
             rule_set.plusAssign(it)
         } else if (it.startsWith("full:")) {
             domain.plusAssign(it.removePrefix("full:").lowercase())
