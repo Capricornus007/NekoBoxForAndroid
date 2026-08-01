@@ -719,7 +719,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_cache_success">Кэш очищен</string>
     <string name="clear_cache_failed">Не удалось очистить кэш: %s</string>
     <string name="concurrent_dial">Параллельный вызов</string>
-    <string name="concurrent_dial_summary">Включить параллельные соединения для более быстрого установления сети, может увеличить расход батареи</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">Таймаут теста (мс)</string>
     <string name="preview_version_hint">Это приложение является предварительной версией и может содержать множество проблем. Если вы не хотите тестировать его, пожалуйста, перейдите на GitHub, чтобы скачать релизную версию!</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
