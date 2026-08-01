@@ -122,4 +122,6 @@ replace github.com/sagernet/wireguard-go => ../../wireguard-go
 
 // replace berty.tech/go-libtor => github.com/berty/go-libtor v0.0.0-20220627102132-9189eb6e3982
 
-replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
+// hawkff/sing-quic v0.6.2 is incompatible with official sing-box v1.13.15 hysteria API.
+// Use official sagernet/sing-quic which ships compatible hysteria structs.
+// replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
