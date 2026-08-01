@@ -1082,7 +1082,8 @@ public class SingBoxOptions {
 
         public Integer default_mark;
 
-        public Boolean concurrent_dial;
+        // sing-box 1.13 网络策略（default/fallback/hybrid），替代已移除的 concurrent_dial
+        public String default_network_strategy;
 
     }
 
@@ -4532,6 +4533,9 @@ public class SingBoxOptions {
         public String action;
 
         public String outbound;
+
+        // sing-box 1.13 resolve 规则动作使用（RouteActionResolve.strategy）
+        public String strategy;
 
     }
 

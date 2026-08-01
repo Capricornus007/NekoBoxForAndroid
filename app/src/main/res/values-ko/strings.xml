@@ -548,7 +548,7 @@
     <string name="clear_cache_success">캐시가 지워졌습니다</string>
     <string name="clear_cache_failed">캐시 지우기 실패: %s</string>
     <string name="concurrent_dial">동시 다이얼</string>
-    <string name="concurrent_dial_summary">더 빠른 네트워크 연결을 위해 동시 연결을 활성화합니다. 배터리 사용량이 증가할 수 있습니다</string>
+    <string name="concurrent_dial_summary">Wi-Fi와 모바일 데이터로 동시에 연결합니다. 시스템 설정에서 Wi-Fi와 모바일 데이터를 모두 켜 두어야 하며 배터리 사용량이 증가합니다.</string>
     <string name="connection_test_timeout">테스트 시간 초과 (ms)</string>
     <string name="preview_version_hint">이 앱은 미리 보기 버전이며 많은 문제가 포함될 수 있습니다. 테스트하지 않으려면 GitHub에서 Release 버전을 다운로드하세요!</string>
     <string name="preview_hint_dont_show_again">다시 표시하지 않음</string>

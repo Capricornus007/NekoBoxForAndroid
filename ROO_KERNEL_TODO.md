@@ -26,10 +26,14 @@
 - [x] CI（ci.yml/preview.yml）libcore 缓存 key 纳入 `nb4a.properties`（SINGBOX_VERSION 变更触发内核重编）。
 - [x] 静态校验脚本：[`roo_check_imports.py`](roo_check_imports.py)（import 路径 + fork 残留）、[`roo_check_symbols.py`](roo_check_symbols.py)（官方符号存在性），`uv run` 执行，均通过。
 - [x] 首轮 CI 编译修复（2026-08-01）：① 官方 1.13.0 已移除 wireguard outbound（仅 endpoint），`box_include.go` 改为镜像官方 `include/registry.go` 的报错 stub（`option.StubOptions` + 明确错误信息）；② `adapter.DNSTransport` 接口 v1.13 新增 `Reset()`，`platformLocalDNSTransport` 补空实现（对齐官方 local transport，JNI 无持久连接）；③ `platform_box.go` 删除冗余 `context` import。
+- [x] 首轮真机运行修复（2026-08-01，配置 schema 对齐官方 v1.13，[`ConfigBuilder.kt`](app/src/main/java/io/nekohasekai/sagernet/fmt/ConfigBuilder.kt) 等）：
+  - `route.concurrent_dial` 1.13 已删除（`box.New` 报 unknown field 直接崩，内核完全起不来）→ 映射为官方替代 `default_network_strategy: "hybrid"`（WiFi/移动数据并发竞速拨号）；设置项保留，7 语言摘要改为明确说明（需 WiFi+移动数据同开、更耗电），防小白盲开
+  - 入站 `sniff`/`sniff_override_destination`/`domain_strategy` 字段 1.13 硬错误（legacy inbound fields removed，tun/mixed 均中招）→ 迁移为路由规则动作 `{"action":"sniff"}` / `{"action":"resolve","strategy":...}`（置于规则最前）；`sniff_override_destination` 官方无替代（`OverrideDestination` 已成死代码），`trafficSniffing` 设置退化为 关/开 两档（`traffic_sniffing_values` 数组缩减，存量值 "2" 按开启处理）
+  - DNS 地址 `hosts`（旧 fork=系统解析器）：官方 legacy 升级把裸 `hosts` 静默误判为 UDP 服务器域名（远程 DNS 全灭且不报错）→ `normalizeDnsAddress()` 归一化为 `local`（direct/remote/订阅 resolver 三处）
 
 **已知降级项**（debug 日志兜底，待用户反馈具体案例）：SSR/Snell 节点（官方无）、`ResetAllConnections`、Clash API（yacd）切换 selector 不触发 `selector_OnProxySelected` 回调、**WireGuard 节点**（官方 1.13 仅支持 endpoint 形态，而 [`WireGuardFmt.kt`](app/src/main/java/io/nekohasekai/sagernet/fmt/wireguard/WireGuardFmt.kt) 仍生成 outbound 配置，`box.New` 会报 stub 错误；需做配置生成的 outbound→endpoint 迁移：`Outbound_WireGuardOptions` → `Endpoint_WireGuardOptions` 并写入 `endpoints` 数组，字段结构有差异需对照 `option/wireguard.go`）。
 
-**遗留风险**（只能 CI 验证）：quic-go v0.59 http3 API（`http.go` TryH3Direct）、`dyhkwong/sing-juicity` 与新 sing/sing-quic 的编译兼容、`option.DefaultRule`→`DefaultHeadlessRule` 字段类型。
+**遗留风险**（只能 CI/真机验证）：quic-go v0.59 http3 API（`http.go` TryH3Direct）、`dyhkwong/sing-juicity` 与新 sing/sing-quic 的编译兼容、`option.DefaultRule`→`DefaultHeadlessRule` 字段类型。另：「DNS hosts」功能（`dnsHosts` 非空时）规则上 `_hack_config_map["ip_accept_any"]` 在官方 DNS 规则 schema 中不存在，会触发 unknown field——server 侧 `type:"hosts"+predefined` 官方原生支持，规则侧需找官方等价（待有用户案例再修）。
 
 **下一阶段**：按本文档阶段 3 做 Kotlin 侧适配（husi 风格 Service/Client 模型）或维持现状先功能回归（阶段 4）。
 

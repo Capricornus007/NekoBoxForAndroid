@@ -655,10 +655,10 @@
         <item>3</item>
     </string-array>
 
+    <!-- sing-box 1.13 已移除 sniff_override_destination，override 档已下线 -->
     <string-array name="traffic_sniffing_values">
         <item>@string/off</item>
         <item>@string/sniff_routing</item>
-        <item>@string/sniff_override</item>
     </string-array>
 
     <!-- Snell Protocol -->

@@ -187,8 +187,9 @@ fun buildConfig(
     val dnsHosts by lazy { parseDnsHosts(DataStore.dnsHosts) }
     val enableDnsRouting = DataStore.enableDnsRouting
     val useFakeDns = DataStore.enableFakeDns && !forTest
+    // sing-box 1.13 已移除 sniff_override_destination（sniff 规则动作不再覆盖目标地址），
+    // trafficSniffing 退化为开关语义（>0 即启用）。
     val needSniff = DataStore.trafficSniffing > 0
-    val needSniffOverride = DataStore.trafficSniffing == 2
     val externalIndexMap = ArrayList<IndexEntity>()
     val ipv6Mode = if (forTest) IPv6Mode.ENABLE else DataStore.ipv6Mode
 
@@ -201,6 +202,10 @@ fun buildConfig(
             else -> "prefer_ipv4"
         }
     }
+
+    // 旧 fork 的 "hosts" DNS 地址 = 系统解析器；官方内核无此 scheme，对应 "local"
+    // （官方 legacy 升级会把裸 "hosts" 误判为 UDP 服务器域名，静默失败）。
+    fun normalizeDnsAddress(address: String): String = if (address == "hosts") "local" else address
 
     return MyOptions().apply {
 	if (!forTest) {
@@ -266,11 +271,10 @@ fun buildConfig(
                 }
                 endpoint_independent_nat = true
                 mtu = DataStore.mtu
-                domain_strategy = genDomainStrategy(DataStore.resolveDestination)
                 auto_route = true
                 strict_route = DataStore.strictRoute
-                sniff = needSniff
-                sniff_override_destination = needSniffOverride
+                // sing-box 1.13 移除了入站 sniff/domain_strategy 字段，
+                // 改由路由规则动作实现（见下方 route.rules 构建处）。
                 when (ipv6Mode) {
                     IPv6Mode.DISABLE -> {
                         inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
@@ -291,9 +295,6 @@ fun buildConfig(
                 tag = TAG_MIXED
                 listen = bind
                 listen_port = DataStore.mixedPort
-                domain_strategy = genDomainStrategy(DataStore.resolveDestination)
-                sniff = needSniff
-                sniff_override_destination = needSniffOverride
                 if (DataStore.mixedInboundNeedsAuth) {
                     users = listOf(User().also { u ->
                         u.username = Key.MIXED_USERNAME
@@ -312,8 +313,8 @@ fun buildConfig(
             rules = mutableListOf()
             rule_set = mutableListOf()
 
-            // 添加并发拨号设置
-             concurrent_dial = DataStore.concurrentDial
+            // sing-box 1.13 中 route.concurrent_dial 替代为网络策略：hybrid = 在所有可用网络接口（WiFi/移动数据）上并发竞速拨号。
+            if (DataStore.concurrentDial) default_network_strategy = "hybrid"
         }
 
         // returns outbound tag
@@ -928,7 +929,7 @@ fun buildConfig(
 
         directDNS.firstOrNull().let {
             dns.servers.add(DNSServerOptions().apply {
-                address = it ?: throw Exception("No direct DNS, check your settings!")
+                address = normalizeDnsAddress(it ?: throw Exception("No direct DNS, check your settings!"))
                 tag = "dns-direct"
                 detour = TAG_DIRECT
                 address_resolver = "dns-local"
@@ -939,7 +940,7 @@ fun buildConfig(
         remoteDns.firstOrNull().let {
             // Always use direct DNS for urlTest
             if (!forTest) dns.servers.add(DNSServerOptions().apply {
-                address = it ?: throw Exception("No remote DNS, check your settings!")
+                address = normalizeDnsAddress(it ?: throw Exception("No remote DNS, check your settings!"))
                 tag = "dns-remote"
                 address_resolver = "dns-direct"
                 strategy = autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy(tag))
@@ -973,6 +974,14 @@ fun buildConfig(
             route.rules.add(0, Rule_DefaultOptions().apply {
                 port = listOf(53)
                 action = "hijack-dns"
+            })
+            // sing-box 1.13：sniff / 解析目标地址迁移为路由规则动作（须位于规则最前）。
+            if (DataStore.resolveDestination) route.rules.add(0, Rule_DefaultOptions().apply {
+                action = "resolve"
+                strategy = genDomainStrategy(true)
+            })
+            if (needSniff) route.rules.add(0, Rule_DefaultOptions().apply {
+                action = "sniff"
             })
             if (DataStore.bypassLanInCore) {
                 route.rules.add(Rule_DefaultOptions().apply {
@@ -1031,7 +1040,7 @@ fun buildConfig(
 
                 val serverTag = "dns-sub-$gid"
                 dns.servers.add(DNSServerOptions().apply {
-                    address = resolver
+                    address = normalizeDnsAddress(resolver)
                     tag = serverTag
                     detour = TAG_DIRECT
                     if (!resolver.isIpAddress()) {

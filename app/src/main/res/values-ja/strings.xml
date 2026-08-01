@@ -554,7 +554,7 @@
     <string name="clear_cache_success">キャッシュをクリアしました</string>
     <string name="clear_cache_failed">キャッシュのクリアに失敗しました: %s</string>
     <string name="concurrent_dial">同時ダイヤル</string>
-    <string name="concurrent_dial_summary">ネットワーク確立を高速化するため同時接続を有効にします。バッテリー消費が増加する可能性があります</string>
+    <string name="concurrent_dial_summary">Wi-Fiとモバイルデータで同時に接続します。システム設定でWi-Fiとモバイルデータの両方をオンにしておく必要があり、バッテリー消費が増加します。</string>
     <string name="connection_test_timeout">テストタイムアウト (ms)</string>
     <string name="preview_version_hint">このアプリはプレビュー版であり、多くの問題が含まれている可能性があります。テストしたくない場合は、GitHub にアクセスして Release 版をダウンロードしてください！</string>
     <string name="preview_hint_dont_show_again">今後表示しない</string>
