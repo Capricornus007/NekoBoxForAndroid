@@ -726,7 +726,7 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="clear_cache_success">Cache svuotata</string>
     <string name="clear_cache_failed">Impossibile svuotare la cache: %s</string>
     <string name="concurrent_dial">Dial concorrente</string>
-    <string name="concurrent_dial_summary">Abilita connessioni simultanee per una creazione più rapida della rete, potrebbe aumentare il consumo della batteria</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">Timeout test (ms)</string>
     <string name="preview_version_hint">Questa applicazione è una versione di anteprima e potrebbe contenere molti problemi. Se non vuoi testarla, vai su GitHub per scaricare la versione Release!</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
