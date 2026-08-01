@@ -2,6 +2,7 @@ package libcore
 
 import (
 	"sync"
+	"time"
 
 	tun "github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common/control"
@@ -112,7 +113,12 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 	}
 	newInterface, err := control.NewDefaultInterfaceFinder().ByIndex(int(interfaceIndex))
 	if err != nil {
+		// 启动早期接口/路由表可能尚未就绪（真机日志：
+		// "find updated interface: wlan0: route ip+net: no such network interface"）。
+		// 直接丢弃会让 defaultInterface 永久为 nil，该 box 的所有拨号秒报
+		// "no available network interface"，故后台重试几次。
 		m.logger.Error(E.Cause(err, "find updated interface: ", interfaceName))
+		go m.retryUpdateDefaultInterface(interfaceName, interfaceIndex, 5)
 		return
 	}
 	m.access.Lock()
@@ -128,5 +134,37 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 	m.access.Unlock()
 	for _, callback := range callbacks {
 		callback(newInterface, 0)
+	}
+}
+
+// retryUpdateDefaultInterface 弥补 UpdateDefaultInterface 的瞬时失败：
+// 若期间已有其他回调成功设置了接口则直接放弃。
+func (m *interfaceMonitor) retryUpdateDefaultInterface(interfaceName string, interfaceIndex int32, attempts int) {
+	for i := 0; i < attempts; i++ {
+		time.Sleep(200 * time.Millisecond)
+		m.access.Lock()
+		ready := m.defaultInterfaceInitialized && m.defaultInterface != nil
+		m.access.Unlock()
+		if ready {
+			return
+		}
+		newInterface, err := control.NewDefaultInterfaceFinder().ByIndex(int(interfaceIndex))
+		if err != nil {
+			continue
+		}
+		m.access.Lock()
+		if m.defaultInterfaceInitialized && m.defaultInterface != nil {
+			m.access.Unlock()
+			return
+		}
+		m.defaultInterface = newInterface
+		m.defaultInterfaceInitialized = true
+		callbacks := m.callbacks.Array()
+		m.access.Unlock()
+		for _, callback := range callbacks {
+			callback(newInterface, 0)
+		}
+		m.logger.Info("default interface recovered after retry: ", interfaceName)
+		return
 	}
 }

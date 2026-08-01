@@ -18,6 +18,7 @@ import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.utils.DefaultNetworkListener
 import io.nekohasekai.sagernet.utils.PackageCache
+import kotlinx.coroutines.runBlocking
 import libcore.BoxPlatformInterface
 import libcore.InterfaceUpdateListener
 import libcore.Libcore
@@ -92,7 +93,13 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
 
     override fun startDefaultInterfaceMonitor(listener: InterfaceUpdateListener?) {
         if (listener == null) return
-        runOnDefaultDispatcher {
+        // 必须同步注册：官方内核拨号时 DefaultInterface()==nil 会秒报
+        // "no available network interface"（见 libcore/interface_monitor.go 批注）。
+        // 原先 runOnDefaultDispatcher 异步注册，测试盒 box.Start() 后立刻拨号，
+        // 首拨几乎必然抢在首次回调之前 → 批量测速大面积"超时"。
+        // DefaultNetworkListener 的 actor 是 Dispatchers.Unconfined，send 内联处理，
+        // 缓存命中时首次回调在此调用返回前即完成（调用的 Go 线程短暂阻塞，可接受）。
+        runBlocking {
             DefaultNetworkListener.start(listener) { network ->
                 checkDefaultInterfaceUpdate(listener, network)
             }
@@ -101,7 +108,8 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
 
     override fun closeDefaultInterfaceMonitor(listener: InterfaceUpdateListener?) {
         if (listener == null) return
-        runOnDefaultDispatcher {
+        // 与 start 对称同步化，避免 box.Close 后监听者残留/时序错乱。
+        runBlocking {
             DefaultNetworkListener.stop(listener)
         }
     }
