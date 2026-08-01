@@ -19,7 +19,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Golang Status
-        run: find buildScript libcore/*.sh | xargs cat | sha1sum > golang_status
+        run: find buildScript libcore/*.sh nb4a.properties | xargs cat | sha1sum > golang_status
       - name: Libcore Status
         run: git ls-files libcore | xargs cat | sha1sum > libcore_status
       - name: LibCore Cache
@@ -51,7 +51,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Golang Status
-        run: find buildScript libcore/*.sh | xargs cat | sha1sum > golang_status
+        run: find buildScript libcore/*.sh nb4a.properties | xargs cat | sha1sum > golang_status
       - name: Libcore Status
         run: git ls-files libcore | xargs cat | sha1sum > libcore_status
       - name: LibCore Cache

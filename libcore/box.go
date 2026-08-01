@@ -7,30 +7,27 @@ import (
 	"io"
 	"libcore/device"
 	"log"
+	"net"
+	"net/http"
 	"runtime"
 	"runtime/debug"
 	"strings"
 	"sync"
+	"time"
 
-	"github.com/matsuridayo/libneko/protect_server"
-	"github.com/matsuridayo/libneko/speedtest"
 	"github.com/sagernet/sing-box/adapter"
-	"github.com/sagernet/sing-box/boxapi"
-	"github.com/sagernet/sing-box/experimental/libbox/platform"
+	"github.com/sagernet/sing-box/experimental/v2rayapi"
 	"github.com/sagernet/sing-box/protocol/group"
 
 	box "github.com/sagernet/sing-box"
-	"github.com/sagernet/sing-box/common/conntrack"
-	"github.com/sagernet/sing-box/common/dialer"
 	"github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
+	E "github.com/sagernet/sing/common/exceptions"
+	M "github.com/sagernet/sing/common/metadata"
+	N "github.com/sagernet/sing/common/network"
 	"github.com/sagernet/sing/service"
 	"github.com/sagernet/sing/service/pause"
 )
-
-func init() {
-	dialer.DoNotSelectInterface = true
-}
 
 var mainInstance *BoxInstance
 
@@ -59,12 +56,9 @@ func VersionBox() string {
 }
 
 func ResetAllConnections(system bool) {
-	if system {
-		conntrack.Close()
-		log.Println("Reset system connections done")
-	} else {
-		log.Println("TODO: Reset user connections")
-	}
+	// 官方内核没有 conntrack（starifly fork 私有实现）。
+	// 按迁移方针先跳过并留 debug 日志，待有具体案例再修。
+	log.Println("DEBUG: ResetAllConnections(system=", system, ") skipped: official sing-box has no conntrack")
 }
 
 type BoxInstance struct {
@@ -74,7 +68,7 @@ type BoxInstance struct {
 	cancel context.CancelFunc
 	state  int
 
-	v2api        *boxapi.SbV2rayServer
+	v2api        *v2rayapi.StatsService
 	selector     *group.Selector
 	pauseManager pause.Manager
 }
@@ -89,13 +83,23 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 		nekoboxAndroidDNSTransportRegistry(localTransport), nekoboxAndroidServiceRegistry(),
 	)
 	ctx = service.ContextWithDefaultRegistry(ctx)
-	service.MustRegister[platform.Interface](ctx, boxPlatformInterfaceInstance)
+	service.MustRegister[adapter.PlatformInterface](ctx, boxPlatformInterfaceInstance)
 
 	// parse options
 	var options option.Options
 	err = options.UnmarshalJSONContext(ctx, []byte(config))
 	if err != nil {
 		return nil, fmt.Errorf("decode config: %v", err)
+	}
+
+	// 官方内核不支持 fork 私有的 "geoip:xxx"/"geosite:xxx" 伪路径 local rule-set，
+	// 这里预处理：从 geoip.db/geosite.db 生成 .srs 缓存并改写为真实路径。
+	if options.Route != nil {
+		err = prepareLocalGeoRuleSets(options.Route.RuleSet)
+		if err != nil {
+			cancel()
+			return nil, fmt.Errorf("prepare geo rule-sets: %v", err)
+		}
 	}
 
 	// create box
@@ -192,46 +196,107 @@ func (b *BoxInstance) SetV2rayStats(outbounds string) {
 		log.Println("duplicate call of SetV2rayStats")
 		return
 	}
-	b.v2api = boxapi.NewSbV2rayServer(option.V2RayStatsServiceOptions{
+	// 官方 experimental/v2rayapi 的 StatsService 即 adapter.ConnectionTracker
+	b.v2api = v2rayapi.NewStatsService(option.V2RayStatsServiceOptions{
 		Enabled:   true,
 		Outbounds: strings.Split(outbounds, "\n"),
 	})
-	b.Box.Router().AppendTracker(b.v2api.StatsService())
+	b.Box.Router().AppendTracker(b.v2api)
 }
 
 func (b *BoxInstance) QueryStats(tag, direct string) int64 {
 	if b.v2api == nil {
 		return 0
 	}
-	return b.v2api.QueryStats(fmt.Sprintf("outbound>>>%s>>>traffic>>>%s", tag, direct))
+	resp, err := b.v2api.GetStats(context.Background(), &v2rayapi.GetStatsRequest{
+		Name:   fmt.Sprintf("outbound>>>%s>>>traffic>>>%s", tag, direct),
+		Reset_: true,
+	})
+	if err != nil || resp.Stat == nil {
+		return 0
+	}
+	return resp.Stat.Value
 }
 
 func (b *BoxInstance) SelectOutbound(tag string) bool {
 	if b.selector != nil {
-		return b.selector.SelectOutbound(tag)
+		if b.selector.SelectOutbound(tag) {
+			// 替代 fork 的 nekoutils.Selector_OnProxySelected 钩子。
+			// 注意：仅覆盖 app 内的切换路径；通过 Clash API（yacd 面板）
+			// 切换不会触发该回调（官方内核无此钩子，待有具体案例再修）。
+			if intfNB4A != nil {
+				intfNB4A.Selector_OnProxySelected(b.selector.Tag(), tag)
+			}
+			return true
+		}
 	}
 	return false
 }
 
 func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err error) {
 	defer device.DeferPanicToError("box.UrlTest", func(err_ error) { err = err_ })
-	var connectionTracker adapter.ConnectionTracker
-	// test i
-	if i != nil {
+	if i == nil {
+		i = mainInstance
+	}
+	var client *http.Client
+	if i == nil {
+		// 无实例：直连测试
+		client = &http.Client{Timeout: time.Duration(timeout) * time.Millisecond}
+	} else {
+		var connectionTracker adapter.ConnectionTracker
 		if i.v2api != nil {
-			connectionTracker = i.v2api.StatsService()
+			connectionTracker = i.v2api
 		}
-		return speedtest.UrlTest(boxapi.CreateProxyHttpClient(i.Box, connectionTracker), link, timeout, speedtest.UrlTestStandard_RTT)
+		client = newProxyHTTPClient(i.Box, connectionTracker, timeout)
 	}
-	// test direct
-	if mainInstance == nil {
-		return speedtest.UrlTest(boxapi.CreateProxyHttpClient(nil, nil), link, timeout, speedtest.UrlTestStandard_RTT)
+	return urlTest(client, link)
+}
+
+// newProxyHTTPClient 替代 fork 的 boxapi.CreateProxyHttpClient：
+// 经 box 的默认（final）outbound 拨号的 HTTP client。
+func newProxyHTTPClient(b *box.Box, tracker adapter.ConnectionTracker, timeout int32) *http.Client {
+	transport := &http.Transport{DisableKeepAlives: true}
+	transport.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+		outbound := b.Outbound().Default()
+		if outbound == nil {
+			return nil, E.New("no default outbound")
+		}
+		destination := M.ParseSocksaddr(addr)
+		conn, err := outbound.DialContext(ctx, N.NetworkTCP, destination)
+		if err != nil {
+			return nil, err
+		}
+		if tracker != nil {
+			conn = tracker.RoutedConnection(ctx, conn, adapter.InboundContext{
+				Outbound:    outbound.Tag(),
+				Destination: destination,
+			}, nil, outbound)
+		}
+		return conn, nil
 	}
-	// test mainInstance
-	if mainInstance.v2api != nil {
-		connectionTracker = mainInstance.v2api.StatsService()
+	return &http.Client{
+		Transport: transport,
+		Timeout:   time.Duration(timeout) * time.Millisecond,
 	}
-	return speedtest.UrlTest(boxapi.CreateProxyHttpClient(mainInstance.Box, connectionTracker), link, timeout, speedtest.UrlTestStandard_RTT)
+}
+
+// urlTest 替代 libneko/speedtest.UrlTest（UrlTestStandard_RTT 模式）：
+// GET 请求，计时到收到响应头。
+func urlTest(client *http.Client, link string) (int32, error) {
+	req, err := http.NewRequest(http.MethodGet, link, nil)
+	if err != nil {
+		return 0, err
+	}
+	start := time.Now()
+	resp, err := client.Do(req)
+	if err != nil {
+		return 0, err
+	}
+	_ = resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return 0, E.New("unexpected status: ", resp.Status)
+	}
+	return int32(time.Since(start).Milliseconds()), nil
 }
 
 var protectCloser io.Closer
@@ -242,7 +307,7 @@ func goServeProtect(start bool) {
 		protectCloser = nil
 	}
 	if start {
-		protectCloser = protect_server.ServeProtect("protect_path", false, 0, func(fd int) {
+		protectCloser = serveProtect("protect_path", func(fd int) {
 			intfBox.AutoDetectInterfaceControl(int32(fd))
 		})
 	}

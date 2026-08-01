@@ -70,7 +70,8 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
 		// 显式配置 ALPN 时尊重用户配置（例如填 http/1.1 可回退旧行为）。
 		options.TLS.ALPN = []string{"h2", "http/1.1"}
 	}
-	detour, err := tls.NewDialerFromOptions(ctx, router, outboundDialer, options.Server, common.PtrValueOrDefault(options.TLS))
+	// 官方 v1.13 签名：NewDialerFromOptions(ctx, logger, dialer, serverAddress, options)
+	detour, err := tls.NewDialerFromOptions(ctx, logger, outboundDialer, options.Server, common.PtrValueOrDefault(options.TLS))
 	if err != nil {
 		return nil, err
 	}

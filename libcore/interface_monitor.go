@@ -40,6 +40,7 @@ func (s *interfaceMonitorStub) UnregisterCallback(element *list.Element[tun.Defa
 func (s *interfaceMonitorStub) RegisterMyInterface(interfaceName string) {
 }
 
-func (s *interfaceMonitorStub) MyInterface() string {
-	return ""
+// sing-tun v0.8.12 起接口为 MyInterfaces() []string（旧版 MyInterface() string）
+func (s *interfaceMonitorStub) MyInterfaces() []string {
+	return nil
 }

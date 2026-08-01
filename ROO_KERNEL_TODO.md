@@ -6,6 +6,34 @@
 
 ---
 
+## 0. 实施进展（2026-08-01，第一阶段：官方内核直换，保留旧架构）
+
+**已实施**（用户方针：官方有的协议先接过去；neko 魔改才存在的 feat 先 skip + debug 日志兜底，待具体案例再修）：
+
+- [x] `get_source.sh` 改为读取 `nb4a.properties` 的 `SINGBOX_VERSION`（当前 v1.13.15），浅克隆**官方** `SagerNet/sing-box` 到 `../sing-box`；`get_source_env.sh`（fork commit 锁定）已删除；已有非官方克隆自动重定向。
+- [x] `libcore/go.mod`：删除 `libneko`、starifly/reF1nd replace；依赖版本对齐官方 sing-box v1.13.15 go.mod（Go 仍 1.24.7，无需升级工具链）。`go.sum` 不入库，`libcore/build.sh` 在 bind 前 `go mod tidy` 现场重建。
+- [x] 摘除 fork 私有依赖并自实现/替换：
+  - `libneko/neko_log` → [`libcore/log.go`](libcore/log.go)（截断式文件日志）
+  - `libneko/protect_server` → [`libcore/protect.go`](libcore/protect.go)（unix socket SCM_RIGHTS 收 fd）
+  - `libneko/speedtest` → `box.go` 自实现 `urlTest`（经默认 outbound 的 HTTP GET 计时）
+  - fork `boxapi.SbV2rayServer` → 官方 `experimental/v2rayapi.StatsService`（实现 `adapter.ConnectionTracker`，`GetStats(Reset_=true)` 取增量）
+  - fork `boxapi.CreateProxyHttpClient` → `box.go` `newProxyHTTPClient`（`b.Outbound().Default()` 拨号）
+  - fork `conntrack` → 官方无，`ResetAllConnections` 降级为 debug 日志
+  - `nekoutils.Selector_OnProxySelected` → `BoxInstance.SelectOutbound` 内包装（Clash API 路径不覆盖，见降级项）
+  - `nekoutils` geoip/geosite 钩子 → [`libcore/ruleset.go`](libcore/ruleset.go)：`box.New` 前预处理 local rule-set，官方命名（`geoip-cn`）优先指向已有 `.srs`，老格式（`geoip:cn`）从 db 转换生成 `.srs` 缓存
+- [x] `platform_box.go` 迁移到官方 `adapter.PlatformInterface`（`OpenInterface`/`FindConnectionOwner` 等新签名；JNI 侧 `BoxPlatformInterface` 未变，Kotlin 零改动）。
+- [x] `box_include.go` 摘除官方没有的 SSR/Snell 注册；`protocol/http`、`protocol/juicity` 适配官方 `tls.NewDialerFromOptions`/`tls.NewSTDClient` 新签名（多 logger 参数）；`interface_monitor.go` 适配 sing-tun v0.8.12（`MyInterfaces() []string`）。
+- [x] CI（ci.yml/preview.yml）libcore 缓存 key 纳入 `nb4a.properties`（SINGBOX_VERSION 变更触发内核重编）。
+- [x] 静态校验脚本：[`roo_check_imports.py`](roo_check_imports.py)（import 路径 + fork 残留）、[`roo_check_symbols.py`](roo_check_symbols.py)（官方符号存在性），`uv run` 执行，均通过。
+
+**已知降级项**（debug 日志兜底，待用户反馈具体案例）：SSR/Snell 节点（官方无）、`ResetAllConnections`、Clash API（yacd）切换 selector 不触发 `selector_OnProxySelected` 回调。
+
+**遗留风险**（只能 CI 验证）：quic-go v0.59 http3 API（`http.go` TryH3Direct）、`dyhkwong/sing-juicity` 与新 sing/sing-quic 的编译兼容、`option.DefaultRule`→`DefaultHeadlessRule` 字段类型。
+
+**下一阶段**：按本文档阶段 3 做 Kotlin 侧适配（husi 风格 Service/Client 模型）或维持现状先功能回归（阶段 4）。
+
+---
+
 ## 1. 结论摘要
 
 | 维度 | ThroneForAndroid（现状） | husi（参考目标） |
