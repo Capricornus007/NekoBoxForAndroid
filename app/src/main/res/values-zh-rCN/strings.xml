@@ -714,7 +714,7 @@
     <string name="clear_cache_success">缓存已清除</string>
     <string name="clear_cache_failed">清除缓存失败：%s</string>
     <string name="concurrent_dial">并发拨号</string>
-    <string name="concurrent_dial_summary">启用并发连接以加快网络建立，可能会增加电池消耗</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">测试超时（毫秒）</string>
     <string name="preview_version_hint">此应用程序为预览版，可能包含许多问题。如果您不想测试，请前往GitHub下载Release版本！</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
