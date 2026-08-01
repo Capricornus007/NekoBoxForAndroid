@@ -67,6 +67,10 @@ class ConfigBuildResult(
     val selectorGroupId: Long,
 ) {
     data class IndexEntity(var chain: LinkedHashMap<Int, ProxyEntity>)
+
+    // forTest 配置为该测试实例生成的独立临时 cache 文件名（相对 no_backup 工作目录），
+    // 测速完成后由 TestInstance 删除；非测速配置恒为 null。
+    var testCacheFile: String? = null
 }
 
 private fun sanitizeDnsEntry(value: String): String {
@@ -230,8 +234,25 @@ fun buildConfig(
         }
     }
 
+    var testCacheFile: String? = null
     return MyOptions().apply {
-	if (!forTest) {
+ if (forTest) {
+            // 官方内核在 PlatformLogWriter != nil 时无条件创建 CacheFile 与 ClashServer
+            // （sing-box box.go 的 needCacheFile/needClashAPI），测试实例无法关闭。
+            // 不显式给 path 时所有实例共用工作目录（no_backup）下的 cache.db：主进程批量
+            // 测速会并发创建大量 TestInstance 共享同一 bbolt 文件，freelist 被写坏后，
+            // 每次 box.Start 的清理 batch 在 bbolt 定时器 goroutine 中 panic（该 panic 在
+            // 异步 goroutine 中，cachefile 的 recover 兜不住）→ 主进程 SIGABRT 闪退。
+            // 故为每个测试实例分配独立临时文件相互隔离，测完由 TestInstance 删除。
+            val testCacheFileName = "urltest_" + proxy.id + "_" + System.nanoTime() + ".db"
+            testCacheFile = testCacheFileName
+            experimental = ExperimentalOptions().apply {
+                cache_file = CacheFile().apply {
+                    enabled = true
+                    path = testCacheFileName
+                }
+            }
+        } else {
             experimental = ExperimentalOptions().apply {
                 cache_file = CacheFile().apply {
                     enabled = true
@@ -240,7 +261,7 @@ fun buildConfig(
                     store_fakeip = true
                     // }
                 }
-                
+
                 if (DataStore.enableClashAPI) {
                     clash_api = ClashAPIOptions().apply {
                         external_controller = "127.0.0.1:9090"
@@ -1086,7 +1107,7 @@ fun buildConfig(
             trafficMap,
             tagMap,
             if (buildSelector) group.id else -1L
-        )
+        ).also { it.testCacheFile = testCacheFile }
     }
 
 }

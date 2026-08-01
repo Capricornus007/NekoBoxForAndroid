@@ -58,6 +58,18 @@ class SagerNet : Application(),
 
         if (isMainProcess || isBgProcess) {
             externalAssets.mkdirs()
+            // 官方内核在 PlatformLogWriter != nil 时会为每个 box 强制创建 CacheFile，
+            // 无显式 path 时共用工作目录（no_backup）下的 cache.db。主进程批量测速的
+            // 并发 TestInstance 曾共享该文件导致 bbolt freelist 损坏（"page already freed"
+            // panic 在异步 batch goroutine 中无法 recover → SIGABRT 闪退），且损坏文件
+            // 能正常打开、提交时才崩，官方 Open 阶段的校验发现不了。
+            // 现测试实例已改用独立临时文件（ConfigBuilder forTest 分支），这里在进程启动、
+            // 尚无 box 打开时清扫存量损坏文件及残留临时文件，实现老用户自愈。
+            runCatching {
+                File(noBackupFilesDir, "cache.db").delete()
+                noBackupFilesDir.listFiles { file -> file.name.startsWith("urltest_") }
+                    ?.forEach { it.delete() }
+            }
             Seq.setContext(this)
             Libcore.initCore(
                 process,
