@@ -29,7 +29,7 @@ Android 端的代码主要分为两个核心包：
 - [`io/nekohasekai/sagernet/database/`](app/src/main/java/io/nekohasekai/sagernet/database): 数据库与偏好设置模块。
   - `SagerDatabase.kt`: Room 数据库定义，存储代理配置、分组、规则等。
   - `ProfileManager.kt` / `GroupManager.kt`: 配置和分组管理器。
-- [`io/nekohasekai/sagernet/fmt/`](app/src/main/java/io/nekohasekai/sagernet/fmt): 各种代理协议的配置格式化与解析。`ConfigBuilder.kt` 生成 sing-box 配置，已对齐官方 v1.13 schema：入站 sniff/解析目标地址迁移为路由规则动作（`sniff`/`resolve`，置于规则最前）；`concurrent_dial` 映射为 `default_network_strategy: "hybrid"`；DNS 地址 `hosts` 归一化为 `local`。
+- [`io/nekohasekai/sagernet/fmt/`](app/src/main/java/io/nekohasekai/sagernet/fmt): 各种代理协议的配置格式化与解析。`ConfigBuilder.kt` 生成 sing-box 配置，已对齐官方 v1.13 schema：入站 sniff/解析目标地址迁移为路由规则动作（`sniff`/`resolve`，置于规则最前）；tun 地址用合并字段 `address`（`inet4_address`/`endpoint_independent_nat` 等 legacy 字段已弃用）；`concurrent_dial` 映射为 `default_network_strategy: "hybrid"`；DNS 地址 `hosts` 归一化为 `local`。
   - 支持 Shadowsocks, VMess, Trojan, Hysteria, Juicity, Naive, WireGuard 等协议的配置解析与转换。
   - `SingBoxOutboundParser.kt`: 将 sing-box 配置中的单个 outbound JSON 还原为原生协议 Bean（支持 shadowsocks/vmess/vless/trojan/hysteria/hysteria2/tuic/socks/http/wireguard/anytls，含 TLS/transport/multiplex 子块解析）。用于订阅返回完整 sing-box 配置（含 `outbounds`）的场景：`RawUpdater.parseJSON` 的 `outbounds` 分支对每个 outbound 优先调用 `parseSingBoxOutbound()` 还原原生节点，不支持的类型或解析失败时回退为 `ConfigBean`（自定义 JSON）；`dns`/`block`/`direct`/`selector`/`urltest` 类型的 outbound 始终跳过。
 - [`io/nekohasekai/sagernet/ui/`](app/src/main/java/io/nekohasekai/sagernet/ui): 各种 Activity 和 Fragment 界面。

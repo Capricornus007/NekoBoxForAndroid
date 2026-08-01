@@ -2829,11 +2829,8 @@ public class SingBoxOptions {
 
         public Integer mtu;
 
-        // Generate note: Listable
-        public List<String> inet4_address;
-
-        // Generate note: Listable
-        public List<String> inet6_address;
+        // Generate note: Listable（sing-box 1.12 起替代 inet4_address/inet6_address 的合并字段）
+        public List<String> address;
 
         public Boolean auto_route;
 

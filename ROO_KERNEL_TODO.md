@@ -30,6 +30,7 @@
   - `route.concurrent_dial` 1.13 已删除（`box.New` 报 unknown field 直接崩，内核完全起不来）→ 映射为官方替代 `default_network_strategy: "hybrid"`（WiFi/移动数据并发竞速拨号）；设置项保留，7 语言摘要改为明确说明（需 WiFi+移动数据同开、更耗电），防小白盲开
   - 入站 `sniff`/`sniff_override_destination`/`domain_strategy` 字段 1.13 硬错误（legacy inbound fields removed，tun/mixed 均中招）→ 迁移为路由规则动作 `{"action":"sniff"}` / `{"action":"resolve","strategy":...}`（置于规则最前）；`sniff_override_destination` 官方无替代（`OverrideDestination` 已成死代码），`trafficSniffing` 设置退化为 关/开 两档（`traffic_sniffing_values` 数组缩减，存量值 "2" 按开启处理）
   - DNS 地址 `hosts`（旧 fork=系统解析器）：官方 legacy 升级把裸 `hosts` 静默误判为 UDP 服务器域名（远程 DNS 全灭且不报错）→ `normalizeDnsAddress()` 归一化为 `local`（direct/remote/订阅 resolver 三处）
+  - tun 入站 `inet4_address`/`inet6_address`：字段虽仍在结构体（可解析），但构造函数硬报错（1.12 已移除，`initialize inbound[0]` 失败）→ 迁移为合并字段 `address`；`endpoint_independent_nat` 同步停止发射（官方已移除语义，当前无硬检查但迟早硬化）。Kotlin 侧 `startVpn` 不解析 tun JSON（地址/路由/MTU 用 DataStore），零影响
 
 **已知降级项**（debug 日志兜底，待用户反馈具体案例）：SSR/Snell 节点（官方无）、`ResetAllConnections`、Clash API（yacd）切换 selector 不触发 `selector_OnProxySelected` 回调、**WireGuard 节点**（官方 1.13 仅支持 endpoint 形态，而 [`WireGuardFmt.kt`](app/src/main/java/io/nekohasekai/sagernet/fmt/wireguard/WireGuardFmt.kt) 仍生成 outbound 配置，`box.New` 会报 stub 错误；需做配置生成的 outbound→endpoint 迁移：`Outbound_WireGuardOptions` → `Endpoint_WireGuardOptions` 并写入 `endpoints` 数组，字段结构有差异需对照 `option/wireguard.go`）。
 
