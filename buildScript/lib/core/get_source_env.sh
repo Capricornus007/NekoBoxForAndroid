@@ -1,4 +1,4 @@
-export COMMIT_SING_BOX="9cefe6270c9e21fa81d4c73e3d1c97413fd50b92"
+export COMMIT_SING_BOX="9cefe6270237110ece44e24ee60d51650448a11e"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
