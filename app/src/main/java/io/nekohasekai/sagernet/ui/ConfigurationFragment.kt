@@ -1095,6 +1095,9 @@ class ConfigurationFragment @JvmOverloads constructor(
                         } catch (e: Exception) {
                             profile.status = 3
                             profile.error = e.readableMessage
+                            // 诊断日志：批量测速失败原因临时记录，用于确认
+                            // "no available network interface"（接口监视器竞态）假设
+                            Logs.w("URLTest ${profile.displayName()}: ${e.readableMessage}")
                         }
 
                         test.update(profile)
