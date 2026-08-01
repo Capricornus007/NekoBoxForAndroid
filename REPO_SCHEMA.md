@@ -61,7 +61,7 @@ Go 语言编写的底层核心，负责高性能的网络处理。**内核为官
 - [`libcore/log.go`](libcore/log.go): `neko_log` 的自实现替代（带大小截断的文件日志 writer，接管标准库 log）。
 - [`libcore/protect.go`](libcore/protect.go): `libneko/protect_server` 的自实现替代（unix socket 接收主进程经 SCM_RIGHTS 发来的 fd 并回调 `VpnService.protect`）。
 - [`libcore/ruleset.go`](libcore/ruleset.go): geo 规则集预处理（替代 fork 的 `nekoutils` geoip/geosite 钩子）。官方 local rule-set 只认真实文件路径，本模块在 `box.New` 前改写配置：官方格式（`geoip-cn`/`geosite-cn`）优先指向 `<externalAssets>/` 下已存在的官方 `.srs`；老 nb4a 格式（`geoip:cn`/`geosite:cn`）或官方 `.srs` 缺失时，从本地 `geoip.db`/`geosite.db` 转换生成 `.srs` 缓存（`<externalAssets>/srs/`，db 更新后自动重建）。
-- [`libcore/build.sh`](libcore/build.sh): 编译 Go 核心的本地脚本（gomobile bind 前先 `go mod tidy`：go.sum 不入库，由构建时现场重建；go.mod 直接依赖版本已按官方 sing-box go.mod 钉死）。
+- [`libcore/build.sh`](libcore/build.sh): 编译 Go 核心的本地脚本（gomobile bind 前先 `go mod tidy`：go.sum 不入库，由构建时现场重建；go.mod 直接依赖版本已按官方 sing-box go.mod 钉死）。bind 时从 `nb4a.properties` 读取 `SINGBOX_VERSION`，经 `-ldflags "-X github.com/sagernet/sing-box/constant.Version=..."` 注入内核版本号（官方 `constant.Version` 默认为 `"unknown"`，不注入则关于页 sing-box 版本显示 unknown）。
 - [`libcore/device/`](libcore/device/), [`ech/`](libcore/ech/), [`procfs/`](libcore/procfs/), [`stun/`](libcore/stun/): Go 核心的子模块，处理设备、ECH、进程文件系统和 STUN 测试。
 - [`libcore/protocol/`](libcore/protocol/): libcore 侧自定义/覆盖的 sing-box 协议实现，在 [`libcore/box_include.go`](libcore/box_include.go) 中注册。
   - `juicity/`: Juicity outbound（官方内核无此协议，基于 `dyhkwong/sing-juicity`）。
