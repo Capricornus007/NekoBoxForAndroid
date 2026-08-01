@@ -728,7 +728,7 @@
     <string name="clear_cache_success">تم مسح ذاكرة التخزين المؤقت</string>
     <string name="clear_cache_failed">فشل مسح ذاكرة التخزين المؤقت: %s</string>
     <string name="concurrent_dial">اتصال متزامن</string>
-    <string name="concurrent_dial_summary">تمكين الاتصالات المتزامنة لإنشاء الشبكة بشكل أسرع، قد يزيد من استهلاك البطارية</string>
+    <string name="concurrent_dial_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">مهلة الاختبار (مللي ثانية)</string>
     <string name="preview_version_hint">هذا التطبيق هو إصدار تجريبي وقد يحتوي على العديد من المشاكل. إذا كنت لا ترغب في اختباره، فيرجى زيارة GitHub لتنزيل إصدار الإصدار!</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
