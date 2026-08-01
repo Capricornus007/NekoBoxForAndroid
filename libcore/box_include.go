@@ -5,6 +5,7 @@ import (
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/adapter/endpoint"
+	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/adapter/inbound"
 	"github.com/sagernet/sing-box/adapter/outbound"
 	"github.com/sagernet/sing-box/adapter/service"
@@ -27,9 +28,7 @@ import (
 	"github.com/sagernet/sing-box/protocol/mixed"
 	"github.com/sagernet/sing-box/protocol/redirect"
 	"github.com/sagernet/sing-box/protocol/shadowsocks"
-	"github.com/sagernet/sing-box/protocol/shadowsocksr"
 	"github.com/sagernet/sing-box/protocol/shadowtls"
-	snellprotocol "github.com/sagernet/sing-box/protocol/snell"
 	"github.com/sagernet/sing-box/protocol/socks"
 	"github.com/sagernet/sing-box/protocol/ssh"
 	"github.com/sagernet/sing-box/protocol/tor"
@@ -45,6 +44,8 @@ import (
 
 	_ "github.com/sagernet/sing-box/experimental/clashapi"
 	_ "github.com/sagernet/sing-box/transport/v2rayquic"
+
+	E "github.com/sagernet/sing/common/exceptions"
 )
 
 func nekoboxAndroidInboundRegistry() *inbound.Registry {
@@ -76,7 +77,9 @@ func nekoboxAndroidOutboundRegistry() *outbound.Registry {
 	socks.RegisterOutbound(registry)
 	http.RegisterOutbound(registry)
 	shadowsocks.RegisterOutbound(registry)
-	shadowsocksr.RegisterOutbound(registry)
+	// 官方内核无 shadowsocksr / snell（starifly fork 私有），按迁移方针先摘除；
+	// 配置中含这两类 outbound 时 box.New 会报 "unknown outbound type" 直接失败，
+	// 待有具体用户案例再评估替代实现。
 	vmess.RegisterOutbound(registry)
 	trojan.RegisterOutbound(registry)
 	tor.RegisterOutbound(registry)
@@ -84,7 +87,6 @@ func nekoboxAndroidOutboundRegistry() *outbound.Registry {
 	shadowtls.RegisterOutbound(registry)
 	vless.RegisterOutbound(registry)
 	anytls.RegisterOutbound(registry)
-	snellprotocol.RegisterOutbound(registry)
 
 	hysteria.RegisterOutbound(registry)
 	tuic.RegisterOutbound(registry)

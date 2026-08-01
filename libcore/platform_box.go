@@ -9,11 +9,12 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/matsuridayo/libneko/neko_log"
 	"github.com/sagernet/sing-box/adapter"
 	sblog "github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	tun "github.com/sagernet/sing-tun"
+	"github.com/sagernet/sing/common"
+	"github.com/sagernet/sing/common/control"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
 )
@@ -99,7 +100,7 @@ func (w *boxPlatformInterfaceWrapper) UsePlatformDefaultInterfaceMonitor() bool 
 }
 
 func (w *boxPlatformInterfaceWrapper) CreateDefaultInterfaceMonitor(l logger.Logger) tun.DefaultInterfaceMonitor {
-	return &interfaceMonitorStub{}
+	return newInterfaceMonitor(w, l)
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformNetworkInterfaces() bool {
@@ -205,7 +206,6 @@ func (w *boxPlatformInterfaceWrapper) SendNotification(notification *adapter.Not
 var disableSingBoxLog = false
 
 func (w *boxPlatformInterfaceWrapper) Write(p []byte) (n int, err error) {
-	// use neko_log
 	if !disableSingBoxLog {
 		log.Print(string(p))
 	}
@@ -219,11 +219,9 @@ type boxPlatformLogWriterWrapper struct {
 
 var boxPlatformLogWriter sblog.PlatformWriter = &boxPlatformLogWriterWrapper{}
 
-func (w *boxPlatformLogWriterWrapper) DisableColors() bool { return true }
-
-func (w *boxPlatformLogWriterWrapper) WriteMessage(level uint8, message string) {
+func (w *boxPlatformLogWriterWrapper) WriteMessage(level sblog.Level, message string) {
 	if !strings.HasSuffix(message, "\n") {
 		message += "\n"
 	}
-	neko_log.LogWriter.Write([]byte(message))
+	platformLog.Write([]byte(message))
 }

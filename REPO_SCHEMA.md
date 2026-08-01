@@ -29,7 +29,7 @@ Android 端的代码主要分为两个核心包：
 - [`io/nekohasekai/sagernet/database/`](app/src/main/java/io/nekohasekai/sagernet/database): 数据库与偏好设置模块。
   - `SagerDatabase.kt`: Room 数据库定义，存储代理配置、分组、规则等。
   - `ProfileManager.kt` / `GroupManager.kt`: 配置和分组管理器。
-- [`io/nekohasekai/sagernet/fmt/`](app/src/main/java/io/nekohasekai/sagernet/fmt): 各种代理协议的配置格式化与解析。
+- [`io/nekohasekai/sagernet/fmt/`](app/src/main/java/io/nekohasekai/sagernet/fmt): 各种代理协议的配置格式化与解析。`ConfigBuilder.kt` 生成 sing-box 配置，已对齐官方 v1.13 schema：入站 sniff/解析目标地址迁移为路由规则动作（`sniff`/`resolve`，置于规则最前）；tun 地址用合并字段 `address`（`inet4_address`/`endpoint_independent_nat` 等 legacy 字段已弃用）；`concurrent_dial` 映射为 `default_network_strategy: "hybrid"`；DNS 地址 `hosts` 归一化为 `local`。
   - 支持 Shadowsocks, VMess, Trojan, Hysteria, Juicity, Naive, WireGuard 等协议的配置解析与转换。
   - `SingBoxOutboundParser.kt`: 将 sing-box 配置中的单个 outbound JSON 还原为原生协议 Bean（支持 shadowsocks/vmess/vless/trojan/hysteria/hysteria2/tuic/socks/http/wireguard/anytls，含 TLS/transport/multiplex 子块解析）。用于订阅返回完整 sing-box 配置（含 `outbounds`）的场景：`RawUpdater.parseJSON` 的 `outbounds` 分支对每个 outbound 优先调用 `parseSingBoxOutbound()` 还原原生节点，不支持的类型或解析失败时回退为 `ConfigBean`（自定义 JSON）；`dns`/`block`/`direct`/`selector`/`urltest` 类型的 outbound 始终跳过。
 - [`io/nekohasekai/sagernet/ui/`](app/src/main/java/io/nekohasekai/sagernet/ui): 各种 Activity 和 Fragment 界面。
@@ -54,14 +54,20 @@ Android 端的代码主要分为两个核心包：
 ---
 
 ### 1.3 底层核心模块 (`libcore/`)
-Go 语言编写的底层核心，负责高性能的网络处理：
+Go 语言编写的底层核心，负责高性能的网络处理。**内核为官方 `SagerNet/sing-box`**（版本由 [`nb4a.properties`](nb4a.properties) 的 `SINGBOX_VERSION` 指定，构建时克隆官方源码，无任何 fork/魔改；原 starifly fork、`libneko`、`nekoutils`、`boxapi`、`conntrack` 依赖已全部摘除）：
 - [`libcore/nb4a.go`](libcore/nb4a.go): Go 核心的入口，导出 `InitCore` 等函数，供 Android 端通过 JNI 调用。
-- [`libcore/box.go`](libcore/box.go) / [`box_include.go`](libcore/box_include.go): 与 `sing-box` 核心的集成与初始化。
-- [`libcore/build.sh`](libcore/build.sh): 编译 Go 核心的本地脚本。
+- [`libcore/box.go`](libcore/box.go) / [`box_include.go`](libcore/box_include.go): 与 `sing-box` 核心的集成与初始化。流量统计使用官方 `experimental/v2rayapi.StatsService`；`UrlTest` 为自实现（经 box 默认 outbound 拨号的 HTTP GET 计时，替代 libneko/speedtest）；`ResetAllConnections` 因官方无 conntrack 暂为 debug 日志兜底。SSR/Snell 协议官方内核不支持，已摘除（配置含此类节点时 `box.New` 报错，待有具体案例再评估）。WireGuard 官方 1.13 起仅支持 endpoint（outbound 已移除），`box_include.go` 镜像官方注册了报错 stub；Kotlin 侧 `WireGuardFmt` 的 outbound→endpoint 配置迁移待做（见 ROO_KERNEL_TODO 已知降级项）。
+- [`libcore/platform_box.go`](libcore/platform_box.go): 实现官方 `adapter.PlatformInterface`（旧 `experimental/libbox/platform` 包已不存在）：TUN 创建（`OpenInterface`）、fd protect、按应用分包（`FindConnectionOwner`）、默认接口监视器、平台网络接口枚举（`NetworkInterfaces`，官方拨号路径硬性要求）等。[`libcore/interface_monitor.go`](libcore/interface_monitor.go): 完整 `tun.DefaultInterfaceMonitor` 实现：Kotlin 经 JNI 回调 `InterfaceUpdateListener.UpdateDefaultInterface` 上报物理默认接口（复用 app 侧 `DefaultNetworkListener`，避开 VPN 接口）。[`libcore/network_interface.go`](libcore/network_interface.go) / [`iterator.go`](libcore/iterator.go) / [`link_flags_unix.go`](libcore/link_flags_unix.go): `GetInterfaces` JNI 桥接类型与转换辅助；Kotlin 侧 `NativeInterface.getInterfaces()` 枚举网络接口（类型/MTU/地址/flags/metered）。JNI 侧 `BoxPlatformInterface` 相应新增 `StartDefaultInterfaceMonitor`/`CloseDefaultInterfaceMonitor`/`GetInterfaces`。
+- [`libcore/log.go`](libcore/log.go): `neko_log` 的自实现替代（带大小截断的文件日志 writer，接管标准库 log）。
+- [`libcore/protect.go`](libcore/protect.go): `libneko/protect_server` 的自实现替代（unix socket 接收主进程经 SCM_RIGHTS 发来的 fd 并回调 `VpnService.protect`）。
+- [`libcore/ruleset.go`](libcore/ruleset.go): geo 规则集预处理（替代 fork 的 `nekoutils` geoip/geosite 钩子）。官方 local rule-set 只认真实文件路径，本模块在 `box.New` 前改写配置：官方格式（`geoip-cn`/`geosite-cn`）优先指向 `<externalAssets>/` 下已存在的官方 `.srs`；老 nb4a 格式（`geoip:cn`/`geosite:cn`）或官方 `.srs` 缺失时，从本地 `geoip.db`/`geosite.db` 转换生成 `.srs` 缓存（`<externalAssets>/srs/`，db 更新后自动重建）。
+- [`libcore/build.sh`](libcore/build.sh): 编译 Go 核心的本地脚本（gomobile bind 前先 `go mod tidy`：go.sum 不入库，由构建时现场重建；go.mod 直接依赖版本已按官方 sing-box go.mod 钉死）。
 - [`libcore/device/`](libcore/device/), [`ech/`](libcore/ech/), [`procfs/`](libcore/procfs/), [`stun/`](libcore/stun/): Go 核心的子模块，处理设备、ECH、进程文件系统和 STUN 测试。
 - [`libcore/protocol/`](libcore/protocol/): libcore 侧自定义/覆盖的 sing-box 协议实现，在 [`libcore/box_include.go`](libcore/box_include.go) 中注册。
-  - `juicity/`: Juicity outbound。
+  - `juicity/`: Juicity outbound（官方内核无此协议，基于 `dyhkwong/sing-juicity`）。
   - `http/`: 对 sing-box `http` outbound 的**覆盖实现**（在 sing-box 自身注册之后再次注册同名 `"http"` 类型，registry 后注册生效）。行为差异：TLS 启用且用户未显式配置 ALPN 时默认提供 `["h2", "http/1.1"]`，TLS 握手后按 ALPN 协商结果分流——协商到 `h2` 走 HTTP/2 CONNECT（基于 `golang.org/x/net/http2`，上行流为 `io.Pipe` 请求体、响应体为下行流），否则保持原有 HTTP/1.1 CONNECT。用于兼容 h2-only 的 HTTPS 代理节点（对齐 v2ray 系核心行为）；用户可在节点配置中显式填写 ALPN=`http/1.1` 回退旧行为。
+
+> 内核迁移的完整调研与后续计划见 [`ROO_KERNEL_TODO.md`](ROO_KERNEL_TODO.md)。已知降级项（debug 日志兜底，待用户反馈后按案例修）：SSR/Snell 节点、`ResetAllConnections`（重置连接）、通过 Clash API（yacd 面板）切换 selector 节点不触发 `selector_OnProxySelected` 回调（app 内切换不受影响）、WireGuard 节点（配置生成需从 outbound 迁移为 endpoint）。
 
 ---
 
@@ -69,7 +75,8 @@ Go 语言编写的底层核心，负责高性能的网络处理：
 
 项目的构建分为两步：
 1. **编译底层 Go 核心**：
-   - 使用 `gomobile` 工具，运行 `buildScript/lib/core/build.sh` 或 `libcore/build.sh`。
+   - 源码获取：[`buildScript/lib/core/get_source.sh`](buildScript/lib/core/get_source.sh) 读取 `nb4a.properties` 的 `SINGBOX_VERSION`，将**官方** `SagerNet/sing-box` 浅克隆到仓库同级目录 `../sing-box`（`libcore/go.mod` 以 `replace` 指向它）；已存在的非官方（旧 fork）克隆会被强制重定向到官方仓库。
+   - 使用 `gomobile` 工具，运行 `buildScript/lib/core/build.sh` 或 `libcore/build.sh`（bind 前先 `go mod tidy` 重建依赖锁定）。
    - 编译生成 `app/libs/libcore.aar` 库。
 2. **编译 Android 应用程序**：
    - 使用 Gradle 编译 Android 应用。

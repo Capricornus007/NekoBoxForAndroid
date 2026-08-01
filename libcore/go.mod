@@ -3,7 +3,8 @@ module libcore
 go 1.26.4
 
 require (
-	github.com/dyhkwong/sing-juicity v0.0.3
+	// v0.1.6签名与 v1.13.15 锁定版一致。
+	github.com/exclavenetwork/sing-juicity v0.1.6
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/matsuridayo/libneko v1.0.0 // replaced
 	github.com/miekg/dns v1.1.72
