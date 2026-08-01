@@ -566,8 +566,8 @@
     <string name="clear_cache_confirm">确定要清理缓存吗？</string>
     <string name="clear_cache_success">缓存已清理</string>
     <string name="clear_cache_failed">清理缓存失败: %s</string>
-    <string name="concurrent_dial">并发拨号</string>
-    <string name="concurrent_dial_summary">使用WiFi/移动数据并发连接。需要系统中保持WiFi与移动数据同时开启，且会增加耗电量。</string>
+    <string name="dual_network_acceleration">双网络加速</string>
+    <string name="dual_network_acceleration_summary">使用WiFi/移动数据并发连接。需要系统中保持WiFi与移动数据同时开启，且会增加耗电量。</string>
     <string name="layout">布局</string>
     <string name="layout_single_column">单列</string>
     <string name="layout_double_column">双列</string>

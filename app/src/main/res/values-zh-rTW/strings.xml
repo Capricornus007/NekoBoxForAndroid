@@ -569,8 +569,8 @@
     <string name="clear_cache_confirm">確定要清理快取嗎？</string>
     <string name="clear_cache_success">快取已清理</string>
     <string name="clear_cache_failed">清理快取失敗: %s</string>
-    <string name="concurrent_dial">併發撥號</string>
-    <string name="concurrent_dial_summary">使用WiFi/行動數據併發連線。需要系統中保持WiFi與行動數據同時開啟，且會增加耗電量。</string>
+    <string name="dual_network_acceleration">雙網路加速</string>
+    <string name="dual_network_acceleration_summary">使用WiFi/行動數據併發連線。需要系統中保持WiFi與行動數據同時開啟，且會增加耗電量。</string>
     <string name="connection_test_timeout">測試超時（ms）</string>
     <string name="preview_version_hint">本應用為預覽版，可能存在諸多問題。若您不願參與測試，請前往GitHub下載正式釋出版本！</string>
     <string name="preview_hint_dont_show_again">不再顯示</string>

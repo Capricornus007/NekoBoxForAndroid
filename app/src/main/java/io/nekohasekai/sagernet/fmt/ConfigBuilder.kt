@@ -331,8 +331,8 @@ fun buildConfig(
             rules = mutableListOf()
             rule_set = mutableListOf()
 
-            // sing-box 1.13 中 route.concurrent_dial 替代为网络策略：hybrid = 在所有可用网络接口（WiFi/移动数据）上并发竞速拨号。
-            if (DataStore.concurrentDial) default_network_strategy = "hybrid"
+            // 双网络加速：hybrid = 在所有可用网络接口（WiFi/移动数据）上并发传输
+            if (DataStore.dualNetworkAcceleration) default_network_strategy = "hybrid"
         }
 
         // returns outbound tag

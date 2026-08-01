@@ -618,8 +618,8 @@
     <string name="clear_cache_confirm">آیا مطمئنید می‌خواهید حافظهٔ پنهان را پاک کنید؟</string>
     <string name="clear_cache_success">حافظهٔ پنهان پاک شد</string>
     <string name="clear_cache_failed">پاک‌سازی حافظهٔ پنهان ناموفق بود: %s</string>
-    <string name="concurrent_dial">اتصال هم‌زمان</string>
-    <string name="concurrent_dial_summary">اتصال هم‌زمان از طریق Wi-Fi و دادهٔ موبایل؛ نیازمند روشن بودن هم‌زمان Wi-Fi و دادهٔ موبایل در تنظیمات سیستم است و مصرف باتری را افزایش می‌دهد.</string>
+    <string name="dual_network_acceleration">شتاب‌دهی دو شبکه‌ای</string>
+    <string name="dual_network_acceleration_summary">اتصال هم‌زمان از طریق Wi-Fi و دادهٔ موبایل؛ نیازمند روشن بودن هم‌زمان Wi-Fi و دادهٔ موبایل در تنظیمات سیستم است و مصرف باتری را افزایش می‌دهد.</string>
     <string name="connection_test_timeout">مهلت آزمایش (ms)</string>
     <string name="preview_version_hint">این برنامه نسخهٔ پیش‌نمایش است و ممکن است مشکلات زیادی داشته باشد. اگر نمی‌خواهید آن را آزمایش کنید، لطفاً برای دانلود نسخهٔ Release به GitHub بروید!</string>
     <string name="preview_hint_dont_show_again">دوباره نشان نده</string>

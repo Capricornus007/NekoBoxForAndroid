@@ -625,8 +625,8 @@
     <string name="clear_cache_confirm">Вы уверены, что хотите очистить кэш?</string>
     <string name="clear_cache_success">Кэш очищен</string>
     <string name="clear_cache_failed">Не удалось очистить кэш: %s</string>
-    <string name="concurrent_dial">Параллельное подключение</string>
-    <string name="concurrent_dial_summary">Одновременное подключение через Wi-Fi и мобильные данные. Требует, чтобы Wi-Fi и мобильные данные были включены в системе, и увеличивает расход батареи.</string>
+    <string name="dual_network_acceleration">Двойное сетевое ускорение</string>
+    <string name="dual_network_acceleration_summary">Одновременное подключение через Wi-Fi и мобильные данные. Требует, чтобы Wi-Fi и мобильные данные были включены в системе, и увеличивает расход батареи.</string>
     <string name="connection_test_timeout">Тайм-аут проверки (мс)</string>
     <string name="xhttp_host">XHTTP Host</string>
     <string name="xhttp_path">XHTTP Path</string>
