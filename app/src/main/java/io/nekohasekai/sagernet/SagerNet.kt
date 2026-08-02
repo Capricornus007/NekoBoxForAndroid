@@ -61,6 +61,9 @@ class SagerNet :
         if (isMainProcess || isBgProcess) {
             externalAssets.mkdirs()
             Seq.setContext(this)
+            // notification channels MUST exist before :bg calls startForeground()
+            // (Android 16 enforces this strictly, CannotPostForegroundServiceNotificationException)
+            updateNotificationChannels()
             // Prime the cached configurationStore off the main thread before the first
             // synchronous read below (logBufSize/logLevel). PublicDatabase no longer allows
             // main-thread queries, so the bulk-SELECT prime must run on PrefSnapshotExecutor;
