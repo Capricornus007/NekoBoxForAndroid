@@ -346,14 +346,6 @@
     <string name="route_warn">تأكد من قراءة الوثائق قبل إضافة قواعد مخصصة،
         وإلا فقد لا تتمكن من الاتصال بالإنترنت.</string>
     <string name="lines">%d خطوط</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="zero">0 أسطر</item>
-        <item quantity="one">سطر واحد</item>
-        <item quantity="two">سطران</item>
-        <item quantity="few">%d أسطر</item>
-        <item quantity="many">%d سطرًا</item>
-        <item quantity="other">%d سطر</item>
-    </plurals>
     <string name="not_set">غير مضبوط</string>
     <string name="night_mode">الوضع الليلي</string>
     <string name="language">اللّغة</string>

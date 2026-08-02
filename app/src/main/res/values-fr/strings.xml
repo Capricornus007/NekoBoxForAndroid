@@ -346,10 +346,6 @@
     <string name="route_warn">Assurez-vous d\'avoir lu la documentation avant d\'ajouter des règles personnalisées,
         sinon vous pourriez ne pas pouvoir vous connecter à Internet.</string>
     <string name="lines">%d lignes</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="one">%d ligne</item>
-        <item quantity="other">%d lignes</item>
-    </plurals>
     <string name="not_set">Non défini</string>
     <string name="night_mode">Mode nuit</string>
     <string name="language">Langue</string>

@@ -337,10 +337,6 @@
     <string name="license">Lisens</string>
     <string name="route_warn">Sørg for at du har lest dokumentasjonen før du legger til egne regler, ellers kan du miste internettforbindelsen.</string>
     <string name="lines">%d linjer</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="one">%d linje</item>
-        <item quantity="other">%d linjer</item>
-    </plurals>
     <string name="not_set">Ikke satt</string>
     <string name="night_mode">Nattmodus</string>
     <string name="language">Språk</string>

@@ -338,10 +338,6 @@
     <string name="license">Lizenz</string>
     <string name="route_warn">Stellen Sie sicher, dass Sie die Dokumentation gelesen haben, bevor Sie benutzerdefinierte Regeln hinzufügen, da Sie sonst möglicherweise keine Verbindung zum Internet herstellen können.</string>
     <string name="lines">%d Zeilen</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="one">%d Zeile</item>
-        <item quantity="other">%d Zeilen</item>
-    </plurals>
     <string name="not_set">Nicht gesetzt</string>
     <string name="night_mode">Nachtmodus</string>
     <string name="language">Sprache</string>

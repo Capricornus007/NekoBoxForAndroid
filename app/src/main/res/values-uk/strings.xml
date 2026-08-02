@@ -345,12 +345,6 @@
     <string name="route_warn">Переконайтеся, що ви прочитали документацію перед додаванням власних правил,
         інакше ви можете не мати доступу до Інтернету.</string>
     <string name="lines">%d рядків</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="one">%d рядок</item>
-        <item quantity="few">%d рядки</item>
-        <item quantity="many">%d рядків</item>
-        <item quantity="other">%d рядків</item>
-    </plurals>
     <string name="not_set">Не встановлено</string>
     <string name="night_mode">Нічний режим</string>
     <string name="language">Мова</string>

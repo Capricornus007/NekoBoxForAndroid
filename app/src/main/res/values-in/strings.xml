@@ -338,9 +338,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="route_warn">Pastikan Anda telah membaca dokumentasi sebelum menambahkan aturan kustom,
         jika tidak, Anda mungkin tidak dapat terhubung ke Internet.</string>
     <string name="lines">%d Baris</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="other">%d baris</item>
-    </plurals>
     <string name="not_set">Tidak diatur</string>
     <string name="night_mode">Mode Malam</string>
     <string name="language">Bahasa</string>

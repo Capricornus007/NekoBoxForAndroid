@@ -341,10 +341,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="route_warn">Zorg ervoor dat u de documentatie heeft gelezen voordat u aangepaste regels toevoegt,
         anders kunt u mogelijk geen verbinding maken met internet.</string>
     <string name="lines">%d regels</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="one">%d regel</item>
-        <item quantity="other">%d regels</item>
-    </plurals>
     <string name="not_set">Niet ingesteld</string>
     <string name="night_mode">Nachtmodus</string>
     <string name="language">Taal</string>

@@ -341,10 +341,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="route_warn">Assicurati di aver letto la documentazione prima di aggiungere regole personalizzate,
         altrimenti potresti non riuscire a connetterti a Internet.</string>
     <string name="lines">%d righe</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="one">%d riga</item>
-        <item quantity="other">%d righe</item>
-    </plurals>
     <string name="not_set">Non impostato</string>
     <string name="night_mode">Modalità notte</string>
     <string name="language">Linguaggio</string>

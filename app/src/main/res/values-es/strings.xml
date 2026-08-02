@@ -342,10 +342,6 @@
     <string name="license">Licencia</string>
     <string name="route_warn">Asegúrate de haber leído la documentación antes de agregar reglas personalizadas, de lo contrario podrías no poder conectarte a Internet.</string>
     <string name="lines">%d Líneas</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="one">%d línea</item>
-        <item quantity="other">%d líneas</item>
-    </plurals>
     <string name="not_set">No establecido</string>
     <string name="night_mode">Modo nocturno</string>
     <string name="language">Idioma</string>

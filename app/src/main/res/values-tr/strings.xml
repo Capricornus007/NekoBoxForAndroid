@@ -341,10 +341,6 @@
     <string name="route_warn">Özel kurallar eklemeden önce belgeleri okuduğunuzdan emin olun,
         aksi halde internete bağlanamayabilirsiniz.</string>
     <string name="lines">%d Satır</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="one">%d satır</item>
-        <item quantity="other">%d satır</item>
-    </plurals>
     <string name="not_set">Ayarlanmadı</string>
     <string name="night_mode">Gece Modu</string>
     <string name="language">Lisan</string>

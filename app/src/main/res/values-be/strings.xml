@@ -337,12 +337,6 @@
     <string name="license">Ліцэнзія</string>
     <string name="route_warn">Пераканайцеся, што вы прачыталі дакументацыю перад даданнем уласных правілаў, інакш вы можаце страціць магчымасць падключэння да Інтэрнэту.</string>
     <string name="lines">%d ліній</string>
-    <plurals name="dns_hosts_lines">
-        <item quantity="one">%d радок</item>
-        <item quantity="few">%d радкі</item>
-        <item quantity="many">%d радкоў</item>
-        <item quantity="other">%d радкоў</item>
-    </plurals>
     <string name="not_set">Не зададзена</string>
     <string name="night_mode">Начны рэжым</string>
     <string name="language">Мова</string>
