@@ -42,9 +42,9 @@
     <string name="group_status_empty">空群組</string>
     <string name="group_status_empty_subscription">尚未更新</string>
     <string name="group_status_proxies">%d 個代理</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d 個代理 | 更新於 %s</string>
     <string name="group_no_difference">%s：無差異</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s：已更新 %d 個代理</string>
     <string name="group_show_diff">差異</string>
     <string name="group_diff">差異 (%s)</string>
     <string name="group_delete_confirm_prompt">你確定要移除這個群組嗎？</string>
@@ -383,7 +383,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="server_dns_subscription_sum">可選的 DNS，僅用於解析此訂閱中的伺服器域名。留空以使用預設行為。接受 https://、tls://、quic:// 或 host[:port]。</string>
     <string name="server_dns_invalid">無效的自訂伺服器 DNS。請使用 https://、tls://、quic:// 或 host[:port]，或留空。</string>
     <string name="subscription_used">%s 已使用</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">已用 %s / 剩餘 %s</string>
     <string name="subscription_expire">到期：%s</string>
     <string name="subscription_import">匯入訂閱</string>
     <string name="subscription_import_message">確認要匯入訂閱 %s？如果您來自不可信來源，這樣做可能導致您的 IP 和此行為洩漏。</string>

@@ -42,9 +42,9 @@
     <string name="group_status_empty">空分組</string>
     <string name="group_status_empty_subscription">尚未更新</string>
     <string name="group_status_proxies">%d 個代理</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d 個代理 | 更新於 %s</string>
     <string name="group_no_difference">%s: 無差異</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s：已更新 %d 個代理</string>
     <string name="group_show_diff">差異</string>
     <string name="group_diff">差異 (%s)</string>
     <string name="group_delete_confirm_prompt">您確定要移除此分組嗎？</string>
@@ -83,8 +83,8 @@
     <string name="speed_detail">代理：%1$s↑ %2$s↓\n直連：%3$s↑ %4$s↓</string>
     <string name="speed">每秒 %s</string>
     <string name="connection_test_testing">測試中…</string>
-    <string name="connection_test_available">成功：HTTPS 握手耗時 %dms</string>
-    <string name="connection_test_available_http">成功：HTTP 握手耗時 %dms</string>
+    <string name="connection_test_available">成功：耗時 %d 毫秒</string>
+    <string name="connection_test_available_http">成功：耗時 %d 毫秒</string>
     <string name="connection_test_error">失敗：%s</string>
     <string name="connection_test_fail">網路不可用</string>
     <string name="connection_test_error_status_code">錯誤代碼：#%d</string>
@@ -376,7 +376,7 @@
     <string name="server_dns_subscription_sum">可選的 DNS 設定，僅用於解析此訂閱中的伺服器網域名稱。留空則使用預設行為。接受 https://、tls://、quic:// 以及 host[:port]。</string>
     <string name="server_dns_invalid">自訂伺服器 DNS 不正確。請使用 https://、tls://、quic:// 或 host[:port] 或留空。</string>
     <string name="subscription_used">已用 %s</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">已用 %s / 剩餘 %s</string>
     <string name="subscription_expire">到期：%s</string>
     <string name="subscription_import">匯入訂閱</string>
     <string name="subscription_import_message">確認要匯入訂閱 %s？如果您來自不受信任的來源，這樣做可能會導致您的 IP 和此行為被洩露。</string>

@@ -38,7 +38,7 @@
     <string name="group_status_proxies">%d پراکسی‌ها</string>
     <string name="group_status_proxies_subscription" formatted="false">%d پراکسی‌ها | به‌روزرسانی شدند در %s</string>
     <string name="group_no_difference">%s: بدون تفاوت</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s: %d پراکسی به‌روزرسانی شد</string>
     <string name="group_show_diff">تفاوت‌ها</string>
     <string name="group_diff">تفاوت‌ها (%s)</string>
     <string name="group_delete_confirm_prompt">آیا مطمئن هستید که می‌خواهید این گروه را حذف کنید؟</string>

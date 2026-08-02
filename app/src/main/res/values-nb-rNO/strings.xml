@@ -42,9 +42,9 @@
     <string name="group_status_empty">Tom gruppe</string>
     <string name="group_status_empty_subscription">Ikke oppdatert ennå</string>
     <string name="group_status_proxies">%d proxier</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d proxyer | Oppdatert %2$s</string>
     <string name="group_no_difference">%s: Ingen forskjell</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%1$s: Oppdaterte %2$d proxyer</string>
     <string name="group_show_diff">Diff</string>
     <string name="group_diff">Diff (%s)</string>
     <string name="group_delete_confirm_prompt">Er du sikker på at du vil fjerne denne gruppen?</string>
@@ -384,7 +384,7 @@
     <string name="server_dns_subscription_sum">Valgfri DNS som kun brukes til å løse serverdomener i dette abonnementet. La være tomt for å bruke standard oppførsel. Godtar https://, tls://, quic:// eller vert[:port].</string>
     <string name="server_dns_invalid">Ugyldig egendefinert server-DNS. Bruk https://, tls://, quic:// eller vert[:port], eller la være tomt.</string>
     <string name="subscription_used">%s Brukt</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%1$s brukt / %2$s gjenstår</string>
     <string name="subscription_expire">Utløper: %s</string>
     <string name="subscription_import">Importer abonnement</string>
     <string name="subscription_import_message">Bekreft at du vil importere abonnement %s? Hvis du

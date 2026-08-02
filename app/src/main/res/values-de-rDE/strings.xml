@@ -42,9 +42,9 @@
     <string name="group_status_empty">Leere Gruppe</string>
     <string name="group_status_empty_subscription">Noch nicht aktualisiert</string>
     <string name="group_status_proxies">%d Proxys</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d Proxies | Aktualisiert am %2$s</string>
     <string name="group_no_difference">%s: Kein Unterschied</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%1$s: %2$d Proxies aktualisiert</string>
     <string name="group_show_diff">Unterschied</string>
     <string name="group_diff">Unterschied (%s)</string>
     <string name="group_delete_confirm_prompt">Sind Sie sicher, dass Sie diese Gruppe entfernen möchten?</string>
@@ -382,7 +382,7 @@
     <string name="server_dns_subscription_sum">Optionaler DNS, der nur zur Auflösung von Server-Domänen in diesem Abonnement verwendet wird. Leer lassen, um das Standardverhalten zu verwenden. Akzeptiert https://, tls://, quic:// oder host[:port].</string>
     <string name="server_dns_invalid">Ungültiger benutzerdefinierter Server-DNS. Verwenden Sie https://, tls://, quic:// oder host[:port], oder lassen Sie es leer.</string>
     <string name="subscription_used">%s verwendet</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%1$s verwendet / %2$s verbleibend</string>
     <string name="subscription_expire">Ablauf: %s</string>
     <string name="subscription_import">Abonnement importieren</string>
     <string name="subscription_import_message">Bestätigen Sie, dass Sie das Abonnement %s importieren möchten? Wenn Sie

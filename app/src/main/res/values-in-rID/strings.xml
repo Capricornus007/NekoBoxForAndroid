@@ -42,9 +42,9 @@
     <string name="group_status_empty">Grup kosong</string>
     <string name="group_status_empty_subscription">Belum diperbarui</string>
     <string name="group_status_proxies">%d Proxy</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d Proksi | Diperbarui pada %2$s</string>
     <string name="group_no_difference">%s: Tidak ada perbedaan</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%1$s: Memperbarui %2$d proksi</string>
     <string name="group_show_diff">Diff</string>
     <string name="group_diff">Diff (%s)</string>
     <string name="group_delete_confirm_prompt">Apakah Anda yakin ingin menghapus grup ini?</string>
@@ -385,7 +385,7 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="server_dns_subscription_sum">DNS opsional yang hanya digunakan untuk menyelesaikan domain server dalam langganan ini. Biarkan kosong untuk menggunakan perilaku default. Menerima https://, tls://, quic:// atau host[:port].</string>
     <string name="server_dns_invalid">DNS server kustom tidak valid. Gunakan https://, tls://, quic:// atau host[:port], atau biarkan kosong.</string>
     <string name="subscription_used">%s Digunakan</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%1$s Digunakan / %2$s Tersisa</string>
     <string name="subscription_expire">Kadaluarsa: %s</string>
     <string name="subscription_import">Impor langganan</string>
     <string name="subscription_import_message">Konfirmasi Anda ingin mengimpor langganan %s? Jika Anda

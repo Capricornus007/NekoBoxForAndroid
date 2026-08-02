@@ -42,9 +42,9 @@
     <string name="group_status_empty">空组</string>
     <string name="group_status_empty_subscription">尚未更新</string>
     <string name="group_status_proxies">%d 个代理</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d 个代理 | 更新于 %s</string>
     <string name="group_no_difference">%s: 无差异</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s：已更新 %d 个代理</string>
     <string name="group_show_diff">差异</string>
     <string name="group_diff">差异 (%s)</string>
     <string name="group_delete_confirm_prompt">确定要删除此分组吗？</string>
@@ -83,8 +83,8 @@
     <string name="speed_detail">代理：%1$s↑ %2$s↓\n直连：%3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">测试中…</string>
-    <string name="connection_test_available">成功：HTTPS 握手耗时 %dms</string>
-    <string name="connection_test_available_http">成功：HTTP 握手耗时 %dms</string>
+    <string name="connection_test_available">成功：耗时 %d 毫秒</string>
+    <string name="connection_test_available_http">成功：耗时 %d 毫秒</string>
     <string name="connection_test_error">失败：%s</string>
     <string name="connection_test_fail">网络不可用</string>
     <string name="connection_test_error_status_code">错误代码：#%d</string>
@@ -382,7 +382,7 @@
     <string name="server_dns_subscription_sum">可选 DNS，仅用于解析此订阅中的服务器域名。留空以使用默认行为。接受 https://、tls://、quic:// 或 host[:port]。</string>
     <string name="server_dns_invalid">自定义服务器 DNS 无效。请使用 https://、tls://、quic:// 或 host[:port]，或留空。</string>
     <string name="subscription_used">%s 已用</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">已用 %s / 剩余 %s</string>
     <string name="subscription_expire">到期: %s</string>
     <string name="subscription_import">导入订阅</string>
     <string name="subscription_import_message">确认要导入订阅 %s 吗？如果您

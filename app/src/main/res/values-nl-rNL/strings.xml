@@ -42,9 +42,9 @@
     <string name="group_status_empty">Lege groep</string>
     <string name="group_status_empty_subscription">Nog niet bijgewerkt</string>
     <string name="group_status_proxies">%d Proxies</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d Proxy\'s | Bijgewerkt op %2$s</string>
     <string name="group_no_difference">%s: Geen verschil</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%1$s: %2$d proxy\'s bijgewerkt</string>
     <string name="group_show_diff">Verschil</string>
     <string name="group_diff">Verschil (%s)</string>
     <string name="group_delete_confirm_prompt">Weet u zeker dat u deze groep wilt verwijderen?</string>
@@ -391,7 +391,7 @@ Aanbeveling: Schakel dit alleen in als u alle geïnstalleerde apps vertrouwt.</s
     <string name="server_dns_subscription_sum">Optionele DNS die alleen wordt gebruikt om serverdomeinen in dit abonnement op te lossen. Laat leeg om het standaardgedrag te gebruiken. Accepteert https://, tls://, quic:// of host[:poort].</string>
     <string name="server_dns_invalid">Ongeldige aangepaste server-DNS. Gebruik https://, tls://, quic:// of host[:poort], of laat leeg.</string>
     <string name="subscription_used">%s Gebruikt</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%1$s gebruikt / %2$s resterend</string>
     <string name="subscription_expire">Verloopt: %s</string>
     <string name="subscription_import">Abonnement importeren</string>
     <string name="subscription_import_message">Bevestig dat u abonnement %s wilt importeren? Als u

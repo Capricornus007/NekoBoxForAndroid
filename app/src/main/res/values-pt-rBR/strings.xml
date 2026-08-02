@@ -42,9 +42,9 @@
     <string name="group_status_empty">Grupo vazio</string>
     <string name="group_status_empty_subscription">Ainda não atualizado</string>
     <string name="group_status_proxies">%d Proxies</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d Proxies | Atualizado em %2$s</string>
     <string name="group_no_difference">%s: Sem diferença</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%1$s: %2$d proxies atualizados</string>
     <string name="group_show_diff">Diferença</string>
     <string name="group_diff">Diferença (%s)</string>
     <string name="group_delete_confirm_prompt">Tem certeza de que deseja remover este grupo?</string>
@@ -386,7 +386,7 @@
     <string name="server_dns_subscription_sum">DNS opcional usado apenas para resolver domínios de servidores nesta assinatura. Deixe vazio para usar o comportamento padrão. Aceita https://, tls://, quic:// ou host[:porta].</string>
     <string name="server_dns_invalid">DNS personalizado do servidor inválido. Use https://, tls://, quic:// ou host[:porta], ou deixe vazio.</string>
     <string name="subscription_used">%s Usado</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%1$s usado / %2$s restante</string>
     <string name="subscription_expire">Expira em: %s</string>
     <string name="subscription_import">Importar assinatura</string>
     <string name="subscription_import_message">Confirme que deseja importar a assinatura %s? Se você

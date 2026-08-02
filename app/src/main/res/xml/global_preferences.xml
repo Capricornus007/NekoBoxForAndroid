@@ -137,7 +137,7 @@
             app:title="@string/bypass_lan_in_core" />
         <SwitchPreferenceCompat
              app:icon="@drawable/ic_baseline_compare_arrows_24"
-             app:key="dualNetworkAcceleration"
+             app:key="concurrentDial"
              app:title="@string/dual_network_acceleration"
              app:summary="@string/dual_network_acceleration_summary" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference

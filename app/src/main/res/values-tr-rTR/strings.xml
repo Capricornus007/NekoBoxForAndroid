@@ -42,9 +42,9 @@
     <string name="group_status_empty">Boş grup</string>
     <string name="group_status_empty_subscription">Henüz güncellenmedi</string>
     <string name="group_status_proxies">%d Proxy</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d Proxy | %2$s tarihinde güncellendi</string>
     <string name="group_no_difference">%s: Fark yok</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%1$s: %2$d proxy güncellendi</string>
     <string name="group_show_diff">Fark</string>
     <string name="group_diff">Fark (%s)</string>
     <string name="group_delete_confirm_prompt">Bu grubu kaldırmak istediğinize emin misiniz?</string>
@@ -384,7 +384,7 @@
     <string name="server_dns_subscription_sum">Yalnızca bu abonelikteki sunucu alan adlarını çözümlemek için kullanılan isteğe bağlı DNS. Varsayılan davranışı kullanmak için boş bırakın. https://, tls://, quic:// veya host[:port] kabul eder.</string>
     <string name="server_dns_invalid">Geçersiz özel sunucu DNS. https://, tls://, quic:// veya host[:port] kullanın ya da boş bırakın.</string>
     <string name="subscription_used">%s Kullanıldı</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%1$s Kullanıldı / %2$s Kaldı</string>
     <string name="subscription_expire">Sona Erme: %s</string>
     <string name="subscription_import">Abonelik içe aktar</string>
     <string name="subscription_import_message">%s aboneliğini içe aktarmak istediğinize emin misiniz? Eğer

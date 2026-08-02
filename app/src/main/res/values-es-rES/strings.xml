@@ -42,9 +42,9 @@
     <string name="group_status_empty">Grupo vacío</string>
     <string name="group_status_empty_subscription">Aún no actualizado</string>
     <string name="group_status_proxies">%d Proxies</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d Proxies | Actualizado el %2$s</string>
     <string name="group_no_difference">%s: Sin diferencia</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%1$s: Se actualizaron %2$d proxies</string>
     <string name="group_show_diff">Diferencia</string>
     <string name="group_diff">Diferencia (%s)</string>
     <string name="group_delete_confirm_prompt">¿Estás seguro de que quieres eliminar este grupo?</string>
@@ -384,7 +384,7 @@
     <string name="server_dns_subscription_sum">DNS opcional utilizado solo para resolver dominios de servidor en esta suscripción. Déjelo vacío para usar el comportamiento predeterminado. Acepta https://, tls://, quic:// o host[:puerto].</string>
     <string name="server_dns_invalid">DNS de servidor personalizado no válido. Use https://, tls://, quic:// o host[:puerto], o déjelo vacío.</string>
     <string name="subscription_used">%s Usado</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%1$s Usado / %2$s Restante</string>
     <string name="subscription_expire">Vence: %s</string>
     <string name="subscription_import">Importar suscripción</string>
     <string name="subscription_import_message">¿Confirma que desea importar la suscripción %s? Si

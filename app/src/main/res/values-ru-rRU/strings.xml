@@ -42,9 +42,9 @@
     <string name="group_status_empty">Пустая группа</string>
     <string name="group_status_empty_subscription">Ещё не обновлено</string>
     <string name="group_status_proxies">%d прокси</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d прокси | Обновлено %s</string>
     <string name="group_no_difference">%s: Нет различий</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s: обновлено %d прокси</string>
     <string name="group_show_diff">Diff</string>
     <string name="group_diff">Diff (%s)</string>
     <string name="group_delete_confirm_prompt">Вы уверены, что хотите удалить эту группу?</string>
@@ -389,7 +389,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="server_dns_subscription_sum">Необязательный DNS, используемый только для разрешения доменов сервера в этой подписке. Оставьте пустым для использования поведения по умолчанию. Принимает https://, tls://, quic:// или host[:port].</string>
     <string name="server_dns_invalid">Недопустимый пользовательский DNS сервера. Используйте https://, tls://, quic:// или host[:port], или оставьте пустым.</string>
     <string name="subscription_used">%s Использовано</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%s Использовано / %s Осталось</string>
     <string name="subscription_expire">Срок действия: %s</string>
     <string name="subscription_import">Импорт подписки</string>
     <string name="subscription_import_message">Подтвердите импорт подписки %s? Если вы переходите из ненадёжного источника, это может привести к утечке вашего IP и данного поведения.</string>

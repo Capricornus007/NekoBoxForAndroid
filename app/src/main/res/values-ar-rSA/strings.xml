@@ -42,9 +42,9 @@
     <string name="group_status_empty">مجموعة فارغة</string>
     <string name="group_status_empty_subscription">لم يتم التحديث بعد</string>
     <string name="group_status_proxies">%d بروكسي</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d وكلاء | تم التحديث في %2$s</string>
     <string name="group_no_difference">%s: لا فرق</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%1$s: تم تحديث %2$d وكلاء</string>
     <string name="group_show_diff">الفرق</string>
     <string name="group_diff">الفرق (%s)</string>
     <string name="group_delete_confirm_prompt">هل أنت متأكد من رغبتك في إزالة هذه المجموعة؟</string>
@@ -387,7 +387,7 @@
     <string name="server_dns_subscription_sum">DNS اختياري يُستخدم فقط لحل نطاقات الخادم في هذه الاشتراك. اتركه فارغًا لاستخدام السلوك الافتراضي. يقبل https://, tls://, quic:// أو host[:port].</string>
     <string name="server_dns_invalid">DNS خادم مخصص غير صالح. استخدم https://, tls://, quic:// أو host[:port]، أو اتركه فارغًا.</string>
     <string name="subscription_used">%s مستخدم</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%1$s مستخدم / %2$s متبقي</string>
     <string name="subscription_expire">تاريخ الانتهاء: %s</string>
     <string name="subscription_import">استيراد اشتراك</string>
     <string name="subscription_import_message">هل تريد تأكيد استيراد الاشتراك %s؟ إذا كنت قادمًا من مصدر غير موثوق، فقد يؤدي ذلك إلى تسرب عنوان IP وسلوكك.</string>

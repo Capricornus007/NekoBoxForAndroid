@@ -42,9 +42,9 @@
     <string name="group_status_empty">Gruppo vuoto</string>
     <string name="group_status_empty_subscription">Non ancora aggiornato</string>
     <string name="group_status_proxies">%d Proxy</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d proxy | Aggiornato il %2$s</string>
     <string name="group_no_difference">%s: Nessuna differenza</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%1$s: Aggiornati %2$d proxy</string>
     <string name="group_show_diff">Differenza</string>
     <string name="group_diff">Differenza (%s)</string>
     <string name="group_delete_confirm_prompt">Sei sicuro di voler rimuovere questo gruppo?</string>
@@ -387,7 +387,7 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="server_dns_subscription_sum">DNS opzionale utilizzato solo per risolvere i domini del server in questo abbonamento. Lascia vuoto per utilizzare il comportamento predefinito. Accetta https://, tls://, quic:// o host[:porta].</string>
     <string name="server_dns_invalid">DNS personalizzato del server non valido. Usa https://, tls://, quic:// o host[:porta], oppure lascia vuoto.</string>
     <string name="subscription_used">%s Utilizzato</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%1$s Usato / %2$s Rimanente</string>
     <string name="subscription_expire">Scadenza: %s</string>
     <string name="subscription_import">Importa abbonamento</string>
     <string name="subscription_import_message">Confermi di voler importare l\'abbonamento %s? Se provieni da una fonte non attendibile, ciò potrebbe causare la fuga del tuo IP e di questo comportamento.</string>

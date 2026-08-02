@@ -42,9 +42,9 @@
     <string name="group_status_empty">Порожня група</string>
     <string name="group_status_empty_subscription">Ще не оновлено</string>
     <string name="group_status_proxies">%d проксі</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d проксі | Оновлено %2$s</string>
     <string name="group_no_difference">%s: Без змін</string>
-    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%1$s: Оновлено %2$d проксі</string>
     <string name="group_show_diff">Різниця</string>
     <string name="group_diff">Різниця (%s)</string>
     <string name="group_delete_confirm_prompt">Ви впевнені, що хочете видалити цю групу?</string>
@@ -392,7 +392,7 @@
     <string name="server_dns_subscription_sum">Необов\'язковий DNS, який використовується лише для розпізнавання доменів сервера в цій підписці. Залиште порожнім, щоб використовувати поведінку за замовчуванням. Приймає https://, tls://, quic:// або host[:port].</string>
     <string name="server_dns_invalid">Недійсний власний DNS сервера. Використовуйте https://, tls://, quic:// або host[:port], або залиште порожнім.</string>
     <string name="subscription_used">Використано %s</string>
-    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%1$s використано / %2$s залишилось</string>
     <string name="subscription_expire">Термін дії: %s</string>
     <string name="subscription_import">Імпортувати підписку</string>
     <string name="subscription_import_message">Підтвердьте, що ви хочете імпортувати підписку %s? Якщо ви
