@@ -423,7 +423,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             rules = mutableListOf()
             rule_set = mutableListOf()
 
-            concurrent_dial = DataStore.concurrentDial
+            // sing-box 1.14 removed route.concurrent_dial; the feature is no
+            // longer supported by the upstream core.
+            // concurrent_dial = DataStore.concurrentDial
 
             if (needSniff) {
                 rules.add(
