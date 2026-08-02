@@ -99,7 +99,12 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 		nekoboxAndroidDNSTransportRegistry(localTransport), nekoboxAndroidServiceRegistry(),
 	)
 	ctx = service.ContextWithDefaultRegistry(ctx)
-	service.MustRegister[adapter.PlatformInterface](ctx, boxPlatformInterfaceInstance)
+	// 每 box 注册独立的 PlatformInterface 实例（对齐官方 libbox 结构）。
+	// 若用进程级单例，并发测速时各 box 的 Initialize 会互相覆盖 wrapper.networkManager，
+	// 导致 interfaceMonitor.UpdateDefaultInterface 里 UpdateInterfaces() 刷的是"最新 box"
+	// 的 NetworkManager 缓存，落选 box 自己的接口缓存永远为空 → 所有拨号秒报
+	// "no available network interface"（见 platform_box.go 批注）。
+	service.MustRegister[adapter.PlatformInterface](ctx, &boxPlatformInterfaceWrapper{})
 
 	// parse options
 	var options option.Options

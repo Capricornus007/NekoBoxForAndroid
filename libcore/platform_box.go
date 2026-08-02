@@ -24,8 +24,12 @@ import (
 
 // 官方内核（v1.13.15）的平台接口是 adapter.PlatformInterface
 // （旧的 experimental/libbox/platform 包已不存在）。
-var boxPlatformInterfaceInstance adapter.PlatformInterface = &boxPlatformInterfaceWrapper{}
-
+//
+// 注意：boxPlatformInterfaceWrapper 必须按 box 实例创建（见 box.go newSingBoxInstance），
+// 不能做成进程级单例——networkManager/myTunName 是每 box 状态，单例会被并发测速的
+// 多个 box 的 Initialize 互相覆盖，导致 interfaceMonitor.UpdateDefaultInterface 里
+// UpdateInterfaces() 刷错 NetworkManager，落选 box 的接口缓存永远为空，
+// 其所有拨号秒报 "no available network interface"。
 type boxPlatformInterfaceWrapper struct {
 	networkManager adapter.NetworkManager
 	myTunName      string
