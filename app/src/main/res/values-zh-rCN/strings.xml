@@ -672,7 +672,7 @@
     <string name="lan_sharing">LAN Sharing</string>
     <string name="lan_sharing_requires_root">LAN sharing requires root</string>
     <string name="lan_sharing_summary">Allow LAN devices to connect</string>
-    <string name="lifetime_traffic">Lifetime Traffic</string>
+    <string name="lifetime_traffic">Lifetime: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>
     <string name="mdv_advanced_json">Advanced JSON</string>
     <string name="mdv_auto_disable_timeout">Auto Disable Timeout</string>
@@ -711,13 +711,13 @@
     <string name="olcrtc_vp8_batch">VP8 Batch</string>
     <string name="olcrtc_vp8_fps">VP8 FPS</string>
     <string name="plugin_approval_action">Approval Action</string>
-    <string name="plugin_approval_conflict_message">Plugin conflict detected</string>
+    <string name="plugin_approval_conflict_message">More than one untrusted package provides this plugin: %1$s\n\nResolve the conflict before approving a package.</string>
     <string name="plugin_approval_conflict_title">Plugin Conflict</string>
     <string name="plugin_approval_failed">Plugin approval failed</string>
-    <string name="plugin_approval_message">Approve this plugin?</string>
+    <string name="plugin_approval_message">Package: %1$s\n\nSHA-256 certificate fingerprint(s):\n%2$s\n\nThe installed plugin\'s executable code can run through the app\'s plugin interface. Only approve if you trust this package.</string>
     <string name="plugin_approval_success">Plugin approved</string>
     <string name="plugin_approval_title">Plugin Approval</string>
-    <string name="plugin_signer_rejected">Plugin signer rejected</string>
+    <string name="plugin_signer_rejected">Plugin package %1$s with signer %2$s blocked. Reconnect to review it.</string>
     <string name="plugin_signer_unreadable">Plugin signer unreadable</string>
     <string name="probe_url">Probe URL</string>
     <string name="profile_reference_not_allowed">Profile reference not allowed</string>
@@ -746,7 +746,7 @@
     <string name="subscription_send_hwid_summary">Send hardware ID with subscription request</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
-    <string name="theme_classic_color_swatch">Classic Color Swatch</string>
+    <string name="theme_classic_color_swatch">Classic Color Swatch %1$d</string>
     <string name="theme_classic_colors">Classic Colors</string>
     <string name="theme_dark_high_contrast">Dark High Contrast</string>
     <string name="theme_dracula_m3">Dracula M3</string>
