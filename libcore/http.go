@@ -214,8 +214,10 @@ func (r *httpRequest) Execute() (HTTPResponse, error) {
 	}
 	response, err := r.h1h2Client.Do(&r.request)
 	if err != nil {
+		log.Println("http execute via socks5 failed:", err)
 		// trySocks5 && tryH3Direct
 		if r.tryH3Direct && errors.Is(err, errFailConnectSocks5) {
+			log.Println("http execute: socks5 unavailable, falling back to H3 direct")
 			return r.doH3Direct()
 		}
 		return nil, err
@@ -305,6 +307,7 @@ func (r *httpRequest) doH3Direct() (HTTPResponse, error) {
 			// 执行HTTP请求
 			rsp, err := f()
 			if rsp == nil || err != nil {
+				log.Println("h3 direct request", t, "failed:", err)
 				mu.Lock()
 				finalErr = errors.Join(finalErr, fmt.Errorf("%s: %w", t, err))
 				mu.Unlock()
