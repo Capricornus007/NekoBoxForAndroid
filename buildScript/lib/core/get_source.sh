@@ -46,10 +46,10 @@ popd >/dev/null
 
 #### libneko ####
 if [ ! -d "libneko" ]; then
-  git clone --no-checkout https://github.com/hawkff/libneko.git
+  git clone --no-checkout https://github.com/Capricornus007/libneko.git
 fi
 pushd libneko >/dev/null
-git remote set-url origin https://github.com/hawkff/libneko.git
+git remote set-url origin https://github.com/Capricornus007/libneko.git
 git fetch origin --tags --force
 git checkout "$COMMIT_LIBNEKO"
 popd >/dev/null
