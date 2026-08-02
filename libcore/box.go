@@ -123,6 +123,16 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 	var logWriter sblog.PlatformWriter
 	if platformLog {
 		logWriter = boxPlatformLogWriter
+		// 官方内核的 PlatformWriter 通道不做级别过滤（observable.go 无条件
+		// 转发所有级别），在此记录配置级别供 WriteMessage 侧过滤；
+		// 空级别对齐官方默认 trace。级别非法时 box.New 会报同样的错，此处忽略。
+		if options.Log != nil && options.Log.Level != "" {
+			if parsedLevel, parseErr := sblog.ParseLevel(options.Log.Level); parseErr == nil {
+				setPlatformLogLevel(parsedLevel)
+			}
+		} else {
+			setPlatformLogLevel(sblog.LevelTrace)
+		}
 	}
 	instance, err := box.New(box.Options{
 		Options:           options,

@@ -186,7 +186,14 @@ abstract class BoxInstance(
                             "--config",
                             configFile.absolutePath,
                             "--log-level",
-                            if (DataStore.logLevel > 0) "trace" else "warn",
+                            when (DataStore.logLevel) {
+                                0 -> "panic"
+                                1 -> "warn"
+                                2 -> "info"
+                                3 -> "debug"
+                                4 -> "trace"
+                                else -> "info"
+                            },
                             "client"
                         )
 

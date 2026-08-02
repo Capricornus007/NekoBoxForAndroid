@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/netip"
 	"strings"
+	"sync/atomic"
 	"syscall"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -230,12 +231,25 @@ func (w *boxPlatformInterfaceWrapper) Write(p []byte) (n int, err error) {
 
 // 日志
 
+// 官方内核（observable.go）对 PlatformWriter 通道不做级别过滤：所有级别
+// （含 trace）的消息都会无条件送达 WriteMessage，过滤需在本侧实现。
+// platformLogLevel 由 newSingBoxInstance 按配置 log.level 记录；
+// 初始值与空级别均对齐官方默认 LevelTrace（全放行）。
+var platformLogLevel = int32(sblog.LevelTrace)
+
+func setPlatformLogLevel(level sblog.Level) {
+	atomic.StoreInt32(&platformLogLevel, int32(level))
+}
+
 type boxPlatformLogWriterWrapper struct {
 }
 
 var boxPlatformLogWriter sblog.PlatformWriter = &boxPlatformLogWriterWrapper{}
 
 func (w *boxPlatformLogWriterWrapper) WriteMessage(level sblog.Level, message string) {
+	if int32(level) > atomic.LoadInt32(&platformLogLevel) {
+		return
+	}
 	if !strings.HasSuffix(message, "\n") {
 		message += "\n"
 	}
