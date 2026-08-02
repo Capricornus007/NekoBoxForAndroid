@@ -106,6 +106,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="require_transproxy">Aktifkan Transproxy Inbound</string>
     <string name="transproxy_mode">Mode Transproxy</string>
     <string name="connection_test_url">URL Uji Koneksi</string>
+    <string name="auto_switch_timeout">Auto-switch on Timeout</string>
+    <string name="auto_switch_timeout_summary">Automatically switch to next config if no response</string>
+    <string name="auto_switch_timeout_duration">Timeout Duration (seconds)</string>
     <!-- proxy category -->
     <string name="profile_name">Nama Profil</string>
     <string name="server_address">Server</string>
@@ -771,4 +774,9 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
+    <string name="vpn_watchdog">Auto-reconnect</string>
+    <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
+    <string name="vpn_watchdog_test">🧪 Test watchdog</string>
+    <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
+    <string name="vpn_watchdog_interval">Check interval (sec)</string>
 </resources>
