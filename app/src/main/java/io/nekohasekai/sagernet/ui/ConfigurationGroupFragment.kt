@@ -1165,11 +1165,7 @@ class ConfigurationGroupFragment : Fragment() {
             val ctx = card.context
             val primary = ctx.getColorAttr(R.attr.colorPrimary)
             val surface = ctx.getColorAttr(R.attr.colorSurface)
-            card.strokeWidth = ctx.resources.getDimensionPixelSize(
-                if (selected) R.dimen.card_stroke_width_selected else R.dimen.card_stroke_width,
-            )
-            card.strokeColor =
-                if (selected) primary else ctx.getColour(R.color.card_stroke)
+            card.strokeWidth = 0
             card.setCardBackgroundColor(
                 if (selected) {
                     ColorUtils.compositeColors(

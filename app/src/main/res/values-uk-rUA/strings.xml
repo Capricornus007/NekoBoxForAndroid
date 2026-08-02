@@ -49,9 +49,6 @@
     <string name="layout_single_column">Один стовпець</string>
     <string name="layout_double_column">Два стовпці</string>
     <string name="sort_and_layout">Sort and Appearance</string>
-    <string name="card_style">Card</string>
-    <string name="card_style_classic">Класичний</string>
-    <string name="card_style_stroke">Stroke</string>
     <string name="group_status_empty">Порожня група</string>
     <string name="group_status_empty_subscription">Ще не оновлено</string>
     <string name="group_status_proxies">%d проксі</string>

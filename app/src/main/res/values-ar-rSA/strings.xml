@@ -49,9 +49,6 @@
     <string name="layout_single_column">عمود واحد</string>
     <string name="layout_double_column">عمودين</string>
     <string name="sort_and_layout">Sort and Appearance</string>
-    <string name="card_style">Card</string>
-    <string name="card_style_classic">كلاسيكي</string>
-    <string name="card_style_stroke">Stroke</string>
     <string name="group_status_empty">مجموعة فارغة</string>
     <string name="group_status_empty_subscription">لم يتم التحديث بعد</string>
     <string name="group_status_proxies">%d بروكسي</string>

@@ -49,9 +49,6 @@
     <string name="layout_single_column">單列</string>
     <string name="layout_double_column">雙列</string>
     <string name="sort_and_layout">排序與外觀</string>
-    <string name="card_style">卡片</string>
-    <string name="card_style_classic">經典</string>
-    <string name="card_style_stroke">描邊</string>
     <string name="group_status_empty">空分組</string>
     <string name="group_status_empty_subscription">尚未更新</string>
     <string name="group_status_proxies">%d 個代理</string>

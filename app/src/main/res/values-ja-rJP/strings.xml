@@ -49,9 +49,6 @@
     <string name="layout_single_column">1列</string>
     <string name="layout_double_column">2列</string>
     <string name="sort_and_layout">Sort and Appearance</string>
-    <string name="card_style">Card</string>
-    <string name="card_style_classic">クラシック</string>
-    <string name="card_style_stroke">Stroke</string>
     <string name="group_status_empty">空のグループ</string>
     <string name="group_status_empty_subscription">未更新</string>
     <string name="group_status_proxies">%d プロキシ</string>

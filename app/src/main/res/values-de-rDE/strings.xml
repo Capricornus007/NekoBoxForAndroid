@@ -49,9 +49,6 @@
     <string name="layout_single_column">Einspaltig</string>
     <string name="layout_double_column">Zweispaltig</string>
     <string name="sort_and_layout">Sort and Appearance</string>
-    <string name="card_style">Card</string>
-    <string name="card_style_classic">Klassisch</string>
-    <string name="card_style_stroke">Stroke</string>
     <string name="group_status_empty">Leere Gruppe</string>
     <string name="group_status_empty_subscription">Noch nicht aktualisiert</string>
     <string name="group_status_proxies">%d Proxys</string>

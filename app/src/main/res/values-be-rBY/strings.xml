@@ -49,9 +49,6 @@
     <string name="layout_single_column">Адзін слупок</string>
     <string name="layout_double_column">Два слупкі</string>
     <string name="sort_and_layout">Sort and Appearance</string>
-    <string name="card_style">Card</string>
-    <string name="card_style_classic">Класічны</string>
-    <string name="card_style_stroke">Stroke</string>
     <string name="group_status_empty">Пустая група</string>
     <string name="group_status_empty_subscription">Яшчэ не абноўлена</string>
     <string name="group_status_proxies">%d проксі</string>

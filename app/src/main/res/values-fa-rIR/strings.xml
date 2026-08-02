@@ -49,9 +49,6 @@
     <string name="layout_single_column">تک ستونه</string>
     <string name="layout_double_column">دو ستونه</string>
     <string name="sort_and_layout">Sort and Appearance</string>
-    <string name="card_style">Card</string>
-    <string name="card_style_classic">کلاسیک</string>
-    <string name="card_style_stroke">Stroke</string>
     <string name="group_status_empty">گروه خالی</string>
     <string name="group_status_empty_subscription">هنوز به‌روزرسانی نشده</string>
     <string name="group_status_proxies">%d پراکسی</string>

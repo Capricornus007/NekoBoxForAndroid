@@ -169,17 +169,6 @@
                             android:id="@+id/action_layout_double"
                             android:title="@string/layout_double_column" />
                     </group>
-                    <item
-                        android:title="@string/card_style"
-                        android:enabled="false" />
-                    <group android:id="@+id/card_style_group" android:checkableBehavior="single">
-                        <item
-                            android:id="@+id/action_card_style_classic"
-                            android:title="@string/card_style_classic" />
-                        <item
-                            android:id="@+id/action_card_style_stroke"
-                            android:title="@string/card_style_stroke" />
-                    </group>
                 </menu>
             </item>
         </menu>

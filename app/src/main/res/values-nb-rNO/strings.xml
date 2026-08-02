@@ -49,9 +49,6 @@
     <string name="layout_single_column">Enkel kolonne</string>
     <string name="layout_double_column">Dobbel kolonne</string>
     <string name="sort_and_layout">Sort and Appearance</string>
-    <string name="card_style">Card</string>
-    <string name="card_style_classic">Klassisk</string>
-    <string name="card_style_stroke">Stroke</string>
     <string name="group_status_empty">Tom gruppe</string>
     <string name="group_status_empty_subscription">Ikke oppdatert ennå</string>
     <string name="group_status_proxies">%d proxier</string>

@@ -49,9 +49,6 @@
     <string name="layout_single_column">단일 열</string>
     <string name="layout_double_column">이중 열</string>
     <string name="sort_and_layout">Sort and Appearance</string>
-    <string name="card_style">Card</string>
-    <string name="card_style_classic">클래식</string>
-    <string name="card_style_stroke">Stroke</string>
     <string name="group_status_empty">빈 그룹</string>
     <string name="group_status_empty_subscription">아직 업데이트되지 않음</string>
     <string name="group_status_proxies">%d 프록시</string>

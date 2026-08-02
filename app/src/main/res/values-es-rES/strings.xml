@@ -49,9 +49,6 @@
     <string name="layout_single_column">Una columna</string>
     <string name="layout_double_column">Dos columnas</string>
     <string name="sort_and_layout">Sort and Appearance</string>
-    <string name="card_style">Card</string>
-    <string name="card_style_classic">Clásico</string>
-    <string name="card_style_stroke">Stroke</string>
     <string name="group_status_empty">Grupo vacío</string>
     <string name="group_status_empty_subscription">Aún no actualizado</string>
     <string name="group_status_proxies">%d Proxies</string>
