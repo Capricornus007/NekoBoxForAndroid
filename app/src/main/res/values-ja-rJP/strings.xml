@@ -621,6 +621,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="snell_reuse_summary">v4-v6 のみ</string>
     <string name="action_close">閉じる</string>
     <string name="action_masterdnsvpn">MasterDNS VPN</string>
+    <string name="action_amneziawg">AmneziaWG</string>
+    <string name="action_olcrtc">OLC RTC</string>
     <string name="amneziawg_category">AmneziaWG 設定</string>
     <string name="amneziawg_h1">ヘッダー 1</string>
     <string name="amneziawg_h2">ヘッダー 2</string>

@@ -89,8 +89,7 @@
     <string name="connection_test_fail">インターネットは利用できません</string>
     <string name="connection_test_error">失敗: %s</string>
     <string name="connection_test_testing">テスト中…</string>
-    <string name="speed_detail">プロキシ：%1$s↑ %2$s↓\nダイレクト：%3$s↑ %4$s↓
-\nダイレクト： %3$s↑ %4$s↓</string>
+    <string name="speed_detail">プロキシ：%1$s↑ %2$s↓\nダイレクト：%3$s↑ %4$s↓</string>
     <string name="security_settings">セキュリティ設定</string>
     <string name="show_direct_speed">ダイレクト接続のスピードを表示</string>
     <string name="show_stop_sum">クィックタイトルを使えなくなりたいの場合</string>

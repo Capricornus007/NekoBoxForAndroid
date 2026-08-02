@@ -622,6 +622,8 @@
     <string name="snell_reuse_summary">仅 v4-v6</string>
     <string name="action_close">关闭</string>
     <string name="action_masterdnsvpn">MasterDNS VPN</string>
+    <string name="action_amneziawg">AmneziaWG</string>
+    <string name="action_olcrtc">OLC RTC</string>
     <string name="amneziawg_category">AmneziaWG 设置</string>
     <string name="amneziawg_h1">标头 1</string>
     <string name="amneziawg_h2">标头 2</string>
