@@ -74,9 +74,11 @@ Go 语言编写的底层核心，负责高性能的网络处理。**内核为官
 
 ## 2. 构建流程 (Build Process)
 
-项目的构建分为两步：
+> 本项目**不需要本地 Go 环境**，也**不需要本地克隆 sing-box 仓库**。所有编译（Go 核心 + Android APK）均在 GitHub Actions 中完成。开发者（AI）只需写好代码并提交，由用户 push 到 GitHub Actions 上验证编译与真机测试。
+
+项目的构建分为两步（均在 CI 中执行）：
 1. **编译底层 Go 核心**：
-   - 源码获取：[`buildScript/lib/core/get_source.sh`](buildScript/lib/core/get_source.sh) 读取 `nb4a.properties` 的 `SINGBOX_VERSION`，将**官方** `SagerNet/sing-box` 浅克隆到仓库同级目录 `../sing-box`（`libcore/go.mod` 以 `replace` 指向它）；已存在的非官方（旧 fork）克隆会被强制重定向到官方仓库。
+   - 源码获取：[`buildScript/lib/core/get_source.sh`](buildScript/lib/core/get_source.sh) 读取 `nb4a.properties` 的 `SINGBOX_VERSION`，在 CI 中将**官方** `SagerNet/sing-box` 浅克隆到仓库同级目录 `../sing-box`（`libcore/go.mod` 以 `replace` 指向它）；已存在的非官方（旧 fork）克隆会被强制重定向到官方仓库。
    - 使用 `gomobile` 工具，运行 `buildScript/lib/core/build.sh` 或 `libcore/build.sh`（bind 前先 `go mod tidy` 重建依赖锁定）。
    - 编译生成 `app/libs/libcore.aar` 库。
 2. **编译 Android 应用程序**：
@@ -88,7 +90,7 @@ Go 语言编写的底层核心，负责高性能的网络处理。**内核为官
 ## 3. 开发备忘与协作规范 (Developer Notes)
 
 ### 3.1 GitHub Actions 小步快跑模式
-- **背景**：项目所有者个人不做安卓开发，因此本项目的开发采用 **GitHub Actions 小步快跑** 的模式。
+- **背景**：项目所有者个人不做安卓开发，**本地不安装 Go 环境**，因此本项目的开发采用 **GitHub Actions 小步快跑** 的模式。
 - **CI/CD 流程**：
   - 核心构建工作流定义在 [`.github/workflows/build.yml`](.github/workflows/build.yml) 中。
   - 每次向 `main` 分支提交代码或手动触发（`workflow_dispatch`）时，GitHub Actions 会自动运行构建。
@@ -97,6 +99,8 @@ Go 语言编写的底层核心，负责高性能的网络处理。**内核为官
 - **开发建议**：
   - 开发者在修改代码时，应尽量保持**小步快跑**，每次完成一个微小的、自洽的修改后即提交代码。
   - 提交后，通过 GitHub Actions 自动验证编译是否通过，并下载生成的测试 APK 进行真机测试。
+  - **不要询问用户本地是否有 Go 环境**：本地一律不装 Go，也不做本地编译。AI 只需把代码写好、改完整，交由用户 push 到 GitHub Actions 上验证即可。
+  - **依赖查询走 firecrawl MCP**：本地已删除 sing-box 等仓库克隆，不再依赖本地源码。需要查询 sing-box 官方源码、go.mod 依赖版本、API 定义等外部信息时，直接通过 firecrawl MCP 联网访问 GitHub 获取。
 
 ### 3.2 文档同步规范
 - **核心要求**：每次对项目结构、关键模块、新增协议、构建流程或配置进行修改时，**必须**同步更新本文件 (`REPO_SCHEMA.md`)。
