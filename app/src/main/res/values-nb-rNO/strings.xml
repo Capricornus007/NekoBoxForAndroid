@@ -104,6 +104,9 @@
     <string name="require_transproxy">Aktiver innkommende transproxy</string>
     <string name="transproxy_mode">Transproxy-modus</string>
     <string name="connection_test_url">Tilkoblingstest-URL</string>
+    <string name="auto_switch_timeout">Auto-switch on Timeout</string>
+    <string name="auto_switch_timeout_summary">Automatically switch to next config if no response</string>
+    <string name="auto_switch_timeout_duration">Timeout Duration (seconds)</string>
     <!-- proxy category -->
     <string name="profile_name">Profilnavn</string>
     <string name="server_address">Server</string>
@@ -766,4 +769,9 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
+    <string name="vpn_watchdog">Auto-reconnect</string>
+    <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
+    <string name="vpn_watchdog_test">🧪 Test watchdog</string>
+    <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
+    <string name="vpn_watchdog_interval">Check interval (sec)</string>
 </resources>
