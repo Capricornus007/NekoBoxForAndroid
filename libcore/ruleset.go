@@ -53,6 +53,12 @@ func prepareLocalGeoRuleSets(ruleSets []option.RuleSet) error {
 		if !ok {
 			continue
 		}
+		// 1.14.x: rs.Tag は badoption.Listable[string]（複数タグ可）。
+		// レガシー変換では先頭タグをそのまま用いる。
+		var tag string
+		if len(rs.Tag) > 0 {
+			tag = rs.Tag[0]
+		}
 		var dbName string
 		if isGeoIP {
 			dbName = geoipDat
@@ -69,9 +75,9 @@ func prepareLocalGeoRuleSets(ruleSets []option.RuleSet) error {
 			}
 		}
 
-		dstPath, err := convertGeoRuleSetToSRS(rs.Tag, code, filepath.Join(externalAssetsPath, dbName), isGeoIP)
+		dstPath, err := convertGeoRuleSetToSRS(tag, code, filepath.Join(externalAssetsPath, dbName), isGeoIP)
 		if err != nil {
-			return fmt.Errorf("rule-set %s: %w", rs.Tag, err)
+			return fmt.Errorf("rule-set %s: %w", tag, err)
 		}
 		rs.LocalOptions.Path = dstPath
 	}

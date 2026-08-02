@@ -59,6 +59,16 @@ func (p *platformLocalDNSTransport) Close() error {
 func (p *platformLocalDNSTransport) Reset() {
 }
 
+// ExchangeAsync implements adapter.DNSTransport (added in sing-box 1.14.x).
+// Falls back to Exchange on a background goroutine, mirroring the official
+// local transport behavior.
+func (p *platformLocalDNSTransport) ExchangeAsync(ctx context.Context, message *mDNS.Msg, callback func(response *mDNS.Msg, err error)) {
+	go func() {
+		response, err := p.Exchange(ctx, message)
+		callback(response, err)
+	}()
+}
+
 func (p *platformLocalDNSTransport) Exchange(ctx context.Context, message *mDNS.Msg) (*mDNS.Msg, error) {
 	if p.raw && rawQueryFunc != nil {
 		// Raw - only available on Android 10 and above

@@ -17,7 +17,6 @@ import (
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/boxapi"
-	"github.com/sagernet/sing-box/common/dialer"
 	"github.com/sagernet/sing-box/protocol/group"
 
 	box "github.com/sagernet/sing-box"
@@ -31,9 +30,9 @@ import (
 	"github.com/sagernet/sing/service/pause"
 )
 
-func init() {
-	dialer.DoNotSelectInterface.Store(true)
-}
+// 1.14.x: dialer.DoNotSelectInterface は廃止。interface 自動選択の制御は
+// PlatformInterface/NetworkManager の AutoDetectInterface に委ねる（NekoBox は
+// boxPlatformInterfaceWrapper.UsePlatformNetworkInterfaces() = false で無効化済み）。
 
 var mainInstance *BoxInstance
 
@@ -103,6 +102,7 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 	ctx = box.Context(ctx,
 		nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(),
 		nekoboxAndroidDNSTransportRegistry(localTransport), nekoboxAndroidServiceRegistry(),
+		nekoboxAndroidCertificateProviderRegistry(),
 	)
 	ctx = service.ContextWithDefaultRegistry(ctx)
 	ctx = service.ContextWith[adapter.PlatformInterface](ctx, newBoxPlatformInterfaceWrapper())

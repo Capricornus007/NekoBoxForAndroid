@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/sagernet/sing-box/adapter"
+	"github.com/sagernet/sing-box/adapter/certificate"
 	"github.com/sagernet/sing-box/adapter/endpoint"
 	"github.com/sagernet/sing-box/adapter/inbound"
 	"github.com/sagernet/sing-box/adapter/outbound"
@@ -90,7 +91,8 @@ func nekoboxAndroidOutboundRegistry() *outbound.Registry {
 	hysteria2.RegisterOutbound(registry)
 	juicity.RegisterOutbound(registry)
 
-	wireguard.RegisterOutbound(registry)
+	// sing-box 1.14.x: WireGuard は endpoint 化された（RegisterOutbound 廃止）。
+	// outbound 登録は不要、nekoboxAndroidEndpointRegistry で endpoint 登録する。
 	amneziawg.RegisterOutbound(registry)
 
 	return registry
@@ -133,4 +135,10 @@ func nekoboxAndroidServiceRegistry() *service.Registry {
 	registry := service.NewRegistry()
 
 	return registry
+}
+
+// 1.14.x で box.Context に CertificateProviderRegistry が追加された。
+// NekoBox は証明書プロバイダ（ACME/Tailscale）を使わないため空レジストリで良い。
+func nekoboxAndroidCertificateProviderRegistry() *certificate.Registry {
+	return certificate.NewRegistry()
 }

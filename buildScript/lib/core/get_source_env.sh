@@ -4,4 +4,5 @@ export COMMIT_SING_BOX="3b6b67c056e99c33e52c8871ab6855e0096050a3"
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
 export VERSION_SING_BOX="1.13.x-bbolt-fix"
 export COMMIT_LIBNEKO="6a85c185d62435a5293ef70ac3b638ae3ee1efa7"
-export COMMIT_WIREGUARD_GO="506b7631853c"
+# sing-box 1.14.x は wireguard-go v0.0.5-0.20260717024847-6f5e8b1947ae を要求
+export COMMIT_WIREGUARD_GO="6f5e8b1947ae"

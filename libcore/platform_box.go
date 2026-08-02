@@ -131,6 +131,60 @@ func (w *boxPlatformInterfaceWrapper) UsePlatformWIFIMonitor() bool {
 	return false
 }
 
+// ---- 1.14.x で追加された PlatformInterface メソッド（NekoBox は未使用）----
+
+func (w *boxPlatformInterfaceWrapper) UsePlatformNeighborResolver() bool {
+	return false
+}
+
+func (w *boxPlatformInterfaceWrapper) StartNeighborMonitor(listener adapter.NeighborUpdateListener) error {
+	return nil
+}
+
+func (w *boxPlatformInterfaceWrapper) CloseNeighborMonitor(listener adapter.NeighborUpdateListener) error {
+	return nil
+}
+
+func (w *boxPlatformInterfaceWrapper) UsePlatformShell() bool {
+	return false
+}
+
+func (w *boxPlatformInterfaceWrapper) CheckPlatformShell() error {
+	return E.New("android: platform shell unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) OpenShellSession(user *adapter.PlatformUser, command string, env []string, term string, rows int32, cols int32) (adapter.ShellSession, error) {
+	return nil, E.New("android: platform shell unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) LookupUser(username string) (*adapter.PlatformUser, error) {
+	return nil, E.New("android: platform shell unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) LookupSFTPServer() (string, error) {
+	return "", E.New("android: platform shell unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) ReadSystemSSHHostKey() ([]byte, error) {
+	return nil, E.New("android: platform shell unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) TailscaleHostname() string {
+	return ""
+}
+
+func (w *boxPlatformInterfaceWrapper) UsePlatformBridge() bool {
+	return false
+}
+
+func (w *boxPlatformInterfaceWrapper) CreateBridge(options adapter.BridgeOptions) (adapter.BridgeSession, error) {
+	return nil, E.New("android: platform bridge unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) ProcessPlatformOptions(options option.TunPlatformOptions) error {
+	return nil
+}
+
 func (w *boxPlatformInterfaceWrapper) ReadWIFIState() adapter.WIFIState {
 	state := strings.Split(intfBox.WIFIState(), ",")
 	if len(state) < 2 {
