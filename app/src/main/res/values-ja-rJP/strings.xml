@@ -638,9 +638,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="amneziawg_s2">S2</string>
     <string name="amneziawg_s3">S3</string>
     <string name="amneziawg_s4">S4</string>
-    <string name="app_name">NekoBox</string>
-    <string name="app_name_long">NekoBox for Android</string>
-    <string name="available">利用可能</string>
     <string name="balancer_use_front_proxy">フロントプロキシを使用</string>
     <string name="balancer_use_landing_proxy">ランディングプロキシを使用</string>
     <string name="battery_optimization_disabled">バッテリー最適化を無効化</string>
@@ -649,9 +646,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="concurrent_dial">同時ダイアル</string>
     <string name="concurrent_dial_summary">同時接続でネットワーク確立を高速化、バッテリー消費が増加する可能性があります</string>
     <string name="connection_status_connected">接続済み</string>
-    <string name="connection_test_icmp_ping">ICMP ピング</string>
-    <string name="connection_test_tcp_ping">TCP ピング</string>
-    <string name="connection_test_url_test">URL テスト</string>
     <string name="create_clear_cache_shortcut_summary">キャッシュクリアのショートカットを作成</string>
     <string name="dns_hosts_lines">%d 行の DNS ホスト</string>
     <string name="donate">寄付</string>
@@ -676,8 +670,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="lan_sharing">LAN 共有</string>
     <string name="lan_sharing_requires_root">LAN 共有には root が必要</string>
     <string name="lan_sharing_summary">LAN デバイスの接続を許可</string>
-    <string name="leastPing">最小遅延</string>
-    <string name="lifetime_traffic">累計トラフィック</string>
+    <string name="lifetime_traffic">累計トラフィック：%1$s↑ %2$s↓</string>
     <string name="mal_close">閉じる</string>
     <string name="mdv_advanced_json">詳細 JSON</string>
     <string name="mdv_auto_disable_timeout">自動無効化タイムアウト</string>
@@ -705,7 +698,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="mdv_setup_packet_dup">セットアップパケット重複</string>
     <string name="mdv_upload_compression">アップロード圧縮</string>
     <string name="more_options">その他のオプション</string>
-    <string name="mtu">MTU</string>
     <string name="no_amnezia_awg_profiles">AmneziaWG プロファイルがありません</string>
     <string name="olcrtc_carrier">キャリア</string>
     <string name="olcrtc_client_id">クライアント ID</string>
@@ -716,16 +708,14 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="olcrtc_transport_cat">トランスポート</string>
     <string name="olcrtc_vp8_batch">VP8 バッチ</string>
     <string name="olcrtc_vp8_fps">VP8 FPS</string>
-    <string name="ooc_subscription_token">サブスクリプショントークン</string>
-    <string name="pcap">PCAP</string>
     <string name="plugin_approval_action">承認アクション</string>
-    <string name="plugin_approval_conflict_message">プラグイン競合を検出</string>
+    <string name="plugin_approval_conflict_message">このプラグインを提供する信頼できないパッケージが複数あります：%1$s\n\nパッケージを承認する前に競合を解決してください。</string>
     <string name="plugin_approval_conflict_title">プラグイン競合</string>
     <string name="plugin_approval_failed">プラグイン承認に失敗</string>
-    <string name="plugin_approval_message">このプラグインを承認しますか？</string>
+    <string name="plugin_approval_message">パッケージ：%1$s\n\nSHA-256 証明書フィンガープリント：\n%2$s\n\nインストールされたプラグインの実行可能コードは、アプリのプラグインインターフェースを介して実行できます。このパッケージを信頼する場合のみ承認してください。</string>
     <string name="plugin_approval_success">プラグインを承認しました</string>
     <string name="plugin_approval_title">プラグイン承認</string>
-    <string name="plugin_signer_rejected">プラグイン署名者が拒否されました</string>
+    <string name="plugin_signer_rejected">署名者 %2$s のプラグインパッケージ %1$s をブロックしました。再確認するには再接続してください。</string>
     <string name="plugin_signer_unreadable">プラグイン署名者を読み取れません</string>
     <string name="probe_url">プローブ URL</string>
     <string name="profile_reference_not_allowed">プロファイル参照は許可されていません</string>
@@ -744,7 +734,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="scan_toggle_torch">トーチ切替</string>
     <string name="scan_torch_turn_off">トーチを消す</string>
     <string name="scan_torch_turn_on">トーチを点ける</string>
-    <string name="service_mode_vpn">VPN モード</string>
     <string name="shortcut_pin_not_supported">ショートカットのピン留めは非対応</string>
     <string name="shortcut_pin_requested">ショートカットのピン留めを要求</string>
     <string name="subscription_custom_dns">カスタム DNS</string>
@@ -756,7 +745,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="subscription_send_hwid_summary">サブスクリプション要求時にハードウェア ID を送信</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
-    <string name="theme_classic_color_swatch">クラシックカラースウォッチ</string>
+    <string name="theme_classic_color_swatch">クラシックカラースウォッチ %1$d</string>
     <string name="theme_classic_colors">クラシックカラー</string>
     <string name="theme_dark_high_contrast">ダークハイコントラスト</string>
     <string name="theme_dracula_m3">Dracula M3</string>
@@ -764,16 +753,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="theme_fallback_summary">フォールバックテーマを使用</string>
     <string name="theme_monokai">Monokai</string>
     <string name="theme_nord">Nord</string>
-    <string name="traffic">トラフィック</string>
-    <string name="traffic_downlink">ダウンロード</string>
-    <string name="traffic_downlink_total">総ダウンロード</string>
-    <string name="traffic_uplink">アップロード</string>
-    <string name="traffic_uplink_total">総アップロード</string>
     <string name="ui_style">UI スタイル</string>
     <string name="ui_style_classic">クラシック</string>
     <string name="ui_style_expressive">エクスプレッシブ</string>
-    <string name="v2rayn">v2rayN</string>
     <string name="waterfall_settings">ウォーターフォール設定</string>
     <string name="webdav_insecure_url">安全でない WebDAV サーバー URL</string>
-    <string name="ws_max_early_data">WebSocket 最大早期データ</string>
-</resources>
+    </resources>

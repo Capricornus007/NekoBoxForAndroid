@@ -619,4 +619,4 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="snell_mode">模式</string>
     <string name="snell_reuse">重用</string>
     <string name="snell_reuse_summary">僅 v4-v6</string>
-</resources>
+    </resources>

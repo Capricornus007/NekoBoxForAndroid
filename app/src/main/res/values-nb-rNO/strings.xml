@@ -625,4 +625,4 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="snell_mode">Modus</string>
     <string name="snell_reuse">Gjenbruk</string>
     <string name="snell_reuse_summary">kun v4-v6</string>
-</resources>
+    </resources>

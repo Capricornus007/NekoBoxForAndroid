@@ -95,8 +95,8 @@
     <string name="speed_detail">الوكيل: %1$s↑ %2$s↓\nمباشر: %3$s↑ %4$s↓</string>
     <string name="speed">%s/ث</string>
     <string name="connection_test_testing">اختبار...</string>
-    <string name="connection_test_available">الاختبار متاح</string>
-    <string name="connection_test_available_http">اختبار HTTP متاح</string>
+    <string name="connection_test_available">النجاح: استغرقت مصافحة HTTPS %dms</string>
+    <string name="connection_test_available_http">النجاح: استغرقت مصافحة HTTP %dms</string>
     <string name="connection_test_error">فشل: %s</string>
     <string name="connection_test_fail">الإنترنت غير متاح</string>
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
@@ -220,7 +220,7 @@
     <string name="service_failed">فشل: </string>
     <string name="stop">إيقاف</string>
     <string name="stopping">جارٍ الإيقاف…</string>
-    <string name="vpn_error">خطأ VPN</string>
+    <string name="vpn_error">خطأ VPN: %s</string>
     <string name="vpn_permission_denied">تم رفض الإذن لإنشاء خدمة VPN</string>
     <string name="reboot_required">فشل بدء خدمة VPN. قد تحتاج إلى إعادة تشغيل
 جهازك.</string>
@@ -753,4 +753,4 @@
     <string name="dynamic_colors_classic">متاح مع الواجهة الجديدة</string>
     <string name="theme_fallback_summary">اللون عند تعطيل الديناميكي</string>
     <string name="more_options">المزيد</string>
-</resources>
+    </resources>

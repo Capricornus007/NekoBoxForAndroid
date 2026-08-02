@@ -57,7 +57,6 @@
     <string name="app_desc">Kotlinで記述されたAndroid用のユニバーサルプロキシツールチェーン。</string>
     <string name="cag_dns">DNS設定</string>
     <string name="speed">%s/s</string>
-    <string name="traffic">%1$s↑ %2$s↓</string>
     <string name="general_settings">アブリ設定</string>
     <string name="menu_route">ルート</string>
     <string name="uuid">ユーザーID</string>
@@ -583,4 +582,4 @@
     <string name="snell_mode">モード</string>
     <string name="snell_reuse">再利用</string>
     <string name="snell_reuse_summary">v4-v6 のみ</string>
-</resources>
+    </resources>

@@ -627,4 +627,4 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="snell_mode">Режим</string>
     <string name="snell_reuse">Повторное использование</string>
     <string name="snell_reuse_summary">только v4-v6</string>
-</resources>
+    </resources>

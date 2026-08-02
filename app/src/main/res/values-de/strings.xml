@@ -95,8 +95,8 @@
     <string name="speed_detail">Proxy: %1$s↑ %2$s↓\nDirekt: %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Testen…</string>
-    <string name="connection_test_available">Test verfügbar</string>
-    <string name="connection_test_available_http">HTTP-Test verfügbar</string>
+    <string name="connection_test_available">Erfolg: HTTPS-Handshake dauerte %dms</string>
+    <string name="connection_test_available_http">Erfolg: HTTP-Handshake dauerte %dms</string>
     <string name="connection_test_error">Fehlgeschlagen: %s</string>
     <string name="connection_test_fail">Internet nicht verfügbar</string>
     <string name="connection_test_error_status_code">Fehlercode: #%d</string>
@@ -220,7 +220,7 @@
     <string name="service_failed">Fehlgeschlagen: </string>
     <string name="stop">Stopp</string>
     <string name="stopping">Wird heruntergefahren…</string>
-    <string name="vpn_error">VPN-Fehler</string>
+    <string name="vpn_error">VPN-Fehler: %s</string>
     <string name="vpn_permission_denied">Keine Berechtigung zum Erstellen eines VPN-Dienstes</string>
     <string name="reboot_required">Fehler beim Starten des VPN-Dienstes. Möglicherweise müssen Sie Ihr
         Gerät neu starten.</string>
@@ -739,4 +739,4 @@
     <string name="dynamic_colors_classic">Verfügbar mit der neuen Oberfläche</string>
     <string name="theme_fallback_summary">Farbe wenn Dynamik deaktiviert</string>
     <string name="more_options">Mehr</string>
-</resources>
+    </resources>

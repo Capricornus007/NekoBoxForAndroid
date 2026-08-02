@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">NekoBox</string>
-    <string name="app_name_long" translatable="false">NekoBox for Android</string>
     <string name="app_desc">مجموعه ابزار جامع پراکسی برای اندروید، نوشته‌شده با کاتلین.</string>
     <string name="project">پروژه</string>
     <string name="github">کد منبع</string>
@@ -51,7 +49,6 @@
     <!-- misc -->
     <string name="service_mode">حالت سرویس</string>
     <string name="service_mode_proxy">فقط به حالت پراکسی</string>
-    <string name="service_mode_vpn" translatable="false">VPN</string>
     <string name="port_proxy">پورت پراکسی</string>
     <string name="port_http">پورت پراکسی HTTP</string>
     <string name="disable_mixed_inbound">غیرفعال کردن ورودی ترکیبی</string>
@@ -66,7 +63,6 @@
     <string name="general_settings">تنظیمات برنامه</string>
     <string name="require_http">فعال‌کردن ورودی HTTP</string>
     <string name="cag_ws">تنظیمات WebSocket</string>
-    <string name="ws_max_early_data" translatable="false">Max early data</string>
     <string name="ws_browser_forwarding">اتصال مرورگر</string>
     <string name="ws_browser_forwarding_sum">ارسال WebSocketهای مربوطه از طریق مرورگر</string>
     <string name="speed_interval">تنظیم فاصله زمانی نمایش سرعت</string>
@@ -78,7 +74,6 @@
     <string name="security_settings">تنظیمات امنیت TLS</string>
     <string name="allow_insecure">اتصال محافظت نشده</string>
     <string name="allow_insecure_sum">اگر بررسی گواهی‌ها غیرفعال باشد، اتصال بدون رمزنگاری خواهد بود.</string>
-    <string name="traffic" translatable="false">%1$s↑ %2$s↓</string>
     <string name="speed_detail">سرعت： %1$s↑ %2$s↓\nمستقیم： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">در حال آزمایش</string>
@@ -209,19 +204,6 @@
     <string name="share">اشتراک‌گذاری</string>
     <string name="add_profile">اضافه‌کردن پراکسی جدید</string>
     <string name="select_profile">انتخاب پراکسی</string>
-    <string name="action_socks" translatable="false">SOCKS</string>
-    <string name="action_http" translatable="false">HTTP</string>
-    <string name="action_shadowsocks" translatable="false">Shadowsocks</string>
-    <string name="action_shadowsocksr" translatable="false">ShadowsocksR</string>
-    <string name="action_vmess" translatable="false">VMess</string>
-    <string name="action_trojan" translatable="false">Trojan</string>
-    <string name="action_trojan_go" translatable="false">Trojan Go</string>
-    <string name="action_mieru" translatable="false">Mieru</string>
-    <string name="action_naive" translatable="false">Naïve</string>
-    <string name="action_hysteria" translatable="false">Hysteria</string>
-    <string name="action_ssh" translatable="false">SSH</string>
-    <string name="action_wireguard" translatable="false">WireGuard</string>
-    <string name="action_tuic" translatable="false">TUIC</string>
     <string name="proxy_chain">زنجیره پراکسی</string>
     <string name="custom_config">پیکربندی اختصاصی</string>
     <string name="balancer">برابرکننده</string>
@@ -309,23 +291,17 @@
     <string name="enable_log_sum">برای اهداف عیب‌یابی</string>
     <string name="list">فهرست</string>
     <string name="random">تصادفی</string>
-    <string name="leastPing" translatable="false">Ping</string>
     <string name="api_port">پورت API</string>
     <string name="probe_interval">مدت زمان Balancer observation</string>
     <string name="standard">استاندارد</string>
-    <string name="v2rayn" translatable="false">V2RayN</string>
-    <string name="available" translatable="false">%dms</string>
     <string name="unavailable">در دسترس نیست</string>
     <string name="always_show_address">نشانی‌ها همواره نمایش داده شود</string>
     <string name="always_show_address_sum">همیشه نشانی سرور را روی کارت پیکربندی نمایش دهید</string>
     <string name="clear_traffic_statistics">پاک کردن اطلاعات ترافیک</string>
     <string name="connection_test">آزمایش اتصال</string>
     <string name="connection_test_clear_results">پاک کردن نتایج آزمایش</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
     <string name="connection_test_tcp_ping_unavailable">TCPing در دسترس نیست</string>
-    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing در دسترس نیست</string>
-    <string name="connection_test_url_test" translatable="false">آزمایش اتصال به لینک</string>
     <string name="connection_test_domain_not_found">دامنه یافت نشد</string>
     <string name="connection_test_refused">اتصال رد شد</string>
     <string name="connection_test_unreachable">متصل نمی‌شود</string>
@@ -364,7 +340,6 @@
     <string name="install_from_play_store">نصب از فروشگاه Play</string>
     <string name="install_from_fdroid">نصب از F-Droid</string>
     <string name="download">دانلود</string>
-    <string name="ooc_subscription_token">مشخصه OOCv1 API</string>
     <string name="ooc_subscription_token_invalid">مشخصه OOCv1 نادرست</string>
     <string name="update_subscription_warning">پروکسی متصل نیست، آیا مطمئن هستید که می خواهید به‌روزرسانی کنید؟</string>
     <string name="ooc_warning">هشدار</string>
@@ -401,13 +376,6 @@
 
     <string name="shadowsocks_plugin_simple_obfs">Obfs ساده (افزونه اندروید Shadowsocks)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (افزونه Shadowsocks اندروید)</string>
-
-    <string name="traffic_uplink" translatable="false">%s | %s/s ↑</string>
-    <string name="traffic_downlink" translatable="false">%s | %s/s ↓</string>
-
-    <string name="traffic_uplink_total" translatable="false">%s ↑</string>
-    <string name="traffic_downlink_total" translatable="false">%s ↓</string>
-
     <string name="tcp_connections">%d اتصال TCP</string>
     <string name="udp_connections">%d اتصال UDP</string>
 
@@ -440,8 +408,6 @@
     <string name="wireguard_local_address">نشانی محلی</string>
     <string name="wireguard_public_key">کلید عمومی همتا</string>
     <string name="wireguard_psk">کلید همتا از پیش مشترک</string>
-
-    <string name="cloudflare_wrap" translatable="false">Cloudflare Warp</string>
     <string name="warp_license">CloudFlare Warp یک ارائه دهنده رایگان WireGuard VPN است. با استفاده از آن، با شرایط استفاده، موافقت می کنید.</string>
     <string name="warp_generate">ایجاد پیکربندی</string>
     <string name="generating">در حال ایجاد...</string>
@@ -450,7 +416,6 @@
     <string name="destination_override_summary">از دامنه ردیابی‌شده برای بازنویسی آدرس مقصد استفاده کنید، نه فقط برای مسیریابی.</string>
     <string name="resolve_destination">بررسی مقصد</string>
     <string name="resolve_destination_summary">اگر آدرس مقصد یک دامنه باشد، بر اساس استراتژی IPv6 (تعارض با FakeDNS) از بین می‌رود.</string>
-    <string name="pcap" translatable="false">Pcap</string>
     <string name="pcap_notice">فایل‌های Pcap در %s ذخیره می‌شوند.</string>
     <string name="naive_insecure_concurrency">همزمانی ناامن</string>
     <string name="naive_insecure_concurrency_summary">از N اتصال تونل همزمان برای قوی‌تر بودن در شرایط بد شبکه استفاده کنید. اتصالات بیشتر، اتصال به تونل را آسان‌تر و ایمن‌تر می کند. این پروژه برای افزایش امنیت در برابر شنود ترافیک تلاش می‌کند. استفاده ناامن، هدف پروژه نیست. \n\nاگر می‌خواهید از این استفاده کنید، ابتدا N=2 را امتحان کنید تا ببینید آیا مشکلات شما حل می‌شود یا خیر. اکیداً توصیه می‌شود از بیش از 4 اتصال در اینجا استفاده نکنید.</string>
@@ -462,8 +427,6 @@
     <string name="nat_stun_server_hint">سرور STUN</string>
     <string name="nat_result_hint">بررسی نتیجه NAT</string>
     <string name="tools_network">شبکه</string>
-    <string name="mtu" translatable="false">MTU</string>
-
     <string name="backup">پشتیبان‌گیری</string>
     <string name="backup_groups_and_configurations">گروه‌ها و پیکربندی‌ها</string>
     <string name="backup_rules">دستورالعمل‌های مسیریابی</string>
@@ -514,7 +477,6 @@
     <string name="use_selector">استفاده از انتخاب‌گر</string>
     <string name="front_proxy">پراکسی جلویی</string>
     <string name="landing_proxy" >پراکسی در حال فرود</string>
-    <string name="action_shadowtls" translatable="false">ShadowTLS</string>
     <string name="protocol_version">نسخه پروتکل</string>
     <string name="share_subscription">اشتراک‌گذاری گروه اشتراکی</string>
     <string name="show_group_in_notification">نمایش نام گروه در نوار اعلان</string>
@@ -648,4 +610,4 @@
     <string name="snell_mode">حالت</string>
     <string name="snell_reuse">استفادهٔ مجدد</string>
     <string name="snell_reuse_summary">فقط v4-v6</string>
-</resources>
+    </resources>

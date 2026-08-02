@@ -95,8 +95,8 @@
     <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirect： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Test ediliyor…</string>
-    <string name="connection_test_available">Test Mevcut</string>
-    <string name="connection_test_available_http">HTTP Test Mevcut</string>
+    <string name="connection_test_available">Başarılı: HTTPS el sıkışması %dms sürdü</string>
+    <string name="connection_test_available_http">Başarılı: HTTP el sıkışması %dms sürdü</string>
     <string name="connection_test_error">Başarısız: %s</string>
     <string name="connection_test_fail">İnternet Kullanılamıyor</string>
     <string name="connection_test_error_status_code">Hata kodu: #%d</string>
@@ -221,7 +221,7 @@
     <string name="service_failed">Başarısız: </string>
     <string name="stop">Durdur</string>
     <string name="stopping">Kapatılıyor…</string>
-    <string name="vpn_error">VPN Hatası</string>
+    <string name="vpn_error">VPN Hatası: %s</string>
     <string name="vpn_permission_denied">VPN hizmeti oluşturma izni reddedildi</string>
     <string name="reboot_required">Failed to start VPN service. You might need to reboot your
         device.</string>
@@ -746,4 +746,4 @@
     <string name="dynamic_colors_classic">Yeni arayüzle kullanılabilir</string>
     <string name="theme_fallback_summary">Dinamik devre dışıyken bu renk</string>
     <string name="more_options">Daha Fazla</string>
-</resources>
+    </resources>

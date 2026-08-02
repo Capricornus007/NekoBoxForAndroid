@@ -629,4 +629,4 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="snell_mode">Modo</string>
     <string name="snell_reuse">Reutilizar</string>
     <string name="snell_reuse_summary">solo v4-v6</string>
-</resources>
+    </resources>

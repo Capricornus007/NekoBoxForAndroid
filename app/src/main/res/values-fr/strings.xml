@@ -99,8 +99,8 @@
     <string name="speed_detail">Proxy : %1$s↑ %2$s↓\nDirect : %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Test en cours...</string>
-    <string name="connection_test_available">Test dispo.</string>
-    <string name="connection_test_available_http">Test HTTP dispo.</string>
+    <string name="connection_test_available">Succès : la poignée de main HTTPS a pris %dms</string>
+    <string name="connection_test_available_http">Succès : la poignée de main HTTP a pris %dms</string>
     <string name="connection_test_error">Échec : %s</string>
     <string name="connection_test_fail">Internet indisponible</string>
     <string name="connection_test_error_status_code">Code d\'erreur : #%d</string>
@@ -226,7 +226,7 @@
     <string name="service_failed">Échec : </string>
     <string name="stop">Arrêter</string>
     <string name="stopping">Arrêt en cours…</string>
-    <string name="vpn_error">Erreur VPN</string>
+    <string name="vpn_error">Erreur VPN : %s</string>
     <string name="vpn_permission_denied">Permission refusée pour créer un service VPN</string>
     <string name="reboot_required">Échec du démarrage du service VPN. Vous devrez peut-être redémarrer votre
         appareil.</string>
@@ -760,4 +760,4 @@
     <string name="dynamic_colors_classic">Disponible avec la nouvelle interface</string>
     <string name="theme_fallback_summary">Couleur si dynamique désactivé</string>
     <string name="more_options">Plus</string>
-</resources>
+    </resources>

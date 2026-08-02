@@ -629,4 +629,4 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="snell_mode">Modus</string>
     <string name="snell_reuse">Hergebruik</string>
     <string name="snell_reuse_summary">alleen v4-v6</string>
-</resources>
+    </resources>

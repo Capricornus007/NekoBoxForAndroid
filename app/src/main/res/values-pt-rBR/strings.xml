@@ -622,4 +622,4 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="snell_mode">Modo</string>
     <string name="snell_reuse">Reuso</string>
     <string name="snell_reuse_summary">apenas v4-v6</string>
-</resources>
+    </resources>

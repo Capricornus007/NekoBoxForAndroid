@@ -95,8 +95,8 @@
     <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirecto： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Probando…</string>
-    <string name="connection_test_available">Test disponible</string>
-    <string name="connection_test_available_http">Test HTTP disponible</string>
+    <string name="connection_test_available">Éxito: el protocolo de enlace HTTPS tardó %dms</string>
+    <string name="connection_test_available_http">Éxito: el protocolo de enlace HTTP tardó %dms</string>
     <string name="connection_test_error">Falló: %s</string>
     <string name="connection_test_fail">Internet no disponible</string>
     <string name="connection_test_error_status_code">Código de error: #%d</string>
@@ -224,7 +224,7 @@
     <string name="service_failed">Falló: </string>
     <string name="stop">Detener</string>
     <string name="stopping">Apagando…</string>
-    <string name="vpn_error">Error de VPN</string>
+    <string name="vpn_error">Error de VPN: %s</string>
     <string name="vpn_permission_denied">Permiso denegado para crear un servicio VPN</string>
     <string name="reboot_required">No se pudo iniciar el servicio VPN. Es posible que necesite reiniciar su
         dispositivo.</string>
@@ -754,4 +754,4 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="dynamic_colors_classic">Disponible con la nueva interfaz</string>
     <string name="theme_fallback_summary">Usar este color sin dinámico</string>
     <string name="more_options">Más</string>
-</resources>
+    </resources>
