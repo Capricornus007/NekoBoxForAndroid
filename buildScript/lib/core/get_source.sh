@@ -5,14 +5,15 @@ source "buildScript/init/env.sh"
 ENV_NB4A=1
 source "buildScript/lib/core/get_source_env.sh"
 
-pushd .. >/dev/null
-
 #### sing-box ####
+# nb4a.properties はリポジトリルートに存在する。pushd .. の前に読むこと。
 SINGBOX_BRANCH=$(grep '^SINGBOX_BRANCH=' nb4a.properties | head -n1 | cut -d'=' -f2 | tr -d '\r[:space:]')
 if [ -z "$SINGBOX_BRANCH" ]; then
   SINGBOX_BRANCH="1.13.x"
 fi
 echo ">> Using NekoBox sing-box fork, branch: $SINGBOX_BRANCH"
+
+pushd .. >/dev/null
 
 NEKO_SINGBOX_REPO="https://github.com/Capricornus007/sing-box.git"
 if [ ! -d "sing-box" ]; then
