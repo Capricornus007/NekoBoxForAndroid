@@ -581,4 +581,13 @@
     <string name="snell_mode">モード</string>
     <string name="snell_reuse">再利用</string>
     <string name="snell_reuse_summary">v4-v6 のみ</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">タイムアウトで自動切り替え</string>
+    <string name="auto_switch_timeout_summary">応答がない場合に次の設定へ自動的に切り替える</string>
+    <string name="auto_switch_timeout_duration">タイムアウト時間（秒）</string>
+    <string name="vpn_watchdog">自動再接続</string>
+    <string name="vpn_watchdog_summary">接続が切れたらVPNを再起動する</string>
+    <string name="vpn_watchdog_test">🧪 ウォッチドッグをテスト</string>
+    <string name="vpn_watchdog_test_summary">VPNを強制再起動してウォッチドッグをテストする</string>
+    <string name="vpn_watchdog_interval">チェック間隔（秒）</string>
+</resources>

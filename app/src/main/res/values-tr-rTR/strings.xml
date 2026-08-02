@@ -587,8 +587,8 @@
     <string name="clear_cache_confirm">Önbelleği temizlemek istediğinizden emin misiniz?</string>
     <string name="clear_cache_success">Önbellek temizlendi</string>
     <string name="clear_cache_failed">Önbellek temizlenemedi: %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">Çift ağ hızlandırma</string>
+    <string name="dual_network_acceleration_summary">Wi-Fi ve mobil veri üzerinden aynı anda bağlanın. Sistem ayarlarında Wi-Fi ve mobil verinin açık kalmasını gerektirir ve pil tüketimini artırır.</string>
     <string name="connection_test_timeout">Test Zaman Aşımı (ms)</string>
     <string name="preview_version_hint">Bu uygulama bir önizleme sürümüdür ve birçok sorun içerebilir. Test etmek istemiyorsanız, lütfen GitHub\'a giderek Sürüm sürümünü indirin!</string>
     <string name="preview_hint_dont_show_again">Tekrar gösterme</string>
@@ -621,4 +621,13 @@
     <string name="snell_mode">Mod</string>
     <string name="snell_reuse">Tekrar Kullan</string>
     <string name="snell_reuse_summary">yalnızca v4-v6</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Zaman aşımında otomatik geçiş</string>
+    <string name="auto_switch_timeout_summary">Yanıt yoksa otomatik olarak sonraki yapılandırmaya geç</string>
+    <string name="auto_switch_timeout_duration">Zaman aşımı süresi (saniye)</string>
+    <string name="vpn_watchdog">Otomatik yeniden bağlan</string>
+    <string name="vpn_watchdog_summary">Bağlantı kesilirse VPN\'i yeniden başlat</string>
+    <string name="vpn_watchdog_test">🧪 Watchdog\'u test et</string>
+    <string name="vpn_watchdog_test_summary">Watchdog\'u test etmek için VPN\'i yeniden başlatmaya zorla</string>
+    <string name="vpn_watchdog_interval">Kontrol aralığı (sn)</string>
+</resources>

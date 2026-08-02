@@ -645,4 +645,9 @@
 <string name="vpn_watchdog_test_summary">Форсировать перезапуск VPN прямо сейчас для проверки</string>
 <string name="ws_max_early_data">Максимальный объём данных</string>
 
+
+    <string name="auto_switch_timeout">Автоматическое переключение по таймауту</string>
+    <string name="auto_switch_timeout_summary">Автоматически переключаться на следующую конфигурацию, если нет ответа</string>
+    <string name="auto_switch_timeout_duration">Длительность таймаута (сек)</string>
+    <string name="vpn_watchdog_interval">Интервал проверки (сек)</string>
 </resources>

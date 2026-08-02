@@ -585,8 +585,8 @@
     <string name="clear_cache_confirm">Sind Sie sicher, dass Sie den Cache leeren möchten?</string>
     <string name="clear_cache_success">Cache geleert</string>
     <string name="clear_cache_failed">Fehler beim Leeren des Caches: %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">Dual-Network-Beschleunigung</string>
+    <string name="dual_network_acceleration_summary">Gleichzeitig über WLAN und Mobilfunk verbinden. Erfordert, dass WLAN und Mobilfunk in den Systemeinstellungen aktiviert bleiben, und erhöht den Akkuverbrauch.</string>
     <string name="connection_test_timeout">Test-Timeout (ms)</string>
     <string name="preview_version_hint">Diese Anwendung ist eine Vorschauversion und kann viele Probleme enthalten. Wenn Sie sie nicht testen möchten, gehen Sie bitte zu GitHub, um die Release-Version herunterzuladen!</string>
     <string name="preview_hint_dont_show_again">Nicht mehr anzeigen</string>
@@ -619,4 +619,13 @@
     <string name="snell_mode">Modus</string>
     <string name="snell_reuse">Wiederverwendung</string>
     <string name="snell_reuse_summary">nur v4-v6</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Bei Zeitüberschreitung automatisch wechseln</string>
+    <string name="auto_switch_timeout_summary">Automatisch zur nächsten Konfiguration wechseln, wenn keine Antwort erfolgt</string>
+    <string name="auto_switch_timeout_duration">Zeitüberschreitung (Sekunden)</string>
+    <string name="vpn_watchdog">Automatische Wiederverbindung</string>
+    <string name="vpn_watchdog_summary">VPN bei Verbindungsabbruch neu starten</string>
+    <string name="vpn_watchdog_test">🧪 Watchdog testen</string>
+    <string name="vpn_watchdog_test_summary">VPN zum Testen des Watchdogs neu starten</string>
+    <string name="vpn_watchdog_interval">Prüfintervall (Sek.)</string>
+</resources>

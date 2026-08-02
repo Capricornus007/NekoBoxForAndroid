@@ -601,8 +601,8 @@
     <string name="clear_cache_confirm">Êtes-vous sûr de vouloir vider le cache ?</string>
     <string name="clear_cache_success">Cache vidé</string>
     <string name="clear_cache_failed">Échec du vidage du cache : %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">Accélération double réseau</string>
+    <string name="dual_network_acceleration_summary">Connecter simultanément via Wi-Fi et données mobiles. Nécessite que le Wi-Fi et les données mobiles restent activés dans les paramètres système, et augmente la consommation de batterie.</string>
     <string name="connection_test_timeout">Délai d\'attente du test (ms)</string>
     <string name="preview_version_hint">Cette application est une version preview et peut contenir de nombreux problèmes. Si vous ne souhaitez pas la tester, veuillez aller sur GitHub pour télécharger la version Release !</string>
     <string name="preview_hint_dont_show_again">Ne plus afficher</string>
@@ -635,4 +635,13 @@
     <string name="snell_mode">Mode</string>
     <string name="snell_reuse">Réutiliser</string>
     <string name="snell_reuse_summary">v4-v6 uniquement</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Bascule automatique en cas de délai dépassé</string>
+    <string name="auto_switch_timeout_summary">Basculer automatiquement vers la configuration suivante en cas d\'absence de réponse</string>
+    <string name="auto_switch_timeout_duration">Durée du délai (secondes)</string>
+    <string name="vpn_watchdog">Reconnexion automatique</string>
+    <string name="vpn_watchdog_summary">Redémarrer le VPN en cas de coupure</string>
+    <string name="vpn_watchdog_test">🧪 Tester le gardien</string>
+    <string name="vpn_watchdog_test_summary">Forcer le redémarrage du VPN pour tester le gardien</string>
+    <string name="vpn_watchdog_interval">Intervalle de vérification (s)</string>
+</resources>

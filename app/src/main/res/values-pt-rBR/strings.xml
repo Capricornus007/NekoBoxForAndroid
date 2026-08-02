@@ -588,8 +588,8 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="clear_cache_confirm">Tem certeza de que deseja limpar o cache?</string>
     <string name="clear_cache_success">Cache limpo</string>
     <string name="clear_cache_failed">Falha ao limpar o cache: %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">Aceleração de rede dupla</string>
+    <string name="dual_network_acceleration_summary">Conectar simultaneamente via Wi-Fi e dados móveis. Exige que Wi-Fi e dados móveis permaneçam ativados nas configurações do sistema e aumenta o consumo de bateria.</string>
     <string name="connection_test_timeout">Tempo Limite de Teste (ms)</string>
     <string name="preview_version_hint">Esta aplicação é uma versão de pré-visualização e pode conter muitos problemas. Se não deseja testá-la, vá para o GitHub para baixar a versão de lançamento!</string>
     <string name="preview_hint_dont_show_again">Não mostrar novamente</string>
@@ -622,4 +622,13 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="snell_mode">Modo</string>
     <string name="snell_reuse">Reuso</string>
     <string name="snell_reuse_summary">apenas v4-v6</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Alternar automaticamente no timeout</string>
+    <string name="auto_switch_timeout_summary">Alternar automaticamente para a próxima configuração se não houver resposta</string>
+    <string name="auto_switch_timeout_duration">Duração do timeout (segundos)</string>
+    <string name="vpn_watchdog">Reconexão automática</string>
+    <string name="vpn_watchdog_summary">Reiniciar a VPN se a conexão cair</string>
+    <string name="vpn_watchdog_test">🧪 Testar watchdog</string>
+    <string name="vpn_watchdog_test_summary">Forçar reinício da VPN para testar o watchdog</string>
+    <string name="vpn_watchdog_interval">Intervalo de verificação (s)</string>
+</resources>

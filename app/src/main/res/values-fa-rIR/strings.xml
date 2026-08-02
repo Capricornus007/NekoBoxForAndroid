@@ -583,8 +583,8 @@
     <string name="clear_cache_confirm">آیا مطمئن هستید که می‌خواهید حافظه نهان را پاک کنید؟</string>
     <string name="clear_cache_success">حافظه نهان پاک شد</string>
     <string name="clear_cache_failed">پاک کردن حافظه نهان ناموفق بود: %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">شتاب‌دهی دو شبکه‌ای</string>
+    <string name="dual_network_acceleration_summary">اتصال هم‌زمان از طریق Wi-Fi و دادهٔ موبایل؛ نیازمند روشن بودن هم‌زمان Wi-Fi و دادهٔ موبایل در تنظیمات سیستم است و مصرف باتری را افزایش می‌دهد.</string>
     <string name="connection_test_timeout">مهلت تست (میلی‌ثانیه)</string>
     <string name="preview_version_hint">این برنامه یک نسخه پیش‌نمایش است و ممکن است مشکلات زیادی داشته باشد. اگر نمی‌خواهید آن را آزمایش کنید، لطفاً به GitHub رفته و نسخه Release را دانلود کنید!</string>
     <string name="preview_hint_dont_show_again">دیگر نشان نده</string>
@@ -619,4 +619,13 @@
     <string name="snell_mode">حالت</string>
     <string name="snell_reuse">استفاده مجدد</string>
     <string name="snell_reuse_summary">فقط v4-v6</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">تعویض خودکار در پایان مهلت</string>
+    <string name="auto_switch_timeout_summary">در صورت عدم پاسخ، به‌طور خودکار به پیکربندی بعدی بروید</string>
+    <string name="auto_switch_timeout_duration">مدت مهلت (ثانیه)</string>
+    <string name="vpn_watchdog">اتصال مجدد خودکار</string>
+    <string name="vpn_watchdog_summary">راه‌اندازی مجدد VPN هنگام قطع اتصال</string>
+    <string name="vpn_watchdog_test">🧪 تست نگهبان</string>
+    <string name="vpn_watchdog_test_summary">اجبار به راه‌اندازی مجدد VPN برای تست نگهبان</string>
+    <string name="vpn_watchdog_interval">فاصله بررسی (ثانیه)</string>
+</resources>

@@ -591,8 +591,8 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="clear_cache_confirm">Er du sikker på at du vil tømme cachen?</string>
     <string name="clear_cache_success">Cache tømt</string>
     <string name="clear_cache_failed">Kunne ikke tømme cache: %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">Akselerasjon for dobbelt nettverk</string>
+    <string name="dual_network_acceleration_summary">Koble til samtidig via Wi-Fi og mobildata. Krever at både Wi-Fi og mobildata forblir aktivert i systeminnstillingene, og øker batteriforbruket.</string>
     <string name="connection_test_timeout">Tidsavbrudd for test (ms)</string>
     <string name="preview_version_hint">Denne applikasjonen er en forhåndsvisningsversjon og kan inneholde mange problemer. Hvis du ikke vil teste den, gå til GitHub for å laste ned Release-versjonen!</string>
     <string name="preview_hint_dont_show_again">Ikke vis igjen</string>
@@ -625,4 +625,13 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="snell_mode">Modus</string>
     <string name="snell_reuse">Gjenbruk</string>
     <string name="snell_reuse_summary">kun v4-v6</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Automatisk bytte ved timeout</string>
+    <string name="auto_switch_timeout_summary">Bytt automatisk til neste konfigurasjon hvis det ikke kommer noe svar</string>
+    <string name="auto_switch_timeout_duration">Tidsavbrudd (sekunder)</string>
+    <string name="vpn_watchdog">Automatisk tilkobling på nytt</string>
+    <string name="vpn_watchdog_summary">Start VPN på nytt hvis tilkoblingen faller</string>
+    <string name="vpn_watchdog_test">🧪 Test vakthund</string>
+    <string name="vpn_watchdog_test_summary">Tving VPN til å starte på nytt for å teste vakthunden</string>
+    <string name="vpn_watchdog_interval">Kontrollintervall (sek)</string>
+</resources>

@@ -594,8 +594,8 @@
     <string name="clear_cache_confirm">هل أنت متأكد أنك تريد مسح ذاكرة التخزين المؤقت؟</string>
     <string name="clear_cache_success">تم مسح ذاكرة التخزين المؤقت</string>
     <string name="clear_cache_failed">فشل مسح ذاكرة التخزين المؤقت: %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">تسريع الشبكة المزدوجة</string>
+    <string name="dual_network_acceleration_summary">الاتصال في وقت واحد عبر Wi-Fi والبيانات الخلوية. يتطلب بقاء كل من Wi-Fi والبيانات الخلوية مفعّلين في إعدادات النظام، ويزيد من استهلاك البطارية.</string>
     <string name="connection_test_timeout">مهلة الاختبار (مللي ثانية)</string>
     <string name="preview_version_hint">هذا التطبيق هو إصدار تجريبي وقد يحتوي على العديد من المشاكل. إذا كنت لا ترغب في اختباره، فيرجى زيارة GitHub لتنزيل إصدار الإصدار!</string>
     <string name="preview_hint_dont_show_again">لا تظهر مرة أخرى</string>
@@ -628,4 +628,13 @@
     <string name="snell_mode">الوضع</string>
     <string name="snell_reuse">إعادة الاستخدام</string>
     <string name="snell_reuse_summary">v4-v6 فقط</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">التبديل التلقائي عند انتهاء المهلة</string>
+    <string name="auto_switch_timeout_summary">التبديل تلقائيًا إلى الإعداد التالي في حالة عدم الاستجابة</string>
+    <string name="auto_switch_timeout_duration">مدة المهلة (ثوانٍ)</string>
+    <string name="vpn_watchdog">إعادة الاتصال تلقائيًا</string>
+    <string name="vpn_watchdog_summary">إعادة تشغيل VPN عند انقطاع الاتصال</string>
+    <string name="vpn_watchdog_test">🧪 اختبار الحارس</string>
+    <string name="vpn_watchdog_test_summary">فرض إعادة تشغيل VPN لاختبار الحارس</string>
+    <string name="vpn_watchdog_interval">فترة الفحص (ثوانٍ)</string>
+</resources>

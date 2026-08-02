@@ -753,4 +753,15 @@
     <string name="dynamic_colors_classic">متاح مع الواجهة الجديدة</string>
     <string name="theme_fallback_summary">اللون عند تعطيل الديناميكي</string>
     <string name="more_options">المزيد</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">التبديل التلقائي عند انتهاء المهلة</string>
+    <string name="auto_switch_timeout_summary">التبديل تلقائيًا إلى الإعداد التالي في حالة عدم الاستجابة</string>
+    <string name="auto_switch_timeout_duration">مدة المهلة (ثوانٍ)</string>
+    <string name="vpn_watchdog">إعادة الاتصال تلقائيًا</string>
+    <string name="vpn_watchdog_summary">إعادة تشغيل VPN عند انقطاع الاتصال</string>
+    <string name="vpn_watchdog_test">🧪 اختبار الحارس</string>
+    <string name="vpn_watchdog_test_summary">فرض إعادة تشغيل VPN لاختبار الحارس</string>
+    <string name="vpn_watchdog_interval">فترة الفحص (ثوانٍ)</string>
+    <string name="dual_network_acceleration">تسريع الشبكة المزدوجة</string>
+    <string name="dual_network_acceleration_summary">الاتصال في وقت واحد عبر Wi-Fi والبيانات الخلوية. يتطلب بقاء كل من Wi-Fi والبيانات الخلوية مفعّلين في إعدادات النظام، ويزيد من استهلاك البطارية.</string>
+</resources>

@@ -751,4 +751,15 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="dynamic_colors_classic">Beschikbaar met de nieuwe interface</string>
     <string name="theme_fallback_summary">Gebruikt wanneer dynamische kleuren niet beschikbaar of uitgeschakeld zijn</string>
     <string name="more_options">Meer opties</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Automatisch overschakelen bij timeout</string>
+    <string name="auto_switch_timeout_summary">Automatisch overschakelen naar de volgende configuratie bij geen reactie</string>
+    <string name="auto_switch_timeout_duration">Timeout-duur (seconden)</string>
+    <string name="vpn_watchdog">Automatisch opnieuw verbinden</string>
+    <string name="vpn_watchdog_summary">VPN herstarten bij verbindingsverlies</string>
+    <string name="vpn_watchdog_test">🧪 Watchdog testen</string>
+    <string name="vpn_watchdog_test_summary">VPN geforceerd herstarten om de watchdog te testen</string>
+    <string name="vpn_watchdog_interval">Controle-interval (sec)</string>
+    <string name="dual_network_acceleration">Dual-netwerkversnelling</string>
+    <string name="dual_network_acceleration_summary">Gelijktijdig verbinden via wifi en mobiele data. Vereist dat zowel wifi als mobiele data ingeschakeld blijven in de systeeminstellingen en verhoogt het batterijverbruik.</string>
+</resources>

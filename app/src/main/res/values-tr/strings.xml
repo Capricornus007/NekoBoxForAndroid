@@ -746,4 +746,15 @@
     <string name="dynamic_colors_classic">Yeni arayüzle kullanılabilir</string>
     <string name="theme_fallback_summary">Dinamik devre dışıyken bu renk</string>
     <string name="more_options">Daha Fazla</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Zaman aşımında otomatik geçiş</string>
+    <string name="auto_switch_timeout_summary">Yanıt yoksa otomatik olarak sonraki yapılandırmaya geç</string>
+    <string name="auto_switch_timeout_duration">Zaman aşımı süresi (saniye)</string>
+    <string name="vpn_watchdog">Otomatik yeniden bağlan</string>
+    <string name="vpn_watchdog_summary">Bağlantı kesilirse VPN\'i yeniden başlat</string>
+    <string name="vpn_watchdog_test">🧪 Watchdog\'u test et</string>
+    <string name="vpn_watchdog_test_summary">Watchdog\'u test etmek için VPN\'i yeniden başlatmaya zorla</string>
+    <string name="vpn_watchdog_interval">Kontrol aralığı (sn)</string>
+    <string name="dual_network_acceleration">Çift ağ hızlandırma</string>
+    <string name="dual_network_acceleration_summary">Wi-Fi ve mobil veri üzerinden aynı anda bağlanın. Sistem ayarlarında Wi-Fi ve mobil verinin açık kalmasını gerektirir ve pil tüketimini artırır.</string>
+</resources>

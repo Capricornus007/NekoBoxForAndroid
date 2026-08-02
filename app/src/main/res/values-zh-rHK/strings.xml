@@ -585,8 +585,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_cache_confirm">您確定要清除快取嗎？</string>
     <string name="clear_cache_success">快取已清除</string>
     <string name="clear_cache_failed">清除快取失敗：%s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">雙網路加速</string>
+    <string name="dual_network_acceleration_summary">同時透過 Wi-Fi 與行動數據連線。需在系統設定中保持 Wi-Fi 與行動數據皆開啟，並會增加耗電。</string>
     <string name="connection_test_timeout">測試超時（毫秒）</string>
     <string name="preview_version_hint">此應用程式為預覽版本，可能包含諸多問題。若不想測試，請到GitHub下載Release版本！</string>
     <string name="preview_hint_dont_show_again">唔好再顯示</string>
@@ -619,4 +619,13 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="snell_mode">模式</string>
     <string name="snell_reuse">重用</string>
     <string name="snell_reuse_summary">僅 v4-v6</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">超時自動切換</string>
+    <string name="auto_switch_timeout_summary">無回應時自動切換到下一個設定</string>
+    <string name="auto_switch_timeout_duration">超時時長（秒）</string>
+    <string name="vpn_watchdog">自動重連</string>
+    <string name="vpn_watchdog_summary">連線中斷時自動重啟 VPN</string>
+    <string name="vpn_watchdog_test">🧪 測試看門狗</string>
+    <string name="vpn_watchdog_test_summary">強制重啟 VPN 以測試看門狗</string>
+    <string name="vpn_watchdog_interval">檢查間隔（秒）</string>
+</resources>

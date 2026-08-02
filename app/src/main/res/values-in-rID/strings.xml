@@ -596,8 +596,8 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="clear_cache_confirm">Apakah Anda yakin ingin membersihkan cache?</string>
     <string name="clear_cache_success">Cache dibersihkan</string>
     <string name="clear_cache_failed">Gagal membersihkan cache: %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">Akselerasi jaringan ganda</string>
+    <string name="dual_network_acceleration_summary">Terhubung secara bersamaan melalui Wi-Fi dan data seluler. Membutuhkan Wi-Fi dan data seluler tetap aktif di pengaturan sistem, dan meningkatkan penggunaan baterai.</string>
     <string name="connection_test_timeout">Batas Waktu Tes (ms)</string>
     <string name="preview_version_hint">Aplikasi ini adalah versi pratinjau dan mungkin mengandung banyak masalah. Jika Anda tidak ingin mengujinya, silakan kunjungi GitHub untuk mengunduh versi Rilis!</string>
     <string name="preview_hint_dont_show_again">Jangan tampilkan lagi</string>
@@ -630,4 +630,13 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="snell_mode">Mode</string>
     <string name="snell_reuse">Gunakan Ulang</string>
     <string name="snell_reuse_summary">hanya v4-v6</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Beralih otomatis saat timeout</string>
+    <string name="auto_switch_timeout_summary">Beralih otomatis ke konfigurasi berikutnya jika tidak ada respons</string>
+    <string name="auto_switch_timeout_duration">Durasi timeout (detik)</string>
+    <string name="vpn_watchdog">Sambungkan ulang otomatis</string>
+    <string name="vpn_watchdog_summary">Mulai ulang VPN saat koneksi terputus</string>
+    <string name="vpn_watchdog_test">🧪 Uji watchdog</string>
+    <string name="vpn_watchdog_test_summary">Paksa mulai ulang VPN untuk menguji watchdog</string>
+    <string name="vpn_watchdog_interval">Interval pemeriksaan (dtk)</string>
+</resources>

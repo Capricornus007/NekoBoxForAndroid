@@ -745,4 +745,15 @@
     <string name="dynamic_colors_classic">Доступно з новим інтерфейсом</string>
     <string name="theme_fallback_summary">Використовується, коли динамічні кольори недоступні або вимкнені</string>
     <string name="more_options">Більше опцій</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Автоматичне перемикання за таймаутом</string>
+    <string name="auto_switch_timeout_summary">Автоматично перемикатися на наступну конфігурацію, якщо немає відповіді</string>
+    <string name="auto_switch_timeout_duration">Тривалість таймауту (секунди)</string>
+    <string name="vpn_watchdog">Автоматичне перепідключення</string>
+    <string name="vpn_watchdog_summary">Перезапускати VPN при обриві з\'єднання</string>
+    <string name="vpn_watchdog_test">🧪 Тест watchdog</string>
+    <string name="vpn_watchdog_test_summary">Примусово перезапустити VPN для тестування watchdog</string>
+    <string name="vpn_watchdog_interval">Інтервал перевірки (сек)</string>
+    <string name="dual_network_acceleration">Прискорення подвійної мережі</string>
+    <string name="dual_network_acceleration_summary">Одночасне з\'єднання через Wi-Fi та мобільні дані. Вимагає, щоб Wi-Fi та мобільні дані залишалися увімкненими в налаштуваннях системи, і збільшує споживання батареї.</string>
+</resources>

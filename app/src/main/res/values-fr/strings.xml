@@ -760,4 +760,15 @@
     <string name="dynamic_colors_classic">Disponible avec la nouvelle interface</string>
     <string name="theme_fallback_summary">Couleur si dynamique désactivé</string>
     <string name="more_options">Plus</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Bascule automatique en cas de délai dépassé</string>
+    <string name="auto_switch_timeout_summary">Basculer automatiquement vers la configuration suivante en cas d\'absence de réponse</string>
+    <string name="auto_switch_timeout_duration">Durée du délai (secondes)</string>
+    <string name="vpn_watchdog">Reconnexion automatique</string>
+    <string name="vpn_watchdog_summary">Redémarrer le VPN en cas de coupure</string>
+    <string name="vpn_watchdog_test">🧪 Tester le gardien</string>
+    <string name="vpn_watchdog_test_summary">Forcer le redémarrage du VPN pour tester le gardien</string>
+    <string name="vpn_watchdog_interval">Intervalle de vérification (s)</string>
+    <string name="dual_network_acceleration">Accélération double réseau</string>
+    <string name="dual_network_acceleration_summary">Connecter simultanément via Wi-Fi et données mobiles. Nécessite que le Wi-Fi et les données mobiles restent activés dans les paramètres système, et augmente la consommation de batterie.</string>
+</resources>

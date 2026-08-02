@@ -742,4 +742,15 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="dynamic_colors_classic">Tilgjengelig med det nye grensesnittet</string>
     <string name="theme_fallback_summary">Brukes når dynamiske farger er utilgjengelige eller deaktivert</string>
     <string name="more_options">Flere alternativer</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Automatisk bytte ved timeout</string>
+    <string name="auto_switch_timeout_summary">Bytt automatisk til neste konfigurasjon hvis det ikke kommer noe svar</string>
+    <string name="auto_switch_timeout_duration">Tidsavbrudd (sekunder)</string>
+    <string name="vpn_watchdog">Automatisk tilkobling på nytt</string>
+    <string name="vpn_watchdog_summary">Start VPN på nytt hvis tilkoblingen faller</string>
+    <string name="vpn_watchdog_test">🧪 Test vakthund</string>
+    <string name="vpn_watchdog_test_summary">Tving VPN til å starte på nytt for å teste vakthunden</string>
+    <string name="vpn_watchdog_interval">Kontrollintervall (sek)</string>
+    <string name="dual_network_acceleration">Akselerasjon for dobbelt nettverk</string>
+    <string name="dual_network_acceleration_summary">Koble til samtidig via Wi-Fi og mobildata. Krever at både Wi-Fi og mobildata forblir aktivert i systeminnstillingene, og øker batteriforbruket.</string>
+</resources>

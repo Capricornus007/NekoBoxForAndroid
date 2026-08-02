@@ -739,4 +739,15 @@
     <string name="dynamic_colors_classic">Verfügbar mit der neuen Oberfläche</string>
     <string name="theme_fallback_summary">Farbe wenn Dynamik deaktiviert</string>
     <string name="more_options">Mehr</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Bei Zeitüberschreitung automatisch wechseln</string>
+    <string name="auto_switch_timeout_summary">Automatisch zur nächsten Konfiguration wechseln, wenn keine Antwort erfolgt</string>
+    <string name="auto_switch_timeout_duration">Zeitüberschreitung (Sekunden)</string>
+    <string name="vpn_watchdog">Automatische Wiederverbindung</string>
+    <string name="vpn_watchdog_summary">VPN bei Verbindungsabbruch neu starten</string>
+    <string name="vpn_watchdog_test">🧪 Watchdog testen</string>
+    <string name="vpn_watchdog_test_summary">VPN zum Testen des Watchdogs neu starten</string>
+    <string name="vpn_watchdog_interval">Prüfintervall (Sek.)</string>
+    <string name="dual_network_acceleration">Dual-Network-Beschleunigung</string>
+    <string name="dual_network_acceleration_summary">Gleichzeitig über WLAN und Mobilfunk verbinden. Erfordert, dass WLAN und Mobilfunk in den Systemeinstellungen aktiviert bleiben, und erhöht den Akkuverbrauch.</string>
+</resources>

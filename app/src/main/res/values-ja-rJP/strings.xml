@@ -585,8 +585,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_cache_confirm">キャッシュをクリアしてもよろしいですか？</string>
     <string name="clear_cache_success">キャッシュをクリアしました</string>
     <string name="clear_cache_failed">キャッシュのクリアに失敗しました: %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">デュアルネットワーク加速</string>
+    <string name="dual_network_acceleration_summary">Wi-Fiとモバイルデータで同時に接続します。システム設定でWi-Fiとモバイルデータの両方をオンにしておく必要があり、バッテリー消費が増加します。</string>
     <string name="connection_test_timeout">テストタイムアウト (ms)</string>
     <string name="preview_version_hint">このアプリケーションはプレビューバージョンであり、多くの問題が含まれている可能性があります。テストしたくない場合は、GitHubからリリースバージョンをダウンロードしてください。</string>
     <string name="preview_hint_dont_show_again">今後表示しない</string>
@@ -760,4 +760,13 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="ui_style_expressive">エクスプレッシブ</string>
     <string name="waterfall_settings">ウォーターフォール設定</string>
     <string name="webdav_insecure_url">安全でない WebDAV サーバー URL</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">タイムアウトで自動切り替え</string>
+    <string name="auto_switch_timeout_summary">応答がない場合に次の設定へ自動的に切り替える</string>
+    <string name="auto_switch_timeout_duration">タイムアウト時間（秒）</string>
+    <string name="vpn_watchdog">自動再接続</string>
+    <string name="vpn_watchdog_summary">接続が切れたらVPNを再起動する</string>
+    <string name="vpn_watchdog_test">🧪 ウォッチドッグをテスト</string>
+    <string name="vpn_watchdog_test_summary">VPNを強制再起動してウォッチドッグをテストする</string>
+    <string name="vpn_watchdog_interval">チェック間隔（秒）</string>
+</resources>

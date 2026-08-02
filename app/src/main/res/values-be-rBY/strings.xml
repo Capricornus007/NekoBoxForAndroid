@@ -581,8 +581,8 @@
     <string name="clear_cache_confirm">Вы ўпэўнены, што хочаце ачысціць кэш?</string>
     <string name="clear_cache_success">Кэш ачышчаны</string>
     <string name="clear_cache_failed">Не атрымалася ачысціць кэш: %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">Паскарэнне двайной сеткі</string>
+    <string name="dual_network_acceleration_summary">Адначасовае злучэнне праз Wi-Fi і мабільныя даныя. Патрабуе, каб Wi-Fi і мабільныя даныя заставаліся ўключанымі ў наладах сістэмы, і павялічвае спажыванне батарэі.</string>
     <string name="connection_test_timeout">Тайм-аўт тэсту (мс)</string>
     <string name="preview_version_hint">Гэта дадатак з\'яўляецца папярэдняй версіяй і можа ўтрымліваць шмат праблем. Калі вы не жадаеце тэставаць яго, калі ласка, перайдзіце на GitHub, каб спампаваць Release версію!</string>
     <string name="preview_hint_dont_show_again">Не паказваць зноў</string>
@@ -615,4 +615,13 @@
     <string name="snell_mode">Рэжым</string>
     <string name="snell_reuse">Паўторна выкарыстоўваць</string>
     <string name="snell_reuse_summary">толькі v4-v6</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Аўтаматычнае пераключэнне па таймаўце</string>
+    <string name="auto_switch_timeout_summary">Аўтаматычна пераключацца на наступную канфігурацыю, калі няма адказу</string>
+    <string name="auto_switch_timeout_duration">Працягласць таймаўту (секунды)</string>
+    <string name="vpn_watchdog">Аўтаматычнае перападключэнне</string>
+    <string name="vpn_watchdog_summary">Перазапускаць VPN пры абрыве злучэння</string>
+    <string name="vpn_watchdog_test">🧪 Тэст watchdog</string>
+    <string name="vpn_watchdog_test_summary">Прымусова перазапусціць VPN для тэставання watchdog</string>
+    <string name="vpn_watchdog_interval">Інтэрвал праверкі (сек)</string>
+</resources>

@@ -589,8 +589,8 @@
     <string name="clear_cache_confirm">确定要清除缓存吗？</string>
     <string name="clear_cache_success">缓存已清除</string>
     <string name="clear_cache_failed">清除缓存失败：%s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">双网络加速</string>
+    <string name="dual_network_acceleration_summary">同时通过 Wi-Fi 和移动数据连接。需在系统设置中保持 Wi-Fi 和移动数据均开启，并会增加耗电。</string>
     <string name="connection_test_timeout">测试超时（毫秒）</string>
     <string name="preview_version_hint">此应用程序为预览版，可能包含许多问题。如果您不想测试，请前往GitHub下载Release版本！</string>
     <string name="preview_hint_dont_show_again">不再显示</string>
@@ -764,4 +764,10 @@
     <string name="ui_style_expressive">生动</string>
     <string name="waterfall_settings">瀑布式设置</string>
     <string name="webdav_insecure_url">不安全的 WebDAV 地址</string>
-    </resources>
+    
+    <string name="vpn_watchdog">自动重连</string>
+    <string name="vpn_watchdog_summary">连接中断时自动重启 VPN</string>
+    <string name="vpn_watchdog_test">🧪 测试看门狗</string>
+    <string name="vpn_watchdog_test_summary">强制重启 VPN 以测试看门狗</string>
+    <string name="vpn_watchdog_interval">检查间隔（秒）</string>
+</resources>

@@ -591,8 +591,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_cache_confirm">Вы уверены, что хотите очистить кэш?</string>
     <string name="clear_cache_success">Кэш очищен</string>
     <string name="clear_cache_failed">Не удалось очистить кэш: %s</string>
-    <string name="dual_network_acceleration">Dual Network Acceleration</string>
-    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
+    <string name="dual_network_acceleration">Двойное сетевое ускорение</string>
+    <string name="dual_network_acceleration_summary">Одновременное подключение через Wi-Fi и мобильные данные. Требует, чтобы Wi-Fi и мобильные данные были включены в системе, и увеличивает расход батареи.</string>
     <string name="connection_test_timeout">Таймаут теста (мс)</string>
     <string name="preview_version_hint">Это приложение является предварительной версией и может содержать множество проблем. Если вы не хотите тестировать его, пожалуйста, перейдите на GitHub, чтобы скачать релизную версию!</string>
     <string name="preview_hint_dont_show_again">Больше не показывать</string>
@@ -627,4 +627,14 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="snell_mode">Режим</string>
     <string name="snell_reuse">Повторное использование</string>
     <string name="snell_reuse_summary">только v4-v6</string>
-    </resources>
+    
+    <string name="auto_switch_timeout">Автоматическое переключение по таймауту</string>
+    <string name="auto_switch_timeout_summary">Автоматически переключаться на следующую конфигурацию, если нет ответа</string>
+    <string name="auto_switch_timeout_duration">Длительность таймаута (сек)</string>
+    <string name="vpn_watchdog_interval">Интервал проверки (сек)</string>
+
+    <string name="vpn_watchdog">Авто-переподключение</string>
+    <string name="vpn_watchdog_summary">Перезапускать VPN при зависании (~90 сек)</string>
+    <string name="vpn_watchdog_test">🧪 Протестировать watchdog</string>
+    <string name="vpn_watchdog_test_summary">Форсировать перезапуск VPN прямо сейчас для проверки</string>
+</resources>
