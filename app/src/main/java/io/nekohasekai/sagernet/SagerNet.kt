@@ -202,48 +202,30 @@ class SagerNet :
         }
 
         fun updateNotificationChannels() {
-            if (Build.VERSION.SDK_INT >= 26) {
-                @RequiresApi(26)
-                {
-                    // Force-recreate channels so Android picks up changed importance levels.
-                    // createNotificationChannel is a no-op for existing channels, so we must
-                    // delete first. The delete+create window is microseconds on the same
-                    // thread — :bg process cannot start a service in that gap.
-                    notification.deleteNotificationChannel("service-vpn")
-                    notification.deleteNotificationChannel("service-proxy")
-                    // Android 16+ (SDK 36) では startForeground に IMPORTANCE_LOW が
-                    // 許可されず CannotPostForegroundServiceNotificationException が発生する。
-                    // そのため IMPORTANCE_DEFAULT を使用する。
-                    val fgImportance = if (Build.VERSION.SDK_INT >= 36) {
-                        NotificationManager.IMPORTANCE_DEFAULT
-                    } else {
-                        NotificationManager.IMPORTANCE_LOW
-                    }
-                    notification.createNotificationChannels(
-                        listOf(
-                            NotificationChannel(
-                                "service-vpn",
-                                application.getText(R.string.service_vpn),
-                                fgImportance,
-                            ),
-                            NotificationChannel(
-                                "service-proxy",
-                                application.getText(R.string.service_proxy),
-                                fgImportance,
-                            ),
-                            NotificationChannel(
-                                "service-subscription",
-                                application.getText(R.string.service_subscription),
-                                NotificationManager.IMPORTANCE_DEFAULT,
-                            ),
-                            NotificationChannel(
-                                "connection-test",
-                                application.getText(R.string.connection_test),
-                                NotificationManager.IMPORTANCE_DEFAULT,
-                            ),
-                        ),
+            if (Build.VERSION.SDK_INT >= 26) @RequiresApi(26) {
+                notification.createNotificationChannels(
+                    listOf(
+                        NotificationChannel(
+                            "service-vpn",
+                            application.getText(R.string.service_vpn),
+                            if (Build.VERSION.SDK_INT >= 28) NotificationManager.IMPORTANCE_MIN
+                            else NotificationManager.IMPORTANCE_LOW
+                        ),   // #1355
+                        NotificationChannel(
+                            "service-proxy",
+                            application.getText(R.string.service_proxy),
+                            NotificationManager.IMPORTANCE_LOW
+                        ), NotificationChannel(
+                            "service-subscription",
+                            application.getText(R.string.service_subscription),
+                            NotificationManager.IMPORTANCE_DEFAULT
+                        ), NotificationChannel(
+                            "connection-test",
+                            application.getText(R.string.connection_test),
+                            NotificationManager.IMPORTANCE_DEFAULT
+                        )
                     )
-                }
+                )
             }
         }
 
