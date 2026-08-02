@@ -102,6 +102,9 @@
     <string name="require_transproxy">투명 프록시 인바운드 활성화</string>
     <string name="transproxy_mode">투명 프록시 모드</string>
     <string name="connection_test_url">연결 테스트 URL</string>
+    <string name="auto_switch_timeout">Auto-switch on Timeout</string>
+    <string name="auto_switch_timeout_summary">Automatically switch to next config if no response</string>
+    <string name="auto_switch_timeout_duration">Timeout Duration (seconds)</string>
     <!-- proxy category -->
     <string name="profile_name">프로필 이름</string>
     <string name="server_address">서버</string>
@@ -751,4 +754,9 @@
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
+    <string name="vpn_watchdog">Auto-reconnect</string>
+    <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
+    <string name="vpn_watchdog_test">🧪 Test watchdog</string>
+    <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
+    <string name="vpn_watchdog_interval">Check interval (sec)</string>
 </resources>
