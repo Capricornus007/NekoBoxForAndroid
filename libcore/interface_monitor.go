@@ -2,14 +2,18 @@ package libcore
 
 import (
 	"sync"
+	"time"
 
 	tun "github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common/control"
+	E "github.com/sagernet/sing/common/exceptions"
+	"github.com/sagernet/sing/common/logger"
 	"github.com/sagernet/sing/common/x/list"
 )
 
 // InterfaceUpdateListener 由 Kotlin 侧实现回调：
 // ConnectivityManager 默认网络变化时通知 Go 默认物理接口（名称 + index，-1 表示无网络）。
+// 参考 husi libcore/tun.go。
 type InterfaceUpdateListener interface {
 	UpdateDefaultInterface(interfaceName string, interfaceIndex int32)
 }
@@ -19,25 +23,33 @@ var (
 	_ InterfaceUpdateListener     = (*interfaceMonitor)(nil)
 )
 
-// interfaceMonitor は完全なデフォルトインターフェースモニター。
+// interfaceMonitor 是完整的默认接口监视器（替代旧 interfaceMonitorStub 空实现）。
+// 官方内核 v1.13 只要注册了 PlatformInterface 就强制使用平台监视器
+// （route/network.go: usePlatformDefaultInterfaceMonitor = platformInterface != nil），
+// stub 的 DefaultInterface()=nil 会导致所有拨号报 "no available network interface"。
 type interfaceMonitor struct {
+	wrapper                     *boxPlatformInterfaceWrapper
 	access                      sync.Mutex
 	callbacks                   list.List[tun.DefaultInterfaceUpdateCallback]
+	logger                      logger.Logger
 	myInterfaces                []string
 	defaultInterface            *control.Interface
 	defaultInterfaceInitialized bool
 }
 
-func newInterfaceMonitor() *interfaceMonitor {
-	return &interfaceMonitor{}
+// wrapper 指针延迟访问 networkManager：
+// CreateDefaultInterfaceMonitor 先于 PlatformInterface.Initialize 被调用（box.go），
+// 回调发生时 Initialize 已执行完毕。
+func newInterfaceMonitor(w *boxPlatformInterfaceWrapper, l logger.Logger) *interfaceMonitor {
+	return &interfaceMonitor{wrapper: w, logger: l}
 }
 
 func (m *interfaceMonitor) Start() error {
-	return nil
+	return intfBox.StartDefaultInterfaceMonitor(m)
 }
 
 func (m *interfaceMonitor) Close() error {
-	return nil
+	return intfBox.CloseDefaultInterfaceMonitor(m)
 }
 
 func (m *interfaceMonitor) DefaultInterface() *control.Interface {
@@ -46,6 +58,7 @@ func (m *interfaceMonitor) DefaultInterface() *control.Interface {
 	return m.defaultInterface
 }
 
+// Kotlin 侧 DefaultNetworkListener 报告的本来就是物理接口（避开 VPN），无需 override。
 func (m *interfaceMonitor) OverrideAndroidVPN() bool {
 	return false
 }
@@ -72,28 +85,86 @@ func (m *interfaceMonitor) RegisterMyInterface(interfaceName string) {
 	m.myInterfaces = append(m.myInterfaces, interfaceName)
 }
 
+// sing-tun v0.8.12 起接口为 MyInterfaces() []string（旧版 MyInterface() string）
 func (m *interfaceMonitor) MyInterfaces() []string {
+	m.access.Lock()
+	defer m.access.Unlock()
 	return m.myInterfaces
 }
 
+// UpdateDefaultInterface 实现 InterfaceUpdateListener（Kotlin 回调入口）。
 func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfaceIndex int32) {
-	// Kotlin 側からコールバックされる。必要に応じてデフォルトインターフェースを更新。
+	// 先刷新平台接口列表（NetworkManager 仅在平台分支缓存，拨号路径依赖之）
+	if m.wrapper.networkManager != nil {
+		if err := m.wrapper.networkManager.UpdateInterfaces(); err != nil {
+			m.logger.Error(E.Cause(err, "update interfaces"))
+		}
+	}
+	if interfaceIndex == -1 {
+		m.access.Lock()
+		m.defaultInterface = nil
+		m.defaultInterfaceInitialized = true
+		callbacks := m.callbacks.Array()
+		m.access.Unlock()
+		for _, callback := range callbacks {
+			callback(nil, 0)
+		}
+		return
+	}
+	newInterface, err := control.NewDefaultInterfaceFinder().ByIndex(int(interfaceIndex))
+	if err != nil {
+		// 启动早期接口/路由表可能尚未就绪（真机日志：
+		// "find updated interface: wlan0: route ip+net: no such network interface"）。
+		// 直接丢弃会让 defaultInterface 永久为 nil，该 box 的所有拨号秒报
+		// "no available network interface"，故后台重试几次。
+		m.logger.Error(E.Cause(err, "find updated interface: ", interfaceName))
+		go m.retryUpdateDefaultInterface(interfaceName, interfaceIndex, 5)
+		return
+	}
+	m.access.Lock()
+	oldInterface := m.defaultInterface
+	m.defaultInterface = newInterface
+	if m.defaultInterfaceInitialized && oldInterface != nil &&
+		oldInterface.Name == newInterface.Name && oldInterface.Index == newInterface.Index {
+		m.access.Unlock()
+		return
+	}
+	m.defaultInterfaceInitialized = true
+	callbacks := m.callbacks.Array()
+	m.access.Unlock()
+	for _, callback := range callbacks {
+		callback(newInterface, 0)
+	}
 }
 
-// interfaceMonitorStub はデフォルトインターフェースモニターのスタブ実装。
-type interfaceMonitorStub struct{}
-
-func (s *interfaceMonitorStub) Start() error { return nil }
-func (s *interfaceMonitorStub) Close() error { return nil }
-func (s *interfaceMonitorStub) DefaultInterface() *control.Interface {
-	return nil
+// retryUpdateDefaultInterface 弥补 UpdateDefaultInterface 的瞬时失败：
+// 若期间已有其他回调成功设置了接口则直接放弃。
+func (m *interfaceMonitor) retryUpdateDefaultInterface(interfaceName string, interfaceIndex int32, attempts int) {
+	for i := 0; i < attempts; i++ {
+		time.Sleep(200 * time.Millisecond)
+		m.access.Lock()
+		ready := m.defaultInterfaceInitialized && m.defaultInterface != nil
+		m.access.Unlock()
+		if ready {
+			return
+		}
+		newInterface, err := control.NewDefaultInterfaceFinder().ByIndex(int(interfaceIndex))
+		if err != nil {
+			continue
+		}
+		m.access.Lock()
+		if m.defaultInterfaceInitialized && m.defaultInterface != nil {
+			m.access.Unlock()
+			return
+		}
+		m.defaultInterface = newInterface
+		m.defaultInterfaceInitialized = true
+		callbacks := m.callbacks.Array()
+		m.access.Unlock()
+		for _, callback := range callbacks {
+			callback(newInterface, 0)
+		}
+		m.logger.Info("default interface recovered after retry: ", interfaceName)
+		return
+	}
 }
-func (s *interfaceMonitorStub) OverrideAndroidVPN() bool { return false }
-func (s *interfaceMonitorStub) AndroidVPNEnabled() bool  { return false }
-func (s *interfaceMonitorStub) RegisterCallback(callback tun.DefaultInterfaceUpdateCallback) *list.Element[tun.DefaultInterfaceUpdateCallback] {
-	return nil
-}
-func (s *interfaceMonitorStub) UnregisterCallback(element *list.Element[tun.DefaultInterfaceUpdateCallback]) {
-}
-func (s *interfaceMonitorStub) RegisterMyInterface(interfaceName string) {}
-func (s *interfaceMonitorStub) MyInterfaces() []string                   { return nil }

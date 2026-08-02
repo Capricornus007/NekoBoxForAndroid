@@ -46,12 +46,22 @@ func (p *protectServer) loop(callback func(fd int)) {
 		if err != nil {
 			return // listener 已关闭
 		}
-		handleProtectConn(conn, callback)
+		// 并发处理：串行时 JNI protect 回调逐一排队，主进程
+		// sendFdToProtect 的 100ms 超时容易失败 → fd 未 protect，
+		// 测速流量回环进 tun（真机日志可见 tun-in 收到测试包）。
+		go handleProtectConn(conn, callback)
 	}
 }
 
 func handleProtectConn(conn *net.UnixConn, callback func(fd int)) {
 	defer conn.Close()
+	// 并发 goroutine 中兜底：单次 protect 失败（如 VPN 关闭中 JNI 回调异常）
+	// 不应击垮整个 :bg 进程。
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println("protect: handler panic:", r)
+		}
+	}()
 
 	buf := make([]byte, 1)
 	oob := make([]byte, unix.CmsgSpace(4))

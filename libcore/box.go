@@ -22,6 +22,7 @@ import (
 
 	box "github.com/sagernet/sing-box"
 	"github.com/sagernet/sing-box/constant"
+	sblog "github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
@@ -80,6 +81,21 @@ type BoxInstance struct {
 }
 
 func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *BoxInstance, err error) {
+	return newSingBoxInstance(config, localTransport, true)
+}
+
+// NewTestSingBoxInstance 供 URL 测速等一次性实例使用：不注册 PlatformLogWriter。
+// 官方内核在 PlatformLogWriter != nil 时无条件创建 CacheFile 与 ClashServer
+// （官方 box.go 的 needCacheFile/needClashAPI 分支）：主进程批量测速并发创建的
+// 大量实例曾共享默认 cache.db（bbolt）把 freelist 写坏，并在 bbolt 定时器
+// goroutine 里 panic 导致主进程闪退；即便退而求其次做文件隔离也是纯浪费——
+// 测速实例根本不需要 cache 与 Clash API。置 nil 后两者均不再创建，
+// box 日志回落到 stderr（logcat 仍可见）。
+func NewTestSingBoxInstance(config string, localTransport LocalDNSTransport) (b *BoxInstance, err error) {
+	return newSingBoxInstance(config, localTransport, false)
+}
+
+func newSingBoxInstance(config string, localTransport LocalDNSTransport, platformLog bool) (b *BoxInstance, err error) {
 	defer device.DeferPanicToError("NewSingBoxInstance", func(err_ error) { err = err_ })
 
 	// create box context
@@ -109,10 +125,25 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 	}
 
 	// create box
+	// 测速实例（platformLog=false）传 nil：见 NewTestSingBoxInstance 批注。
+	var logWriter sblog.PlatformWriter
+	if platformLog {
+		logWriter = boxPlatformLogWriter
+		// 官方内核的 PlatformWriter 通道不做级别过滤（observable.go 无条件
+		// 转发所有级别），在此记录配置级别供 WriteMessage 侧过滤；
+		// 空级别对齐官方默认 trace。级别非法时 box.New 会报同样的错，此处忽略。
+		if options.Log != nil && options.Log.Level != "" {
+			if parsedLevel, parseErr := sblog.ParseLevel(options.Log.Level); parseErr == nil {
+				setPlatformLogLevel(parsedLevel)
+			}
+		} else {
+			setPlatformLogLevel(sblog.LevelTrace)
+		}
+	}
 	instance, err := box.New(box.Options{
 		Options:           options,
 		Context:           ctx,
-		PlatformLogWriter: boxPlatformLogWriter,
+		PlatformLogWriter: logWriter,
 	})
 	if err != nil {
 		cancel()
