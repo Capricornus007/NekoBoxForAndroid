@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.bg
 
 import android.Manifest.permission.POST_NOTIFICATIONS
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -9,7 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
 import android.os.Build
 import android.text.format.Formatter
 import android.widget.Toast
@@ -224,20 +223,14 @@ class ServiceNotification(
 
     private suspend fun show() = useBuilder {
         try {
-            val notification = it.build()
-            // Android 16+ requires the notification to be posted before startForeground
-            if (Build.VERSION.SDK_INT >= 36) {
-                val nm = (service as Service).getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                nm.notify(notificationId, notification)
-            }
             if (Build.VERSION.SDK_INT >= 34) {
                 (service as Service).startForeground(
                     notificationId,
-                    notification,
-                    FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
+                    it.build(),
+                    FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
                 )
             } else {
-                (service as Service).startForeground(notificationId, notification)
+                (service as Service).startForeground(notificationId, it.build())
             }
         } catch (e: Exception) {
             Toast.makeText(
