@@ -341,7 +341,7 @@ class BaseService {
                     val result = Libcore.urlTest(
                         box,
                         DataStore.connectionTestURL,
-                        3000
+                        3000,
                     )
                     result > 0
                 } ?: false

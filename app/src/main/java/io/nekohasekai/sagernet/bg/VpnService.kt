@@ -17,15 +17,14 @@ import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.ui.VpnRequestActivity
 import io.nekohasekai.sagernet.utils.Subnet
-import android.net.VpnService as BaseVpnService
 import kotlinx.coroutines.GlobalScope
+import android.net.VpnService as BaseVpnService
 
 class VpnService :
     BaseVpnService(),
     BaseService.Interface {
 
     private val watchdog = VpnWatchdog(this)
-
 
     companion object {
 
@@ -75,7 +74,7 @@ class VpnService :
         conn?.close()
         conn = null
         super.killProcesses()
-}
+    }
 
     override fun onBind(intent: Intent) = when (intent.action) {
         SERVICE_INTERFACE -> super<BaseVpnService>.onBind(intent)

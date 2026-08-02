@@ -376,13 +376,17 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 .setTitle("🧪 Тест авто-переподключения")
                 .setMessage(
                     "Watchdog форсирует перезапуск VPN.\n\n" +
-                    "VPN отключится на 1–3 секунды, затем автоматически переподключится.\n\n" +
-                    "Продолжить?"
+                        "VPN отключится на 1–3 секунды, затем автоматически переподключится.\n\n" +
+                        "Продолжить?",
                 )
                 .setPositiveButton("Запустить") { _, _ ->
                     io.nekohasekai.sagernet.bg.VpnWatchdog.testModeRequested = true
                     com.google.android.material.snackbar.Snackbar
-                        .make(requireView(), "Тест запущен. Перезапуск через ≤30 сек...", com.google.android.material.snackbar.Snackbar.LENGTH_LONG)
+                        .make(
+                            requireView(),
+                            "Тест запущен. Перезапуск через ≤30 сек...",
+                            com.google.android.material.snackbar.Snackbar.LENGTH_LONG,
+                        )
                         .show()
                 }
                 .setNegativeButton(android.R.string.cancel, null)

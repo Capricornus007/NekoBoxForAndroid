@@ -9,7 +9,7 @@ import libcore.Libcore
 class VpnWatchdog(private val service: BaseService.Interface) {
 
     companion object {
-        private const val FAIL_THRESHOLD  = 2     // 2 сбоя = рестарт (быстрая реакция)
+        private const val FAIL_THRESHOLD = 2 // 2 сбоя = рестарт (быстрая реакция)
         private const val HTTP_TIMEOUT_MS = 3_000 // Ждем ответа всего 3 секунды
 
         @Volatile
@@ -29,7 +29,7 @@ class VpnWatchdog(private val service: BaseService.Interface) {
         // ЧИТАЕМ ИНТЕРВАЛ ИЗ НАСТРОЕК (по дефолту 7 сек)
         var intervalSec = DataStore.vpnWatchdogInterval
         if (intervalSec < 3) intervalSec = 3 // Защита от дурака (не меньше 3 сек)
-        
+
         val checkIntervalMs = intervalSec * 1000L
         val minRestartIntervalMs = checkIntervalMs * 3 // Антипетля (3 интервала)
 
@@ -70,7 +70,7 @@ class VpnWatchdog(private val service: BaseService.Interface) {
         val reachable = if (testModeRequested) {
             // Если мы нажали кнопку теста, МЫ ВРЕМ (имитируем лаг)
             Logs.w("Watchdog: 🧪 ИМИТАЦИЯ ЗАВИСАНИЯ (Тестовый режим)")
-            false 
+            false
         } else {
             // Обычная проверка
             try {
@@ -87,28 +87,28 @@ class VpnWatchdog(private val service: BaseService.Interface) {
 
         // Если мы здесь - значит либо реальный лаг, либо мы его имитируем
         consecutiveFailures++
-        
+
         // Показываем пользователю, что счетчик тикает (чтобы ты видел работу)
         showToast("Watchdog: обнаружен лаг ($consecutiveFailures/$FAIL_THRESHOLD)...")
         Logs.w("Watchdog: Потеря связи или Тест (#$consecutiveFailures)")
 
         if (consecutiveFailures >= FAIL_THRESHOLD) {
             val now = System.currentTimeMillis()
-            
+
             // Проверка антипетли (в режиме теста игнорируем её, чтобы сработало сразу)
             if (!testModeRequested && (now - lastRestartAt < minRestartIntervalMs)) {
-                return 
+                return
             }
 
             lastRestartAt = now
             consecutiveFailures = 0
-            
+
             // Если это был тест, выключаем его после первого успешного срабатывания
-            testModeRequested = false 
-            
+            testModeRequested = false
+
             Logs.w("Watchdog: ▶ ВЫПОЛНЯЮ АВТО-ВОССТАНОВЛЕНИЕ")
             showToast("⚠️ Связь восстановлена автоматически!")
-            
+
             Libcore.resetAllConnections(true)
         }
     }
