@@ -58,7 +58,7 @@
     <string name="ws_browser_forwarding_sum">轉傳對應的 WebSocket 連線至瀏覽器。</string>
     <string name="speed_interval">速度通知更新間隔</string>
     <string name="traffic">%1$s↑ %2$s↓</string>
-    <string name="speed_detail">代理： %1$s↑ %2$s↓
+    <string name="speed_detail">代理：%1$s↑ %2$s↓\n直接：%3$s↑ %4$s↓
 \n直連： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">正在測試…</string>
@@ -573,7 +573,7 @@
     <string name="preview_hint_dont_show_again">不再顯示</string>
     <string name="check_update_preview">檢查預覽版更新</string>
     <string name="check_update_release">檢查正式版更新</string>
-    <string name="release_not_available">Throne 目前尚未發佈正式版</string>
+    <string name="release_not_available">NekoBox 目前尚未發佈正式版</string>
     <string name="update_dialog_title">發現新版本</string>
     <string name="update_dialog_message">當前版本：%1$s\n可升級版本：%2$s\n是否前往下載？</string>
     <string name="check_update_no">檢查成功，但沒有更新。</string>

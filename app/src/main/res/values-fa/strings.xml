@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Throne</string>
-    <string name="app_name_long" translatable="false">Throne for Android</string>
+    <string name="app_name" translatable="false">NekoBox</string>
+    <string name="app_name_long" translatable="false">NekoBox for Android</string>
     <string name="app_desc">مجموعه ابزار جامع پراکسی برای اندروید، نوشته‌شده با کاتلین.</string>
     <string name="project">پروژه</string>
     <string name="github">کد منبع</string>
@@ -622,7 +622,7 @@
     <string name="preview_hint_dont_show_again">دوباره نشان نده</string>
     <string name="check_update_preview">بررسی به‌روزرسانی نسخهٔ پیش‌نمایش</string>
     <string name="check_update_release">بررسی به‌روزرسانی نسخهٔ Release</string>
-    <string name="release_not_available">Throne هنوز نسخهٔ پایدار منتشر نکرده است</string>
+    <string name="release_not_available">NekoBox هنوز نسخهٔ پایدار منتشر نکرده است</string>
     <string name="update_dialog_title">نسخهٔ جدید در دسترس است</string>
     <string name="update_dialog_message">نسخهٔ فعلی: %1$s\nنسخهٔ موجود: %2$s\nآیا می‌خواهید آن را دانلود کنید؟</string>
     <string name="check_update_no">بررسی موفق بود، اما به‌روزرسانی‌ای نیست.</string>

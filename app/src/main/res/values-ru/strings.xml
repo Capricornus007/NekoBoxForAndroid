@@ -35,8 +35,8 @@
 <string name="always_show_address">Всегда показывать адрес</string>
 <string name="always_show_address_sum">Всегда отображать адрес сервера на карте конфигурации</string>
 <string name="app_desc">Универсальный набор инструментов прокси для Android, написанный на Kotlin.</string>
-<string name="app_name">Throne</string>
-<string name="app_name_long">Throne для Android</string>
+<string name="app_name">NekoBox</string>
+<string name="app_name_long">NekoBox для Android</string>
 <string name="app_tls_version">Минимальная версия TLS протокола</string>
 <string name="app_version">Версия</string>
 <string name="append_http_proxy">Добавить HTTP-прокси к VPN</string>
@@ -83,7 +83,7 @@
 <string name="check_update_no">Обновления не найдены.</string>
 <string name="check_update_preview">Проверить наличие обновлений предварительной версии</string>
 <string name="check_update_release">Проверить наличие обновлений релизнойной версии</string>
-<string name="release_not_available">Throne ещё не опубликовал стабильный релиз</string>
+<string name="release_not_available">NekoBox ещё не опубликовал стабильный релиз</string>
 <string name="circular_reference">Циклическая ссылка</string>
 <string name="circular_reference_sum">Маршрут не может содержать сам себя.</string>
 <string name="clear_logcat">Очистить журнал</string>
@@ -425,7 +425,7 @@
 <string name="sniff_override">Результат проверки для адрес назначения</string>
 <string name="sniff_routing">Перехватывать результат для Маршрутизации</string>
 <string name="speed">%s/с</string>
-<string name="speed_detail">Прокси ：%1$s↑ %2$s↓ 
+<string name="speed_detail">Прокси: %1$s↑ %2$s↓\nНапрямую: %3$s↑ %4$s↓
 \nПрямой ：%3$s↑%4$s↓</string>
 <string name="speed_interval">Интервал обновления уведомлений о скорости</string>
 <string name="ss_cat">Настройки Shadowsocks</string>
