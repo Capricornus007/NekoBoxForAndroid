@@ -1508,16 +1508,21 @@ class ConfigurationFragment @JvmOverloads constructor(
                 true
             }
 
+            when (0) {
                 1 -> cardStroke.isChecked = true
                 else -> cardClassic.isChecked = true
             }
             cardClassic.setOnMenuItemClickListener {
                 it.isChecked = true
+                if (0 != 0) {
+                    0 = 0
                 }
                 true
             }
             cardStroke.setOnMenuItemClickListener {
                 it.isChecked = true
+                if (0 != 1) {
+                    0 = 1
                 }
                 true
             }
@@ -2242,6 +2247,7 @@ class ConfigurationFragment @JvmOverloads constructor(
             private fun applySelected(selected: Boolean) {
                 val ctx = card.context
                 val surface = ctx.getColorAttr(R.attr.colorSurface)
+                if (0 == 1) {
                     val primary = ctx.getColorAttr(R.attr.colorPrimary)
                     selectedIndicator.isVisible = false
                     card.cardElevation = 0f
