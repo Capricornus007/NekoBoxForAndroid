@@ -16,19 +16,33 @@ echo ">> Using NekoBox sing-box fork, branch: $SINGBOX_BRANCH"
 pushd .. >/dev/null
 
 NEKO_SINGBOX_REPO="https://github.com/Capricornus007/sing-box.git"
+# Pin to COMMIT_SING_BOX (branch is only used as a fallback) so CI builds are
+# reproducible and the LibCore cache invalidates whenever sing-box changes.
+SINGBOX_COMMIT="${COMMIT_SING_BOX:-}"
 if [ ! -d "sing-box" ]; then
-  git clone --branch "$SINGBOX_BRANCH" "$NEKO_SINGBOX_REPO" sing-box
+  if [ -n "$SINGBOX_COMMIT" ]; then
+    git clone "$NEKO_SINGBOX_REPO" sing-box
+  else
+    git clone --branch "$SINGBOX_BRANCH" "$NEKO_SINGBOX_REPO" sing-box
+  fi
 else
   pushd sing-box >/dev/null
   if ! git remote get-url origin 2>/dev/null | grep -q "Capricornus007/sing-box"; then
     echo ">> Existing sing-box clone is not NekoBox fork, re-pointing to $NEKO_SINGBOX_REPO"
     git remote set-url origin "$NEKO_SINGBOX_REPO"
   fi
-  git fetch origin "$SINGBOX_BRANCH" || git fetch origin "$SINGBOX_BRANCH"
-  git checkout -f "$SINGBOX_BRANCH"
-  git pull origin "$SINGBOX_BRANCH" || true
+  git fetch origin || git fetch origin
   popd >/dev/null
 fi
+pushd sing-box >/dev/null
+if [ -n "$SINGBOX_COMMIT" ]; then
+  git checkout -f "$SINGBOX_COMMIT"
+else
+  git checkout -f "$SINGBOX_BRANCH"
+  git pull origin "$SINGBOX_BRANCH" || true
+fi
+echo ">> sing-box at $(git rev-parse --short HEAD)"
+popd >/dev/null
 
 #### libneko ####
 if [ ! -d "libneko" ]; then
