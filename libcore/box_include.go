@@ -5,7 +5,6 @@ import (
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/adapter/endpoint"
-	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/adapter/inbound"
 	"github.com/sagernet/sing-box/adapter/outbound"
 	"github.com/sagernet/sing-box/adapter/service"
@@ -44,8 +43,6 @@ import (
 
 	_ "github.com/sagernet/sing-box/experimental/clashapi"
 	_ "github.com/sagernet/sing-box/transport/v2rayquic"
-
-	E "github.com/sagernet/sing/common/exceptions"
 )
 
 func nekoboxAndroidInboundRegistry() *inbound.Registry {

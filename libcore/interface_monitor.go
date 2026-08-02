@@ -83,16 +83,17 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 // interfaceMonitorStub はデフォルトインターフェースモニターのスタブ実装。
 type interfaceMonitorStub struct{}
 
-func (s *interfaceMonitorStub) Start() error  { return nil }
-func (s *interfaceMonitorStub) Close() error  { return nil }
+func (s *interfaceMonitorStub) Start() error { return nil }
+func (s *interfaceMonitorStub) Close() error { return nil }
 func (s *interfaceMonitorStub) DefaultInterface() *control.Interface {
 	return nil
 }
-func (s *interfaceMonitorStub) OverrideAndroidVPN() bool  { return false }
-func (s *interfaceMonitorStub) AndroidVPNEnabled() bool   { return false }
+func (s *interfaceMonitorStub) OverrideAndroidVPN() bool { return false }
+func (s *interfaceMonitorStub) AndroidVPNEnabled() bool  { return false }
 func (s *interfaceMonitorStub) RegisterCallback(callback tun.DefaultInterfaceUpdateCallback) *list.Element[tun.DefaultInterfaceUpdateCallback] {
 	return nil
 }
-func (s *interfaceMonitorStub) UnregisterCallback(element *list.Element[tun.DefaultInterfaceUpdateCallback]) {}
-func (s *interfaceMonitorStub) RegisterMyInterface(interfaceName string)                                     {}
-func (s *interfaceMonitorStub) MyInterfaces() []string                                                       { return nil }
+func (s *interfaceMonitorStub) UnregisterCallback(element *list.Element[tun.DefaultInterfaceUpdateCallback]) {
+}
+func (s *interfaceMonitorStub) RegisterMyInterface(interfaceName string) {}
+func (s *interfaceMonitorStub) MyInterfaces() []string                   { return nil }
