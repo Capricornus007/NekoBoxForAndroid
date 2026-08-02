@@ -1,12 +1,13 @@
 package moe.matsuri.nb4a
 
 import android.content.Context
+import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
+import android.system.OsConstants
 import android.os.Build
 import android.os.Build.VERSION_CODES
-import android.system.OsConstants
 import androidx.annotation.RequiresApi
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.bg.ServiceNotification
@@ -50,11 +51,11 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun findConnectionOwner(ipProto: Int, srcIp: String, srcPort: Int, destIp: String, destPort: Int): Int {
+    override fun findConnectionOwner(
+        ipProto: Int, srcIp: String, srcPort: Int, destIp: String, destPort: Int
+    ): Int {
         return SagerNet.connectivity.getConnectionOwnerUid(
-            ipProto,
-            InetSocketAddress(srcIp, srcPort),
-            InetSocketAddress(destIp, destPort),
+            ipProto, InetSocketAddress(srcIp, srcPort), InetSocketAddress(destIp, destPort)
         )
     }
 
@@ -66,10 +67,8 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         }
 
         val packageNames = PackageCache.uidMap[uid]
-        if (!packageNames.isNullOrEmpty()) {
-            for (packageName in packageNames) {
-                return packageName
-            }
+        if (!packageNames.isNullOrEmpty()) for (packageName in packageNames) {
+            return packageName
         }
 
         error("unknown uid $uid")
@@ -143,8 +142,7 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
     // 参考 husi AndroidPlatformInterface.getInterfaces。
 
     override fun getInterfaces(): NetworkInterfaceIterator {
-        @Suppress("DEPRECATION")
-        val networks = SagerNet.connectivity.allNetworks
+        @Suppress("DEPRECATION") val networks = SagerNet.connectivity.allNetworks
         val networkInterfaces = NetworkInterface.getNetworkInterfaces().toList()
         val interfaces = mutableListOf<LibcoreNetworkInterface>()
         for (network in networks) {
@@ -157,12 +155,8 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
                 .let { it.toStringIterator(it.size) }
             boxInterface.type = when {
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> Libcore.InterfaceTypeWIFI
-                networkCapabilities.hasTransport(
-                    NetworkCapabilities.TRANSPORT_CELLULAR,
-                ) -> Libcore.InterfaceTypeCellular
-                networkCapabilities.hasTransport(
-                    NetworkCapabilities.TRANSPORT_ETHERNET,
-                ) -> Libcore.InterfaceTypeEthernet
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> Libcore.InterfaceTypeCellular
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> Libcore.InterfaceTypeEthernet
                 else -> Libcore.InterfaceTypeOther
             }
             boxInterface.index = networkInterface.index
@@ -224,6 +218,7 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
             }
         }
     }
+
 }
 
 private fun Iterable<String>.toStringIterator(size: Int): StringIterator {
@@ -237,8 +232,8 @@ private fun Iterable<String>.toStringIterator(size: Int): StringIterator {
 
 private fun InterfaceAddress.toPrefix(): String {
     return if (address is Inet6Address) {
-        "${Inet6Address.getByAddress(address.address).hostAddress}/$networkPrefixLength"
+        "${Inet6Address.getByAddress(address.address).hostAddress}/${networkPrefixLength}"
     } else {
-        "${address.hostAddress}/$networkPrefixLength"
+        "${address.hostAddress}/${networkPrefixLength}"
     }
 }

@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.ConnectivityManager
+import android.net.LinkProperties
 import android.net.Network
 import android.os.Build
 import android.os.PowerManager
@@ -35,7 +36,8 @@ import moe.matsuri.nb4a.utils.cleanWebview
 import java.io.File
 import androidx.work.Configuration as WorkConfiguration
 
-class SagerNet : Application(),
+class SagerNet :
+    Application(),
     WorkConfiguration.Provider {
 
     override fun attachBaseContext(base: Context) {
@@ -58,19 +60,29 @@ class SagerNet : Application(),
 
         if (isMainProcess || isBgProcess) {
             externalAssets.mkdirs()
-            // 官方内核在 PlatformLogWriter != nil 时会为每个 box 强制创建 CacheFile，
-            // 无显式 path 时共用工作目录（no_backup）下的 cache.db。主进程批量测速的
-            // 并发 TestInstance 曾共享该文件导致 bbolt freelist 损坏（"page already freed"
-            // panic 在异步 batch goroutine 中无法 recover → SIGABRT 闪退），且损坏文件
-            // 能正常打开、提交时才崩，官方 Open 阶段的校验发现不了。
-            // 现测试实例已从 Go 侧彻底不创建 cache（libcore NewTestSingBoxInstance），
-            // 这里在进程启动、尚无 box 打开时清扫存量损坏文件及历史残留，实现老用户自愈。
-            runCatching {
-                File(noBackupFilesDir, "cache.db").delete()
-                noBackupFilesDir.listFiles { file -> file.name.startsWith("urltest_") }
-                    ?.forEach { it.delete() }
-            }
             Seq.setContext(this)
+            // notification channels MUST exist before :bg calls startForeground()
+            // (Android 16 enforces this strictly, CannotPostForegroundServiceNotificationException)
+            updateNotificationChannels()
+            // Prime the cached configurationStore off the main thread before the first
+            // synchronous read below (logBufSize/logLevel). PublicDatabase no longer allows
+            // main-thread queries, so the bulk-SELECT prime must run on PrefSnapshotExecutor;
+            // join here so cold-start reads are served from the snapshot. One-time, pre-UI.
+            // Capture any prime failure off the daemon thread (Thread.join does not rethrow) so
+            // it is logged here rather than silently deferred to the first read.
+            val primeError = arrayOfNulls<Throwable>(1)
+            Thread {
+                try {
+                    DataStore.configurationStore.prime()
+                } catch (t: Throwable) {
+                    primeError[0] = t
+                }
+            }.apply {
+                isDaemon = true
+                start()
+                join()
+            }
+            primeError[0]?.let { Logs.w("configurationStore prime failed", it) }
             Libcore.initCore(
                 process,
                 cacheDir.absolutePath + "/",
@@ -78,20 +90,8 @@ class SagerNet : Application(),
                 externalAssets.absolutePath + "/",
                 DataStore.logBufSize,
                 DataStore.logLevel > 0,
-                nativeInterface, nativeInterface, LocalResolverImpl
+                nativeInterface, nativeInterface, LocalResolverImpl,
             )
-
-            if (isBgProcess) {
-                // 常驻注册默认网络监听：预热 DefaultNetworkListener 的 network 缓存，
-                // 使本进程 box 的接口监视器 Start 即同步拿到默认接口
-                // （主进程已在下方 isMainProcess 分支做同样的事；
-                //  竞态背景见 NativeInterface.startDefaultInterfaceMonitor 批注）。
-                runOnDefaultDispatcher {
-                    DefaultNetworkListener.start(this@SagerNet) {
-                        underlyingNetwork = it
-                    }
-                }
-            }
 
             // fix multi process issue in Android 9+
             JavaUtil.handleWebviewDir(this)
@@ -103,6 +103,10 @@ class SagerNet : Application(),
         }
 
         if (isMainProcess) {
+            if (DataStore.uiDesignVersion < 1) {
+                DataStore.dynamicColors = false
+                DataStore.uiDesignVersion = 1
+            }
             Theme.apply(this)
             Theme.applyNightTheme()
             AppLocale.apply()
@@ -117,13 +121,23 @@ class SagerNet : Application(),
 
         if (BuildConfig.DEBUG) {
             System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
+            // Plan 027 Stage 1: surface main-thread disk I/O (incl. synchronous SagerDatabase
+            // access) so remaining main-thread DAO sites can be found and moved off-thread.
+            // penaltyLog only (never penaltyDeath) - this is observation, not enforcement.
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .penaltyLog()
+                    .build(),
+            )
             StrictMode.setVmPolicy(
                 StrictMode.VmPolicy.Builder()
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
                     .detectLeakedRegistrationObjects()
                     .penaltyLog()
-                    .build()
+                    .build(),
             )
         }
     }
@@ -133,11 +147,10 @@ class SagerNet : Application(),
         updateNotificationChannels()
     }
 
-    override fun getWorkManagerConfiguration(): WorkConfiguration {
-        return WorkConfiguration.Builder()
+    override val workManagerConfiguration: WorkConfiguration
+        get() = WorkConfiguration.Builder()
             .setDefaultProcessName("${BuildConfig.APPLICATION_ID}:bg")
             .build()
-    }
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
@@ -160,9 +173,10 @@ class SagerNet : Application(),
                     it,
                     0,
                     Intent(
-                        application, MainActivity::class.java
+                        application,
+                        MainActivity::class.java,
                     ).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT),
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0,
                 )
             }
         }
@@ -188,44 +202,68 @@ class SagerNet : Application(),
         }
 
         fun updateNotificationChannels() {
-            if (Build.VERSION.SDK_INT >= 26) @RequiresApi(26) {
-                notification.createNotificationChannels(
-                    listOf(
-                        NotificationChannel(
-                            "service-vpn",
-                            application.getText(R.string.service_vpn),
-                            if (Build.VERSION.SDK_INT >= 28) NotificationManager.IMPORTANCE_MIN
-                            else NotificationManager.IMPORTANCE_LOW
-                        ),   // #1355
-                        NotificationChannel(
-                            "service-proxy",
-                            application.getText(R.string.service_proxy),
-                            NotificationManager.IMPORTANCE_LOW
-                        ), NotificationChannel(
-                            "service-subscription",
-                            application.getText(R.string.service_subscription),
-                            NotificationManager.IMPORTANCE_DEFAULT
-                        ), NotificationChannel(
-                            "connection-test",
-                            application.getText(R.string.connection_test),
-                            NotificationManager.IMPORTANCE_DEFAULT
-                        )
+            if (Build.VERSION.SDK_INT >= 26) {
+                @RequiresApi(26)
+                {
+                    notification.createNotificationChannels(
+                        listOf(
+                            NotificationChannel(
+                                "service-vpn",
+                                application.getText(R.string.service_vpn),
+                                if (Build.VERSION.SDK_INT >= 28) {
+                                    NotificationManager.IMPORTANCE_MIN
+                                } else {
+                                    NotificationManager.IMPORTANCE_LOW
+                                },
+                            ), // #1355
+                            NotificationChannel(
+                                "service-proxy",
+                                application.getText(R.string.service_proxy),
+                                NotificationManager.IMPORTANCE_LOW,
+                            ),
+                            NotificationChannel(
+                                "service-subscription",
+                                application.getText(R.string.service_subscription),
+                                NotificationManager.IMPORTANCE_DEFAULT,
+                            ),
+                            NotificationChannel(
+                                "connection-test",
+                                application.getText(R.string.connection_test),
+                                NotificationManager.IMPORTANCE_DEFAULT,
+                            ),
+                        ),
                     )
-                )
+                }
             }
         }
 
-        fun startService() = ContextCompat.startForegroundService(
-            application, Intent(application, SagerConnection.serviceClass)
+        // Default to carrying the current in-process selection so :bg starts the profile the UI
+        // last selected, even if the async write-through DB commit hasn't landed yet. Callers with
+        // a specific id (e.g. a shortcut switching profile) pass it explicitly. A non-resolving id
+        // (incl. 0L "none") is ignored by :bg, which then falls back to its refreshed snapshot/DB.
+        fun startService(profileId: Long = DataStore.selectedProxy) = ContextCompat.startForegroundService(
+            application,
+            Intent(application, SagerConnection.serviceClass).apply {
+                if (profileId >= 0L) putExtra(Action.EXTRA_PROFILE_ID, profileId)
+            },
         )
 
-        fun reloadService() =
-            application.sendBroadcast(Intent(Action.RELOAD).setPackage(application.packageName))
+        fun reloadService(profileId: Long = -1L) = application.sendBroadcast(
+            Intent(Action.RELOAD).setPackage(application.packageName).apply {
+                if (profileId >= 0L) putExtra(Action.EXTRA_PROFILE_ID, profileId)
+            },
+        )
 
-        fun stopService() =
-            application.sendBroadcast(Intent(Action.CLOSE).setPackage(application.packageName))
+        fun stopService() = application.sendBroadcast(Intent(Action.CLOSE).setPackage(application.packageName))
 
         var underlyingNetwork: Network? = null
+
+        fun isPrivateDnsActiveOnUnderlyingNetwork(): Boolean {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return false
+            val network = underlyingNetwork ?: connectivity.activeNetwork ?: return false
+            val linkProperties: LinkProperties = connectivity.getLinkProperties(network) ?: return false
+            return linkProperties.isPrivateDnsActive
+        }
 
         var appVersionNameForDisplay = {
             var n = BuildConfig.VERSION_NAME
@@ -240,5 +278,4 @@ class SagerNet : Application(),
             n
         }()
     }
-
 }
