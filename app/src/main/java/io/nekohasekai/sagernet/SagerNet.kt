@@ -208,17 +208,25 @@ class SagerNet :
                     // thread — :bg process cannot start a service in that gap.
                     notification.deleteNotificationChannel("service-vpn")
                     notification.deleteNotificationChannel("service-proxy")
+                    // Android 16+ (SDK 36) では startForeground に IMPORTANCE_LOW が
+                    // 許可されず CannotPostForegroundServiceNotificationException が発生する。
+                    // そのため IMPORTANCE_DEFAULT を使用する。
+                    val fgImportance = if (Build.VERSION.SDK_INT >= 36) {
+                        NotificationManager.IMPORTANCE_DEFAULT
+                    } else {
+                        NotificationManager.IMPORTANCE_LOW
+                    }
                     notification.createNotificationChannels(
                         listOf(
                             NotificationChannel(
                                 "service-vpn",
                                 application.getText(R.string.service_vpn),
-                                NotificationManager.IMPORTANCE_LOW,
+                                fgImportance,
                             ),
                             NotificationChannel(
                                 "service-proxy",
                                 application.getText(R.string.service_proxy),
-                                NotificationManager.IMPORTANCE_LOW,
+                                fgImportance,
                             ),
                             NotificationChannel(
                                 "service-subscription",
