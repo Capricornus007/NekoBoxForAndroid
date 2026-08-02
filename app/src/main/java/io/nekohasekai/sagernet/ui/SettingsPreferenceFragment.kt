@@ -276,7 +276,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             if (count == 0) {
                 preference.context.getString(R.string.not_set)
             } else {
-                preference.context.resources.getQuantityString(R.plurals.dns_hosts_lines, count, count)
+                preference.context.resources.getString(R.string.dns_hosts_lines, count)
             }
         }
         dnsHosts.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
