@@ -42,9 +42,9 @@
     <string name="group_status_empty">گروه خالی</string>
     <string name="group_status_empty_subscription">هنوز به‌روزرسانی نشده</string>
     <string name="group_status_proxies">%d پراکسی</string>
-    <string name="group_status_proxies_subscription">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: بدون تفاوت</string>
-    <string name="group_updated">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">تفاوت</string>
     <string name="group_diff">تفاوت (%s)</string>
     <string name="group_delete_confirm_prompt">آیا مطمئن هستید که می‌خواهید این گروه را حذف کنید؟</string>
@@ -362,7 +362,7 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">تأیید</string>
     <string name="missing_plugin">پلاگین گم شده</string>
-    <string name="profile_requiring_plugin">Profile %s requires the %s plugin to be installed, but
+    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
         it was not found.</string>
     <string name="action_learn_more">بیشتر بدانید</string>
     <string name="action_download">دانلود</string>
@@ -381,7 +381,7 @@
     <string name="server_dns_subscription_sum">DNS اختیاری که فقط برای حل دامنه‌های سرور در این اشتراک استفاده می‌شود. خالی بگذارید تا از رفتار پیش‌فرض استفاده شود. https://، tls://، quic:// یا host[:port] را می‌پذیرد.</string>
     <string name="server_dns_invalid">DNS سرور سفارشی نامعتبر است. از https://، tls://، quic:// یا host[:port] استفاده کنید، یا خالی بگذارید.</string>
     <string name="subscription_used">%s استفاده شده</string>
-    <string name="subscription_traffic">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">انقضا: %s</string>
     <string name="subscription_import">وارد کردن اشتراک</string>
     <string name="subscription_import_message">آیا مطمئن هستید که می‌خواهید اشتراک %s را وارد کنید؟ اگر از یک منبع نامعتبر می‌آیید، انجام این کار ممکن است منجر به نشت IP شما و این رفتار شود.</string>
@@ -404,7 +404,7 @@
     <string name="group_order_origin">مبدأ</string>
     <string name="group_order_by_name">بر اساس نام</string>
     <string name="group_order_by_delay">بر اساس تأخیر</string>
-    <string name="plugin_exists_but_on_shit_system">Profile %s requires the %s plugin, but your
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
         proprietary equipment vendor (usually surveillance capital giants and malware maker)
         tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (پلاگین اندروید Shadowsocks)</string>
@@ -484,9 +484,9 @@
     <string name="tuic_disable_sni">غیرفعال‌سازی SNI</string>
     <string name="tuic_reduce_rtt">فعال‌سازی handshake 0-RTT QUIC</string>
     <string name="pinned_certchain_sha256">SHA256 گواهی پین شده</string>
-    <string name="please_update">Your APP is too old (%s). And will stop working at %s. Please
+    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
         update!</string>
-    <string name="please_update_force">Your APP is too old (%s). And has been stopped working at %s.
+    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
         Please update!</string>
     <string name="connection_test_delete_unavailable">پاک کردن غیرقابل‌دسترس</string>
     <string name="move">انتقال</string>

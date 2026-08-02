@@ -42,9 +42,9 @@
     <string name="group_status_empty">Boş grup</string>
     <string name="group_status_empty_subscription">Henüz güncellenmedi</string>
     <string name="group_status_proxies">%d Proxy</string>
-    <string name="group_status_proxies_subscription">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: Fark yok</string>
-    <string name="group_updated">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">Fark</string>
     <string name="group_diff">Fark (%s)</string>
     <string name="group_delete_confirm_prompt">Bu grubu kaldırmak istediğinize emin misiniz?</string>
@@ -364,7 +364,7 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Onayla</string>
     <string name="missing_plugin">Eksik Eklenti</string>
-    <string name="profile_requiring_plugin">Profile %s requires the %s plugin to be installed, but
+    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
         it was not found.</string>
     <string name="action_learn_more">DAHA FAZLA BİLGİ</string>
     <string name="action_download">İNDİR</string>
@@ -384,7 +384,7 @@
     <string name="server_dns_subscription_sum">Yalnızca bu abonelikteki sunucu alan adlarını çözümlemek için kullanılan isteğe bağlı DNS. Varsayılan davranışı kullanmak için boş bırakın. https://, tls://, quic:// veya host[:port] kabul eder.</string>
     <string name="server_dns_invalid">Geçersiz özel sunucu DNS. https://, tls://, quic:// veya host[:port] kullanın ya da boş bırakın.</string>
     <string name="subscription_used">%s Kullanıldı</string>
-    <string name="subscription_traffic">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">Sona Erme: %s</string>
     <string name="subscription_import">Abonelik içe aktar</string>
     <string name="subscription_import_message">%s aboneliğini içe aktarmak istediğinize emin misiniz? Eğer
@@ -409,7 +409,7 @@
     <string name="group_order_origin">Köken</string>
     <string name="group_order_by_name">Ada Göre</string>
     <string name="group_order_by_delay">Gecikmeye Göre</string>
-    <string name="plugin_exists_but_on_shit_system">Profile %s requires the %s plugin, but your
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
         proprietary equipment vendor (usually surveillance capital giants and malware maker)
         tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Basit Obfs (Shadowsocks Android Eklentisi)</string>
@@ -488,9 +488,9 @@
     <string name="tuic_disable_sni">SNI\'yi Devre Dışı Bırak</string>
     <string name="tuic_reduce_rtt">0-RTT QUIC El Sıkışmasını Etkinleştir</string>
     <string name="pinned_certchain_sha256">Sabitlenmiş Sertifika SHA256</string>
-    <string name="please_update">Your APP is too old (%s). And will stop working at %s. Please
+    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
         update!</string>
-    <string name="please_update_force">Your APP is too old (%s). And has been stopped working at %s.
+    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
         Please update!</string>
     <string name="connection_test_delete_unavailable">Kullanılamayanları Temizle</string>
     <string name="move">Taşı</string>

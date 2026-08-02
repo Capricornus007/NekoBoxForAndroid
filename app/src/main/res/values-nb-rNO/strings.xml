@@ -42,9 +42,9 @@
     <string name="group_status_empty">Tom gruppe</string>
     <string name="group_status_empty_subscription">Ikke oppdatert ennå</string>
     <string name="group_status_proxies">%d proxier</string>
-    <string name="group_status_proxies_subscription">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: Ingen forskjell</string>
-    <string name="group_updated">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">Diff</string>
     <string name="group_diff">Diff (%s)</string>
     <string name="group_delete_confirm_prompt">Er du sikker på at du vil fjerne denne gruppen?</string>
@@ -363,7 +363,7 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Bekreft</string>
     <string name="missing_plugin">Manglende plugin</string>
-    <string name="profile_requiring_plugin">Profile %s requires the %s plugin to be installed, but
+    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
         it was not found.</string>
     <string name="action_learn_more">LÆR MER</string>
     <string name="action_download">LAST NED</string>
@@ -384,7 +384,7 @@
     <string name="server_dns_subscription_sum">Valgfri DNS som kun brukes til å løse serverdomener i dette abonnementet. La være tomt for å bruke standard oppførsel. Godtar https://, tls://, quic:// eller vert[:port].</string>
     <string name="server_dns_invalid">Ugyldig egendefinert server-DNS. Bruk https://, tls://, quic:// eller vert[:port], eller la være tomt.</string>
     <string name="subscription_used">%s Brukt</string>
-    <string name="subscription_traffic">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">Utløper: %s</string>
     <string name="subscription_import">Importer abonnement</string>
     <string name="subscription_import_message">Bekreft at du vil importere abonnement %s? Hvis du
@@ -409,7 +409,7 @@
     <string name="group_order_origin">Opprinnelse</string>
     <string name="group_order_by_name">Etter navn</string>
     <string name="group_order_by_delay">Etter forsinkelse</string>
-    <string name="plugin_exists_but_on_shit_system">Profile %s requires the %s plugin, but your
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
         proprietary equipment vendor (usually surveillance capital giants and malware maker)
         tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks Android-plugin)</string>
@@ -492,9 +492,9 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="tuic_disable_sni">Deaktiver SNI</string>
     <string name="tuic_reduce_rtt">Aktiver 0-RTT QUIC-håndtrykk</string>
     <string name="pinned_certchain_sha256">Festet sertifikat SHA256</string>
-    <string name="please_update">Your APP is too old (%s). And will stop working at %s. Please
+    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
         update!</string>
-    <string name="please_update_force">Your APP is too old (%s). And has been stopped working at %s.
+    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
         Please update!</string>
     <string name="connection_test_delete_unavailable">Fjern utilgjengelige</string>
     <string name="move">Flytt</string>

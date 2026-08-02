@@ -42,9 +42,9 @@
     <string name="group_status_empty">빈 그룹</string>
     <string name="group_status_empty_subscription">아직 업데이트되지 않음</string>
     <string name="group_status_proxies">%d 프록시</string>
-    <string name="group_status_proxies_subscription">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: 차이 없음</string>
-    <string name="group_updated">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">차이</string>
     <string name="group_diff">차이 (%s)</string>
     <string name="group_delete_confirm_prompt">이 그룹을 삭제하시겠습니까?</string>
@@ -357,7 +357,7 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">확인</string>
     <string name="missing_plugin">플러그인 누락</string>
-    <string name="profile_requiring_plugin">Profile %s requires the %s plugin to be installed, but
+    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
         it was not found.</string>
     <string name="action_learn_more">자세히 알아보기</string>
     <string name="action_download">다운로드</string>
@@ -376,7 +376,7 @@
     <string name="server_dns_subscription_sum">이 구독에서 서버 도메인을 확인하는 데만 사용되는 선택적 DNS입니다. 기본 동작을 사용하려면 비워 둡니다. https://, tls://, quic:// 또는 host[:port] 형식을 허용합니다.</string>
     <string name="server_dns_invalid">잘못된 사용자 지정 서버 DNS입니다. https://, tls://, quic:// 또는 host[:port]를 사용하거나 비워 두세요.</string>
     <string name="subscription_used">%s 사용됨</string>
-    <string name="subscription_traffic">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">만료: %s</string>
     <string name="subscription_import">구독 가져오기</string>
     <string name="subscription_import_message">구독 %s을(를) 가져오시겠습니까? 신뢰할 수 없는 출처에서 오는 경우 이 작업을 수행하면 IP 및 이 동작이 유출될 수 있습니다.</string>
@@ -399,7 +399,7 @@
     <string name="group_order_origin">원본</string>
     <string name="group_order_by_name">이름 순</string>
     <string name="group_order_by_delay">지연 시간 순</string>
-    <string name="plugin_exists_but_on_shit_system">Profile %s requires the %s plugin, but your
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
         proprietary equipment vendor (usually surveillance capital giants and malware maker)
         tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks 안드로이드 플러그인)</string>
@@ -477,9 +477,9 @@
     <string name="tuic_disable_sni">SNI 비활성화</string>
     <string name="tuic_reduce_rtt">0-RTT QUIC 핸드셰이크 활성화</string>
     <string name="pinned_certchain_sha256">고정 인증서 SHA256</string>
-    <string name="please_update">Your APP is too old (%s). And will stop working at %s. Please
+    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
         update!</string>
-    <string name="please_update_force">Your APP is too old (%s). And has been stopped working at %s.
+    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
         Please update!</string>
     <string name="connection_test_delete_unavailable">사용 불가 지우기</string>
     <string name="move">이동</string>

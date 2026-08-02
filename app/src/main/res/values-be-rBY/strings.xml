@@ -42,9 +42,9 @@
     <string name="group_status_empty">Пустая група</string>
     <string name="group_status_empty_subscription">Яшчэ не абноўлена</string>
     <string name="group_status_proxies">%d проксі</string>
-    <string name="group_status_proxies_subscription">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: Няма розніцы</string>
-    <string name="group_updated">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">Розніца</string>
     <string name="group_diff">Розніца (%s)</string>
     <string name="group_delete_confirm_prompt">Вы ўпэўнены, што хочаце выдаліць гэтую групу?</string>
@@ -361,7 +361,7 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Пацвердзіць</string>
     <string name="missing_plugin">Адсутны плагін</string>
-    <string name="profile_requiring_plugin">Profile %s requires the %s plugin to be installed, but
+    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
         it was not found.</string>
     <string name="action_learn_more">ДАВЕДАЦЦА БОЛЬШ</string>
     <string name="action_download">ЗАГРУЗІЦЬ</string>
@@ -380,7 +380,7 @@
     <string name="server_dns_subscription_sum">Неабавязковы DNS, які выкарыстоўваецца толькі для распазнавання даменаў сервера ў гэтай падпісцы. Пакіньце пустым для выкарыстання стандартнага паводзінаў. Прымае https://, tls://, quic:// або host[:port].</string>
     <string name="server_dns_invalid">Няправільны ўласны DNS сервера. Выкарыстоўвайце https://, tls://, quic:// або host[:port], ці пакіньце пустым.</string>
     <string name="subscription_used">%s Выкарыстана</string>
-    <string name="subscription_traffic">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">Тэрмін дзеяння: %s</string>
     <string name="subscription_import">Імпартаваць падпіску</string>
     <string name="subscription_import_message">Пацвердзіце, што жадаеце імпартаваць падпіску %s? Калі вы\n        з ненадзейнай крыніцы, гэта можа прывесці да ўцечкі вашага IP і гэтых\n        дзеянняў.</string>
@@ -403,7 +403,7 @@
     <string name="group_order_origin">Зыходны</string>
     <string name="group_order_by_name">Па імені</string>
     <string name="group_order_by_delay">Па затрымцы</string>
-    <string name="plugin_exists_but_on_shit_system">Profile %s requires the %s plugin, but your
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
         proprietary equipment vendor (usually surveillance capital giants and malware maker)
         tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (плагін Shadowsocks для Android)</string>
@@ -482,9 +482,9 @@
     <string name="tuic_disable_sni">Адключыць SNI</string>
     <string name="tuic_reduce_rtt">Уключыць 0-RTT QUIC рукапацісканне</string>
     <string name="pinned_certchain_sha256">Замацаваны сертыфікат SHA256</string>
-    <string name="please_update">Your APP is too old (%s). And will stop working at %s. Please
+    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
         update!</string>
-    <string name="please_update_force">Your APP is too old (%s). And has been stopped working at %s.
+    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
         Please update!</string>
     <string name="connection_test_delete_unavailable">Ачысціць недаступныя</string>
     <string name="move">Перамясціць</string>

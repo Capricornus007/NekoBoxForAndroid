@@ -42,9 +42,9 @@
     <string name="group_status_empty">Grup kosong</string>
     <string name="group_status_empty_subscription">Belum diperbarui</string>
     <string name="group_status_proxies">%d Proxy</string>
-    <string name="group_status_proxies_subscription">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: Tidak ada perbedaan</string>
-    <string name="group_updated">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">Diff</string>
     <string name="group_diff">Diff (%s)</string>
     <string name="group_delete_confirm_prompt">Apakah Anda yakin ingin menghapus grup ini?</string>
@@ -364,7 +364,7 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Konfirmasi</string>
     <string name="missing_plugin">Plugin Hilang</string>
-    <string name="profile_requiring_plugin">Profile %s requires the %s plugin to be installed, but
+    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
         it was not found.</string>
     <string name="action_learn_more">PELAJARI LEBIH LANJUT</string>
     <string name="action_download">UNDUH</string>
@@ -385,7 +385,7 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="server_dns_subscription_sum">DNS opsional yang hanya digunakan untuk menyelesaikan domain server dalam langganan ini. Biarkan kosong untuk menggunakan perilaku default. Menerima https://, tls://, quic:// atau host[:port].</string>
     <string name="server_dns_invalid">DNS server kustom tidak valid. Gunakan https://, tls://, quic:// atau host[:port], atau biarkan kosong.</string>
     <string name="subscription_used">%s Digunakan</string>
-    <string name="subscription_traffic">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">Kadaluarsa: %s</string>
     <string name="subscription_import">Impor langganan</string>
     <string name="subscription_import_message">Konfirmasi Anda ingin mengimpor langganan %s? Jika Anda
@@ -410,7 +410,7 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="group_order_origin">Asal</string>
     <string name="group_order_by_name">Berdasarkan Nama</string>
     <string name="group_order_by_delay">Berdasarkan Latensi</string>
-    <string name="plugin_exists_but_on_shit_system">Profile %s requires the %s plugin, but your
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
         proprietary equipment vendor (usually surveillance capital giants and malware maker)
         tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Plugin Android Shadowsocks)</string>
@@ -496,9 +496,9 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="tuic_disable_sni">Nonaktifkan SNI</string>
     <string name="tuic_reduce_rtt">Aktifkan handshake QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">Sertifikat PIN SHA256</string>
-    <string name="please_update">Your APP is too old (%s). And will stop working at %s. Please
+    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
         update!</string>
-    <string name="please_update_force">Your APP is too old (%s). And has been stopped working at %s.
+    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
         Please update!</string>
     <string name="connection_test_delete_unavailable">Hapus yang tidak tersedia</string>
     <string name="move">Pindahkan</string>

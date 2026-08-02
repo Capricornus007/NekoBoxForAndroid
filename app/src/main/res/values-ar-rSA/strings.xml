@@ -42,9 +42,9 @@
     <string name="group_status_empty">مجموعة فارغة</string>
     <string name="group_status_empty_subscription">لم يتم التحديث بعد</string>
     <string name="group_status_proxies">%d بروكسي</string>
-    <string name="group_status_proxies_subscription">%d Proxies | Updated on %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: لا فرق</string>
-    <string name="group_updated">%s: Updated %d proxies</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">الفرق</string>
     <string name="group_diff">الفرق (%s)</string>
     <string name="group_delete_confirm_prompt">هل أنت متأكد من رغبتك في إزالة هذه المجموعة؟</string>
@@ -368,7 +368,7 @@
     <string name="subscription_user_agent">وكيل المستخدم</string>
     <string name="confirm">تأكيد</string>
     <string name="missing_plugin">المكون الإضافي المفقود</string>
-    <string name="profile_requiring_plugin">Profile %s requires the %s plugin to be installed, but
+    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
         it was not found.</string>
     <string name="action_learn_more">معرفة المزيد</string>
     <string name="action_download">تحميل</string>
@@ -387,7 +387,7 @@
     <string name="server_dns_subscription_sum">DNS اختياري يُستخدم فقط لحل نطاقات الخادم في هذه الاشتراك. اتركه فارغًا لاستخدام السلوك الافتراضي. يقبل https://, tls://, quic:// أو host[:port].</string>
     <string name="server_dns_invalid">DNS خادم مخصص غير صالح. استخدم https://, tls://, quic:// أو host[:port]، أو اتركه فارغًا.</string>
     <string name="subscription_used">%s مستخدم</string>
-    <string name="subscription_traffic">%s Used / %s Remaining</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">تاريخ الانتهاء: %s</string>
     <string name="subscription_import">استيراد اشتراك</string>
     <string name="subscription_import_message">هل تريد تأكيد استيراد الاشتراك %s؟ إذا كنت قادمًا من مصدر غير موثوق، فقد يؤدي ذلك إلى تسرب عنوان IP وسلوكك.</string>
@@ -410,7 +410,7 @@
     <string name="group_order_origin">الأصل</string>
     <string name="group_order_by_name">حسب الاسم</string>
     <string name="group_order_by_delay">حسب التأخير</string>
-    <string name="plugin_exists_but_on_shit_system">Profile %s requires the %s plugin, but your
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
         proprietary equipment vendor (usually surveillance capital giants and malware maker)
         tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (مكون Shadowsocks الإضافي لنظام Android)</string>
@@ -494,9 +494,9 @@
     <string name="tuic_disable_sni">تعطيل SNI</string>
     <string name="tuic_reduce_rtt">تمكين مصافحة QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">شهادة SHA256 المثبتة</string>
-    <string name="please_update">Your APP is too old (%s). And will stop working at %s. Please
+    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
         update!</string>
-    <string name="please_update_force">Your APP is too old (%s). And has been stopped working at %s.
+    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
         Please update!</string>
     <string name="connection_test_delete_unavailable">مسح غير المتاح</string>
     <string name="move">نقل</string>

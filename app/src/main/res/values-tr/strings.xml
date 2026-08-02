@@ -50,9 +50,9 @@
     <string name="group_status_empty">Boş grup</string>
     <string name="group_status_empty_subscription">Henüz güncellenmedi</string>
     <string name="group_status_proxies">%d Proxy</string>
-    <string name="group_status_proxies_subscription">%1$d Proxy | %2$s tarihinde güncellendi</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d Proxy | %2$s tarihinde güncellendi</string>
     <string name="group_no_difference">%s: Fark yok</string>
-    <string name="group_updated">%1$s: %2$d proxy güncellendi</string>
+    <string name="group_updated" formatted="false">%1$s: %2$d proxy güncellendi</string>
     <string name="group_show_diff">Fark</string>
     <string name="group_diff">Fark (%s)</string>
     <string name="group_delete_confirm_prompt">Bu grubu kaldırmak istediğinize emin misiniz?</string>
@@ -419,7 +419,7 @@
     <string name="subscription_custom_hwid_params_summary">Biçim: hwid=değer,os=değer,osVersion=değer,model=değer. Bu cihaz değerlerini kullanmak için boş bırakın; doldurulduğunda yalnızca listelenen değerler gönderilir.</string>
     <string name="confirm">Onayla</string>
     <string name="missing_plugin">Eksik Eklenti</string>
-    <string name="profile_requiring_plugin">Profil %1$s, %2$s eklentisinin kurulu olmasını gerektiriyor, ancak
+    <string name="profile_requiring_plugin" formatted="false">Profil %1$s, %2$s eklentisinin kurulu olmasını gerektiriyor, ancak
         bulunamadı.</string>
     <string name="action_learn_more">DAHA FAZLA BİLGİ</string>
     <string name="action_download">İNDİR</string>
@@ -439,7 +439,7 @@
     <string name="server_dns_subscription_sum">Yalnızca bu abonelikteki sunucu alan adlarını çözümlemek için kullanılan isteğe bağlı DNS. Varsayılan davranışı kullanmak için boş bırakın. https://, tls://, quic:// veya host[:port] kabul eder.</string>
     <string name="server_dns_invalid">Geçersiz özel sunucu DNS. https://, tls://, quic:// veya host[:port] kullanın ya da boş bırakın.</string>
     <string name="subscription_used">%s Kullanıldı</string>
-    <string name="subscription_traffic">%1$s Kullanıldı / %2$s Kaldı</string>
+    <string name="subscription_traffic" formatted="false">%1$s Kullanıldı / %2$s Kaldı</string>
     <string name="subscription_expire">Sona Erme: %s</string>
     <string name="subscription_import">Abonelik içe aktar</string>
     <string name="subscription_import_message">%s aboneliğini içe aktarmak istediğinize emin misiniz? Eğer
@@ -506,7 +506,7 @@
     <string name="group_order_origin">Köken</string>
     <string name="group_order_by_name">Ada Göre</string>
     <string name="group_order_by_delay">Gecikmeye Göre</string>
-    <string name="plugin_exists_but_on_shit_system">Profil %1$s, %2$s eklentisini gerektiriyor, ancak
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profil %1$s, %2$s eklentisini gerektiriyor, ancak
         tescilli ekipman sağlayıcınız (genellikle gözetim kapitalizmi devleri ve kötü amaçlı yazılım üreticileri)
         Android\'inize müdahale ederek eklentiyi kullanılamaz hale getirdi.</string>
     <string name="shadowsocks_plugin_simple_obfs">Basit Obfs (Shadowsocks Android Eklentisi)</string>
@@ -602,9 +602,9 @@
     <string name="tuic_disable_sni">SNI\'yi Devre Dışı Bırak</string>
     <string name="tuic_reduce_rtt">0-RTT QUIC El Sıkışmasını Etkinleştir</string>
     <string name="pinned_certchain_sha256">Sabitlenmiş Sertifika SHA256</string>
-    <string name="please_update">Uygulamanız çok eski (%1$s). %2$s tarihinde çalışmayı durduracak. Lütfen
+    <string name="please_update" formatted="false">Uygulamanız çok eski (%1$s). %2$s tarihinde çalışmayı durduracak. Lütfen
         güncelleyin!</string>
-    <string name="please_update_force">Uygulamanız çok eski (%1$s). %2$s tarihinde çalışmayı durdurdu.
+    <string name="please_update_force" formatted="false">Uygulamanız çok eski (%1$s). %2$s tarihinde çalışmayı durdurdu.
         Lütfen güncelleyin!</string>
     <string name="connection_test_delete_unavailable">Kullanılamayanları Temizle</string>
     <string name="move">Taşı</string>

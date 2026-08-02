@@ -50,9 +50,9 @@
     <string name="group_status_empty">Tom gruppe</string>
     <string name="group_status_empty_subscription">Ikke oppdatert ennå</string>
     <string name="group_status_proxies">%d proxier</string>
-    <string name="group_status_proxies_subscription">%1$d proxyer | Oppdatert %2$s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%1$d proxyer | Oppdatert %2$s</string>
     <string name="group_no_difference">%s: Ingen forskjell</string>
-    <string name="group_updated">%1$s: Oppdaterte %2$d proxyer</string>
+    <string name="group_updated" formatted="false">%1$s: Oppdaterte %2$d proxyer</string>
     <string name="group_show_diff">Diff</string>
     <string name="group_diff">Diff (%s)</string>
     <string name="group_delete_confirm_prompt">Er du sikker på at du vil fjerne denne gruppen?</string>
@@ -415,7 +415,7 @@
     <string name="subscription_custom_hwid_params_summary">Format: hwid=verdi,os=verdi,osVersion=verdi,model=verdi. La stå tomt for å bruke denne enhetens verdier; når fylt ut, sendes kun de oppførte verdiene.</string>
     <string name="confirm">Bekreft</string>
     <string name="missing_plugin">Manglende plugin</string>
-    <string name="profile_requiring_plugin">Profil %1$s krever at %2$s-pluginen er installert, men den ble ikke funnet.</string>
+    <string name="profile_requiring_plugin" formatted="false">Profil %1$s krever at %2$s-pluginen er installert, men den ble ikke funnet.</string>
     <string name="action_learn_more">LÆR MER</string>
     <string name="action_download">LAST NED</string>
     <string name="install_from_play_store">Installer fra Play Store</string>
@@ -435,7 +435,7 @@
     <string name="server_dns_subscription_sum">Valgfri DNS som kun brukes til å løse serverdomener i dette abonnementet. La være tomt for å bruke standard oppførsel. Godtar https://, tls://, quic:// eller vert[:port].</string>
     <string name="server_dns_invalid">Ugyldig egendefinert server-DNS. Bruk https://, tls://, quic:// eller vert[:port], eller la være tomt.</string>
     <string name="subscription_used">%s Brukt</string>
-    <string name="subscription_traffic">%1$s brukt / %2$s gjenstår</string>
+    <string name="subscription_traffic" formatted="false">%1$s brukt / %2$s gjenstår</string>
     <string name="subscription_expire">Utløper: %s</string>
     <string name="subscription_import">Importer abonnement</string>
     <string name="subscription_import_message">Bekreft at du vil importere abonnement %s? Hvis du
@@ -502,7 +502,7 @@
     <string name="group_order_origin">Opprinnelse</string>
     <string name="group_order_by_name">Etter navn</string>
     <string name="group_order_by_delay">Etter forsinkelse</string>
-    <string name="plugin_exists_but_on_shit_system">Profil %1$s krever %2$s-pluginen, men din proprietære utstyrsleverandør (vanligvis overvåkningskapitalgiganter og skadevareprodusenter) har tuklet med Android-en din, noe som gjør pluginen ubrukelig.</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profil %1$s krever %2$s-pluginen, men din proprietære utstyrsleverandør (vanligvis overvåkningskapitalgiganter og skadevareprodusenter) har tuklet med Android-en din, noe som gjør pluginen ubrukelig.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks Android-plugin)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Shadowsocks Android Plugin)</string>
     <string name="tcp_connections">%d TCP-tilkoblinger</string>
@@ -600,8 +600,8 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="tuic_disable_sni">Deaktiver SNI</string>
     <string name="tuic_reduce_rtt">Aktiver 0-RTT QUIC-håndtrykk</string>
     <string name="pinned_certchain_sha256">Festet sertifikat SHA256</string>
-    <string name="please_update">Appen din er for gammel (%1$s). Den vil slutte å fungere %2$s. Vennligst oppdater!</string>
-    <string name="please_update_force">Appen din er for gammel (%1$s). Den har sluttet å fungere fra %2$s. Vennligst oppdater!</string>
+    <string name="please_update" formatted="false">Appen din er for gammel (%1$s). Den vil slutte å fungere %2$s. Vennligst oppdater!</string>
+    <string name="please_update_force" formatted="false">Appen din er for gammel (%1$s). Den har sluttet å fungere fra %2$s. Vennligst oppdater!</string>
     <string name="connection_test_delete_unavailable">Fjern utilgjengelige</string>
     <string name="move">Flytt</string>
     <string name="exe_prefer_provider">Foretrukket plugin-leverandør</string>
