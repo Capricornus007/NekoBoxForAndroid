@@ -319,8 +319,8 @@ fun buildConfig(
                 listen_port = DataStore.mixedPort
                 if (DataStore.mixedInboundNeedsAuth) {
                     users = listOf(User().also { u ->
-                        u.username = Key.MIXED_USERNAME
-                        u.password = DataStore.mixedSecret
+                        u.username = DataStore.mixedUsername
+                        u.password = DataStore.mixedPassword
                     })
                 }
             })

@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.database
 
 import android.os.Binder
-import android.os.Build
 import androidx.preference.PreferenceDataStore
 import io.nekohasekai.sagernet.CONNECTION_TEST_URL
 import io.nekohasekai.sagernet.GroupType
@@ -142,15 +141,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     // hopefully hashCode = mHandle doesn't change, currently this is true from KitKat to Nougat
     private val userIndex by lazy { Binder.getCallingUserHandle().hashCode() }
-    val mixedSecret: String
-        @Synchronized get() {
-            var s = configurationStore.getString(Key.MIXED_SECRET)
-            if (s.isNullOrEmpty()) {
-                s = java.util.UUID.randomUUID().toString().replace("-", "")
-                configurationStore.putString(Key.MIXED_SECRET, s)
-            }
-            return s
-        }
 
     var mixedPort: Int
         get() = getLocalPort(Key.MIXED_PORT, 2080)
@@ -162,12 +152,15 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     val mixedInboundDisabled: Boolean
         get() = disableMixedInbound && serviceMode == Key.MODE_VPN
 
-    val mixedInboundNeedsAuth: Boolean
-        get() = serviceMode == Key.MODE_VPN && !mixedInboundDisabled &&
-            !(appendHttpProxy && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+    // 混合入站账密由用户设置决定：用户名留空即不启用认证（本机回环免密直连）
+    var mixedUsername by configurationStore.string(Key.MIXED_USERNAME) { "" }
+    var mixedPassword by configurationStore.string(Key.MIXED_PASSWORD) { "" }
 
-    val mixedInboundUser: String get() = if (mixedInboundAuthed) Key.MIXED_USERNAME else ""
-    val mixedInboundPass: String get() = if (mixedInboundAuthed) mixedSecret else ""
+    val mixedInboundNeedsAuth: Boolean
+        get() = serviceMode == Key.MODE_VPN && !mixedInboundDisabled && mixedUsername.isNotBlank()
+
+    val mixedInboundUser: String get() = if (mixedInboundAuthed) mixedUsername else ""
+    val mixedInboundPass: String get() = if (mixedInboundAuthed) mixedPassword else ""
 
     fun initGlobal() {
         if (configurationStore.getString(Key.MIXED_PORT) == null) {
@@ -194,7 +187,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     val persistAcrossReboot by configurationStore.boolean(Key.PERSIST_ACROSS_REBOOT) { false }
 
-    var appendHttpProxy by configurationStore.boolean(Key.APPEND_HTTP_PROXY)
     var httpProxyBypass by configurationStore.string(Key.HTTP_PROXY_BYPASS) { "" }
     var dnsHosts by configurationStore.string(Key.DNS_HOSTS) { "" }
     var strictRoute by configurationStore.boolean(Key.STRICT_ROUTE) { true }

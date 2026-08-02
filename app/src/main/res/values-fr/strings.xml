@@ -229,7 +229,10 @@
     <string name="wireguard_local_address">Adresse locale</string>
     <string name="proxy_cat">Préférences du serveur</string>
     <string name="need_reload">Recharger le service de proxy pour appliquer les modifications</string>
-    <string name="append_http_proxy">Ajouter un proxy HTTP au VPN</string>
+    <string name="mixed_auth_config">Configurer l\'authentification</string>
+    <string name="mixed_auth_username_hint">Nom d\'utilisateur (laissez les deux vides pour aucune authentification)</string>
+    <string name="mixed_auth_no_auth">Non défini (sans authentification)</string>
+    <string name="mixed_auth_enabled_sum">Nom d\'utilisateur : %1$s</string>
     <string name="subscription_settings">Préférences de souscription</string>
     <string name="group_type">Type du groupe</string>
     <string name="subscription_type">Type de souscription</string>

@@ -44,13 +44,13 @@ object Key {
 
     const val MIXED_PORT = "mixedPort"
     const val DISABLE_MIXED_INBOUND = "disableMixedInbound"
-    const val MIXED_SECRET = "mixedSecret" // storage key for the generated inbound secret
-    const val MIXED_USERNAME = "neko" // username presented to the authed mixed inbound
+    const val MIXED_USERNAME = "mixedUsername" // 混合入站认证用户名；留空即不启用认证
+    const val MIXED_PASSWORD = "mixedPassword" // 混合入站认证密码
+    const val MIXED_AUTH_CONFIG = "mixedAuthConfig" // 设置页「配置身份验证」入口，仅 UI 查找用
     const val ALLOW_ACCESS = "allowAccess"
     const val SPEED_INTERVAL = "speedInterval"
     const val SHOW_DIRECT_SPEED = "showDirectSpeed"
 
-    const val APPEND_HTTP_PROXY = "appendHttpProxy"
     const val HTTP_PROXY_BYPASS = "httpProxyBypass"
     const val DNS_HOSTS = "dnsHosts"
     const val STRICT_ROUTE = "strictRoute"

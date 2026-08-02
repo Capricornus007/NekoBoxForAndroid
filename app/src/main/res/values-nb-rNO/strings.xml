@@ -144,8 +144,10 @@
     <string name="group_basic">Grunnleggende</string>
     <string name="trojan_provider">Trojansk leverandør</string>
     <string name="protocol_settings">Protokollinnstillinger</string>
-    <string name="append_http_proxy_sum">HTTP -proxy brukes direkte fra (nettleser/ noen støttede apper), uten å gå gjennom den virtuelle NIC -enheten (Android 10+)</string>
-    <string name="append_http_proxy">Legg til HTTP -proxy til VPN</string>
+    <string name="mixed_auth_config">Konfigurer autentisering</string>
+    <string name="mixed_auth_username_hint">Brukernavn (la begge stå tomme for ingen autentisering)</string>
+    <string name="mixed_auth_no_auth">Ikke satt (ingen autentisering)</string>
+    <string name="mixed_auth_enabled_sum">Brukernavn: %1$s</string>
     <string name="connection_test_unreachable">Uoppnåelig</string>
     <string name="connection_test_refused">Tilkobling nektet</string>
     <string name="connection_test_domain_not_found">Domenet ble ikke funnet</string>

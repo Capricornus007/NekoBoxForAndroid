@@ -329,8 +329,10 @@
     <string name="connection_test_refused">З\'єднання відхилено</string>
     <string name="connection_test_unreachable">Недоступний</string>
     <string name="connection_test_timeout">Час очікування минув</string>
-    <string name="append_http_proxy">Додати HTTP-проксі до VPN</string>
-    <string name="append_http_proxy_sum">HTTP-проксі буде використовуватися безпосередньо (браузером / деякими підтримуваними програмами), не проходячи через віртуальний мережевий пристрій (Android 10+)</string>
+    <string name="mixed_auth_config">Налаштувати автентифікацію</string>
+    <string name="mixed_auth_username_hint">Ім\'я користувача (залиште обидва поля порожніми — без автентифікації)</string>
+    <string name="mixed_auth_no_auth">Не задано (без автентифікації)</string>
+    <string name="mixed_auth_enabled_sum">Ім\'я користувача: %1$s</string>
     <string name="protocol_settings">Налаштування протоколу</string>
     <string name="trojan_provider">Постачальник Trojan</string>
     <string name="group_basic">Основні</string>

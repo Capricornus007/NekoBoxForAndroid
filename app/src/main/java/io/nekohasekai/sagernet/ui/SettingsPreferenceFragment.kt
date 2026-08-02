@@ -96,7 +96,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val disableMixedInbound = findPreference<SwitchPreference>(Key.DISABLE_MIXED_INBOUND)!!
         val serviceMode = findPreference<Preference>(Key.SERVICE_MODE)!!
         val allowAccess = findPreference<Preference>(Key.ALLOW_ACCESS)!!
-        val appendHttpProxy = findPreference<SwitchPreference>(Key.APPEND_HTTP_PROXY)!!
+        val mixedAuthConfig = findPreference<Preference>(Key.MIXED_AUTH_CONFIG)!!
         val httpProxyBypass = findPreference<EditTextPreference>(Key.HTTP_PROXY_BYPASS)!!
         val dnsHosts = findPreference<EditTextPreference>(Key.DNS_HOSTS)!!
         val strictRoute = findPreference<SwitchPreference>(Key.STRICT_ROUTE)!!
@@ -202,13 +202,12 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
-        // 禁用混合入站：开启时代理端口/追加HTTP代理设置项变灰，端口摘要显示「已禁用」
+        // 禁用混合入站：开启时代理端口/身份验证/绕过列表设置项变灰，端口摘要显示「已禁用」
         fun updateMixedPortState(disabled: Boolean = DataStore.disableMixedInbound) {
             mixedPort.isEnabled = !disabled
-            // httpProxyBypass 通过 dependency 级联随 appendHttpProxy 一起变灰
-            appendHttpProxy.isEnabled = !disabled
+            mixedAuthConfig.isEnabled = !disabled
+            httpProxyBypass.isEnabled = !disabled
             if (disabled) {
-                appendHttpProxy.isChecked = false
                 mixedPort.summaryProvider = null
                 mixedPort.summary = getString(R.string.mixed_inbound_disabled)
             } else {
@@ -229,24 +228,34 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             needReload()
             true
         }
-        mixedPort.onPreferenceChangeListener = reloadListener
-        appendHttpProxy.setOnPreferenceChangeListener { _, newValue ->
-            if (newValue as Boolean) {
-                MaterialAlertDialogBuilder(requireContext()).apply {
-                    setTitle(R.string.append_http_proxy_security_title)
-                    setMessage(R.string.append_http_proxy_security_message)
-                    setNegativeButton(android.R.string.cancel, null)
-                    setPositiveButton(R.string.enable_anyway) { _, _ ->
-                        appendHttpProxy.isChecked = true
-                        needReload()
-                    }
-                }.show()
-                false
-            } else {
-                needReload()
-                true
-            }
+        // 配置身份验证：弹窗编辑混合入站用户名/密码，两项均留空则不启用认证
+        fun updateMixedAuthSummary() {
+            mixedAuthConfig.summary = DataStore.mixedUsername.takeIf { it.isNotBlank() }
+                ?.let { getString(R.string.mixed_auth_enabled_sum, it) }
+                ?: getString(R.string.mixed_auth_no_auth)
         }
+        updateMixedAuthSummary()
+        mixedAuthConfig.setOnPreferenceClickListener {
+            val view = layoutInflater.inflate(R.layout.layout_mixed_auth_dialog, null)
+            val usernameEdit = view.findViewById<EditText>(R.id.mixed_username_edit)
+            val passwordEdit = view.findViewById<EditText>(R.id.mixed_password_edit)
+            usernameEdit.setText(DataStore.mixedUsername)
+            passwordEdit.setText(DataStore.mixedPassword)
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.mixed_auth_config)
+                .setView(view)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    DataStore.mixedUsername = usernameEdit.text.toString().trim()
+                    DataStore.mixedPassword = passwordEdit.text.toString()
+                    updateMixedAuthSummary()
+                    needReload()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+            true
+        }
+
+        mixedPort.onPreferenceChangeListener = reloadListener
         httpProxyBypass.onPreferenceChangeListener = reloadListener
         dnsHosts.onPreferenceChangeListener = reloadListener
         strictRoute.onPreferenceChangeListener = reloadListener
