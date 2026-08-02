@@ -113,6 +113,8 @@ jobs:
           go-version: '1.26.4'
       - name: Native Build
         if: steps.cache.outputs.cache-hit != 'true'
+        env:
+          ALLOW_UNPINNED_SIBLINGS: 1
         run: ./run lib core
       - name: Verify 16 KB ELF alignment
         run: bash ./scripts/verify-elf-alignment.sh app/libs/libcore.aar
