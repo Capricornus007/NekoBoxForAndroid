@@ -396,6 +396,12 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         // ────────────────────────────────────────────────────────────
     }
 
+    private fun recreateActivityAfterPreferencePersisted() {
+        listView.postDelayed({
+            activity?.let(ActivityCompat::recreate)
+        }, 100L)
+    }
+
     override fun onResume() {
         super.onResume()
 
