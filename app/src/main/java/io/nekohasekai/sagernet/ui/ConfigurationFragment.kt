@@ -1073,11 +1073,13 @@ class ConfigurationFragment @JvmOverloads constructor(
         val dialog = test.builder.show()
         val testJobs = mutableListOf<Job>()
         val group = DataStore.currentGroup()
+        Logs.d("URLTest: batch start, group=${group.name}, concurrent=${DataStore.connectionTestConcurrent}")
 
         val mainJob = runOnDefaultDispatcher {
             val profilesList = SagerDatabase.proxyDao.getByGroup(group.id)
             test.proxyN = profilesList.size
             val profiles = ConcurrentLinkedQueue(profilesList)
+            Logs.d("URLTest: batch profiles=${profilesList.size}")
             repeat(DataStore.connectionTestConcurrent) {
                 testJobs.add(launch(Dispatchers.IO) {
                     val urlTest = UrlTest() // note: this is NOT in bg process
@@ -1089,6 +1091,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                             val result = urlTest.doTest(profile)
                             profile.status = 1
                             profile.ping = result
+                            Logs.d("URLTest ${profile.displayName()}: done, ping=${result}ms")
                         } catch (e: PluginManager.PluginNotFoundException) {
                             profile.status = 2
                             profile.error = e.readableMessage

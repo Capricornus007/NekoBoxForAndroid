@@ -5,6 +5,7 @@ import io.nekohasekai.sagernet.bg.GuardedProcessPool
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.fmt.buildConfig
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.tryResume
 import io.nekohasekai.sagernet.ktx.tryResumeWithException
@@ -25,14 +26,21 @@ class TestInstance(profile: ProxyEntity, val link: String, private val timeout: 
             runOnDefaultDispatcher {
                 use {
                     try {
+                        Logs.d("URLTest ${profile.displayName()}: init()")
                         init()
+                        Logs.d("URLTest ${profile.displayName()}: launch()")
                         launch()
                         if (processes.processCount > 0) {
                             // wait for plugin start
+                            Logs.d("URLTest ${profile.displayName()}: waiting ${processes.processCount} plugin(s) start, delay 500ms")
                             delay(500)
                         }
-                        c.tryResume(Libcore.urlTest(box, link, timeout))
+                        Logs.d("URLTest ${profile.displayName()}: calling Libcore.urlTest(box, link=$link, timeout=${timeout}ms)")
+                        val latency = Libcore.urlTest(box, link, timeout)
+                        Logs.d("URLTest ${profile.displayName()}: result latency=${latency}ms")
+                        c.tryResume(latency)
                     } catch (e: Exception) {
+                        Logs.d("URLTest ${profile.displayName()}: failed: ${e.readableMessage}")
                         c.tryResumeWithException(e)
                     }
                 }
