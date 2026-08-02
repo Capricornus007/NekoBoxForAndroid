@@ -830,4 +830,6 @@
     <string name="ui_style_expressive">Expressive</string>
     <string name="waterfall_settings">Waterfall Settings</string>
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
+    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
+    <string name="dns_hosts_lines">DNS Hosts Lines</string>
 </resources>
