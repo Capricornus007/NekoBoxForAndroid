@@ -100,7 +100,7 @@ func (w *boxPlatformInterfaceWrapper) UsePlatformDefaultInterfaceMonitor() bool 
 }
 
 func (w *boxPlatformInterfaceWrapper) CreateDefaultInterfaceMonitor(l logger.Logger) tun.DefaultInterfaceMonitor {
-	return newInterfaceMonitor(w, l)
+	return newInterfaceMonitor()
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformNetworkInterfaces() bool {

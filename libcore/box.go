@@ -17,6 +17,7 @@ import (
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/boxapi"
+	"github.com/sagernet/sing-box/common/dialer"
 	"github.com/sagernet/sing-box/protocol/group"
 
 	box "github.com/sagernet/sing-box"
@@ -72,7 +73,7 @@ type BoxInstance struct {
 	cancel context.CancelFunc
 	state  int
 
-	v2api        *v2rayapi.StatsService
+	v2api        *boxapi.SbV2rayServer
 	selector     *group.Selector
 	urlTest      *group.URLTest
 	pauseManager pause.Manager
@@ -204,25 +205,18 @@ func (b *BoxInstance) SetV2rayStats(outbounds string) {
 		return
 	}
 	// 官方 experimental/v2rayapi 的 StatsService 即 adapter.ConnectionTracker
-	b.v2api = v2rayapi.NewStatsService(option.V2RayStatsServiceOptions{
+	b.v2api = boxapi.NewSbV2rayServer(option.V2RayStatsServiceOptions{
 		Enabled:   true,
 		Outbounds: strings.Split(outbounds, "\n"),
 	})
-	b.Box.Router().AppendTracker(b.v2api)
+	b.Box.Router().AppendTracker(b.v2api.StatsService())
 }
 
 func (b *BoxInstance) QueryStats(tag, direct string) int64 {
 	if b.v2api == nil {
 		return 0
 	}
-	resp, err := b.v2api.GetStats(context.Background(), &v2rayapi.GetStatsRequest{
-		Name:   fmt.Sprintf("outbound>>>%s>>>traffic>>>%s", tag, direct),
-		Reset_: true,
-	})
-	if err != nil || resp.Stat == nil {
-		return 0
-	}
-	return resp.Stat.Value
+	return b.v2api.QueryStats(fmt.Sprintf("outbound>>>%s>>>traffic>>>%s", tag, direct))
 }
 
 func (b *BoxInstance) SelectOutbound(tag string) bool {
@@ -266,7 +260,7 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 	} else {
 		var connectionTracker adapter.ConnectionTracker
 		if i.v2api != nil {
-			connectionTracker = i.v2api
+			connectionTracker = i.v2api.StatsService()
 		}
 		client = newProxyHTTPClient(i.Box, connectionTracker, timeout)
 	}
