@@ -10,15 +10,26 @@ object Key {
     const val PERSIST_ACROSS_REBOOT = "isAutoConnect"
 
     const val CLEAR_CACHE = "clearCache"
+    const val PLUGIN_SIGNER_APPROVALS = "pluginSignerApprovals"
 
     const val APP_EXPERT = "isExpert"
     const val APP_THEME = "appTheme"
     const val USE_SYSTEM_THEME = "useSystemTheme"
     const val NIGHT_THEME = "nightTheme"
+
+    // Remembers the user's night-mode setting before a dark-only theme (Dracula
+    // or Dark High Contrast) forced it on, so it can be restored when switching
+    // to another theme. Storage key kept as "nightThemeBeforeDracula" for
+    // backward compatibility with previously persisted values.
+    const val NIGHT_THEME_BEFORE_DRACULA = "nightThemeBeforeDracula"
     const val APP_LANGUAGE = "appLanguage"
+    const val DYNAMIC_COLORS = "dynamicColors"
+    const val UI_DESIGN_VERSION = "uiDesignVersion"
     const val SERVICE_MODE = "serviceMode"
     const val MODE_VPN = "vpn"
     const val MODE_PROXY = "proxy"
+
+    const val LAN_SHARING = "lanSharing"
 
     const val GLOBAL_CUSTOM_CONFIG = "globalCustomConfig"
 
@@ -39,14 +50,19 @@ object Key {
 
     const val BYPASS_LAN = "bypassLan"
     const val BYPASS_LAN_IN_CORE = "bypassLanInCore"
-    const val CONCURRENT_DIAL = "concurrentDial" // 留作未来补回并发拨号功能
-    const val DUAL_NETWORK_ACCELERATION = "dualNetworkAcceleration"
+    const val CONCURRENT_DIAL = "concurrentDial"
 
-    const val MIXED_PORT = "mixedPort"
-    const val DISABLE_MIXED_INBOUND = "disableMixedInbound"
+    const val MIXED_PORT = "mixedPort" // migration source
+    const val SOCKS_PORT = "socksPort"
+    const val HTTP_PORT = "httpPort"
+    const val MIXED_USERNAME = "mixedUsername"
+    const val MIXED_PASSWORD = "mixedPassword"
     const val MIXED_SECRET = "mixedSecret" // storage key for the generated inbound secret
-    const val MIXED_USERNAME = "neko" // username presented to the authed mixed inbound
+    const val CLASH_API_SECRET = "clashApiSecret" // per-install secret for the local Clash API
+
     const val ALLOW_ACCESS = "allowAccess"
+    const val REQUIRE_PROXY_IN_VPN = "requireProxyInVPN" // keep local mixed inbound open in VPN mode
+    const val PROXY_MODE_INBOUND_AUTH = "proxyModeInboundAuth" // authenticate loopback inbound in Proxy mode
     const val SPEED_INTERVAL = "speedInterval"
     const val SHOW_DIRECT_SPEED = "showDirectSpeed"
 
@@ -59,6 +75,7 @@ object Key {
     const val CONNECTION_TEST_TIMEOUT = "connectionTestTimeout"
 
     const val NETWORK_CHANGE_RESET_CONNECTIONS = "networkChangeResetConnections"
+    const val RESTART_PROFILE_ON_NETWORK_CHANGE = "restartProfileOnNetworkChange"
     const val WAKE_RESET_CONNECTIONS = "wakeResetConnections"
     const val RULES_PROVIDER = "rulesProvider"
     const val LOG_LEVEL = "logLevel"
@@ -135,6 +152,46 @@ object Key {
     const val SERVER_DISABLE_MTU_DISCOVERY = "serverDisableMtuDiscovery"
     const val SERVER_HOP_INTERVAL = "hopInterval"
 
+    const val SERVER_HY2_OBFS_TYPE = "serverHy2ObfsType"
+    const val SERVER_HY2_GECKO_MIN_PACKET = "serverHy2GeckoMinPacket"
+    const val SERVER_HY2_GECKO_MAX_PACKET = "serverHy2GeckoMaxPacket"
+    const val SERVER_HY2_ECH_CATEGORY = "serverHy2EchCategory"
+    const val SERVER_HY2_ECH_ENABLED = "serverHy2EchEnabled"
+    const val SERVER_HY2_ECH_CONFIG = "serverHy2EchConfig"
+
+    // MasterDnsVPN
+    const val MDV_DOMAINS = "mdvDomains"
+    const val MDV_ENCRYPTION_METHOD = "mdvEncryptionMethod"
+    const val MDV_ENCRYPTION_KEY = "mdvEncryptionKey"
+    const val MDV_RESOLVERS = "mdvResolvers"
+    const val MDV_BALANCING_STRATEGY = "mdvBalancingStrategy"
+    const val MDV_PACKET_DUP = "mdvPacketDup"
+    const val MDV_SETUP_PACKET_DUP = "mdvSetupPacketDup"
+    const val MDV_AUTO_DISABLE_TIMEOUT = "mdvAutoDisableTimeout"
+    const val MDV_AUTO_REMOVE_LOW_MTU = "mdvAutoRemoveLowMtu"
+    const val MDV_BASE_ENCODE = "mdvBaseEncode"
+    const val MDV_UPLOAD_COMPRESSION = "mdvUploadCompression"
+    const val MDV_DOWNLOAD_COMPRESSION = "mdvDownloadCompression"
+    const val MDV_COMPRESSION_MIN_SIZE = "mdvCompressionMinSize"
+    const val MDV_MIN_UPLOAD_MTU = "mdvMinUploadMtu"
+    const val MDV_MIN_DOWNLOAD_MTU = "mdvMinDownloadMtu"
+    const val MDV_MAX_UPLOAD_MTU = "mdvMaxUploadMtu"
+    const val MDV_MAX_DOWNLOAD_MTU = "mdvMaxDownloadMtu"
+    const val MDV_LOCAL_DNS_ENABLED = "mdvLocalDnsEnabled"
+    const val MDV_LOCAL_DNS_PORT = "mdvLocalDnsPort"
+    const val MDV_LOG_LEVEL = "mdvLogLevel"
+    const val MDV_ADVANCED_JSON = "mdvAdvancedJson"
+
+    // olcRTC
+    const val OLCRTC_CARRIER = "olcrtcCarrier"
+    const val OLCRTC_ROOM_ID = "olcrtcRoomId"
+    const val OLCRTC_CLIENT_ID = "olcrtcClientId"
+    const val OLCRTC_KEY_HEX = "olcrtcKeyHex"
+    const val OLCRTC_TRANSPORT = "olcrtcTransport"
+    const val OLCRTC_VP8_FPS = "olcrtcVp8Fps"
+    const val OLCRTC_VP8_BATCH = "olcrtcVp8Batch"
+    const val OLCRTC_DNS_SERVER = "olcrtcDnsServer"
+
     const val SERVER_PRIVATE_KEY = "serverPrivateKey"
     const val SERVER_INSECURE_CONCURRENCY = "serverInsecureConcurrency"
 
@@ -166,20 +223,36 @@ object Key {
     const val GROUP_LANDING_PROXY = "groupLandingProxy"
 
     const val GROUP_SUBSCRIPTION = "groupSubscription"
+    const val SUBSCRIPTION_EXTRA_LINKS = "subscriptionExtraLinks"
     const val SUBSCRIPTION_LINK = "subscriptionLink"
     const val SUBSCRIPTION_FORCE_RESOLVE = "subscriptionForceResolve"
     const val SUBSCRIPTION_DEDUPLICATION = "subscriptionDeduplication"
     const val SUBSCRIPTION_UPDATE = "subscriptionUpdate"
     const val SUBSCRIPTION_UPDATE_WHEN_CONNECTED_ONLY = "subscriptionUpdateWhenConnectedOnly"
     const val SUBSCRIPTION_USER_AGENT = "subscriptionUserAgent"
+    const val SUBSCRIPTION_SEND_HWID = "subscriptionSendHwid"
+    const val SUBSCRIPTION_CUSTOM_HWID_PARAMS = "subscriptionCustomHwidParams"
     const val SUBSCRIPTION_AUTO_UPDATE = "subscriptionAutoUpdate"
     const val SUBSCRIPTION_AUTO_UPDATE_DELAY = "subscriptionAutoUpdateDelay"
     const val SUBSCRIPTION_FILTER_MODE = "subscriptionFilterMode"
     const val SUBSCRIPTION_FILTER_REGEX = "subscriptionFilterRegex"
     const val SUBSCRIPTION_SERVER_DNS = "subscriptionServerDns"
+    const val SUBSCRIPTION_CUSTOM_DNS = "subscriptionCustomDns"
+
+    // Balancer
+    const val BALANCER_TYPE = "balancerType"
+    const val BALANCER_STRATEGY = "balancerStrategy"
+    const val BALANCER_GROUP = "balancerGroup"
+    const val BALANCER_NAME_FILTER = "balancerNameFilter"
+    const val BALANCER_NAME_FILTER1 = "balancerNameFilter1"
+    const val BALANCER_USE_LANDING_PROXY = "balancerUseLandingProxy"
+    const val BALANCER_USE_FRONT_PROXY = "balancerUseFrontProxy"
+    const val PROBE_URL = "probeUrl"
+    const val PROBE_INTERVAL = "probeInterval"
+
+    const val USE_IEC_UNIT = "useIECUnit"
 
     //
-
     const val APP_TLS_VERSION = "appTLSVersion"
     const val ENABLE_CLASH_API = "enableClashAPI"
 
@@ -231,6 +304,11 @@ object Action {
     const val CLOSE = "io.nekohasekai.sagernet.CLOSE"
     const val RELOAD = "io.nekohasekai.sagernet.RELOAD"
 
+    // Optional Long extra carrying the freshly-selected profile id across the start/reload IPC,
+    // so the :bg process does not depend on the UI's async write-through DB commit having landed
+    // (see RoomPreferenceDataStore cached mode). -1 / absent => read selectedProxy from the store.
+    const val EXTRA_PROFILE_ID = "io.nekohasekai.sagernet.EXTRA_PROFILE_ID"
+
     // const val SWITCH_WAKE_LOCK = "io.nekohasekai.sagernet.SWITCH_WAKELOCK"
-    const val RESET_UPSTREAM_CONNECTIONS = "moe.nb4a.RESET_UPSTREAM_CONNECTIONS"
+    const val RESET_UPSTREAM_CONNECTIONS = "moe.sb4a.RESET_UPSTREAM_CONNECTIONS"
 }
