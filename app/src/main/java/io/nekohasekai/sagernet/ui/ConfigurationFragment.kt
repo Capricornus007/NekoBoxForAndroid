@@ -276,7 +276,6 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
     }
 
-    fun refreshAllGroupFragmentsCardStyle() {
         adapter.groupFragments.values.forEach { fragment ->
             if (fragment.isAdded && fragment.view != null) {
                 fragment.adapter?.notifyDataSetChanged()
@@ -1522,25 +1521,16 @@ class ConfigurationFragment @JvmOverloads constructor(
                 true
             }
 
-            val cardClassic = menu.findItem(R.id.action_card_style_classic)
-            val cardStroke = menu.findItem(R.id.action_card_style_stroke)
-            when (DataStore.profileCardStyle) {
                 1 -> cardStroke.isChecked = true
                 else -> cardClassic.isChecked = true
             }
             cardClassic.setOnMenuItemClickListener {
                 it.isChecked = true
-                if (DataStore.profileCardStyle != 0) {
-                    DataStore.profileCardStyle = 0
-                    (parentFragment as? ConfigurationFragment)?.refreshAllGroupFragmentsCardStyle()
                 }
                 true
             }
             cardStroke.setOnMenuItemClickListener {
                 it.isChecked = true
-                if (DataStore.profileCardStyle != 1) {
-                    DataStore.profileCardStyle = 1
-                    (parentFragment as? ConfigurationFragment)?.refreshAllGroupFragmentsCardStyle()
                 }
                 true
             }
@@ -2267,7 +2257,6 @@ class ConfigurationFragment @JvmOverloads constructor(
             private fun applySelected(selected: Boolean) {
                 val ctx = card.context
                 val surface = ctx.getColorAttr(R.attr.colorSurface)
-                if (DataStore.profileCardStyle == 1) {
                     val primary = ctx.getColorAttr(R.attr.colorPrimary)
                     selectedIndicator.isVisible = false
                     card.cardElevation = 0f
