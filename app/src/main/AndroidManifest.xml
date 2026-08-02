@@ -329,11 +329,7 @@
             android:exported="false"
             android:foregroundServiceType="systemExempted"
             android:process=":bg"
-            tools:ignore="ForegroundServicePermission">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="@string/fgs_special_use_explanation" />
-        </service>
+            tools:ignore="ForegroundServicePermission" />
 
         <service
             android:name="io.nekohasekai.sagernet.bg.VpnService"
@@ -343,10 +339,6 @@
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":bg"
             tools:ignore="ForegroundServicePermission">
-
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="@string/fgs_special_use_explanation" />
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
@@ -362,9 +354,6 @@
             android:process=":bg"
             tools:ignore="ForegroundServicePermission"
             tools:targetApi="n">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="@string/fgs_special_use_explanation" />
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>

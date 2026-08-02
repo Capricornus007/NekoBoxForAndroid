@@ -134,14 +134,11 @@ class ServiceNotification(
         .setWhen(0)
         .setTicker(service.getString(R.string.forward_success))
         .setContentTitle(title)
-        .setContentText(service.getString(R.string.forward_success))
         .setOnlyAlertOnce(true)
-        .setOngoing(true)
         .setContentIntent(SagerNet.configureIntent(service))
         .setSmallIcon(R.drawable.ic_service_active)
         .setCategory(NotificationCompat.CATEGORY_SERVICE)
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+        .setPriority(if (visible) NotificationCompat.PRIORITY_LOW else NotificationCompat.PRIORITY_MIN)
 
     private val buildLock = Mutex()
 
