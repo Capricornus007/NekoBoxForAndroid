@@ -25,7 +25,8 @@ import (
 type boxPlatformInterfaceWrapper struct {
 	// myTunAddress is captured from the tun options in OpenInterface so the
 	// router can answer MyInterfaceAddress() without enumerating interfaces.
-	myTunAddress []netip.Addr
+	myTunAddress   []netip.Addr
+	networkManager adapter.NetworkManager
 }
 
 func newBoxPlatformInterfaceWrapper() *boxPlatformInterfaceWrapper {
@@ -33,6 +34,7 @@ func newBoxPlatformInterfaceWrapper() *boxPlatformInterfaceWrapper {
 }
 
 func (w *boxPlatformInterfaceWrapper) Initialize(networkManager adapter.NetworkManager) error {
+	w.networkManager = networkManager
 	return nil
 }
 
@@ -99,7 +101,7 @@ func (w *boxPlatformInterfaceWrapper) UsePlatformDefaultInterfaceMonitor() bool 
 }
 
 func (w *boxPlatformInterfaceWrapper) CreateDefaultInterfaceMonitor(l logger.Logger) tun.DefaultInterfaceMonitor {
-	return newInterfaceMonitor()
+	return newInterfaceMonitor(w, l)
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformNetworkInterfaces() bool {
