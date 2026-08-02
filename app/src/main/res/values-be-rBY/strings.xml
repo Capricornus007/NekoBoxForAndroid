@@ -83,8 +83,8 @@
     <string name="speed_detail">Проксі: %1$s↑ %2$s↓\nПрамы: %3$s↑ %4$s↓</string>
     <string name="speed">%s/с</string>
     <string name="connection_test_testing">Тэставанне…</string>
-    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
-    <string name="connection_test_available_http">Success: HTTP handshake took %dms</string>
+    <string name="connection_test_available">Поспех: рукапацісканне HTTPS заняло %dms</string>
+    <string name="connection_test_available_http">Поспех: рукапацісканне HTTP заняло %dms</string>
     <string name="connection_test_error">Памылка: %s</string>
     <string name="connection_test_fail">Інтэрнэт недаступны</string>
     <string name="connection_test_error_status_code">Код памылкі: #%d</string>

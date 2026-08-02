@@ -83,8 +83,8 @@
     <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirect： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Testando…</string>
-    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
-    <string name="connection_test_available_http">Success: HTTP handshake took %dms</string>
+    <string name="connection_test_available">Sucesso: o handshake HTTPS levou %dms</string>
+    <string name="connection_test_available_http">Sucesso: o handshake HTTP levou %dms</string>
     <string name="connection_test_error">Falhou: %s</string>
     <string name="connection_test_fail">Internet Indisponível</string>
     <string name="connection_test_error_status_code">Código de erro: #%d</string>

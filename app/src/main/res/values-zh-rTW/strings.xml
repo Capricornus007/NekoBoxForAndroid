@@ -83,8 +83,8 @@
     <string name="speed_detail">代理：%1$s↑ %2$s↓\n直連：%3$s↑ %4$s↓</string>
     <string name="speed">每秒 %s</string>
     <string name="connection_test_testing">測試中…</string>
-    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
-    <string name="connection_test_available_http">Success: HTTP handshake took %dms</string>
+    <string name="connection_test_available">成功：HTTPS 握手耗時 %dms</string>
+    <string name="connection_test_available_http">成功：HTTP 握手耗時 %dms</string>
     <string name="connection_test_error">失敗：%s</string>
     <string name="connection_test_fail">網路不可用</string>
     <string name="connection_test_error_status_code">錯誤代碼：#%d</string>

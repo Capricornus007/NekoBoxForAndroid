@@ -83,8 +83,8 @@
     <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirect： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Test ediliyor…</string>
-    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
-    <string name="connection_test_available_http">Success: HTTP handshake took %dms</string>
+    <string name="connection_test_available">Başarılı: HTTPS el sıkışması %dms sürdü</string>
+    <string name="connection_test_available_http">Başarılı: HTTP el sıkışması %dms sürdü</string>
     <string name="connection_test_error">Başarısız: %s</string>
     <string name="connection_test_fail">İnternet Kullanılamıyor</string>
     <string name="connection_test_error_status_code">Hata kodu: #%d</string>

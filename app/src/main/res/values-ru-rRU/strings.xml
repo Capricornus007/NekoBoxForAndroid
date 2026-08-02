@@ -83,8 +83,8 @@
     <string name="speed_detail">Прокси: %1$s↑ %2$s↓\nПрямое: %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Тестирование…</string>
-    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
-    <string name="connection_test_available_http">Success: HTTP handshake took %dms</string>
+    <string name="connection_test_available">Успех: рукопожатие HTTPS заняло %dms</string>
+    <string name="connection_test_available_http">Успех: рукопожатие HTTP заняло %dms</string>
     <string name="connection_test_error">Не удалось: %s</string>
     <string name="connection_test_fail">Интернет недоступен</string>
     <string name="connection_test_error_status_code">Код ошибки: #%d</string>
