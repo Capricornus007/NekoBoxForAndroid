@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.bg
 
 import android.Manifest.permission.POST_NOTIFICATIONS
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -123,7 +124,7 @@ class ServiceNotification(
         updateActions()
         useBuilder {
             it.priority =
-                if (acquired) NotificationCompat.PRIORITY_HIGH else NotificationCompat.PRIORITY_LOW
+                if (acquired) NotificationCompat.PRIORITY_HIGH else NotificationCompat.PRIORITY_DEFAULT
         }
         update()
     }
@@ -140,7 +141,7 @@ class ServiceNotification(
         .setContentIntent(SagerNet.configureIntent(service))
         .setSmallIcon(R.drawable.ic_service_active)
         .setCategory(NotificationCompat.CATEGORY_SERVICE)
-        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
 
     private val buildLock = Mutex()
@@ -223,14 +224,20 @@ class ServiceNotification(
 
     private suspend fun show() = useBuilder {
         try {
+            val notification = it.build()
+            // Android 16+ requires the notification to be posted before startForeground
+            if (Build.VERSION.SDK_INT >= 36) {
+                val nm = (service as Service).getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                nm.notify(notificationId, notification)
+            }
             if (Build.VERSION.SDK_INT >= 34) {
                 (service as Service).startForeground(
                     notificationId,
-                    it.build(),
+                    notification,
                     FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
                 )
             } else {
-                (service as Service).startForeground(notificationId, it.build())
+                (service as Service).startForeground(notificationId, notification)
             }
         } catch (e: Exception) {
             Toast.makeText(
