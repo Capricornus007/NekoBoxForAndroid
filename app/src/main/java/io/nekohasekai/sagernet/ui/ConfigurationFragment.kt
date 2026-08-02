@@ -23,7 +23,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -32,6 +31,7 @@ import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.size
+import kotlinx.coroutines.delay
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceDataStore
@@ -58,7 +58,6 @@ import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.ProxyGroup
 import io.nekohasekai.sagernet.database.SagerDatabase
-import io.nekohasekai.sagernet.database.SubscriptionBean
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
 import io.nekohasekai.sagernet.databinding.LayoutProfileListBinding
 import io.nekohasekai.sagernet.databinding.LayoutProgressListBinding
@@ -66,8 +65,8 @@ import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.toUniversalLink
 import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.group.RawUpdater
-import io.nekohasekai.sagernet.ktx.FixedGridLayoutManager
 import io.nekohasekai.sagernet.ktx.FixedLinearLayoutManager
+import io.nekohasekai.sagernet.ktx.FixedGridLayoutManager
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.SubscriptionFoundException
 import io.nekohasekai.sagernet.ktx.alert
@@ -94,8 +93,8 @@ import io.nekohasekai.sagernet.ui.profile.JuicitySettingsActivity
 import io.nekohasekai.sagernet.ui.profile.MieruSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.NaiveSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.SSHSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.ShadowsocksRSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ShadowsocksSettingsActivity
+import io.nekohasekai.sagernet.ui.profile.ShadowsocksRSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.SnellSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.SocksSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TrojanGoSettingsActivity
@@ -111,7 +110,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -134,12 +132,12 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import java.util.zip.ZipInputStream
 import kotlin.collections.set
+import androidx.appcompat.app.AlertDialog
+import io.nekohasekai.sagernet.database.SubscriptionBean
 import kotlin.math.abs
 
 class ConfigurationFragment @JvmOverloads constructor(
-    val select: Boolean = false,
-    val selectedItem: ProxyEntity? = null,
-    val titleRes: Int = 0,
+    val select: Boolean = false, val selectedItem: ProxyEntity? = null, val titleRes: Int = 0
 ) : ToolbarFragment(R.layout.layout_group_list),
     PopupMenu.OnMenuItemClickListener,
     Toolbar.OnMenuItemClickListener,
@@ -223,7 +221,11 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
     }
 
-    private fun updateProfileStateSnapshots(selectedProxy: Long, currentProfile: Long, serviceStarted: Boolean) {
+    private fun updateProfileStateSnapshots(
+        selectedProxy: Long,
+        currentProfile: Long,
+        serviceStarted: Boolean,
+    ) {
         val changedIds = mutableSetOf<Long>()
         if (selectedProxySnapshot != selectedProxy) {
             changedIds.add(selectedProxySnapshot)
@@ -284,7 +286,9 @@ class ConfigurationFragment @JvmOverloads constructor(
     }
 
     val updateSelectedCallback = object : ViewPager2.OnPageChangeCallback() {
-        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+        override fun onPageScrolled(
+            position: Int, positionOffset: Float, positionOffsetPixels: Int
+        ) {
             if (adapter.groupList.size > position) {
                 DataStore.selectedGroup = adapter.groupList[position].id
             }
@@ -380,10 +384,12 @@ class ConfigurationFragment @JvmOverloads constructor(
                         fragment.configurationListView.scrollTo(selectedProfileIndex, true)
                         return@setOnClickListener
                     }
+
                 }
 
                 fragment.configurationListView.scrollTo(0)
             }
+
         }
 
         DataStore.profileCacheStore.registerChangeListener(this)
@@ -433,52 +439,46 @@ class ConfigurationFragment @JvmOverloads constructor(
 
     private val importFile =
         registerForActivityResult(ActivityResultContracts.GetContent()) { file ->
-            if (file != null) {
-                runOnDefaultDispatcher {
-                    try {
-                        val fileName =
-                            requireContext().contentResolver.query(file, null, null, null, null)
-                                ?.use { cursor ->
-                                    cursor.moveToFirst()
-                                    cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)
-                                        .let(cursor::getString)
-                                }
-                        val proxies = mutableListOf<AbstractBean>()
-                        if (fileName != null && fileName.endsWith(".zip")) {
-                            // try parse wireguard zip
-                            val zip =
-                                ZipInputStream(requireContext().contentResolver.openInputStream(file)!!)
-                            while (true) {
-                                val entry = zip.nextEntry ?: break
-                                if (entry.isDirectory) continue
-                                val fileText = zip.bufferedReader().readText()
-                                RawUpdater.parseRaw(fileText, entry.name)
-                                    ?.let { pl -> proxies.addAll(pl) }
-                                zip.closeEntry()
+            if (file != null) runOnDefaultDispatcher {
+                try {
+                    val fileName =
+                        requireContext().contentResolver.query(file, null, null, null, null)
+                            ?.use { cursor ->
+                                cursor.moveToFirst()
+                                cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)
+                                    .let(cursor::getString)
                             }
-                            zip.closeQuietly()
-                        } else {
-                            val fileText =
-                                requireContext().contentResolver.openInputStream(file)!!.use {
-                                    it.bufferedReader().readText()
-                                }
-                            RawUpdater.parseRaw(fileText, fileName ?: "")
+                    val proxies = mutableListOf<AbstractBean>()
+                    if (fileName != null && fileName.endsWith(".zip")) {
+                        // try parse wireguard zip
+                        val zip =
+                            ZipInputStream(requireContext().contentResolver.openInputStream(file)!!)
+                        while (true) {
+                            val entry = zip.nextEntry ?: break
+                            if (entry.isDirectory) continue
+                            val fileText = zip.bufferedReader().readText()
+                            RawUpdater.parseRaw(fileText, entry.name)
                                 ?.let { pl -> proxies.addAll(pl) }
+                            zip.closeEntry()
                         }
-                        if (proxies.isEmpty()) {
-                            onMainDispatcher {
-                                snackbar(getString(R.string.no_proxies_found_in_file)).show()
+                        zip.closeQuietly()
+                    } else {
+                        val fileText =
+                            requireContext().contentResolver.openInputStream(file)!!.use {
+                                it.bufferedReader().readText()
                             }
-                        } else {
-                            import(proxies)
-                        }
-                    } catch (e: SubscriptionFoundException) {
-                        (requireActivity() as MainActivity).importSubscription(e.link.toUri())
-                    } catch (e: Exception) {
-                        Logs.w(e)
-                        onMainDispatcher {
-                            snackbar(e.readableMessage).show()
-                        }
+                        RawUpdater.parseRaw(fileText, fileName ?: "")
+                            ?.let { pl -> proxies.addAll(pl) }
+                    }
+                    if (proxies.isEmpty()) onMainDispatcher {
+                        snackbar(getString(R.string.no_proxies_found_in_file)).show()
+                    } else import(proxies)
+                } catch (e: SubscriptionFoundException) {
+                    (requireActivity() as MainActivity).importSubscription(e.link.toUri())
+                } catch (e: Exception) {
+                    Logs.w(e)
+                    onMainDispatcher {
+                        snackbar(e.readableMessage).show()
                     }
                 }
             }
@@ -493,12 +493,11 @@ class ConfigurationFragment @JvmOverloads constructor(
             DataStore.editingGroup = targetId
             snackbar(
                 requireContext().resources.getQuantityString(
-                    R.plurals.added,
-                    proxies.size,
-                    proxies.size,
-                ),
+                    R.plurals.added, proxies.size, proxies.size
+                )
             ).show()
         }
+
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -511,46 +510,39 @@ class ConfigurationFragment @JvmOverloads constructor(
                 val text = SagerNet.getClipboardText()
                 if (text.isBlank()) {
                     snackbar(getString(R.string.clipboard_empty)).show()
-                } else {
-                    runOnDefaultDispatcher {
-                        try {
-                            val proxies = RawUpdater.parseRaw(text)
-                            if (proxies.isNullOrEmpty()) {
-                                onMainDispatcher {
-                                    snackbar(getString(R.string.no_proxies_found_in_clipboard)).show()
-                                }
+                } else runOnDefaultDispatcher {
+                    try {
+                        val proxies = RawUpdater.parseRaw(text)
+                        if (proxies.isNullOrEmpty()) {
+                            onMainDispatcher {
+                                snackbar(getString(R.string.no_proxies_found_in_clipboard)).show()
+                            }
+                        } else {
+                            import(proxies)
+                        }
+                    } catch (e: SubscriptionFoundException) {
+                        onMainDispatcher {
+                            if (e.link.startsWith("sn://")) {
+                                (requireActivity() as MainActivity).importSubscription(e.link.toUri())
                             } else {
-                                import(proxies)
-                            }
-                        } catch (e: SubscriptionFoundException) {
-                            onMainDispatcher {
-                                if (e.link.startsWith("sn://")) {
-                                    (requireActivity() as MainActivity).importSubscription(e.link.toUri())
-                                } else {
-                                    val subscriptionLink = Uri.parse(e.link).getQueryParameter("url") ?: e.link
+                                val subscriptionLink = Uri.parse(e.link).getQueryParameter("url") ?: e.link
 
-                                    val group = ProxyGroup(type = GroupType.SUBSCRIPTION)
-                                    val subscription = SubscriptionBean()
-                                    group.subscription = subscription
-                                    subscription.link = subscriptionLink
-                                    subscription.autoUpdate = false
-                                    group.name = ""
-                                    startActivity(
-                                        Intent(requireContext(), GroupSettingsActivity::class.java).apply {
-                                            putExtra(GroupSettingsActivity.EXTRA_FROM_CLIPBOARD, true)
-                                            putExtra(
-                                                GroupSettingsActivity.EXTRA_GROUP_SUBSCRIPTION_LINK,
-                                                subscriptionLink,
-                                            )
-                                        },
-                                    )
-                                }
+                                val group = ProxyGroup(type = GroupType.SUBSCRIPTION)
+                                val subscription = SubscriptionBean()
+                                group.subscription = subscription
+                                subscription.link = subscriptionLink
+                                subscription.autoUpdate = false
+                                group.name = ""
+                                startActivity(Intent(requireContext(), GroupSettingsActivity::class.java).apply {
+                                    putExtra(GroupSettingsActivity.EXTRA_FROM_CLIPBOARD, true)
+                                    putExtra(GroupSettingsActivity.EXTRA_GROUP_SUBSCRIPTION_LINK, subscriptionLink)
+                                })
                             }
-                        } catch (e: Exception) {
-                            Logs.w(e)
-                            onMainDispatcher {
-                                snackbar(e.readableMessage).show()
-                            }
+                        }
+                    } catch (e: Exception) {
+                        Logs.w(e)
+                        onMainDispatcher {
+                            snackbar(e.readableMessage).show()
                         }
                     }
                 }
@@ -581,11 +573,9 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
 
             R.id.action_new_vless -> {
-                startActivity(
-                    Intent(requireActivity(), VMessSettingsActivity::class.java).apply {
-                        putExtra("vless", true)
-                    },
-                )
+                startActivity(Intent(requireActivity(), VMessSettingsActivity::class.java).apply {
+                    putExtra("vless", true)
+                })
             }
 
             R.id.action_new_trojan -> {
@@ -661,13 +651,11 @@ class ConfigurationFragment @JvmOverloads constructor(
                 runOnDefaultDispatcher {
                     val profiles = SagerDatabase.proxyDao.getByGroup(DataStore.currentGroupId())
                     val toClear = mutableListOf<ProxyEntity>()
-                    if (profiles.isNotEmpty()) {
-                        for (profile in profiles) {
-                            if (profile.tx != 0L || profile.rx != 0L) {
-                                profile.tx = 0
-                                profile.rx = 0
-                                toClear.add(profile)
-                            }
+                    if (profiles.isNotEmpty()) for (profile in profiles) {
+                        if (profile.tx != 0L || profile.rx != 0L) {
+                            profile.tx = 0
+                            profile.rx = 0
+                            toClear.add(profile)
                         }
                     }
                     if (toClear.isNotEmpty()) {
@@ -688,14 +676,12 @@ class ConfigurationFragment @JvmOverloads constructor(
                 runOnDefaultDispatcher {
                     val profiles = SagerDatabase.proxyDao.getByGroup(DataStore.currentGroupId())
                     val toClear = mutableListOf<ProxyEntity>()
-                    if (profiles.isNotEmpty()) {
-                        for (profile in profiles) {
-                            if (profile.status != 0) {
-                                profile.status = 0
-                                profile.ping = 0
-                                profile.error = null
-                                toClear.add(profile)
-                            }
+                    if (profiles.isNotEmpty()) for (profile in profiles) {
+                        if (profile.status != 0) {
+                            profile.status = 0
+                            profile.ping = 0
+                            profile.error = null
+                            toClear.add(profile)
                         }
                     }
                     if (toClear.isNotEmpty()) {
@@ -711,11 +697,9 @@ class ConfigurationFragment @JvmOverloads constructor(
                 runOnDefaultDispatcher {
                     val profiles = SagerDatabase.proxyDao.getByGroup(DataStore.currentGroupId())
                     val toClear = mutableListOf<ProxyEntity>()
-                    if (profiles.isNotEmpty()) {
-                        for (profile in profiles) {
-                            if (profile.status != 0 && profile.status != 1) {
-                                toClear.add(profile)
-                            }
+                    if (profiles.isNotEmpty()) for (profile in profiles) {
+                        if (profile.status != 0 && profile.status != 1) {
+                            toClear.add(profile)
                         }
                     }
                     if (toClear.isNotEmpty()) {
@@ -736,8 +720,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                                     runOnDefaultDispatcher {
                                         for (profile in toClear) {
                                             ProfileManager.deleteProfile2(
-                                                profile.groupId,
-                                                profile.id,
+                                                profile.groupId, profile.id
                                             )
                                         }
                                     }
@@ -765,15 +748,15 @@ class ConfigurationFragment @JvmOverloads constructor(
                             MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.confirm)
                                 .setMessage(
                                     getString(R.string.delete_confirm_prompt) + "\n" +
-                                        toClear.mapIndexedNotNull { index, proxyEntity ->
-                                            if (index < 20) {
-                                                proxyEntity.displayName()
-                                            } else if (index == 20) {
-                                                "......"
-                                            } else {
-                                                null
-                                            }
-                                        }.joinToString("\n"),
+                                            toClear.mapIndexedNotNull { index, proxyEntity ->
+                                                if (index < 20) {
+                                                    proxyEntity.displayName()
+                                                } else if (index == 20) {
+                                                    "......"
+                                                } else {
+                                                    null
+                                                }
+                                            }.joinToString("\n")
                                 )
                                 .setPositiveButton(R.string.yes) { _, _ ->
                                     for (profile in toClear) {
@@ -789,8 +772,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                                     runOnDefaultDispatcher {
                                         for (profile in toClear) {
                                             ProfileManager.deleteProfile2(
-                                                profile.groupId,
-                                                profile.id,
+                                                profile.groupId, profile.id
                                             )
                                         }
                                     }
@@ -878,7 +860,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 notification?.updateNotification(
                     progress,
                     proxyN,
-                    progress >= proxyN || status == 2,
+                    progress >= proxyN || status == 2
                 )
                 if (status >= 1) return@runOnMainDispatcher
                 if (!isAdded) return@runOnMainDispatcher
@@ -923,13 +905,13 @@ class ConfigurationFragment @JvmOverloads constructor(
                     append(
                         profile.displayType(),
                         ForegroundColorSpan(context.getProtocolColor(profile.type)),
-                        SPAN_EXCLUSIVE_EXCLUSIVE,
+                        SPAN_EXCLUSIVE_EXCLUSIVE
                     )
                     append(" ")
                     append(
                         profileStatusText,
                         ForegroundColorSpan(profileStatusColor),
-                        SPAN_EXCLUSIVE_EXCLUSIVE,
+                        SPAN_EXCLUSIVE_EXCLUSIVE
                     )
                     append("\n")
                 }
@@ -938,6 +920,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 binding.progress.text = "$progress / $proxyN"
             }
         }
+
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -965,93 +948,88 @@ class ConfigurationFragment @JvmOverloads constructor(
             test.proxyN = profilesList.size
             val profiles = ConcurrentLinkedQueue(profilesList)
             repeat(DataStore.connectionTestConcurrent) {
-                testJobs.add(
-                    launch(Dispatchers.IO) {
-                        while (isActive) {
-                            val profile = profiles.poll() ?: break
+                testJobs.add(launch(Dispatchers.IO) {
+                    while (isActive) {
+                        val profile = profiles.poll() ?: break
 
-                            profile.status = 0
-                            var address = profile.requireBean().serverAddress
-                            if (!address.isIpAddress()) {
-                                try {
-                                    SagerNet.underlyingNetwork!!.getAllByName(address).apply {
-                                        if (isNotEmpty()) {
-                                            address = this[0].hostAddress
-                                        }
-                                    }
-                                } catch (ignored: UnknownHostException) {
-                                }
-                            }
-                            if (!isActive) break
-                            if (!address.isIpAddress()) {
-                                profile.status = 2
-                                profile.error = app.getString(R.string.connection_test_domain_not_found)
-                                test.update(profile)
-                                continue
-                            }
+                        profile.status = 0
+                        var address = profile.requireBean().serverAddress
+                        if (!address.isIpAddress()) {
                             try {
-                                if (icmpPing) {
-                                    // removed
-                                } else {
-                                    val socket =
-                                        SagerNet.underlyingNetwork?.socketFactory?.createSocket()
-                                            ?: Socket()
-                                    try {
-                                        socket.soTimeout = 3000
-                                        socket.bind(InetSocketAddress(0))
-                                        val start = SystemClock.elapsedRealtime()
-                                        socket.connect(
-                                            InetSocketAddress(
-                                                address,
-                                                profile.requireBean().serverPort,
-                                            ),
-                                            3000,
-                                        )
-                                        if (!isActive) break
-                                        profile.status = 1
-                                        profile.ping = (SystemClock.elapsedRealtime() - start).toInt()
-                                        test.update(profile)
-                                    } finally {
-                                        socket.closeQuietly()
+                                SagerNet.underlyingNetwork!!.getAllByName(address).apply {
+                                    if (isNotEmpty()) {
+                                        address = this[0].hostAddress
                                     }
                                 }
-                            } catch (e: Exception) {
-                                if (!isActive) break
-                                val message = e.readableMessage
-
-                                if (icmpPing) {
-                                    profile.status = 2
-                                    profile.error = getString(R.string.connection_test_unreachable)
-                                } else {
-                                    profile.status = 2
-                                    when {
-                                        !message.contains("failed:") ->
-                                            profile.error =
-                                                getString(R.string.connection_test_timeout_error)
-
-                                        else -> when {
-                                            message.contains("ECONNREFUSED") -> {
-                                                profile.error =
-                                                    getString(R.string.connection_test_refused)
-                                            }
-
-                                            message.contains("ENETUNREACH") -> {
-                                                profile.error =
-                                                    getString(R.string.connection_test_unreachable)
-                                            }
-
-                                            else -> {
-                                                profile.status = 3
-                                                profile.error = message
-                                            }
-                                        }
-                                    }
-                                }
-                                test.update(profile)
+                            } catch (ignored: UnknownHostException) {
                             }
                         }
-                    },
-                )
+                        if (!isActive) break
+                        if (!address.isIpAddress()) {
+                            profile.status = 2
+                            profile.error = app.getString(R.string.connection_test_domain_not_found)
+                            test.update(profile)
+                            continue
+                        }
+                        try {
+                            if (icmpPing) {
+                                // removed
+                            } else {
+                                val socket =
+                                    SagerNet.underlyingNetwork?.socketFactory?.createSocket()
+                                        ?: Socket()
+                                try {
+                                    socket.soTimeout = 3000
+                                    socket.bind(InetSocketAddress(0))
+                                    val start = SystemClock.elapsedRealtime()
+                                    socket.connect(
+                                        InetSocketAddress(
+                                            address, profile.requireBean().serverPort
+                                        ), 3000
+                                    )
+                                    if (!isActive) break
+                                    profile.status = 1
+                                    profile.ping = (SystemClock.elapsedRealtime() - start).toInt()
+                                    test.update(profile)
+                                } finally {
+                                    socket.closeQuietly()
+                                }
+                            }
+                        } catch (e: Exception) {
+                            if (!isActive) break
+                            val message = e.readableMessage
+
+                            if (icmpPing) {
+                                profile.status = 2
+                                profile.error = getString(R.string.connection_test_unreachable)
+                            } else {
+                                profile.status = 2
+                                when {
+                                    !message.contains("failed:") -> profile.error =
+                                        getString(R.string.connection_test_timeout_error)
+
+                                    else -> when {
+                                        message.contains("ECONNREFUSED") -> {
+                                            profile.error =
+                                                getString(R.string.connection_test_refused)
+                                        }
+
+                                        message.contains("ENETUNREACH") -> {
+                                            profile.error =
+                                                getString(R.string.connection_test_unreachable)
+                                        }
+
+                                        else -> {
+                                            profile.status = 3
+                                            profile.error = message
+                                        }
+                                    }
+                                }
+                            }
+                            test.update(profile)
+                        }
+                    }
+                })
             }
 
             testJobs.joinAll()
@@ -1081,7 +1059,7 @@ class ConfigurationFragment @JvmOverloads constructor(
             test.dialogStatus.set(1)
             test.notification = ConnectionTestNotification(
                 dialog.context,
-                "[${group.displayName()}] ${getString(R.string.connection_test)}",
+                "[${group.displayName()}] ${getString(R.string.connection_test)}"
             )
             dialog.hide()
         }
@@ -1100,32 +1078,30 @@ class ConfigurationFragment @JvmOverloads constructor(
             test.proxyN = profilesList.size
             val profiles = ConcurrentLinkedQueue(profilesList)
             repeat(DataStore.connectionTestConcurrent) {
-                testJobs.add(
-                    launch(Dispatchers.IO) {
-                        val urlTest = UrlTest() // note: this is NOT in bg process
-                        while (isActive) {
-                            val profile = profiles.poll() ?: break
-                            profile.status = 0
+                testJobs.add(launch(Dispatchers.IO) {
+                    val urlTest = UrlTest() // note: this is NOT in bg process
+                    while (isActive) {
+                        val profile = profiles.poll() ?: break
+                        profile.status = 0
 
-                            try {
-                                val result = urlTest.doTest(profile)
-                                profile.status = 1
-                                profile.ping = result
-                            } catch (e: PluginManager.PluginNotFoundException) {
-                                profile.status = 2
-                                profile.error = e.readableMessage
-                            } catch (e: Exception) {
-                                profile.status = 3
-                                profile.error = e.readableMessage
-                                // 诊断日志：批量测速失败原因临时记录，用于确认
-                                // "no available network interface"（接口监视器竞态）假设
-                                Logs.w("URLTest ${profile.displayName()}: ${e.readableMessage}")
-                            }
-
-                            test.update(profile)
+                        try {
+                            val result = urlTest.doTest(profile)
+                            profile.status = 1
+                            profile.ping = result
+                        } catch (e: PluginManager.PluginNotFoundException) {
+                            profile.status = 2
+                            profile.error = e.readableMessage
+                        } catch (e: Exception) {
+                            profile.status = 3
+                            profile.error = e.readableMessage
+                            // 诊断日志：批量测速失败原因临时记录，用于确认
+                            // "no available network interface"（接口监视器竞态）假设
+                            Logs.w("URLTest ${profile.displayName()}: ${e.readableMessage}")
                         }
-                    },
-                )
+
+                        test.update(profile)
+                    }
+                })
             }
 
             testJobs.joinAll()
@@ -1155,14 +1131,13 @@ class ConfigurationFragment @JvmOverloads constructor(
             test.dialogStatus.set(1)
             test.notification = ConnectionTestNotification(
                 dialog.context,
-                "[${group.displayName()}] ${getString(R.string.connection_test)}",
+                "[${group.displayName()}] ${getString(R.string.connection_test)}"
             )
             dialog.hide()
         }
     }
 
-    inner class GroupPagerAdapter :
-        FragmentStateAdapter(this),
+    inner class GroupPagerAdapter : FragmentStateAdapter(this),
         ProfileManager.Listener,
         GroupManager.Listener {
 
@@ -1269,10 +1244,8 @@ class ConfigurationFragment @JvmOverloads constructor(
             tabLayout.post {
                 groupList.add(group)
 
-                if (groupList.any { !it.ungrouped }) {
-                    tabLayout.post {
-                        tabLayout.visibility = View.VISIBLE
-                    }
+                if (groupList.any { !it.ungrouped }) tabLayout.post {
+                    tabLayout.visibility = View.VISIBLE
                 }
 
                 notifyItemInserted(groupList.size - 1)
@@ -1325,7 +1298,11 @@ class ConfigurationFragment @JvmOverloads constructor(
         lateinit var proxyGroup: ProxyGroup
         var selected = false
 
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?,
+        ): View {
             return LayoutProfileListBinding.inflate(inflater).root
         }
 
@@ -1361,13 +1338,16 @@ class ConfigurationFragment @JvmOverloads constructor(
 
         private fun setupItemTouchHelper() {
             if (select) return
-
+            
             if (::itemTouchHelper.isInitialized) {
                 itemTouchHelper.attachToRecyclerView(null)
             }
-
+            
             itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, 0) {
-                override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                override fun getMovementFlags(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder
+                ): Int {
                     val dragFlags = if (DataStore.groupLayoutMode == 1) {
                         ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
                     } else {
@@ -1376,20 +1356,24 @@ class ConfigurationFragment @JvmOverloads constructor(
                     return makeMovementFlags(dragFlags, 0) // No swipe flags
                 }
 
-                override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                override fun getSwipeDirs(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                ): Int {
                     return 0
                 }
 
-                override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                override fun getDragDirs(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                ): Int {
                     return if (isEnabled) {
                         if (DataStore.groupLayoutMode == 1) {
                             ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
                         } else {
                             ItemTouchHelper.UP or ItemTouchHelper.DOWN
                         }
-                    } else {
-                        0
-                    }
+                    } else 0
                 }
 
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -1397,24 +1381,27 @@ class ConfigurationFragment @JvmOverloads constructor(
 
                 override fun onMove(
                     recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder,
+                    viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder,
                 ): Boolean {
                     val fromPosition = viewHolder.bindingAdapterPosition
                     val toPosition = target.bindingAdapterPosition
-
+                    
                     if (fromPosition == RecyclerView.NO_POSITION || toPosition == RecyclerView.NO_POSITION) {
                         return false
                     }
-
+                    
                     adapter?.move(fromPosition, toPosition)
                     return true
                 }
 
-                override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                override fun clearView(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                ) {
                     super.clearView(recyclerView, viewHolder)
                     adapter?.commitMove()
                 }
+
             })
             itemTouchHelper.attachToRecyclerView(configurationListView)
         }
@@ -1497,7 +1484,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 updateTo(GroupOrder.BY_DELAY)
                 true
             }
-
+            
             val layoutSingle = menu.findItem(R.id.action_layout_single)
             val layoutDouble = menu.findItem(R.id.action_layout_double)
             when (DataStore.groupLayoutMode) {
@@ -1543,13 +1530,13 @@ class ConfigurationFragment @JvmOverloads constructor(
                 FixedLinearLayoutManager(configurationListView)
             }
         }
-
+        
         fun switchLayoutMode() {
             setupLayoutManager()
             configurationListView.layoutManager = layoutManager
-
+            
             setupItemTouchHelper()
-
+            
             adapter?.notifyDataSetChanged()
         }
 
@@ -1594,7 +1581,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                     MotionEvent.ACTION_DOWN -> lastRawY = event.rawY
                     MotionEvent.ACTION_MOVE -> {
                         val cannotScroll = !recyclerView.canScrollVertically(-1) &&
-                            !recyclerView.canScrollVertically(1)
+                                !recyclerView.canScrollVertically(1)
                         if (cannotScroll) {
                             val fingerDy = event.rawY - lastRawY
                             if (abs(fingerDy) >= touchSlop) {
@@ -1620,8 +1607,7 @@ class ConfigurationFragment @JvmOverloads constructor(
             undoManager.flush()
         }
 
-        inner class ConfigurationAdapter :
-            RecyclerView.Adapter<ConfigurationHolder>(),
+        inner class ConfigurationAdapter : RecyclerView.Adapter<ConfigurationHolder>(),
             ProfileManager.Listener,
             GroupManager.Listener,
             UndoSnackbarManager.Interface<ProxyEntity> {
@@ -1653,9 +1639,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 val bean = p.requireBean()
                 val address = if (alwaysShowAddress && bean.name.isNotBlank()) {
                     bean.displayAddress()
-                } else {
-                    ""
-                }
+                } else ""
                 return !((!showTraffic || p.status <= 0) && address.isBlank())
             }
 
@@ -1675,17 +1659,18 @@ class ConfigurationFragment @JvmOverloads constructor(
                         } catch (e: Exception) {
                             false
                         }
-                    ) {
-                        return true
-                    }
+                    ) return true
                 }
                 return false
             }
 
-            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConfigurationHolder {
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int,
+            ): ConfigurationHolder {
                 return ConfigurationHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.layout_profile, parent, false),
+                        .inflate(R.layout.layout_profile, parent, false)
                 )
             }
 
@@ -1700,7 +1685,11 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
             }
 
-            override fun onBindViewHolder(holder: ConfigurationHolder, position: Int, payloads: List<Any>) {
+            override fun onBindViewHolder(
+                holder: ConfigurationHolder,
+                position: Int,
+                payloads: List<Any>,
+            ) {
                 if (payloads.isNotEmpty() && payloads.all { it === profileStatePayload }) {
                     try {
                         holder.bindProfileState(getItemAt(position))
@@ -1729,7 +1718,10 @@ class ConfigurationFragment @JvmOverloads constructor(
                 updateVisibleTraffic(profileId, holder)
             }
 
-            private fun updateVisibleTraffic(profileId: Long, visibleHolder: ConfigurationHolder? = null) {
+            private fun updateVisibleTraffic(
+                profileId: Long,
+                visibleHolder: ConfigurationHolder? = null,
+            ) {
                 val cached = configurationList[profileId] ?: return
                 val holder = if (visibleHolder != null) {
                     visibleHolder
@@ -1742,8 +1734,8 @@ class ConfigurationFragment @JvmOverloads constructor(
                 val index = holder.bindingAdapterPosition
                 val previousHasMiddleRow = holder.lastSelfHasMiddleRow
                 val previouslyShowedTraffic = holder.lastBoundTx != Long.MIN_VALUE &&
-                    holder.lastBoundRx != Long.MIN_VALUE &&
-                    holder.lastBoundTx + holder.lastBoundRx != 0L
+                        holder.lastBoundRx != Long.MIN_VALUE &&
+                        holder.lastBoundTx + holder.lastBoundRx != 0L
                 val showTraffic = cached.tx + cached.rx != 0L
 
                 if (previousHasMiddleRow == null || previouslyShowedTraffic != showTraffic) {
@@ -1763,7 +1755,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 if (pendingTrafficUpdates.isEmpty()) return
                 for (index in 0 until configurationListView.childCount) {
                     val holder = configurationListView.getChildViewHolder(
-                        configurationListView.getChildAt(index),
+                        configurationListView.getChildAt(index)
                     ) as? ConfigurationHolder ?: continue
                     val profileId = holder.itemId
                     if (profileId in pendingTrafficUpdates) {
@@ -1820,13 +1812,11 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
                 configurationIdList.clear()
                 val lower = name.lowercase()
-                configurationIdList.addAll(
-                    configurationList.filter {
-                        it.value.displayName().lowercase().contains(lower) ||
+                configurationIdList.addAll(configurationList.filter {
+                    it.value.displayName().lowercase().contains(lower) ||
                             it.value.displayType().lowercase().contains(lower) ||
                             it.value.displayAddress().lowercase().contains(lower)
-                    }.keys,
-                )
+                }.keys)
                 notifyDataSetChanged()
             }
 
@@ -1839,18 +1829,13 @@ class ConfigurationFragment @JvmOverloads constructor(
                     moveLinear(from, to)
                 }
             }
-
+            
             private fun moveLinear(from: Int, to: Int) {
                 val first = getItemAt(from)
                 var previousOrder = first.userOrder
-                val (step, range) = if (from < to) {
-                    Pair(1, from until to)
-                } else {
-                    Pair(
-                        -1,
-                        to + 1 downTo from,
-                    )
-                }
+                val (step, range) = if (from < to) Pair(1, from until to) else Pair(
+                    -1, to + 1 downTo from
+                )
                 for (i in range) {
                     val next = getItemAt(i + step)
                     val order = next.userOrder
@@ -1864,13 +1849,13 @@ class ConfigurationFragment @JvmOverloads constructor(
                 updated.add(first)
                 notifyItemMoved(from, to)
             }
-
+            
             private fun moveDualColumn(from: Int, to: Int) {
                 val draggedItemId = configurationIdList[from]
 
                 configurationIdList.removeAt(from)
                 configurationIdList.add(to, draggedItemId)
-
+                
                 for (i in configurationIdList.indices) {
                     val item = getItem(configurationIdList[i])
                     val newOrder = (i + 1).toLong()
@@ -1879,7 +1864,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                         updated.add(item)
                     }
                 }
-
+                
                 notifyItemMoved(from, to)
             }
 
@@ -1977,10 +1962,10 @@ class ConfigurationFragment @JvmOverloads constructor(
                         profile
                     }
                     val contentChanged = !noTraffic ||
-                        cachedProfile == null ||
-                        cachedProfile != updatedProfile ||
-                        cachedProfile.dirty != updatedProfile.dirty ||
-                        cachedProfile.displayName() != updatedProfile.displayName()
+                            cachedProfile == null ||
+                            cachedProfile != updatedProfile ||
+                            cachedProfile.dirty != updatedProfile.dirty ||
+                            cachedProfile.displayName() != updatedProfile.displayName()
                     configurationList[profile.id] = updatedProfile
                     if (noTraffic && !contentChanged) return@post
 
@@ -2049,6 +2034,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 when (proxyGroup.order) {
                     GroupOrder.BY_NAME -> {
                         newProfiles = newProfiles.sortedBy { it.displayName() }
+
                     }
 
                     GroupOrder.BY_DELAY -> {
@@ -2079,15 +2065,16 @@ class ConfigurationFragment @JvmOverloads constructor(
                     } else if (newProfiles.isNotEmpty()) {
                         configurationListView.scrollTo(0, true)
                     }
+
                 }
             }
+
         }
 
         val profileAccess = Mutex()
         val reloadAccess = Mutex()
 
-        inner class ConfigurationHolder(val view: View) :
-            RecyclerView.ViewHolder(view),
+        inner class ConfigurationHolder(val view: View) : RecyclerView.ViewHolder(view),
             PopupMenu.OnMenuItemClickListener {
 
             lateinit var entity: ProxyEntity
@@ -2103,7 +2090,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                     !proxyEntity.haveStandardLink() -> {
                         popup.menu.findItem(R.id.action_group_qr).subMenu?.removeItem(R.id.action_standard_qr)
                         popup.menu.findItem(R.id.action_group_clipboard).subMenu?.removeItem(
-                            R.id.action_standard_clipboard,
+                            R.id.action_standard_clipboard
                         )
                     }
 
@@ -2156,9 +2143,8 @@ class ConfigurationFragment @JvmOverloads constructor(
                     val proxyEntity = entity
                     it.context.startActivity(
                         proxyEntity.settingIntent(
-                            it.context,
-                            proxyGroup.type == GroupType.SUBSCRIPTION,
-                        ),
+                            it.context, proxyGroup.type == GroupType.SUBSCRIPTION
+                        )
                     )
                 }
                 removeButton.setOnClickListener {
@@ -2234,9 +2220,8 @@ class ConfigurationFragment @JvmOverloads constructor(
                         R.id.action_edit -> {
                             anchor.context.startActivity(
                                 proxyEntity.settingIntent(
-                                    anchor.context,
-                                    proxyGroup.type == GroupType.SUBSCRIPTION,
-                                ),
+                                    anchor.context, proxyGroup.type == GroupType.SUBSCRIPTION
+                                )
                             )
                             true
                         }
@@ -2261,23 +2246,19 @@ class ConfigurationFragment @JvmOverloads constructor(
                     selectedIndicator.isVisible = false
                     card.cardElevation = 0f
                     card.strokeWidth = ctx.resources.getDimensionPixelSize(
-                        if (selected) {
-                            R.dimen.card_stroke_width_selected
-                        } else {
-                            R.dimen.card_stroke_width
-                        },
+                        if (selected) R.dimen.card_stroke_width_selected
+                        else R.dimen.card_stroke_width
                     )
                     card.strokeColor =
                         if (selected) primary else ctx.getColour(R.color.card_stroke)
                     card.setCardBackgroundColor(
                         if (selected) {
                             ColorUtils.compositeColors(
-                                ColorUtils.setAlphaComponent(primary, 26),
-                                surface,
+                                ColorUtils.setAlphaComponent(primary, 26), surface
                             )
                         } else {
                             surface
-                        },
+                        }
                     )
                 } else {
                     val primary = ctx.getColorAttr(R.attr.selectedColorPrimary)
@@ -2288,12 +2269,11 @@ class ConfigurationFragment @JvmOverloads constructor(
                     card.setCardBackgroundColor(
                         if (selected) {
                             ColorUtils.compositeColors(
-                                ColorUtils.setAlphaComponent(primary, 20),
-                                surface,
+                                ColorUtils.setAlphaComponent(primary, 20), surface
                             )
                         } else {
                             surface
-                        },
+                        }
                     )
                 }
             }
@@ -2317,15 +2297,13 @@ class ConfigurationFragment @JvmOverloads constructor(
                     trafficText.text = view.context.getString(
                         R.string.traffic,
                         Formatter.formatFileSize(view.context, tx),
-                        Formatter.formatFileSize(view.context, rx),
+                        Formatter.formatFileSize(view.context, rx)
                     )
                 }
 
                 var address = if (pf.alwaysShowAddress && bean.name.isNotBlank()) {
                     bean.displayAddress()
-                } else {
-                    ""
-                }
+                } else ""
                 if (showTraffic && address.length >= 30) {
                     address = address.substring(0, 27) + "..."
                 }
@@ -2366,7 +2344,7 @@ class ConfigurationFragment @JvmOverloads constructor(
 
                 val selectOrChain = select || proxyEntity.type == ProxyEntity.TYPE_CHAIN
                 val isDoubleColumn = layoutManager is FixedGridLayoutManager
-
+                
                 if (isDoubleColumn) {
                     editButton.isGone = true
                     shareLayout.isGone = true
@@ -2401,6 +2379,7 @@ class ConfigurationFragment @JvmOverloads constructor(
 
                 lastBoundTx = tx
                 lastBoundRx = rx
+
             }
 
             fun bindProfileState(proxyEntity: ProxyEntity) {
@@ -2411,7 +2390,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 val pf = parentFragment as? ConfigurationFragment ?: return
                 val selected = pf.isSelectedProfile(proxyEntity.id)
                 val started = selected && DataStore.serviceState.started &&
-                    pf.isCurrentProfile(proxyEntity.id)
+                        pf.isCurrentProfile(proxyEntity.id)
                 editButton.isEnabled = !started
                 removeButton.isEnabled = !started
                 applySelected(selected)
@@ -2426,7 +2405,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 val traffic = view.context.getString(
                     R.string.traffic,
                     Formatter.formatFileSize(view.context, proxyEntity.tx),
-                    Formatter.formatFileSize(view.context, proxyEntity.rx),
+                    Formatter.formatFileSize(view.context, proxyEntity.rx)
                 )
                 if (proxyEntity.status <= 0) {
                     if (profileStatus.text?.toString() != traffic) {
@@ -2446,9 +2425,7 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             fun export(link: String) {
                 val success = SagerNet.trySetPrimaryClip(link)
-                (activity as MainActivity).snackbar(
-                    if (success) R.string.action_export_msg else R.string.action_export_err,
-                )
+                (activity as MainActivity).snackbar(if (success) R.string.action_export_msg else R.string.action_export_err)
                     .show()
             }
 
@@ -2460,7 +2437,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                         R.id.action_standard_clipboard -> export(entity.toStdLink())
                         R.id.action_universal_qr -> showCode(entity.requireBean().toUniversalLink())
                         R.id.action_universal_clipboard -> export(
-                            entity.requireBean().toUniversalLink(),
+                            entity.requireBean().toUniversalLink()
                         )
 
                         R.id.action_config_export_clipboard -> export(entity.exportConfig().first)
@@ -2468,8 +2445,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                             val cfg = entity.exportConfig()
                             DataStore.serverConfig = cfg.first
                             startFilesForResult(
-                                (parentFragment as ConfigurationFragment).exportConfig,
-                                cfg.second,
+                                (parentFragment as ConfigurationFragment).exportConfig, cfg.second
                             )
                         }
                     }
@@ -2481,6 +2457,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 return true
             }
         }
+
     }
 
     private val exportConfig =
@@ -2502,6 +2479,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                             snackbar(e.readableMessage).show()
                         }
                     }
+
                 }
             }
         }
@@ -2510,4 +2488,5 @@ class ConfigurationFragment @JvmOverloads constructor(
         searchView.onActionViewCollapsed()
         searchView.clearFocus()
     }
+
 }
