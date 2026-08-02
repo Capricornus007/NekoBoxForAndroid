@@ -48,7 +48,7 @@
     <string name="layout">تخطيط</string>
     <string name="layout_single_column">عمود واحد</string>
     <string name="layout_double_column">عمودين</string>
-    <string name="sort_and_layout">Sort and Appearance</string>
+    <string name="sort_and_layout">الفرز والمظهر</string>
     <string name="group_status_empty">مجموعة فارغة</string>
     <string name="group_status_empty_subscription">لم يتم التحديث بعد</string>
     <string name="group_status_proxies">%d بروكسي</string>
@@ -70,6 +70,10 @@
     <string name="lan_sharing_requires_root">صلاحية الجذر مطلوبة ولكنها غير متوفرة</string>
     <string name="port_proxy">منفذ الوكيل</string>
     <string name="port_http">منفذ وكيل HTTP</string>
+    <string name="disable_mixed_inbound">تعطيل الوارد المختلط</string>
+    <string name="disable_mixed_inbound_sum">وارد TUN خالص؛ لا يستمع على منفذ الوكيل المحلي</string>
+    <string name="mixed_inbound_disabled">معطل</string>
+    <string name="disable_mixed_inbound_proxy_toast">التعطيل يعمل فقط في وضع TUN؛ يتم الاستماع حاليًا على المنفذ: %1$d</string>
     <string name="port_transproxy">منفذ الوكيل الشفاف</string>
     <string name="cag_route">إعدادات التوجيه</string>
     <string name="allow_access">السماح بالاتصالات من الشبكة المحلية</string>
@@ -721,11 +725,13 @@
     <string name="clear_cache_success">تم مسح ذاكرة التخزين المؤقت</string>
     <string name="clear_cache_failed">فشل مسح ذاكرة التخزين المؤقت: %s</string>
     <string name="concurrent_dial">اتصال متزامن</string>
-    <string name="concurrent_dial_summary">تمكين الاتصالات المتزامنة لإنشاء الشبكة بشكل أسرع، قد يزيد من استهلاك البطارية</string>
+    <string name="concurrent_dial_summary">Enable concurrent connections for faster network establishment, may increase battery usage</string>
     <string name="connection_test_timeout">مهلة الاختبار (مللي ثانية)</string>
     <string name="preview_version_hint">هذا التطبيق هو إصدار تجريبي وقد يحتوي على العديد من المشاكل. إذا كنت لا ترغب في اختباره، فيرجى زيارة GitHub لتنزيل إصدار الإصدار!</string>
+    <string name="preview_hint_dont_show_again">لا تظهر مرة أخرى</string>
     <string name="check_update_preview">التحقق من تحديثات الإصدار التجريبي</string>
     <string name="check_update_release">التحقق من تحديثات إصدار الإصدار</string>
+    <string name="release_not_available">لم يصدر NekoBox إصدارًا مستقرًا بعد</string>
     <string name="update_dialog_title">إصدار جديد متاح</string>
     <string name="update_dialog_message">الإصدار الحالي: %1$s\nالإصدار المتاح: %2$s\nهل تريد تنزيله؟</string>
     <string name="check_update_no">تم التحقق بنجاح، ولكن لا توجد تحديثات.</string>
@@ -762,10 +768,10 @@
     <string name="dynamic_colors_classic">متاح مع الواجهة الجديدة</string>
     <string name="theme_fallback_summary">يُستخدم عند عدم توفر الألوان الديناميكية أو تعطيلها</string>
     <string name="more_options">المزيد من الخيارات</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
-    <string name="donate">Donate</string>
-    <string name="donate_info">Support the development of this app.</string>
-    <string name="extra_subscription_links_hint">Extra subscription URL</string>
-    <string name="service_mode_transproxy">Transproxy</string>
-    <string name="copy_toast_msg">Copied to clipboard</string>
+    <string name="extra_subscription_links">روابط الاشتراك الإضافية</string>
+    <string name="donate">تبرع</string>
+    <string name="donate_info">ادعم تطوير هذا التطبيق.</string>
+    <string name="extra_subscription_links_hint">رابط اشتراك إضافي</string>
+    <string name="service_mode_transproxy">الوكيل الشفاف</string>
+    <string name="copy_toast_msg">تم النسخ إلى الحافظة</string>
 </resources>

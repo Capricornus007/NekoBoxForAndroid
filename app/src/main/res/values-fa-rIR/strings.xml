@@ -48,7 +48,7 @@
     <string name="layout">چیدمان</string>
     <string name="layout_single_column">تک ستونه</string>
     <string name="layout_double_column">دو ستونه</string>
-    <string name="sort_and_layout">Sort and Appearance</string>
+    <string name="sort_and_layout">مرتب‌سازی و ظاهر</string>
     <string name="group_status_empty">گروه خالی</string>
     <string name="group_status_empty_subscription">هنوز به‌روزرسانی نشده</string>
     <string name="group_status_proxies">%d پراکسی</string>
@@ -70,6 +70,10 @@
     <string name="lan_sharing_requires_root">دسترسی روت نیاز است اما در دسترس نیست</string>
     <string name="port_proxy">پورت پراکسی</string>
     <string name="port_http">پورت پراکسی HTTP</string>
+    <string name="disable_mixed_inbound">غیرفعال‌سازی ورودی مختلط</string>
+    <string name="disable_mixed_inbound_sum">ورودی TUN خالص؛ به پورت پروکسی محلی گوش نده</string>
+    <string name="mixed_inbound_disabled">غیرفعال</string>
+    <string name="disable_mixed_inbound_proxy_toast">غیرفعال‌سازی فقط در حالت TUN اعمال می‌شود؛ اکنون به پورت %1$d گوش می‌دهد.</string>
     <string name="port_transproxy">پورت انتقال‌پروکسی</string>
     <string name="cag_route">تنظیمات مسیریابی</string>
     <string name="allow_access">اجازه اتصال از شبکه محلی</string>
@@ -703,11 +707,13 @@
     <string name="clear_cache_success">حافظه نهان پاک شد</string>
     <string name="clear_cache_failed">پاک کردن حافظه نهان ناموفق بود: %s</string>
     <string name="concurrent_dial">اتصال همزمان</string>
-    <string name="concurrent_dial_summary">فعال‌سازی اتصالات همزمان برای برقراری سریع‌تر شبکه، ممکن است مصرف باتری را افزایش دهد</string>
+    <string name="concurrent_dial_summary">Enable concurrent connections for faster network establishment, may increase battery usage</string>
     <string name="connection_test_timeout">مهلت تست (میلی‌ثانیه)</string>
     <string name="preview_version_hint">این برنامه یک نسخه پیش‌نمایش است و ممکن است مشکلات زیادی داشته باشد. اگر نمی‌خواهید آن را آزمایش کنید، لطفاً به GitHub رفته و نسخه Release را دانلود کنید!</string>
+    <string name="preview_hint_dont_show_again">دیگر نشان نده</string>
     <string name="check_update_preview">بررسی به‌روزرسانی نسخه پیش‌نمایش</string>
     <string name="check_update_release">بررسی به‌روزرسانی نسخه انتشار</string>
+    <string name="release_not_available">NekoBox هنوز نسخه پایداری منتشر نکرده است.</string>
     <string name="update_dialog_title">نسخه جدید موجود است</string>
     <string name="update_dialog_message">نسخه فعلی: %1$s\nنسخه موجود: %2$s\nآیا می‌خواهید آن را دانلود کنید؟</string>
     <string name="check_update_no">بررسی موفقیت‌آمیز بود، اما به‌روزرسانی وجود ندارد.</string>
@@ -746,10 +752,10 @@
     <string name="dynamic_colors_classic">قابل استفاده با رابط کاربری جدید</string>
     <string name="theme_fallback_summary">زمانی استفاده می‌شود که رنگ‌های پویا در دسترس نباشند یا غیرفعال شوند</string>
     <string name="more_options">گزینه‌های بیشتر</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
-    <string name="donate">Donate</string>
-    <string name="donate_info">Support the development of this app.</string>
-    <string name="extra_subscription_links_hint">Extra subscription URL</string>
+    <string name="extra_subscription_links">لینک‌های اشتراک اضافی</string>
+    <string name="donate">حمایت مالی</string>
+    <string name="donate_info">حمایت از توسعه این برنامه.</string>
+    <string name="extra_subscription_links_hint">نشانی اشتراک اضافی</string>
     <string name="service_mode_transproxy">Transproxy</string>
-    <string name="copy_toast_msg">Copied to clipboard</string>
+    <string name="copy_toast_msg">در کلیپ‌بورد کپی شد</string>
 </resources>

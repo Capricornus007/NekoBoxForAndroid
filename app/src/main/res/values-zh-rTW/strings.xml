@@ -70,6 +70,10 @@
     <string name="lan_sharing_requires_root">需要 Root 權限但無法使用</string>
     <string name="port_proxy">代理連接埠</string>
     <string name="port_http">HTTP 代理連接埠</string>
+    <string name="disable_mixed_inbound">禁用混合入站</string>
+    <string name="disable_mixed_inbound_sum">純 TUN 入站；不監聽本地代理端口</string>
+    <string name="mixed_inbound_disabled">已停用</string>
+    <string name="disable_mixed_inbound_proxy_toast">僅在 TUN 模式下停用生效；目前監聽端口：%1$d</string>
     <string name="port_transproxy">透明代理連接埠</string>
     <string name="cag_route">路由設定</string>
     <string name="allow_access">允許來自區域網路的連線</string>
@@ -702,11 +706,13 @@
     <string name="clear_cache_success">快取已清除</string>
     <string name="clear_cache_failed">清除快取失敗：%s</string>
     <string name="concurrent_dial">並行撥號</string>
-    <string name="concurrent_dial_summary">啟用並行連線以加快網路建立速度，可能會增加電池用量</string>
+    <string name="concurrent_dial_summary">Enable concurrent connections for faster network establishment, may increase battery usage</string>
     <string name="connection_test_timeout">測試逾時（毫秒）</string>
     <string name="preview_version_hint">此應用程式為預覽版本，可能包含許多問題。如果您不想測試，請前往 GitHub 下載正式版本！</string>
+    <string name="preview_hint_dont_show_again">不再顯示</string>
     <string name="check_update_preview">檢查預覽版本更新</string>
     <string name="check_update_release">檢查正式版本更新</string>
+    <string name="release_not_available">NekoBox 尚未發布穩定版本</string>
     <string name="update_dialog_title">發現新版本</string>
     <string name="update_dialog_message">目前版本：%1$s\n可用版本：%2$s\n您要下載嗎？</string>
     <string name="check_update_no">檢查成功，但無更新。</string>
@@ -745,10 +751,10 @@
     <string name="dynamic_colors_classic">搭配新式介面使用</string>
     <string name="theme_fallback_summary">當動態色彩不可用或停用時使用</string>
     <string name="more_options">更多選項</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
-    <string name="donate">Donate</string>
-    <string name="donate_info">Support the development of this app.</string>
-    <string name="extra_subscription_links_hint">Extra subscription URL</string>
-    <string name="service_mode_transproxy">Transproxy</string>
-    <string name="copy_toast_msg">Copied to clipboard</string>
+    <string name="extra_subscription_links">額外訂閱連結</string>
+    <string name="donate">捐贈</string>
+    <string name="donate_info">支持本應用程式的開發。</string>
+    <string name="extra_subscription_links_hint">額外的訂閱 URL</string>
+    <string name="service_mode_transproxy">透明代理</string>
+    <string name="copy_toast_msg">已複製到剪貼簿</string>
 </resources>

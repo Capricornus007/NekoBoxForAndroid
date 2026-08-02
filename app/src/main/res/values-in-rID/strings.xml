@@ -48,7 +48,7 @@
     <string name="layout">Tata letak</string>
     <string name="layout_single_column">Kolom tunggal</string>
     <string name="layout_double_column">Kolom ganda</string>
-    <string name="sort_and_layout">Sort and Appearance</string>
+    <string name="sort_and_layout">Urutkan dan Tampilan</string>
     <string name="group_status_empty">Grup kosong</string>
     <string name="group_status_empty_subscription">Belum diperbarui</string>
     <string name="group_status_proxies">%d Proxy</string>
@@ -70,6 +70,10 @@
     <string name="lan_sharing_requires_root">Akses Root diperlukan tetapi tidak tersedia</string>
     <string name="port_proxy">Port Proxy</string>
     <string name="port_http">Port HTTP Proxy</string>
+    <string name="disable_mixed_inbound">Nonaktifkan Inbound Campuran</string>
+    <string name="disable_mixed_inbound_sum">Inbound TUN murni; tidak mendengarkan pada port proksi lokal</string>
+    <string name="mixed_inbound_disabled">Nonaktif</string>
+    <string name="disable_mixed_inbound_proxy_toast">Penonaktifan hanya berlaku dalam mode TUN; saat ini mendengarkan pada port: %1$d</string>
     <string name="port_transproxy">Port Transproxy</string>
     <string name="cag_route">Pengaturan Rute</string>
     <string name="allow_access">Izinkan Koneksi dari LAN</string>
@@ -717,11 +721,13 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="clear_cache_success">Cache dibersihkan</string>
     <string name="clear_cache_failed">Gagal membersihkan cache: %s</string>
     <string name="concurrent_dial">Concurrent Dial</string>
-    <string name="concurrent_dial_summary">Aktifkan koneksi concurrent untuk pembentukan jaringan yang lebih cepat, dapat meningkatkan penggunaan baterai</string>
+    <string name="concurrent_dial_summary">Enable concurrent connections for faster network establishment, may increase battery usage</string>
     <string name="connection_test_timeout">Batas Waktu Tes (ms)</string>
     <string name="preview_version_hint">Aplikasi ini adalah versi pratinjau dan mungkin mengandung banyak masalah. Jika Anda tidak ingin mengujinya, silakan kunjungi GitHub untuk mengunduh versi Rilis!</string>
+    <string name="preview_hint_dont_show_again">Jangan tampilkan lagi</string>
     <string name="check_update_preview">Periksa pembaruan versi pratinjau</string>
     <string name="check_update_release">Periksa pembaruan versi rilis</string>
+    <string name="release_not_available">NekoBox belum merilis versi stabil</string>
     <string name="update_dialog_title">Versi baru tersedia</string>
     <string name="update_dialog_message">Versi saat ini: %1$s\nVersi tersedia: %2$s\nApakah Anda ingin mengunduhnya?</string>
     <string name="check_update_no">Pemeriksaan berhasil, tetapi tidak ada pembaruan.</string>
@@ -758,10 +764,10 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="dynamic_colors_classic">Tersedia dengan antarmuka baru</string>
     <string name="theme_fallback_summary">Digunakan saat warna dinamis tidak tersedia atau dinonaktifkan</string>
     <string name="more_options">Opsi lainnya</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
-    <string name="donate">Donate</string>
-    <string name="donate_info">Support the development of this app.</string>
-    <string name="extra_subscription_links_hint">Extra subscription URL</string>
+    <string name="extra_subscription_links">Tautan Langganan Tambahan</string>
+    <string name="donate">Donasi</string>
+    <string name="donate_info">Dukung pengembangan aplikasi ini.</string>
+    <string name="extra_subscription_links_hint">URL langganan tambahan</string>
     <string name="service_mode_transproxy">Transproxy</string>
-    <string name="copy_toast_msg">Copied to clipboard</string>
+    <string name="copy_toast_msg">Disalin ke papan klip</string>
 </resources>

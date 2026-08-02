@@ -48,7 +48,7 @@
     <string name="layout">Макет</string>
     <string name="layout_single_column">Одна колонка</string>
     <string name="layout_double_column">Две колонки</string>
-    <string name="sort_and_layout">Sort and Appearance</string>
+    <string name="sort_and_layout">Сортировка и оформление</string>
     <string name="group_status_empty">Пустая группа</string>
     <string name="group_status_empty_subscription">Ещё не обновлено</string>
     <string name="group_status_proxies">%d прокси</string>
@@ -70,6 +70,10 @@
     <string name="lan_sharing_requires_root">Требуется root-доступ, но он недоступен</string>
     <string name="port_proxy">Порт прокси</string>
     <string name="port_http">Порт HTTP прокси</string>
+    <string name="disable_mixed_inbound">Отключить смешанный входящий</string>
+    <string name="disable_mixed_inbound_sum">Чистый входящий TUN; не слушать локальный прокси-порт</string>
+    <string name="mixed_inbound_disabled">Отключено</string>
+    <string name="disable_mixed_inbound_proxy_toast">Отключение действует только в режиме TUN; в данный момент прослушивается порт: %1$d</string>
     <string name="port_transproxy">Порт Transproxy</string>
     <string name="cag_route">Настройки маршрутизации</string>
     <string name="allow_access">Разрешить подключения из локальной сети</string>
@@ -712,11 +716,13 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_cache_success">Кэш очищен</string>
     <string name="clear_cache_failed">Не удалось очистить кэш: %s</string>
     <string name="concurrent_dial">Параллельный вызов</string>
-    <string name="concurrent_dial_summary">Включить параллельные соединения для более быстрого установления сети, может увеличить расход батареи</string>
+    <string name="concurrent_dial_summary">Enable concurrent connections for faster network establishment, may increase battery usage</string>
     <string name="connection_test_timeout">Таймаут теста (мс)</string>
     <string name="preview_version_hint">Это приложение является предварительной версией и может содержать множество проблем. Если вы не хотите тестировать его, пожалуйста, перейдите на GitHub, чтобы скачать релизную версию!</string>
+    <string name="preview_hint_dont_show_again">Больше не показывать</string>
     <string name="check_update_preview">Проверить обновления предварительной версии</string>
     <string name="check_update_release">Проверить обновления релизной версии</string>
+    <string name="release_not_available">NekoBox еще не выпустила стабильную версию.</string>
     <string name="update_dialog_title">Доступна новая версия</string>
     <string name="update_dialog_message">Текущая версия: %1$s\nДоступная версия: %2$s\nХотите скачать её?</string>
     <string name="check_update_no">Проверка прошла успешно, но обновлений нет.</string>
@@ -755,10 +761,10 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dynamic_colors_classic">Доступно с новым интерфейсом</string>
     <string name="theme_fallback_summary">Используется, когда динамические цвета недоступны или отключены</string>
     <string name="more_options">Дополнительные параметры</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
-    <string name="donate">Donate</string>
-    <string name="donate_info">Support the development of this app.</string>
-    <string name="extra_subscription_links_hint">Extra subscription URL</string>
+    <string name="extra_subscription_links">Дополнительные ссылки подписки</string>
+    <string name="donate">Пожертвовать</string>
+    <string name="donate_info">Поддержите разработку приложения.</string>
+    <string name="extra_subscription_links_hint">Дополнительный URL подписки</string>
     <string name="service_mode_transproxy">Transproxy</string>
-    <string name="copy_toast_msg">Copied to clipboard</string>
+    <string name="copy_toast_msg">Скопировано в буфер обмена</string>
 </resources>

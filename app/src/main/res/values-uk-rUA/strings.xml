@@ -48,7 +48,7 @@
     <string name="layout">Макет</string>
     <string name="layout_single_column">Один стовпець</string>
     <string name="layout_double_column">Два стовпці</string>
-    <string name="sort_and_layout">Sort and Appearance</string>
+    <string name="sort_and_layout">Сортування та вигляд</string>
     <string name="group_status_empty">Порожня група</string>
     <string name="group_status_empty_subscription">Ще не оновлено</string>
     <string name="group_status_proxies">%d проксі</string>
@@ -70,6 +70,10 @@
     <string name="lan_sharing_requires_root">Потрібен root-доступ, але він недоступний</string>
     <string name="port_proxy">Порт проксі</string>
     <string name="port_http">Порт HTTP проксі</string>
+    <string name="disable_mixed_inbound">Вимкнути змішаний вхідний трафік</string>
+    <string name="disable_mixed_inbound_sum">Чистий вхідний TUN; не прослуховувати локальний проксі-порт</string>
+    <string name="mixed_inbound_disabled">Вимкнено</string>
+    <string name="disable_mixed_inbound_proxy_toast">Вимкнення діє лише в режимі TUN; наразі прослуховується порт: %1$d</string>
     <string name="port_transproxy">Порт транспроксі</string>
     <string name="cag_route">Налаштування маршрутизації</string>
     <string name="allow_access">Дозволити підключення з локальної мережі</string>
@@ -720,11 +724,13 @@
     <string name="clear_cache_success">Кеш очищено</string>
     <string name="clear_cache_failed">Не вдалося очистити кеш: %s</string>
     <string name="concurrent_dial">Одночасне встановлення з\'єднання</string>
-    <string name="concurrent_dial_summary">Увімкнути одночасні з\'єднання для швидшого встановлення мережі, може збільшити споживання батареї</string>
+    <string name="concurrent_dial_summary">Enable concurrent connections for faster network establishment, may increase battery usage</string>
     <string name="connection_test_timeout">Тайм-аут тесту (мс)</string>
     <string name="preview_version_hint">Ця програма є попередньою версією і може містити багато проблем. Якщо ви не бажаєте тестувати її, перейдіть на GitHub, щоб завантажити стабільну версію!</string>
+    <string name="preview_hint_dont_show_again">Не показувати знову</string>
     <string name="check_update_preview">Перевірити оновлення попередньої версії</string>
     <string name="check_update_release">Перевірити оновлення стабільної версії</string>
+    <string name="release_not_available">NekoBox ще не опублікував стабільний реліз</string>
     <string name="update_dialog_title">Доступна нова версія</string>
     <string name="update_dialog_message">Поточна версія: %1$s\nДоступна версія: %2$s\nБажаєте завантажити?</string>
     <string name="check_update_no">Перевірка успішна, але оновлень немає.</string>
@@ -761,10 +767,10 @@
     <string name="dynamic_colors_classic">Доступно з новим інтерфейсом</string>
     <string name="theme_fallback_summary">Використовується, коли динамічні кольори недоступні або вимкнені</string>
     <string name="more_options">Більше опцій</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
-    <string name="donate">Donate</string>
-    <string name="donate_info">Support the development of this app.</string>
-    <string name="extra_subscription_links_hint">Extra subscription URL</string>
-    <string name="service_mode_transproxy">Transproxy</string>
-    <string name="copy_toast_msg">Copied to clipboard</string>
+    <string name="extra_subscription_links">Додаткові посилання на підписки</string>
+    <string name="donate">Пожертвувати</string>
+    <string name="donate_info">Підтримайте розробку цього додатка.</string>
+    <string name="extra_subscription_links_hint">Додаткове посилання на підписку</string>
+    <string name="service_mode_transproxy">Транспроксі</string>
+    <string name="copy_toast_msg">Скопійовано до буфера обміну</string>
 </resources>
