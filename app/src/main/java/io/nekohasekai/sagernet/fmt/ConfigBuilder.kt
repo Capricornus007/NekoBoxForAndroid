@@ -192,7 +192,10 @@ fun buildConfig(
     // trafficSniffing 退化为开关语义（>0 即启用）。
     val needSniff = DataStore.trafficSniffing > 0
     val externalIndexMap = ArrayList<IndexEntity>()
-    val ipv6Mode = if (forTest) IPv6Mode.ENABLE else DataStore.ipv6Mode
+    // 测速配置必须与正式连接一致（对齐 husi）：沿用用户的 IPv6 模式。
+    // 曾强制 ENABLE——测速拨号的协议族选择与真实路径不同，
+    // v6 不通的网络里测速假 err（节点实际可用），反之假成功。
+    val ipv6Mode = DataStore.ipv6Mode
 
     fun genDomainStrategy(noAsIs: Boolean): String {
         return when {
@@ -538,8 +541,9 @@ fun buildConfig(
                             domainListDNSDirectForce.add("full:$serverAddress")
                         }
                     }
-                    _hack_config_map["domain_strategy"] =
-                        if (forTest) "" else defaultServerDomainStrategy
+                    // 测速配置必须与正式连接一致（对齐 husi）：沿用统一的服务器
+                    // 域名解析策略。曾强制空——测速解析出的 IP/协议族与真实路径不同。
+                    _hack_config_map["domain_strategy"] = defaultServerDomainStrategy
 
                     _hack_config_map["tag"] = tagOut
 
