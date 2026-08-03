@@ -62,18 +62,14 @@ class TestInstance(profile: ProxyEntity, val link: String, private val timeout: 
                         Logs.d("URLTest ${profile.displayName()}: waiting ${processes.processCount} plugin(s) start")
                         awaitExternalProcessesReady(strict = true)
                     }
-                    Logs.d("URLTest ${profile.displayName()}: calling Libcore.urlTest(box, link=$link, timeout=${timeout}ms)")
+                    Logs.d(
+                        "URLTest ${profile.displayName()}: calling Libcore.urlTest(box, link=$link, timeout=${timeout}ms)",
+                    )
                     val result = Libcore.urlTest(box, link, timeout)
                     Logs.d("URLTest ${profile.displayName()}: result latency=${result}ms")
                     if (c.isActive) c.resume(result)
                 } catch (e: Exception) {
                     Logs.d("URLTest ${profile.displayName()}: failed: ${e.readableMessage}")
-                    if (c.isActive) c.resumeWithException(e)
-                }
-                    }
-                    val result = Libcore.urlTest(box, link, timeout)
-                    if (c.isActive) c.resume(result)
-                } catch (e: Exception) {
                     if (c.isActive) c.resumeWithException(e)
                 }
             }
