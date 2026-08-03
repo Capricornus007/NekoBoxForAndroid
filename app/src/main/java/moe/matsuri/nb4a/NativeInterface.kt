@@ -116,25 +116,30 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
 
     private fun checkDefaultInterfaceUpdate(listener: InterfaceUpdateListener, network: Network?) {
         if (network == null) {
+            Logs.i("checkDefaultInterfaceUpdate network=null -> clear default interface")
             listener.updateDefaultInterface("", -1)
             return
         }
         // LinkProperties / NetworkInterface 可能短暂未就绪，参考 husi 重试
-        repeat(10) {
+        repeat(10) { attempt ->
             val linkProperties = SagerNet.connectivity.getLinkProperties(network)
             if (linkProperties == null) {
+                Logs.i("checkDefaultInterfaceUpdate attempt=${attempt + 1} linkProperties=null network=$network")
                 Thread.sleep(100)
                 return@repeat
             }
             val interfaceIndex = try {
                 NetworkInterface.getByName(linkProperties.interfaceName).index
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Logs.i("checkDefaultInterfaceUpdate attempt=${attempt + 1} getByName failed name=${linkProperties.interfaceName}: $e")
                 Thread.sleep(100)
                 return@repeat
             }
+            Logs.i("checkDefaultInterfaceUpdate ok name=${linkProperties.interfaceName} index=$interfaceIndex network=$network attempt=${attempt + 1}")
             listener.updateDefaultInterface(linkProperties.interfaceName, interfaceIndex)
             return
         }
+        Logs.w("checkDefaultInterfaceUpdate exhausted retries network=$network -> clear default interface")
         listener.updateDefaultInterface("", -1)
     }
 

@@ -55,17 +55,23 @@ object DefaultNetworkListener {
             }
 
             is NetworkMessage.Put -> {
+                // 诊断：夜间/飞行模式网络事件时间线（与 Go UpdateDefaultInterface 对照）
+                Logs.i("DefaultNetworkListener Put network=${message.network} listeners=${listeners.size}")
                 network = message.network
                 pendingRequests.forEach { it.response.complete(message.network) }
                 pendingRequests.clear()
                 listeners.values.forEach { it(network) }
             }
-            is NetworkMessage.Update -> if (network == message.network) listeners.values.forEach {
-                it(
-                    network
-                )
+            is NetworkMessage.Update -> if (network == message.network) {
+                Logs.i("DefaultNetworkListener Update network=${message.network} listeners=${listeners.size}")
+                listeners.values.forEach {
+                    it(
+                        network
+                    )
+                }
             }
             is NetworkMessage.Lost -> if (network == message.network) {
+                Logs.i("DefaultNetworkListener Lost network=${message.network} listeners=${listeners.size}")
                 network = null
                 listeners.values.forEach { it(null) }
             }
