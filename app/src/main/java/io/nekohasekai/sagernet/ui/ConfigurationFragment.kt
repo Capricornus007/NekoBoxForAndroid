@@ -1113,6 +1113,7 @@ class ConfigurationFragment @JvmOverloads constructor(
         val testJobs = mutableListOf<Job>()
         // See pingTest(): cache the group name off-thread for the minimize callback.
         var groupName = ""
+        Logs.d("URLTest: batch start, concurrent=${DataStore.connectionTestConcurrent}")
 
         val mainJob = runOnDefaultDispatcher {
             val group = DataStore.currentGroup()
@@ -1120,6 +1121,7 @@ class ConfigurationFragment @JvmOverloads constructor(
             val profilesList = SagerDatabase.proxyDao.getByGroup(group.id)
             test.proxyN = profilesList.size
             val profiles = ConcurrentLinkedQueue(profilesList)
+            Logs.d("URLTest: batch profiles=${profilesList.size}")
             repeat(DataStore.connectionTestConcurrent) {
                 testJobs.add(
                     launch(Dispatchers.IO) {
@@ -1132,6 +1134,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 val result = urlTest.doTest(profile)
                                 profile.status = 1
                                 profile.ping = result
+                                Logs.d("URLTest ${profile.displayName()}: done, ping=${result}ms")
                                 // Clear any stale error from a previous failed test so a now-passing
                                 // profile doesn't keep showing an old failure message.
                                 profile.error = null
@@ -1146,10 +1149,10 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 if (!isActive) break
                                 profile.status = 3
                                 profile.error = e.readableMessage
+                                // 诊断日志：批量测速失败原因临时记录，用于确认
+                                // "no available network interface"（接口监视器竞态）假设
+                                Logs.w("URLTest ${profile.displayName()}: ${e.readableMessage}")
                             }
-
-                            if (!isActive) break
-                            test.update(profile)
                         }
                     },
                 )

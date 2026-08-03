@@ -5,6 +5,7 @@ import io.nekohasekai.sagernet.bg.GuardedProcessPool
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.fmt.buildConfig
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import libcore.Libcore
@@ -48,7 +49,9 @@ class TestInstance(profile: ProxyEntity, val link: String, private val timeout: 
         runOnDefaultDispatcher {
             use {
                 try {
+                    Logs.d("URLTest ${profile.displayName()}: init()")
                     init()
+                    Logs.d("URLTest ${profile.displayName()}: launch()")
                     launch()
                     if (processes.processCount > 0) {
                         // Wait until the external plugin sidecar(s) have actually bound
@@ -56,7 +59,17 @@ class TestInstance(profile: ProxyEntity, val link: String, private val timeout: 
                         // 500ms guess that often raced the sidecar (flaky "connection
                         // refused"). strict = true turns a never-bound listener into a
                         // clear error rather than a misleading connection failure.
+                        Logs.d("URLTest ${profile.displayName()}: waiting ${processes.processCount} plugin(s) start")
                         awaitExternalProcessesReady(strict = true)
+                    }
+                    Logs.d("URLTest ${profile.displayName()}: calling Libcore.urlTest(box, link=$link, timeout=${timeout}ms)")
+                    val result = Libcore.urlTest(box, link, timeout)
+                    Logs.d("URLTest ${profile.displayName()}: result latency=${result}ms")
+                    if (c.isActive) c.resume(result)
+                } catch (e: Exception) {
+                    Logs.d("URLTest ${profile.displayName()}: failed: ${e.readableMessage}")
+                    if (c.isActive) c.resumeWithException(e)
+                }
                     }
                     val result = Libcore.urlTest(box, link, timeout)
                     if (c.isActive) c.resume(result)

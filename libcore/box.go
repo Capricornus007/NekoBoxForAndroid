@@ -284,6 +284,7 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 	if i == nil {
 		i = mainInstance
 	}
+	boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.UrlTest link=%s timeout=%dms instance=%v", link, timeout, i != nil))
 	var client *http.Client
 	if i == nil {
 		// 无实例：直连测试
@@ -295,7 +296,9 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 		}
 		client = newProxyHTTPClient(i.Box, connectionTracker, timeout)
 	}
-	return urlTest(client, link)
+	latency, err = urlTest(client, link)
+	boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.UrlTest result latency=%dms err=%v", latency, err))
+	return
 }
 
 // newProxyHTTPClient 替代 fork 的 boxapi.CreateProxyHttpClient：
@@ -331,18 +334,23 @@ func newProxyHTTPClient(b *box.Box, tracker adapter.ConnectionTracker, timeout i
 func urlTest(client *http.Client, link string) (int32, error) {
 	req, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {
+		boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest new request failed: %v", err))
 		return 0, err
 	}
 	start := time.Now()
 	resp, err := client.Do(req)
 	if err != nil {
+		boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest request failed after %dms: %v", time.Since(start).Milliseconds(), err))
 		return 0, err
 	}
 	_ = resp.Body.Close()
 	if resp.StatusCode >= 400 {
+		boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest unexpected status: %s", resp.Status))
 		return 0, E.New("unexpected status: ", resp.Status)
 	}
-	return int32(time.Since(start).Milliseconds()), nil
+	latency := int32(time.Since(start).Milliseconds())
+	boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest ok status=%s latency=%dms", resp.Status, latency))
+	return latency, nil
 }
 
 var protectCloser io.Closer

@@ -431,7 +431,9 @@ func (r *httpRequest) doH3Direct() (HTTPResponse, error) {
 					Transport: &http3.Transport{
 						TLSClientConfig: r.tls.Clone(),
 						QUICConfig: &quic.Config{
-							MaxIdleTimeout: time.Second,
+							// 与 doH3Direct 整体 10s 超时保持一致，避免 QUIC 空闲超时(1s)过早触发
+							// 导致 "no recent network activity" 误报订阅更新失败
+							MaxIdleTimeout: 10 * time.Second,
 						},
 					},
 				}
