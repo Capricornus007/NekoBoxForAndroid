@@ -61,8 +61,9 @@ func ResetAllConnections(system bool) {
 	// 官方无 conntrack；等价能力是 NetworkManager.ResetNetwork()：
 	// CloseAll 连接 + 通知 endpoint/inbound/outbound.InterfaceUpdated()
 	// （hy2/quic 等会丢弃死路径上的会话，下次拨号重建）。
-	// BaseService 在默认网卡名变化时调用；接口监视器成功 apply 后
-	// notifyInterfaceUpdate 也会自动 ResetNetwork——两条路径互补。
+	// 正常切网由 interfaceMonitor → notifyInterfaceUpdate 自动 ResetNetwork
+	// （对齐官方 libbox，app 侧不应再叠一层）。本函数仅供手动
+	// Action.RESET_UPSTREAM_CONNECTIONS / wakeResetConnections 等显式入口。
 	b := mainInstance
 	if b == nil || b.Box == nil {
 		log.Println("ResetAllConnections: no main instance, skip system=", system)

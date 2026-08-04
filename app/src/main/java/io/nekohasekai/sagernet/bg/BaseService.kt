@@ -281,20 +281,22 @@ class BaseService {
         var upstreamInterfaceName: String?
 
         suspend fun preInit() {
-            DefaultNetworkListener.start(this) {
-                SagerNet.connectivity.getLinkProperties(it)?.also { link ->
-                    SagerNet.underlyingNetwork = it
+            // 只负责 underlyingNetwork / 网卡名跟踪，供 VpnService.setUnderlyingNetworks。
+            // 切网后的连接重置交给官方路径：
+            //   interfaceMonitor.UpdateDefaultInterface
+            //     → notifyInterfaceUpdate → NetworkManager.ResetNetwork()
+            // 此处再调 resetAllConnections 会与内核各拆一次 hy2/quic，表现为
+            // 切网卡顿、偶发测速延迟飙高。networkChangeResetConnections 设置项
+            // 保留兼容，但默认不再在此路径触发（手动重置入口仍可用）。
+            DefaultNetworkListener.start(this) { network ->
+                if (network == null) return@start
+                SagerNet.connectivity.getLinkProperties(network)?.also { link ->
+                    SagerNet.underlyingNetwork = network
                     DataStore.vpnService?.updateUnderlyingNetwork()
-                    //
                     val oldName = upstreamInterfaceName
                     if (oldName != link.interfaceName) {
+                        Logs.d("Network changed: $oldName -> ${link.interfaceName}")
                         upstreamInterfaceName = link.interfaceName
-                    }
-                    if (oldName != null && upstreamInterfaceName != null && oldName != upstreamInterfaceName) {
-                        Logs.d("Network changed: $oldName -> $upstreamInterfaceName")
-                        if (DataStore.networkChangeResetConnections) {
-                            Libcore.resetAllConnections(true)
-                        }
                     }
                 }
             }
