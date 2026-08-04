@@ -1,6 +1,7 @@
 package libcore
 
 import (
+	"net"
 	"strconv"
 	"sync"
 	"time"
@@ -106,9 +107,86 @@ func (m *interfaceMonitor) defaultInterfaceState() string {
 	return m.defaultInterface.Name + "#" + strconv.Itoa(m.defaultInterface.Index)
 }
 
+// resolveInterface 解析默认物理接口。优先走 NetworkManager 平台缓存
+// （UpdateInterfaces 刚从 Kotlin getInterfaces 刷入），避免
+// control.NewDefaultInterfaceFinder().ByIndex 读 x/net/route 在 Android OEM
+// （尤其 VPN 开启时）报 "route ip+net: no such network interface"。
+// 真机日志：applied=0 / stuck 连发，但拨号未必失败——根因是找错了 finder。
+func (m *interfaceMonitor) resolveInterface(interfaceName string, interfaceIndex int32) (*control.Interface, string, error) {
+	idx := int(interfaceIndex)
+
+	// 1) NetworkManager.InterfaceFinder（平台 UpdateInterfaces 已写入）
+	if m.wrapper.networkManager != nil {
+		if iif, err := m.wrapper.networkManager.InterfaceFinder().ByIndex(idx); err == nil && iif != nil {
+			return iif, "nm-finder", nil
+		}
+		// 2) NetworkInterfaces 缓存按 index/name 匹配
+		for _, ni := range m.wrapper.networkManager.NetworkInterfaces() {
+			if ni.Index == idx || (interfaceName != "" && ni.Name == interfaceName) {
+				iface := ni.Interface
+				return &iface, "nm-cache", nil
+			}
+		}
+	}
+
+	// 3) 系统路由表 finder（Android 上常失败，保留作非平台回退）
+	if iif, err := control.NewDefaultInterfaceFinder().ByIndex(idx); err == nil && iif != nil {
+		return iif, "route-finder", nil
+	}
+
+	// 4) net.InterfaceByIndex
+	if nif, err := net.InterfaceByIndex(idx); err == nil && nif != nil {
+		return &control.Interface{
+			Index:        nif.Index,
+			MTU:          nif.MTU,
+			Name:         nif.Name,
+			HardwareAddr: nif.HardwareAddr,
+			Flags:        nif.Flags,
+		}, "net-by-index", nil
+	}
+
+	// 5) 最后兜底：用 Kotlin 上报的 name+index 构造（足够触发 notify→ResetNetwork）
+	if interfaceName != "" && idx > 0 {
+		return &control.Interface{
+			Index: idx,
+			Name:  interfaceName,
+			Flags: net.FlagUp | net.FlagRunning,
+		}, "kotlin-fallback", nil
+	}
+
+	return nil, "", E.New("interface not found: ", interfaceName, "#", idx)
+}
+
+// applyDefaultInterface 写入 defaultInterface 并在变化时通知回调
+// （回调链 → NetworkManager.notifyInterfaceUpdate → ResetNetwork）。
+func (m *interfaceMonitor) applyDefaultInterface(newInterface *control.Interface, source string) {
+	m.access.Lock()
+	oldInterface := m.defaultInterface
+	m.defaultInterface = newInterface
+	if m.defaultInterfaceInitialized && oldInterface != nil &&
+		oldInterface.Name == newInterface.Name && oldInterface.Index == newInterface.Index {
+		m.access.Unlock()
+		m.logger.Info("UpdateDefaultInterface unchanged name=", newInterface.Name,
+			" index=", newInterface.Index, " source=", source, " skip callbacks")
+		return
+	}
+	m.defaultInterfaceInitialized = true
+	callbacks := m.callbacks.Array()
+	oldDesc := "nil"
+	if oldInterface != nil {
+		oldDesc = oldInterface.Name + "#" + strconv.Itoa(oldInterface.Index)
+	}
+	m.access.Unlock()
+	m.logger.Info("UpdateDefaultInterface applied ", oldDesc, " -> ",
+		newInterface.Name, "#", newInterface.Index, " source=", source,
+		" callbacks=", len(callbacks))
+	for _, callback := range callbacks {
+		callback(newInterface, 0)
+	}
+}
+
 // UpdateDefaultInterface 实现 InterfaceUpdateListener（Kotlin 回调入口）。
 func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfaceIndex int32) {
-	// 诊断：夜间断连/飞行模式恢复时，核对 Kotlin 上报与 Go 侧 ByIndex 结果是否一致。
 	m.logger.Info("UpdateDefaultInterface enter name=", interfaceName,
 		" index=", interfaceIndex, " current=", m.defaultInterfaceState())
 
@@ -130,94 +208,35 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 		}
 		return
 	}
-	newInterface, err := control.NewDefaultInterfaceFinder().ByIndex(int(interfaceIndex))
+
+	newInterface, source, err := m.resolveInterface(interfaceName, interfaceIndex)
 	if err != nil {
-		// 启动早期接口/路由表可能尚未就绪（真机日志：
-		// "find updated interface: wlan0: route ip+net: no such network interface"）。
-		// 直接丢弃会让 defaultInterface 永久为 nil，该 box 的所有拨号秒报
-		// "no available network interface"，故后台重试几次。
-		// 诊断重点：重试窗口仅 5×200ms；若期间 defaultInterface 已是 stale 非 nil，
-		// retry 会直接放弃，之后只能等下一次系统回调——夜间事件稀疏时即假死。
+		// 瞬时未就绪：短重试；仍失败则 kotlin-fallback 应已兜住，此处极少到达
 		m.logger.Error(E.Cause(err, "find updated interface: ", interfaceName),
 			" current=", m.defaultInterfaceState(), " will retry 5x200ms")
 		go m.retryUpdateDefaultInterface(interfaceName, interfaceIndex, 5)
 		return
 	}
-	m.access.Lock()
-	oldInterface := m.defaultInterface
-	m.defaultInterface = newInterface
-	if m.defaultInterfaceInitialized && oldInterface != nil &&
-		oldInterface.Name == newInterface.Name && oldInterface.Index == newInterface.Index {
-		m.access.Unlock()
-		m.logger.Info("UpdateDefaultInterface unchanged name=", newInterface.Name,
-			" index=", newInterface.Index, " skip callbacks")
-		return
-	}
-	m.defaultInterfaceInitialized = true
-	callbacks := m.callbacks.Array()
-	oldDesc := "nil"
-	if oldInterface != nil {
-		oldDesc = oldInterface.Name + "#" + strconv.Itoa(oldInterface.Index)
-	}
-	m.access.Unlock()
-	m.logger.Info("UpdateDefaultInterface applied ", oldDesc, " -> ",
-		newInterface.Name, "#", newInterface.Index, " callbacks=", len(callbacks))
-	for _, callback := range callbacks {
-		callback(newInterface, 0)
-	}
+	m.applyDefaultInterface(newInterface, source)
 }
 
-// retryUpdateDefaultInterface 弥补 UpdateDefaultInterface 的瞬时失败：
-// 若期间已有其他回调成功设置了接口则直接放弃。
+// retryUpdateDefaultInterface 弥补 resolve 的瞬时失败。
 func (m *interfaceMonitor) retryUpdateDefaultInterface(interfaceName string, interfaceIndex int32, attempts int) {
 	for i := 0; i < attempts; i++ {
 		time.Sleep(200 * time.Millisecond)
-		m.access.Lock()
-		ready := m.defaultInterfaceInitialized && m.defaultInterface != nil
-		cur := "uninit"
-		if m.defaultInterfaceInitialized {
-			if m.defaultInterface == nil {
-				cur = "nil"
-			} else {
-				cur = m.defaultInterface.Name + "#" + strconv.Itoa(m.defaultInterface.Index)
-			}
+		// 刷新平台列表后再 resolve
+		if m.wrapper.networkManager != nil {
+			_ = m.wrapper.networkManager.UpdateInterfaces()
 		}
-		m.access.Unlock()
-		if ready {
-			// 关键：ready 只看「非 nil」，不区分 stale 与真正恢复。
-			// 若 ByIndex 失败时残留旧接口，这里会直接放弃，导致 defaultInterface 卡在 stale。
-			m.logger.Info("retryUpdateDefaultInterface abort attempt=", i+1, "/", attempts,
-				" reason=already-set current=", cur, " target=", interfaceName, "#", interfaceIndex)
-			return
-		}
-		newInterface, err := control.NewDefaultInterfaceFinder().ByIndex(int(interfaceIndex))
+		newInterface, source, err := m.resolveInterface(interfaceName, interfaceIndex)
 		if err != nil {
 			m.logger.Info("retryUpdateDefaultInterface attempt=", i+1, "/", attempts,
-				" ByIndex failed: ", err, " current=", cur)
+				" resolve failed: ", err)
 			continue
 		}
-		m.access.Lock()
-		if m.defaultInterfaceInitialized && m.defaultInterface != nil {
-			cur2 := m.defaultInterface.Name + "#" + strconv.Itoa(m.defaultInterface.Index)
-			m.access.Unlock()
-			m.logger.Info("retryUpdateDefaultInterface abort after ByIndex ok attempt=", i+1,
-				" reason=already-set current=", cur2)
-			return
-		}
-		m.defaultInterface = newInterface
-		m.defaultInterfaceInitialized = true
-		callbacks := m.callbacks.Array()
-		m.access.Unlock()
-		for _, callback := range callbacks {
-			callback(newInterface, 0)
-		}
-		m.logger.Info("default interface recovered after retry: ", interfaceName,
-			"#", newInterface.Index, " attempt=", i+1)
+		m.applyDefaultInterface(newInterface, source+"-retry"+strconv.Itoa(i+1))
 		return
 	}
-	// 重试耗尽：此后无周期 reconcile，只能等下一次 Kotlin 回调。
-	// 若日志出现本行且之后长时间无 UpdateDefaultInterface enter，即可坐实
-	// 「一次性失败 + 休眠期回调稀疏 → 永久卡死」。
 	m.logger.Error("default interface stuck after retry exhausted target=",
 		interfaceName, "#", interfaceIndex, " current=", m.defaultInterfaceState(),
 		" waiting for next callback")

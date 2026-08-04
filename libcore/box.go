@@ -58,9 +58,18 @@ func VersionBox() string {
 }
 
 func ResetAllConnections(system bool) {
-	// 官方内核没有 conntrack（starifly fork 私有实现）。
-	// 按迁移方针先跳过并留 debug 日志，待有具体案例再修。
-	log.Println("DEBUG: ResetAllConnections(system=", system, ") skipped: official sing-box has no conntrack")
+	// 官方无 conntrack；等价能力是 NetworkManager.ResetNetwork()：
+	// CloseAll 连接 + 通知 endpoint/inbound/outbound.InterfaceUpdated()
+	// （hy2/quic 等会丢弃死路径上的会话，下次拨号重建）。
+	// BaseService 在默认网卡名变化时调用；接口监视器成功 apply 后
+	// notifyInterfaceUpdate 也会自动 ResetNetwork——两条路径互补。
+	b := mainInstance
+	if b == nil || b.Box == nil {
+		log.Println("ResetAllConnections: no main instance, skip system=", system)
+		return
+	}
+	b.Network().ResetNetwork()
+	log.Println("ResetAllConnections: Network.ResetNetwork() done system=", system)
 }
 
 type BoxInstance struct {

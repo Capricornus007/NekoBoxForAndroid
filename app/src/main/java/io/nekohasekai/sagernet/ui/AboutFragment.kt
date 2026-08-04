@@ -228,11 +228,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                 try {
                     val client = Libcore.newHttpClient().apply {
                         modernTLS()
-                        trySocks5(
-                            DataStore.mixedPort,
-                            DataStore.mixedInboundUser,
-                            DataStore.mixedInboundPass
-                        )
+                        tryProxyOutbound()
                     }
                     val response = client.newRequest().apply {
                         setURL("https://api.github.com/repos/dsfkjlweuyr/ThroneForAndroid/releases/latest")

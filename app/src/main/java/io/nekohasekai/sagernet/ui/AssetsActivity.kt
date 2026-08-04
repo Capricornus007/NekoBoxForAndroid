@@ -280,14 +280,10 @@ class AssetsActivity : ThemedActivity() {
         val repo = rulesProviders[DataStore.rulesProvider].repoByFileName[fileName]
 
         val client = Libcore.newHttpClient().apply {
-            modernTLS()
-            keepAlive()
-            trySocks5(
-                DataStore.mixedPort,
-                DataStore.mixedInboundUser,
-                DataStore.mixedInboundPass
-            )
-        }
+                    modernTLS()
+                    keepAlive()
+                    tryProxyOutbound()
+                }
 
         try {
             var response = client.newRequest().apply {
@@ -347,14 +343,10 @@ class AssetsActivity : ThemedActivity() {
             return
         }
         val client = Libcore.newHttpClient().apply {
-            modernTLS()
-            keepAlive()
-            trySocks5(
-                DataStore.mixedPort,
-                DataStore.mixedInboundUser,
-                DataStore.mixedInboundPass
-            )
-        }
+                    modernTLS()
+                    keepAlive()
+                    tryProxyOutbound()
+                }
         try {
             val response = client.newRequest().apply {
                 setURL(url)
