@@ -282,12 +282,11 @@ class BaseService {
 
         suspend fun preInit() {
             // 只负责 underlyingNetwork / 网卡名跟踪，供 VpnService.setUnderlyingNetworks。
-            // 切网后的连接重置交给官方路径：
-            //   interfaceMonitor.UpdateDefaultInterface
-            //     → notifyInterfaceUpdate → NetworkManager.ResetNetwork()
-            // 此处再调 resetAllConnections 会与内核各拆一次 hy2/quic，表现为
-            // 切网卡顿、偶发测速延迟飙高。networkChangeResetConnections 设置项
-            // 保留兼容，但默认不再在此路径触发（手动重置入口仍可用）。
+            // 「网络变化时重置出站」由 DataStore.networkChangeResetConnections 控制，
+            // 经 NativeInterface → Libcore.setNetworkChangeResetConnections →
+            // interfaceMonitor 是否 callback → 官方 ResetNetwork 生效；
+            // 此处不再叠调 resetAllConnections（避免与内核双路径各拆一次）。
+            // 「唤醒时重置」见 receiver 内 DataStore.wakeResetConnections。
             DefaultNetworkListener.start(this) { network ->
                 if (network == null) return@start
                 SagerNet.connectivity.getLinkProperties(network)?.also { link ->

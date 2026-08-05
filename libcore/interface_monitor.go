@@ -4,6 +4,7 @@ import (
 	"net"
 	"strconv"
 	"sync"
+	"sync/atomic"
 
 	tun "github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common/control"
@@ -11,6 +12,22 @@ import (
 	"github.com/sagernet/sing/common/logger"
 	"github.com/sagernet/sing/common/x/list"
 )
+
+// networkChangeResetConnections 对应 app 设置
+// DataStore.networkChangeResetConnections（「当网络发生变化时重置出站连接」）。
+// true（默认）：name/index 变化时通知回调 → 官方 notifyInterfaceUpdate → ResetNetwork。
+// false：仍更新 DefaultInterface() 供新拨号绑定，但不通知回调（不拆现有出站）；
+// 从 nil 恢复时仍通知，以便 NetworkWake（否则 Lost 后会一直 pause）。
+var networkChangeResetConnections atomic.Bool
+
+func init() {
+	networkChangeResetConnections.Store(true)
+}
+
+// SetNetworkChangeResetConnections 由 Kotlin 在发起接口更新前同步设置项。
+func SetNetworkChangeResetConnections(enable bool) {
+	networkChangeResetConnections.Store(enable)
+}
 
 // InterfaceUpdateListener 由 Kotlin 侧实现回调：
 // ConnectivityManager 默认网络变化时通知 Go 默认物理接口（名称 + index，-1 表示无网络）。
@@ -182,6 +199,17 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 		m.access.Unlock()
 		return
 	}
+
+	// 设置项 networkChangeResetConnections=false：只更新默认接口，不拆出站。
+	// 例外：old==nil（曾 Lost/pause）必须通知以 NetworkWake，否则会一直暂停。
+	if oldInterface != nil && !networkChangeResetConnections.Load() {
+		m.access.Unlock()
+		m.logger.Info("updated default interface ", newInterface.Name,
+			" index ", newInterface.Index, " source ", source,
+			" skip ResetNetwork (networkChangeResetConnections=false)")
+		return
+	}
+
 	callbacks := m.callbacks.Array()
 	oldDesc := "nil"
 	if oldInterface != nil {

@@ -115,12 +115,15 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
     }
 
     private fun checkDefaultInterfaceUpdate(listener: InterfaceUpdateListener, network: Network?) {
+        // 同步「网络变化时重置出站」开关到 Go：控制 name/index 变化时是否
+        // callback → 官方 ResetNetwork（见 libcore/interface_monitor.go）。
+        Libcore.setNetworkChangeResetConnections(DataStore.networkChangeResetConnections)
         if (network == null) {
             Logs.i("checkDefaultInterfaceUpdate network=null -> clear default interface")
             listener.updateDefaultInterface("", -1)
             return
         }
-        // LinkProperties / NetworkInterface 可能短暂未就绪，参考 husi 重试
+        // LinkProperties / NetworkInterface 可能短暂未就绪，参考 husi/SFA 重试
         repeat(10) { attempt ->
             val linkProperties = SagerNet.connectivity.getLinkProperties(network)
             if (linkProperties == null) {
