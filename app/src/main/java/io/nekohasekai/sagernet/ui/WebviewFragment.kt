@@ -13,6 +13,7 @@ import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.databinding.LayoutWebviewBinding
+import io.nekohasekai.sagernet.ktx.wrapDialogContent
 import moe.matsuri.nb4a.utils.WebViewUtil
 
 // Fragment必须有一个无参public的构造函数，否则在数据恢复的时候，会报crash
@@ -55,12 +56,13 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_set_url -> {
-                val view = EditText(context).apply {
+                val ctx = requireContext()
+                val view = EditText(ctx).apply {
                     inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
                     setText(DataStore.yacdURL)
                 }
-                MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.set_panel_url)
-                    .setView(view)
+                MaterialAlertDialogBuilder(ctx).setTitle(R.string.set_panel_url)
+                    .setView(ctx.wrapDialogContent(view))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         DataStore.yacdURL = view.text.toString()
                         mWebView.loadUrl(DataStore.yacdURL)

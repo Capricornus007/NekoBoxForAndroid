@@ -2,6 +2,9 @@ package io.nekohasekai.sagernet.ktx
 
 import android.app.Activity
 import android.content.Context
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -24,5 +27,29 @@ fun AlertDialog.tryToShow() {
         }
     } catch (e: Exception) {
         Logs.e(e)
+    }
+}
+
+/**
+ * Wrap a dialog content view with Material-recommended horizontal padding.
+ * Bare EditText / TextInputLayout set via setView() otherwise sits flush against
+ * dialog edges, which looks especially cramped under original (FilledBox) style.
+ */
+fun Context.wrapDialogContent(
+    content: View,
+    horizontalDp: Int = 20,
+    verticalDp: Int = 8,
+): FrameLayout {
+    val h = dp2px(horizontalDp)
+    val v = dp2px(verticalDp)
+    return FrameLayout(this).apply {
+        setPadding(h, v, h, v)
+        addView(
+            content,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            ),
+        )
     }
 }

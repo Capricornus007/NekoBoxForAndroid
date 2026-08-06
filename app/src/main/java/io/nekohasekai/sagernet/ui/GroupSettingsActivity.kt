@@ -11,7 +11,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -37,6 +36,7 @@ import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeLi
 import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
+import io.nekohasekai.sagernet.ktx.dp2px
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.widget.LinkWithExtraPreference
@@ -320,8 +320,14 @@ class GroupSettingsActivity(
     private fun showExtraLinksDialog() {
         val links = extraLinksToList()
         val context = this@GroupSettingsActivity
+        val hPad = dp2px(20)
+        val vPad = dp2px(12)
 
-        val scrollView = ScrollView(context)
+        val scrollView = ScrollView(context).apply {
+            isFillViewport = true
+            setPadding(hPad, vPad, hPad, vPad)
+            clipToPadding = false
+        }
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = ViewGroup.LayoutParams(
@@ -352,16 +358,24 @@ class GroupSettingsActivity(
         links: MutableList<String>,
     ) {
         container.removeAllViews()
+        // FilledBox (original style) merges visually without generous gaps + outline.
+        val rowGap = dp2px(10)
+        val btnSize = dp2px(48)
+        val btnMarginStart = dp2px(8)
         for (i in links.indices) {
             val row = LinearLayout(container.context).apply {
                 orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
                 layoutParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply { setMargins(0, 8, 0, 8) }
+                ).apply { setMargins(0, rowGap, 0, rowGap) }
             }
 
+            // Force outlined box so multi-row URLs don't glue together under original
+            // style (theme default is FilledBox there).
             val inputLayout = TextInputLayout(row.context).apply {
+                boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_OUTLINE
                 layoutParams = LinearLayout.LayoutParams(
                     0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f
                 )
@@ -382,9 +396,9 @@ class GroupSettingsActivity(
             inputLayout.addView(editText)
 
             val btn = ImageButton(row.context).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    48.dpToPx(), 48.dpToPx()
-                )
+                layoutParams = LinearLayout.LayoutParams(btnSize, btnSize).apply {
+                    marginStart = btnMarginStart
+                }
                 setBackgroundResource(row.context.resolveSelectableItemBackground())
             }
 
@@ -416,10 +430,6 @@ class GroupSettingsActivity(
         val outValue = android.util.TypedValue()
         theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, outValue, true)
         return outValue.resourceId
-    }
-
-    private fun Int.dpToPx(): Int {
-        return (this * resources.displayMetrics.density).toInt()
     }
 
     @SuppressLint("CommitTransaction")
