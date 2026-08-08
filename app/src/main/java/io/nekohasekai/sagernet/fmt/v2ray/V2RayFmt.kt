@@ -738,7 +738,9 @@ fun buildSingBoxOutboundStreamSettings(bean: StandardV2RayBean): V2RayTransportO
                     // Convert base config to JSON
                     val baseJson = JSONObject(gson.toJson(baseConfig))
                     // Parse extra config
-                    val extraJson = JSONObject(bean.xhttpExtra)
+                    // Normalize legacy numeric XHTTP ranges on every build so existing
+                    // subscription entries do not require re-importing to become valid.
+                    val extraJson = JSONObject(XhttpExtraConverter.xrayToSingBox(bean.xhttpExtra))
                     // Merge extra fields into base config
                     val allowedKeys = arrayOf(
                         "download",
