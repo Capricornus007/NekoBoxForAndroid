@@ -24,7 +24,7 @@
 **The Google Play version has been controlled by a third party since May 2024 and is a non-open
 source version. Please do not download it.**
 
-## 更新日志 & Telegram 发布频道 / Changelog & Telegram Channel
+## 交流反馈 / Feedback
 
 https://t.me/Matsuridayo
 
