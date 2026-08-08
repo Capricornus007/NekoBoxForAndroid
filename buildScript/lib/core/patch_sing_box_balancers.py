@@ -61,6 +61,32 @@ def ensure_managed_urltest_priority_support(urltest: pathlib.Path):
     urltest.write_text(text)
 
 
+def ensure_priority_initial_check_is_sequential(urltest: pathlib.Path):
+    text = urltest.read_text()
+    text = text.replace(
+        '''\tif waitForInitial {
+\t\tg.CheckOutbounds(true)
+\t} else {
+''',
+        '''\tif waitForInitial {
+\t\tg.CheckOutbounds(shouldForceInitialCheck(g.strategy))
+\t} else {
+''',
+        1,
+    )
+    if "func shouldCheckPrioritySequential" in text and "func shouldForceInitialCheck" not in text:
+        text = text.replace(
+            "func shouldCheckPrioritySequential(strategy string, force bool) bool {",
+            '''func shouldForceInitialCheck(strategy string) bool {
+\treturn strategy != "priority"
+}
+
+func shouldCheckPrioritySequential(strategy string, force bool) bool {''',
+            1,
+        )
+    urltest.write_text(text)
+
+
 def main():
     if len(sys.argv) != 2:
         raise SystemExit("usage: patch_sing_box_balancers.py <sing-box-dir>")
@@ -94,6 +120,7 @@ def main():
     )
 
     urltest = root / "protocol" / "group" / "urltest.go"
+    ensure_priority_initial_check_is_sequential(urltest)
     patch_file(
         urltest,
         '''\tinterval                     time.Duration
@@ -279,7 +306,7 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
 \tg.started = true
 \tg.lastActive.Store(time.Now())
 \tif waitForInitial {
-\t\tg.CheckOutbounds(true)
+\t\tg.CheckOutbounds(shouldForceInitialCheck(g.strategy))
 \t} else {
 \t\tgo g.CheckOutbounds(false)
 \t}
@@ -445,7 +472,11 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
         urltest,
         '''func (g *URLTestGroup) urlTest(ctx context.Context, force bool) (map[string]uint16, error) {
 ''',
-        '''func shouldCheckPrioritySequential(strategy string, force bool) bool {
+        '''func shouldForceInitialCheck(strategy string) bool {
+\treturn strategy != "priority"
+}
+
+func shouldCheckPrioritySequential(strategy string, force bool) bool {
 \treturn strategy == "priority" && !force
 }
 
@@ -576,6 +607,15 @@ func TestPriorityCheckModes(t *testing.T) {
 \t}
 \tif shouldCheckPrioritySequential("fastest", false) {
 \t\tt.Fatal("fastest check must remain parallel")
+\t}
+}
+
+func TestInitialCheckModes(t *testing.T) {
+\tif shouldForceInitialCheck("priority") {
+\t\tt.Fatal("initial priority check must be sequential")
+\t}
+\tif !shouldForceInitialCheck("fastest") {
+\t\tt.Fatal("initial fastest check must remain forced and parallel")
 \t}
 }
 
