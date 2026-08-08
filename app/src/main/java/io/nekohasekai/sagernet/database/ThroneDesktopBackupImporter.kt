@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets
  * 解析 Throne 电脑版 `.thrbackup`（QDataStream + 内嵌 SQLite），
  * 并尽力映射为 T4A 的分组/节点、路由规则与设置。
  *
- * 忽略自定义图标（icons/*）。
+ * 忽略自定义图标（icons/ 下文件）。
  */
 object ThroneDesktopBackupImporter {
 
@@ -76,7 +76,7 @@ object ThroneDesktopBackupImporter {
             val key = readQString(buf) ?: return@repeat
             val value = readQByteArray(buf) ?: return@repeat
             if (key == "database") databaseBytes = value
-            // icons/* intentionally ignored
+            // icons/ entries intentionally ignored
         }
         if (databaseBytes == null) {
             throw InvalidBackupException("backup has no database payload")
