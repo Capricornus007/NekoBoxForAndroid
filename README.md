@@ -15,7 +15,7 @@
 
 ## 下载 / Downloads
 
-[![GitHub All Releases](https://img.shields.io/github/downloads/Matsuridayo/NekoBoxForAndroid/total?label=downloads-total&logo=github&style=flat-square)](https://github.com/dsfkjlweuyr/ThroneForAndroid/releases)
+[![GitHub All Releases](https://img.shields.io/github/downloads/dsfkjlweuyr/ThroneForAndroid/total?label=downloads-total&logo=github&style=flat-square)](https://github.com/dsfkjlweuyr/ThroneForAndroid/releases)
 
 [GitHub Releases 下载](https://github.com/dsfkjlweuyr/ThroneForAndroid/releases)
 
