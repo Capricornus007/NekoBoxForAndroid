@@ -101,6 +101,15 @@
                         android:text="@string/action_import_file"
                         android:textColor="?whiteOrTextPrimary" />
 
+                    <Button
+                        android:id="@+id/action_import_throne_desktop"
+                        style="@style/Widget.SagerNet.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cornerRadius="24dp"
+                        android:text="@string/action_import_throne_desktop"
+                        android:textColor="?whiteOrTextPrimary" />
+
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

@@ -449,12 +449,15 @@
     <string name="backup_summary">如果路由规则不与配置一起备份，则自定义出站将丢失。</string>
     <string name="backup_settings">设置</string>
     <string name="backup_not_file">不是一个备份文件，预期 .json，但 %s</string>
+    <string name="backup_not_throne_desktop">不是 Throne 电脑版备份文件，预期 .thrbackup，但 %s</string>
     <string name="backup_rules">路由规则</string>
     <string name="nat_result_hint">NAT 测试结果</string>
     <string name="nat_stun_server_hint">Stun 服务器</string>
     <string name="invalid_backup_file">无效的备份文件</string>
     <string name="backup_import_summary">导入将覆盖现有的数据。</string>
     <string name="backup_importing">正导入…</string>
+    <string name="action_import_throne_desktop">从Throne电脑版导入</string>
+    <string name="backup_import_throne_desktop_summary">从 Throne 电脑版 .thrbackup 导入配置档、路由与设置（忽略自定义图标）。勾选的类别将覆盖本地现有数据。</string>
     <string name="action_copy">复制</string>
     <string name="action_open">打开</string>
     <string name="please_update">您的 APP (%s) 太旧了喵，%s 再不更新就没的用了喵～</string>

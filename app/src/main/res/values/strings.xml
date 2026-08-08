@@ -530,10 +530,13 @@
     <string name="backup_summary">If the routing settings are not backed up with configurations,
         then custom outbounds will be lost.</string>
     <string name="backup_not_file">Not an backup file: excepted .json, but %s</string>
+    <string name="backup_not_throne_desktop">Not a Throne desktop backup: expected .thrbackup, but %s</string>
     <string name="invalid_backup_file">Invalid backup file</string>
     <string name="backup_import">Import</string>
     <string name="backup_import_summary">Importing will overwrite the existing data.</string>
     <string name="backup_importing">Importing…</string>
+    <string name="action_import_throne_desktop">Import from Throne desktop</string>
+    <string name="backup_import_throne_desktop_summary">Import profiles, routes and settings from a Throne desktop .thrbackup file. Custom icons are ignored. Existing data in selected categories will be overwritten.</string>
 
     <string name="packet_encoding">Packet Encoding</string>
     <string name="acquire_wake_lock">Acquire WakeLock</string>
