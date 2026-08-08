@@ -455,7 +455,7 @@
     <string name="nat_stun_server_hint">Stun 服务器</string>
     <string name="invalid_backup_file">无效的备份文件</string>
     <string name="backup_import_summary">导入将覆盖现有的数据。</string>
-    <string name="backup_importing">正导入…</string>
+    <string name="backup_importing">正在导入…</string>
     <string name="action_import_throne_desktop">从Throne电脑版导入</string>
     <string name="backup_import_throne_desktop_summary">从 Throne 电脑版 .thrbackup 导入配置档、路由与设置（忽略自定义图标）。勾选的类别将覆盖本地现有数据。</string>
     <string name="action_copy">复制</string>
