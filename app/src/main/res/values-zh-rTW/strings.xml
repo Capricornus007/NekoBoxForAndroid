@@ -422,6 +422,9 @@
     <string name="backup_groups_and_configurations">分組和設定檔</string>
     <string name="backup_summary">如果路由規則不與設定檔一起備份，則自訂出站將丟失。</string>
     <string name="backup_not_file">不是一個備份檔案，預計 .json，但 %s</string>
+    <string name="backup_not_throne_desktop">不是 Throne 電腦版備份檔案，預期 .thrbackup，但 %s</string>
+    <string name="action_import_throne_desktop">從 Throne 電腦版匯入</string>
+    <string name="backup_import_throne_desktop_summary">從 Throne 電腦版 .thrbackup 匯入設定檔、路由與設定（忽略自訂圖示）。勾選的類別將覆蓋本機現有資料。</string>
     <string name="packet_encoding">封包編碼</string>
     <string name="menu_dashboard">sing-box 儀表板</string>
     <string name="action_copy">複製</string>

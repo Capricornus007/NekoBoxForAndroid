@@ -9,4 +9,7 @@
     <string name="project">Progetto</string>
     <string name="app_desc">La toolchain proxy universale per Android, scritta in Kotlin.</string>
     <string name="preview_hint_dont_show_again">Non mostrare più</string>
+    <string name="backup_not_throne_desktop">Non è un backup Throne desktop: previsto .thrbackup, ma %s</string>
+    <string name="action_import_throne_desktop">Importa da Throne desktop</string>
+    <string name="backup_import_throne_desktop_summary">Importa profili, route e impostazioni da un file .thrbackup di Throne desktop. Le icone personalizzate vengono ignorate. I dati esistenti delle categorie selezionate verranno sovrascritti.</string>
 </resources>

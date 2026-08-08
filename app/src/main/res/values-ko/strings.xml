@@ -430,6 +430,9 @@
     <string name="backup_settings">설정</string>
     <string name="backup_summary">라우팅 설정을 구성과 함께 백업하지 않으면 사용자 지정 아웃바운드가 손실됩니다.</string>
     <string name="backup_not_file">백업 파일이 아닙니다: .json을 예상했으나 %s</string>
+    <string name="backup_not_throne_desktop">Throne 데스크톱 백업이 아닙니다: .thrbackup을 예상했으나 %s</string>
+    <string name="action_import_throne_desktop">Throne 데스크톱에서 가져오기</string>
+    <string name="backup_import_throne_desktop_summary">Throne 데스크톱 .thrbackup에서 프로필, 라우트, 설정을 가져옵니다(사용자 지정 아이콘 무시). 선택한 범주의 기존 데이터를 덮어씁니다.</string>
     <string name="invalid_backup_file">잘못된 백업 파일</string>
     <string name="backup_import">가져오기</string>
     <string name="backup_import_summary">가져오면 기존 데이터를 덮어씁니다.</string>

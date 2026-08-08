@@ -383,4 +383,7 @@
     <string name="ssh_public_key">المفتاح العمومي</string>
     <string name="ssh_auth_type_none">لا شيء</string>
     <string name="preview_hint_dont_show_again">عدم الإظهار مرة أخرى</string>
+    <string name="backup_not_throne_desktop">ليست نسخة احتياطية لـ Throne لسطح المكتب: المتوقع .thrbackup، لكن %s</string>
+    <string name="action_import_throne_desktop">استيراد من Throne لسطح المكتب</string>
+    <string name="backup_import_throne_desktop_summary">استيراد الملفات الشخصية والمسارات والإعدادات من ملف .thrbackup لـ Throne لسطح المكتب. يتم تجاهل الأيقونات المخصصة. ستُستبدل البيانات الحالية للفئات المحددة.</string>
 </resources>

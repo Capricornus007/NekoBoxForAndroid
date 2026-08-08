@@ -304,5 +304,8 @@
     <string name="backup_import_summary">L\'importation écrasera les données existantes.</string>
     <string name="tools_network">Réseaux</string>
     <string name="backup_importing">Importation…</string>
+    <string name="backup_not_throne_desktop">Ce n’est pas une sauvegarde Throne bureau : .thrbackup attendu, mais %s</string>
+    <string name="action_import_throne_desktop">Importer depuis Throne bureau</string>
+    <string name="backup_import_throne_desktop_summary">Importe profils, routes et paramètres depuis un fichier .thrbackup Throne bureau. Les icônes personnalisées sont ignorées. Les données existantes des catégories sélectionnées seront écrasées.</string>
     <string name="preview_hint_dont_show_again">Ne plus afficher</string>
 </resources>

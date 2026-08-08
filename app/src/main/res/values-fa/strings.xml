@@ -469,6 +469,9 @@
     <string name="backup_settings">تنظیمات</string>
     <string name="backup_summary">اگر از دستورالعمل‌های مسیریابی با پیکربندی‌ها، پشتیبان‌گیری نشود، خروجی‌های سفارشی از بین خواهند رفت.</string>
     <string name="backup_not_file">یک فایل پشتیبانی نیست.: انتظار می‌رود یک فایل .json باشد اما %s است.</string>
+    <string name="backup_not_throne_desktop">پشتیبان Throne دسکتاپ نیست: انتظار .thrbackup می‌رفت اما %s است</string>
+    <string name="action_import_throne_desktop">ورود از Throne دسکتاپ</string>
+    <string name="backup_import_throne_desktop_summary">ورود پروفایل‌ها، مسیرها و تنظیمات از فایل .thrbackup دسکتاپ Throne. آیکون‌های سفارشی نادیده گرفته می‌شوند. داده‌های موجود در دسته‌های انتخاب‌شده بازنویسی می‌شوند.</string>
     <string name="invalid_backup_file">فایل پشتیبانی نادرست</string>
     <string name="backup_import">افزودن</string>
     <string name="backup_import_summary">افزودن فایل پشتیبانی، اطلاعات و تنظیمات کنونی را حذف و بازنویسی می‌کند.</string>

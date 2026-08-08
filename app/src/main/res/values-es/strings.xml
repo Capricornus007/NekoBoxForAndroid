@@ -440,6 +440,9 @@
     <string name="backup_settings">Ajustes</string> 
     <string name="backup_summary">Si no se realiza un respaldo de los ajustes de enrutamiento con las configuraciones, se perderán las salidas personalizadas.</string> 
     <string name="backup_not_file">No es un archivo de respaldo: excepto .json, pero %s</string> 
+    <string name="backup_not_throne_desktop">No es una copia de Throne de escritorio: se esperaba .thrbackup, pero %s</string>
+    <string name="action_import_throne_desktop">Importar desde Throne de escritorio</string>
+    <string name="backup_import_throne_desktop_summary">Importa perfiles, rutas y ajustes desde un .thrbackup de Throne de escritorio. Se ignoran los iconos personalizados. Los datos existentes de las categorías seleccionadas se sobrescribirán.</string>
     <string name="invalid_backup_file">Archivo de respaldo no válido</string> 
     <string name="backup_import">Importar</string> 
     <string name="backup_import_summary">La importación sobrescribirá los datos existentes.</string> 

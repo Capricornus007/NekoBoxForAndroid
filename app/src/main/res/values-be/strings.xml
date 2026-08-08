@@ -113,4 +113,7 @@
     <string name="menu_group">Група</string>
     <string name="menu_configuration">Канфігурацыя</string>
     <string name="preview_hint_dont_show_again">Больш не паказваць</string>
+    <string name="backup_not_throne_desktop">Гэта не рэзервовая копія Throne для ПК: чакаўся .thrbackup, а не %s</string>
+    <string name="action_import_throne_desktop">Імпарт з Throne для ПК</string>
+    <string name="backup_import_throne_desktop_summary">Імпарт профіляў, маршрутаў і налад з .thrbackup Throne для ПК. Карыстальніцкія значкі ігнаруюцца. Існуючыя даныя выбраных катэгорый будуць перазапісаны.</string>
 </resources>

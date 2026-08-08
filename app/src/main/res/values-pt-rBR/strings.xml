@@ -22,4 +22,7 @@
     <string name="mixed_inbound_disabled">Desativado</string>
     <string name="disable_mixed_inbound_proxy_toast">A desativação só tem efeito no modo TUN; porta de escuta atual: %1$d</string>
     <string name="preview_hint_dont_show_again">Não mostrar novamente</string>
+    <string name="backup_not_throne_desktop">Não é um backup do Throne para desktop: esperado .thrbackup, mas %s</string>
+    <string name="action_import_throne_desktop">Importar do Throne para desktop</string>
+    <string name="backup_import_throne_desktop_summary">Importa perfis, rotas e configurações de um arquivo .thrbackup do Throne para desktop. Ícones personalizados são ignorados. Os dados existentes das categorias selecionadas serão sobrescritos.</string>
 </resources>

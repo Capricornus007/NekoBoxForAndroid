@@ -393,4 +393,7 @@
 \n
 \nBunu kullanmanız gerekiyorsa, sorunlarınızı çözüp çözmediğini görmek için önce N=2 değerini deneyin. Burada 4\'ten fazla bağlantı kullanmamanızı şiddetle tavsiye ederiz.</string>
     <string name="preview_hint_dont_show_again">Bir daha gösterme</string>
+    <string name="backup_not_throne_desktop">Throne masaüstü yedeği değil: .thrbackup bekleniyordu, ancak %s</string>
+    <string name="action_import_throne_desktop">Throne masaüstünden içe aktar</string>
+    <string name="backup_import_throne_desktop_summary">Throne masaüstü .thrbackup dosyasından profilleri, rotaları ve ayarları içe aktarır. Özel simgeler yok sayılır. Seçili kategorilerdeki mevcut verilerin üzerine yazılır.</string>
 </resources>

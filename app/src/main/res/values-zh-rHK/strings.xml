@@ -102,4 +102,7 @@
     <string name="card_style_classic">經典</string>
     <string name="card_style_stroke">描邊</string>
     <string name="preview_hint_dont_show_again">不再顯示</string>
+    <string name="backup_not_throne_desktop">不是 Throne 電腦版備份檔案，預期 .thrbackup，但 %s</string>
+    <string name="action_import_throne_desktop">從 Throne 電腦版匯入</string>
+    <string name="backup_import_throne_desktop_summary">從 Throne 電腦版 .thrbackup 匯入設定檔、路由與設定（忽略自訂圖示）。勾選的類別將覆蓋本機現有資料。</string>
 </resources>

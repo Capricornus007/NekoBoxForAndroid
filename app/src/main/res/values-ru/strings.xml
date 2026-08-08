@@ -61,6 +61,9 @@
 <string name="backup_import_summary">При импорте существующие данные будут перезаписаны.</string>
 <string name="backup_importing">Импортирование…</string>
 <string name="backup_not_file">Не файл резервной копии: ожидался .json, а не %s</string>
+<string name="backup_not_throne_desktop">Это не резервная копия Throne для ПК: ожидался .thrbackup, а не %s</string>
+<string name="action_import_throne_desktop">Импорт из Throne для ПК</string>
+<string name="backup_import_throne_desktop_summary">Импорт профилей, маршрутов и настроек из .thrbackup Throne для ПК. Пользовательские значки игнорируются. Существующие данные выбранных категорий будут перезаписаны.</string>
 <string name="backup_rules">Правила маршрутизации</string>
 <string name="backup_settings">Настройки</string>
 <string name="backup_summary">Если правила маршрутизации резервируются без конфигураций, то пользовательские исходящие соединения будут потеряны.</string>

@@ -436,6 +436,9 @@
     <string name="backup_settings">設定</string>
     <string name="backup_summary">ルーティング設定を構成と一緒にバックアップしないと、カスタムアウトバウンドが失われます。</string>
     <string name="backup_not_file">バックアップファイルではありません: .json を期待しましたが %s でした</string>
+    <string name="backup_not_throne_desktop">Throne デスクトップのバックアップではありません: .thrbackup を期待しましたが %s でした</string>
+    <string name="action_import_throne_desktop">Throne デスクトップからインポート</string>
+    <string name="backup_import_throne_desktop_summary">Throne デスクトップの .thrbackup からプロファイル、ルート、設定をインポートします（カスタムアイコンは無視）。選択したカテゴリの既存データは上書きされます。</string>
     <string name="invalid_backup_file">無効なバックアップファイル</string>
     <string name="backup_import">インポート</string>
     <string name="backup_import_summary">インポートすると既存のデータが上書きされます。</string>

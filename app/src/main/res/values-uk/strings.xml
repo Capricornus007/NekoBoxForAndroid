@@ -455,6 +455,9 @@
     <string name="backup_settings">Налаштування</string>
     <string name="backup_summary">Якщо налаштування маршрутизації не будуть збережені разом з конфігураціями, власні вихідні з\'єднання будуть втрачені.</string>
     <string name="backup_not_file">Не є файлом резервної копії: очікувався .json, але отримано %s</string>
+    <string name="backup_not_throne_desktop">Це не резервна копія Throne для ПК: очікувався .thrbackup, але %s</string>
+    <string name="action_import_throne_desktop">Імпорт із Throne для ПК</string>
+    <string name="backup_import_throne_desktop_summary">Імпорт профілів, маршрутів і налаштувань із .thrbackup Throne для ПК. Користувацькі піктограми ігноруються. Наявні дані вибраних категорій буде перезаписано.</string>
     <string name="invalid_backup_file">Неправильний файл резервної копії</string>
     <string name="backup_import">Імпорт</string>
     <string name="backup_import_summary">Імпортування перезапише наявні дані.</string>

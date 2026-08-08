@@ -204,4 +204,7 @@
     <string name="security">Enkripsi lapisan transportasi</string>
     <string name="alter_id">Ubah ID</string>
     <string name="preview_hint_dont_show_again">Jangan tampilkan lagi</string>
+    <string name="backup_not_throne_desktop">Bukan cadangan Throne desktop: diharapkan .thrbackup, tetapi %s</string>
+    <string name="action_import_throne_desktop">Impor dari Throne desktop</string>
+    <string name="backup_import_throne_desktop_summary">Mengimpor profil, rute, dan pengaturan dari file .thrbackup Throne desktop. Ikon kustom diabaikan. Data yang ada pada kategori terpilih akan ditimpa.</string>
 </resources>

@@ -375,4 +375,7 @@
     <string name="copy_label">Kopier navn</string>
     <string name="udp_connections">%d UDP-tilkoblinger</string>
     <string name="preview_hint_dont_show_again">Ikke vis igjen</string>
+    <string name="backup_not_throne_desktop">Ikke en Throne-skrivebordsbackup: forventet .thrbackup, men %s</string>
+    <string name="action_import_throne_desktop">Importer fra Throne-skrivebord</string>
+    <string name="backup_import_throne_desktop_summary">Importerer profiler, ruter og innstillinger fra en Throne-skrivebord .thrbackup-fil. Egendefinerte ikoner ignoreres. Eksisterende data i valgte kategorier overskrives.</string>
 </resources>
