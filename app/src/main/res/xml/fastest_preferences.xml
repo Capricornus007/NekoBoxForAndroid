@@ -1,0 +1,46 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        app:icon="@drawable/ic_social_emoji_symbols"
+        app:key="profileName"
+        app:title="@string/profile_name"
+        app:useSimpleSummaryProvider="true" />
+
+    <moe.matsuri.nb4a.ui.SimpleMenuPreference
+        app:entries="@array/fastest_candidate_mode_entry"
+        app:entryValues="@array/fastest_candidate_mode_value"
+        app:icon="@drawable/ic_baseline_filter_list_24"
+        app:key="fastestCandidateMode"
+        app:title="@string/fastest_candidate_mode"
+        app:useSimpleSummaryProvider="true" />
+
+    <PreferenceCategory
+        app:key="fastestRegexOptions"
+        app:title="@string/fastest_regex_options">
+
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:icon="@drawable/ic_baseline_view_list_24"
+            app:key="fastestSourceGroup"
+            app:title="@string/fastest_regex_source_group"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_social_emoji_symbols"
+            app:key="fastestNameRegex"
+            app:title="@string/fastest_regex_pattern"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:icon="@drawable/ic_baseline_filter_list_24"
+            app:key="fastestIgnoreCase"
+            app:title="@string/fastest_regex_ignore_case" />
+
+        <Preference
+            app:icon="@drawable/ic_baseline_manage_search_24"
+            app:key="fastestRegexPreview"
+            app:title="@string/fastest_regex_preview" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

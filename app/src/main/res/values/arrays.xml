@@ -820,4 +820,13 @@
         <item>60</item>
     </string-array>
 
+    <string-array name="fastest_candidate_mode_entry">
+        <item>Manual list</item>
+        <item>Subscription by regex</item>
+    </string-array>
+    <string-array name="fastest_candidate_mode_value">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
 </resources>

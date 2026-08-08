@@ -117,6 +117,12 @@ object Key {
     const val PROFILE_NAME = "profileName"
     const val PROFILE_GROUP = "profileGroup"
     const val PROFILE_CURRENT = "profileCurrent"
+    const val FASTEST_CANDIDATE_MODE = "fastestCandidateMode"
+    const val FASTEST_SOURCE_GROUP = "fastestSourceGroup"
+    const val FASTEST_NAME_REGEX = "fastestNameRegex"
+    const val FASTEST_IGNORE_CASE = "fastestIgnoreCase"
+    const val FASTEST_REGEX_OPTIONS = "fastestRegexOptions"
+    const val FASTEST_REGEX_PREVIEW = "fastestRegexPreview"
 
     const val SERVER_ADDRESS = "serverAddress"
     const val SERVER_PORT = "serverPort"

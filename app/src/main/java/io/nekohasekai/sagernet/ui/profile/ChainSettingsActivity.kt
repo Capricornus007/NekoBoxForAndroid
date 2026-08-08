@@ -14,33 +14,52 @@ import androidx.activity.result.component1
 import androidx.activity.result.component2
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
+import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.nekohasekai.sagernet.GroupType
+import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.database.ProxyEntity
+import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.databinding.LayoutAddEntityBinding
 import io.nekohasekai.sagernet.databinding.LayoutProfileBinding
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
+import io.nekohasekai.sagernet.fmt.internal.FastestCandidateResolutionError
+import io.nekohasekai.sagernet.fmt.internal.FastestCandidateResolutionException
+import io.nekohasekai.sagernet.fmt.internal.FastestCandidateResolver
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.ProfileSelectActivity
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import moe.matsuri.nb4a.Protocols.getProtocolColor
+import moe.matsuri.nb4a.ui.SimpleMenuPreference
 
 class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout_chain_settings) {
 
     companion object {
         const val EXTRA_STRATEGY = "chain_strategy"
+        const val EXTRA_CANDIDATE_MODE = "fastest_candidate_mode"
     }
 
     private var currentStrategy = ChainBean.STRATEGY_CHAIN
 
     override fun createEntity() = ChainBean().apply {
         strategy = intent.getIntExtra(EXTRA_STRATEGY, ChainBean.STRATEGY_CHAIN)
+        candidateMode = intent.getIntExtra(
+            EXTRA_CANDIDATE_MODE,
+            ChainBean.CANDIDATE_MODE_MANUAL,
+        )
+        if (strategy == ChainBean.STRATEGY_FASTEST &&
+            candidateMode == ChainBean.CANDIDATE_MODE_REGEX
+        ) {
+            sourceGroupId = defaultSubscriptionGroupId()
+        }
         currentStrategy = strategy
     }
 
@@ -50,17 +69,44 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         currentStrategy = strategy
         DataStore.profileName = name
         DataStore.serverProtocol = proxies.joinToString(",")
+        DataStore.fastestCandidateMode = candidateMode
+        DataStore.fastestSourceGroup = sourceGroupId
+        DataStore.fastestNameRegex = nameRegex
+        DataStore.fastestIgnoreCase = ignoreCase
     }
 
     override fun ChainBean.serialize() {
         name = DataStore.profileName
         strategy = currentStrategy
-        proxies = proxyList.map { it.id }
+        candidateMode = DataStore.fastestCandidateMode
+        sourceGroupId = DataStore.fastestSourceGroup
+        nameRegex = DataStore.fastestNameRegex.orEmpty()
+        ignoreCase = DataStore.fastestIgnoreCase
+        proxies = if (isRegexFastest()) {
+            DataStore.serverProtocol.split(",").mapNotNull {
+                it.takeIf(String::isNotBlank)?.toLongOrNull()
+            }
+        } else {
+            proxyList.map { it.id }
+        }
         initializeDefaultValues()
     }
 
     override suspend fun saveAndExit() {
-        if (proxyList.isEmpty()) {
+        if (isRegexFastest()) {
+            try {
+                FastestCandidateResolver.resolve(regexFastestBean())
+            } catch (e: FastestCandidateResolutionException) {
+                onMainDispatcher {
+                    Toast.makeText(
+                        this@ChainSettingsActivity,
+                        fastestResolutionMessage(e),
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
+                return
+            }
+        } else if (proxyList.isEmpty()) {
             onMainDispatcher {
                 Toast.makeText(this@ChainSettingsActivity, R.string.profile_empty, Toast.LENGTH_SHORT)
                     .show()
@@ -70,13 +116,71 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         super.saveAndExit()
     }
 
-    override fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.name_preferences)
+    override fun PreferenceFragmentCompat.createPreferences(
+        savedInstanceState: Bundle?,
+        rootKey: String?,
+    ) {
+        if (currentStrategy != ChainBean.STRATEGY_FASTEST) {
+            addPreferencesFromResource(R.xml.name_preferences)
+            return
+        }
+
+        addPreferencesFromResource(R.xml.fastest_preferences)
+
+        val candidateMode = findPreference<SimpleMenuPreference>(Key.FASTEST_CANDIDATE_MODE)!!
+        val sourceGroup = findPreference<SimpleMenuPreference>(Key.FASTEST_SOURCE_GROUP)!!
+        val regexOptions = findPreference<PreferenceCategory>(Key.FASTEST_REGEX_OPTIONS)!!
+        val preview = findPreference<Preference>(Key.FASTEST_REGEX_PREVIEW)!!
+
+        val subscriptionGroups = SagerDatabase.groupDao.allGroups()
+            .filter { it.type == GroupType.SUBSCRIPTION }
+        sourceGroup.entries = subscriptionGroups.map { it.displayName() }.toTypedArray()
+        sourceGroup.entryValues = subscriptionGroups.map { it.id.toString() }.toTypedArray()
+        sourceGroup.isEnabled = subscriptionGroups.isNotEmpty()
+        fun selectDefaultSourceGroupIfNeeded() {
+            if (DataStore.fastestSourceGroup == 0L) {
+                DataStore.fastestSourceGroup = subscriptionGroups.firstOrNull()?.id ?: 0L
+            }
+        }
+
+        fun updateCandidateMode(mode: Int) {
+            val useRegex = mode == ChainBean.CANDIDATE_MODE_REGEX
+            if (useRegex) selectDefaultSourceGroupIfNeeded()
+            regexOptions.isVisible = useRegex
+            configurationList.isVisible = !useRegex
+            configurationDivider.isVisible = !useRegex
+            if (!useRegex && proxyList.isEmpty()) {
+                runOnDefaultDispatcher {
+                    configurationAdapter.reload()
+                }
+            }
+        }
+
+        updateCandidateMode(DataStore.fastestCandidateMode)
+        candidateMode.setOnPreferenceChangeListener { _, newValue ->
+            if (DataStore.fastestCandidateMode == ChainBean.CANDIDATE_MODE_MANUAL) {
+                DataStore.serverProtocol = proxyList.joinToString(",") { it.id.toString() }
+            }
+            updateCandidateMode(newValue.toString().toInt())
+            true
+        }
+        preview.setOnPreferenceClickListener {
+            runOnDefaultDispatcher {
+                val result = runCatching {
+                    FastestCandidateResolver.resolve(regexFastestBean())
+                }
+                onMainDispatcher {
+                    showRegexPreview(result)
+                }
+            }
+            true
+        }
     }
 
     lateinit var configurationList: RecyclerView
     lateinit var configurationAdapter: ProxiesAdapter
     lateinit var layoutManager: LinearLayoutManager
+    lateinit var configurationDivider: View
 
     @SuppressLint("InlinedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,6 +195,7 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             },
         )
         configurationList = findViewById(R.id.configuration_list)
+        configurationDivider = findViewById(R.id.list_cell)
         layoutManager = FixedLinearLayoutManager(configurationList)
         configurationList.layoutManager = layoutManager
         configurationAdapter = ProxiesAdapter()
@@ -148,14 +253,87 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             }
         }
 
-        runOnDefaultDispatcher {
-            configurationAdapter.reload()
+        if (!isRegexFastest()) {
+            runOnDefaultDispatcher {
+                configurationAdapter.reload()
+            }
         }
+    }
+
+    private fun isRegexFastest() =
+        currentStrategy == ChainBean.STRATEGY_FASTEST &&
+            DataStore.fastestCandidateMode == ChainBean.CANDIDATE_MODE_REGEX
+
+    private fun defaultSubscriptionGroupId(): Long {
+        val selected = SagerDatabase.groupDao.getById(DataStore.selectedGroup)
+        return selected?.takeIf { it.type == GroupType.SUBSCRIPTION }?.id
+            ?: SagerDatabase.groupDao.allGroups().firstOrNull {
+                it.type == GroupType.SUBSCRIPTION
+            }?.id
+            ?: 0L
+    }
+
+    private fun regexFastestBean() = ChainBean().apply {
+        strategy = ChainBean.STRATEGY_FASTEST
+        candidateMode = ChainBean.CANDIDATE_MODE_REGEX
+        sourceGroupId = DataStore.fastestSourceGroup
+        nameRegex = DataStore.fastestNameRegex.orEmpty()
+        ignoreCase = DataStore.fastestIgnoreCase
+    }
+
+    private fun fastestResolutionMessage(exception: FastestCandidateResolutionException): String {
+        return when (exception.error) {
+            FastestCandidateResolutionError.EMPTY_REGEX ->
+                getString(R.string.fastest_regex_error_empty)
+
+            FastestCandidateResolutionError.INVALID_REGEX -> getString(
+                R.string.fastest_regex_error_invalid,
+                exception.cause?.message.orEmpty(),
+            )
+
+            FastestCandidateResolutionError.SOURCE_GROUP_MISSING ->
+                getString(R.string.fastest_regex_error_source_missing)
+
+            FastestCandidateResolutionError.SOURCE_GROUP_NOT_SUBSCRIPTION ->
+                getString(R.string.fastest_regex_error_source_not_subscription)
+
+            FastestCandidateResolutionError.DUPLICATE_MANUAL_CANDIDATES ->
+                getString(R.string.profile_reference_not_allowed)
+        }
+    }
+
+    private fun showRegexPreview(result: Result<List<ProxyEntity>>) {
+        val message = result.fold(
+            onSuccess = { candidates ->
+                if (candidates.isEmpty()) {
+                    getString(R.string.fastest_regex_preview_no_matches)
+                } else {
+                    buildString {
+                        append(getString(R.string.fastest_regex_preview_count, candidates.size))
+                        append("\n\n")
+                        append(candidates.joinToString("\n") { it.displayName() })
+                    }
+                }
+            },
+            onFailure = { error ->
+                if (error is FastestCandidateResolutionException) {
+                    fastestResolutionMessage(error)
+                } else {
+                    error.message ?: error.toString()
+                }
+            },
+        )
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.fastest_regex_preview)
+            .setMessage(message)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     inner class ProxiesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         suspend fun reload() {
+            proxyList.clear()
             val idList = DataStore.serverProtocol.split(",")
                 .mapNotNull { it.takeIf { it.isNotBlank() }?.toLong() }
             if (idList.isNotEmpty()) {

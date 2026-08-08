@@ -19,8 +19,15 @@ public class ChainBean extends InternalBean {
     public static final int STRATEGY_WATERFALL = 1;
     public static final int STRATEGY_FASTEST = 2;
 
+    public static final int CANDIDATE_MODE_MANUAL = 0;
+    public static final int CANDIDATE_MODE_REGEX = 1;
+
     public List<Long> proxies;
     public int strategy;
+    public int candidateMode;
+    public long sourceGroupId;
+    public String nameRegex;
+    public boolean ignoreCase = true;
 
     @Override
     public String displayName() {
@@ -51,12 +58,20 @@ public class ChainBean extends InternalBean {
         if (proxies == null) {
             proxies = new ArrayList<>();
         }
+        if (nameRegex == null) nameRegex = "";
+        if (candidateMode != CANDIDATE_MODE_REGEX) {
+            candidateMode = CANDIDATE_MODE_MANUAL;
+        }
     }
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(2);
+        output.writeInt(3);
         output.writeInt(strategy);
+        output.writeInt(candidateMode);
+        output.writeLong(sourceGroupId);
+        output.writeString(nameRegex);
+        output.writeBoolean(ignoreCase);
         output.writeInt(proxies.size());
         for (Long proxy : proxies) {
             output.writeLong(proxy);
@@ -74,6 +89,17 @@ public class ChainBean extends InternalBean {
             strategy = input.readInt();
         } else {
             strategy = STRATEGY_CHAIN;
+        }
+        if (version >= 3) {
+            candidateMode = input.readInt();
+            sourceGroupId = input.readLong();
+            nameRegex = input.readString();
+            ignoreCase = input.readBoolean();
+        } else {
+            candidateMode = CANDIDATE_MODE_MANUAL;
+            sourceGroupId = 0L;
+            nameRegex = "";
+            ignoreCase = true;
         }
         int length = input.readInt();
         proxies = new ArrayList<>();

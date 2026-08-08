@@ -18,6 +18,7 @@ import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.buildSingBoxOutboundHysteriaBean
 import io.nekohasekai.sagernet.fmt.internal.BalancerBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
+import io.nekohasekai.sagernet.fmt.internal.FastestCandidateResolver
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.juicity.buildSingBoxOutboundJuicityBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
@@ -451,6 +452,13 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
         @Suppress("UNCHECKED_CAST")
         fun buildChain(chainId: Long, entity: ProxyEntity): String {
+            // 动态分组（最快 / 瀑布）不做链路展平，改为构建 urltest 分组。
+            // 静态候选仍交回 buildChain 构建，与 main 现有链路建置架构对齐。
+            if (entity.type == ProxyEntity.TYPE_FASTEST ||
+                entity.type == ProxyEntity.TYPE_WATERFALL
+            ) {
+                return buildDynamicGroup(entity, managedByParent = false)
+            }
             val profileList = entity.resolveChain()
             // profileList 的顺序即应用流量经过各 outbound 的顺序：前一跳通过
             // detour 交给后一跳拨号，最后一项直接连接物理网络。
@@ -742,6 +750,69 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
             trafficMap[chainTagOut] = chainTrafficSet.toList()
             return chainTagOut
+        }
+
+        // 构建动态分组（最快 / 瀑布）的 urltest outbound。
+        // 由 sf 分支的 buildProfile 移植而来，并对齐 main 重构后的架构：
+        // 静态候选改由 buildChain 构建（原 buildStaticChain 已在 main 合并进 buildChain）。
+        fun buildDynamicGroup(
+            entity: ProxyEntity,
+            managedByParent: Boolean = false,
+        ): String {
+            val bean = entity.chainBean ?: error("Missing dynamic profile data")
+            val candidates = if (entity.type == ProxyEntity.TYPE_FASTEST) {
+                FastestCandidateResolver.resolve(bean)
+            } else {
+                if (bean.proxies.size != bean.proxies.distinct().size) {
+                    error("Dynamic proxy profile contains duplicate candidates")
+                }
+                val profilesById = SagerDatabase.proxyDao.getEntities(bean.proxies).associateBy { it.id }
+                bean.proxies.mapNotNull(profilesById::get)
+            }
+            if (candidates.isEmpty()) {
+                error("Dynamic proxy profile has no available candidates")
+            }
+
+            val candidateTags = candidates.map { candidate ->
+                when {
+                    entity.type == ProxyEntity.TYPE_WATERFALL &&
+                        candidate.type == ProxyEntity.TYPE_FASTEST ->
+                        buildDynamicGroup(candidate, managedByParent = true)
+
+                    candidate.type == ProxyEntity.TYPE_WATERFALL ||
+                        candidate.type == ProxyEntity.TYPE_FASTEST ->
+                        error("Unsupported nested dynamic proxy profile")
+
+                    else -> buildChain(candidate.id, candidate)
+                }
+            }
+
+            val groupTag = readableTag(entity.displayName())
+            outbounds.add(Outbound_URLTestOptions().apply {
+                type = "urltest"
+                tag = groupTag
+                outbounds = candidateTags
+                url = DataStore.connectionTestURL
+                interval = "10m"
+                idle_timeout = "30m"
+                timeout = "${DataStore.connectionTestTimeout}ms"
+                tolerance = if (entity.type == ProxyEntity.TYPE_FASTEST) 50 else 0
+                strategy = if (entity.type == ProxyEntity.TYPE_WATERFALL) {
+                    "priority"
+                } else {
+                    "fastest"
+                }
+                managed_by_parent = managedByParent
+                wait_for_initial = true
+            })
+
+            trafficMap[groupTag] = buildList {
+                add(entity)
+                candidateTags.forEach { tag ->
+                    addAll(trafficMap[tag].orEmpty())
+                }
+            }.distinctBy { it.id }
+            return groupTag
         }
 
         if (buildSelector) {

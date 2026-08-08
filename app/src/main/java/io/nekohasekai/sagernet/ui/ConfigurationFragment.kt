@@ -683,6 +683,16 @@ class ConfigurationFragment @JvmOverloads constructor(
                 startActivity(Intent(requireActivity(), BalancerSettingsActivity::class.java))
             }
 
+            R.id.action_new_fastest_regex -> {
+                startActivity(Intent(requireActivity(), ChainSettingsActivity::class.java).apply {
+                    putExtra(ChainSettingsActivity.EXTRA_STRATEGY, ChainBean.STRATEGY_FASTEST)
+                    putExtra(
+                        ChainSettingsActivity.EXTRA_CANDIDATE_MODE,
+                        ChainBean.CANDIDATE_MODE_REGEX,
+                    )
+                })
+            }
+
             R.id.action_update_subscription -> {
                 val group = DataStore.currentGroup()
                 if (group.type != GroupType.SUBSCRIPTION) {

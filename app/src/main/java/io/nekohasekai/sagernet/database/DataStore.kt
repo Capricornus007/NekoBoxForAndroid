@@ -316,6 +316,10 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var editingId by profileCacheStore.long(Key.PROFILE_ID)
     var editingGroup by profileCacheStore.long(Key.PROFILE_GROUP)
     var profileName by profileCacheStore.string(Key.PROFILE_NAME)
+    var fastestCandidateMode by profileCacheStore.stringToInt(Key.FASTEST_CANDIDATE_MODE) { 0 }
+    var fastestSourceGroup by profileCacheStore.long(Key.FASTEST_SOURCE_GROUP)
+    var fastestNameRegex by profileCacheStore.string(Key.FASTEST_NAME_REGEX)
+    var fastestIgnoreCase by profileCacheStore.boolean(Key.FASTEST_IGNORE_CASE) { true }
     var serverAddress by profileCacheStore.string(Key.SERVER_ADDRESS)
     var serverPort by profileCacheStore.stringToInt(Key.SERVER_PORT)
     var serverPorts by profileCacheStore.string("serverPorts")
