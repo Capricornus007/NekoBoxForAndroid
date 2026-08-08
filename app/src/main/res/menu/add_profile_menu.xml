@@ -100,9 +100,6 @@
                         android:id="@+id/action_new_fastest"
                         android:title="@string/proxy_fastest" />
                     <item
-                        android:id="@+id/action_new_fastest_regex"
-                        android:title="@string/proxy_fastest_regex" />
-                    <item
                         android:id="@+id/action_new_balancer"
                         android:title="@string/balancer" />
                 </menu>

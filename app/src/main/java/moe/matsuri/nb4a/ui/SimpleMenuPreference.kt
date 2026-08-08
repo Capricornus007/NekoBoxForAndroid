@@ -55,11 +55,13 @@ open class SimpleMenuPreference
     }
 
     override fun onClick() {
-        val selected = entryValues.indexOf(value)
+        val values = entryValues ?: return
+        val labels = entries ?: return
+        val selected = values.indexOf(value)
         MaterialAlertDialogBuilder(context)
             .setTitle(title)
-            .setSingleChoiceItems(entries, selected) { dialog, which ->
-                val newValue = entryValues[which].toString()
+            .setSingleChoiceItems(labels, selected) { dialog, which ->
+                val newValue = values[which].toString()
                 if (callChangeListener(newValue)) value = newValue
                 dialog.dismiss()
             }

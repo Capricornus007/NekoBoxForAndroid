@@ -44,22 +44,12 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
 
     companion object {
         const val EXTRA_STRATEGY = "chain_strategy"
-        const val EXTRA_CANDIDATE_MODE = "fastest_candidate_mode"
     }
 
     private var currentStrategy = ChainBean.STRATEGY_CHAIN
 
     override fun createEntity() = ChainBean().apply {
         strategy = intent.getIntExtra(EXTRA_STRATEGY, ChainBean.STRATEGY_CHAIN)
-        candidateMode = intent.getIntExtra(
-            EXTRA_CANDIDATE_MODE,
-            ChainBean.CANDIDATE_MODE_MANUAL,
-        )
-        if (strategy == ChainBean.STRATEGY_FASTEST &&
-            candidateMode == ChainBean.CANDIDATE_MODE_REGEX
-        ) {
-            sourceGroupId = defaultSubscriptionGroupId()
-        }
         currentStrategy = strategy
     }
 
@@ -263,15 +253,6 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
     private fun isRegexFastest() =
         currentStrategy == ChainBean.STRATEGY_FASTEST &&
             DataStore.fastestCandidateMode == ChainBean.CANDIDATE_MODE_REGEX
-
-    private fun defaultSubscriptionGroupId(): Long {
-        val selected = SagerDatabase.groupDao.getById(DataStore.selectedGroup)
-        return selected?.takeIf { it.type == GroupType.SUBSCRIPTION }?.id
-            ?: SagerDatabase.groupDao.allGroups().firstOrNull {
-                it.type == GroupType.SUBSCRIPTION
-            }?.id
-            ?: 0L
-    }
 
     private fun regexFastestBean() = ChainBean().apply {
         strategy = ChainBean.STRATEGY_FASTEST
