@@ -308,7 +308,6 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 		}
 		latency, err = urlTest(i.Box, connectionTracker, link, timeout)
 	}
-	latency, err = urlTest(client, link)
 	boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.UrlTest result latency=%dms err=%v", latency, err))
 	return
 }
