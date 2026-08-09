@@ -296,7 +296,6 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 		i = mainInstance
 	}
 	boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.UrlTest link=%s timeout=%dms instance=%v", link, timeout, i != nil))
-	var client *http.Client
 	if i == nil {
 		// 无实例：直连测试（单 GET，计时含拨号）
 		client := &http.Client{Timeout: time.Duration(timeout) * time.Millisecond}
