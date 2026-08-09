@@ -83,7 +83,7 @@ object ThroneDesktopBackupImporter {
         }
         if (databaseBytes!!.size < 16 ||
             !databaseBytes!!.copyOfRange(0, 16).contentEquals(
-                "SQLite format 3\u0000".toByteArray(Charsets.US_ASCII)
+                "SQLite format 3\u0000".toByteArray(Charsets.US_ASCII),
             )
         ) {
             throw InvalidBackupException("database payload is not SQLite")
@@ -120,16 +120,11 @@ object ThroneDesktopBackupImporter {
         )
     }
 
-    fun import(
-        parsed: ParsedBackup,
-        importProfiles: Boolean,
-        importRules: Boolean,
-        importSettings: Boolean,
-    ) {
+    fun import(parsed: ParsedBackup, importProfiles: Boolean, importRules: Boolean, importSettings: Boolean) {
         val db = SQLiteDatabase.openDatabase(
             parsed.dbFile.path,
             null,
-            SQLiteDatabase.OPEN_READONLY or SQLiteDatabase.NO_LOCALIZED_COLLATORS
+            SQLiteDatabase.OPEN_READONLY or SQLiteDatabase.NO_LOCALIZED_COLLATORS,
         )
         try {
             val settingsMap = readSettings(db)
@@ -188,8 +183,9 @@ object ThroneDesktopBackupImporter {
         hasSettings: Boolean,
     ): Triple<Boolean, Boolean, Boolean> {
         val db = SQLiteDatabase.openDatabase(
-            dbFile.path, null,
-            SQLiteDatabase.OPEN_READONLY or SQLiteDatabase.NO_LOCALIZED_COLLATORS
+            dbFile.path,
+            null,
+            SQLiteDatabase.OPEN_READONLY or SQLiteDatabase.NO_LOCALIZED_COLLATORS,
         )
         try {
             fun count(table: String): Int = try {
@@ -290,7 +286,7 @@ object ThroneDesktopBackupImporter {
                         landingProxyId = if (iLand >= 0) c.getLong(iLand) else -1L,
                         profilesJson = if (iProfiles >= 0) c.getString(iProfiles) ?: "[]" else "[]",
                         order = orderMap[id] ?: id,
-                    )
+                    ),
                 )
             }
         }
@@ -318,7 +314,7 @@ object ThroneDesktopBackupImporter {
                         trafficUp = if (iUp >= 0) c.getLong(iUp) else 0L,
                         trafficDl = if (iDl >= 0) c.getLong(iDl) else 0L,
                         latency = if (iLat >= 0) c.getInt(iLat) else 0,
-                    )
+                    ),
                 )
             }
         }
@@ -351,7 +347,7 @@ object ThroneDesktopBackupImporter {
                 ungrouped = true,
                 name = "Ungrouped",
                 type = GroupType.BASIC,
-            )
+            ),
         )
 
         for (g in deskGroups) {
@@ -481,7 +477,7 @@ object ThroneDesktopBackupImporter {
         for (rpId in targetIds) {
             db.rawQuery(
                 "SELECT * FROM route_rules WHERE route_profile_id = ? ORDER BY rule_order",
-                arrayOf(rpId.toString())
+                arrayOf(rpId.toString()),
             ).use { c ->
                 fun idx(n: String) = c.getColumnIndex(n)
                 val iName = idx("name")
@@ -517,7 +513,7 @@ object ThroneDesktopBackupImporter {
                                 it.startsWith("domain:") || it.startsWith("full:") ||
                                     it.startsWith("geosite:") || it.startsWith("geosite-") -> it
                                 else -> "domain:$it"
-                            }
+                            },
                         )
                     }
                     parseStringList(if (iDomKey >= 0) c.getString(iDomKey) else null).forEach {
@@ -596,7 +592,7 @@ object ThroneDesktopBackupImporter {
                             protocol = protocol,
                             ruleset = remoteRulesets.joinToString("\n"),
                             outbound = outbound,
-                        )
+                        ),
                     )
                     userOrder++
                 }

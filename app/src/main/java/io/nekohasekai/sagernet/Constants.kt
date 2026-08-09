@@ -324,4 +324,3 @@ object Action {
 }
 
 // 顶层常量，供 BackupFragment 直接使用（不带 Key. 前缀）
-const val actionImportThroneDesktop = "actionImportThroneDesktop"

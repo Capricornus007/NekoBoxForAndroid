@@ -650,7 +650,6 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         }
     }
 
-
     suspend fun startImport(file: Uri) {
         if (!isAdded) return
         val appContext = requireContext().applicationContext

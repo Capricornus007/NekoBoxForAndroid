@@ -135,11 +135,15 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
             val interfaceIndex = try {
                 NetworkInterface.getByName(linkProperties.interfaceName).index
             } catch (e: Exception) {
-                Logs.i("checkDefaultInterfaceUpdate attempt=${attempt + 1} getByName failed name=${linkProperties.interfaceName}: $e")
+                Logs.i(
+                    "checkDefaultInterfaceUpdate attempt=${attempt + 1} getByName failed name=${linkProperties.interfaceName}: $e",
+                )
                 Thread.sleep(100)
                 return@repeat
             }
-            Logs.i("checkDefaultInterfaceUpdate ok name=${linkProperties.interfaceName} index=$interfaceIndex network=$network attempt=${attempt + 1}")
+            Logs.i(
+                "checkDefaultInterfaceUpdate ok name=${linkProperties.interfaceName} index=$interfaceIndex network=$network attempt=${attempt + 1}",
+            )
             listener.updateDefaultInterface(linkProperties.interfaceName, interfaceIndex)
             return
         }
