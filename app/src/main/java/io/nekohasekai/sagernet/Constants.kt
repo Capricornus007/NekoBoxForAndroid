@@ -318,3 +318,23 @@ object Action {
     // const val SWITCH_WAKE_LOCK = "io.nekohasekai.sagernet.SWITCH_WAKELOCK"
     const val RESET_UPSTREAM_CONNECTIONS = "moe.sb4a.RESET_UPSTREAM_CONNECTIONS"
 }
+
+// Mixed inbound authentication constants (from maskedeken fork)
+const val DISABLE_MIXED_INBOUND = "disableMixedInbound"
+const val mixedSecret = "mixedSecret"
+const val APPEND_HTTP_PROXY = "appendHttpProxy"
+const val appendHttpProxySecurityTitle = "append_http_proxy_security_title"
+const val appendHttpProxySecurityMessage = "append_http_proxy_security_message"
+const val enableAnyway = "enable_anyway"
+const val actionImportThroneDesktop = "actionImportThroneDesktop"
+}
+
+// Mixed inbound authentication constants (from maskedeken fork)
+const val DISABLE_MIXED_INBOUND = "disableMixedInbound"
+const val mixedSecret = "mixedSecret"
+const val APPEND_HTTP_PROXY = "appendHttpProxy"
+const val appendHttpProxySecurityTitle = "append_http_proxy_security_title"
+const val appendHttpProxySecurityMessage = "append_http_proxy_security_message"
+const val enableAnyway = "enable_anyway"
+const val actionImportThroneDesktop = "actionImportThroneDesktop"
+}
