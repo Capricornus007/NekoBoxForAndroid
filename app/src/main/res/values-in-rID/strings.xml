@@ -478,13 +478,10 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="backup_summary">Jika pengaturan routing tidak dicadangkan bersama konfigurasi,
         maka outbound kustom akan hilang.</string>
     <string name="backup_not_file">Bukan file cadangan: yang diharapkan .json, tetapi %s</string>
-    <string name="backup_not_throne_desktop">Not a Throne desktop backup: expected .thrbackup, but %s</string>
     <string name="invalid_backup_file">File cadangan tidak valid</string>
     <string name="backup_import">Impor</string>
     <string name="backup_import_summary">Impor akan menimpa data yang ada.</string>
     <string name="backup_importing">Mengimpor…</string>
-    <string name="action_import_throne_desktop">Import from Throne desktop</string>
-    <string name="backup_import_throne_desktop_summary">Import profiles, routes and settings from a Throne desktop .thrbackup file. Custom icons are ignored. Existing data in selected categories will be overwritten.</string>
     <string name="packet_encoding">Pengkodean Paket</string>
     <string name="acquire_wake_lock">Ambil WakeLock</string>
     <string name="release_wake_lock">Lepaskan WakeLock</string>
@@ -776,6 +773,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
+    <string name="append_http_proxy_security_title">Security Warning</string>
+    <string name="append_http_proxy_security_message">Enabling HTTP proxy may expose your traffic.</string>
+    <string name="enable_anyway">Enable Anyway</string>
     <string name="vpn_watchdog">Auto-reconnect</string>
     <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
     <string name="vpn_watchdog_test">🧪 Test watchdog</string>
