@@ -10,8 +10,8 @@
 
 **已实施**（用户方针：官方有的协议先接过去；neko 魔改才存在的 feat 先 skip + debug 日志兜底，待具体案例再修）：
 
-- [x] `get_source.sh` 改为读取 `nb4a.properties` 的 `SINGBOX_VERSION`（当前 v1.13.15），浅克隆**官方** `SagerNet/sing-box` 到 `../sing-box`；`get_source_env.sh`（fork commit 锁定）已删除；已有非官方克隆自动重定向。
-- [x] `libcore/go.mod`：删除 `libneko`、starifly/reF1nd replace；依赖版本对齐官方 sing-box v1.13.15 go.mod（Go 仍 1.24.7，无需升级工具链）。`go.sum` 不入库，`libcore/build.sh` 在 bind 前 `go mod tidy` 现场重建。
+- [x] `get_source.sh` 改为读取 `nb4a.properties` 的唯一 `SINGBOX_VERSION`（当前 v1.13.16），浅克隆**官方** `SagerNet/sing-box` 到 `../sing-box`；`get_source_env.sh`（fork commit 锁定）已删除；已有目录无条件校正官方 remote、强制刷新指定 tag，并校验 `HEAD == tag commit`。
+- [x] `libcore/go.mod`：删除 `libneko`、starifly/reF1nd replace；`github.com/sagernet/sing-box v0.0.0` 仅作 module graph 占位，实际源码由 `replace => ../../sing-box` 指向 `SINGBOX_VERSION` 对应官方源码；共同直接依赖版本对齐官方 sing-box v1.13.16 go.mod（Go 仍 1.24.7，无需升级工具链）。`go.sum` 不入库，`libcore/build.sh` 在 bind 前 `go mod tidy` 现场重建。
 - [x] 摘除 fork 私有依赖并自实现/替换：
   - `libneko/neko_log` → [`libcore/log.go`](libcore/log.go)（截断式文件日志）
   - `libneko/protect_server` → [`libcore/protect.go`](libcore/protect.go)（unix socket SCM_RIGHTS 收 fd）
@@ -23,7 +23,7 @@
   - `nekoutils` geoip/geosite 钩子 → [`libcore/ruleset.go`](libcore/ruleset.go)：`box.New` 前预处理 local rule-set，官方命名（`geoip-cn`）优先指向已有 `.srs`，老格式（`geoip:cn`）从 db 转换生成 `.srs` 缓存
 - [x] `platform_box.go` 迁移到官方 `adapter.PlatformInterface`（`OpenInterface`/`FindConnectionOwner` 等新签名；JNI 侧 `BoxPlatformInterface` 未变，Kotlin 零改动）。
 - [x] `box_include.go` 摘除官方没有的 SSR/Snell 注册；`protocol/http`、`protocol/juicity` 适配官方 `tls.NewDialerFromOptions`/`tls.NewSTDClient` 新签名（多 logger 参数）；`interface_monitor.go` 适配 sing-tun v0.8.12（`MyInterfaces() []string`）。
-- [x] CI（ci.yml/preview.yml）libcore 缓存 key 纳入 `nb4a.properties`（SINGBOX_VERSION 变更触发内核重编）。
+- [x] CI（ci.yml/preview.yml/release.yml）libcore 缓存 key 纳入 `nb4a.properties`（SINGBOX_VERSION 变更触发内核重编，禁止复用旧 AAR）。
 - [x] 静态校验脚本：[`roo_check_imports.py`](roo_check_imports.py)（import 路径 + fork 残留）、[`roo_check_symbols.py`](roo_check_symbols.py)（官方符号存在性），`uv run` 执行，均通过。
 - [x] 首轮 CI 编译修复（2026-08-01）：① 官方 1.13.0 已移除 wireguard outbound（仅 endpoint），`box_include.go` 改为镜像官方 `include/registry.go` 的报错 stub（`option.StubOptions` + 明确错误信息）；② `adapter.DNSTransport` 接口 v1.13 新增 `Reset()`，`platformLocalDNSTransport` 补空实现（对齐官方 local transport，JNI 无持久连接）；③ `platform_box.go` 删除冗余 `context` import。
 - [x] 首轮真机运行修复（2026-08-01，配置 schema 对齐官方 v1.13，[`ConfigBuilder.kt`](app/src/main/java/io/nekohasekai/sagernet/fmt/ConfigBuilder.kt) 等）：

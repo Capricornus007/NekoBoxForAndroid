@@ -30,6 +30,7 @@ import io.nekohasekai.sagernet.fmt.snell.SnellBean
 import io.nekohasekai.sagernet.fmt.snell.buildSingBoxOutboundSnellBean
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.fmt.wireguard.buildSingBoxOutboundWireguardBean
+import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.isIpAddress
 import io.nekohasekai.sagernet.ktx.mkPort
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
@@ -348,6 +349,18 @@ fun buildConfig(
             chainId: Long, entity: ProxyEntity
         ): String {
             val profileList = entity.resolveChain()
+            // profileList 的顺序即应用流量经过各 outbound 的顺序：前一跳通过
+            // detour 交给后一跳拨号，最后一项直接连接物理网络。
+            Logs.d(
+                "Outbound chain id=$chainId forTest=$forTest appToEgress=" +
+                    profileList.joinToString(" -> ") { hop ->
+                        val hopBean = hop.requireBean()
+                        val host = serverHostOf(hopBean) ?: "<unknown>"
+                        val endpoint = hopBean.displayAddress().takeIf { it.isNotBlank() }
+                            ?: "$host:${hopBean.serverPort}"
+                        "${hop.id}:${hop.displayType()}@$endpoint"
+                    }
+            )
             val chainTrafficSet = HashSet<ProxyEntity>().apply {
                 plusAssign(profileList)
                 add(entity)

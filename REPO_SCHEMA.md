@@ -30,6 +30,7 @@ Android 端的代码主要分为两个核心包：
   - `SagerDatabase.kt`: Room 数据库定义，存储代理配置、分组、规则等。
   - `ProfileManager.kt` / `GroupManager.kt`: 配置和分组管理器。
 - [`io/nekohasekai/sagernet/fmt/`](app/src/main/java/io/nekohasekai/sagernet/fmt): 各种代理协议的配置格式化与解析。`ConfigBuilder.kt` 生成 sing-box 配置，已对齐官方 v1.13 schema：入站 sniff/解析目标地址迁移为路由规则动作（`sniff`/`resolve`，置于规则最前）；tun 地址用合并字段 `address`（`inet4_address`/`endpoint_independent_nat` 等 legacy 字段已弃用）；「双网络加速」设置（`dualNetworkAcceleration`，原误名 `concurrent_dial`——"并发拨号"实为 singbox-p 社区版概念，与官核无关）映射为 `default_network_strategy: "hybrid"`；DNS 地址归一化：dns-direct/订阅 resolver 的 `hosts` 视为 `local`（本机直解，语义正确），远程 DNS 的 `hosts`/`local`/`localhost`/`fakeip` 占位符一律回退为 `https://8.8.8.8/dns-query` 并 Toast 提示用户修改设置（本机直解用作远程即 DNS 泄露），且 dns-remote 显式 `detour`=当前节点（对齐 Throne 桌面端 `detour:"proxy"`）。
+  - debug 级别输出脱敏的 `Outbound chain ... appToEgress=` 链拓扑摘要，仅含实体 ID、协议类型与服务器端点，不含 UUID、密码、Reality 公钥或其他认证材料，用于区分链式代理 EOF 发生在哪一跳。
   - 支持 Shadowsocks, VMess, Trojan, Hysteria, Juicity, Naive, WireGuard 等协议的配置解析与转换。
   - `forTest`（URL 测速）配置不生成 `experimental` 块：官方内核在 `PlatformLogWriter != nil` 时无条件创建 CacheFile（bbolt）与 ClashServer，无显式 `path` 时所有实例共用工作目录（`no_backup`）下的 `cache.db`。主进程批量测速并发创建大量 `TestInstance` 曾共享该文件，bbolt freelist 被写坏后每次 `box.Start` 的清理 batch 在 bbolt 定时器 goroutine 中 `page already freed` panic（异步 goroutine 中无法 recover）→ 主进程 SIGABRT 闪退。最终修复在 Go 侧：测速实例走 [`NewTestSingBoxInstance`](libcore/box.go)（不注册 PlatformLogWriter → 官方 `needCacheFile`/`needClashAPI` 均不触发），测速完全不产生 cache.db；[`SagerNet.onCreate`](app/src/main/java/io/nekohasekai/sagernet/SagerNet.kt)（main/bg 进程）启动时仍清扫存量共享 `cache.db` 与历史残留 `urltest_*.db` 实现老用户自愈。另：测速拨号依赖平台接口监视器，`NativeInterface.startDefaultInterfaceMonitor` 必须同步注册（异步曾致首拨竞态秒报 `no available network interface`），`SagerNet` 两个进程常驻 `DefaultNetworkListener` 预热缓存。**测速配置须与正式连接逐项对齐**（对齐 husi）：`ipv6Mode` 与 outbound `domain_strategy` 均沿用用户设置——曾分别强制 `IPv6Mode.ENABLE` 与空串，测速拨号的协议族/解析结果与真实路径不同，造成"测速 err 实际能用、测速成功实际不能用"的双向失真；DNS 侧 forTest 保持 dns-direct 收尾（与正式配置中服务器域名经 dns 规则归 dns-direct 的解析路径一致），无 fakeip/sniff/路由规则/experimental 属测速本就不需要之合理差异。
   - `SingBoxOutboundParser.kt`: 将 sing-box 配置中的单个 outbound JSON 还原为原生协议 Bean（支持 shadowsocks/vmess/vless/trojan/hysteria/hysteria2/tuic/socks/http/wireguard/anytls，含 TLS/transport/multiplex 子块解析）。用于订阅返回完整 sing-box 配置（含 `outbounds`）的场景：`RawUpdater.parseJSON` 的 `outbounds` 分支对每个 outbound 优先调用 `parseSingBoxOutbound()` 还原原生节点，不支持的类型或解析失败时回退为 `ConfigBean`（自定义 JSON）；`dns`/`block`/`direct`/`selector`/`urltest` 类型的 outbound 始终跳过。
@@ -64,6 +65,8 @@ Go 语言编写的底层核心，负责高性能的网络处理。**内核为官
 - [`libcore/protect.go`](libcore/protect.go): `libneko/protect_server` 的自实现替代（unix socket 接收主进程经 SCM_RIGHTS 发来的 fd 并回调 `VpnService.protect`）。
 - [`libcore/ruleset.go`](libcore/ruleset.go): geo 规则集预处理（替代 fork 的 `nekoutils` geoip/geosite 钩子）。官方 local rule-set 只认真实文件路径，本模块在 `box.New` 前改写配置：官方格式（`geoip-cn`/`geosite-cn`）优先指向 `<externalAssets>/` 下已存在的官方 `.srs`；老 nb4a 格式（`geoip:cn`/`geosite:cn`）或官方 `.srs` 缺失时，从本地 `geoip.db`/`geosite.db` 转换生成 `.srs` 缓存（`<externalAssets>/srs/`，db 更新后自动重建）。
 - [`libcore/build.sh`](libcore/build.sh): 编译 Go 核心的本地脚本（gomobile bind 前先 `go mod tidy`：go.sum 不入库，由构建时现场重建；go.mod 直接依赖版本已按官方 sing-box go.mod 钉死）。bind 时从 `nb4a.properties` 读取 `SINGBOX_VERSION`，经 `-ldflags "-X github.com/sagernet/sing-box/constant.Version=..."` 注入内核版本号（官方 `constant.Version` 默认为 `"unknown"`，不注入则关于页 sing-box 版本显示 unknown）。
+  - sing-box 版本以 [`nb4a.properties`](nb4a.properties) 的 `SINGBOX_VERSION` 为唯一真实来源；[`libcore/go.mod`](libcore/go.mod) 中 `github.com/sagernet/sing-box v0.0.0` 仅为 module graph 占位，实际源码始终由 `replace => ../../sing-box` 提供。源码获取脚本强制使用官方 remote、强制刷新指定 tag，并校验 `HEAD` 与该 tag 的 commit 完全一致；发布/预览/CI 的内核缓存键均包含 `nb4a.properties`，版本变化不会复用旧 AAR。
+  - [`libcore/interface_monitor.go`](libcore/interface_monitor.go) 在 debug 级别记录同一默认接口的重复上报及 `skip ResetNetwork`，在 info 级别记录默认接口丢失与回调数，便于把 Hysteria2 共享会话 EOF 与真实切网事件精确对时。
 - [`libcore/device/`](libcore/device/), [`ech/`](libcore/ech/), [`procfs/`](libcore/procfs/), [`stun/`](libcore/stun/): Go 核心的子模块，处理设备、ECH、进程文件系统和 STUN 测试。
 - [`libcore/protocol/`](libcore/protocol/): libcore 侧自定义/覆盖的 sing-box 协议实现，在 [`libcore/box_include.go`](libcore/box_include.go) 中注册。
   - `juicity/`: Juicity outbound（官方内核无此协议，基于 `dyhkwong/sing-juicity`）。
@@ -79,7 +82,7 @@ Go 语言编写的底层核心，负责高性能的网络处理。**内核为官
 
 项目的构建分为两步（均在 CI 中执行）：
 1. **编译底层 Go 核心**：
-   - 源码获取：[`buildScript/lib/core/get_source.sh`](buildScript/lib/core/get_source.sh) 读取 `nb4a.properties` 的 `SINGBOX_VERSION`，在 CI 中将**官方** `SagerNet/sing-box` 浅克隆到仓库同级目录 `../sing-box`（`libcore/go.mod` 以 `replace` 指向它）；已存在的非官方（旧 fork）克隆会被强制重定向到官方仓库。
+   - 源码获取：[`buildScript/lib/core/get_source.sh`](buildScript/lib/core/get_source.sh) 读取 `nb4a.properties` 的唯一 `SINGBOX_VERSION`，校验其 tag 格式，在 CI 中将**官方** `SagerNet/sing-box` 浅克隆到仓库同级目录 `../sing-box`（`libcore/go.mod` 以 `replace` 指向它）；已有目录会被无条件校正到官方 remote、强制刷新目标 tag，并校验 `HEAD == tag commit`，不一致即终止构建。
    - 使用 `gomobile` 工具，运行 `buildScript/lib/core/build.sh` 或 `libcore/build.sh`（bind 前先 `go mod tidy` 重建依赖锁定）。
    - 编译生成 `app/libs/libcore.aar` 库。
 2. **编译 Android 应用程序**：

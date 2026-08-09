@@ -172,10 +172,15 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 
 	m.access.Lock()
 	if interfaceIndex == -1 {
+		oldDesc := "nil"
+		if m.defaultInterface != nil {
+			oldDesc = m.defaultInterface.Name + "#" + strconv.Itoa(m.defaultInterface.Index)
+		}
 		m.defaultInterface = nil
 		m.defaultInterfaceInitialized = true
 		callbacks := m.callbacks.Array()
 		m.access.Unlock()
+		m.logger.Info("default interface lost prev ", oldDesc, " callbacks ", len(callbacks))
 		// 官方：立即 callback(nil) → NetworkPause + "missing default interface"
 		for _, callback := range callbacks {
 			callback(nil, 0)
@@ -197,6 +202,9 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 	// 官方：name+index 未变则不通知（不 ResetNetwork）
 	if oldInterface != nil && oldInterface.Name == newInterface.Name && oldInterface.Index == newInterface.Index {
 		m.access.Unlock()
+		m.logger.Debug("default interface unchanged ", newInterface.Name,
+			" index ", newInterface.Index, " source ", source,
+			" skip ResetNetwork")
 		return
 	}
 
