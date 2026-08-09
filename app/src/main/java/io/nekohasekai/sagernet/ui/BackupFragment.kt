@@ -49,6 +49,7 @@ import java.io.IOException
 import java.util.*
 import java.util.zip.ZipInputStream
 import kotlin.coroutines.resume
+import io.nekohasekai.sagernet.actionImportThroneDesktop
 
 private suspend fun Call.awaitResponse(): Response = suspendCancellableCoroutine { continuation ->
     continuation.invokeOnCancellation { cancel() }
