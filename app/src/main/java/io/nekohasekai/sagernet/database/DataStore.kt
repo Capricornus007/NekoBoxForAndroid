@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.database
 
 import android.os.Binder
-import android.os.Build
 import androidx.preference.PreferenceDataStore
 import io.nekohasekai.sagernet.CONNECTION_TEST_URL
 import io.nekohasekai.sagernet.GroupType
@@ -187,15 +186,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     } // defaults to 0, no automatic update
 
     private val userIndex by lazy { Binder.getCallingUserHandle().hashCode() }
-    val mixedSecret: String
-        @Synchronized get() {
-            var s = configurationStore.getString(Key.MIXED_SECRET)
-            if (s.isNullOrEmpty()) {
-                s = java.util.UUID.randomUUID().toString().replace("-", "")
-                configurationStore.putString(Key.MIXED_SECRET, s)
-            }
-            return s
-        }
 
     val clashApiSecret: String
         @Synchronized get() {

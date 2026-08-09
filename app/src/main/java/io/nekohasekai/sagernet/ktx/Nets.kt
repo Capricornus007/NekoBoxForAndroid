@@ -4,10 +4,19 @@ package io.nekohasekai.sagernet.ktx
 
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.fmt.AbstractBean
+import libcore.HTTPClient
 import moe.matsuri.nb4a.utils.NGUtil
 import okhttp3.HttpUrl
 import java.net.InetSocketAddress
 import java.net.Socket
+
+/**
+ * 内部 HTTP（订阅/资产/版本检查）经 box 默认 outbound 拨号
+ *   （VPN 应用自身流量默认不进 tun，直连/h3 会绕过节点）
+ */
+fun HTTPClient.tryProxyOutbound() {
+    tryBoxOutbound()
+}
 
 fun linkBuilder() = HttpUrl.Builder().scheme("https")
 

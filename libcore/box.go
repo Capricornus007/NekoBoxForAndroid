@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"runtime"
 	"runtime/debug"
 	"strings"
@@ -61,9 +62,19 @@ func VersionBox() string {
 }
 
 func ResetAllConnections(system bool) {
-	// 官方内核没有 conntrack（starifly fork 私有实现）。
-	// 按迁移方针先跳过并留 debug 日志，待有具体案例再修。
-	log.Println("DEBUG: ResetAllConnections(system=", system, ") skipped: official sing-box has no conntrack")
+	// 官方无 conntrack；等价能力是 NetworkManager.ResetNetwork()：
+	// CloseAll 连接 + 通知 endpoint/inbound/outbound.InterfaceUpdated()
+	// （hy2/quic 等会丢弃死路径上的会话，下次拨号重建）。
+	// 正常切网由 interfaceMonitor → notifyInterfaceUpdate 自动 ResetNetwork
+	// （对齐官方 libbox，app 侧不应再叠一层）。本函数仅供手动
+	// Action.RESET_UPSTREAM_CONNECTIONS / wakeResetConnections 等显式入口。
+	b := mainInstance
+	if b == nil || b.Box == nil {
+		log.Println("ResetAllConnections: no main instance, skip system=", system)
+		return
+	}
+	b.Network().ResetNetwork()
+	log.Println("ResetAllConnections: Network.ResetNetwork() done system=", system)
 }
 
 type BoxInstance struct {
@@ -287,51 +298,112 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 	boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.UrlTest link=%s timeout=%dms instance=%v", link, timeout, i != nil))
 	var client *http.Client
 	if i == nil {
-		// 无实例：直连测试
-		client = &http.Client{Timeout: time.Duration(timeout) * time.Millisecond}
+		// 无实例：直连测试（单 GET，计时含拨号）
+		client := &http.Client{Timeout: time.Duration(timeout) * time.Millisecond}
+		latency, err = urlTestDirect(client, link)
 	} else {
 		var connectionTracker adapter.ConnectionTracker
 		if i.v2api != nil {
 			connectionTracker = i.v2api.StatsService()
 		}
-		client = newProxyHTTPClient(i.Box, connectionTracker, timeout)
+		latency, err = urlTest(i.Box, connectionTracker, link, timeout)
 	}
 	latency, err = urlTest(client, link)
 	boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.UrlTest result latency=%dms err=%v", latency, err))
 	return
 }
 
-// newProxyHTTPClient 替代 fork 的 boxapi.CreateProxyHttpClient：
-// 经 box 的默认（final）outbound 拨号的 HTTP client。
-func newProxyHTTPClient(b *box.Box, tracker adapter.ConnectionTracker, timeout int32) *http.Client {
-	transport := &http.Transport{DisableKeepAlives: true}
-	transport.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
-		outbound := b.Outbound().Default()
-		if outbound == nil {
-			return nil, E.New("no default outbound")
+// urlTest 替代 libneko/speedtest.UrlTest 与 fork 的 boxapi.CreateProxyHttpClient，
+// 对齐 husi libcore/ping.go 的"显式拨号 + 连接复用 + 双 HEAD 请求"模式：
+// 第一次 HEAD 预热（含握手，不计时），第二次 HEAD 复用同一连接计时。
+// 收益：① 延迟为纯 RTT，跨协议可比、贴近实际使用时连接复用的体感；
+// ② 第二次请求验证连接持续性——"首包能通但随即断开"的节点不再假成功。
+// 超时由 ctx 全程控制（拨号 + 两次请求共用 timeout 预算）。
+func urlTest(b *box.Box, tracker adapter.ConnectionTracker, link string, timeout int32) (int32, error) {
+	linkURL, err := url.Parse(link)
+	if err != nil {
+		return 0, E.Cause(err, "parse test link")
+	}
+	hostname := linkURL.Hostname()
+	port := linkURL.Port()
+	if port == "" {
+		switch linkURL.Scheme {
+		case "http":
+			port = "80"
+		case "https":
+			port = "443"
+		default:
+			return 0, E.New("unsupported test link scheme: ", linkURL.Scheme)
 		}
-		destination := M.ParseSocksaddr(addr)
-		conn, err := outbound.DialContext(ctx, N.NetworkTCP, destination)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Millisecond)
+	defer cancel()
+
+	outbound := b.Outbound().Default()
+	if outbound == nil {
+		return 0, E.New("no default outbound")
+	}
+	destination := M.ParseSocksaddrHostPortStr(hostname, port)
+	conn, err := outbound.DialContext(ctx, N.NetworkTCP, destination)
+	if err != nil {
+		return 0, err
+	}
+	if tracker != nil {
+		conn = tracker.RoutedConnection(ctx, conn, adapter.InboundContext{
+			Outbound:    outbound.Tag(),
+			Destination: destination,
+		}, nil, outbound)
+	}
+	defer conn.Close()
+
+	// client 恒复用上面建立的连接（keep-alive）；重定向不跟随（generate_204 类直返）。
+	client := &http.Client{
+		Transport: &http.Transport{
+			DialContext: func(context.Context, string, string) (net.Conn, error) {
+				return conn, nil
+			},
+		},
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+	defer client.CloseIdleConnections()
+
+	doHead := func() error {
+		req, err := http.NewRequestWithContext(ctx, http.MethodHead, link, nil)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		if tracker != nil {
-			conn = tracker.RoutedConnection(ctx, conn, adapter.InboundContext{
-				Outbound:    outbound.Tag(),
-				Destination: destination,
-			}, nil, outbound)
+		resp, err := client.Do(req)
+		if err != nil {
+			return err
 		}
-		return conn, nil
+		_ = resp.Body.Close()
+		if resp.StatusCode >= 400 {
+			return E.New("unexpected status: ", resp.Status)
+		}
+		return nil
 	}
-	return &http.Client{
-		Transport: transport,
-		Timeout:   time.Duration(timeout) * time.Millisecond,
+
+	// 第一次：预热（建立 TLS 会话等），不计时
+	if err = doHead(); err != nil {
+		boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest warmup request failed: %v", err))
+		return 0, err
 	}
+	// 第二次：复用连接，纯 RTT 计时
+	start := time.Now()
+	if err = doHead(); err != nil {
+		boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest measure request failed after %dms: %v", time.Since(start).Milliseconds(), err))
+		return 0, err
+	}
+	latency := int32(time.Since(start).Milliseconds())
+	boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest ok latency=%dms", latency))
+	return latency, nil
 }
 
-// urlTest 替代 libneko/speedtest.UrlTest（UrlTestStandard_RTT 模式）：
-// GET 请求，计时到收到响应头。
-func urlTest(client *http.Client, link string) (int32, error) {
+// urlTestDirect 为无 box 实例时的直连测速：单 GET，计时含拨号。
+func urlTestDirect(client *http.Client, link string) (int32, error) {
 	req, err := http.NewRequest(http.MethodGet, link, nil)
 	if err != nil {
 		boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest new request failed: %v", err))

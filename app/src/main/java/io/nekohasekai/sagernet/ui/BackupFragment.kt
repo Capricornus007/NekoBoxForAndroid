@@ -233,6 +233,10 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
             startFilesForResult(importFile, "*/*")
         }
 
+        binding.actionImportThroneDesktop.setOnClickListener {
+            startFilesForResult(importThroneDesktopFile, "*/*")
+        }
+
         setupWebDAV(binding)
     }
 
@@ -646,6 +650,94 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         if (file != null) {
             runOnDefaultDispatcher {
                 startImport(file)
+            }
+        }
+    }
+
+    private val importThroneDesktopFile =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { file ->
+            if (file != null) {
+                runOnDefaultDispatcher {
+                    startImportThroneDesktop(file)
+                }
+            }
+        }
+
+    private suspend fun startImportThroneDesktop(file: Uri) {
+        val activity = requireActivity()
+        val fileName = requireContext().contentResolver.query(file, null, null, null, null)
+            ?.use { cursor ->
+                cursor.moveToFirst()
+                cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME).let(cursor::getString)
+            }
+            ?.takeIf { it.isNotBlank() } ?: file.pathSegments.last()
+            .substringAfterLast('/')
+            .substringAfter(':')
+
+        if (!fileName.endsWith(".thrbackup", ignoreCase = true)) {
+            onMainDispatcher {
+                snackbar(getString(R.string.backup_not_throne_desktop, fileName)).show()
+            }
+            return
+        }
+
+        try {
+            val bytes = requireContext().contentResolver.openInputStream(file)!!.use { it.readBytes() }
+            val parsed = ThroneDesktopBackupImporter.parse(bytes, app.cacheDir)
+            onMainDispatcher {
+                if (!isAdded) {
+                    parsed.dbFile.delete()
+                    return@onMainDispatcher
+                }
+                val import = LayoutImportBinding.inflate(layoutInflater)
+                // reuse import checkboxes; hide unavailable parts
+                if (!parsed.hasProfiles) import.backupConfigurations.isVisible = false
+                if (!parsed.hasRoutes) import.backupRules.isVisible = false
+                if (!parsed.hasSettings) import.backupSettings.isVisible = false
+
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.action_import_throne_desktop)
+                    .setMessage(R.string.backup_import_throne_desktop_summary)
+                    .setView(import.root)
+                    .setPositiveButton(R.string.backup_import) { _, _ ->
+                        SagerNet.stopService()
+                        val progress = LayoutProgressBinding.inflate(layoutInflater)
+                        progress.content.text = getString(R.string.backup_importing)
+                        val dialog = AlertDialog.Builder(requireContext())
+                            .setView(progress.root)
+                            .setCancelable(false)
+                            .show()
+                        runOnDefaultDispatcher {
+                            runCatching {
+                                ThroneDesktopBackupImporter.import(
+                                    parsed,
+                                    import.backupConfigurations.isChecked && parsed.hasProfiles,
+                                    import.backupRules.isChecked && parsed.hasRoutes,
+                                    import.backupSettings.isChecked && parsed.hasSettings,
+                                )
+                                triggerFullRestart(requireContext())
+                            }.onFailure {
+                                Logs.w(it)
+                                parsed.dbFile.delete()
+                                onMainDispatcher {
+                                    dialog.dismiss()
+                                    MessageStore.showMessage(activity, it.readableMessage)
+                                }
+                            }
+                        }
+                    }
+                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                        parsed.dbFile.delete()
+                    }
+                    .setOnCancelListener {
+                        parsed.dbFile.delete()
+                    }
+                    .show()
+            }
+        } catch (e: Exception) {
+            Logs.w(e)
+            onMainDispatcher {
+                MessageStore.showMessage(activity, e.readableMessage)
             }
         }
     }

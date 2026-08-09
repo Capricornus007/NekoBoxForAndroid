@@ -305,13 +305,12 @@
     <string name="connection_test_refused">接続が拒否されました</string>
     <string name="connection_test_unreachable">到達不可</string>
     <string name="connection_test_timeout_error">タイムアウト</string>
-    <string name="append_http_proxy">VPN に HTTP プロキシを追加</string>
-    <string name="append_http_proxy_sum">HTTP プロキシは仮想 NIC デバイスを経由せず、(ブラウザ/一部の対応アプリ) から直接使用されます (Android 10+)</string>
+    <string name="mixed_auth_config">認証を設定</string>
+    <string name="mixed_auth_username_hint">ユーザー名（両方空欄で認証なし）</string>
+    <string name="mixed_auth_no_auth">未設定（認証なし）</string>
+    <string name="mixed_auth_enabled_sum">ユーザー名: %1$s</string>
     <string name="http_proxy_bypass">HTTP プロキシのバイパスリスト</string>
     <string name="http_proxy_bypass_dialog_message">1 行に 1 つ。# で始まる行はコメントです。例: *zhihu.com</string>
-    <string name="append_http_proxy_security_title">セキュリティに関する通知</string>
-    <string name="append_http_proxy_security_message">有効にすると、このデバイス上の他のアプリがローカルプロキシポートを直接使用できるようになります。\n\n推奨：インストールされているすべてのアプリを信頼している場合にのみ有効にしてください。</string>
-    <string name="enable_anyway">それでも有効にする</string>
     <string name="strict_route">厳格なルーティング</string>
     <string name="protocol_settings">プロトコル設定</string>
     <string name="trojan_provider">Trojan プロバイダー</string>
@@ -432,6 +431,9 @@
     <string name="backup_settings">設定</string>
     <string name="backup_summary">ルーティング設定を構成と一緒にバックアップしないと、カスタムアウトバウンドが失われます。</string>
     <string name="backup_not_file">バックアップファイルではありません: .json を期待しましたが %s でした</string>
+    <string name="backup_not_throne_desktop">Throne デスクトップのバックアップではありません: .thrbackup を期待しましたが %s でした</string>
+    <string name="action_import_throne_desktop">Throne デスクトップからインポート</string>
+    <string name="backup_import_throne_desktop_summary">Throne デスクトップの .thrbackup からプロファイル、ルート、設定をインポートします（カスタムアイコンは無視）。選択したカテゴリの既存データは上書きされます。</string>
     <string name="invalid_backup_file">無効なバックアップファイル</string>
     <string name="backup_import">インポート</string>
     <string name="backup_import_summary">インポートすると既存のデータが上書きされます。</string>

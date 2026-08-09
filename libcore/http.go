@@ -48,6 +48,8 @@ type HTTPClient interface {
 	PinnedTLS12()
 	PinnedSHA256(sumHex string)
 	TrySocks5(port int32, username string, password string)
+	// TryBoxOutbound 经 mainInstance 默认 outbound 拨号（纯 TUN / 禁用 mixed 时用）。
+	TryBoxOutbound()
 	TryH3Direct()
 	KeepAlive()
 	NewRequest() HTTPRequest
@@ -157,6 +159,26 @@ func (c *httpClient) TrySocks5(port int32, username string, password string) {
 		return dialer.DialContext(ctx, network, addr)
 	}
 	c.trySocks5 = true
+}
+
+// TryBoxOutbound 经当前 main box 默认 outbound 拨号。
+// 用于 disableMixedInbound（纯 TUN）场景：VPN 应用自身流量默认不进 tun，
+// 不能再走 127.0.0.1:mixedPort（入站已不存在），必须显式经节点出站。
+func (c *httpClient) TryBoxOutbound() {
+	c.h1h2Transport.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+		b := mainInstance
+		if b == nil || b.Box == nil {
+			if c.tryH3Direct {
+				return nil, errors.New("box not running")
+			}
+			return new(net.Dialer).DialContext(ctx, network, addr)
+		}
+		outbound := b.Outbound().Default()
+		if outbound == nil {
+			return nil, errors.New("no default outbound")
+		}
+		return outbound.DialContext(ctx, network, metadata.ParseSocksaddr(addr))
+	}
 }
 
 func (c *httpClient) TryH3Direct() {

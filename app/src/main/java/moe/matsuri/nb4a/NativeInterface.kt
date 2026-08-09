@@ -116,26 +116,34 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
     }
 
     private fun checkDefaultInterfaceUpdate(listener: InterfaceUpdateListener, network: Network?) {
+        // 同步「网络变化时重置出站」开关到 Go：控制 name/index 变化时是否
+        // callback → 官方 ResetNetwork（见 libcore/interface_monitor.go）。
+        Libcore.setNetworkChangeResetConnections(DataStore.networkChangeResetConnections)
         if (network == null) {
+            Logs.i("checkDefaultInterfaceUpdate network=null -> clear default interface")
             listener.updateDefaultInterface("", -1)
             return
         }
-        // LinkProperties / NetworkInterface 可能短暂未就绪，参考 husi 重试
-        repeat(10) {
+        // LinkProperties / NetworkInterface 可能短暂未就绪，参考 husi/SFA 重试
+        repeat(10) { attempt ->
             val linkProperties = SagerNet.connectivity.getLinkProperties(network)
             if (linkProperties == null) {
+                Logs.i("checkDefaultInterfaceUpdate attempt=${attempt + 1} linkProperties=null network=$network")
                 Thread.sleep(100)
                 return@repeat
             }
             val interfaceIndex = try {
                 NetworkInterface.getByName(linkProperties.interfaceName).index
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Logs.i("checkDefaultInterfaceUpdate attempt=${attempt + 1} getByName failed name=${linkProperties.interfaceName}: $e")
                 Thread.sleep(100)
                 return@repeat
             }
+            Logs.i("checkDefaultInterfaceUpdate ok name=${linkProperties.interfaceName} index=$interfaceIndex network=$network attempt=${attempt + 1}")
             listener.updateDefaultInterface(linkProperties.interfaceName, interfaceIndex)
             return
         }
+        Logs.w("checkDefaultInterfaceUpdate exhausted retries network=$network -> clear default interface")
         listener.updateDefaultInterface("", -1)
     }
 

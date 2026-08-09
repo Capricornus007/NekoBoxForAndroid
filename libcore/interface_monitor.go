@@ -1,8 +1,10 @@
 package libcore
 
 import (
+	"net"
+	"strconv"
 	"sync"
-	"time"
+	"sync/atomic"
 
 	tun "github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common/control"
@@ -11,9 +13,26 @@ import (
 	"github.com/sagernet/sing/common/x/list"
 )
 
+// networkChangeResetConnections 对应 app 设置
+// DataStore.networkChangeResetConnections（「当网络发生变化时重置出站连接」）。
+// true（默认）：name/index 变化时通知回调 → 官方 notifyInterfaceUpdate → ResetNetwork。
+// false：仍更新 DefaultInterface() 供新拨号绑定，但不通知回调（不拆现有出站）；
+// 从 nil 恢复时仍通知，以便 NetworkWake（否则 Lost 后会一直 pause）。
+var networkChangeResetConnections atomic.Bool
+
+func init() {
+	networkChangeResetConnections.Store(true)
+}
+
+// SetNetworkChangeResetConnections 由 Kotlin 在发起接口更新前同步设置项。
+func SetNetworkChangeResetConnections(enable bool) {
+	networkChangeResetConnections.Store(enable)
+}
+
 // InterfaceUpdateListener 由 Kotlin 侧实现回调：
 // ConnectivityManager 默认网络变化时通知 Go 默认物理接口（名称 + index，-1 表示无网络）。
-// 参考 husi libcore/tun.go。
+// 对齐官方 experimental/libbox/monitor.go 的 InterfaceUpdateListener（本仓库 JNI
+// 未传 isExpensive/isConstrained，二者由 NetworkInterfaces 缓存提供）。
 type InterfaceUpdateListener interface {
 	UpdateDefaultInterface(interfaceName string, interfaceIndex int32)
 }
@@ -23,10 +42,22 @@ var (
 	_ InterfaceUpdateListener     = (*interfaceMonitor)(nil)
 )
 
-// interfaceMonitor 是完整的默认接口监视器（替代旧 interfaceMonitorStub 空实现）。
+// interfaceMonitor 对齐官方 libbox platformDefaultInterfaceMonitor。
 // 官方内核 v1.13 只要注册了 PlatformInterface 就强制使用平台监视器
-// （route/network.go: usePlatformDefaultInterfaceMonitor = platformInterface != nil），
-// stub 的 DefaultInterface()=nil 会导致所有拨号报 "no available network interface"。
+// （route/network.go: usePlatformDefaultInterfaceMonitor = platformInterface != nil）。
+//
+// 行为与官方 monitor.go 一致：
+//  1. UpdateInterfaces() 刷新平台缓存
+//  2. index==-1 → defaultInterface=nil 并通知回调（NetworkPause）
+//  3. ByIndex 成功后，仅当 name/index 相对旧值变化时才通知回调
+//     （回调 → notifyInterfaceUpdate → ResetNetwork）
+//  4. ByIndex 失败只打错误日志并 return，保留旧 defaultInterface（不重试、不清空）
+//
+// 唯一 Android 补丁：官方只调 networkManager.InterfaceFinder().ByIndex；
+// 在部分 OEM（OnePlus/Android16+VPN）上 finder 可能尚未含该 index。
+// resolveInterface 在 nm-finder 失败时回退 nm-cache / net.InterfaceByIndex /
+// Kotlin name+index，避免"永远 applied=0、ResetNetwork 从不触发"。
+// 不做时间防抖——切网重置完全交给官方 notifyInterfaceUpdate。
 type interfaceMonitor struct {
 	wrapper                     *boxPlatformInterfaceWrapper
 	access                      sync.Mutex
@@ -37,9 +68,6 @@ type interfaceMonitor struct {
 	defaultInterfaceInitialized bool
 }
 
-// wrapper 指针延迟访问 networkManager：
-// CreateDefaultInterfaceMonitor 先于 PlatformInterface.Initialize 被调用（box.go），
-// 回调发生时 Initialize 已执行完毕。
 func newInterfaceMonitor(w *boxPlatformInterfaceWrapper, l logger.Logger) *interfaceMonitor {
 	return &interfaceMonitor{wrapper: w, logger: l}
 }
@@ -58,7 +86,6 @@ func (m *interfaceMonitor) DefaultInterface() *control.Interface {
 	return m.defaultInterface
 }
 
-// Kotlin 侧 DefaultNetworkListener 报告的本来就是物理接口（避开 VPN），无需 override。
 func (m *interfaceMonitor) OverrideAndroidVPN() bool {
 	return false
 }
@@ -85,86 +112,114 @@ func (m *interfaceMonitor) RegisterMyInterface(interfaceName string) {
 	m.myInterfaces = append(m.myInterfaces, interfaceName)
 }
 
-// sing-tun v0.8.12 起接口为 MyInterfaces() []string（旧版 MyInterface() string）
 func (m *interfaceMonitor) MyInterfaces() []string {
 	m.access.Lock()
 	defer m.access.Unlock()
 	return m.myInterfaces
 }
 
-// UpdateDefaultInterface 实现 InterfaceUpdateListener（Kotlin 回调入口）。
+// resolveInterface 在官方 ByIndex 路径之上增加平台缓存/系统/Kotlin 回退。
+// 优先顺序与官方一致地以 NetworkManager 缓存为准（UpdateInterfaces 刚刷入）。
+func (m *interfaceMonitor) resolveInterface(interfaceName string, interfaceIndex int32) (*control.Interface, string, error) {
+	idx := int(interfaceIndex)
+
+	if m.wrapper.networkManager != nil {
+		// 官方路径：InterfaceFinder().ByIndex（UpdateInterfaces 后应命中）
+		if iif, err := m.wrapper.networkManager.InterfaceFinder().ByIndex(idx); err == nil && iif != nil {
+			return iif, "nm-finder", nil
+		}
+		// 回退：直接扫 NetworkInterfaces 缓存（finder 与 cache 偶发不同步）
+		for _, ni := range m.wrapper.networkManager.NetworkInterfaces() {
+			if ni.Index == idx || (interfaceName != "" && ni.Name == interfaceName) {
+				iface := ni.Interface
+				return &iface, "nm-cache", nil
+			}
+		}
+	}
+
+	if nif, err := net.InterfaceByIndex(idx); err == nil && nif != nil {
+		return &control.Interface{
+			Index:        nif.Index,
+			MTU:          nif.MTU,
+			Name:         nif.Name,
+			HardwareAddr: nif.HardwareAddr,
+			Flags:        nif.Flags,
+		}, "net-by-index", nil
+	}
+
+	// 最后用 Kotlin 上报的 name+index 构造，保证 DefaultInterface() 非 nil 且能通知回调。
+	// 官方 notifyInterfaceUpdate 若 NetworkInterfaces 缓存无此 index 会当 race 跳过
+	// ResetNetwork；因此应尽量让 nm-finder/nm-cache 命中。
+	if interfaceName != "" && idx > 0 {
+		return &control.Interface{
+			Index: idx,
+			Name:  interfaceName,
+			Flags: net.FlagUp | net.FlagRunning,
+		}, "kotlin-fallback", nil
+	}
+
+	return nil, "", E.New("interface not found: ", interfaceName, "#", idx)
+}
+
+// UpdateDefaultInterface 对齐官方 libbox monitor.go updateDefaultInterface。
 func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfaceIndex int32) {
-	// 先刷新平台接口列表（NetworkManager 仅在平台分支缓存，拨号路径依赖之）
+	// 官方：先刷新平台接口列表
 	if m.wrapper.networkManager != nil {
 		if err := m.wrapper.networkManager.UpdateInterfaces(); err != nil {
 			m.logger.Error(E.Cause(err, "update interfaces"))
 		}
 	}
+
+	m.access.Lock()
 	if interfaceIndex == -1 {
-		m.access.Lock()
 		m.defaultInterface = nil
 		m.defaultInterfaceInitialized = true
 		callbacks := m.callbacks.Array()
 		m.access.Unlock()
+		// 官方：立即 callback(nil) → NetworkPause + "missing default interface"
 		for _, callback := range callbacks {
 			callback(nil, 0)
 		}
 		return
 	}
-	newInterface, err := control.NewDefaultInterfaceFinder().ByIndex(int(interfaceIndex))
+
+	oldInterface := m.defaultInterface
+	newInterface, source, err := m.resolveInterface(interfaceName, interfaceIndex)
 	if err != nil {
-		// 启动早期接口/路由表可能尚未就绪（真机日志：
-		// "find updated interface: wlan0: route ip+net: no such network interface"）。
-		// 直接丢弃会让 defaultInterface 永久为 nil，该 box 的所有拨号秒报
-		// "no available network interface"，故后台重试几次。
+		// 官方：ByIndex 失败只报错 return，保留旧 defaultInterface，不重试、不 clear
+		m.access.Unlock()
 		m.logger.Error(E.Cause(err, "find updated interface: ", interfaceName))
-		go m.retryUpdateDefaultInterface(interfaceName, interfaceIndex, 5)
 		return
 	}
-	m.access.Lock()
-	oldInterface := m.defaultInterface
 	m.defaultInterface = newInterface
-	if m.defaultInterfaceInitialized && oldInterface != nil &&
-		oldInterface.Name == newInterface.Name && oldInterface.Index == newInterface.Index {
+	m.defaultInterfaceInitialized = true
+
+	// 官方：name+index 未变则不通知（不 ResetNetwork）
+	if oldInterface != nil && oldInterface.Name == newInterface.Name && oldInterface.Index == newInterface.Index {
 		m.access.Unlock()
 		return
 	}
-	m.defaultInterfaceInitialized = true
+
+	// 设置项 networkChangeResetConnections=false：只更新默认接口，不拆出站。
+	// 例外：old==nil（曾 Lost/pause）必须通知以 NetworkWake，否则会一直暂停。
+	if oldInterface != nil && !networkChangeResetConnections.Load() {
+		m.access.Unlock()
+		m.logger.Info("updated default interface ", newInterface.Name,
+			" index ", newInterface.Index, " source ", source,
+			" skip ResetNetwork (networkChangeResetConnections=false)")
+		return
+	}
+
 	callbacks := m.callbacks.Array()
+	oldDesc := "nil"
+	if oldInterface != nil {
+		oldDesc = oldInterface.Name + "#" + strconv.Itoa(oldInterface.Index)
+	}
 	m.access.Unlock()
+
+	m.logger.Info("updated default interface ", newInterface.Name,
+		" index ", newInterface.Index, " source ", source, " prev ", oldDesc)
 	for _, callback := range callbacks {
 		callback(newInterface, 0)
-	}
-}
-
-// retryUpdateDefaultInterface 弥补 UpdateDefaultInterface 的瞬时失败：
-// 若期间已有其他回调成功设置了接口则直接放弃。
-func (m *interfaceMonitor) retryUpdateDefaultInterface(interfaceName string, interfaceIndex int32, attempts int) {
-	for i := 0; i < attempts; i++ {
-		time.Sleep(200 * time.Millisecond)
-		m.access.Lock()
-		ready := m.defaultInterfaceInitialized && m.defaultInterface != nil
-		m.access.Unlock()
-		if ready {
-			return
-		}
-		newInterface, err := control.NewDefaultInterfaceFinder().ByIndex(int(interfaceIndex))
-		if err != nil {
-			continue
-		}
-		m.access.Lock()
-		if m.defaultInterfaceInitialized && m.defaultInterface != nil {
-			m.access.Unlock()
-			return
-		}
-		m.defaultInterface = newInterface
-		m.defaultInterfaceInitialized = true
-		callbacks := m.callbacks.Array()
-		m.access.Unlock()
-		for _, callback := range callbacks {
-			callback(newInterface, 0)
-		}
-		m.logger.Info("default interface recovered after retry: ", interfaceName)
-		return
 	}
 }

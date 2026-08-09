@@ -2,6 +2,7 @@ package libcore
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"libcore/procfs"
 	"log"
@@ -9,6 +10,8 @@ import (
 	"strings"
 	"sync/atomic"
 	"syscall"
+
+	"golang.org/x/sys/unix"
 
 	"github.com/sagernet/sing-box/adapter"
 	sblog "github.com/sagernet/sing-box/log"
@@ -45,8 +48,18 @@ func (w *boxPlatformInterfaceWrapper) UsePlatformAutoDetectInterfaceControl() bo
 func (w *boxPlatformInterfaceWrapper) AutoDetectInterfaceControl(fd int) error {
 	// call protect_path
 	if !isBgProcess {
-		_ = sendFdToProtect(fd, "protect_path")
-		return nil
+		err := sendFdToProtect(fd, "protect_path")
+		if err == nil {
+			return nil
+		}
+		// protect 服务不存在/无监听 = VPN 未运行，无需 protect，放行；
+		// 其余失败（如 100ms ack 超时）说明 VPN 在跑但 protect 异常，必须
+		// fail-fast——吞掉错误会让未 protect 的测速流量回环进 tun，经当前
+		// 节点"套娃"出站，测速结果与节点直连可用性彻底脱节。
+		if errors.Is(err, unix.ENOENT) || errors.Is(err, unix.ECONNREFUSED) {
+			return nil
+		}
+		return E.Cause(err, "protect fd via protect_path")
 	}
 	// bg process call VPNService
 	return intfBox.AutoDetectInterfaceControl(int32(fd))

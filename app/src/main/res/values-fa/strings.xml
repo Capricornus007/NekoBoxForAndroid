@@ -306,13 +306,12 @@
     <string name="connection_test_refused">اتصال رد شد</string>
     <string name="connection_test_unreachable">متصل نمی‌شود</string>
     <string name="connection_test_timeout_error">بدون پاسخ</string>
-    <string name="append_http_proxy">پراکسی HTTP را به VPN اضافه کنید</string>
-    <string name="append_http_proxy_sum">پروکسی HTTP مستقیماً از (مرورگر/برخی برنامه‌های پشتیبانی‌شده) بدون استفاده از دستگاه NIC مجازی (نسخه اندروید بالاتر از 10) استفاده می‌شود.</string>
+    <string name="mixed_auth_config">پیکربندی احراز هویت</string>
+    <string name="mixed_auth_username_hint">نام کاربری (خالی گذاشتن هر دو یعنی بدون احراز هویت)</string>
+    <string name="mixed_auth_no_auth">تنظیم نشده (بدون احراز هویت)</string>
+    <string name="mixed_auth_enabled_sum">نام کاربری: %1$s</string>
     <string name="http_proxy_bypass">فهرست دور زدن پروکسی HTTP</string>
     <string name="http_proxy_bypass_dialog_message">در هر خط یک مورد. خطوطی که با # شروع می‌شوند نظر هستند. مثال: *zhihu.com</string>
-    <string name="append_http_proxy_security_title">اطلاعیه امنیتی</string>
-    <string name="append_http_proxy_security_message">پس از فعال‌سازی، برنامه‌های دیگر در این دستگاه می‌توانند مستقیماً از پورت پروکسی محلی استفاده کنند.\n\nتوصیه: تنها در صورتی که به تمام برنامه‌های نصب‌شده اعتماد دارید، این گزینه را فعال کنید.</string>
-    <string name="enable_anyway">همچنان فعال کن</string>
     <string name="protocol_settings">تنظیمات پروتکل‌ها</string>
     <string name="trojan_provider">تأمین‌کننده Trojan</string>
     <string name="group_basic">ابتدایی</string>
@@ -433,6 +432,9 @@
     <string name="backup_settings">تنظیمات</string>
     <string name="backup_summary">اگر از دستورالعمل‌های مسیریابی با پیکربندی‌ها، پشتیبان‌گیری نشود، خروجی‌های سفارشی از بین خواهند رفت.</string>
     <string name="backup_not_file">یک فایل پشتیبانی نیست.: انتظار می‌رود یک فایل .json باشد اما %s است.</string>
+    <string name="backup_not_throne_desktop">پشتیبان Throne دسکتاپ نیست: انتظار .thrbackup می‌رفت اما %s است</string>
+    <string name="action_import_throne_desktop">ورود از Throne دسکتاپ</string>
+    <string name="backup_import_throne_desktop_summary">ورود پروفایل‌ها، مسیرها و تنظیمات از فایل .thrbackup دسکتاپ Throne. آیکون‌های سفارشی نادیده گرفته می‌شوند. داده‌های موجود در دسته‌های انتخاب‌شده بازنویسی می‌شوند.</string>
     <string name="invalid_backup_file">فایل پشتیبانی نادرست</string>
     <string name="backup_import">افزودن</string>
     <string name="backup_import_summary">افزودن فایل پشتیبانی، اطلاعات و تنظیمات کنونی را حذف و بازنویسی می‌کند.</string>

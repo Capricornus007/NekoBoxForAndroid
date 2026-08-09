@@ -66,7 +66,6 @@ object Key {
     const val SPEED_INTERVAL = "speedInterval"
     const val SHOW_DIRECT_SPEED = "showDirectSpeed"
 
-    const val APPEND_HTTP_PROXY = "appendHttpProxy"
     const val HTTP_PROXY_BYPASS = "httpProxyBypass"
     const val DNS_HOSTS = "dnsHosts"
     const val STRICT_ROUTE = "strictRoute"
