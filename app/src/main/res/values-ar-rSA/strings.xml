@@ -478,13 +478,10 @@
     <string name="backup_summary">إذا لم يتم نسخ إعدادات التوجيه احتياطيًا مع الإعدادات،
         فسيتم فقدان المخارج المخصصة.</string>
     <string name="backup_not_file">ليس ملف نسخ احتياطي: متوقع .json، ولكن %s</string>
-    <string name="backup_not_throne_desktop">Not a Throne desktop backup: expected .thrbackup, but %s</string>
     <string name="invalid_backup_file">ملف نسخ احتياطي غير صالح</string>
     <string name="backup_import">استيراد</string>
     <string name="backup_import_summary">سيؤدي الاستيراد إلى استبدال البيانات الموجودة.</string>
     <string name="backup_importing">جارٍ الاستيراد…</string>
-    <string name="action_import_throne_desktop">Import from Throne desktop</string>
-    <string name="backup_import_throne_desktop_summary">Import profiles, routes and settings from a Throne desktop .thrbackup file. Custom icons are ignored. Existing data in selected categories will be overwritten.</string>
     <string name="packet_encoding">ترميز الحزم</string>
     <string name="acquire_wake_lock">اكتساب WakeLock</string>
     <string name="release_wake_lock">تحرير WakeLock</string>
@@ -776,6 +773,9 @@
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
+    <string name="append_http_proxy_security_title">Security Warning</string>
+    <string name="append_http_proxy_security_message">Enabling HTTP proxy may expose your traffic.</string>
+    <string name="enable_anyway">Enable Anyway</string>
     <string name="vpn_watchdog">Auto-reconnect</string>
     <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
     <string name="vpn_watchdog_test">🧪 Test watchdog</string>
