@@ -273,6 +273,10 @@ object Key {
 
     const val VPN_WATCHDOG_ENABLED = "vpnWatchdogEnabled"
     const val VPN_WATCHDOG_INTERVAL = "vpnWatchdogInterval"
+
+    // ---- 新增（缺失的常量） ----
+    const val APPEND_HTTP_PROXY = "appendHttpProxy"
+    const val DISABLE_MIXED_INBOUND = "disableMixedInbound"
 }
 
 object TunImplementation {
@@ -319,22 +323,5 @@ object Action {
     const val RESET_UPSTREAM_CONNECTIONS = "moe.sb4a.RESET_UPSTREAM_CONNECTIONS"
 }
 
-// Mixed inbound authentication constants (from maskedeken fork)
-const val DISABLE_MIXED_INBOUND = "disableMixedInbound"
-const val mixedSecret = "mixedSecret"
-const val APPEND_HTTP_PROXY = "appendHttpProxy"
-const val appendHttpProxySecurityTitle = "append_http_proxy_security_title"
-const val appendHttpProxySecurityMessage = "append_http_proxy_security_message"
-const val enableAnyway = "enable_anyway"
+// 顶层常量，供 BackupFragment 直接使用（不带 Key. 前缀）
 const val actionImportThroneDesktop = "actionImportThroneDesktop"
-}
-
-// Mixed inbound authentication constants (from maskedeken fork)
-const val DISABLE_MIXED_INBOUND = "disableMixedInbound"
-const val mixedSecret = "mixedSecret"
-const val APPEND_HTTP_PROXY = "appendHttpProxy"
-const val appendHttpProxySecurityTitle = "append_http_proxy_security_title"
-const val appendHttpProxySecurityMessage = "append_http_proxy_security_message"
-const val enableAnyway = "enable_anyway"
-const val actionImportThroneDesktop = "actionImportThroneDesktop"
-}

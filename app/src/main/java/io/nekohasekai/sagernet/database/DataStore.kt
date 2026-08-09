@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.database
 
+import android.os.Build
 import android.os.Binder
 import androidx.preference.PreferenceDataStore
 import io.nekohasekai.sagernet.CONNECTION_TEST_URL
@@ -241,6 +242,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var mixedPassword by configurationStore.string(Key.MIXED_PASSWORD) {
         Util.generateCryptoSecurePassword()
     }
+    val mixedSecret: String get() = mixedPassword
 
     fun initGlobal() {
         if (configurationStore.getString(Key.MIXED_PORT) == null) {
