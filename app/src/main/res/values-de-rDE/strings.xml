@@ -469,13 +469,10 @@
     <string name="backup_settings">Einstellungen</string>
     <string name="backup_summary">Wenn die Routing-Einstellungen nicht mit Konfigurationen gesichert werden, gehen benutzerdefinierte Outbounds verloren.</string>
     <string name="backup_not_file">Keine Backup-Datei: erwartet .json, aber %s</string>
-    <string name="backup_not_throne_desktop">Not a Throne desktop backup: expected .thrbackup, but %s</string>
     <string name="invalid_backup_file">Ungültige Backup-Datei</string>
     <string name="backup_import">Importieren</string>
     <string name="backup_import_summary">Das Importieren überschreibt vorhandene Daten.</string>
     <string name="backup_importing">Importieren…</string>
-    <string name="action_import_throne_desktop">Import from Throne desktop</string>
-    <string name="backup_import_throne_desktop_summary">Import profiles, routes and settings from a Throne desktop .thrbackup file. Custom icons are ignored. Existing data in selected categories will be overwritten.</string>
     <string name="packet_encoding">Paketcodierung</string>
     <string name="acquire_wake_lock">WakeLock erwerben</string>
     <string name="release_wake_lock">WakeLock freigeben</string>
@@ -766,6 +763,9 @@
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
+    <string name="append_http_proxy_security_title">Security Warning</string>
+    <string name="append_http_proxy_security_message">Enabling HTTP proxy may expose your traffic.</string>
+    <string name="enable_anyway">Enable Anyway</string>
     <string name="vpn_watchdog">Auto-reconnect</string>
     <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
     <string name="vpn_watchdog_test">🧪 Test watchdog</string>
