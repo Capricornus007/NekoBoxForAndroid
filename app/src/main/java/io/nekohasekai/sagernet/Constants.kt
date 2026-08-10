@@ -10,6 +10,12 @@ object Key {
     const val PERSIST_ACROSS_REBOOT = "isAutoConnect"
 
     const val CLEAR_CACHE = "clearCache"
+    /**
+     * Staged in-app update release name (e.g. 1.4.2-mod-07).
+     * Kept while the downloaded APK is still newer than the installed app;
+     * cleared after startup cleans cache once the install has caught up.
+     */
+    const val PENDING_UPDATE_VERSION = "pendingUpdateVersion"
 
     const val APP_EXPERT = "isExpert"
     const val APP_THEME = "appTheme"

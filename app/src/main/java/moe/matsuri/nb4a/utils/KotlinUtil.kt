@@ -26,6 +26,22 @@ fun SagerNet.cleanWebview() {
     }
 }
 
+/** Remove staged in-app update APKs under cacheDir (update.apk / leftovers). */
+fun SagerNet.cleanAppUpdateCache() {
+    try {
+        cacheDir.listFiles()?.forEach { f ->
+            val n = f.name.lowercase()
+            if (n == "update.apk" || n == "update.apk.tmp" || n == "update.tmp" ||
+                n.endsWith(".apk") || n.endsWith(".apk.tmp")
+            ) {
+                f.delete()
+            }
+        }
+    } catch (e: Exception) {
+        Logs.e(e)
+    }
+}
+
 fun File.recreate(dir: Boolean) {
     if (parentFile?.isDirectory != true) return
     if (dir && !isFile) {

@@ -22,6 +22,7 @@ import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.isOss
 import io.nekohasekai.sagernet.ktx.isPreview
+import io.nekohasekai.sagernet.ktx.isStagedUpdateStillNewer
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ui.MainActivity
 import io.nekohasekai.sagernet.utils.*
@@ -31,6 +32,7 @@ import libcore.Libcore
 import moe.matsuri.nb4a.NativeInterface
 import moe.matsuri.nb4a.net.LocalResolverImpl
 import moe.matsuri.nb4a.utils.JavaUtil
+import moe.matsuri.nb4a.utils.cleanAppUpdateCache
 import moe.matsuri.nb4a.utils.cleanWebview
 import java.io.File
 import androidx.work.Configuration as WorkConfiguration
@@ -83,6 +85,13 @@ class SagerNet : Application(),
             Theme.applyNightTheme()
             AppLocale.apply()
             runOnDefaultDispatcher {
+                // Staged update APK: keep if still newer than installed; clean only after catch-up.
+                val staged = DataStore.pendingUpdateVersion
+                if (staged.isNotBlank() && !isStagedUpdateStillNewer(staged)) {
+                    cleanAppUpdateCache()
+                    DataStore.pendingUpdateVersion = ""
+                }
+
                 DefaultNetworkListener.start(this) {
                     underlyingNetwork = it
                 }

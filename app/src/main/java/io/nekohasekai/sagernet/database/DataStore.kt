@@ -94,6 +94,12 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var showBottomBar by configurationStore.boolean(Key.SHOW_BOTTOM_BAR)
     var confirmProfileDelete by configurationStore.boolean(Key.CONFIRM_PROFILE_DELETE) { true }
     var groupLayoutMode by configurationStore.stringToInt(Key.GROUP_LAYOUT_MODE) { 0 }
+    /**
+     * Release name of a downloaded but not-yet-consumed update APK in cacheDir.
+     * Empty means nothing staged. Startup only deletes the APK when the installed
+     * version has caught up to this name (cancel install keeps the cache).
+     */
+    var pendingUpdateVersion by configurationStore.string(Key.PENDING_UPDATE_VERSION) { "" }
 
     var allowInsecureOnRequest by configurationStore.boolean(Key.ALLOW_INSECURE_ON_REQUEST)
     var networkChangeResetConnections by configurationStore.boolean(Key.NETWORK_CHANGE_RESET_CONNECTIONS) { true }

@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.result.component1
 import androidx.activity.result.component2
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.danielstone.materialaboutlibrary.MaterialAboutFragment
@@ -23,6 +24,7 @@ import com.danielstone.materialaboutlibrary.model.MaterialAboutList
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.databinding.LayoutAboutBinding
+import io.nekohasekai.sagernet.databinding.LayoutProgressBinding
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.plugin.PluginManager.loadString
 import io.nekohasekai.sagernet.utils.PackageCache
@@ -35,6 +37,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
 import moe.matsuri.nb4a.utils.Util
 import org.json.JSONObject
+import java.io.File
 
 class AboutFragment : ToolbarFragment(R.layout.layout_about) {
 
@@ -61,6 +64,8 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
 
     class AboutContent : MaterialAboutFragment() {
 
+        private var pendingApkFile: File? = null
+
         val requestIgnoreBatteryOptimizations = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { (resultCode, _) ->
@@ -68,6 +73,16 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.about_fragment_holder, AboutContent())
                     .commitAllowingStateLoss()
+            }
+        }
+
+        private val requestInstallPermission = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            val apk = pendingApkFile
+            pendingApkFile = null
+            if (apk != null && canInstallPackages()) {
+                installApk(apk)
             }
         }
 
@@ -222,53 +237,78 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                             DataStore.mixedInboundPass
                         )
                     }
-                    val response = client.newRequest().apply {
-                        if (checkPreview) {
-                            setURL("https://api.github.com/repos/behindflower/NekoBoxForAndroid/releases/tags/preview")
+                    try {
+                        val response = client.newRequest().apply {
+                            if (checkPreview) {
+                                setURL("https://api.github.com/repos/behindflower/NekoBoxForAndroid/releases/tags/preview")
+                            } else {
+                                setURL("https://api.github.com/repos/behindflower/NekoBoxForAndroid/releases/latest")
+                            }
+                        }.execute()
+                        val release = JSONObject(Util.getStringBox(response.contentString))
+                        val releaseName = release.getString("name")
+                        val releaseUrl = release.getString("html_url")
+                        var haveUpdate = releaseName.isNotBlank()
+                        haveUpdate = if (isPreview) {
+                            if (checkPreview) {
+                                haveUpdate && releaseName != BuildConfig.PRE_VERSION_NAME
+                            } else {
+                                // User: 1.3.9 pre-1.4.0 Stable: 1.3.9 -> No update
+                                haveUpdate && releaseName != BuildConfig.VERSION_NAME
+                            }
                         } else {
-                            setURL("https://api.github.com/repos/behindflower/NekoBoxForAndroid/releases/latest")
+                            // User: 1.4.0 Preview: pre-1.4.0 -> No update
+                            // User: 1.4.0 Preview: pre-1.4.1 -> Update
+                            // User: 1.4.0 Stable: 1.4.0 -> No update
+                            // User: 1.4.0 Stable: 1.4.1 -> Update
+                            haveUpdate && !releaseName.contains(BuildConfig.VERSION_NAME)
                         }
-                    }.execute()
-                    val release = JSONObject(Util.getStringBox(response.contentString))
-                    val releaseName = release.getString("name")
-                    val releaseUrl = release.getString("html_url")
-                    var haveUpdate = releaseName.isNotBlank()
-                    haveUpdate = if (isPreview) {
-                        if (checkPreview) {
-                            haveUpdate && releaseName != BuildConfig.PRE_VERSION_NAME
-                        } else {
-                            // User: 1.3.9 pre-1.4.0 Stable: 1.3.9 -> No update
-                            haveUpdate && releaseName != BuildConfig.VERSION_NAME
-                        }
-                    } else {
-                        // User: 1.4.0 Preview: pre-1.4.0 -> No update
-                        // User: 1.4.0 Preview: pre-1.4.1 -> Update
-                        // User: 1.4.0 Stable: 1.4.0 -> No update
-                        // User: 1.4.0 Stable: 1.4.1 -> Update
-                        haveUpdate && !releaseName.contains(BuildConfig.VERSION_NAME)
-                    }
-                    runOnMainDispatcher {
-                        if (!isAdded) return@runOnMainDispatcher
-                        if (haveUpdate) {
-                            val context = context ?: return@runOnMainDispatcher
-                            MaterialAlertDialogBuilder(context)
-                                .setTitle(R.string.update_dialog_title)
-                                .setMessage(
-                                    context.getString(
-                                        R.string.update_dialog_message,
-                                        SagerNet.appVersionNameForDisplay,
-                                        releaseName
-                                    )
-                                )
-                                .setPositiveButton(R.string.yes) { _, _ ->
-                                    val intent = Intent(Intent.ACTION_VIEW, releaseUrl.toUri())
-                                    context.startActivity(intent)
+                        val assets = release.optJSONArray("assets")?.filterIsInstance<JSONObject>().orEmpty()
+                        val apkAsset = pickApkAsset(assets)
+                        runOnMainDispatcher {
+                            if (!isAdded) return@runOnMainDispatcher
+                            if (haveUpdate) {
+                                val context = context ?: return@runOnMainDispatcher
+                                if (apkAsset != null) {
+                                    val downloadUrl = apkAsset.getStr("browser_download_url")
+                                        ?: return@runOnMainDispatcher openReleasePage(releaseUrl)
+                                    MaterialAlertDialogBuilder(context)
+                                        .setTitle(R.string.update_dialog_title)
+                                        .setMessage(
+                                            context.getString(
+                                                R.string.update_dialog_message,
+                                                SagerNet.appVersionNameForDisplay,
+                                                releaseName
+                                            )
+                                        )
+                                        .setPositiveButton(R.string.yes) { _, _ ->
+                                            downloadAndInstall(downloadUrl, releaseName, releaseUrl)
+                                        }
+                                        .setNeutralButton(R.string.update_open_page) { _, _ ->
+                                            openReleasePage(releaseUrl)
+                                        }
+                                        .setNegativeButton(R.string.no, null)
+                                        .show()
+                                } else {
+                                    val abis = Build.SUPPORTED_ABIS.filter { it.isNotBlank() }
+                                        .joinToString(", ")
+                                    MaterialAlertDialogBuilder(context)
+                                        .setTitle(R.string.update_dialog_title)
+                                        .setMessage(
+                                            context.getString(R.string.update_no_apk_for_abi, abis)
+                                        )
+                                        .setPositiveButton(R.string.yes) { _, _ ->
+                                            openReleasePage(releaseUrl)
+                                        }
+                                        .setNegativeButton(R.string.no, null)
+                                        .show()
                                 }
-                                .setNegativeButton(R.string.no, null)
-                                .show()
-                        } else {
-                            Toast.makeText(app, R.string.check_update_no, Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(app, R.string.check_update_no, Toast.LENGTH_SHORT).show()
+                            }
                         }
+                    } finally {
+                        client.close()
                     }
                 } catch (e: Exception) {
                     Logs.w(e)
@@ -276,6 +316,165 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         Toast.makeText(app, e.readableMessage, Toast.LENGTH_SHORT).show()
                     }
                 }
+            }
+        }
+
+        /** Prefer the first SUPPORTED_ABIS entry that has a matching per-ABI release APK. */
+        private fun pickApkAsset(assets: List<JSONObject>): JSONObject? {
+            val apkAssets = assets.filter { asset ->
+                val name = asset.getStr("name")?.lowercase() ?: return@filter false
+                name.endsWith(".apk")
+            }
+            if (apkAssets.isEmpty()) return null
+            for (abi in Build.SUPPORTED_ABIS) {
+                if (abi.isNullOrBlank()) continue
+                val needle = "-$abi.apk"
+                apkAssets.find { (it.getStr("name") ?: "").contains(needle, ignoreCase = true) }
+                    ?.let { return it }
+            }
+            // universal / single apk without abi suffix
+            return apkAssets.find { asset ->
+                val name = asset.getStr("name")?.lowercase() ?: return@find false
+                !name.contains("arm64") && !name.contains("armeabi") &&
+                    !name.contains("x86_64") && !name.contains("x86")
+            } ?: apkAssets.firstOrNull()
+        }
+
+        private fun openReleasePage(releaseUrl: String) {
+            val context = context ?: return
+            runCatching {
+                context.startActivity(Intent(Intent.ACTION_VIEW, releaseUrl.toUri()))
+            }
+        }
+
+        private fun downloadAndInstall(downloadUrl: String, releaseName: String, releaseUrl: String) {
+            if (!isAdded) return
+            val context = context ?: return
+            val apkFile = File(app.cacheDir, "update.apk")
+
+            // Cancelled install earlier: reuse same-version cached APK without re-download.
+            if (apkFile.isFile && apkFile.length() > 0L &&
+                DataStore.pendingUpdateVersion == releaseName
+            ) {
+                requestInstall(apkFile)
+                return
+            }
+
+            val progressBinding = LayoutProgressBinding.inflate(layoutInflater)
+            progressBinding.content.setText(R.string.update_downloading)
+            val progressDialog = MaterialAlertDialogBuilder(context)
+                .setView(progressBinding.root)
+                .setCancelable(false)
+                .create()
+            progressDialog.show()
+
+            runOnIoDispatcher {
+                val client = Libcore.newHttpClient().apply {
+                    modernTLS()
+                    keepAlive()
+                    trySocks5(
+                        DataStore.mixedPort,
+                        DataStore.mixedInboundUser,
+                        DataStore.mixedInboundPass
+                    )
+                }
+                try {
+                    val response = client.newRequest().apply {
+                        setURL(downloadUrl)
+                    }.execute()
+                    app.cacheDir.mkdirs()
+                    // Fixed names so repeated updates overwrite instead of stacking versioned APKs.
+                    // Also drop leftover release-named APKs from older builds of this feature.
+                    app.cacheDir.listFiles()?.forEach { f ->
+                        val n = f.name.lowercase()
+                        if (n.endsWith(".apk") || n.endsWith(".apk.tmp") || n == "update.tmp") {
+                            f.delete()
+                        }
+                    }
+                    val tmpFile = File(app.cacheDir, "update.apk.tmp")
+                    response.writeTo(tmpFile.canonicalPath)
+                    if (apkFile.exists()) apkFile.delete()
+                    if (!tmpFile.renameTo(apkFile)) {
+                        tmpFile.copyTo(apkFile, overwrite = true)
+                        tmpFile.delete()
+                    }
+                    // Record staged version: startup cleans only after installed version catches up.
+                    // Cancelled install keeps this + update.apk for retry.
+                    DataStore.pendingUpdateVersion = releaseName
+                    runOnMainDispatcher {
+                        if (progressDialog.isShowing) progressDialog.dismiss()
+                        if (!isAdded) return@runOnMainDispatcher
+                        requestInstall(apkFile)
+                    }
+                } catch (e: Exception) {
+                    Logs.w(e)
+                    // Failed download: remove partial file so it doesn't sit in cache forever.
+                    runCatching {
+                        File(app.cacheDir, "update.apk.tmp").delete()
+                    }
+                    runOnMainDispatcher {
+                        if (progressDialog.isShowing) progressDialog.dismiss()
+                        if (!isAdded) return@runOnMainDispatcher
+                        val ctx = this@AboutContent.context ?: return@runOnMainDispatcher
+                        MaterialAlertDialogBuilder(ctx)
+                            .setTitle(R.string.error_title)
+                            .setMessage(e.readableMessage)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .setNeutralButton(R.string.update_open_page) { _, _ ->
+                                openReleasePage(releaseUrl)
+                            }
+                            .show()
+                    }
+                } finally {
+                    client.close()
+                }
+            }
+        }
+
+        private fun canInstallPackages(): Boolean {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                app.packageManager.canRequestPackageInstalls()
+            } else {
+                true
+            }
+        }
+
+        private fun requestInstall(apkFile: File) {
+            if (!isAdded) return
+            if (!canInstallPackages()) {
+                pendingApkFile = apkFile
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    requestInstallPermission.launch(
+                        Intent(
+                            Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                            "package:${app.packageName}".toUri()
+                        )
+                    )
+                }
+                return
+            }
+            installApk(apkFile)
+        }
+
+        private fun installApk(apkFile: File) {
+            val context = context ?: return
+            if (!apkFile.isFile) {
+                Toast.makeText(app, R.string.error_title, Toast.LENGTH_SHORT).show()
+                return
+            }
+            val uri = FileProvider.getUriForFile(
+                context, BuildConfig.APPLICATION_ID + ".cache", apkFile
+            )
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/vnd.android.package-archive")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            runCatching {
+                startActivity(intent)
+            }.onFailure { e ->
+                Logs.w(e)
+                Toast.makeText(app, e.readableMessage, Toast.LENGTH_SHORT).show()
             }
         }
 
