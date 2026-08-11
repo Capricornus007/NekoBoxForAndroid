@@ -537,6 +537,7 @@
     <string name="enable_ech_sum">Verschlüsselten Client Hello aktivieren</string>
     <string name="ech_settings">ECH-Einstellungen</string>
     <string name="ech_config">ECH-Konfiguration</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgrade-Host</string>
     <string name="http_upgrade_path">HTTPUpgrade-Pfad</string>
     <string name="update_current_subscription">Aktuelles Gruppenabonnement aktualisieren</string>
