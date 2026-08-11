@@ -539,6 +539,7 @@
     <string name="enable_ech_sum">启用加密客户端问候</string>
     <string name="ech_settings">ECH 设置</string>
     <string name="ech_config">ECH 配置</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgrade 主机</string>
     <string name="http_upgrade_path">HTTPUpgrade 路径</string>
     <string name="update_current_subscription">更新当前分组的订阅</string>
