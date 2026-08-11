@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	tun "github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common/control"
@@ -164,10 +165,15 @@ func (m *interfaceMonitor) resolveInterface(interfaceName string, interfaceIndex
 // UpdateDefaultInterface 对齐官方 libbox monitor.go updateDefaultInterface。
 func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfaceIndex int32) {
 	// 官方：先刷新平台接口列表
+	// 诊断：计时 —— 每次事件（含 onCapabilitiesChanged 风暴）都会触发，
+	// 且 UpdateInterfaces 经 JNI 回调 Kotlin getInterfaces 全量枚举网卡。
+	var updateElapsed time.Duration
 	if m.wrapper.networkManager != nil {
+		start := time.Now()
 		if err := m.wrapper.networkManager.UpdateInterfaces(); err != nil {
 			m.logger.Error(E.Cause(err, "update interfaces"))
 		}
+		updateElapsed = time.Since(start)
 	}
 
 	m.access.Lock()
@@ -204,7 +210,7 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 		m.access.Unlock()
 		m.logger.Debug("default interface unchanged ", newInterface.Name,
 			" index ", newInterface.Index, " source ", source,
-			" skip ResetNetwork")
+			" skip ResetNetwork updateInterfaces ", updateElapsed)
 		return
 	}
 
@@ -226,7 +232,8 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 	m.access.Unlock()
 
 	m.logger.Info("updated default interface ", newInterface.Name,
-		" index ", newInterface.Index, " source ", source, " prev ", oldDesc)
+		" index ", newInterface.Index, " source ", source, " prev ", oldDesc,
+		" updateInterfaces ", updateElapsed)
 	for _, callback := range callbacks {
 		callback(newInterface, 0)
 	}

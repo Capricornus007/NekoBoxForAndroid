@@ -8,6 +8,7 @@ import android.net.wifi.WifiManager
 import android.system.OsConstants
 import android.os.Build
 import android.os.Build.VERSION_CODES
+import android.os.SystemClock
 import androidx.annotation.RequiresApi
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.bg.ServiceNotification
@@ -26,6 +27,8 @@ import libcore.NB4AInterface
 import libcore.NetworkInterfaceIterator
 import libcore.StringIterator
 import java.net.Inet6Address
+import java.util.Collections
+import java.util.WeakHashMap
 import java.net.InetSocketAddress
 import java.net.InterfaceAddress
 import java.net.NetworkInterface
@@ -114,12 +117,38 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         }
     }
 
+    // 每个监听器（box）的上报状态：用于 Info 去重 + 风暴计数诊断。
+    // WeakHashMap 键为 gomobile 代理对象，box close 后不泄漏。
+    private class IfaceReportState {
+        var name: String? = null
+        var index: Int = Int.MIN_VALUE
+        var network: Network? = null
+        var suppressed: Int = 0
+    }
+
+    private val ifaceReportStates = Collections.synchronizedMap(
+        WeakHashMap<InterfaceUpdateListener, IfaceReportState>()
+    )
+
+    private fun reportState(listener: InterfaceUpdateListener): IfaceReportState =
+        synchronized(ifaceReportStates) {
+            ifaceReportStates.getOrPut(listener) { IfaceReportState() }
+        }
+
     private fun checkDefaultInterfaceUpdate(listener: InterfaceUpdateListener, network: Network?) {
+        // 诊断：入口线程 + 全程耗时（验证事件链是否跑在主线程、单次事件成本）
+        val start = SystemClock.elapsedRealtime()
+        Logs.d("checkDefaultInterfaceUpdate enter network=$network thread=${Thread.currentThread().name}")
         // 同步「网络变化时重置出站」开关到 Go：控制 name/index 变化时是否
         // callback → 官方 ResetNetwork（见 libcore/interface_monitor.go）。
         Libcore.setNetworkChangeResetConnections(DataStore.networkChangeResetConnections)
+        val state = reportState(listener)
         if (network == null) {
-            Logs.i("checkDefaultInterfaceUpdate network=null -> clear default interface")
+            Logs.i("checkDefaultInterfaceUpdate network=null -> clear default interface suppressedSinceLast=${state.suppressed} elapsed=${SystemClock.elapsedRealtime() - start}ms")
+            state.name = null
+            state.index = Int.MIN_VALUE
+            state.network = null
+            state.suppressed = 0
             listener.updateDefaultInterface("", -1)
             return
         }
@@ -127,22 +156,38 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         repeat(10) { attempt ->
             val linkProperties = SagerNet.connectivity.getLinkProperties(network)
             if (linkProperties == null) {
-                Logs.i("checkDefaultInterfaceUpdate attempt=${attempt + 1} linkProperties=null network=$network")
+                Logs.d("checkDefaultInterfaceUpdate attempt=${attempt + 1} linkProperties=null network=$network")
                 Thread.sleep(100)
                 return@repeat
             }
             val interfaceIndex = try {
                 NetworkInterface.getByName(linkProperties.interfaceName).index
             } catch (e: Exception) {
-                Logs.i("checkDefaultInterfaceUpdate attempt=${attempt + 1} getByName failed name=${linkProperties.interfaceName}: $e")
+                Logs.d("checkDefaultInterfaceUpdate attempt=${attempt + 1} getByName failed name=${linkProperties.interfaceName}: $e")
                 Thread.sleep(100)
                 return@repeat
             }
-            Logs.i("checkDefaultInterfaceUpdate ok name=${linkProperties.interfaceName} index=$interfaceIndex network=$network attempt=${attempt + 1}")
+            // 结果与上次完全相同：仍照常上报 Go（行为不变），但 Info 不刷屏，只计数
+            if (state.name == linkProperties.interfaceName && state.index == interfaceIndex && state.network == network) {
+                state.suppressed++
+                if (state.suppressed == 1 || state.suppressed % 20 == 0) {
+                    Logs.d("checkDefaultInterfaceUpdate duplicate #${state.suppressed} name=${linkProperties.interfaceName} index=$interfaceIndex network=$network elapsed=${SystemClock.elapsedRealtime() - start}ms")
+                }
+            } else {
+                Logs.i("checkDefaultInterfaceUpdate ok name=${linkProperties.interfaceName} index=$interfaceIndex network=$network attempt=${attempt + 1} suppressedSinceLast=${state.suppressed} elapsed=${SystemClock.elapsedRealtime() - start}ms thread=${Thread.currentThread().name}")
+                state.name = linkProperties.interfaceName
+                state.index = interfaceIndex
+                state.network = network
+                state.suppressed = 0
+            }
             listener.updateDefaultInterface(linkProperties.interfaceName, interfaceIndex)
             return
         }
-        Logs.w("checkDefaultInterfaceUpdate exhausted retries network=$network -> clear default interface")
+        Logs.w("checkDefaultInterfaceUpdate exhausted retries network=$network -> clear default interface suppressedSinceLast=${state.suppressed} elapsed=${SystemClock.elapsedRealtime() - start}ms")
+        state.name = null
+        state.index = Int.MIN_VALUE
+        state.network = null
+        state.suppressed = 0
         listener.updateDefaultInterface("", -1)
     }
 

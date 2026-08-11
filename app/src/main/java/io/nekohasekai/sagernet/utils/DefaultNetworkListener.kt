@@ -8,6 +8,7 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.CompletableDeferred
@@ -56,24 +57,29 @@ object DefaultNetworkListener {
 
             is NetworkMessage.Put -> {
                 // 诊断：夜间/飞行模式网络事件时间线（与 Go UpdateDefaultInterface 对照）
-                Logs.i("DefaultNetworkListener Put network=${message.network} listeners=${listeners.size}")
+                // elapsed 覆盖全部 listener 同步执行耗时（Unconfined actor 内联在回调线程跑）
+                val start = SystemClock.elapsedRealtime()
                 network = message.network
                 pendingRequests.forEach { it.response.complete(message.network) }
                 pendingRequests.clear()
                 listeners.values.forEach { it(network) }
+                Logs.i("DefaultNetworkListener Put network=${message.network} listeners=${listeners.size} elapsed=${SystemClock.elapsedRealtime() - start}ms thread=${Thread.currentThread().name}")
             }
             is NetworkMessage.Update -> if (network == message.network) {
-                Logs.i("DefaultNetworkListener Update network=${message.network} listeners=${listeners.size}")
+                // 切网/信号抖动时此事件会风暴（onCapabilitiesChanged），降为 debug
+                val start = SystemClock.elapsedRealtime()
                 listeners.values.forEach {
                     it(
                         network
                     )
                 }
+                Logs.d("DefaultNetworkListener Update network=${message.network} listeners=${listeners.size} elapsed=${SystemClock.elapsedRealtime() - start}ms thread=${Thread.currentThread().name}")
             }
             is NetworkMessage.Lost -> if (network == message.network) {
-                Logs.i("DefaultNetworkListener Lost network=${message.network} listeners=${listeners.size}")
+                val start = SystemClock.elapsedRealtime()
                 network = null
                 listeners.values.forEach { it(null) }
+                Logs.i("DefaultNetworkListener Lost network=${message.network} listeners=${listeners.size} elapsed=${SystemClock.elapsedRealtime() - start}ms thread=${Thread.currentThread().name}")
             }
         }
     }
@@ -92,18 +98,25 @@ object DefaultNetworkListener {
     suspend fun stop(key: Any) = networkActor.send(NetworkMessage.Stop(key))
 
     // NB: this runs in ConnectivityThread, and this behavior cannot be changed until API 26
+    // （实际经 register 传 mainHandler 派发到进程主线程，入口日志验证）
     private object Callback : ConnectivityManager.NetworkCallback() {
-        override fun onAvailable(network: Network) =
+        override fun onAvailable(network: Network) {
+            Logs.d("DefaultNetworkListener onAvailable enter network=$network thread=${Thread.currentThread().name}")
             runBlocking { networkActor.send(NetworkMessage.Put(network)) }
+        }
 
         override fun onCapabilitiesChanged(
             network: Network, networkCapabilities: NetworkCapabilities
         ) { // it's a good idea to refresh capabilities
+            // 风暴源：逐条 debug（Info 会刷屏）
+            Logs.d("DefaultNetworkListener onCapabilitiesChanged enter network=$network thread=${Thread.currentThread().name}")
             runBlocking { networkActor.send(NetworkMessage.Update(network)) }
         }
 
-        override fun onLost(network: Network) =
+        override fun onLost(network: Network) {
+            Logs.d("DefaultNetworkListener onLost enter network=$network thread=${Thread.currentThread().name}")
             runBlocking { networkActor.send(NetworkMessage.Lost(network)) }
+        }
     }
 
     private var fallback = false
