@@ -548,6 +548,7 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="enable_ech_sum">Activar Encrypted Client Hello</string>
     <string name="ech_settings">Ajustes de ECH</string>
     <string name="ech_config">Configuración de ECH</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">Host de HTTPUpgrade</string>
     <string name="http_upgrade_path">Ruta de HTTPUpgrade</string>
     <string name="update_current_subscription">Actualizar suscripción del grupo actual</string>
