@@ -68,6 +68,9 @@ public abstract class StandardV2RayBean extends AbstractBean {
 
     public String echConfig;
 
+    // sing-box ech.query_server_name：ECH HTTPS 记录查询域名（链接 ech=<domain>+<doh> 的域名部分）
+    public String echQueryServerName;
+
     // --------------------------------------- Mux
 
     public Boolean enableMux;
@@ -126,6 +129,7 @@ public abstract class StandardV2RayBean extends AbstractBean {
 
         if (enableECH == null) enableECH = false;
         if (JavaUtil.isNullOrBlank(echConfig)) echConfig = "";
+        if (JavaUtil.isNullOrBlank(echQueryServerName)) echQueryServerName = "";
 
         if (enableMux == null) enableMux = false;
         if (muxPadding == null) muxPadding = false;
@@ -148,7 +152,7 @@ public abstract class StandardV2RayBean extends AbstractBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(10);
+        output.writeInt(11);
         super.serialize(output);
         output.writeString(uuid);
         output.writeString(encryption);
@@ -214,6 +218,8 @@ public abstract class StandardV2RayBean extends AbstractBean {
 
         output.writeBoolean(enableECH);
         output.writeString(echConfig);
+        // v11
+        output.writeString(echQueryServerName);
 
         output.writeInt(packetEncoding);
 
@@ -343,6 +349,11 @@ public abstract class StandardV2RayBean extends AbstractBean {
                     echConfig = input.readString();
                 }
             } // otherwise the next field is packetEncoding
+        }
+
+        // v11
+        if (version >= 11) {
+            echQueryServerName = input.readString();
         }
 
         packetEncoding = input.readInt();

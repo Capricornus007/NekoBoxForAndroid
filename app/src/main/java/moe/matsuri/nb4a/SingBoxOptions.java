@@ -2084,6 +2084,9 @@ public class SingBoxOptions {
 
         public String config_path;
 
+        // Since sing-box 1.13.0
+        public String query_server_name;
+
     }
 
     public static class OutboundUTLSOptions extends SingBoxOption {
