@@ -547,6 +547,7 @@
     <string name="enable_ech_sum">تمكين Encrypted Client Hello</string>
     <string name="ech_settings">إعدادات ECH</string>
     <string name="ech_config">تكوين ECH</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">مضيف HTTPUpgrade</string>
     <string name="http_upgrade_path">مسار HTTPUpgrade</string>
     <string name="update_current_subscription">تحديث اشتراك المجموعة الحالية</string>
