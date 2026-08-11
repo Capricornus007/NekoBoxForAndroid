@@ -519,6 +519,7 @@
     <string name="enable_ech_sum">启用 ECH</string>
     <string name="ech_settings">ECH 设置</string>
     <string name="ech_config">ECH 配置</string>
+    <string name="ech_query_server_name">ECH 查询域名</string>
     <string name="http_upgrade_host">HTTPUpgrade 主机</string>
     <string name="http_upgrade_path">HTTPUpgrade 路径</string>
     <string name="update_current_subscription">更新当前组订阅</string>

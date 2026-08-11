@@ -213,6 +213,7 @@ private class SingBoxTLSFields {
     var realityShortId: String = ""
     var enableECH: Boolean = false
     var echConfig: String = ""
+    var echQueryServerName: String = ""
     var disableSNI: Boolean = false
 }
 
@@ -247,6 +248,7 @@ private fun JSONObject.parseSingBoxTLS(): SingBoxTLSFields? {
                     is JSONArray -> config.toStringList().joinToString("\n")
                     else -> ""
                 }
+                echQueryServerName = it.getStr("query_server_name") ?: ""
             }
         }
         disableSNI = tls.optBoolean("disable_sni", false)
@@ -265,6 +267,7 @@ private fun StandardV2RayBean.applySingBoxTLS(tls: SingBoxTLSFields?) {
     realityShortId = tls.realityShortId
     enableECH = tls.enableECH
     echConfig = tls.echConfig
+    echQueryServerName = tls.echQueryServerName
 }
 
 // ---------------------------------------------------------------------------

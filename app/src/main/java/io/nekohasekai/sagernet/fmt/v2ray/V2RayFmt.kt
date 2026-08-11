@@ -203,6 +203,17 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
             url.queryParameter("sid")?.let {
                 realityShortId = it
             }
+            // 社区格式: ech=<ECH查询域名>+<DoH地址>（Xray echConfigList 风格），或 ech=true/1
+            url.queryParameter("ech")?.let {
+                if (it.isNotBlank() && !it.equals("none", true) && it != "0" && !it.equals("false", true)) {
+                    enableECH = true
+                    // sing-box 不支持为 ECH 查询单独指定 DoH（走自身 DNS 路由），仅保留域名部分
+                    val queryDomain = it.substringBefore('+')
+                    if (queryDomain.isNotBlank() && !queryDomain.equals("true", true) && queryDomain != "1") {
+                        echQueryServerName = queryDomain
+                    }
+                }
+            }
         }
     }
 
@@ -600,6 +611,12 @@ fun StandardV2RayBean.toUriVMessVLESSTrojan(isTrojan: Boolean): String {
                     builder.addQueryParameter("pbk", realityPubKey)
                     builder.addQueryParameter("sid", realityShortId)
                 }
+                if (enableECH) {
+                    builder.addQueryParameter(
+                        "ech",
+                        echQueryServerName.ifBlank { "true" }
+                    )
+                }
             }
         }
     }
@@ -800,6 +817,9 @@ fun buildSingBoxOutboundTLS(bean: StandardV2RayBean): OutboundTLSOptions? {
         if (bean.enableECH) {
             ech = OutboundECHOptions().apply {
                 enabled = true
+                if (bean.echQueryServerName.isNotBlank()) {
+                    query_server_name = bean.echQueryServerName
+                }
                 if (bean.echConfig.isNotBlank()) {
                     config = if (bean.echConfig.contains("BEGIN ECH CONFIGS")) {
                         bean.echConfig.lines()
