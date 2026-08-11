@@ -553,6 +553,7 @@
     <string name="enable_ech_sum">Activer Encrypted Client Hello</string>
     <string name="ech_settings">Paramètres ECH</string>
     <string name="ech_config">Configuration ECH</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">Hôte HTTPUpgrade</string>
     <string name="http_upgrade_path">Chemin HTTPUpgrade</string>
     <string name="update_current_subscription">Mettre à jour l\'abonnement du groupe actuel</string>
