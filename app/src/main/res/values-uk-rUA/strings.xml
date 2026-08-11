@@ -546,6 +546,7 @@
     <string name="enable_ech_sum">Увімкнути Encrypted Client Hello</string>
     <string name="ech_settings">Налаштування ECH</string>
     <string name="ech_config">Конфігурація ECH</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgrade Host</string>
     <string name="http_upgrade_path">HTTPUpgrade Path</string>
     <string name="update_current_subscription">Оновити підписку поточної групи</string>
