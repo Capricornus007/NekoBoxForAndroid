@@ -535,6 +535,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="enable_ech_sum">暗号化されたClient Helloを有効にする</string>
     <string name="ech_settings">ECH設定</string>
     <string name="ech_config">ECH設定</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgradeホスト</string>
     <string name="http_upgrade_path">HTTPUpgradeパス</string>
     <string name="update_current_subscription">現在のグループのサブスクリプションを更新</string>
