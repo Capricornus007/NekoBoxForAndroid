@@ -167,19 +167,23 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
                 Thread.sleep(100)
                 return@repeat
             }
-            // 结果与上次完全相同：仍照常上报 Go（行为不变），但 Info 不刷屏，只计数
+            // 结果与上次完全相同：短路，不调 Go。
+            // Go 侧 unchanged 路径本就只是 UpdateInterfaces 刷缓存后 skip ResetNetwork，
+            // 不上报零语义损失（下次真实变化时全链照跑、缓存照刷）。
+            // 批量测速时每个 test box 挂一个监听器，onCapabilitiesChanged 风暴 ×
+            // N 个 box × (JNI + Go UpdateInterfaces 全量枚举) 曾把主线程按秒阻塞。
             if (state.name == linkProperties.interfaceName && state.index == interfaceIndex && state.network == network) {
                 state.suppressed++
                 if (state.suppressed == 1 || state.suppressed % 20 == 0) {
-                    Logs.d("checkDefaultInterfaceUpdate duplicate #${state.suppressed} name=${linkProperties.interfaceName} index=$interfaceIndex network=$network elapsed=${SystemClock.elapsedRealtime() - start}ms")
+                    Logs.d("checkDefaultInterfaceUpdate duplicate #${state.suppressed} name=${linkProperties.interfaceName} index=$interfaceIndex network=$network elapsed=${SystemClock.elapsedRealtime() - start}ms (unchanged, skip Go)")
                 }
-            } else {
-                Logs.i("checkDefaultInterfaceUpdate ok name=${linkProperties.interfaceName} index=$interfaceIndex network=$network attempt=${attempt + 1} suppressedSinceLast=${state.suppressed} elapsed=${SystemClock.elapsedRealtime() - start}ms thread=${Thread.currentThread().name}")
-                state.name = linkProperties.interfaceName
-                state.index = interfaceIndex
-                state.network = network
-                state.suppressed = 0
+                return
             }
+            Logs.i("checkDefaultInterfaceUpdate ok name=${linkProperties.interfaceName} index=$interfaceIndex network=$network attempt=${attempt + 1} suppressedSinceLast=${state.suppressed} elapsed=${SystemClock.elapsedRealtime() - start}ms thread=${Thread.currentThread().name}")
+            state.name = linkProperties.interfaceName
+            state.index = interfaceIndex
+            state.network = network
+            state.suppressed = 0
             listener.updateDefaultInterface(linkProperties.interfaceName, interfaceIndex)
             return
         }

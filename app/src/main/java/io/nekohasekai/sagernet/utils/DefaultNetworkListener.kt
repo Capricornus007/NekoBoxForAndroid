@@ -7,7 +7,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
 import android.os.Handler
-import android.os.Looper
+import android.os.HandlerThread
 import android.os.SystemClock
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
@@ -97,8 +97,9 @@ object DefaultNetworkListener {
 
     suspend fun stop(key: Any) = networkActor.send(NetworkMessage.Stop(key))
 
-    // NB: this runs in ConnectivityThread, and this behavior cannot be changed until API 26
-    // （实际经 register 传 mainHandler 派发到进程主线程，入口日志验证）
+    // NB: API 26 以下跑在 ConnectivityThread；26+ 经 register 传 callbackHandler
+    // 派发到专用 worker 线程（曾用 mainHandler 派发到进程主线程，
+    // 测速多监听器 + onCapabilitiesChanged 风暴时主线程被秒级阻塞 → 界面卡死）
     private object Callback : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             Logs.d("DefaultNetworkListener onAvailable enter network=$network thread=${Thread.currentThread().name}")
@@ -128,7 +129,8 @@ object DefaultNetworkListener {
             removeCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL)
         }
     }.build()
-    private val mainHandler = Handler(Looper.getMainLooper())
+    private val callbackThread = HandlerThread("DefaultNetworkListener").apply { start() }
+    private val callbackHandler = Handler(callbackThread.looper)
 
     /**
      * Unfortunately registerDefaultNetworkCallback is going to return VPN interface since Android P DP1:
@@ -146,14 +148,14 @@ object DefaultNetworkListener {
             when (Build.VERSION.SDK_INT) {
                 in 31..Int.MAX_VALUE -> @TargetApi(31) {
                     SagerNet.connectivity.registerBestMatchingNetworkCallback(
-                        request, Callback, mainHandler
+                        request, Callback, callbackHandler
                     )
                 }
                 in 28 until 31 -> @TargetApi(28) {  // we want REQUEST here instead of LISTEN
-                    SagerNet.connectivity.requestNetwork(request, Callback, mainHandler)
+                    SagerNet.connectivity.requestNetwork(request, Callback, callbackHandler)
                 }
                 in 26 until 28 -> @TargetApi(26) {
-                    SagerNet.connectivity.registerDefaultNetworkCallback(Callback, mainHandler)
+                    SagerNet.connectivity.registerDefaultNetworkCallback(Callback, callbackHandler)
                 }
                 in 24 until 26 -> @TargetApi(24) {
                     SagerNet.connectivity.registerDefaultNetworkCallback(Callback)
