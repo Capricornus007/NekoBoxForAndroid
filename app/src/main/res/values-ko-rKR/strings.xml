@@ -529,6 +529,7 @@
     <string name="enable_ech_sum">암호화된 Client Hello 활성화</string>
     <string name="ech_settings">ECH 설정</string>
     <string name="ech_config">ECH 구성</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgrade 호스트</string>
     <string name="http_upgrade_path">HTTPUpgrade 경로</string>
     <string name="update_current_subscription">현재 그룹의 구독 업데이트</string>
