@@ -539,6 +539,7 @@
     <string name="enable_ech_sum">Şifrelenmiş Client Hello\'yu Etkinleştir</string>
     <string name="ech_settings">ECH Ayarları</string>
     <string name="ech_config">ECH Yapılandırması</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgrade Host</string>
     <string name="http_upgrade_path">HTTPUpgrade Yolu</string>
     <string name="update_current_subscription">Mevcut Grubun aboneliğini güncelle</string>
