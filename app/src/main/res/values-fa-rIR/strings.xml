@@ -536,6 +536,7 @@
     <string name="enable_ech_sum">فعال‌سازی Encrypted Client Hello</string>
     <string name="ech_settings">تنظیمات ECH</string>
     <string name="ech_config">پیکربندی ECH</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">میزبان HTTPUpgrade</string>
     <string name="http_upgrade_path">مسیر HTTPUpgrade</string>
     <string name="update_current_subscription">به‌روزرسانی اشتراک گروه فعلی</string>
