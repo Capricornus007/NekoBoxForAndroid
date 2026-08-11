@@ -531,6 +531,7 @@
     <string name="enable_ech_sum">啟用加密客戶端 Hello</string>
     <string name="ech_settings">ECH 設定</string>
     <string name="ech_config">ECH 配置</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgrade 主機</string>
     <string name="http_upgrade_path">HTTPUpgrade 路徑</string>
     <string name="update_current_subscription">更新目前分組的訂閱</string>
