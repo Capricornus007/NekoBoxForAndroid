@@ -546,6 +546,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="enable_ech_sum">Aktifkan Encrypted Client Hello</string>
     <string name="ech_settings">Pengaturan ECH</string>
     <string name="ech_config">Konfigurasi ECH</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">Host HTTPUpgrade</string>
     <string name="http_upgrade_path">Path HTTPUpgrade</string>
     <string name="update_current_subscription">Perbarui langganan Grup saat ini</string>
