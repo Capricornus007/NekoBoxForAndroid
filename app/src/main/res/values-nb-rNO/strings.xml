@@ -543,6 +543,7 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="enable_ech_sum">Aktiver Encrypted Client Hello</string>
     <string name="ech_settings">ECH-innstillinger</string>
     <string name="ech_config">ECH-konfigurasjon</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgrade-vert</string>
     <string name="http_upgrade_path">HTTPUpgrade-sti</string>
     <string name="update_current_subscription">Oppdater gjeldende gruppes abonnement</string>
