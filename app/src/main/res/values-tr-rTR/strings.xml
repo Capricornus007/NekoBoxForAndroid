@@ -599,7 +599,10 @@
     <string name="check_update_release">Sürüm güncellemelerini kontrol et</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">Yeni sürüm mevcut</string>
-    <string name="update_dialog_message">Mevcut sürüm: %1$s\nKullanılabilir sürüm: %2$s\nİndirmek istiyor musunuz?</string>
+    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_open_page">Open release page</string>
+    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
     <string name="check_update_no">Kontrol başarılı, ancak güncelleme yok.</string>
     <string name="reset_settings">Varsayılan ayarları geri yükle</string>
     <string name="reset_settings_message">Varsayılan ayarları geri yükleyin, ancak düğümler ve gruplar gibi veriler korunacaktır. Verileri tamamen temizlemek için sistem ayarlarından uygulama verilerini temizleyin.</string>
