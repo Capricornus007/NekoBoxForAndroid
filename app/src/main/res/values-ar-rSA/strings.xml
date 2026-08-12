@@ -19,6 +19,7 @@
     <string name="quick_toggle">تبديل</string>
     <string name="quick_enable">تمكين</string>
     <string name="quick_disable">تعطيل</string>
+    <string name="quick_clear_cache_restart">Restart After Clear</string>
     <string name="tile_title">المبدل</string>
     <string name="menu_traffic">حركة المرور</string>
     <string name="menu_dashboard">لوحة تحكم sing-box</string>
@@ -42,9 +43,9 @@
     <string name="group_status_empty">مجموعة فارغة</string>
     <string name="group_status_empty_subscription">لم يتم التحديث بعد</string>
     <string name="group_status_proxies">%d بروكسي</string>
-    <string name="group_status_proxies_subscription" formatted="false">%1$d وكلاء | تم التحديث في %2$s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: لا فرق</string>
-    <string name="group_updated" formatted="false">%1$s: تم تحديث %2$d وكلاء</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">الفرق</string>
     <string name="group_diff">الفرق (%s)</string>
     <string name="group_delete_confirm_prompt">هل أنت متأكد من رغبتك في إزالة هذه المجموعة؟</string>
@@ -83,8 +84,8 @@
     <string name="speed_detail">الوكيل: %1$s↑ %2$s↓\nمباشر: %3$s↑ %4$s↓</string>
     <string name="speed">%s/ث</string>
     <string name="connection_test_testing">اختبار...</string>
-    <string name="connection_test_available">نجاح: استغرقت مصافحة HTTPS %dms</string>
-    <string name="connection_test_available_http">نجاح: استغرقت مصافحة HTTP %dms</string>
+    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
+    <string name="connection_test_available_http">Success: HTTP handshake took %dms</string>
     <string name="connection_test_error">فشل: %s</string>
     <string name="connection_test_fail">الإنترنت غير متاح</string>
     <string name="connection_test_error_status_code">رمز الخطأ: #%d</string>
@@ -101,6 +102,9 @@
     <string name="require_transproxy">تفعيل الوارد عبر Transproxy</string>
     <string name="transproxy_mode">وضع Transproxy</string>
     <string name="connection_test_url">عنوان URL لاختبار الاتصال</string>
+    <string name="auto_switch_timeout">Auto-switch on Timeout</string>
+    <string name="auto_switch_timeout_summary">Automatically switch to next config if no response</string>
+    <string name="auto_switch_timeout_duration">Timeout Duration (seconds)</string>
     <!-- proxy category -->
     <string name="profile_name">اسم الملف الشخصي</string>
     <string name="server_address">الخادم</string>
@@ -334,13 +338,12 @@
     <string name="connection_test_refused">تم رفض الاتصال</string>
     <string name="connection_test_unreachable">غير قابل للوصول</string>
     <string name="connection_test_timeout_error">مهلة</string>
-    <string name="append_http_proxy">إضافة وكيل HTTP إلى VPN</string>
-    <string name="append_http_proxy_sum">سيتم استخدام وكيل HTTP مباشرة من (المتصفح/ بعض التطبيقات المدعومة)، دون المرور عبر جهاز واجهة الشبكة الظاهرية (أندرويد 10+)</string>
+    <string name="mixed_auth_config">Configure authentication</string>
+    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
+    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
+    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="http_proxy_bypass">قائمة تجاوز وكيل HTTP</string>
     <string name="http_proxy_bypass_dialog_message">سطر واحد لكل إدخال. الأسطر التي تبدأ بـ # هي تعليقات. مثال: *zhihu.com</string>
-    <string name="append_http_proxy_security_title">إشعار أمني</string>
-    <string name="append_http_proxy_security_message">عند التمكين، يمكن للتطبيقات الأخرى على هذا الجهاز استخدام منفذ الوكيل المحلي مباشرة.\n\nتوصية: قم بتمكين هذا فقط إذا كنت تثق في جميع التطبيقات المثبتة.</string>
-    <string name="enable_anyway">تمكين على أي حال</string>
     <string name="strict_route">توجيه صارم</string>
     <string name="protocol_settings">إعدادات البروتوكول</string>
     <string name="trojan_provider">موفر Trojan</string>
@@ -387,7 +390,7 @@
     <string name="server_dns_subscription_sum">DNS اختياري يُستخدم فقط لحل نطاقات الخادم في هذه الاشتراك. اتركه فارغًا لاستخدام السلوك الافتراضي. يقبل https://, tls://, quic:// أو host[:port].</string>
     <string name="server_dns_invalid">DNS خادم مخصص غير صالح. استخدم https://, tls://, quic:// أو host[:port]، أو اتركه فارغًا.</string>
     <string name="subscription_used">%s مستخدم</string>
-    <string name="subscription_traffic" formatted="false">%1$s مستخدم / %2$s متبقي</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">تاريخ الانتهاء: %s</string>
     <string name="subscription_import">استيراد اشتراك</string>
     <string name="subscription_import_message">هل تريد تأكيد استيراد الاشتراك %s؟ إذا كنت قادمًا من مصدر غير موثوق، فقد يؤدي ذلك إلى تسرب عنوان IP وسلوكك.</string>
@@ -544,6 +547,7 @@
     <string name="enable_ech_sum">تمكين Encrypted Client Hello</string>
     <string name="ech_settings">إعدادات ECH</string>
     <string name="ech_config">تكوين ECH</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">مضيف HTTPUpgrade</string>
     <string name="http_upgrade_path">مسار HTTPUpgrade</string>
     <string name="update_current_subscription">تحديث اشتراك المجموعة الحالية</string>
@@ -594,19 +598,19 @@
     <string name="clear_cache_confirm">هل أنت متأكد أنك تريد مسح ذاكرة التخزين المؤقت؟</string>
     <string name="clear_cache_success">تم مسح ذاكرة التخزين المؤقت</string>
     <string name="clear_cache_failed">فشل مسح ذاكرة التخزين المؤقت: %s</string>
-    <string name="dual_network_acceleration">تسريع الشبكة المزدوجة</string>
-    <string name="dual_network_acceleration_summary">الاتصال في وقت واحد عبر Wi-Fi والبيانات الخلوية. يتطلب بقاء كل من Wi-Fi والبيانات الخلوية مفعّلين في إعدادات النظام، ويزيد من استهلاك البطارية.</string>
+    <string name="dual_network_acceleration">Dual Network Acceleration</string>
+    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">مهلة الاختبار (مللي ثانية)</string>
     <string name="preview_version_hint">هذا التطبيق هو إصدار تجريبي وقد يحتوي على العديد من المشاكل. إذا كنت لا ترغب في اختباره، فيرجى زيارة GitHub لتنزيل إصدار الإصدار!</string>
     <string name="preview_hint_dont_show_again">لا تظهر مرة أخرى</string>
     <string name="check_update_preview">التحقق من تحديثات الإصدار التجريبي</string>
     <string name="check_update_release">التحقق من تحديثات إصدار الإصدار</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">إصدار جديد متاح</string>
-    <string name="update_dialog_message">الإصدار الحالي: %1$s\nالإصدار المتاح: %2$s\nهل تريد تنزيله؟</string>
-    <string name="update_downloading">جارٍ تنزيل التحديث…</string>
-    <string name="update_open_page">فتح صفحة الإصدارات</string>
-    <string name="update_no_apk_for_abi">لا يوجد ملف APK متوافق مع هذا الجهاز (%1$s). فتح صفحة الإصدارات بدلاً من ذلك؟</string>
+    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_open_page">Open release page</string>
+    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
     <string name="check_update_no">تم التحقق بنجاح، ولكن لا توجد تحديثات.</string>
     <string name="reset_settings">استعادة الإعدادات الافتراضية</string>
     <string name="reset_settings_message">استعادة الإعدادات الافتراضية، ولكن سيتم الاحتفاظ بالبيانات مثل العقد والمجموعات. لمسح البيانات بالكامل، امسح بيانات التطبيق مباشرة في إعدادات النظام.</string>
@@ -631,21 +635,6 @@
     <string name="snell_mode">الوضع</string>
     <string name="snell_reuse">إعادة الاستخدام</string>
     <string name="snell_reuse_summary">v4-v6 فقط</string>
-    
-    <string name="auto_switch_timeout">التبديل التلقائي عند انتهاء المهلة</string>
-    <string name="auto_switch_timeout_summary">التبديل تلقائيًا إلى الإعداد التالي في حالة عدم الاستجابة</string>
-    <string name="auto_switch_timeout_duration">مدة المهلة (ثوانٍ)</string>
-    <string name="vpn_watchdog">إعادة الاتصال تلقائيًا</string>
-    <string name="vpn_watchdog_summary">إعادة تشغيل VPN عند انقطاع الاتصال</string>
-    <string name="vpn_watchdog_test">🧪 اختبار الحارس</string>
-    <string name="vpn_watchdog_test_summary">فرض إعادة تشغيل VPN لاختبار الحارس</string>
-    <string name="vpn_watchdog_interval">فترة الفحص (ثوانٍ)</string>
-    <string name="quick_clear_cache_restart">Restart After Clear</string>
-    <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
-    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
-    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
     <string name="action_close">Close</string>
     <string name="action_masterdnsvpn">MasterDNS VPN</string>
@@ -685,6 +674,8 @@
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Fastest Settings</string>
     <string name="http_proxy_bypass_sum">Bypass proxy for these hosts</string>
+    <string name="append_http_proxy">Append HTTP proxy</string>
+    <string name="append_http_proxy_sum">Append HTTP proxy to all connections</string>
     <string name="hysteria2_ech_config_hint">تكوين ECH</string>
     <string name="hysteria2_ech_config_invalid">Invalid ECH config</string>
     <string name="hysteria2_ech_summary">Encrypted Client Hello</string>
@@ -747,6 +738,19 @@
     <string name="probe_url">Probe URL</string>
     <string name="profile_reference_not_allowed">Profile reference not allowed</string>
     <string name="proxy_fastest">Fastest</string>
+    <string name="proxy_fastest_regex">Fastest (regex)</string>
+    <string name="fastest_candidate_mode">Candidate source</string>
+    <string name="fastest_regex_options">Subscription regex</string>
+    <string name="fastest_regex_source_group">Source subscription</string>
+    <string name="fastest_regex_pattern">Regular expression</string>
+    <string name="fastest_regex_ignore_case">Ignore case</string>
+    <string name="fastest_regex_preview">Check regex</string>
+    <string name="fastest_regex_preview_count">Matching proxies: %1$d</string>
+    <string name="fastest_regex_preview_no_matches">No matching proxies</string>
+    <string name="fastest_regex_error_empty">Enter a regular expression</string>
+    <string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string>
+    <string name="fastest_regex_error_source_missing">Select an existing source subscription</string>
+    <string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string>
     <string name="proxy_mode_inbound_auth">Inbound Auth</string>
     <string name="proxy_mode_inbound_auth_sum">Enable inbound authentication</string>
     <string name="proxy_waterfall">Waterfall</string>
@@ -786,4 +790,12 @@
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
+    <string name="append_http_proxy_security_title">Security Warning</string>
+    <string name="append_http_proxy_security_message">Enabling HTTP proxy may expose your traffic.</string>
+    <string name="enable_anyway">Enable Anyway</string>
+    <string name="vpn_watchdog">Auto-reconnect</string>
+    <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
+    <string name="vpn_watchdog_test">🧪 Test watchdog</string>
+    <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
+    <string name="vpn_watchdog_interval">Check interval (sec)</string>
 </resources>
