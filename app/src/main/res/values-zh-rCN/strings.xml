@@ -599,7 +599,10 @@
     <string name="check_update_release">检查正式版更新</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">新版本可用</string>
-    <string name="update_dialog_message">当前版本：%1$s\n可用版本：%2$s\n是否要下载？</string>
+    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_open_page">Open release page</string>
+    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
     <string name="check_update_no">检查成功，但无更新。</string>
     <string name="reset_settings">恢复默认设置</string>
     <string name="reset_settings_message">恢复默认设置，但节点和分组等数据将被保留。要完全清除数据，请在系统设置中直接清除应用数据。</string>
