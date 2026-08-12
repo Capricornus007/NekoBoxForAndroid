@@ -768,4 +768,9 @@
     <string name="vpn_watchdog_test">🧪 測試看門狗</string>
     <string name="vpn_watchdog_test_summary">強制重啟 VPN 以測試看門狗</string>
     <string name="vpn_watchdog_interval">檢查間隔（秒）</string>
+    <string name="mixed_auth_config">Configure authentication</string>
+    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
+    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
+    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
 </resources>

@@ -774,4 +774,8 @@
     <string name="vpn_watchdog_test">🧪 测试看门狗</string>
     <string name="vpn_watchdog_test_summary">强制重启 VPN 以测试看门狗</string>
     <string name="vpn_watchdog_interval">检查间隔（秒）</string>
+    <string name="mixed_auth_config">Configure authentication</string>
+    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
+    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
+    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
 </resources>
