@@ -1153,6 +1153,9 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 // "no available network interface"（接口监视器竞态）假设
                                 Logs.w("URLTest ${profile.displayName()}: ${e.readableMessage}")
                             }
+
+                            if (!isActive) break
+                            test.update(profile)
                         }
                     },
                 )
