@@ -19,6 +19,7 @@
     <string name="quick_toggle">切換</string>
     <string name="quick_enable">啟用</string>
     <string name="quick_disable">停用</string>
+    <string name="quick_clear_cache_restart">Restart After Clear</string>
     <string name="tile_title">開關</string>
     <string name="menu_traffic">流量</string>
     <string name="menu_dashboard">sing-box 儀表板</string>
@@ -42,9 +43,9 @@
     <string name="group_status_empty">空群組</string>
     <string name="group_status_empty_subscription">尚未更新</string>
     <string name="group_status_proxies">%d 個代理</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d 個代理 | 更新於 %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s：無差異</string>
-    <string name="group_updated" formatted="false">%s：已更新 %d 個代理</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">差異</string>
     <string name="group_diff">差異 (%s)</string>
     <string name="group_delete_confirm_prompt">你確定要移除這個群組嗎？</string>
@@ -83,8 +84,8 @@
     <string name="speed_detail">代理：%1$s↑ %2$s↓\n直接：%3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">測試中...</string>
-    <string name="connection_test_available">成功：HTTPS 握手耗時 %dms</string>
-    <string name="connection_test_available_http">成功：HTTP 握手耗時 %dms</string>
+    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
+    <string name="connection_test_available_http">Success: HTTP handshake took %dms</string>
     <string name="connection_test_error">失敗：%s</string>
     <string name="connection_test_fail">互聯網不可用</string>
     <string name="connection_test_error_status_code">錯誤代碼：#%d</string>
@@ -105,6 +106,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="require_transproxy">啟用透明代理入站</string>
     <string name="transproxy_mode">透明代理模式</string>
     <string name="connection_test_url">連線測試 URL</string>
+    <string name="auto_switch_timeout">Auto-switch on Timeout</string>
+    <string name="auto_switch_timeout_summary">Automatically switch to next config if no response</string>
+    <string name="auto_switch_timeout_duration">Timeout Duration (seconds)</string>
     <!-- proxy category -->
     <string name="profile_name">設定檔名稱</string>
     <string name="server_address">伺服器</string>
@@ -328,15 +332,12 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="connection_test_refused">連接被拒絕</string>
     <string name="connection_test_unreachable">無法到達</string>
     <string name="connection_test_timeout_error">超時</string>
-    <string name="append_http_proxy">將 HTTP 代理附加到 VPN</string>
-    <string name="append_http_proxy_sum">HTTP 代理將直接從瀏覽器/一些支援的應用程式使用，而不會經過虛擬網絡介面卡裝置 (Android 10+)</string>
+    <string name="mixed_auth_config">Configure authentication</string>
+    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
+    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
+    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="http_proxy_bypass">HTTP 代理繞過清單</string>
     <string name="http_proxy_bypass_dialog_message">每行一個。以 # 開頭的行是註釋。範例：*zhihu.com</string>
-    <string name="append_http_proxy_security_title">安全提示</string>
-    <string name="append_http_proxy_security_message">啟用後，此裝置上的其他應用程式可直接使用本地代理埠。
-
-建議：僅在您信任所有已安裝應用程式時啟用此選項。</string>
-    <string name="enable_anyway">仍要啟用</string>
     <string name="strict_route">嚴格路由</string>
     <string name="protocol_settings">協定設定</string>
     <string name="trojan_provider">Trojan 提供者</string>
@@ -383,7 +384,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="server_dns_subscription_sum">可選的 DNS，僅用於解析此訂閱中的伺服器域名。留空以使用預設行為。接受 https://、tls://、quic:// 或 host[:port]。</string>
     <string name="server_dns_invalid">無效的自訂伺服器 DNS。請使用 https://、tls://、quic:// 或 host[:port]，或留空。</string>
     <string name="subscription_used">%s 已使用</string>
-    <string name="subscription_traffic" formatted="false">已用 %s / 剩餘 %s</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">到期：%s</string>
     <string name="subscription_import">匯入訂閱</string>
     <string name="subscription_import_message">確認要匯入訂閱 %s？如果您來自不可信來源，這樣做可能導致您的 IP 和此行為洩漏。</string>
@@ -535,6 +536,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="enable_ech_sum">啟用加密 Client Hello</string>
     <string name="ech_settings">ECH 設定</string>
     <string name="ech_config">ECH 配置</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgrade 主機</string>
     <string name="http_upgrade_path">HTTPUpgrade 路徑</string>
     <string name="update_current_subscription">更新目前群組的訂閱</string>
@@ -585,19 +587,19 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_cache_confirm">您確定要清除快取嗎？</string>
     <string name="clear_cache_success">快取已清除</string>
     <string name="clear_cache_failed">清除快取失敗：%s</string>
-    <string name="dual_network_acceleration">雙網路加速</string>
-    <string name="dual_network_acceleration_summary">同時透過 Wi-Fi 與行動數據連線。需在系統設定中保持 Wi-Fi 與行動數據皆開啟，並會增加耗電。</string>
+    <string name="dual_network_acceleration">Dual Network Acceleration</string>
+    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">測試超時（毫秒）</string>
     <string name="preview_version_hint">此應用程式為預覽版本，可能包含諸多問題。若不想測試，請到GitHub下載Release版本！</string>
     <string name="preview_hint_dont_show_again">唔好再顯示</string>
     <string name="check_update_preview">檢查預覽版本更新</string>
     <string name="check_update_release">檢查發佈版本更新</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">新版本可用</string>
-    <string name="update_dialog_message">目前版本：%1$s\n可用版本：%2$s\n是否要下載？</string>
-    <string name="update_downloading">正在下載更新…</string>
-    <string name="update_open_page">開啟發佈頁</string>
-    <string name="update_no_apk_for_abi">找不到適用於此裝置（%1$s）的安裝包，您要改為開啟發佈頁嗎？</string>
+    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_open_page">Open release page</string>
+    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
     <string name="check_update_no">檢查成功，但無更新。</string>
     <string name="reset_settings">還原預設設定</string>
     <string name="reset_settings_message">還原預設設定，但節點和群組等資料將被保留。要完全清除資料，請在系統設定中直接清除應用程式資料。</string>
@@ -622,21 +624,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="snell_mode">模式</string>
     <string name="snell_reuse">重用</string>
     <string name="snell_reuse_summary">僅 v4-v6</string>
-    
-    <string name="auto_switch_timeout">超時自動切換</string>
-    <string name="auto_switch_timeout_summary">無回應時自動切換到下一個設定</string>
-    <string name="auto_switch_timeout_duration">超時時長（秒）</string>
-    <string name="vpn_watchdog">自動重連</string>
-    <string name="vpn_watchdog_summary">連線中斷時自動重啟 VPN</string>
-    <string name="vpn_watchdog_test">🧪 測試看門狗</string>
-    <string name="vpn_watchdog_test_summary">強制重啟 VPN 以測試看門狗</string>
-    <string name="vpn_watchdog_interval">檢查間隔（秒）</string>
-    <string name="quick_clear_cache_restart">Restart After Clear</string>
-    <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
-    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
-    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
     <string name="action_close">Close</string>
     <string name="action_masterdnsvpn">MasterDNS VPN</string>
@@ -676,6 +663,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Fastest Settings</string>
     <string name="http_proxy_bypass_sum">Bypass proxy for these hosts</string>
+    <string name="append_http_proxy">Append HTTP proxy</string>
+    <string name="append_http_proxy_sum">Append HTTP proxy to all connections</string>
     <string name="hysteria2_ech_config_hint">ECH 配置</string>
     <string name="hysteria2_ech_config_invalid">Invalid ECH config</string>
     <string name="hysteria2_ech_summary">Encrypted Client Hello</string>
@@ -738,6 +727,19 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="probe_url">Probe URL</string>
     <string name="profile_reference_not_allowed">Profile reference not allowed</string>
     <string name="proxy_fastest">Fastest</string>
+    <string name="proxy_fastest_regex">Fastest (regex)</string>
+    <string name="fastest_candidate_mode">Candidate source</string>
+    <string name="fastest_regex_options">Subscription regex</string>
+    <string name="fastest_regex_source_group">Source subscription</string>
+    <string name="fastest_regex_pattern">Regular expression</string>
+    <string name="fastest_regex_ignore_case">Ignore case</string>
+    <string name="fastest_regex_preview">Check regex</string>
+    <string name="fastest_regex_preview_count">Matching proxies: %1$d</string>
+    <string name="fastest_regex_preview_no_matches">No matching proxies</string>
+    <string name="fastest_regex_error_empty">Enter a regular expression</string>
+    <string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string>
+    <string name="fastest_regex_error_source_missing">Select an existing source subscription</string>
+    <string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string>
     <string name="proxy_mode_inbound_auth">Inbound Auth</string>
     <string name="proxy_mode_inbound_auth_sum">Enable inbound authentication</string>
     <string name="proxy_waterfall">Waterfall</string>
@@ -777,4 +779,12 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
+    <string name="append_http_proxy_security_title">Security Warning</string>
+    <string name="append_http_proxy_security_message">Enabling HTTP proxy may expose your traffic.</string>
+    <string name="enable_anyway">Enable Anyway</string>
+    <string name="vpn_watchdog">Auto-reconnect</string>
+    <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
+    <string name="vpn_watchdog_test">🧪 Test watchdog</string>
+    <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
+    <string name="vpn_watchdog_interval">Check interval (sec)</string>
 </resources>
