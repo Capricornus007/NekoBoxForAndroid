@@ -8,6 +8,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.database.preference.KeyValuePair
+import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -52,6 +53,10 @@ internal object ConfigBuilderTestEnv {
         if (installed) return
         synchronized(this) {
             if (installed) return
+            // Logs defaults to Libcore.nekoLogPrintln, which triggers native library
+            // loading (go.Seq / gojni) that is unavailable in a JVM test. Route it to a
+            // no-op sink before any buildConfig() path reaches it.
+            Logs.sink = {}
             val base = RuntimeEnvironment.getApplication() as Application
             // Attach the required SagerNet-typed context without calling onCreate(), which starts
             // native initialization that is unavailable in a JVM test.
