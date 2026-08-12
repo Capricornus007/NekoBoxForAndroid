@@ -614,7 +614,7 @@ fun StandardV2RayBean.toUriVMessVLESSTrojan(isTrojan: Boolean): String {
                 if (enableECH) {
                     builder.addQueryParameter(
                         "ech",
-                        echQueryServerName.ifBlank { "true" }
+                        echQueryServerName.ifBlank { "true" },
                     )
                 }
             }

@@ -462,7 +462,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         val endpoint = hopBean.displayAddress().takeIf { it.isNotBlank() }
                             ?: "$host:${hopBean.serverPort}"
                         "${hop.id}:${hop.displayType()}@$endpoint"
-                    }
+                    },
             )
             val chainTrafficSet = HashSet<ProxyEntity>().apply {
                 plusAssign(profileList)
