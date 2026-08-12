@@ -711,6 +711,9 @@
     <string name="check_update_release">Перевірити оновлення стабільної версії</string>
     <string name="update_dialog_title">Доступна нова версія</string>
     <string name="update_dialog_message">Поточна версія: %1$s\nДоступна версія: %2$s\nБажаєте завантажити?</string>
+    <string name="update_downloading">Завантаження оновлення…</string>
+    <string name="update_open_page">Відкрити сторінку релізів</string>
+    <string name="update_no_apk_for_abi">Немає сумісного APK для цього пристрою (%1$s). Відкрити сторінку релізів?</string>
     <string name="check_update_no">Перевірка успішна, але оновлень немає.</string>
     <string name="reset_settings">Відновити налаштування за замовчуванням</string>
     <string name="reset_settings_message">Відновити налаштування за замовчуванням, але дані, такі як вузли та групи, будуть збережені. Щоб повністю очистити дані, очистіть дані програми безпосередньо в системних налаштуваннях.</string>

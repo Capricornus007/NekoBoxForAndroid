@@ -560,6 +560,9 @@
     <string name="release_not_available">NekoBox はまだ正式版を公開していません</string>
     <string name="update_dialog_title">新しいバージョンが利用可能です</string>
     <string name="update_dialog_message">現在のバージョン: %1$s\n利用可能なバージョン: %2$s\nダウンロードしますか？</string>
+    <string name="update_downloading">更新をダウンロード中…</string>
+    <string name="update_open_page">リリースページを開く</string>
+    <string name="update_no_apk_for_abi">この端末（%1$s）に一致するAPKがありません。代わりにリリースページを開きますか？</string>
     <string name="check_update_no">確認に成功しましたが、更新はありません。</string>
     <string name="reset_settings">デフォルト設定に戻す</string>
     <string name="reset_settings_message">デフォルト設定に戻しますが、ノードやグループなどのデータは保持されます。データを完全に消去するには、システム設定でアプリのデータを直接クリアしてください。</string>

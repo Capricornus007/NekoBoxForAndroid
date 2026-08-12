@@ -717,6 +717,9 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="check_update_release">Controlla aggiornamenti versione stabile</string>
     <string name="update_dialog_title">Nuova versione disponibile</string>
     <string name="update_dialog_message">Versione attuale: %1$s\nVersione disponibile: %2$s\nVuoi scaricarla?</string>
+    <string name="update_downloading">Download dell\'aggiornamento…</string>
+    <string name="update_open_page">Apri la pagina release</string>
+    <string name="update_no_apk_for_abi">Nessun APK compatibile con questo dispositivo (%1$s). Aprire la pagina release?</string>
     <string name="check_update_no">Controllo riuscito, ma nessun aggiornamento.</string>
     <string name="reset_settings">Ripristina impostazioni predefinite</string>
     <string name="reset_settings_message">Ripristina le impostazioni predefinite, ma i dati come nodi e gruppi verranno conservati. Per cancellare completamente i dati, cancella i dati dell\'app direttamente nelle impostazioni di sistema.</string>

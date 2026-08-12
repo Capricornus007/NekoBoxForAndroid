@@ -127,17 +127,17 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
         logLevel.setOnLongClickListener {
-            if (context == null) return@setOnLongClickListener true
+            val ctx = context ?: return@setOnLongClickListener true
 
-            val view = EditText(context).apply {
+            val view = EditText(ctx).apply {
                 inputType = EditorInfo.TYPE_CLASS_NUMBER
                 var size = DataStore.logBufSize
                 if (size == 0) size = 50
                 setText(size.toString())
             }
 
-            MaterialAlertDialogBuilder(requireContext()).setTitle("Log buffer size (kb)")
-                .setView(view)
+            MaterialAlertDialogBuilder(ctx).setTitle("Log buffer size (kb)")
+                .setView(ctx.wrapDialogContent(view))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     DataStore.logBufSize = view.text.toString().toInt()
                     if (DataStore.logBufSize <= 0) DataStore.logBufSize = 50

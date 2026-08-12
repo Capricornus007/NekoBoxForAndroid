@@ -604,6 +604,9 @@
     <string name="release_not_available">Throne has not published a stable release yet</string>
     <string name="update_dialog_title">إصدار جديد متاح</string>
     <string name="update_dialog_message">الإصدار الحالي: %1$s\nالإصدار المتاح: %2$s\nهل تريد تنزيله؟</string>
+    <string name="update_downloading">جارٍ تنزيل التحديث…</string>
+    <string name="update_open_page">فتح صفحة الإصدارات</string>
+    <string name="update_no_apk_for_abi">لا يوجد ملف APK متوافق مع هذا الجهاز (%1$s). فتح صفحة الإصدارات بدلاً من ذلك؟</string>
     <string name="check_update_no">تم التحقق بنجاح، ولكن لا توجد تحديثات.</string>
     <string name="reset_settings">استعادة الإعدادات الافتراضية</string>
     <string name="reset_settings_message">استعادة الإعدادات الافتراضية، ولكن سيتم الاحتفاظ بالبيانات مثل العقد والمجموعات. لمسح البيانات بالكامل، امسح بيانات التطبيق مباشرة في إعدادات النظام.</string>

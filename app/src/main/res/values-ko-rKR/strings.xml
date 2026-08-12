@@ -586,6 +586,9 @@
     <string name="release_not_available">Throne has not published a stable release yet</string>
     <string name="update_dialog_title">새 버전 사용 가능</string>
     <string name="update_dialog_message">현재 버전: %1$s\n사용 가능한 버전: %2$s\n다운로드하시겠습니까?</string>
+    <string name="update_downloading">업데이트 다운로드 중…</string>
+    <string name="update_open_page">릴리스 페이지 열기</string>
+    <string name="update_no_apk_for_abi">이 기기(%1$s)에 맞는 APK가 없습니다. 릴리스 페이지를 열까요?</string>
     <string name="check_update_no">확인 성공, 업데이트 없음.</string>
     <string name="reset_settings">기본 설정 복원</string>
     <string name="reset_settings_message">기본 설정을 복원하지만 노드 및 그룹과 같은 데이터는 유지됩니다. 데이터를 완전히 지우려면 시스템 설정에서 직접 앱 데이터를 지우십시오.</string>

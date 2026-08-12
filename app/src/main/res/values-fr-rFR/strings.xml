@@ -611,6 +611,9 @@
     <string name="release_not_available">Throne has not published a stable release yet</string>
     <string name="update_dialog_title">Nouvelle version disponible</string>
     <string name="update_dialog_message">Version actuelle : %1$s\nVersion disponible : %2$s\nVoulez-vous la télécharger ?</string>
+    <string name="update_downloading">Téléchargement de la mise à jour…</string>
+    <string name="update_open_page">Ouvrir la page de versions</string>
+    <string name="update_no_apk_for_abi">Aucun APK compatible avec cet appareil (%1$s). Ouvrir la page de versions à la place ?</string>
     <string name="check_update_no">Vérification réussie, mais aucune mise à jour.</string>
     <string name="reset_settings">Restaurer les paramètres par défaut</string>
     <string name="reset_settings_message">Restaurer les paramètres par défaut, mais les données telles que les nœuds et les groupes seront conservées. Pour effacer complètement les données, effacez les données de l\'application directement dans les paramètres système.</string>

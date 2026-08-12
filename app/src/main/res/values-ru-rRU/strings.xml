@@ -601,6 +601,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="release_not_available">Throne has not published a stable release yet</string>
     <string name="update_dialog_title">Доступна новая версия</string>
     <string name="update_dialog_message">Текущая версия: %1$s\nДоступная версия: %2$s\nХотите скачать её?</string>
+    <string name="update_downloading">Загрузка обновления…</string>
+    <string name="update_open_page">Открыть страницу релизов</string>
+    <string name="update_no_apk_for_abi">Нет подходящего APK для этого устройства (%1$s). Открыть страницу релизов?</string>
     <string name="check_update_no">Проверка прошла успешно, но обновлений нет.</string>
     <string name="reset_settings">Восстановить настройки по умолчанию</string>
     <string name="reset_settings_message">Восстановить настройки по умолчанию, но данные, такие как узлы и группы, будут сохранены. Чтобы полностью очистить данные, удалите данные приложения напрямую в системных настройках.</string>

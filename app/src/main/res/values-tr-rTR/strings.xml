@@ -597,6 +597,9 @@
     <string name="release_not_available">Throne has not published a stable release yet</string>
     <string name="update_dialog_title">Yeni sürüm mevcut</string>
     <string name="update_dialog_message">Mevcut sürüm: %1$s\nKullanılabilir sürüm: %2$s\nİndirmek istiyor musunuz?</string>
+    <string name="update_downloading">Güncelleme indiriliyor…</string>
+    <string name="update_open_page">Sürüm sayfasını aç</string>
+    <string name="update_no_apk_for_abi">Bu cihaz (%1$s) için uygun APK yok. Sürüm sayfasını açmak ister misiniz?</string>
     <string name="check_update_no">Kontrol başarılı, ancak güncelleme yok.</string>
     <string name="reset_settings">Varsayılan ayarları geri yükle</string>
     <string name="reset_settings_message">Varsayılan ayarları geri yükleyin, ancak düğümler ve gruplar gibi veriler korunacaktır. Verileri tamamen temizlemek için sistem ayarlarından uygulama verilerini temizleyin.</string>

@@ -703,6 +703,9 @@
     <string name="check_update_release">Праверыць абнаўленні Release версіі</string>
     <string name="update_dialog_title">Даступная новая версія</string>
     <string name="update_dialog_message">Бягучая версія: %1$s\nДаступная версія: %2$s\nЦі жадаеце спампаваць яе?</string>
+    <string name="update_downloading">Спампоўка абнаўлення…</string>
+    <string name="update_open_page">Адкрыць старонку рэлізаў</string>
+    <string name="update_no_apk_for_abi">Няма сумяшчальнага APK для гэтай прылады (%1$s). Адкрыць старонку рэлізаў?</string>
     <string name="check_update_no">Праверка паспяховая, але абнаўленняў няма.</string>
     <string name="reset_settings">Аднавіць стандартныя налады</string>
     <string name="reset_settings_message">Аднавіць стандартныя налады, але дадзеныя, такія як nodes і groups, будуць захаваны. Каб цалкам ачысціць дадзеныя, ачысціце дадзеныя дадатку непасрэдна ў сістэмных наладах.</string>

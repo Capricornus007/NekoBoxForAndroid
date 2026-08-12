@@ -251,6 +251,23 @@ const val isOss = BuildConfig.FLAVOR == "oss"
 const val isPlay = BuildConfig.FLAVOR == "play"
 const val isPreview = BuildConfig.FLAVOR == "preview"
 
+/**
+ * Whether a staged GitHub release name is still newer than the installed build.
+ * Mirrors AboutFragment update comparison so cancel-install keeps cache, successful
+ * install (or otherwise catching up) allows startup cleanup.
+ */
+fun isStagedUpdateStillNewer(stagedReleaseName: String): Boolean {
+    if (stagedReleaseName.isBlank()) return false
+    return if (isPreview) {
+        // Preview build: keep cache unless staged name matches current preview or stable name.
+        stagedReleaseName != BuildConfig.PRE_VERSION_NAME &&
+            stagedReleaseName != BuildConfig.VERSION_NAME
+    } else {
+        // Stable: keep while release name does not contain installed VERSION_NAME.
+        !stagedReleaseName.contains(BuildConfig.VERSION_NAME)
+    }
+}
+
 fun <T> Continuation<T>.tryResume(value: T) {
     try {
         resumeWith(Result.success(value))

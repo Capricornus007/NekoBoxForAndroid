@@ -705,6 +705,9 @@
     <string name="check_update_release">Nach Releaseversions-Updates suchen</string>
     <string name="update_dialog_title">Neue Version verfügbar</string>
     <string name="update_dialog_message">Aktuelle Version: %1$s\nVerfügbare Version: %2$s\nMöchten Sie sie herunterladen?</string>
+    <string name="update_downloading">Update wird heruntergeladen…</string>
+    <string name="update_open_page">Freigabeseite öffnen</string>
+    <string name="update_no_apk_for_abi">Kein passendes APK für dieses Gerät (%1$s). Freigabeseite stattdessen öffnen?</string>
     <string name="check_update_no">Suche erfolgreich, aber keine Updates.</string>
     <string name="reset_settings">Standardeinstellungen wiederherstellen</string>
     <string name="reset_settings_message">Standardeinstellungen wiederherstellen, aber Daten wie Knoten und Gruppen bleiben erhalten. Um Daten vollständig zu löschen, löschen Sie die Anwendungsdaten direkt in den Systemeinstellungen.</string>

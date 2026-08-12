@@ -9,6 +9,7 @@ import androidx.preference.ListPreference
 import androidx.preference.PreferenceViewHolder
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.R
+import io.nekohasekai.sagernet.ktx.wrapDialogContent
 
 class MTUPreference
 @JvmOverloads constructor(
@@ -34,7 +35,7 @@ class MTUPreference
             }
 
             MaterialAlertDialogBuilder(context).setTitle("MTU")
-                .setView(view)
+                .setView(context.wrapDialogContent(view))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     val mtu = view.text.toString().toInt()
                     if (mtu < 1000 || mtu > 10000) return@setPositiveButton

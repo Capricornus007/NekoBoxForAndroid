@@ -593,6 +593,9 @@
     <string name="release_not_available">Throne has not published a stable release yet</string>
     <string name="update_dialog_title">نسخه جدید موجود است</string>
     <string name="update_dialog_message">نسخه فعلی: %1$s\nنسخه موجود: %2$s\nآیا می‌خواهید آن را دانلود کنید؟</string>
+    <string name="update_downloading">در حال دانلود به‌روزرسانی…</string>
+    <string name="update_open_page">باز کردن صفحه انتشار</string>
+    <string name="update_no_apk_for_abi">هیچ APK سازگاری با این دستگاه (%1$s) یافت نشد. صفحه انتشار باز شود؟</string>
     <string name="check_update_no">بررسی موفقیت‌آمیز بود، اما به‌روزرسانی وجود ندارد.</string>
     <string name="reset_settings">بازنشانی تنظیمات پیش‌فرض</string>
     <string name="reset_settings_message">بازنشانی تنظیمات پیش‌فرض، اما داده‌هایی مانند نودها و گروه‌ها حفظ می‌شوند. برای پاکسازی کامل داده‌ها، داده‌های برنامه را مستقیماً در تنظیمات سیستم پاک کنید.</string>

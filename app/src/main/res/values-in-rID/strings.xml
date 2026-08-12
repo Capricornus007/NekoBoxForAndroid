@@ -606,6 +606,9 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="release_not_available">Throne has not published a stable release yet</string>
     <string name="update_dialog_title">Versi baru tersedia</string>
     <string name="update_dialog_message">Versi saat ini: %1$s\nVersi tersedia: %2$s\nApakah Anda ingin mengunduhnya?</string>
+    <string name="update_downloading">Mengunduh pembaruan…</string>
+    <string name="update_open_page">Buka halaman rilis</string>
+    <string name="update_no_apk_for_abi">Tidak ada APK yang cocok untuk perangkat ini (%1$s). Buka halaman rilis saja?</string>
     <string name="check_update_no">Pemeriksaan berhasil, tetapi tidak ada pembaruan.</string>
     <string name="reset_settings">Kembalikan pengaturan default</string>
     <string name="reset_settings_message">Kembalikan pengaturan default, tetapi data seperti node dan grup akan dipertahankan. Untuk menghapus data sepenuhnya, hapus data aplikasi langsung di pengaturan sistem.</string>

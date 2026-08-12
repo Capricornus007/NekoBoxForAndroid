@@ -11,7 +11,8 @@
     <color name="colorError">#F44336</color>
     <color name="colorOnSurfaceVariant">#666666</color>
 
-    <integer-array name="material_colors">
+    <!-- Length 22 on API < 31; values-v31 adds Dynamic as last swatch (23). -->
+    <integer-array name="material_colors" tools:ignore="InconsistentArrays">
         <item>@color/material_red_500</item>
         <item>@color/color_pink_ssr</item>
         <item>@color/material_pink_500</item>
