@@ -19,6 +19,7 @@
     <string name="quick_toggle">Basculer</string>
     <string name="quick_enable">Activer</string>
     <string name="quick_disable">Désactiver</string>
+    <string name="quick_clear_cache_restart">Restart After Clear</string>
     <string name="tile_title">Commutateur</string>
     <string name="menu_traffic">Trafic</string>
     <string name="menu_dashboard">Tableau de bord sing-box</string>
@@ -42,9 +43,9 @@
     <string name="group_status_empty">Groupe vide</string>
     <string name="group_status_empty_subscription">Pas encore mis à jour</string>
     <string name="group_status_proxies">%d proxys</string>
-    <string name="group_status_proxies_subscription" formatted="false">%1$d proxies | Mis à jour le %2$s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: Aucune différence</string>
-    <string name="group_updated" formatted="false">%1$s : Mis à jour %2$d proxies</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">Diff</string>
     <string name="group_diff">Diff (%s)</string>
     <string name="group_delete_confirm_prompt">Êtes-vous sûr de vouloir supprimer ce groupe ?</string>
@@ -87,8 +88,8 @@
     <string name="speed_detail">Proxy : %1$s↑ %2$s↓\nDirect : %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Test en cours...</string>
-    <string name="connection_test_available">Succès : la poignée de main HTTPS a pris %dms</string>
-    <string name="connection_test_available_http">Succès : la poignée de main HTTP a pris %dms</string>
+    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
+    <string name="connection_test_available_http">Success: HTTP handshake took %dms</string>
     <string name="connection_test_error">Échec : %s</string>
     <string name="connection_test_fail">Internet indisponible</string>
     <string name="connection_test_error_status_code">Code d\'erreur : #%d</string>
@@ -105,6 +106,9 @@
     <string name="require_transproxy">Activer l\'entrée Transproxy</string>
     <string name="transproxy_mode">Mode Transproxy</string>
     <string name="connection_test_url">URL de test de connexion</string>
+    <string name="auto_switch_timeout">Auto-switch on Timeout</string>
+    <string name="auto_switch_timeout_summary">Automatically switch to next config if no response</string>
+    <string name="auto_switch_timeout_duration">Timeout Duration (seconds)</string>
     <!-- proxy category -->
     <string name="profile_name">Nom du profil</string>
     <string name="server_address">Serveur</string>
@@ -334,13 +338,12 @@
     <string name="connection_test_refused">Connexion refusée</string>
     <string name="connection_test_unreachable">Inaccessible</string>
     <string name="connection_test_timeout_error">Délai d\'attente</string>
-    <string name="append_http_proxy">Ajouter le proxy HTTP au VPN</string>
-    <string name="append_http_proxy_sum">Le proxy HTTP sera utilisé directement depuis (le navigateur / certaines applications prises en charge), sans passer par l\'interface réseau virtuelle (Android 10+)</string>
+    <string name="mixed_auth_config">Configure authentication</string>
+    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
+    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
+    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="http_proxy_bypass">Liste de contournement du proxy HTTP</string>
     <string name="http_proxy_bypass_dialog_message">Un par ligne. Les lignes commençant par # sont des commentaires. Exemple : *zhihu.com</string>
-    <string name="append_http_proxy_security_title">Avis de sécurité</string>
-    <string name="append_http_proxy_security_message">Lorsque activé, les autres applications de cet appareil peuvent utiliser directement le port proxy local.\n\nRecommandation : activez cette option uniquement si vous faites confiance à toutes les applications installées.</string>
-    <string name="enable_anyway">Activer quand même</string>
     <string name="strict_route">Routage strict</string>
     <string name="protocol_settings">Paramètres du protocole</string>
     <string name="trojan_provider">Fournisseur Trojan</string>
@@ -389,7 +392,7 @@
     <string name="server_dns_subscription_sum">DNS facultatif utilisé uniquement pour résoudre les domaines des serveurs dans cet abonnement. Laissez vide pour utiliser le comportement par défaut. Accepte https://, tls://, quic:// ou hôte[:port].</string>
     <string name="server_dns_invalid">DNS serveur personnalisé invalide. Utilisez https://, tls://, quic:// ou hôte[:port], ou laissez vide.</string>
     <string name="subscription_used">%s Utilisé</string>
-    <string name="subscription_traffic" formatted="false">%1$s Utilisé / %2$s Restant</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">Expiration : %s</string>
     <string name="subscription_import">Importer un abonnement</string>
     <string name="subscription_import_message">Confirmez-vous l\'importation de l\'abonnement %s ? Si vous
@@ -550,6 +553,7 @@
     <string name="enable_ech_sum">Activer Encrypted Client Hello</string>
     <string name="ech_settings">Paramètres ECH</string>
     <string name="ech_config">Configuration ECH</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">Hôte HTTPUpgrade</string>
     <string name="http_upgrade_path">Chemin HTTPUpgrade</string>
     <string name="update_current_subscription">Mettre à jour l\'abonnement du groupe actuel</string>
@@ -601,19 +605,19 @@
     <string name="clear_cache_confirm">Êtes-vous sûr de vouloir vider le cache ?</string>
     <string name="clear_cache_success">Cache vidé</string>
     <string name="clear_cache_failed">Échec du vidage du cache : %s</string>
-    <string name="dual_network_acceleration">Accélération double réseau</string>
-    <string name="dual_network_acceleration_summary">Connecter simultanément via Wi-Fi et données mobiles. Nécessite que le Wi-Fi et les données mobiles restent activés dans les paramètres système, et augmente la consommation de batterie.</string>
+    <string name="dual_network_acceleration">Dual Network Acceleration</string>
+    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">Délai d\'attente du test (ms)</string>
     <string name="preview_version_hint">Cette application est une version preview et peut contenir de nombreux problèmes. Si vous ne souhaitez pas la tester, veuillez aller sur GitHub pour télécharger la version Release !</string>
     <string name="preview_hint_dont_show_again">Ne plus afficher</string>
     <string name="check_update_preview">Vérifier les mises à jour de la version preview</string>
     <string name="check_update_release">Vérifier les mises à jour de la version release</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">Nouvelle version disponible</string>
-    <string name="update_dialog_message">Version actuelle : %1$s\nVersion disponible : %2$s\nVoulez-vous la télécharger ?</string>
-    <string name="update_downloading">Téléchargement de la mise à jour…</string>
-    <string name="update_open_page">Ouvrir la page de versions</string>
-    <string name="update_no_apk_for_abi">Aucun APK compatible avec cet appareil (%1$s). Ouvrir la page de versions à la place ?</string>
+    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_open_page">Open release page</string>
+    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
     <string name="check_update_no">Vérification réussie, mais aucune mise à jour.</string>
     <string name="reset_settings">Restaurer les paramètres par défaut</string>
     <string name="reset_settings_message">Restaurer les paramètres par défaut, mais les données telles que les nœuds et les groupes seront conservées. Pour effacer complètement les données, effacez les données de l\'application directement dans les paramètres système.</string>
@@ -638,21 +642,6 @@
     <string name="snell_mode">Mode</string>
     <string name="snell_reuse">Réutiliser</string>
     <string name="snell_reuse_summary">v4-v6 uniquement</string>
-    
-    <string name="auto_switch_timeout">Bascule automatique en cas de délai dépassé</string>
-    <string name="auto_switch_timeout_summary">Basculer automatiquement vers la configuration suivante en cas d\'absence de réponse</string>
-    <string name="auto_switch_timeout_duration">Durée du délai (secondes)</string>
-    <string name="vpn_watchdog">Reconnexion automatique</string>
-    <string name="vpn_watchdog_summary">Redémarrer le VPN en cas de coupure</string>
-    <string name="vpn_watchdog_test">🧪 Tester le gardien</string>
-    <string name="vpn_watchdog_test_summary">Forcer le redémarrage du VPN pour tester le gardien</string>
-    <string name="vpn_watchdog_interval">Intervalle de vérification (s)</string>
-    <string name="quick_clear_cache_restart">Restart After Clear</string>
-    <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
-    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
-    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
     <string name="action_close">Close</string>
     <string name="action_masterdnsvpn">MasterDNS VPN</string>
@@ -692,6 +681,8 @@
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Fastest Settings</string>
     <string name="http_proxy_bypass_sum">Bypass proxy for these hosts</string>
+    <string name="append_http_proxy">Append HTTP proxy</string>
+    <string name="append_http_proxy_sum">Append HTTP proxy to all connections</string>
     <string name="hysteria2_ech_config_hint">Configuration ECH</string>
     <string name="hysteria2_ech_config_invalid">Invalid ECH config</string>
     <string name="hysteria2_ech_summary">Encrypted Client Hello</string>
@@ -754,6 +745,19 @@
     <string name="probe_url">Probe URL</string>
     <string name="profile_reference_not_allowed">Profile reference not allowed</string>
     <string name="proxy_fastest">Fastest</string>
+    <string name="proxy_fastest_regex">Fastest (regex)</string>
+    <string name="fastest_candidate_mode">Candidate source</string>
+    <string name="fastest_regex_options">Subscription regex</string>
+    <string name="fastest_regex_source_group">Source subscription</string>
+    <string name="fastest_regex_pattern">Regular expression</string>
+    <string name="fastest_regex_ignore_case">Ignore case</string>
+    <string name="fastest_regex_preview">Check regex</string>
+    <string name="fastest_regex_preview_count">Matching proxies: %1$d</string>
+    <string name="fastest_regex_preview_no_matches">No matching proxies</string>
+    <string name="fastest_regex_error_empty">Enter a regular expression</string>
+    <string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string>
+    <string name="fastest_regex_error_source_missing">Select an existing source subscription</string>
+    <string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string>
     <string name="proxy_mode_inbound_auth">Inbound Auth</string>
     <string name="proxy_mode_inbound_auth_sum">Enable inbound authentication</string>
     <string name="proxy_waterfall">Waterfall</string>
@@ -793,4 +797,12 @@
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
+    <string name="append_http_proxy_security_title">Security Warning</string>
+    <string name="append_http_proxy_security_message">Enabling HTTP proxy may expose your traffic.</string>
+    <string name="enable_anyway">Enable Anyway</string>
+    <string name="vpn_watchdog">Auto-reconnect</string>
+    <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
+    <string name="vpn_watchdog_test">🧪 Test watchdog</string>
+    <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
+    <string name="vpn_watchdog_interval">Check interval (sec)</string>
 </resources>
