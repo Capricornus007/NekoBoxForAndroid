@@ -596,7 +596,10 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="check_update_release">檢查發佈版本更新</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">新版本可用</string>
-    <string name="update_dialog_message">目前版本：%1$s\n可用版本：%2$s\n是否要下載？</string>
+    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_open_page">Open release page</string>
+    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
     <string name="check_update_no">檢查成功，但無更新。</string>
     <string name="reset_settings">還原預設設定</string>
     <string name="reset_settings_message">還原預設設定，但節點和群組等資料將被保留。要完全清除資料，請在系統設定中直接清除應用程式資料。</string>
