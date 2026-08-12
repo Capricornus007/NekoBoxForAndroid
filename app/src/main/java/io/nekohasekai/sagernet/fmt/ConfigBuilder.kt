@@ -450,6 +450,13 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
         }
 
+        // 前向引用：buildChain 与 buildDynamicGroup 互相递归——buildChain 遇到动态
+        // 分组（最快/瀑布）时转交 buildDynamicGroup，而 buildDynamicGroup 又对静态候选
+        // 回调 buildChain。Kotlin 局部函数仅在自身声明点之后可见，先声明的 buildChain
+        // 无法直接引用后声明的 buildDynamicGroup，故用一个函数类型的 lateinit 引用桥接
+        // 这条“先→后”的边；引用在 buildDynamicGroup 声明完毕、首次调用发生前赋值。
+        lateinit var buildDynamicGroupImpl: (ProxyEntity, Boolean) -> String
+
         @Suppress("UNCHECKED_CAST")
         fun buildChain(chainId: Long, entity: ProxyEntity): String {
             // 动态分组（最快 / 瀑布）不做链路展平，改为构建 urltest 分组。
@@ -457,7 +464,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             if (entity.type == ProxyEntity.TYPE_FASTEST ||
                 entity.type == ProxyEntity.TYPE_WATERFALL
             ) {
-                return buildDynamicGroup(entity, managedByParent = false)
+                return buildDynamicGroupImpl(entity, false)
             }
             val profileList = entity.resolveChain()
             // profileList 的顺序即应用流量经过各 outbound 的顺序：前一跳通过
@@ -814,6 +821,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }.distinctBy { it.id }
             return groupTag
         }
+        buildDynamicGroupImpl = ::buildDynamicGroup
 
         if (buildSelector) {
             val list = group.id.let { SagerDatabase.proxyDao.getByGroup(it) }
