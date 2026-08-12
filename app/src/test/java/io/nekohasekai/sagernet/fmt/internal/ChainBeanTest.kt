@@ -142,8 +142,11 @@ class ChainBeanTest {
                 ignoreCase = true,
             ).map { it.displayName() },
         )
+        // 大小写不敏感 + UNICODE_CASE 下，"германия" 应命中"🇩🇪 ⚡ Германия"内的
+        // "Германия"（西里尔字母大小写折叠）以及全大写的"ГЕРМАНИЯ"。sf 原始测试此处
+        // 期望值漏列了前者（与本方法上一处不加锚点的部分匹配断言不自洽），此处补齐。
         assertEquals(
-            listOf("ГЕРМАНИЯ"),
+            listOf("🇩🇪 ⚡ Германия", "ГЕРМАНИЯ"),
             FastestCandidateResolver.filterRegexCandidates(
                 candidates,
                 "германия",

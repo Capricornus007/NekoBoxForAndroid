@@ -24,11 +24,11 @@ object FastestCandidateResolver {
         return if (bean.candidateMode == ChainBean.CANDIDATE_MODE_REGEX) {
             val sourceGroup = SagerDatabase.groupDao.getById(bean.sourceGroupId)
                 ?: throw FastestCandidateResolutionException(
-                    FastestCandidateResolutionError.SOURCE_GROUP_MISSING
+                    FastestCandidateResolutionError.SOURCE_GROUP_MISSING,
                 )
             if (sourceGroup.type != GroupType.SUBSCRIPTION) {
                 throw FastestCandidateResolutionException(
-                    FastestCandidateResolutionError.SOURCE_GROUP_NOT_SUBSCRIPTION
+                    FastestCandidateResolutionError.SOURCE_GROUP_NOT_SUBSCRIPTION,
                 )
             }
             filterRegexCandidates(
@@ -39,7 +39,7 @@ object FastestCandidateResolver {
         } else {
             if (bean.proxies.size != bean.proxies.distinct().size) {
                 throw FastestCandidateResolutionException(
-                    FastestCandidateResolutionError.DUPLICATE_MANUAL_CANDIDATES
+                    FastestCandidateResolutionError.DUPLICATE_MANUAL_CANDIDATES,
                 )
             }
             val profilesById = SagerDatabase.proxyDao.getEntities(bean.proxies).associateBy { it.id }
@@ -47,11 +47,7 @@ object FastestCandidateResolver {
         }
     }
 
-    fun filterRegexCandidates(
-        candidates: List<ProxyEntity>,
-        pattern: String,
-        ignoreCase: Boolean,
-    ): List<ProxyEntity> {
+    fun filterRegexCandidates(candidates: List<ProxyEntity>, pattern: String, ignoreCase: Boolean): List<ProxyEntity> {
         if (pattern.isBlank()) {
             throw FastestCandidateResolutionException(FastestCandidateResolutionError.EMPTY_REGEX)
         }
