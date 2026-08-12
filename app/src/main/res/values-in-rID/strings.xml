@@ -607,7 +607,10 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="check_update_release">Periksa pembaruan versi rilis</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">Versi baru tersedia</string>
-    <string name="update_dialog_message">Versi saat ini: %1$s\nVersi tersedia: %2$s\nApakah Anda ingin mengunduhnya?</string>
+    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_open_page">Open release page</string>
+    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
     <string name="check_update_no">Pemeriksaan berhasil, tetapi tidak ada pembaruan.</string>
     <string name="reset_settings">Kembalikan pengaturan default</string>
     <string name="reset_settings_message">Kembalikan pengaturan default, tetapi data seperti node dan grup akan dipertahankan. Untuk menghapus data sepenuhnya, hapus data aplikasi langsung di pengaturan sistem.</string>
