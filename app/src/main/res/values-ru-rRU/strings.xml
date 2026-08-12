@@ -602,7 +602,10 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="check_update_release">Проверить обновления релизной версии</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">Доступна новая версия</string>
-    <string name="update_dialog_message">Текущая версия: %1$s\nДоступная версия: %2$s\nХотите скачать её?</string>
+    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_open_page">Open release page</string>
+    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
     <string name="check_update_no">Проверка прошла успешно, но обновлений нет.</string>
     <string name="reset_settings">Восстановить настройки по умолчанию</string>
     <string name="reset_settings_message">Восстановить настройки по умолчанию, но данные, такие как узлы и группы, будут сохранены. Чтобы полностью очистить данные, удалите данные приложения напрямую в системных настройках.</string>
