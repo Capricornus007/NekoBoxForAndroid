@@ -19,7 +19,9 @@ type fileLogWriter struct {
 
 var platformLog = new(fileLogWriter)
 
-// setupLog 初始化日志文件；truncateOnStart 时先清空旧日志。
+// setupLog 初始化日志文件；truncateOnStart 时在原 inode 上清空旧日志。
+// Android 的主进程和 :bg 进程会同时持有 neko.log。不能先 Remove 再 Open，
+// 否则较早启动的进程仍会写入已取消链接的旧 inode，导出时只能看到后启动进程的日志。
 func setupLog(maxSizeBytes int, path string, truncateOnStart bool, disabled bool) {
 	platformLog.access.Lock()
 	defer platformLog.access.Unlock()
@@ -28,10 +30,11 @@ func setupLog(maxSizeBytes int, path string, truncateOnStart bool, disabled bool
 	platformLog.path = path
 	platformLog.disabled = disabled
 
+	flags := os.O_CREATE | os.O_APPEND | os.O_WRONLY
 	if truncateOnStart {
-		_ = os.Remove(path)
+		flags |= os.O_TRUNC
 	}
-	file, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(path, flags, 0644)
 	if err != nil {
 		log.Println("open log file failed:", err)
 		return
