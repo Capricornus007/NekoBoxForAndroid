@@ -20,7 +20,9 @@ import java.net.UnknownHostException
 
 object DefaultNetworkListener {
     private sealed class NetworkMessage {
-        class Start(val key: Any, val listener: (Network?) -> Unit) : NetworkMessage()
+        class Start(val key: Any, val listener: (Network?) -> Unit) : NetworkMessage() {
+            val processed = CompletableDeferred<Unit>()
+        }
         class Get : NetworkMessage() {
             val response = CompletableDeferred<Network>()
         }
@@ -38,9 +40,16 @@ object DefaultNetworkListener {
         val pendingRequests = arrayListOf<NetworkMessage.Get>()
         for (message in channel) when (message) {
             is NetworkMessage.Start -> {
-                if (listeners.isEmpty()) register()
-                listeners[message.key] = message.listener
-                if (network != null) message.listener(network)
+                try {
+                    if (listeners.isEmpty()) register()
+                    listeners[message.key] = message.listener
+                    if (network != null) message.listener(network)
+                    message.processed.complete(Unit)
+                } catch (error: Throwable) {
+                    val removed = listeners.remove(message.key) != null
+                    if (removed && listeners.isEmpty()) runCatching { unregister() }
+                    message.processed.completeExceptionally(error)
+                }
             }
             is NetworkMessage.Get -> {
                 check(listeners.isNotEmpty()) { "Getting network without any listeners is not supported" }
@@ -84,8 +93,14 @@ object DefaultNetworkListener {
         }
     }
 
-    suspend fun start(key: Any, listener: (Network?) -> Unit) =
-        networkActor.send(NetworkMessage.Start(key, listener))
+    suspend fun start(key: Any, listener: (Network?) -> Unit) {
+        val message = NetworkMessage.Start(key, listener)
+        networkActor.send(message)
+        // send 只保证消息进入 actor，不保证 Start 分支和缓存网络的首次回调已经完成。
+        // 必须等待 processed，否则并发创建测试 Box 时 Go monitor 可能以 default=nil 返回，
+        // 随后的首拨会抢在 updateDefaultInterface(wlan0, index) 之前并立即失败。
+        message.processed.await()
+    }
 
     suspend fun get() = if (fallback) @TargetApi(23) {
         SagerNet.connectivity.activeNetwork

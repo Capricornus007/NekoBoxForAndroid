@@ -100,8 +100,8 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         // "no available network interface"（见 libcore/interface_monitor.go 批注）。
         // 原先 runOnDefaultDispatcher 异步注册，测试盒 box.Start() 后立刻拨号，
         // 首拨几乎必然抢在首次回调之前 → 批量测速大面积"超时"。
-        // DefaultNetworkListener 的 actor 是 Dispatchers.Unconfined，send 内联处理，
-        // 缓存命中时首次回调在此调用返回前即完成（调用的 Go 线程短暂阻塞，可接受）。
+        // DefaultNetworkListener.start 会等待 actor 处理 Start；缓存命中时还会等待
+        // 首次回调及 Go updateDefaultInterface 完成后才返回（Go 线程短暂阻塞，可接受）。
         runBlocking {
             DefaultNetworkListener.start(listener) { network ->
                 checkDefaultInterfaceUpdate(listener, network)
