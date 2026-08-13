@@ -74,11 +74,27 @@ func newInterfaceMonitor(w *boxPlatformInterfaceWrapper, l logger.Logger) *inter
 }
 
 func (m *interfaceMonitor) Start() error {
-	return intfBox.StartDefaultInterfaceMonitor(m)
+	started := time.Now()
+	m.wrapper.urlTestTrace("interface-monitor", "start begin")
+	err := intfBox.StartDefaultInterfaceMonitor(m)
+	m.access.Lock()
+	defaultInterface := m.defaultInterface
+	m.access.Unlock()
+	if err != nil {
+		m.wrapper.urlTestTrace("interface-monitor", "start failed elapsed=%s error=%v", time.Since(started), err)
+	} else if defaultInterface == nil {
+		m.wrapper.urlTestTrace("interface-monitor", "start returned elapsed=%s default=nil", time.Since(started))
+	} else {
+		m.wrapper.urlTestTrace("interface-monitor", "start ready elapsed=%s default=%s#%d", time.Since(started), defaultInterface.Name, defaultInterface.Index)
+	}
+	return err
 }
 
 func (m *interfaceMonitor) Close() error {
-	return intfBox.CloseDefaultInterfaceMonitor(m)
+	started := time.Now()
+	err := intfBox.CloseDefaultInterfaceMonitor(m)
+	m.wrapper.urlTestTrace("interface-monitor", "close elapsed=%s error=%v", time.Since(started), err)
+	return err
 }
 
 func (m *interfaceMonitor) DefaultInterface() *control.Interface {
@@ -164,6 +180,8 @@ func (m *interfaceMonitor) resolveInterface(interfaceName string, interfaceIndex
 
 // UpdateDefaultInterface 对齐官方 libbox monitor.go updateDefaultInterface。
 func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfaceIndex int32) {
+	totalStarted := time.Now()
+	m.wrapper.urlTestTrace("interface-update", "begin value=%s#%d", interfaceName, interfaceIndex)
 	// 官方：先刷新平台接口列表
 	// 诊断：计时 —— 每次事件（含 onCapabilitiesChanged 风暴）都会触发，
 	// 且 UpdateInterfaces 经 JNI 回调 Kotlin getInterfaces 全量枚举网卡。
@@ -172,6 +190,7 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 		start := time.Now()
 		if err := m.wrapper.networkManager.UpdateInterfaces(); err != nil {
 			m.logger.Error(E.Cause(err, "update interfaces"))
+			m.wrapper.urlTestTrace("interface-update", "refresh failed elapsed=%s error=%v", time.Since(start), err)
 		}
 		updateElapsed = time.Since(start)
 	}
@@ -187,6 +206,7 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 		callbacks := m.callbacks.Array()
 		m.access.Unlock()
 		m.logger.Info("default interface lost prev ", oldDesc, " callbacks ", len(callbacks))
+		m.wrapper.urlTestTrace("interface-update", "lost prev=%s callbacks=%d totalElapsed=%s", oldDesc, len(callbacks), time.Since(totalStarted))
 		// 官方：立即 callback(nil) → NetworkPause + "missing default interface"
 		for _, callback := range callbacks {
 			callback(nil, 0)
@@ -200,6 +220,7 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 		// 官方：ByIndex 失败只报错 return，保留旧 defaultInterface，不重试、不 clear
 		m.access.Unlock()
 		m.logger.Error(E.Cause(err, "find updated interface: ", interfaceName))
+		m.wrapper.urlTestTrace("interface-update", "resolve failed value=%s#%d refreshElapsed=%s totalElapsed=%s error=%v", interfaceName, interfaceIndex, updateElapsed, time.Since(totalStarted), err)
 		return
 	}
 	m.defaultInterface = newInterface
@@ -211,6 +232,7 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 		m.logger.Debug("default interface unchanged ", newInterface.Name,
 			" index ", newInterface.Index, " source ", source,
 			" skip ResetNetwork updateInterfaces ", updateElapsed)
+		m.wrapper.urlTestTrace("interface-update", "unchanged value=%s#%d source=%s refreshElapsed=%s totalElapsed=%s", newInterface.Name, newInterface.Index, source, updateElapsed, time.Since(totalStarted))
 		return
 	}
 
@@ -221,6 +243,7 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 		m.logger.Info("updated default interface ", newInterface.Name,
 			" index ", newInterface.Index, " source ", source,
 			" skip ResetNetwork (networkChangeResetConnections=false)")
+		m.wrapper.urlTestTrace("interface-update", "applied value=%s#%d source=%s callbacks=0 reset=false refreshElapsed=%s totalElapsed=%s", newInterface.Name, newInterface.Index, source, updateElapsed, time.Since(totalStarted))
 		return
 	}
 
@@ -234,6 +257,7 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 	m.logger.Info("updated default interface ", newInterface.Name,
 		" index ", newInterface.Index, " source ", source, " prev ", oldDesc,
 		" updateInterfaces ", updateElapsed)
+	m.wrapper.urlTestTrace("interface-update", "applied value=%s#%d source=%s prev=%s callbacks=%d refreshElapsed=%s totalElapsed=%s", newInterface.Name, newInterface.Index, source, oldDesc, len(callbacks), updateElapsed, time.Since(totalStarted))
 	for _, callback := range callbacks {
 		callback(newInterface, 0)
 	}

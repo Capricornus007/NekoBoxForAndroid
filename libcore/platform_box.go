@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync/atomic"
 	"syscall"
+	"time"
 
 	"golang.org/x/sys/unix"
 
@@ -36,6 +37,17 @@ import (
 type boxPlatformInterfaceWrapper struct {
 	networkManager adapter.NetworkManager
 	myTunName      string
+	diagnosticID   uint64
+	diagnosticTag  string
+	isURLTest      bool
+}
+
+func (w *boxPlatformInterfaceWrapper) urlTestTrace(stage string, format string, args ...any) {
+	if !w.isURLTest {
+		return
+	}
+	prefix := fmt.Sprintf("URLTestTrace goId=%d tag=%q stage=%s ", w.diagnosticID, w.diagnosticTag, stage)
+	log.Printf(prefix+format, args...)
 }
 
 func (w *boxPlatformInterfaceWrapper) Initialize(n adapter.NetworkManager) error {
@@ -48,10 +60,13 @@ func (w *boxPlatformInterfaceWrapper) UsePlatformAutoDetectInterfaceControl() bo
 }
 
 func (w *boxPlatformInterfaceWrapper) AutoDetectInterfaceControl(fd int) error {
+	started := time.Now()
+	w.urlTestTrace("protect", "begin fd=%d processBg=%v", fd, isBgProcess)
 	// call protect_path
 	if !isBgProcess {
 		err := sendFdToProtect(fd, "protect_path")
 		if err == nil {
+			w.urlTestTrace("protect", "ok fd=%d elapsed=%s via=protect_path", fd, time.Since(started))
 			return nil
 		}
 		// protect 服务不存在/无监听 = VPN 未运行，无需 protect，放行；
@@ -59,12 +74,20 @@ func (w *boxPlatformInterfaceWrapper) AutoDetectInterfaceControl(fd int) error {
 		// fail-fast——吞掉错误会让未 protect 的测速流量回环进 tun，经当前
 		// 节点"套娃"出站，测速结果与节点直连可用性彻底脱节。
 		if errors.Is(err, unix.ENOENT) || errors.Is(err, unix.ECONNREFUSED) {
+			w.urlTestTrace("protect", "skip fd=%d elapsed=%s reason=no-vpn-service error=%v", fd, time.Since(started), err)
 			return nil
 		}
+		w.urlTestTrace("protect", "failed fd=%d elapsed=%s error=%v", fd, time.Since(started), err)
 		return E.Cause(err, "protect fd via protect_path")
 	}
 	// bg process call VPNService
-	return intfBox.AutoDetectInterfaceControl(int32(fd))
+	err := intfBox.AutoDetectInterfaceControl(int32(fd))
+	if err != nil {
+		w.urlTestTrace("protect", "failed fd=%d elapsed=%s via=vpn-service error=%v", fd, time.Since(started), err)
+	} else {
+		w.urlTestTrace("protect", "ok fd=%d elapsed=%s via=vpn-service", fd, time.Since(started))
+	}
+	return err
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformInterface() bool {
@@ -113,8 +136,10 @@ func (w *boxPlatformInterfaceWrapper) UsePlatformNetworkInterfaces() bool {
 // 并行接口选择（selectInterfaces），而 NetworkManager 只在平台分支缓存接口列表；
 // 列表为空时所有拨号报 "no available network interface"。参考 husi platform_box.go。
 func (w *boxPlatformInterfaceWrapper) NetworkInterfaces() ([]adapter.NetworkInterface, error) {
+	started := time.Now()
 	interfaceIterator, err := intfBox.GetInterfaces()
 	if err != nil {
+		w.urlTestTrace("interfaces", "failed elapsed=%s error=%v", time.Since(started), err)
 		return nil, err
 	}
 	interfaces := make([]adapter.NetworkInterface, 0, interfaceIterator.Length())
@@ -140,6 +165,11 @@ func (w *boxPlatformInterfaceWrapper) NetworkInterfaces() ([]adapter.NetworkInte
 	interfaces = common.UniqBy(interfaces, func(it adapter.NetworkInterface) string {
 		return it.Name
 	})
+	names := make([]string, 0, len(interfaces))
+	for _, netInterface := range interfaces {
+		names = append(names, fmt.Sprintf("%s#%d", netInterface.Name, netInterface.Index))
+	}
+	w.urlTestTrace("interfaces", "ok elapsed=%s count=%d values=%s", time.Since(started), len(interfaces), strings.Join(names, ","))
 	return interfaces, nil
 }
 

@@ -14,6 +14,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -32,6 +33,7 @@ import (
 )
 
 var mainInstance *BoxInstance
+var boxInstanceSequence atomic.Uint64
 
 func VersionBox() string {
 	version := []string{
@@ -83,6 +85,18 @@ type BoxInstance struct {
 	v2api        *v2rayapi.StatsService
 	selector     *group.Selector
 	pauseManager pause.Manager
+
+	diagnosticID  uint64
+	diagnosticTag string
+	isURLTest     bool
+}
+
+func (b *BoxInstance) urlTestTrace(stage string, format string, args ...any) {
+	if b == nil || !b.isURLTest {
+		return
+	}
+	prefix := fmt.Sprintf("URLTestTrace goId=%d tag=%q stage=%s ", b.diagnosticID, b.diagnosticTag, stage)
+	log.Printf(prefix+format, args...)
 }
 
 func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *BoxInstance, err error) {
@@ -102,6 +116,8 @@ func NewTestSingBoxInstance(config string, localTransport LocalDNSTransport) (b 
 
 func newSingBoxInstance(config string, localTransport LocalDNSTransport, platformLog bool) (b *BoxInstance, err error) {
 	defer device.DeferPanicToError("NewSingBoxInstance", func(err_ error) { err = err_ })
+	diagnosticID := boxInstanceSequence.Add(1)
+	createStarted := time.Now()
 
 	// create box context
 	ctx, cancel := context.WithCancel(context.Background())
@@ -115,13 +131,23 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 	// 导致 interfaceMonitor.UpdateDefaultInterface 里 UpdateInterfaces() 刷的是"最新 box"
 	// 的 NetworkManager 缓存，落选 box 自己的接口缓存永远为空 → 所有拨号秒报
 	// "no available network interface"（见 platform_box.go 批注）。
-	service.MustRegister[adapter.PlatformInterface](ctx, &boxPlatformInterfaceWrapper{})
+	platformWrapper := &boxPlatformInterfaceWrapper{
+		diagnosticID: diagnosticID,
+		isURLTest:    !platformLog,
+	}
+	service.MustRegister[adapter.PlatformInterface](ctx, platformWrapper)
 
 	// parse options
 	var options option.Options
 	err = options.UnmarshalJSONContext(ctx, []byte(config))
 	if err != nil {
+		if !platformLog {
+			log.Printf("URLTestTrace goId=%d stage=parse-config failed elapsed=%s error=%v", diagnosticID, time.Since(createStarted), err)
+		}
 		return nil, fmt.Errorf("decode config: %v", err)
+	}
+	if !platformLog {
+		log.Printf("URLTestTrace goId=%d stage=parse-config ok elapsed=%s", diagnosticID, time.Since(createStarted))
 	}
 
 	// 官方内核不支持 fork 私有的 "geoip:xxx"/"geosite:xxx" 伪路径 local rule-set，
@@ -130,6 +156,9 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 		err = prepareLocalGeoRuleSets(options.Route.RuleSet)
 		if err != nil {
 			cancel()
+			if !platformLog {
+				log.Printf("URLTestTrace goId=%d stage=prepare-rulesets failed elapsed=%s error=%v", diagnosticID, time.Since(createStarted), err)
+			}
 			return nil, fmt.Errorf("prepare geo rule-sets: %v", err)
 		}
 	}
@@ -157,14 +186,26 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 	})
 	if err != nil {
 		cancel()
+		if !platformLog {
+			log.Printf("URLTestTrace goId=%d stage=create-box failed elapsed=%s error=%v", diagnosticID, time.Since(createStarted), err)
+		}
 		return nil, fmt.Errorf("create service: %v", err)
 	}
+	diagnosticTag := ""
+	if defaultOutbound := instance.Outbound().Default(); defaultOutbound != nil {
+		diagnosticTag = defaultOutbound.Tag()
+	}
+	platformWrapper.diagnosticTag = diagnosticTag
 
 	b = &BoxInstance{
-		Box:          instance,
-		cancel:       cancel,
-		pauseManager: service.FromContext[pause.Manager](ctx),
+		Box:           instance,
+		cancel:        cancel,
+		pauseManager:  service.FromContext[pause.Manager](ctx),
+		diagnosticID:  diagnosticID,
+		diagnosticTag: diagnosticTag,
+		isURLTest:     !platformLog,
 	}
+	b.urlTestTrace("create-box", "ok elapsed=%s", time.Since(createStarted))
 
 	// selector
 	if proxy, ok := b.Outbound().Outbound("proxy"); ok {
@@ -179,12 +220,20 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 func (b *BoxInstance) Start() (err error) {
 	b.access.Lock()
 	defer b.access.Unlock()
+	started := time.Now()
+	b.urlTestTrace("box-start", "begin")
 
 	defer device.DeferPanicToError("box.Start", func(err_ error) { err = err_ })
 
 	if b.state == 0 {
 		b.state = 1
-		return b.Box.Start()
+		err = b.Box.Start()
+		if err != nil {
+			b.urlTestTrace("box-start", "failed elapsed=%s error=%v", time.Since(started), err)
+		} else {
+			b.urlTestTrace("box-start", "ok elapsed=%s", time.Since(started))
+		}
+		return err
 	}
 	return errors.New("already started")
 }
@@ -192,11 +241,14 @@ func (b *BoxInstance) Start() (err error) {
 func (b *BoxInstance) Close() (err error) {
 	b.access.Lock()
 	defer b.access.Unlock()
+	started := time.Now()
+	b.urlTestTrace("box-close", "begin state=%d", b.state)
 
 	defer device.DeferPanicToError("box.Close", func(err_ error) { err = err_ })
 
 	// no double close
 	if b.state == 2 {
+		b.urlTestTrace("box-close", "skip already-closed elapsed=%s", time.Since(started))
 		return nil
 	}
 	b.state = 2
@@ -212,10 +264,10 @@ func (b *BoxInstance) Close() (err error) {
 		b.cancel()
 	}
 	if b.Box != nil {
-		b.Box.Close()
+		err = b.Box.Close()
 	}
-
-	return nil
+	b.urlTestTrace("box-close", "done elapsed=%s error=%v", time.Since(started), err)
+	return err
 }
 
 func (b *BoxInstance) Sleep() {
@@ -295,7 +347,7 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 		if i.v2api != nil {
 			connectionTracker = i.v2api
 		}
-		latency, err = urlTest(i.Box, connectionTracker, link, timeout)
+		latency, err = urlTest(i, connectionTracker, link, timeout)
 	}
 	boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.UrlTest result latency=%dms err=%v", latency, err))
 	return
@@ -307,9 +359,12 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 // 收益：① 延迟为纯 RTT，跨协议可比、贴近实际使用时连接复用的体感；
 // ② 第二次请求验证连接持续性——"首包能通但随即断开"的节点不再假成功。
 // 超时由 ctx 全程控制（拨号 + 两次请求共用 timeout 预算）。
-func urlTest(b *box.Box, tracker adapter.ConnectionTracker, link string, timeout int32) (int32, error) {
+func urlTest(instance *BoxInstance, tracker adapter.ConnectionTracker, link string, timeout int32) (int32, error) {
+	totalStarted := time.Now()
+	instance.urlTestTrace("urltest", "begin link=%s timeout=%dms", link, timeout)
 	linkURL, err := url.Parse(link)
 	if err != nil {
+		instance.urlTestTrace("parse-link", "failed elapsed=%s error=%v", time.Since(totalStarted), err)
 		return 0, E.Cause(err, "parse test link")
 	}
 	hostname := linkURL.Hostname()
@@ -321,6 +376,7 @@ func urlTest(b *box.Box, tracker adapter.ConnectionTracker, link string, timeout
 		case "https":
 			port = "443"
 		default:
+			instance.urlTestTrace("parse-link", "failed elapsed=%s error=unsupported-scheme scheme=%q", time.Since(totalStarted), linkURL.Scheme)
 			return 0, E.New("unsupported test link scheme: ", linkURL.Scheme)
 		}
 	}
@@ -328,15 +384,20 @@ func urlTest(b *box.Box, tracker adapter.ConnectionTracker, link string, timeout
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Millisecond)
 	defer cancel()
 
-	outbound := b.Outbound().Default()
+	outbound := instance.Outbound().Default()
 	if outbound == nil {
+		instance.urlTestTrace("select-outbound", "failed elapsed=%s error=no-default-outbound", time.Since(totalStarted))
 		return 0, E.New("no default outbound")
 	}
 	destination := M.ParseSocksaddrHostPortStr(hostname, port)
+	dialStarted := time.Now()
+	instance.urlTestTrace("dial", "begin outbound=%q destination=%s", outbound.Tag(), destination)
 	conn, err := outbound.DialContext(ctx, N.NetworkTCP, destination)
 	if err != nil {
+		instance.urlTestTrace("dial", "failed elapsed=%s totalElapsed=%s error=%v", time.Since(dialStarted), time.Since(totalStarted), err)
 		return 0, err
 	}
+	instance.urlTestTrace("dial", "ok elapsed=%s", time.Since(dialStarted))
 	if tracker != nil {
 		conn = tracker.RoutedConnection(ctx, conn, adapter.InboundContext{
 			Outbound:    outbound.Tag(),
@@ -375,18 +436,25 @@ func urlTest(b *box.Box, tracker adapter.ConnectionTracker, link string, timeout
 	}
 
 	// 第一次：预热（建立 TLS 会话等），不计时
+	warmupStarted := time.Now()
+	instance.urlTestTrace("warmup-head", "begin")
 	if err = doHead(); err != nil {
 		boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest warmup request failed: %v", err))
+		instance.urlTestTrace("warmup-head", "failed elapsed=%s totalElapsed=%s error=%v", time.Since(warmupStarted), time.Since(totalStarted), err)
 		return 0, err
 	}
+	instance.urlTestTrace("warmup-head", "ok elapsed=%s", time.Since(warmupStarted))
 	// 第二次：复用连接，纯 RTT 计时
 	start := time.Now()
+	instance.urlTestTrace("measure-head", "begin reusedConnection=true")
 	if err = doHead(); err != nil {
 		boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest measure request failed after %dms: %v", time.Since(start).Milliseconds(), err))
+		instance.urlTestTrace("measure-head", "failed elapsed=%s totalElapsed=%s error=%v", time.Since(start), time.Since(totalStarted), err)
 		return 0, err
 	}
 	latency := int32(time.Since(start).Milliseconds())
 	boxPlatformLogWriter.WriteMessage(sblog.LevelDebug, fmt.Sprintf("box.urlTest ok latency=%dms", latency))
+	instance.urlTestTrace("measure-head", "ok latency=%dms totalElapsed=%s", latency, time.Since(totalStarted))
 	return latency, nil
 }
 

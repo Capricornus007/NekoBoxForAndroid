@@ -1073,19 +1073,28 @@ class ConfigurationFragment @JvmOverloads constructor(
         val dialog = test.builder.show()
         val testJobs = mutableListOf<Job>()
         val group = DataStore.currentGroup()
-        Logs.d("URLTest: batch start, group=${group.name}, concurrent=${DataStore.connectionTestConcurrent}")
+        Logs.d(
+            "URLTestTrace batch=start groupId=${group.id} group=${group.name} " +
+                    "concurrent=${DataStore.connectionTestConcurrent} timeout=${DataStore.connectionTestTimeout}ms " +
+                    "link=${DataStore.connectionTestURL} serviceState=${DataStore.serviceState} " +
+                    "currentProfile=${DataStore.currentProfile} network=${SagerNet.underlyingNetwork}"
+        )
 
         val mainJob = runOnDefaultDispatcher {
             val profilesList = SagerDatabase.proxyDao.getByGroup(group.id)
             test.proxyN = profilesList.size
             val profiles = ConcurrentLinkedQueue(profilesList)
-            Logs.d("URLTest: batch profiles=${profilesList.size}")
-            repeat(DataStore.connectionTestConcurrent) {
+            Logs.d("URLTestTrace batch=loaded profiles=${profilesList.size}")
+            repeat(DataStore.connectionTestConcurrent) { workerId ->
                 testJobs.add(launch(Dispatchers.IO) {
                     val urlTest = UrlTest() // note: this is NOT in bg process
                     while (isActive) {
                         val profile = profiles.poll() ?: break
                         profile.status = 0
+                        Logs.d(
+                            "URLTestTrace batch=dispatch worker=$workerId profileId=${profile.id} " +
+                                    "profile=${profile.displayName()} isCurrent=${profile.id == DataStore.currentProfile}"
+                        )
 
                         try {
                             val result = urlTest.doTest(profile)
@@ -1098,9 +1107,10 @@ class ConfigurationFragment @JvmOverloads constructor(
                         } catch (e: Exception) {
                             profile.status = 3
                             profile.error = e.readableMessage
-                            // 诊断日志：批量测速失败原因临时记录，用于确认
-                            // "no available network interface"（接口监视器竞态）假设
-                            Logs.w("URLTest ${profile.displayName()}: ${e.readableMessage}")
+                            Logs.w(
+                                "URLTestTrace batch=result worker=$workerId profileId=${profile.id} " +
+                                        "profile=${profile.displayName()} failed error=${e.readableMessage}"
+                            )
                         }
 
                         test.update(profile)
@@ -1109,6 +1119,7 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
 
             testJobs.joinAll()
+            Logs.d("URLTestTrace batch=finished profiles=${profilesList.size}")
 
             runOnMainDispatcher {
                 test.cancel()
