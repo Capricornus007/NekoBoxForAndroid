@@ -24,7 +24,7 @@
 - [x] `platform_box.go` 迁移到官方 `adapter.PlatformInterface`（`OpenInterface`/`FindConnectionOwner` 等新签名；JNI 侧 `BoxPlatformInterface` 未变，Kotlin 零改动）。
 - [x] `box_include.go` 摘除官方没有的 SSR/Snell 注册；`protocol/http`、`protocol/juicity` 适配官方 `tls.NewDialerFromOptions`/`tls.NewSTDClient` 新签名（多 logger 参数）；`interface_monitor.go` 适配 sing-tun v0.8.12（`MyInterfaces() []string`）。
 - [x] CI（ci.yml/preview.yml/release.yml）libcore 缓存 key 纳入 `nb4a.properties`（SINGBOX_VERSION 变更触发内核重编，禁止复用旧 AAR）。
-- [x] 静态校验脚本：[`roo_check_imports.py`](roo_check_imports.py)（import 路径 + fork 残留）、[`roo_check_symbols.py`](roo_check_symbols.py)（官方符号存在性），`uv run` 执行，均通过。
+- [x] 静态校验脚本：[`.roo/roo_check_imports.py`](.roo/roo_check_imports.py)（import 路径 + fork 残留）、[`.roo/roo_check_symbols.py`](.roo/roo_check_symbols.py)（官方符号存在性）；在仓库根目录通过 `uv run .roo/<脚本>.py` 执行，均通过。
 - [x] 首轮 CI 编译修复（2026-08-01）：① 官方 1.13.0 已移除 wireguard outbound（仅 endpoint），`box_include.go` 改为镜像官方 `include/registry.go` 的报错 stub（`option.StubOptions` + 明确错误信息）；② `adapter.DNSTransport` 接口 v1.13 新增 `Reset()`，`platformLocalDNSTransport` 补空实现（对齐官方 local transport，JNI 无持久连接）；③ `platform_box.go` 删除冗余 `context` import。
 - [x] 首轮真机运行修复（2026-08-01，配置 schema 对齐官方 v1.13，[`ConfigBuilder.kt`](app/src/main/java/io/nekohasekai/sagernet/fmt/ConfigBuilder.kt) 等）：
   - `route.concurrent_dial` 1.13 已删除（`box.New` 报 unknown field 直接崩，内核完全起不来）→ 映射为官方替代 `default_network_strategy: "hybrid"`（WiFi/移动数据并发竞速拨号）；设置项保留，7 语言摘要改为明确说明（需 WiFi+移动数据同开、更耗电），防小白盲开
