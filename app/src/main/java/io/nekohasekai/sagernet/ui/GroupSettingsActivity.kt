@@ -66,7 +66,9 @@ class GroupSettingsActivity(
         DataStore.subscriptionAutoUpdateDelay = subscription.autoUpdateDelay
         DataStore.subscriptionFilterMode = subscription.filterMode
         DataStore.subscriptionFilterRegex = subscription.filterRegex
-        DataStore.subscriptionServerDns = subscription.serverDnsResolver ?: ""
+        // Throne upstream 尚未支持自定义服务器 DNS，入口停用期间不再加载其 UI 缓存。
+        // 保留原代码以便未来恢复功能：
+        // DataStore.subscriptionServerDns = subscription.serverDnsResolver ?: ""
     }
 
     fun ProxyGroup.serialize() {
@@ -100,7 +102,9 @@ class GroupSettingsActivity(
                 autoUpdateDelay = DataStore.subscriptionAutoUpdateDelay
                 filterMode = DataStore.subscriptionFilterMode
                 filterRegex = DataStore.subscriptionFilterRegex
-                serverDnsResolver = DataStore.subscriptionServerDns
+                // 入口停用期间不要用未展示的 UI 缓存覆盖历史数据库值。
+                // 保留原代码以便未来恢复功能：
+                // serverDnsResolver = DataStore.subscriptionServerDns
             }
         }
     }
@@ -210,6 +214,10 @@ class GroupSettingsActivity(
             true
         }
 
+        // Throne upstream 尚未支持自定义服务器 DNS，XML 入口及对应监听同步停用。
+        // 若仅移除 XML 而继续强制查找 Preference，findPreference() 会返回 null，
+        // 随后的 !! 会使整个设置页进入 createPreferences 异常处理。
+        /* 保留原代码以便未来恢复功能：
         val subscriptionServerDns =
             findPreference<EditTextPreference>(Key.SUBSCRIPTION_SERVER_DNS)!!
         subscriptionServerDns.setOnPreferenceChangeListener { pref, newValue ->
@@ -230,6 +238,7 @@ class GroupSettingsActivity(
                 false
             }
         }
+        */
     }
 
     class UnsavedChangesDialogFragment : AlertDialogFragment<Empty, Empty>() {
@@ -471,6 +480,7 @@ class GroupSettingsActivity(
 
 }
 
+/* 自定义服务器 DNS 的 UI 恢复时一并恢复此校验函数。
 private fun isValidServerDns(raw: String): Boolean {
     val value = raw.trim()
     if (value.isEmpty()) return true
@@ -488,3 +498,4 @@ private fun isValidServerDns(raw: String): Boolean {
     val host = value.substringBeforeLast(":").trim('[', ']')
     return host.isNotEmpty()
 }
+*/
