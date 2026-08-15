@@ -210,37 +210,54 @@ class SagerNet :
             false
         }
 
-        fun updateNotificationChannels() {
-            if (Build.VERSION.SDK_INT >= 26) {
-                @RequiresApi(26)
-                {
-                    notification.createNotificationChannels(
-                        listOf(
-                            NotificationChannel(
-                                "service-vpn",
-                                application.getText(R.string.service_vpn),
-                                NotificationManager.IMPORTANCE_LOW,
-                            ), // #1355
-                            NotificationChannel(
-                                "service-proxy",
-                                application.getText(R.string.service_proxy),
-                                NotificationManager.IMPORTANCE_LOW,
-                            ),
-                            NotificationChannel(
-                                "service-subscription",
-                                application.getText(R.string.service_subscription),
-                                NotificationManager.IMPORTANCE_DEFAULT,
-                            ),
-                            NotificationChannel(
-                                "connection-test",
-                                application.getText(R.string.connection_test),
-                                NotificationManager.IMPORTANCE_DEFAULT,
-                            ),
-                        ),
-                    )
-                }
-            }
-        }
+/**
++         * Re‑create the notification channels with the correct importance.
++         *
++         * Android does not allow changing the importance of an existing
++         * channel; the call to `createNotificationChannel` is ignored if the
++         * channel already exists. In older installations the `service‑vpn`
++         * channel may have been created with `IMPORTANCE_MIN`, which triggers
++         * `CannotPostForegroundServiceNotificationException` when the
++         * foreground service starts. To guarantee the channel uses
++         * `IMPORTANCE_LOW` we first delete any existing channels (no‑op if they
++         * don’t exist) and then create them anew.
++         */
++        fun updateNotificationChannels() {
++            if (Build.VERSION.SDK_INT >= 26) {
++                @RequiresApi(26)
++                {
++                    // Delete possible stale channels before recreating them.
++                    listOf("service-vpn", "service-proxy", "service-subscription", "connection-test").forEach {
++                        notification.deleteNotificationChannel(it)
++                    }
++
++                    notification.createNotificationChannels(
++                        listOf(
++                            NotificationChannel(
++                                "service-vpn",
++                                application.getText(R.string.service_vpn),
++                                NotificationManager.IMPORTANCE_LOW,
++                            ), // low importance satisfies foreground start requirements
++                            NotificationChannel(
++                                "service-proxy",
++                                application.getText(R.string.service_proxy),
++                                NotificationManager.IMPORTANCE_LOW,
++                            ),
++                            NotificationChannel(
++                                "service-subscription",
++                                application.getText(R.string.service_subscription),
++                                NotificationManager.IMPORTANCE_DEFAULT,
++                            ),
++                            NotificationChannel(
++                                "connection-test",
++                                application.getText(R.string.connection_test),
++                                NotificationManager.IMPORTANCE_DEFAULT,
++                            ),
++                        ),
++                    )
++                }
++            }
++        }
 
         // Default to carrying the current in-process selection so :bg starts the profile the UI
         // last selected, even if the async write-through DB commit hasn't landed yet. Callers with
