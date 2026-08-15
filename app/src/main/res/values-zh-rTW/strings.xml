@@ -129,6 +129,8 @@
     <string name="action_export_clipboard">匯出至剪貼簿</string>
     <string name="action_import">自剪貼簿匯入</string>
     <string name="action_import_file">自檔案匯入</string>
+    <string name="scanner_toggle_flashlight">切換手電筒</string>
+    <string name="scanner_select_image">從相簿選擇圖片</string>
     <string name="action_export_msg">匯出成功！</string>
     <string name="action_export_err">匯出失敗。</string>
     <string name="action_import_msg">匯入成功！</string>

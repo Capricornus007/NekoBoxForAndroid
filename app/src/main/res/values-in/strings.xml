@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="scanner_toggle_flashlight">Alihkan senter</string>
+    <string name="scanner_select_image">Pilih gambar</string>
     <string name="port_http">Proksi Port HTTP</string>
     <string name="port_proxy">Proksi Port SOCKS5</string>
     <string name="disable_mixed_inbound">Nonaktifkan Inbound Campuran</string>

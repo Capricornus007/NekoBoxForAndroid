@@ -299,6 +299,8 @@
     <string name="action_export_err">Dışa aktarma başarısız oldu.</string>
     <string name="action_export_msg">Başarıyla dışa aktarıldı!</string>
     <string name="action_import_file">Dosyadan aktar</string>
+    <string name="scanner_toggle_flashlight">El fenerini aç/kapat</string>
+    <string name="scanner_select_image">Görsel seç</string>
     <string name="action_import">Kopyalama Panosundan Aktar</string>
     <string name="action_export">Dışa Aktar</string>
     <string name="action_export_clipboard">Kopyalama Panosuna Aktar</string>

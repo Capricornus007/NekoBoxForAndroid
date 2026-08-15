@@ -241,6 +241,8 @@
     <string name="action_export">صدور</string>
     <string name="action_import">وارد کردن از بریده‌دان</string>
     <string name="action_import_file">وارد کردن از یک فایل</string>
+    <string name="scanner_toggle_flashlight">تغییر وضعیت چراغ‌قوه</string>
+    <string name="scanner_select_image">انتخاب تصویر</string>
     <string name="action_export_msg">صدور موفق</string>
     <string name="action_export_err">صدور انجام نشد.</string>
     <string name="action_import_msg">با موفقیت اضافه شد!</string>

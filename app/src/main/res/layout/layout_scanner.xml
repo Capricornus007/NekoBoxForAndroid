@@ -34,7 +34,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="32dp"
         android:background="@drawable/scanner_action_background"
-        android:contentDescription="@string/action_import_file"
+        android:contentDescription="@string/scanner_select_image"
         android:padding="16dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_image_photo"

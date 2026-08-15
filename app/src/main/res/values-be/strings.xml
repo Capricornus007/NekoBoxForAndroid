@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="scanner_toggle_flashlight">Пераключыць ліхтарык</string>
+    <string name="scanner_select_image">Выбраць выяву</string>
     <string name="logcat">Экспартаваць інфармацыю пра адладку</string>
     <string name="version_x">Версія (%s)</string>
     <string name="app_version">Версія</string>

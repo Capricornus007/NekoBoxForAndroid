@@ -170,6 +170,8 @@
     <string name="transproxy_mode">Mode Transproxy</string>
     <string name="connection_test_unreachable">Non accessible</string>
     <string name="action_import_file">Importer depuis un fichier</string>
+    <string name="scanner_toggle_flashlight">Activer ou désactiver la lampe torche</string>
+    <string name="scanner_select_image">Sélectionner une image</string>
     <string name="port_local_dns">Port du DNS local</string>
     <string name="profile_name">Nom de profil</string>
     <string name="server_address">Serveur</string>

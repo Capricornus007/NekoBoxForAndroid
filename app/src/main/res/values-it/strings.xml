@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="scanner_toggle_flashlight">Attiva o disattiva la torcia</string>
+    <string name="scanner_select_image">Seleziona immagine</string>
     <string name="logcat">Esporta informazioni di debug</string>
     <string name="version_x">Versione (%s)</string>
     <string name="app_version">Versione</string>

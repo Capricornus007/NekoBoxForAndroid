@@ -18,6 +18,8 @@
 <string name="action_import">Импорт из буфера обмена</string>
 <string name="action_import_err">Не удалось импортировать.</string>
 <string name="action_import_file">Импортировать из файла</string>
+<string name="scanner_toggle_flashlight">Переключить фонарик</string>
+<string name="scanner_select_image">Выбрать изображение</string>
 <string name="action_import_msg">Успешно импортировано!</string>
 <string name="action_learn_more">УЗНАТЬ БОЛЬШЕ</string>
 <string name="action_switch">Переключить</string>

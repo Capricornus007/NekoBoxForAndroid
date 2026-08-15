@@ -83,6 +83,8 @@
     <string name="connecting">Kobler til …</string>
     <string name="undo">Angre</string>
     <string name="action_import_file">Importer fra fil</string>
+    <string name="scanner_toggle_flashlight">Slå lommelykt av eller på</string>
+    <string name="scanner_select_image">Velg bilde</string>
     <string name="action_import">Importer fra utklippstavle</string>
     <string name="action_export">Eksporter</string>
     <string name="clear_profiles">Tøm</string>

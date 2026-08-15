@@ -12,6 +12,7 @@ LAYOUT = REPO / "app/src/main/res/layout/layout_scanner.xml"
 BACKGROUND = REPO / "app/src/main/res/drawable/scanner_action_background.xml"
 ACTIVITY = REPO / "app/src/main/java/io/nekohasekai/sagernet/ui/ScannerActivity.kt"
 MENU = REPO / "app/src/main/res/menu/scanner_menu.xml"
+RES = REPO / "app/src/main/res"
 
 ANDROID = "{http://schemas.android.com/apk/res/android}"
 errors: list[str] = []
@@ -53,7 +54,24 @@ if "setSupportActionBar" in activity or "onCreateOptionsMenu" in activity:
 if MENU.exists():
     errors.append("scanner_menu.xml: 悬浮按钮接管入口后该菜单应删除")
 
-print("checked scanner layout, action wiring and obsolete toolbar menu")
+required_strings = {"scanner_toggle_flashlight", "scanner_select_image"}
+for values_dir in sorted(RES.glob("values-*")):
+    strings_file = values_dir / "strings.xml"
+    if not strings_file.exists() or values_dir.name.startswith(("values-night", "values-v")):
+        continue
+    try:
+        translated = {
+            element.get("name")
+            for element in ET.parse(strings_file).getroot().findall("string")
+        }
+    except ET.ParseError as error:
+        errors.append(f"{strings_file.relative_to(REPO)}: XML 无法解析: {error}")
+        continue
+    missing = sorted(required_strings - translated)
+    if missing:
+        errors.append(f"{strings_file.relative_to(REPO)}: 缺少扫码文案 {', '.join(missing)}")
+
+print("checked scanner layout, action wiring, obsolete toolbar menu and locale strings")
 if errors:
     print(f"\n{len(errors)} error(s):")
     for error in errors:

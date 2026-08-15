@@ -217,8 +217,10 @@
     <string name="action_export_clipboard">Exportar al portapapeles</string> 
     <string name="action_export">Exportar</string> 
     <string name="action_import">Importar desde portapapeles</string> 
-    <string name="action_import_file">Importar desde archivo</string> 
-    <string name="action_export_msg">¡Exportación exitosa!</string> 
+    <string name="action_import_file">Importar desde archivo</string>
+    <string name="scanner_toggle_flashlight">Alternar linterna</string>
+    <string name="scanner_select_image">Seleccionar imagen</string>
+    <string name="action_export_msg">¡Exportación exitosa!</string>
     <string name="action_export_err">Error al exportar.</string> 
     <string name="action_import_msg">¡Importación exitosa!</string> 
     <string name="action_import_err">No se pudo importar.</string> 

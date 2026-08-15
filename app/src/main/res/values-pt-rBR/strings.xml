@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="scanner_toggle_flashlight">Alternar lanterna</string>
+    <string name="scanner_select_image">Selecionar imagem</string>
     <string name="group_name">Nome do grupo</string>
     <string name="group_default">Desagrupado</string>
     <string name="document">Documento</string>

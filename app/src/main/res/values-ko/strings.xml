@@ -235,6 +235,8 @@
     <string name="action_export">내보내기</string>
     <string name="action_import">클립보드에서 가져오기</string>
     <string name="action_import_file">파일에서 가져오기</string>
+    <string name="scanner_toggle_flashlight">손전등 전환</string>
+    <string name="scanner_select_image">이미지 선택</string>
     <string name="action_export_msg">내보내기 성공!</string>
     <string name="action_export_err">내보내기 실패.</string>
     <string name="action_import_msg">가져오기 성공!</string>

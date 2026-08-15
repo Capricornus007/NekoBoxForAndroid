@@ -241,6 +241,8 @@
     <string name="action_export">エクスポート</string>
     <string name="action_import">クリップボードからインポート</string>
     <string name="action_import_file">ファイルからインポート</string>
+    <string name="scanner_toggle_flashlight">ライトを切り替える</string>
+    <string name="scanner_select_image">画像を選択</string>
     <string name="action_export_msg">エクスポートに成功しました！</string>
     <string name="action_export_err">エクスポートに失敗しました。</string>
     <string name="action_import_msg">インポートに成功しました！</string>

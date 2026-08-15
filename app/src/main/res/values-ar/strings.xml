@@ -162,6 +162,8 @@
     <string name="action_export_err">فشل التصدير.</string>
     <string name="action_export_msg">تم التصدير بنجاح!</string>
     <string name="action_import_file">استيراد من ملف</string>
+    <string name="scanner_toggle_flashlight">تبديل المصباح</string>
+    <string name="scanner_select_image">اختيار صورة</string>
     <string name="action_import">الاستيراد من الحافظة</string>
     <string name="action_export">يصدر</string>
     <string name="action_export_clipboard">تصدير إلى الحافظة</string>

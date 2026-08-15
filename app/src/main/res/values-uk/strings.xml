@@ -238,6 +238,8 @@
     <string name="action_export">Експорт</string>
     <string name="action_import">Імпортувати з буфера обміну</string>
     <string name="action_import_file">Імпортувати з файлу</string>
+    <string name="scanner_toggle_flashlight">Перемкнути ліхтарик</string>
+    <string name="scanner_select_image">Вибрати зображення</string>
     <string name="action_export_msg">Експортовано успішно!</string>
     <string name="action_export_err">Не вдалося експортувати.</string>
     <string name="action_import_msg">Імпортовано успішно!</string>

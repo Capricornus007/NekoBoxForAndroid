@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="scanner_toggle_flashlight">Taschenlampe umschalten</string>
+    <string name="scanner_select_image">Bild auswählen</string>
     <string name="group_subscription_link">Abonnement-Link</string>
     <string name="group_update">Aktualisieren</string>
     <string name="group_name">Gruppen name</string>

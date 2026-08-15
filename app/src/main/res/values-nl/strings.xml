@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="scanner_toggle_flashlight">Zaklamp in-/uitschakelen</string>
+    <string name="scanner_select_image">Afbeelding selecteren</string>
     <string name="logcat">Foutopsporing Informatie exporteren</string>
     <string name="version_x">Versie (%s)</string>
     <string name="app_version">Versie</string>
