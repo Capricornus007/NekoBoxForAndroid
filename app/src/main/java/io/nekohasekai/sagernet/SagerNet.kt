@@ -14,7 +14,6 @@ import android.os.Build
 import android.os.PowerManager
 import android.os.StrictMode
 import android.os.UserManager
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import go.Seq
@@ -178,24 +177,24 @@ class SagerNet :
                     NotificationChannel(
                         "service-vpn",
                         application.getText(R.string.service_vpn),
-                        NotificationManager.IMPORTANCE_LOW
+                        NotificationManager.IMPORTANCE_LOW,
                     ),
                     NotificationChannel(
                         "service-proxy",
                         application.getText(R.string.service_proxy),
-                        NotificationManager.IMPORTANCE_LOW
+                        NotificationManager.IMPORTANCE_LOW,
                     ),
                     NotificationChannel(
                         "service-subscription",
                         application.getText(R.string.service_subscription),
-                        NotificationManager.IMPORTANCE_DEFAULT
+                        NotificationManager.IMPORTANCE_DEFAULT,
                     ),
                     NotificationChannel(
                         "connection-test",
                         application.getText(R.string.connection_test),
-                        NotificationManager.IMPORTANCE_DEFAULT
-                    )
-                )
+                        NotificationManager.IMPORTANCE_DEFAULT,
+                    ),
+                ),
             )
         }
     }
@@ -243,7 +242,6 @@ class SagerNet :
             false
         }
 
-
         // Default to carrying the current in-process selection so :bg starts the profile the UI
         // last selected, even if the async write-through DB commit hasn't landed yet. Callers with
         // a specific id (e.g. a shortcut switching profile) pass it explicitly. A non-resolving id
@@ -271,7 +269,7 @@ class SagerNet :
             val linkProperties: LinkProperties = connectivity.getLinkProperties(network) ?: return false
             return linkProperties.isPrivateDnsActive
         }
-    var appVersionNameForDisplay = {
+        var appVersionNameForDisplay = {
             var n = BuildConfig.VERSION_NAME
             if (isPreview) {
                 n += " " + BuildConfig.PRE_VERSION_NAME
