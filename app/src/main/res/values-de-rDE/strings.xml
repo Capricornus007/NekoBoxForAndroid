@@ -485,6 +485,12 @@
     <string name="rules_geoip_url">geoip URL</string>
     <string name="tuic_udp_relay_mode">UDP-Relay-Modus</string>
     <string name="tuic_congestion_controller">Überlastungssteuerung</string>
+    <string name="shadowquic_udp_over_stream">UDP over Stream</string>
+    <string name="shadowquic_zero_rtt">0-RTT Handshake</string>
+    <string name="shadowquic_sunny_quic">Sunny QUIC</string>
+    <string name="trusttunnel_quic">QUIC (HTTP/3)</string>
+    <string name="trusttunnel_health_check">Health Check</string>
+    <string name="trusttunnel_congestion_control">QUIC Congestion Control</string>
     <string name="tuic_disable_sni">SNI deaktivieren</string>
     <string name="tuic_reduce_rtt">0-RTT QUIC-Handshake aktivieren</string>
     <string name="pinned_certchain_sha256">SHA256 des gepinnten Zertifikats</string>
@@ -522,6 +528,38 @@
     <string name="share_subscription">Abonnement teilen</string>
     <string name="show_group_in_notification">Gruppennamen in Benachrichtigung anzeigen</string>
     <string name="reset_connections">Verbindungen zurücksetzen</string>
+    <string name="reset_connections_done">Reset upstream connections done</string>
+    <string name="idle">Idle</string>
+    <string name="warning_nonexistent_outbound">Warning: %1$s: A non-existent outbound was specified.</string>
+    <string name="imported_profiles">%1$d profile(s)</string>
+    <string name="please_try_again">Please try again later</string>
+    <string name="conflicting_plugins">Conflicting plugins found from: %1$s</string>
+    <string name="crash_log_title">NB4A Crash</string>
+    <string name="rule_default_name">Rule %1$d</string>
+    <string name="rule_summary_src_ip">src ip: %1$s\n</string>
+    <string name="rule_summary_src_port">src port: %1$s\n</string>
+    <string name="rule_summary_dst_port">dst port: %1$s\n</string>
+    <string name="rule_summary_network">network: %1$s\n</string>
+    <string name="rule_summary_protocol">protocol: %1$s\n</string>
+    <string name="version_prefix">v%1$s</string>
+    <string name="subscription_name">Subscription #%1$s</string>
+    <string name="my_group">My group</string>
+    <string name="asset_version_unknown">Unknown-%1$s</string>
+    <string name="invalid_naive_link">Invalid naive link: %1$s</string>
+    <string name="invalid_ss_android_link">invalid ss-android link: %1$s</string>
+    <string name="invalid_jms_link">invalid jms link: %1$s</string>
+    <string name="invalid_v2rayn_link">invalid v2rayN link: %1$s</string>
+    <string name="invalid_snell_url">Invalid snell URL</string>
+    <string name="not_supported_proxy">Not supported: %1$s</string>
+    <string name="invalid_trojan_link">invalid trojan link: %1$s</string>
+    <string name="invalid_http_link">Invalid http(s) link: %1$s</string>
+    <string name="not_http_proxy">Not http proxy</string>
+    <string name="invalid_hysteria_link">invalid hysteria link: %1$s</string>
+    <string name="invalid_masterdns_link">invalid masterdns link: %1$s</string>
+    <string name="masterdns_no_tunnel">masterdns link missing tunnel domain(s)</string>
+    <string name="masterdns_no_key">masterdns link missing encryption key for encryption method %1$s</string>
+    <string name="webdav_auth_failed">Authentication failed</string>
+    <string name="webdav_check_dir_failed">Failed to check directory (%1$s): %2$s</string>
     <string name="remove_duplicate">Doppelte Server entfernen</string>
     <string name="mtu_help">Langes Drücken auf die Einstellung, um benutzerdefinierte MTU festzulegen.</string>
     <string name="log_level_help">Langes Drücken auf die Einstellung, um die Puffergröße festzulegen.</string>
@@ -788,4 +826,31 @@
     <string name="vpn_watchdog_test">🧪 Test watchdog</string>
     <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
     <string name="vpn_watchdog_interval">Check interval (sec)</string>
+    <string name="rule_domain">domain</string>
+    <string name="rule_dst_ip">dst ip</string>
+    <string name="rule_dst_port">dst port</string>
+    <string name="rule_src_ip">src ip</string>
+    <string name="rule_src_port">src port</string>
+    <string name="rule_ruleset">RuleSet(.srs)</string>
+    <string name="rule_network">network</string>
+    <string name="rule_protocol">protocol</string>
+    <string name="rule_outbound">outbound</string>
+    <string name="pref_sing_box_server">sing-box server</string>
+    <string name="udp_over_tcp">UDP over TCP</string>
+    <string name="reality_public_key">Reality Public Key</string>
+    <string name="reality_short_id">Reality ShortId</string>
+    <string name="debug_button_crash_from_kt">Crash From Kt</string>
+    <string name="debug_button_reset_settings">Reset Settings</string>
+    <string name="toast_create_preferences_failed">Error on createPreferences, please try again.</string>
+    <string name="dialog_watchdog_test_title">Test watchdog</string>
+    <string name="dialog_watchdog_vpn_not_running">VPN is not running. Connect to VPN first.</string>
+    <string name="dialog_watchdog_auto_reconnect_title">Test auto-reconnect</string>
+    <string name="dialog_watchdog_force_restart">Watchdog will force-restart the VPN.
+
+VPN will disconnect for 1-3 seconds, then reconnect automatically.
+
+Continue?</string>
+    <string name="dialog_watchdog_start">Starten</string>
+    <string name="snackbar_watchdog_test_started">Test started. Restarting within ≤30 s...</string>
+    <string name="dialog_log_buffer_size">Log buffer size (kb)</string>
 </resources>
