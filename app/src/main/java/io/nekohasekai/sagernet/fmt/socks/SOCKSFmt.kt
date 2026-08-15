@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.fmt.socks
 
+import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.decodeBase64UrlSafe
 import io.nekohasekai.sagernet.ktx.toLink

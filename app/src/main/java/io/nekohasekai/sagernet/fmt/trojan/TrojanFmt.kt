@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.fmt.trojan
 
+import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.fmt.v2ray.parseDuckSoft
 import io.nekohasekai.sagernet.ktx.app
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull

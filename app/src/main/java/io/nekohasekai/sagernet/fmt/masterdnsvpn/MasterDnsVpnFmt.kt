@@ -10,6 +10,7 @@
 package io.nekohasekai.sagernet.fmt.masterdnsvpn
 
 import io.nekohasekai.sagernet.fmt.LOCALHOST
+import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.linkBuilder

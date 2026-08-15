@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.fmt.snell
 
+import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.unUrlSafe
 import io.nekohasekai.sagernet.ktx.urlSafe

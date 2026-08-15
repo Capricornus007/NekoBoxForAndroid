@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.fmt.hysteria
 
+import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.fmt.LOCALHOST
 import io.nekohasekai.sagernet.ktx.*

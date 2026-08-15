@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.fmt.http
 
+import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.fmt.v2ray.isTLS
 import io.nekohasekai.sagernet.fmt.v2ray.setTLS
 import io.nekohasekai.sagernet.ktx.app
