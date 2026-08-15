@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_desc">Android用のユニバーサルプロキシツールチェーン、Kotlinで書かれています。</string>
     <string name="project">プロジェクト</string>
@@ -22,10 +22,10 @@
     <string name="tile_title">スイッチャー</string>
     <string name="menu_traffic">トラフィック</string>
     <string name="menu_dashboard">sing-box ダッシュボード</string>
-    <!-- externel -->
+    
     <string name="action_copy">コピー</string>
     <string name="action_open">開く</string>
-    <!-- group -->
+    
     <string name="group_name">グループ名</string>
     <string name="group_update">更新</string>
     <string name="group_subscription_link">サブスクリプションリンク</string>
@@ -52,7 +52,7 @@
     <string name="group_changed">更新: \n%s</string>
     <string name="group_deleted">削除: \n%s</string>
     <string name="group_duplicate">重複: \n%s</string>
-    <!-- misc -->
+    
     <string name="service_mode">サービスモード</string>
     <string name="service_mode_proxy">プロキシのみ</string>
     <string name="port_proxy">プロキシポート</string>
@@ -103,7 +103,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="require_transproxy">トランスプロキシ受信を有効にする</string>
     <string name="transproxy_mode">トランスプロキシモード</string>
     <string name="connection_test_url">接続テストURL</string>
-    <!-- proxy category -->
+    
     <string name="profile_name">プロファイル名</string>
     <string name="server_address">サーバー</string>
     <string name="server_port">リモートポート</string>
@@ -141,7 +141,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="extra_headers">追加ヘッダー</string>
     <string name="config_type">設定タイプ</string>
     <string name="edit_config">設定を編集</string>
-    <!-- feature category -->
+    
     <string name="ipv6">IPv6ルート</string>
     <string name="prefer">優先</string>
     <string name="only">のみ</string>
@@ -201,7 +201,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="auto_connect_summary">起動時やアプリアップデート時に、以前実行中だった場合はプロキシを有効にする</string>
     <string name="direct_boot_aware">ロック画面での切替を許可</string>
     <string name="direct_boot_aware_summary">選択したプロファイル情報の保護が弱まります</string>
-    <!-- notification category -->
+    
     <string name="service_vpn">VPN サービス</string>
     <string name="service_proxy">プロキシ サービス</string>
     <string name="forward_success">プロキシを開始しました。</string>
@@ -212,11 +212,11 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="vpn_error">%s</string>
     <string name="vpn_permission_denied">VPN サービスを作成する権限がありません</string>
     <string name="reboot_required">VPN サービスの開始に失敗しました。デバイスを再起動する必要があるかもしれません。</string>
-    <!-- alert category -->
+    
     <string name="profile_empty">プロファイルを選択してください</string>
     <string name="connect">接続</string>
     <string name="clipboard_empty">クリップボードは空です</string>
-    <!-- menu category -->
+    
     <string name="settings">設定</string>
     <string name="edit">編集</string>
     <string name="share">共有</string>
@@ -247,8 +247,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="action_import_err">インポートに失敗しました。</string>
     <string name="file_manager_missing">お使いのデバイスにはAndroid標準のファイルセレクターがありません。
         Material Filesなどのファイルセレクターをインストールしてください。</string>
-    <!-- share -->
-    <!-- profile -->
+    
+    
     <string name="profile_config">プロファイル設定</string>
     <string name="delete">削除</string>
     <string name="delete_confirm_prompt">このプロファイルを削除してもよろしいですか？</string>
@@ -265,12 +265,12 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="undo">元に戻す</string>
     <string name="insecure">安全ではない</string>
     <string name="deprecated">非推奨</string>
-    <!-- tasker -->
-    <!-- status -->
+    
+    
     <string name="connecting">接続中…</string>
     <string name="vpn_connected">接続済み、タップして接続を確認</string>
     <string name="not_connected">未接続</string>
-    <!-- subscriptions -->
+    
     <string name="subscriptions">サブスクリプション</string>
     <string name="cleartext_http_warning">平文HTTPトラフィックは安全ではありません</string>
     <string name="error_title">エラー</string>
@@ -281,7 +281,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="deduplication">重複除去</string>
     <string name="ignore_battery_optimizations">バッテリー最適化を無視</string>
     <string name="ignore_battery_optimizations_sum">一部の制限を解除</string>
-    <!-- plugin -->
+    
     <string name="plugin">プラグイン</string>
     <string name="plugin_configure">設定…</string>
     <string name="plugin_disabled">無効</string>
@@ -628,7 +628,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
     <string name="app_list_permission_denied">インストールされたアプリを読み取れません。\nこれは通常、システムがアプリの読み取り権限を制限しているためです。\nシステム設定で権限を許可してください。</string>
     <string name="open_app_settings">システム設定を開く</string>
-    <!-- Snell Protocol -->
+    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">事前共有キー</string>
     <string name="snell_userkey">ユーザーキー</string>
@@ -794,4 +794,4 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="mixed_auth_no_auth">Not set (no authentication)</string>
     <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="ech_query_server_name">ECH Query Server Name</string>
-</resources>
+<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="service_mode_vpn">VPN</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink">%s | %s/s ↑</string><string name="traffic_downlink">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string></resources>

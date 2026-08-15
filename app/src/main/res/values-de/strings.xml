@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_desc">Die universelle Proxy-Toolchain für Android, geschrieben in Kotlin.</string>
     <string name="project">Projekt</string>
@@ -30,10 +30,10 @@
     <string name="tile_title">Schalter</string>
     <string name="menu_traffic">Verkehr</string>
     <string name="menu_dashboard">sing-box Dashboard</string>
-    <!-- externel -->
+    
     <string name="action_copy">Kopieren</string>
     <string name="action_open">Öffnen</string>
-    <!-- group -->
+    
     <string name="group_name">Gruppenname</string>
     <string name="group_update">Aktualisieren</string>
     <string name="group_subscription_link">Abonnement-Link</string>
@@ -60,7 +60,7 @@
     <string name="group_changed">Aktualisiert: \n%s</string>
     <string name="group_deleted">Gelöscht: \n%s</string>
     <string name="group_duplicate">Duplikat: \n%s</string>
-    <!-- misc -->
+    
     <string name="service_mode">Dienstmodus</string>
     <string name="service_mode_proxy">Nur Proxy</string>
     <string name="port_proxy">Proxy-Port</string>
@@ -113,7 +113,7 @@
     <string name="require_transproxy">Transproxy eingehend aktivieren</string>
     <string name="transproxy_mode">Transproxy-Modus</string>
     <string name="connection_test_url">Verbindungstest-URL</string>
-    <!-- proxy category -->
+    
     <string name="profile_name">Profilname</string>
     <string name="server_address">Server</string>
     <string name="server_port">Remote-Port</string>
@@ -151,7 +151,7 @@
     <string name="extra_headers">Zusätzliche Header</string>
     <string name="config_type">Konfigurationstyp</string>
     <string name="edit_config">Konfiguration bearbeiten</string>
-    <!-- feature category -->
+    
     <string name="ipv6">IPv6-Route</string>
     <string name="prefer">Bevorzugen</string>
     <string name="only">Nur</string>
@@ -212,7 +212,7 @@
     <string name="direct_boot_aware">Umschalten im Sperrbildschirm erlauben</string>
     <string name="direct_boot_aware_summary">Ihre ausgewählten Profilinformationen werden weniger
         geschützt</string>
-    <!-- notification category -->
+    
     <string name="service_vpn">VPN-Dienst</string>
     <string name="service_proxy">Proxy-Dienst</string>
     <string name="forward_success">Proxy gestartet.</string>
@@ -224,11 +224,11 @@
     <string name="vpn_permission_denied">Keine Berechtigung zum Erstellen eines VPN-Dienstes</string>
     <string name="reboot_required">Fehler beim Starten des VPN-Dienstes. Möglicherweise müssen Sie Ihr
         Gerät neu starten.</string>
-    <!-- alert category -->
+    
     <string name="profile_empty">Bitte wählen Sie ein Profil</string>
     <string name="connect">Verbinden</string>
     <string name="clipboard_empty">Zwischenablage ist leer</string>
-    <!-- menu category -->
+    
     <string name="settings">Einstellungen</string>
     <string name="edit">Bearbeiten</string>
     <string name="share">Teilen</string>
@@ -269,8 +269,8 @@
     <string name="action_import_err">Import fehlgeschlagen.</string>
     <string name="file_manager_missing">Ihrem Gerät fehlt ein Android-Standard-Dateiauswahldialog, bitte
         installieren Sie einen, wie Material Files.</string>
-    <!-- share -->
-    <!-- profile -->
+    
+    
     <string name="profile_config">Profilkonfiguration</string>
     <string name="delete">Entfernen</string>
     <string name="delete_confirm_prompt">Sind Sie sicher, dass Sie dieses Profil entfernen möchten?</string>
@@ -289,13 +289,13 @@
     <string name="undo">Rückgängig</string>
     <string name="insecure">Unsicher</string>
     <string name="deprecated">Veraltet</string>
-    <!-- tasker -->
-    <!-- status -->
+    
+    
     <string name="connecting">Verbinden…</string>
     <string name="vpn_connected">Verbunden, tippen um Verbindung zu prüfen</string>
     <string name="connection_status_connected">Verbunden</string>
     <string name="not_connected">Nicht verbunden</string>
-    <!-- subscriptions -->
+    
     <string name="subscriptions">Abonnements</string>
     <string name="cleartext_http_warning">Klartext-HTTP-Verkehr ist unsicher</string>
     <string name="error_title">Fehler</string>
@@ -312,7 +312,7 @@
     <string name="ignore_battery_optimizations_sum">Einige Einschränkungen entfernen</string>
     <string name="battery_optimization_enabled">Akku-Optimierung: an</string>
     <string name="battery_optimization_disabled">Akku-Optimierung: aus</string>
-    <!-- plugin -->
+    
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Konfigurieren…</string>
     <string name="plugin_disabled">Deaktiviert</string>
@@ -738,7 +738,7 @@
     <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
     <string name="app_list_permission_denied">Installierte Apps können nicht gelesen werden.\nDies liegt normalerweise daran, dass das System die Leseberechtigung für Apps eingeschränkt hat.\nBitte erteilen Sie die Berechtigungen in den Systemeinstellungen.</string>
     <string name="open_app_settings">Systemeinstellungen öffnen</string>
-    <!-- Snell Protocol -->
+    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">Pre-shared Key</string>
     <string name="snell_userkey">Benutzerschlüssel</string>
@@ -770,4 +770,4 @@
     <string name="vpn_watchdog_interval">Prüfintervall (Sek.)</string>
     <string name="dual_network_acceleration">Dual-Network-Beschleunigung</string>
     <string name="dual_network_acceleration_summary">Gleichzeitig über WLAN und Mobilfunk verbinden. Erfordert, dass WLAN und Mobilfunk in den Systemeinstellungen aktiviert bleiben, und erhöht den Akkuverbrauch.</string>
-</resources>
+<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="use_system_theme">Use system theme</string><string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string><string name="service_mode_vpn">VPN</string><string name="disable_mixed_inbound">Disable Mixed Inbound</string><string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string><string name="mixed_inbound_disabled">Disabled</string><string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="mixed_auth_config">Configure authentication</string><string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string><string name="mixed_auth_no_auth">Not set (no authentication)</string><string name="mixed_auth_enabled_sum">Username: %1$s</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink">%s | %s/s ↑</string><string name="traffic_downlink">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string><string name="ech_query_server_name">ECH Query Server Name</string><string name="preview_hint_dont_show_again">Don\'t show again</string><string name="release_not_available">NekoBox has not published a stable release yet</string><string name="action_amneziawg">AmneziaWG</string><string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string><string name="extra_subscription_links">Extra Subscription Links</string><string name="mal_close">Close</string><string name="proxy_fastest_regex">Fastest (regex)</string><string name="fastest_candidate_mode">Candidate source</string><string name="fastest_regex_options">Subscription regex</string><string name="fastest_regex_source_group">Source subscription</string><string name="fastest_regex_pattern">Regular expression</string><string name="fastest_regex_ignore_case">Ignore case</string><string name="fastest_regex_preview">Check regex</string><string name="fastest_regex_preview_count">Matching proxies: %1$d</string><string name="fastest_regex_preview_no_matches">No matching proxies</string><string name="fastest_regex_error_empty">Enter a regular expression</string><string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string><string name="fastest_regex_error_source_missing">Select an existing source subscription</string><string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string><string name="extra_subscription_links_hint">Enter subscription links, one per line</string><string name="dns_hosts_lines">%d hosts lines</string></resources>

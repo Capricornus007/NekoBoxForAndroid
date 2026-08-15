@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_desc">Универсальная прокси-платформа для Android, написанная на Kotlin.</string>
     <string name="project">Проект</string>
@@ -22,10 +22,10 @@
     <string name="tile_title">Переключатель</string>
     <string name="menu_traffic">Трафик</string>
     <string name="menu_dashboard">Панель управления sing-box</string>
-    <!-- externel -->
+    
     <string name="action_copy">Копировать</string>
     <string name="action_open">Открыть</string>
-    <!-- group -->
+    
     <string name="group_name">Название группы</string>
     <string name="group_update">Обновить</string>
     <string name="group_subscription_link">Ссылка на подписку</string>
@@ -52,7 +52,7 @@
     <string name="group_changed">Обновлено: \n%s</string>
     <string name="group_deleted">Удалено: \n%s</string>
     <string name="group_duplicate">Дубликат: \n%s</string>
-    <!-- misc -->
+    
     <string name="service_mode">Режим службы</string>
     <string name="service_mode_proxy">Только прокси</string>
     <string name="port_proxy">Порт прокси</string>
@@ -105,7 +105,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="require_transproxy">Включить входящий Transproxy</string>
     <string name="transproxy_mode">Режим Transproxy</string>
     <string name="connection_test_url">URL проверки соединения</string>
-    <!-- proxy category -->
+    
     <string name="profile_name">Имя профиля</string>
     <string name="server_address">Сервер</string>
     <string name="server_port">Удаленный порт</string>
@@ -143,7 +143,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="extra_headers">Дополнительные заголовки</string>
     <string name="config_type">Тип конфигурации</string>
     <string name="edit_config">Редактировать конфигурацию</string>
-    <!-- feature category -->
+    
     <string name="ipv6">Маршрут IPv6</string>
     <string name="prefer">Предпочитать</string>
     <string name="only">Только</string>
@@ -203,7 +203,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="auto_connect_summary">Включать прокси при запуске или обновлении приложения, если он был активен</string>
     <string name="direct_boot_aware">Разрешить переключение на экране блокировки</string>
     <string name="direct_boot_aware_summary">Информация о вашем выбранном профиле будет менее защищена</string>
-    <!-- notification category -->
+    
     <string name="service_vpn">VPN-сервис</string>
     <string name="service_proxy">Прокси-сервис</string>
     <string name="forward_success">Прокси запущен.</string>
@@ -214,11 +214,11 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="vpn_error">%s</string>
     <string name="vpn_permission_denied">Отказано в разрешении на создание VPN-сервиса</string>
     <string name="reboot_required">Не удалось запустить VPN-сервис. Возможно, потребуется перезагрузить устройство.</string>
-    <!-- alert category -->
+    
     <string name="profile_empty">Пожалуйста, выберите профиль</string>
     <string name="connect">Подключиться</string>
     <string name="clipboard_empty">Буфер обмена пуст</string>
-    <!-- menu category -->
+    
     <string name="settings">Настройки</string>
     <string name="edit">Редактировать</string>
     <string name="share">Поделиться</string>
@@ -249,8 +249,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="action_import_err">Не удалось импортировать.</string>
     <string name="file_manager_missing">На вашем устройстве отсутствует стандартный файловый менеджер Android, пожалуйста
         установите его, например, Material Files.</string>
-    <!-- share -->
-    <!-- profile -->
+    
+    
     <string name="profile_config">Конфигурация профиля</string>
     <string name="delete">Удалить</string>
     <string name="delete_confirm_prompt">Вы уверены, что хотите удалить этот профиль?</string>
@@ -273,12 +273,12 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="undo">Отменить</string>
     <string name="insecure">Небезопасно</string>
     <string name="deprecated">Устарело</string>
-    <!-- tasker -->
-    <!-- status -->
+    
+    
     <string name="connecting">Подключение…</string>
     <string name="vpn_connected">Подключено, нажмите для проверки соединения</string>
     <string name="not_connected">Не подключено</string>
-    <!-- subscriptions -->
+    
     <string name="subscriptions">Подписки</string>
     <string name="cleartext_http_warning">Незашифрованный HTTP-трафик небезопасен</string>
     <string name="error_title">Ошибка</string>
@@ -289,7 +289,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="deduplication">Дедупликация</string>
     <string name="ignore_battery_optimizations">Игнорировать оптимизацию батареи</string>
     <string name="ignore_battery_optimizations_sum">Убрать некоторые ограничения</string>
-    <!-- plugin -->
+    
     <string name="plugin">Плагин</string>
     <string name="plugin_configure">Настроить…</string>
     <string name="plugin_disabled">Отключено</string>
@@ -636,7 +636,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
 Обычно это происходит из-за того, что система ограничила разрешения на чтение приложений.
 Пожалуйста, предоставьте разрешения в настройках системы.</string>
     <string name="open_app_settings">Открыть настройки системы</string>
-    <!-- Snell Protocol -->
+    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">Предварительный общий ключ</string>
     <string name="snell_userkey">Ключ пользователя</string>
@@ -803,4 +803,4 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
-</resources>
+<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="service_mode_vpn">VPN</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink">%s | %s/s ↑</string><string name="traffic_downlink">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string></resources>

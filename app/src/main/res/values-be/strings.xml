@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_desc">Універсальны інструментарый проксі для Android, напісаны на Kotlin.</string>
     <string name="project">Праект</string>
@@ -30,10 +30,10 @@
     <string name="tile_title">Пераключальнік</string>
     <string name="menu_traffic">Трафік</string>
     <string name="menu_dashboard">Панэль кіравання sing-box</string>
-    <!-- externel -->
+    
     <string name="action_copy">Капіраваць</string>
     <string name="action_open">Адкрыць</string>
-    <!-- group -->
+    
     <string name="group_name">Назва групы</string>
     <string name="group_update">Абнавіць</string>
     <string name="group_subscription_link">Спасылка падпіскі</string>
@@ -60,7 +60,7 @@
     <string name="group_changed">Абноўлена: \n%s</string>
     <string name="group_deleted">Выдалена: \n%s</string>
     <string name="group_duplicate">Дублікат: \n%s</string>
-    <!-- misc -->
+    
     <string name="service_mode">Рэжым службы</string>
     <string name="service_mode_proxy">Толькі проксі</string>
     <string name="port_proxy">Порт проксі</string>
@@ -110,7 +110,7 @@
     <string name="require_transproxy">Уключыць уваходны Transproxy</string>
     <string name="transproxy_mode">Рэжым Transproxy</string>
     <string name="connection_test_url">URL тэсту злучэння</string>
-    <!-- proxy category -->
+    
     <string name="profile_name">Назва профілю</string>
     <string name="server_address">Сервер</string>
     <string name="server_port">Знешні порт</string>
@@ -148,7 +148,7 @@
     <string name="extra_headers">Дадатковыя загалоўкі</string>
     <string name="config_type">Тып канфігурацыі</string>
     <string name="edit_config">Рэдагаваць канфігурацыю</string>
-    <!-- feature category -->
+    
     <string name="ipv6">Маршрут IPv6</string>
     <string name="prefer">Пераважна</string>
     <string name="only">Толькі</string>
@@ -208,7 +208,7 @@
     <string name="auto_connect_summary">Уключыць проксі пры запуску/абнаўленні дадатку, калі ён быў запушчаны раней</string>
     <string name="direct_boot_aware">Дазволіць пераключэнне на экране блакіроўкі</string>
     <string name="direct_boot_aware_summary">Інфармацыя абранага профілю будзе менш абароненай</string>
-    <!-- notification category -->
+    
     <string name="service_vpn">VPN Служба</string>
     <string name="service_proxy">Проксі Служба</string>
     <string name="forward_success">Проксі запушчана.</string>
@@ -219,11 +219,11 @@
     <string name="vpn_error">%s</string>
     <string name="vpn_permission_denied">Адмова ў дазволе на стварэнне VPN службы</string>
     <string name="reboot_required">Не атрымалася запусціць VPN службу. Магчыма, вам трэба перазагрузіць прыладу.</string>
-    <!-- alert category -->
+    
     <string name="profile_empty">Калі ласка, абярыце профіль</string>
     <string name="connect">Падключыцца</string>
     <string name="clipboard_empty">Буфер абмену пусты</string>
-    <!-- menu category -->
+    
     <string name="settings">Налады</string>
     <string name="edit">Рэдагаваць</string>
     <string name="share">Падзяліцца</string>
@@ -263,8 +263,8 @@
     <string name="action_import_msg">Імпарт паспяховы!</string>
     <string name="action_import_err">Не атрымалася імпартаваць.</string>
     <string name="file_manager_missing">Ваша прылада не мае стандартнага выбару файлаў Android, калі ласка, усталюйце яго, напрыклад, Material Files.</string>
-    <!-- share -->
-    <!-- profile -->
+    
+    
     <string name="profile_config">Канфігурацыя профілю</string>
     <string name="delete">Выдаліць</string>
     <string name="delete_confirm_prompt">Вы ўпэўнены, што хочаце выдаліць гэты профіль?</string>
@@ -287,13 +287,13 @@
     <string name="undo">Адмяніць</string>
     <string name="insecure">Небяспечна</string>
     <string name="deprecated">Састарэла</string>
-    <!-- tasker -->
-    <!-- status -->
+    
+    
     <string name="connecting">Злучэнне…</string>
     <string name="vpn_connected">Падключана, націсніце, каб праверыць злучэнне</string>
     <string name="connection_status_connected">Падключана</string>
     <string name="not_connected">Не падключана</string>
-    <!-- subscriptions -->
+    
     <string name="subscriptions">Падпіскі</string>
     <string name="cleartext_http_warning">Трафік HTTP у адкрытым тэксце небяспечны</string>
     <string name="error_title">Памылка</string>
@@ -310,7 +310,7 @@
     <string name="ignore_battery_optimizations_sum">Зняць некаторыя абмежаванні</string>
     <string name="battery_optimization_enabled">Уключана - праграма можа працаваць без абмежаванняў у фоне</string>
     <string name="battery_optimization_disabled">Выключана - націсніце, каб дазволіць фонавую актыўнасць</string>
-    <!-- plugin -->
+    
     <string name="plugin">Плагін</string>
     <string name="plugin_configure">Наладзіць…</string>
     <string name="plugin_disabled">Адключана</string>
@@ -736,7 +736,7 @@
     <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
     <string name="app_list_permission_denied">Немагчыма прачытаць усталяваныя праграмы.\nГэта звычайна з-за таго, што сістэма абмежавала правы на чытанне праграм.\nКалі ласка, дайце дазволы ў сістэмных наладах.</string>
     <string name="open_app_settings">Адкрыць сістэмныя налады</string>
-    <!-- Snell Protocol -->
+    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">Папярэдне распаўсюджаны ключ</string>
     <string name="snell_userkey">Ключ карыстальніка</string>
@@ -768,4 +768,4 @@
     <string name="vpn_watchdog_interval">Інтэрвал праверкі (сек)</string>
     <string name="dual_network_acceleration">Паскарэнне двайной сеткі</string>
     <string name="dual_network_acceleration_summary">Адначасовае злучэнне праз Wi-Fi і мабільныя даныя. Патрабуе, каб Wi-Fi і мабільныя даныя заставаліся ўключанымі ў наладах сістэмы, і павялічвае спажыванне батарэі.</string>
-</resources>
+<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="use_system_theme">Use system theme</string><string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string><string name="service_mode_vpn">VPN</string><string name="disable_mixed_inbound">Disable Mixed Inbound</string><string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string><string name="mixed_inbound_disabled">Disabled</string><string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="mixed_auth_config">Configure authentication</string><string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string><string name="mixed_auth_no_auth">Not set (no authentication)</string><string name="mixed_auth_enabled_sum">Username: %1$s</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink">%s | %s/s ↑</string><string name="traffic_downlink">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string><string name="ech_query_server_name">ECH Query Server Name</string><string name="preview_hint_dont_show_again">Don\'t show again</string><string name="release_not_available">NekoBox has not published a stable release yet</string><string name="action_amneziawg">AmneziaWG</string><string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string><string name="extra_subscription_links">Extra Subscription Links</string><string name="lan_sharing">LAN Sharing</string><string name="lan_sharing_requires_root">LAN sharing requires root</string><string name="lan_sharing_summary">Allow LAN devices to connect</string><string name="mal_close">Close</string><string name="proxy_fastest_regex">Fastest (regex)</string><string name="fastest_candidate_mode">Candidate source</string><string name="fastest_regex_options">Subscription regex</string><string name="fastest_regex_source_group">Source subscription</string><string name="fastest_regex_pattern">Regular expression</string><string name="fastest_regex_ignore_case">Ignore case</string><string name="fastest_regex_preview">Check regex</string><string name="fastest_regex_preview_count">Matching proxies: %1$d</string><string name="fastest_regex_preview_no_matches">No matching proxies</string><string name="fastest_regex_error_empty">Enter a regular expression</string><string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string><string name="fastest_regex_error_source_missing">Select an existing source subscription</string><string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string><string name="extra_subscription_links_hint">Enter subscription links, one per line</string><string name="dns_hosts_lines">%d hosts lines</string></resources>

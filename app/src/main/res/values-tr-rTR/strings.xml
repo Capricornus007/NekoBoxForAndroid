@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_desc">Android için evrensel proxy araç zinciri, Kotlin ile yazılmıştır.</string>
     <string name="project">Proje</string>
@@ -22,10 +22,10 @@
     <string name="tile_title">Değiştirici</string>
     <string name="menu_traffic">Trafik</string>
     <string name="menu_dashboard">sing-box Kontrol Paneli</string>
-    <!-- externel -->
+    
     <string name="action_copy">Kopyala</string>
     <string name="action_open">Aç</string>
-    <!-- group -->
+    
     <string name="group_name">Grup adı</string>
     <string name="group_update">Güncelle</string>
     <string name="group_subscription_link">Abonelik Bağlantısı</string>
@@ -52,7 +52,7 @@
     <string name="group_changed">Güncellendi: \n%s</string>
     <string name="group_deleted">Silindi: \n%s</string>
     <string name="group_duplicate">Yinelenen: \n%s</string>
-    <!-- misc -->
+    
     <string name="service_mode">Hizmet Modu</string>
     <string name="service_mode_proxy">Yalnızca Proxy</string>
     <string name="port_proxy">Proxy Bağlantı Noktası</string>
@@ -102,7 +102,7 @@
     <string name="require_transproxy">Transproxy Geleni Etkinleştir</string>
     <string name="transproxy_mode">Transproxy Modu</string>
     <string name="connection_test_url">Bağlantı Testi URL\'si</string>
-    <!-- proxy category -->
+    
     <string name="profile_name">Profil Adı</string>
     <string name="server_address">Sunucu</string>
     <string name="server_port">Uzak Port</string>
@@ -140,7 +140,7 @@
     <string name="extra_headers">Ek Başlıklar</string>
     <string name="config_type">Yapılandırma Türü</string>
     <string name="edit_config">Yapılandırmayı Düzenle</string>
-    <!-- feature category -->
+    
     <string name="ipv6">IPv6 Yönlendirme</string>
     <string name="prefer">Tercih Et</string>
     <string name="only">Yalnızca</string>
@@ -201,7 +201,7 @@
     <string name="direct_boot_aware">Kilit Ekranında Değiştirmeye İzin Ver</string>
     <string name="direct_boot_aware_summary">Seçili profil bilgileriniz daha az
         korunacak</string>
-    <!-- notification category -->
+    
     <string name="service_vpn">VPN Hizmeti</string>
     <string name="service_proxy">Proxy Hizmeti</string>
     <string name="forward_success">Proxy başlatıldı.</string>
@@ -213,11 +213,11 @@
     <string name="vpn_permission_denied">VPN hizmeti oluşturma izni reddedildi</string>
     <string name="reboot_required">Failed to start VPN service. You might need to reboot your
         device.</string>
-    <!-- alert category -->
+    
     <string name="profile_empty">Lütfen bir profil seçin</string>
     <string name="connect">Bağlan</string>
     <string name="clipboard_empty">Pano boş</string>
-    <!-- menu category -->
+    
     <string name="settings">Ayarlar</string>
     <string name="edit">Düzenle</string>
     <string name="share">Paylaş</string>
@@ -248,8 +248,8 @@
     <string name="action_import_err">İçe aktarma başarısız.</string>
     <string name="file_manager_missing">Cihazınızda Android standart dosya seçici yok, lütfen
         bir tane kurun, örneğin Material Files.</string>
-    <!-- share -->
-    <!-- profile -->
+    
+    
     <string name="profile_config">Profil yapılandırması</string>
     <string name="delete">Kaldır</string>
     <string name="delete_confirm_prompt">Bu profili kaldırmak istediğinize emin misiniz?</string>
@@ -268,12 +268,12 @@
     <string name="undo">Geri al</string>
     <string name="insecure">Güvensiz</string>
     <string name="deprecated">Kullanımdan kaldırıldı</string>
-    <!-- tasker -->
-    <!-- status -->
+    
+    
     <string name="connecting">Bağlanıyor…</string>
     <string name="vpn_connected">Bağlı, bağlantıyı kontrol etmek için dokunun</string>
     <string name="not_connected">Bağlı değil</string>
-    <!-- subscriptions -->
+    
     <string name="subscriptions">Abonelikler</string>
     <string name="cleartext_http_warning">Düz metin HTTP trafiği güvensizdir</string>
     <string name="error_title">Hata</string>
@@ -284,7 +284,7 @@
     <string name="deduplication">Tekilleştirme</string>
     <string name="ignore_battery_optimizations">Pil optimizasyonlarını yoksay</string>
     <string name="ignore_battery_optimizations_sum">Bazı kısıtlamaları kaldır</string>
-    <!-- plugin -->
+    
     <string name="plugin">Eklenti</string>
     <string name="plugin_configure">Yapılandır…</string>
     <string name="plugin_disabled">Devre Dışı</string>
@@ -630,7 +630,7 @@
     <string name="vless_encryption_hint">...0...</string>
     <string name="app_list_permission_denied">Yüklü uygulamalar okunamıyor.\nBu genellikle sistemin uygulama okuma izinlerini kısıtlamış olmasından kaynaklanır.\nLütfen sistem ayarlarından izin verin.</string>
     <string name="open_app_settings">Sistem Ayarlarını Aç</string>
-    <!-- Snell Protocol -->
+    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">Ön Paylaşımlı Anahtar</string>
     <string name="snell_userkey">Kullanıcı Anahtarı</string>
@@ -796,4 +796,4 @@
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
-</resources>
+<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="service_mode_vpn">VPN</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink">%s | %s/s ↑</string><string name="traffic_downlink">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string></resources>

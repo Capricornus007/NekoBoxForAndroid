@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_desc">Den universelle proxy-verktøykjeden for Android, skrevet i Kotlin.</string>
     <string name="project">Prosjekt</string>
@@ -30,10 +30,10 @@
     <string name="tile_title">Bryter</string>
     <string name="menu_traffic">Trafikk</string>
     <string name="menu_dashboard">sing-box Dashboard</string>
-    <!-- externel -->
+    
     <string name="action_copy">Kopier</string>
     <string name="action_open">Åpne</string>
-    <!-- group -->
+    
     <string name="group_name">Gruppenavn</string>
     <string name="group_update">Oppdater</string>
     <string name="group_subscription_link">Abonnementslenke</string>
@@ -60,7 +60,7 @@
     <string name="group_changed">Oppdatert: \n%s</string>
     <string name="group_deleted">Slettet: \n%s</string>
     <string name="group_duplicate">Duplikat: \n%s</string>
-    <!-- misc -->
+    
     <string name="service_mode">Tjenestemodus</string>
     <string name="service_mode_proxy">Bare proxy</string>
     <string name="port_proxy">Proxy-port</string>
@@ -112,7 +112,7 @@
     <string name="require_transproxy">Aktiver innkommende transproxy</string>
     <string name="transproxy_mode">Transproxy-modus</string>
     <string name="connection_test_url">Tilkoblingstest-URL</string>
-    <!-- proxy category -->
+    
     <string name="profile_name">Profilnavn</string>
     <string name="server_address">Server</string>
     <string name="server_port">Ekstern port</string>
@@ -150,7 +150,7 @@
     <string name="extra_headers">Ekstra overskrifter</string>
     <string name="config_type">Konfigurasjonstype</string>
     <string name="edit_config">Rediger konfigurasjon</string>
-    <!-- feature category -->
+    
     <string name="ipv6">IPv6-rute</string>
     <string name="prefer">Foretrekk</string>
     <string name="only">Kun</string>
@@ -211,7 +211,7 @@
     <string name="direct_boot_aware">Tillat av/på i låseskjerm</string>
     <string name="direct_boot_aware_summary">Din valgte profilinformasjon vil være mindre
         beskyttet</string>
-    <!-- notification category -->
+    
     <string name="service_vpn">VPN-tjeneste</string>
     <string name="service_proxy">Proxy-tjeneste</string>
     <string name="forward_success">Proxy startet.</string>
@@ -223,11 +223,11 @@
     <string name="vpn_permission_denied">Tillatelse nektet for å opprette VPN-tjeneste</string>
     <string name="reboot_required">Kunne ikke starte VPN-tjeneste. Du må kanskje starte enheten på nytt.
         </string>
-    <!-- alert category -->
+    
     <string name="profile_empty">Vennligst velg en profil</string>
     <string name="connect">Koble til</string>
     <string name="clipboard_empty">Utklippstavlen er tom</string>
-    <!-- menu category -->
+    
     <string name="settings">Innstillinger</string>
     <string name="edit">Rediger</string>
     <string name="share">Del</string>
@@ -268,8 +268,8 @@
     <string name="action_import_err">Import mislyktes.</string>
     <string name="file_manager_missing">Enheten din mangler en Android-standard filvelger, vennligst
         installer en, for eksempel Material Files.</string>
-    <!-- share -->
-    <!-- profile -->
+    
+    
     <string name="profile_config">Profilkonfigurasjon</string>
     <string name="delete">Fjern</string>
     <string name="delete_confirm_prompt">Er du sikker på at du vil fjerne denne profilen?</string>
@@ -288,13 +288,13 @@
     <string name="undo">Angre</string>
     <string name="insecure">Usikker</string>
     <string name="deprecated">Foreldet</string>
-    <!-- tasker -->
-    <!-- status -->
+    
+    
     <string name="connecting">Kobler til…</string>
     <string name="vpn_connected">Tilkoblet, trykk for å sjekke tilkobling</string>
     <string name="connection_status_connected">Tilkoblet</string>
     <string name="not_connected">Ikke tilkoblet</string>
-    <!-- subscriptions -->
+    
     <string name="subscriptions">Abonnement</string>
     <string name="cleartext_http_warning">Klartekst HTTP-trafikk er usikker</string>
     <string name="error_title">Feil</string>
@@ -311,7 +311,7 @@
     <string name="ignore_battery_optimizations_sum">Fjern noen begrensninger</string>
     <string name="battery_optimization_enabled">Aktivert – appen kan kjøre ubegrenset i bakgrunnen</string>
     <string name="battery_optimization_disabled">Deaktivert – trykk for å tillate bakgrunnsaktivitet</string>
-    <!-- plugin -->
+    
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Konfigurer…</string>
     <string name="plugin_disabled">Deaktivert</string>
@@ -741,7 +741,7 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
     <string name="app_list_permission_denied">Kan ikke lese installerte apper.\nDette skyldes vanligvis at systemet har begrenset appens lesetilgang.\nGi tillatelser i systeminnstillingene.</string>
     <string name="open_app_settings">Åpne systeminnstillinger</string>
-    <!-- Snell Protocol -->
+    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">Forhåndsdelt nøkkel</string>
     <string name="snell_userkey">Brukernøkkel</string>
@@ -773,4 +773,4 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="vpn_watchdog_interval">Kontrollintervall (sek)</string>
     <string name="dual_network_acceleration">Akselerasjon for dobbelt nettverk</string>
     <string name="dual_network_acceleration_summary">Koble til samtidig via Wi-Fi og mobildata. Krever at både Wi-Fi og mobildata forblir aktivert i systeminnstillingene, og øker batteriforbruket.</string>
-</resources>
+<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="use_system_theme">Use system theme</string><string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string><string name="service_mode_vpn">VPN</string><string name="disable_mixed_inbound">Disable Mixed Inbound</string><string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string><string name="mixed_inbound_disabled">Disabled</string><string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="mixed_auth_config">Configure authentication</string><string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string><string name="mixed_auth_no_auth">Not set (no authentication)</string><string name="mixed_auth_enabled_sum">Username: %1$s</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink">%s | %s/s ↑</string><string name="traffic_downlink">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string><string name="ech_query_server_name">ECH Query Server Name</string><string name="preview_hint_dont_show_again">Don\'t show again</string><string name="release_not_available">NekoBox has not published a stable release yet</string><string name="action_amneziawg">AmneziaWG</string><string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string><string name="extra_subscription_links">Extra Subscription Links</string><string name="lan_sharing">LAN Sharing</string><string name="lan_sharing_requires_root">LAN sharing requires root</string><string name="lan_sharing_summary">Allow LAN devices to connect</string><string name="mal_close">Close</string><string name="proxy_fastest_regex">Fastest (regex)</string><string name="fastest_candidate_mode">Candidate source</string><string name="fastest_regex_options">Subscription regex</string><string name="fastest_regex_source_group">Source subscription</string><string name="fastest_regex_pattern">Regular expression</string><string name="fastest_regex_ignore_case">Ignore case</string><string name="fastest_regex_preview">Check regex</string><string name="fastest_regex_preview_count">Matching proxies: %1$d</string><string name="fastest_regex_preview_no_matches">No matching proxies</string><string name="fastest_regex_error_empty">Enter a regular expression</string><string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string><string name="fastest_regex_error_source_missing">Select an existing source subscription</string><string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string><string name="extra_subscription_links_hint">Enter subscription links, one per line</string><string name="dns_hosts_lines">%d hosts lines</string></resources>

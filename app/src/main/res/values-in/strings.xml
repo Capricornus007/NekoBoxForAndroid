@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_desc">Toolchain proxy universal untuk Android, ditulis dalam Kotlin.</string>
     <string name="project">Proyek</string>
@@ -30,10 +30,10 @@
     <string name="tile_title">Pemindah</string>
     <string name="menu_traffic">Lalu lintas</string>
     <string name="menu_dashboard">Dasbor sing-box</string>
-    <!-- externel -->
+    
     <string name="action_copy">Salin</string>
     <string name="action_open">Buka</string>
-    <!-- group -->
+    
     <string name="group_name">Nama grup</string>
     <string name="group_update">Perbarui</string>
     <string name="group_subscription_link">Tautan Langganan</string>
@@ -60,7 +60,7 @@
     <string name="group_changed">Diperbarui: \n%s</string>
     <string name="group_deleted">Dihapus: \n%s</string>
     <string name="group_duplicate">Duplikat: \n%s</string>
-    <!-- misc -->
+    
     <string name="service_mode">Mode Layanan</string>
     <string name="service_mode_proxy">Hanya Proxy</string>
     <string name="port_proxy">Port Proxy</string>
@@ -114,7 +114,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="require_transproxy">Aktifkan Transproxy Inbound</string>
     <string name="transproxy_mode">Mode Transproxy</string>
     <string name="connection_test_url">URL Uji Koneksi</string>
-    <!-- proxy category -->
+    
     <string name="profile_name">Nama Profil</string>
     <string name="server_address">Server</string>
     <string name="server_port">Port Jarak Jauh</string>
@@ -152,7 +152,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="extra_headers">Header Tambahan</string>
     <string name="config_type">Tipe Konfigurasi</string>
     <string name="edit_config">Edit Konfigurasi</string>
-    <!-- feature category -->
+    
     <string name="ipv6">Rute IPv6</string>
     <string name="prefer">Utamakan</string>
     <string name="only">Hanya</string>
@@ -213,7 +213,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="direct_boot_aware">Izinkan Beralih di Layar Kunci</string>
     <string name="direct_boot_aware_summary">Informasi profil yang Anda pilih akan kurang
         dilindungi</string>
-    <!-- notification category -->
+    
     <string name="service_vpn">Layanan VPN</string>
     <string name="service_proxy">Layanan Proxy</string>
     <string name="forward_success">Proxy dimulai.</string>
@@ -225,11 +225,11 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="vpn_permission_denied">Izin ditolak untuk membuat layanan VPN</string>
     <string name="reboot_required">Gagal memulai layanan VPN. Anda mungkin perlu me-reboot perangkat
         Anda.</string>
-    <!-- alert category -->
+    
     <string name="profile_empty">Silakan pilih profil</string>
     <string name="connect">Hubungkan</string>
     <string name="clipboard_empty">Papan klip kosong</string>
-    <!-- menu category -->
+    
     <string name="settings">Pengaturan</string>
     <string name="edit">Sunting</string>
     <string name="share">Bagikan</string>
@@ -269,8 +269,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="action_import_msg">Berhasil mengimpor!</string>
     <string name="action_import_err">Gagal mengimpor.</string>
     <string name="file_manager_missing">Perangkat Anda tidak memiliki pemilih file standar Android, silakan instal salah satunya, seperti Material Files.</string>
-    <!-- share -->
-    <!-- profile -->
+    
+    
     <string name="profile_config">Konfigurasi Profil</string>
     <string name="delete">Hapus</string>
     <string name="delete_confirm_prompt">Apakah Anda yakin ingin menghapus profil ini?</string>
@@ -287,13 +287,13 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="undo">Urungkan</string>
     <string name="insecure">Tidak aman</string>
     <string name="deprecated">Usang</string>
-    <!-- tasker -->
-    <!-- status -->
+    
+    
     <string name="connecting">Menghubungkan…</string>
     <string name="vpn_connected">Terhubung, ketuk untuk memeriksa koneksi</string>
     <string name="connection_status_connected">Terhubung</string>
     <string name="not_connected">Tidak terhubung</string>
-    <!-- subscriptions -->
+    
     <string name="subscriptions">Langganan</string>
     <string name="cleartext_http_warning">Lalu lintas HTTP cleartext tidak aman</string>
     <string name="error_title">Kesalahan</string>
@@ -310,7 +310,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="ignore_battery_optimizations_sum">Hapus beberapa pembatasan</string>
     <string name="battery_optimization_enabled">Diaktifkan - aplikasi dapat berjalan tanpa batasan di latar belakang</string>
     <string name="battery_optimization_disabled">Dinonaktifkan - ketuk untuk mengizinkan aktivitas latar belakang</string>
-    <!-- plugin -->
+    
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Konfigurasi…</string>
     <string name="plugin_disabled">Nonaktif</string>
@@ -750,7 +750,7 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
     <string name="app_list_permission_denied">Tidak dapat membaca aplikasi yang terinstal.\nBiasanya ini karena sistem telah membatasi izin baca aplikasi.\nHarap berikan izin di pengaturan sistem.</string>
     <string name="open_app_settings">Buka Pengaturan Sistem</string>
-    <!-- Snell Protocol -->
+    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">Kunci Pra-berbagi</string>
     <string name="snell_userkey">Kunci Pengguna</string>
@@ -782,4 +782,4 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="vpn_watchdog_interval">Interval pemeriksaan (dtk)</string>
     <string name="dual_network_acceleration">Akselerasi jaringan ganda</string>
     <string name="dual_network_acceleration_summary">Terhubung secara bersamaan melalui Wi-Fi dan data seluler. Membutuhkan Wi-Fi dan data seluler tetap aktif di pengaturan sistem, dan meningkatkan penggunaan baterai.</string>
-</resources>
+<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="use_system_theme">Use system theme</string><string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string><string name="service_mode_vpn">VPN</string><string name="disable_mixed_inbound">Disable Mixed Inbound</string><string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string><string name="mixed_inbound_disabled">Disabled</string><string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="mixed_auth_config">Configure authentication</string><string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string><string name="mixed_auth_no_auth">Not set (no authentication)</string><string name="mixed_auth_enabled_sum">Username: %1$s</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink">%s | %s/s ↑</string><string name="traffic_downlink">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string><string name="ech_query_server_name">ECH Query Server Name</string><string name="preview_hint_dont_show_again">Don\'t show again</string><string name="release_not_available">NekoBox has not published a stable release yet</string><string name="action_amneziawg">AmneziaWG</string><string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string><string name="extra_subscription_links">Extra Subscription Links</string><string name="lan_sharing">LAN Sharing</string><string name="lan_sharing_requires_root">LAN sharing requires root</string><string name="lan_sharing_summary">Allow LAN devices to connect</string><string name="mal_close">Close</string><string name="proxy_fastest_regex">Fastest (regex)</string><string name="fastest_candidate_mode">Candidate source</string><string name="fastest_regex_options">Subscription regex</string><string name="fastest_regex_source_group">Source subscription</string><string name="fastest_regex_pattern">Regular expression</string><string name="fastest_regex_ignore_case">Ignore case</string><string name="fastest_regex_preview">Check regex</string><string name="fastest_regex_preview_count">Matching proxies: %1$d</string><string name="fastest_regex_preview_no_matches">No matching proxies</string><string name="fastest_regex_error_empty">Enter a regular expression</string><string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string><string name="fastest_regex_error_source_missing">Select an existing source subscription</string><string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string><string name="extra_subscription_links_hint">Enter subscription links, one per line</string><string name="dns_hosts_lines">%d hosts lines</string></resources>

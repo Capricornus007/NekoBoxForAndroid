@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_desc">سلسلة أدوات بروكسي عالمية لنظام Android، مكتوبة بلغة Kotlin.</string>
     <string name="project">المشروع</string>
@@ -22,10 +22,10 @@
     <string name="tile_title">المبدل</string>
     <string name="menu_traffic">حركة المرور</string>
     <string name="menu_dashboard">لوحة تحكم sing-box</string>
-    <!-- externel -->
+    
     <string name="action_copy">نسخ</string>
     <string name="action_open">فتح</string>
-    <!-- group -->
+    
     <string name="group_name">اسم المجموعة</string>
     <string name="group_update">تحديث</string>
     <string name="group_subscription_link">رابط الاشتراك</string>
@@ -52,7 +52,7 @@
     <string name="group_changed">تم التحديث: \n%s</string>
     <string name="group_deleted">تم الحذف: \n%s</string>
     <string name="group_duplicate">مكرر: \n%s</string>
-    <!-- misc -->
+    
     <string name="service_mode">وضع الخدمة</string>
     <string name="service_mode_proxy">وكيل فقط</string>
     <string name="port_proxy">منفذ الوكيل</string>
@@ -101,7 +101,7 @@
     <string name="require_transproxy">تفعيل الوارد عبر Transproxy</string>
     <string name="transproxy_mode">وضع Transproxy</string>
     <string name="connection_test_url">عنوان URL لاختبار الاتصال</string>
-    <!-- proxy category -->
+    
     <string name="profile_name">اسم الملف الشخصي</string>
     <string name="server_address">الخادم</string>
     <string name="server_port">المنفذ البعيد</string>
@@ -139,7 +139,7 @@
     <string name="extra_headers">رؤوس إضافية</string>
     <string name="config_type">نوع التكوين</string>
     <string name="edit_config">تعديل التكوين</string>
-    <!-- feature category -->
+    
     <string name="ipv6">مسار IPv6</string>
     <string name="prefer">تفضيل</string>
     <string name="only">فقط</string>
@@ -200,7 +200,7 @@
     <string name="direct_boot_aware">السماح بالتبديل في شاشة القفل</string>
     <string name="direct_boot_aware_summary">معلومات ملفك الشخصي المحدد
 ستكون أقل حماية</string>
-    <!-- notification category -->
+    
     <string name="service_vpn">خدمة VPN</string>
     <string name="service_proxy">خدمة بروكسي</string>
     <string name="forward_success">تم بدء البروكسي.</string>
@@ -212,11 +212,11 @@
     <string name="vpn_permission_denied">تم رفض الإذن لإنشاء خدمة VPN</string>
     <string name="reboot_required">فشل بدء خدمة VPN. قد تحتاج إلى إعادة تشغيل
 جهازك.</string>
-    <!-- alert category -->
+    
     <string name="profile_empty">يرجى تحديد ملف شخصي</string>
     <string name="connect">اتصال</string>
     <string name="clipboard_empty">الحافظة فارغة</string>
-    <!-- menu category -->
+    
     <string name="settings">الإعدادات</string>
     <string name="edit">تعديل</string>
     <string name="share">مشاركة</string>
@@ -246,8 +246,8 @@
     <string name="action_import_msg">تم الاستيراد بنجاح!</string>
     <string name="action_import_err">فشل الاستيراد.</string>
     <string name="file_manager_missing">جهازك يفتقر إلى محدد ملفات Android قياسي، يرجى تثبيت واحد، مثل Material Files.</string>
-    <!-- share -->
-    <!-- profile -->
+    
+    
     <string name="profile_config">تكوين الملف الشخصي</string>
     <string name="delete">إزالة</string>
     <string name="delete_confirm_prompt">هل أنت متأكد أنك تريد إزالة هذا الملف الشخصي؟</string>
@@ -274,12 +274,12 @@
     <string name="undo">تراجع</string>
     <string name="insecure">غير آمن</string>
     <string name="deprecated">مهمل</string>
-    <!-- tasker -->
-    <!-- status -->
+    
+    
     <string name="connecting">جارٍ الاتصال…</string>
     <string name="vpn_connected">متصل، اضغط للتحقق من الاتصال</string>
     <string name="not_connected">غير متصل</string>
-    <!-- subscriptions -->
+    
     <string name="subscriptions">الاشتراكات</string>
     <string name="cleartext_http_warning">حركة مرور HTTP العادية غير آمنة</string>
     <string name="error_title">خطأ</string>
@@ -290,7 +290,7 @@
     <string name="deduplication">إزالة التكرار</string>
     <string name="ignore_battery_optimizations">تجاهل تحسينات البطارية</string>
     <string name="ignore_battery_optimizations_sum">إزالة بعض القيود</string>
-    <!-- plugin -->
+    
     <string name="plugin">إضافة</string>
     <string name="plugin_configure">تكوين...</string>
     <string name="plugin_disabled">معطل</string>
@@ -637,7 +637,7 @@
     <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
     <string name="app_list_permission_denied">غير قادر على قراءة التطبيقات المثبتة.\nعادةً ما يكون هذا بسبب تقييد النظام لأذونات قراءة التطبيقات.\nيرجى منح الأذونات في إعدادات النظام.</string>
     <string name="open_app_settings">فتح إعدادات النظام</string>
-    <!-- Snell Protocol -->
+    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">مفتاح مشترك مسبقاً</string>
     <string name="snell_userkey">مفتاح المستخدم</string>
@@ -803,4 +803,4 @@
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
-</resources>
+<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="service_mode_vpn">VPN</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink">%s | %s/s ↑</string><string name="traffic_downlink">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string></resources>
