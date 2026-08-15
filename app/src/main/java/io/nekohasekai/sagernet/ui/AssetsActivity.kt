@@ -267,7 +267,7 @@ class AssetsActivity : ThemedActivity() {
                         "<unknown>"
                     }
                 } else {
-                    "Unknown-" + DateFormat.getDateFormat(app).format(Date(file.lastModified()))
+                    getString(R.string.asset_version_unknown, DateFormat.getDateFormat(app).format(Date(file.lastModified())))
                 }
             } else {
                 "<unknown>"

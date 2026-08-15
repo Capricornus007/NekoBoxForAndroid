@@ -52,13 +52,13 @@
             app:key="mdvSetupPacketDup"
             app:title="@string/mdv_setup_packet_dup"
             app:useSimpleSummaryProvider="true" />
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:key="mdvAutoDisableTimeout"
             app:title="@string/mdv_auto_disable_timeout" />
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:key="mdvAutoRemoveLowMtu"
             app:title="@string/mdv_auto_remove_low_mtu" />
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:key="mdvBaseEncode"
             app:title="@string/mdv_base_encode" />
     </PreferenceCategory>
@@ -106,7 +106,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/mdv_misc_cat">
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:key="mdvLocalDnsEnabled"
             app:title="@string/mdv_local_dns_enabled" />
         <EditTextPreference

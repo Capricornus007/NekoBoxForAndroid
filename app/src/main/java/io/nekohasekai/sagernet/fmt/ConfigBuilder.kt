@@ -21,6 +21,10 @@ import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.internal.FastestCandidateResolver
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.juicity.buildSingBoxOutboundJuicityBean
+import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
+import io.nekohasekai.sagernet.fmt.shadowquic.buildSingBoxOutboundShadowQUICBean
+import io.nekohasekai.sagernet.fmt.trusttunnel.TrustTunnelBean
+import io.nekohasekai.sagernet.fmt.trusttunnel.buildSingBoxOutboundTrustTunnelBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.buildSingBoxOutboundShadowsocksBean
 import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
@@ -606,6 +610,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         is JuicityBean ->
                             buildSingBoxOutboundJuicityBean(bean)
 
+                        is ShadowQUICBean ->
+                            buildSingBoxOutboundShadowQUICBean(bean)
+
+                        is TrustTunnelBean ->
+                            buildSingBoxOutboundTrustTunnelBean(bean)
+
                         is SOCKSBean ->
                             buildSingBoxOutboundSocksBean(bean)
 
@@ -1073,7 +1083,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     if (ruleObj.outbound.isNullOrBlank()) {
                         Toast.makeText(
                             SagerNet.application,
-                            "Warning: " + rule.displayName() + ": A non-existent outbound was specified.",
+                            SagerNet.application.getString(R.string.warning_nonexistent_outbound, rule.displayName()),
                             Toast.LENGTH_LONG,
                         ).show()
                     } else {

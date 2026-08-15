@@ -18,6 +18,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.processphoenix.ProcessPhoenix
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
+import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.*
 import io.nekohasekai.sagernet.database.preference.PublicDatabase
@@ -323,11 +324,11 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                         when (response.code) {
                             404 -> needCreateDir = true
                             207 -> needCreateDir = false // directory exists
-                            401 -> throw Exception("Authentication failed")
+                            401 -> throw Exception(app.getString(R.string.webdav_auth_failed))
                             else -> {
                                 if (!response.isSuccessful) {
                                     Logs.e("WebDAV backup - PROPFIND failed: ${response.code} ${response.message}")
-                                    throw Exception("Failed to check directory (${response.code}): ${response.message}")
+                                    throw Exception(app.getString(R.string.webdav_check_dir_failed, response.code, response.message))
                                 }
                             }
                         }

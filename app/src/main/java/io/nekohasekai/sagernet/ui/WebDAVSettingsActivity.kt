@@ -103,7 +103,7 @@ class WebDAVSettingsActivity : ThemedActivity() {
                 if (isClickAllowed()) {
                     testWebDAV()
                 } else {
-                    Snackbar.make(requireView(), "请稍后再试", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(requireView(), getString(R.string.please_try_again), Snackbar.LENGTH_SHORT).show()
                 }
                 true
             }

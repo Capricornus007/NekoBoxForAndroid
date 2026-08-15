@@ -28,6 +28,8 @@ import io.nekohasekai.sagernet.fmt.trojan.TrojanBean;
 import io.nekohasekai.sagernet.fmt.trojan_go.TrojanGoBean;
 import io.nekohasekai.sagernet.fmt.tuic.TuicBean;
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean;
+import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean;
+import io.nekohasekai.sagernet.fmt.trusttunnel.TrustTunnelBean;
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean;
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean;
 import io.nekohasekai.sagernet.ktx.KryosKt;
@@ -182,6 +184,18 @@ public class KryoConverters {
     public static JuicityBean juicityDeserialize(byte[] bytes) {
         if (JavaUtil.isEmpty(bytes)) return null;
         return deserialize(new JuicityBean(), bytes);
+    }
+
+    @TypeConverter
+    public static ShadowQUICBean shadowQuicDeserialize(byte[] bytes) {
+        if (JavaUtil.isEmpty(bytes)) return null;
+        return deserialize(new ShadowQUICBean(), bytes);
+    }
+
+    @TypeConverter
+    public static TrustTunnelBean trustTunnelDeserialize(byte[] bytes) {
+        if (JavaUtil.isEmpty(bytes)) return null;
+        return deserialize(new TrustTunnelBean(), bytes);
     }
 
     @TypeConverter

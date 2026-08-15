@@ -11,6 +11,7 @@ package io.nekohasekai.sagernet.fmt.masterdnsvpn
 
 import io.nekohasekai.sagernet.fmt.LOCALHOST
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.linkBuilder
 import io.nekohasekai.sagernet.ktx.toLink
 import io.nekohasekai.sagernet.ktx.toStringPretty
@@ -221,7 +222,7 @@ fun MasterDnsVpnBean.toUri(): String {
  */
 fun parseMasterDnsVpn(url: String): MasterDnsVpnBean {
     val link = url.replace("masterdns://", "https://").toHttpUrlOrNull()
-        ?: error("invalid masterdns link $url")
+        ?: error(app.getString(R.string.invalid_masterdns_link, url))
     return MasterDnsVpnBean().apply {
         // serverAddress/Port are unused by this protocol; keep the placeholder.
         serverAddress = "masterdnsvpn"
@@ -273,13 +274,13 @@ fun parseMasterDnsVpn(url: String): MasterDnsVpnBean {
         // A profile with no tunnel domain can never connect; fail the import early with a
         // clear message instead of silently creating a broken entry.
         if (domains.isBlank()) {
-            error("masterdns link missing tunnel domain(s)")
+            error(app.getString(R.string.masterdns_no_tunnel))
         }
 
         // When encryption is enabled the key is mandatory (and must match the server).
         // dataEncryptionMethod 0 == None, where an empty key is intentionally allowed.
         if (dataEncryptionMethod != 0 && encryptionKey.isBlank()) {
-            error("masterdns link missing encryption key for encryption method $dataEncryptionMethod")
+            error(app.getString(R.string.masterdns_no_key, dataEncryptionMethod))
         }
     }
 }

@@ -57,12 +57,12 @@
         <EditTextPreference
             app:icon="@drawable/ic_baseline_vpn_key_24"
             app:key="realityPubKey"
-            app:title="Reality Public Key"
+            app:title="@string/reality_public_key"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
             app:icon="@drawable/ic_baseline_texture_24"
             app:key="realityShortId"
-            app:title="Reality ShortId"
+            app:title="@string/reality_short_id"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 

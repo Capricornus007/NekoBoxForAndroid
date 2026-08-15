@@ -41,6 +41,8 @@ import (
 	"github.com/sagernet/sing-box/protocol/wireguard"
 
 	"libcore/protocol/juicity"
+	"libcore/protocol/shadowquic"
+	"libcore/protocol/trusttunnel"
 
 	_ "github.com/sagernet/sing-box/experimental/clashapi"
 	_ "github.com/sagernet/sing-box/transport/v2rayquic"
@@ -90,6 +92,8 @@ func nekoboxAndroidOutboundRegistry() *outbound.Registry {
 	tuic.RegisterOutbound(registry)
 	hysteria2.RegisterOutbound(registry)
 	juicity.RegisterOutbound(registry)
+	shadowquic.RegisterOutbound(registry)
+	trusttunnel.RegisterOutbound(registry)
 
 	// sing-box 1.14.x: WireGuard は endpoint 化された（RegisterOutbound 廃止）。
 	// outbound 登録は不要、nekoboxAndroidEndpointRegistry で endpoint 登録する。

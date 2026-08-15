@@ -36,6 +36,7 @@ import io.nekohasekai.sagernet.database.*
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
 import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
 import io.nekohasekai.sagernet.ktx.dp2px
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
@@ -89,7 +90,7 @@ class GroupSettingsActivity(
     }
 
     fun ProxyGroup.serialize() {
-        name = DataStore.groupName.takeIf { it.isNotBlank() } ?: "My group"
+        name = DataStore.groupName.takeIf { it.isNotBlank() } ?: app.getString(R.string.my_group)
         type = DataStore.groupType
         order = DataStore.groupOrder
         isSelector = DataStore.groupIsSelector
@@ -595,7 +596,7 @@ class GroupSettingsActivity(
             } catch (e: Exception) {
                 Toast.makeText(
                     SagerNet.application,
-                    "Error on createPreferences, please try again.",
+                    getString(R.string.toast_create_preferences_failed),
                     Toast.LENGTH_SHORT,
                 ).show()
                 Logs.e(e)

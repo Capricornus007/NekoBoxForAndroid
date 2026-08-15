@@ -34,7 +34,7 @@ class MTUPreference
                 setText(preferenceDataStore?.getString(key, "") ?: "")
             }
 
-            MaterialAlertDialogBuilder(context).setTitle("MTU")
+            MaterialAlertDialogBuilder(context).setTitle(R.string.mtu)
                 .setView(context.wrapDialogContent(view))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     val mtu = view.text.toString().toInt()

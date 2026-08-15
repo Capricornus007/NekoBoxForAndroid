@@ -13,6 +13,10 @@ import io.nekohasekai.sagernet.fmt.internal.BalancerBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.juicity.toUri
+import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
+import io.nekohasekai.sagernet.fmt.shadowquic.toUri as toShadowQuicUri
+import io.nekohasekai.sagernet.fmt.trusttunnel.TrustTunnelBean
+import io.nekohasekai.sagernet.fmt.trusttunnel.toUri as toTrustTunnelUri
 import io.nekohasekai.sagernet.fmt.masterdnsvpn.MasterDnsVpnBean
 import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.naive.NaiveBean
@@ -234,6 +238,26 @@ object ProtocolRegistry {
             displayType = { "Juicity" },
             settingsActivityClass = JuicitySettingsActivity::class.java,
             toStandardLink = { (it as JuicityBean).toUri() },
+        ),
+        ProtocolDescriptor(
+            type = ProxyEntity.TYPE_SHADOWQUIC,
+            deserialize = { KryoConverters.shadowQuicDeserialize(it) },
+            beanClass = ShadowQUICBean::class.java,
+            getBean = { it.shadowQuicBean },
+            setBean = { e, b -> e.shadowQuicBean = b as ShadowQUICBean? },
+            displayType = { "ShadowQUIC" },
+            settingsActivityClass = ShadowQUICSettingsActivity::class.java,
+            toStandardLink = { (it as ShadowQUICBean).toShadowQuicUri() },
+        ),
+        ProtocolDescriptor(
+            type = ProxyEntity.TYPE_TRUSTTUNNEL,
+            deserialize = { KryoConverters.trustTunnelDeserialize(it) },
+            beanClass = TrustTunnelBean::class.java,
+            getBean = { it.trustTunnelBean },
+            setBean = { e, b -> e.trustTunnelBean = b as TrustTunnelBean? },
+            displayType = { "TrustTunnel" },
+            settingsActivityClass = TrustTunnelSettingsActivity::class.java,
+            toStandardLink = { (it as TrustTunnelBean).toTrustTunnelUri() },
         ),
         ProtocolDescriptor(
             type = ProxyEntity.TYPE_SHADOWTLS,

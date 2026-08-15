@@ -4,11 +4,13 @@ import android.database.sqlite.SQLiteDatabase
 import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.IPv6Mode
 import io.nekohasekai.sagernet.Key
+import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.TunImplementation
 import io.nekohasekai.sagernet.database.preference.PublicDatabase
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.parseSingBoxOutbound
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
 import moe.matsuri.nb4a.proxy.config.ConfigBean
 import org.json.JSONArray
@@ -580,7 +582,7 @@ object ThroneDesktopBackupImporter {
                         RuleEntity(
                             id = userOrder,
                             name = (if (iName >= 0) c.getString(iName) else null)
-                                ?.takeIf { it.isNotBlank() } ?: "Rule $userOrder",
+                                ?.takeIf { it.isNotBlank() } ?: app.getString(R.string.rule_default_name, userOrder),
                             userOrder = userOrder,
                             enabled = true,
                             domains = domainParts.joinToString("\n"),

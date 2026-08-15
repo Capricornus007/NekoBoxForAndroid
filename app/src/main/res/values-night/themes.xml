@@ -33,8 +33,6 @@
     <style name="Theme.SagerNet.Dracula" parent="Theme.SagerNet">
         <item name="colorPrimary">@color/color_dracula</item>
         <item name="appBarBackgroundColor">@color/color_dracula</item>
-        <item name="colorPrimaryDark">@color/color_dracula_dark</item>
-        <item name="colorAccent">@color/color_dracula_accent</item>
         <item name="colorMaterial100">@color/color_dracula_100</item>
         <item name="colorMaterial300">@color/color_dracula_300</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_dracula</item>
@@ -70,14 +68,12 @@
         <item name="statusDetailColor">@color/color_dracula_cyan</item>
         <item name="statusTestingColor">@color/color_dracula_yellow</item>
         <item name="routeProxyColor">@color/color_dracula_cyan</item>
-        <item name="navSelectedColor">?attr/colorAccent</item>
+        <item name="navSelectedColor">?attr/colorPrimary</item>
     </style>
 
     <style name="Theme.SagerNet.Dialog.Dracula" parent="Theme.SagerNet.Dialog">
         <item name="colorPrimary">@color/color_dracula</item>
         <item name="appBarBackgroundColor">@color/color_dracula</item>
-        <item name="colorPrimaryDark">@color/color_dracula_dark</item>
-        <item name="colorAccent">@color/color_dracula_accent</item>
         <item name="colorMaterial100">@color/color_dracula_100</item>
         <item name="colorMaterial300">@color/color_dracula_300</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_dracula</item>
@@ -114,8 +110,6 @@
     <style name="Theme.SagerNet.DarkHighContrast" parent="Theme.SagerNet">
         <item name="colorPrimary">@color/dhc_primary</item>
         <item name="appBarBackgroundColor">@color/dhc_background</item>
-        <item name="colorPrimaryDark">@color/dhc_primary_dark</item>
-        <item name="colorAccent">@color/dhc_primary</item>
         <item name="colorOnPrimary">@color/dhc_on_primary</item>
         <item name="colorMaterial100">@color/dhc_100</item>
         <item name="colorMaterial300">@color/dhc_300</item>
@@ -167,8 +161,6 @@
     <style name="Theme.SagerNet.DraculaM3" parent="Theme.SagerNet">
         <item name="colorPrimary">@color/draculam3_primary</item>
         <item name="appBarBackgroundColor">@color/draculam3_background</item>
-        <item name="colorPrimaryDark">@color/draculam3_primary_dark</item>
-        <item name="colorAccent">@color/draculam3_accent</item>
         <item name="colorOnPrimary">@color/draculam3_on_primary</item>
         <item name="colorMaterial100">@color/draculam3_100</item>
         <item name="colorMaterial300">@color/draculam3_300</item>
@@ -221,8 +213,6 @@
     <style name="Theme.SagerNet.Nord" parent="Theme.SagerNet">
         <item name="colorPrimary">@color/nord_primary</item>
         <item name="appBarBackgroundColor">@color/nord_background</item>
-        <item name="colorPrimaryDark">@color/nord_primary_dark</item>
-        <item name="colorAccent">@color/nord_accent</item>
         <item name="colorOnPrimary">@color/nord_on_primary</item>
         <item name="colorMaterial100">@color/nord_100</item>
         <item name="colorMaterial300">@color/nord_300</item>
@@ -275,8 +265,6 @@
     <style name="Theme.SagerNet.Monokai" parent="Theme.SagerNet">
         <item name="colorPrimary">@color/monokai_primary</item>
         <item name="appBarBackgroundColor">@color/monokai_background</item>
-        <item name="colorPrimaryDark">@color/monokai_primary_dark</item>
-        <item name="colorAccent">@color/monokai_accent</item>
         <item name="colorOnPrimary">@color/monokai_on_primary</item>
         <item name="colorMaterial100">@color/monokai_100</item>
         <item name="colorMaterial300">@color/monokai_300</item>
@@ -329,8 +317,6 @@
     <style name="Theme.SagerNet.Ayu" parent="Theme.SagerNet">
         <item name="colorPrimary">@color/ayu_primary</item>
         <item name="appBarBackgroundColor">@color/ayu_background</item>
-        <item name="colorPrimaryDark">@color/ayu_primary_dark</item>
-        <item name="colorAccent">@color/ayu_accent</item>
         <item name="colorOnPrimary">@color/ayu_on_primary</item>
         <item name="colorMaterial100">@color/ayu_100</item>
         <item name="colorMaterial300">@color/ayu_300</item>
@@ -383,8 +369,6 @@
     <style name="Theme.SagerNet.Catppuccin" parent="Theme.SagerNet">
         <item name="colorPrimary">@color/catppuccin_primary</item>
         <item name="appBarBackgroundColor">@color/catppuccin_background</item>
-        <item name="colorPrimaryDark">@color/catppuccin_primary_dark</item>
-        <item name="colorAccent">@color/catppuccin_accent</item>
         <item name="colorOnPrimary">@color/catppuccin_on_primary</item>
         <item name="colorMaterial100">@color/catppuccin_100</item>
         <item name="colorMaterial300">@color/catppuccin_300</item>
@@ -438,8 +422,6 @@
     <style name="Theme.SagerNet.Dialog.DarkHighContrast" parent="Theme.SagerNet.Dialog">
         <item name="colorPrimary">@color/dhc_primary</item>
         <item name="appBarBackgroundColor">@color/dhc_background</item>
-        <item name="colorPrimaryDark">@color/dhc_primary_dark</item>
-        <item name="colorAccent">@color/dhc_primary</item>
         <item name="colorOnPrimary">@color/dhc_on_primary</item>
         <item name="colorMaterial100">@color/dhc_100</item>
         <item name="colorMaterial300">@color/dhc_300</item>
@@ -478,8 +460,6 @@
     <style name="Theme.SagerNet.Dialog.DraculaM3" parent="Theme.SagerNet.Dialog">
         <item name="colorPrimary">@color/draculam3_primary</item>
         <item name="appBarBackgroundColor">@color/draculam3_background</item>
-        <item name="colorPrimaryDark">@color/draculam3_primary_dark</item>
-        <item name="colorAccent">@color/draculam3_accent</item>
         <item name="colorOnPrimary">@color/draculam3_on_primary</item>
         <item name="colorMaterial100">@color/draculam3_100</item>
         <item name="colorMaterial300">@color/draculam3_300</item>
@@ -519,8 +499,6 @@
     <style name="Theme.SagerNet.Dialog.Nord" parent="Theme.SagerNet.Dialog">
         <item name="colorPrimary">@color/nord_primary</item>
         <item name="appBarBackgroundColor">@color/nord_background</item>
-        <item name="colorPrimaryDark">@color/nord_primary_dark</item>
-        <item name="colorAccent">@color/nord_accent</item>
         <item name="colorOnPrimary">@color/nord_on_primary</item>
         <item name="colorMaterial100">@color/nord_100</item>
         <item name="colorMaterial300">@color/nord_300</item>
@@ -560,8 +538,6 @@
     <style name="Theme.SagerNet.Dialog.Monokai" parent="Theme.SagerNet.Dialog">
         <item name="colorPrimary">@color/monokai_primary</item>
         <item name="appBarBackgroundColor">@color/monokai_background</item>
-        <item name="colorPrimaryDark">@color/monokai_primary_dark</item>
-        <item name="colorAccent">@color/monokai_accent</item>
         <item name="colorOnPrimary">@color/monokai_on_primary</item>
         <item name="colorMaterial100">@color/monokai_100</item>
         <item name="colorMaterial300">@color/monokai_300</item>
@@ -601,8 +577,6 @@
     <style name="Theme.SagerNet.Dialog.Ayu" parent="Theme.SagerNet.Dialog">
         <item name="colorPrimary">@color/ayu_primary</item>
         <item name="appBarBackgroundColor">@color/ayu_background</item>
-        <item name="colorPrimaryDark">@color/ayu_primary_dark</item>
-        <item name="colorAccent">@color/ayu_accent</item>
         <item name="colorOnPrimary">@color/ayu_on_primary</item>
         <item name="colorMaterial100">@color/ayu_100</item>
         <item name="colorMaterial300">@color/ayu_300</item>
@@ -642,8 +616,6 @@
     <style name="Theme.SagerNet.Dialog.Catppuccin" parent="Theme.SagerNet.Dialog">
         <item name="colorPrimary">@color/catppuccin_primary</item>
         <item name="appBarBackgroundColor">@color/catppuccin_background</item>
-        <item name="colorPrimaryDark">@color/catppuccin_primary_dark</item>
-        <item name="colorAccent">@color/catppuccin_accent</item>
         <item name="colorOnPrimary">@color/catppuccin_on_primary</item>
         <item name="colorMaterial100">@color/catppuccin_100</item>
         <item name="colorMaterial300">@color/catppuccin_300</item>

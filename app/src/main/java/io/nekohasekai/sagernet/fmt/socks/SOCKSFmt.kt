@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.fmt.socks
 
+import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.decodeBase64UrlSafe
 import io.nekohasekai.sagernet.ktx.toLink
 import io.nekohasekai.sagernet.ktx.urlSafe
@@ -10,7 +11,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 fun parseSOCKS(link: String): SOCKSBean {
     val url = ("http://" + link.substringAfter("://")).toHttpUrlOrNull()
-        ?: error("Not supported: $link")
+        ?: error(app.getString(R.string.not_supported_proxy, link))
 
     return SOCKSBean().apply {
         protocol = when {

@@ -19,6 +19,8 @@ object TypeMap : HashMap<String, Int>() {
         this["awg"] = ProxyEntity.TYPE_AWG
         this["tuic"] = ProxyEntity.TYPE_TUIC
         this["juicity"] = ProxyEntity.TYPE_JUICITY
+        this["shadowquic"] = ProxyEntity.TYPE_SHADOWQUIC
+        this["trusttunnel"] = ProxyEntity.TYPE_TRUSTTUNNEL
         this["anytls"] = ProxyEntity.TYPE_ANYTLS
         this["snell"] = ProxyEntity.TYPE_SNELL
         this["masterdnsvpn"] = ProxyEntity.TYPE_MASTERDNSVPN

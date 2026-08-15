@@ -8,6 +8,8 @@ import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria1
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria2
 import io.nekohasekai.sagernet.fmt.juicity.parseJuicity
 import io.nekohasekai.sagernet.fmt.masterdnsvpn.parseMasterDnsVpn
+import io.nekohasekai.sagernet.fmt.shadowquic.parseShadowQUIC
+import io.nekohasekai.sagernet.fmt.trusttunnel.parseTrustTunnel
 import io.nekohasekai.sagernet.fmt.naive.parseNaive
 import io.nekohasekai.sagernet.fmt.olcrtc.parseOlcrtc
 import io.nekohasekai.sagernet.fmt.parseUniversal
@@ -234,6 +236,20 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
                 entities.add(parseJuicity(this))
             }.onFailure {
                 Logs.w("Juicity parser rejected input")
+            }
+        } else if (startsWith("shadowquic://")) {
+            Logs.d("Trying ShadowQUIC parser")
+            runCatching {
+                entities.add(parseShadowQUIC(this))
+            }.onFailure {
+                Logs.w("ShadowQUIC parser rejected input")
+            }
+        } else if (startsWith("tt://")) {
+            Logs.d("Trying TrustTunnel parser")
+            runCatching {
+                entities.add(parseTrustTunnel(this))
+            }.onFailure {
+                Logs.w("TrustTunnel parser rejected input")
             }
         } else if (startsWith("snell://")) {
             Logs.d("Trying Snell parser")

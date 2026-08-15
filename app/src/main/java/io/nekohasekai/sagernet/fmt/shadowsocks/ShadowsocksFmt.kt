@@ -15,7 +15,7 @@ fun ShadowsocksBean.fixPluginName() {
 fun parseShadowsocks(url: String): ShadowsocksBean {
     if (url.substringBefore("#").contains("@")) {
         var link = url.replace("ss://", "https://").toHttpUrlOrNull() ?: error(
-            "invalid ss-android link $url",
+            app.getString(R.string.invalid_ss_android_link, url),
         )
 
         if (link.username.isBlank()) { // fix justmysocks's shit link
@@ -25,7 +25,7 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
                         .substringBefore("#")
                         .decodeBase64UrlSafe()
                     ).toHttpUrlOrNull()
-                    ?: error("invalid jms link $url")
+                    ?: error(app.getString(R.string.invalid_jms_link, url))
                 ).newBuilder().fragment(url.substringAfter("#")).build()
         }
 
@@ -63,7 +63,7 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
         val link = (
             "https://" + v2Url.substringAfter("ss://")
                 .decodeBase64UrlSafe()
-            ).toHttpUrlOrNull() ?: error("invalid v2rayN link $url")
+            ).toHttpUrlOrNull() ?: error(app.getString(R.string.invalid_v2rayn_link, url))
 
         return ShadowsocksBean().apply {
             serverAddress = link.host

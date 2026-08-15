@@ -86,7 +86,7 @@ class BaseService {
                     Libcore.resetAllConnections(true)
                     runOnMainDispatcher {
                         Util.collapseStatusBar(ctx)
-                        Toast.makeText(ctx, "Reset upstream connections done", Toast.LENGTH_SHORT)
+                        Toast.makeText(ctx, R.string.reset_connections_done, Toast.LENGTH_SHORT)
                             .show()
                     }
                 }
@@ -130,7 +130,7 @@ class BaseService {
         override val coroutineContext = Dispatchers.Main.immediate + Job()
 
         override fun getState(): Int = (data?.state ?: State.Idle).ordinal
-        override fun getProfileName(): String = data?.proxy?.displayProfileName ?: "Idle"
+        override fun getProfileName(): String = data?.proxy?.displayProfileName ?: SagerNet.application.getString(R.string.idle)
 
         override fun registerCallback(cb: ISagerNetServiceCallback, id: Int) {
             if (id == SagerConnection.CONNECTION_ID_RESTART_BG) {

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 13,
-    "identityHash": "61c0d74ffa6f59afdbc8fd7d456dada8",
+    "identityHash": "650c8dc6c400a8eba7798fd70adb959f",
     "entities": [
       {
         "tableName": "proxy_groups",
@@ -76,7 +76,7 @@
       },
       {
         "tableName": "proxy_entities",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `groupId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `userOrder` INTEGER NOT NULL, `tx` INTEGER NOT NULL, `rx` INTEGER NOT NULL, `lifetimeRx` INTEGER NOT NULL DEFAULT 0, `lifetimeTx` INTEGER NOT NULL DEFAULT 0, `status` INTEGER NOT NULL, `ping` INTEGER NOT NULL, `uuid` TEXT NOT NULL, `error` TEXT, `socksBean` BLOB, `httpBean` BLOB, `ssBean` BLOB, `ssrBean` BLOB, `vmessBean` BLOB, `trojanBean` BLOB, `trojanGoBean` BLOB, `mieruBean` BLOB, `naiveBean` BLOB, `hysteriaBean` BLOB, `tuicBean` BLOB, `juicityBean` BLOB, `sshBean` BLOB, `wgBean` BLOB, `shadowTLSBean` BLOB, `anyTLSBean` BLOB, `chainBean` BLOB, `balancerBean` BLOB, `configBean` BLOB, `snellBean` BLOB, `masterDnsVpnBean` BLOB, `awgBean` BLOB, `olcrtcBean` BLOB)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `groupId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `userOrder` INTEGER NOT NULL, `tx` INTEGER NOT NULL, `rx` INTEGER NOT NULL, `lifetimeRx` INTEGER NOT NULL DEFAULT 0, `lifetimeTx` INTEGER NOT NULL DEFAULT 0, `status` INTEGER NOT NULL, `ping` INTEGER NOT NULL, `uuid` TEXT NOT NULL, `error` TEXT, `socksBean` BLOB, `httpBean` BLOB, `ssBean` BLOB, `ssrBean` BLOB, `vmessBean` BLOB, `trojanBean` BLOB, `trojanGoBean` BLOB, `mieruBean` BLOB, `naiveBean` BLOB, `hysteriaBean` BLOB, `tuicBean` BLOB, `juicityBean` BLOB, `shadowQuicBean` BLOB, `trustTunnelBean` BLOB, `sshBean` BLOB, `wgBean` BLOB, `shadowTLSBean` BLOB, `anyTLSBean` BLOB, `chainBean` BLOB, `balancerBean` BLOB, `configBean` BLOB, `snellBean` BLOB, `masterDnsVpnBean` BLOB, `awgBean` BLOB, `olcrtcBean` BLOB)",
         "fields": [
           {
             "fieldPath": "id",
@@ -209,6 +209,16 @@
           {
             "fieldPath": "juicityBean",
             "columnName": "juicityBean",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "shadowQuicBean",
+            "columnName": "shadowQuicBean",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "trustTunnelBean",
+            "columnName": "trustTunnelBean",
             "affinity": "BLOB"
           },
           {
@@ -392,7 +402,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '61c0d74ffa6f59afdbc8fd7d456dada8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '650c8dc6c400a8eba7798fd70adb959f')"
     ]
   }
 }
