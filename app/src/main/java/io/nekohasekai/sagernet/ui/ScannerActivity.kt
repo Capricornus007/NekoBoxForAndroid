@@ -332,7 +332,9 @@ class ScannerActivity : ThemedActivity() {
         if (::cameraExecutor.isInitialized) cameraExecutor.shutdown()
         barcodeScanner.close()
         if (importedN.get() > 0) {
-            val text = getString(R.string.action_import_msg) + "\n" + getString(R.string.imported_profiles, importedN.get())
+            val text = getString(
+                R.string.action_import_msg,
+            ) + "\n" + getString(R.string.imported_profiles, importedN.get())
             Toast.makeText(app, text, Toast.LENGTH_LONG).show()
         }
     }

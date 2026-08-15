@@ -130,7 +130,8 @@ class BaseService {
         override val coroutineContext = Dispatchers.Main.immediate + Job()
 
         override fun getState(): Int = (data?.state ?: State.Idle).ordinal
-        override fun getProfileName(): String = data?.proxy?.displayProfileName ?: SagerNet.application.getString(R.string.idle)
+        override fun getProfileName(): String =
+            data?.proxy?.displayProfileName ?: SagerNet.application.getString(R.string.idle)
 
         override fun registerCallback(cb: ISagerNetServiceCallback, id: Int) {
             if (id == SagerConnection.CONNECTION_ID_RESTART_BG) {

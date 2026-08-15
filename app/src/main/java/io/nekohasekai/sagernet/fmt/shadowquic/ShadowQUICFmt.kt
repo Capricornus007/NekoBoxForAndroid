@@ -3,7 +3,6 @@ package io.nekohasekai.sagernet.fmt.shadowquic
 import io.nekohasekai.sagernet.ktx.linkBuilder
 import io.nekohasekai.sagernet.ktx.toLink
 import io.nekohasekai.sagernet.ktx.urlSafe
-import moe.matsuri.nb4a.SingBoxOptions
 import moe.matsuri.nb4a.SingBoxOptions.Outbound_ShadowQUICOptions
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
