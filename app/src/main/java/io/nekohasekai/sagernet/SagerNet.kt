@@ -219,11 +219,7 @@ class SagerNet :
                             NotificationChannel(
                                 "service-vpn",
                                 application.getText(R.string.service_vpn),
-                                if (Build.VERSION.SDK_INT >= 28) {
-                                    NotificationManager.IMPORTANCE_MIN
-                                } else {
-                                    NotificationManager.IMPORTANCE_LOW
-                                },
+                                NotificationManager.IMPORTANCE_LOW,
                             ), // #1355
                             NotificationChannel(
                                 "service-proxy",

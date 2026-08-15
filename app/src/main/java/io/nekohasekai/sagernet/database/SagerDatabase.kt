@@ -29,8 +29,8 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
         AutoMigration(from = 11, to = 12),
         // v13: additive balancerBean column on proxy_entities
         AutoMigration(from = 12, to = 13),
-          // v14: new ShadowQUIC & TrustTunnel columns on proxy_entities
-          AutoMigration(from = 13, to = 14),
+        // v14: new ShadowQUIC & TrustTunnel columns on proxy_entities
+        AutoMigration(from = 13, to = 14),
     ],
 )
 @TypeConverters(value = [KryoConverters::class, GsonConverters::class])
