@@ -4572,6 +4572,122 @@ public class SingBoxOptions {
 
     }
 
+    public static class Outbound_ShadowQUICOptions extends Outbound {
+
+        // Generate note: nested type DialerOptions
+        public String detour;
+
+        public String bind_interface;
+
+        public String inet4_bind_address;
+
+        public String inet6_bind_address;
+
+        public String protect_path;
+
+        public Integer routing_mark;
+
+        public Boolean reuse_addr;
+
+        public Long connect_timeout;
+
+        public Boolean tcp_fast_open;
+
+        public Boolean tcp_multi_path;
+
+        public Boolean udp_fragment;
+
+        public String domain_strategy;
+
+        public Long fallback_delay;
+
+        // End of public DialerOptions ;
+
+        // Generate note: nested type ServerOptions
+        public String server;
+
+        public Integer server_port;
+
+        // End of public ServerOptions ;
+
+        public String username;
+
+        public String password;
+
+        public String congestion_control;
+
+        public Boolean udp_over_stream;
+
+        public Boolean zero_rtt_handshake;
+
+        public Boolean sunny_quic;
+
+        public String server_name;
+
+        public java.util.List<String> alpn;
+
+    }
+
+    public static class Outbound_TrustTunnelOptions extends Outbound {
+
+        // Generate note: nested type DialerOptions
+        public String detour;
+
+        public String bind_interface;
+
+        public String inet4_bind_address;
+
+        public String inet6_bind_address;
+
+        public String protect_path;
+
+        public Integer routing_mark;
+
+        public Boolean reuse_addr;
+
+        public Long connect_timeout;
+
+        public Boolean tcp_fast_open;
+
+        public Boolean tcp_multi_path;
+
+        public Boolean udp_fragment;
+
+        public String domain_strategy;
+
+        public Long fallback_delay;
+
+        // End of public DialerOptions ;
+
+        // Generate note: nested type ServerOptions
+        public String server;
+
+        public Integer server_port;
+
+        // End of public ServerOptions ;
+
+        public String username;
+
+        public String password;
+
+        public Boolean quic;
+
+        public String quic_congestion_control;
+
+        public Boolean health_check;
+
+        public String tcp_user_agent;
+
+        public String udp_user_agent;
+
+        public String icmp_user_agent;
+
+        public String health_check_user_agent;
+
+        public OutboundTLSOptions tls;
+
+    }
+
     public static class Outbound_Hysteria2Options extends Outbound {
 
         // Generate note: nested type DialerOptions

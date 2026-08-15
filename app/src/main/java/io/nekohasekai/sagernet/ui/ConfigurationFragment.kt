@@ -76,12 +76,14 @@ import io.nekohasekai.sagernet.ui.profile.MieruSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.NaiveSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.OlcrtcSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.SSHSettingsActivity
+import io.nekohasekai.sagernet.ui.profile.ShadowQUICSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ShadowsocksRSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ShadowsocksSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.SnellSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.SocksSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TrojanGoSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TrojanSettingsActivity
+import io.nekohasekai.sagernet.ui.profile.TrustTunnelSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TuicSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.VMessSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.WireGuardSettingsActivity
@@ -617,6 +619,14 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             R.id.action_new_juicity -> {
                 startActivity(Intent(requireActivity(), JuicitySettingsActivity::class.java))
+            }
+
+            R.id.action_new_shadowquic -> {
+                startActivity(Intent(requireActivity(), ShadowQUICSettingsActivity::class.java))
+            }
+
+            R.id.action_new_trusttunnel -> {
+                startActivity(Intent(requireActivity(), TrustTunnelSettingsActivity::class.java))
             }
 
             R.id.action_new_ssh -> {

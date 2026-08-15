@@ -228,7 +228,7 @@ abstract class ProfileSettingsActivity<T : AbstractBean>(
             } catch (e: Exception) {
                 Toast.makeText(
                     SagerNet.application,
-                    "Error on createPreferences, please try again.",
+                    getString(R.string.toast_create_preferences_failed),
                     Toast.LENGTH_SHORT,
                 ).show()
                 Logs.e(e)

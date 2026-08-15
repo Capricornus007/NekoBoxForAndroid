@@ -3,8 +3,6 @@
 
     <style name="Theme.SagerNet.Monet" parent="Theme.SagerNet">
         <item name="colorPrimary">@color/monet_primary</item>
-        <item name="colorPrimaryDark">@color/monet_primary_variant</item>
-        <item name="colorAccent">@color/monet_secondary</item>
         <item name="colorMaterial100">@color/monet_material_100</item>
         <item name="colorMaterial300">@color/monet_material_300</item>
         <item name="cardElevatedSurfaceColor">@color/monet_card_elevated</item>
@@ -12,8 +10,6 @@
 
     <style name="Theme.SagerNet.Dialog.Monet" parent="Theme.SagerNet.Dialog">
         <item name="colorPrimary">@color/monet_primary</item>
-        <item name="colorPrimaryDark">@color/monet_primary_variant</item>
-        <item name="colorAccent">@color/monet_secondary</item>
         <item name="colorMaterial100">@color/monet_material_100</item>
         <item name="colorMaterial300">@color/monet_material_300</item>
         <item name="cardElevatedSurfaceColor">@color/monet_card_elevated</item>

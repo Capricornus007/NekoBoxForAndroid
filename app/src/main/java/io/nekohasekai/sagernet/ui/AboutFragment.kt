@@ -102,7 +102,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         icon = R.drawable.ic_baseline_nfc_24,
                         text = getString(R.string.version_x, pluginId) +
                             " (${Plugins.displayExeProvider(pkg.packageName)})",
-                        subText = "v" + pkg.versionName,
+                        subText = getString(R.string.version_prefix, pkg.versionName),
                         onClick = {
                             startActivity(
                                 Intent().apply {

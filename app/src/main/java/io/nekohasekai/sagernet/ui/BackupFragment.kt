@@ -25,6 +25,7 @@ import io.nekohasekai.sagernet.databinding.LayoutBackupBinding
 import io.nekohasekai.sagernet.databinding.LayoutImportBinding
 import io.nekohasekai.sagernet.databinding.LayoutProgressBinding
 import io.nekohasekai.sagernet.ktx.*
+import io.nekohasekai.sagernet.ktx.app
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -323,11 +324,17 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                         when (response.code) {
                             404 -> needCreateDir = true
                             207 -> needCreateDir = false // directory exists
-                            401 -> throw Exception("Authentication failed")
+                            401 -> throw Exception(app.getString(R.string.webdav_auth_failed))
                             else -> {
                                 if (!response.isSuccessful) {
                                     Logs.e("WebDAV backup - PROPFIND failed: ${response.code} ${response.message}")
-                                    throw Exception("Failed to check directory (${response.code}): ${response.message}")
+                                    throw Exception(
+                                        app.getString(
+                                            R.string.webdav_check_dir_failed,
+                                            response.code,
+                                            response.message,
+                                        ),
+                                    )
                                 }
                             }
                         }

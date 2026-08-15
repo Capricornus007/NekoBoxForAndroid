@@ -136,7 +136,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setText(size.toString())
             }
 
-            MaterialAlertDialogBuilder(ctx).setTitle("Log buffer size (kb)")
+            MaterialAlertDialogBuilder(ctx).setTitle(R.string.dialog_log_buffer_size)
                 .setView(ctx.wrapDialogContent(view))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     DataStore.logBufSize = view.text.toString().toInt()
@@ -366,25 +366,21 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("vpnWatchdogTest")?.setOnPreferenceClickListener {
             if (!DataStore.serviceState.connected) {
                 MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Тест watchdog")
-                    .setMessage("VPN не запущен. Сначала подключитесь к VPN.")
+                    .setTitle(R.string.dialog_watchdog_test_title)
+                    .setMessage(R.string.dialog_watchdog_vpn_not_running)
                     .setPositiveButton(android.R.string.ok, null)
                     .show()
                 return@setOnPreferenceClickListener true
             }
             MaterialAlertDialogBuilder(requireContext())
-                .setTitle("🧪 Тест авто-переподключения")
-                .setMessage(
-                    "Watchdog форсирует перезапуск VPN.\n\n" +
-                        "VPN отключится на 1–3 секунды, затем автоматически переподключится.\n\n" +
-                        "Продолжить?",
-                )
-                .setPositiveButton("Запустить") { _, _ ->
+                .setTitle(R.string.dialog_watchdog_auto_reconnect_title)
+                .setMessage(R.string.dialog_watchdog_force_restart)
+                .setPositiveButton(R.string.dialog_watchdog_start) { _, _ ->
                     io.nekohasekai.sagernet.bg.VpnWatchdog.testModeRequested = true
                     com.google.android.material.snackbar.Snackbar
                         .make(
                             requireView(),
-                            "Тест запущен. Перезапуск через ≤30 сек...",
+                            R.string.snackbar_watchdog_test_started,
                             com.google.android.material.snackbar.Snackbar.LENGTH_LONG,
                         )
                         .show()

@@ -7,7 +7,7 @@ private val SING_BOX_XHTTP_RANGE_FIELDS = arrayOf(
     "x_padding_bytes",
     "sc_max_each_post_bytes",
     "sc_min_posts_interval_ms",
-    "sc_stream_up_server_secs"
+    "sc_stream_up_server_secs",
 )
 
 /**

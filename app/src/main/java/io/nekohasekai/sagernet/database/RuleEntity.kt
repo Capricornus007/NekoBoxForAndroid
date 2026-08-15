@@ -30,7 +30,7 @@ data class RuleEntity(
 ) : Parcelable {
 
     fun displayName(): String {
-        return name.takeIf { it.isNotBlank() } ?: "Rule $id"
+        return name.takeIf { it.isNotBlank() } ?: app.getString(R.string.rule_default_name, id)
     }
 
     fun mkSummary(): String {
@@ -38,11 +38,11 @@ data class RuleEntity(
         if (config.isNotBlank()) summary += "[config]\n"
         if (domains.isNotBlank()) summary += "$domains\n"
         if (ip.isNotBlank()) summary += "$ip\n"
-        if (source.isNotBlank()) summary += "src ip: $source\n"
-        if (sourcePort.isNotBlank()) summary += "src port: $sourcePort\n"
-        if (port.isNotBlank()) summary += "dst port: $port\n"
-        if (network.isNotBlank()) summary += "network: $network\n"
-        if (protocol.isNotBlank()) summary += "protocol: $protocol\n"
+        if (source.isNotBlank()) summary += app.getString(R.string.rule_summary_src_ip, source)
+        if (sourcePort.isNotBlank()) summary += app.getString(R.string.rule_summary_src_port, sourcePort)
+        if (port.isNotBlank()) summary += app.getString(R.string.rule_summary_dst_port, port)
+        if (network.isNotBlank()) summary += app.getString(R.string.rule_summary_network, network)
+        if (protocol.isNotBlank()) summary += app.getString(R.string.rule_summary_protocol, protocol)
         if (ruleset.isNotBlank()) summary += "$ruleset\n"
         if (packages.isNotEmpty()) {
             summary += app.getString(

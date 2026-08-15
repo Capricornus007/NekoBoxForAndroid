@@ -92,7 +92,7 @@ object Plugins {
 
         if (providers.size > 1) {
             val message =
-                "Conflicting plugins found from: ${providers.joinToString { it.packageName }}"
+                SagerNet.application.getString(R.string.conflicting_plugins, providers.joinToString { it.packageName })
             Toast.makeText(SagerNet.application, message, Toast.LENGTH_LONG).show()
         }
 

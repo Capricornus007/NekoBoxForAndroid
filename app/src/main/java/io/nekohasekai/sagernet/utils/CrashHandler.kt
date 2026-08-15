@@ -7,6 +7,7 @@ import android.util.Log
 import com.jakewharton.processphoenix.ProcessPhoenix
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.Key
+import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.preference.KeyValuePair
 import io.nekohasekai.sagernet.database.preference.PublicDatabase
@@ -58,7 +59,7 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
         ProcessPhoenix.triggerRebirth(
             app,
             Intent(app, BlankActivity::class.java).apply {
-                putExtra("sendLog", "NB4A Crash")
+                putExtra("sendLog", app.getString(R.string.crash_log_title))
             },
         )
     }

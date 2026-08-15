@@ -17,7 +17,11 @@ require (
 	golang.org/x/sys v0.47.0
 )
 
-require golang.org/x/net v0.57.0
+require (
+	github.com/exclavenetwork/sing-shadowquic v0.0.0-20260801175020-65c7acc31f93
+	github.com/xchacha20-poly1305/sing-trusttunnel v0.3.0-beta.5
+	golang.org/x/net v0.57.0
+)
 
 require (
 	github.com/ajg/form v1.7.1 // indirect
@@ -64,6 +68,13 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/mdlayher/netlink v1.11.2 // indirect
 	github.com/mdlayher/socket v0.6.0 // indirect
+	github.com/metacubex/cpu v0.1.0 // indirect
+	github.com/metacubex/hkdf v0.1.0 // indirect
+	github.com/metacubex/hpke v0.1.0 // indirect
+	github.com/metacubex/jls-quic-go v0.0.0-20260727080412-732f2fc9a34d // indirect
+	github.com/metacubex/jls-tls v0.0.0-20260723084315-67adc0e2f796 // indirect
+	github.com/metacubex/mlkem v0.1.0 // indirect
+	github.com/metacubex/randv2 v0.2.1-0.20260726125100-81aa96a9b1a5 // indirect
 	github.com/metacubex/utls v1.8.7 // indirect
 	github.com/mholt/acmez/v3 v3.1.6 // indirect
 	github.com/pierrec/lz4/v4 v4.1.27 // indirect

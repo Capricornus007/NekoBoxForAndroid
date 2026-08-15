@@ -21,6 +21,8 @@ import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.internal.FastestCandidateResolver
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.juicity.buildSingBoxOutboundJuicityBean
+import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
+import io.nekohasekai.sagernet.fmt.shadowquic.buildSingBoxOutboundShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.buildSingBoxOutboundShadowsocksBean
 import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
@@ -31,6 +33,8 @@ import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.socks.buildSingBoxOutboundSocksBean
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
 import io.nekohasekai.sagernet.fmt.ssh.buildSingBoxOutboundSSHBean
+import io.nekohasekai.sagernet.fmt.trusttunnel.TrustTunnelBean
+import io.nekohasekai.sagernet.fmt.trusttunnel.buildSingBoxOutboundTrustTunnelBean
 import io.nekohasekai.sagernet.fmt.tuic.TuicBean
 import io.nekohasekai.sagernet.fmt.tuic.buildSingBoxOutboundTuicBean
 import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean
@@ -606,6 +610,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         is JuicityBean ->
                             buildSingBoxOutboundJuicityBean(bean)
 
+                        is ShadowQUICBean ->
+                            buildSingBoxOutboundShadowQUICBean(bean)
+
+                        is TrustTunnelBean ->
+                            buildSingBoxOutboundTrustTunnelBean(bean)
+
                         is SOCKSBean ->
                             buildSingBoxOutboundSocksBean(bean)
 
@@ -762,10 +772,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         // 构建动态分组（最快 / 瀑布）的 urltest outbound。
         // 由 sf 分支的 buildProfile 移植而来，并对齐 main 重构后的架构：
         // 静态候选改由 buildChain 构建（原 buildStaticChain 已在 main 合并进 buildChain）。
-        fun buildDynamicGroup(
-            entity: ProxyEntity,
-            managedByParent: Boolean = false,
-        ): String {
+        fun buildDynamicGroup(entity: ProxyEntity, managedByParent: Boolean = false): String {
             val bean = entity.chainBean ?: error("Missing dynamic profile data")
             val candidates = if (entity.type == ProxyEntity.TYPE_FASTEST) {
                 FastestCandidateResolver.resolve(bean)
@@ -795,23 +802,25 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
 
             val groupTag = readableTag(entity.displayName())
-            outbounds.add(Outbound_URLTestOptions().apply {
-                type = "urltest"
-                tag = groupTag
-                outbounds = candidateTags
-                url = DataStore.connectionTestURL
-                interval = "10m"
-                idle_timeout = "30m"
-                timeout = "${DataStore.connectionTestTimeout}ms"
-                tolerance = if (entity.type == ProxyEntity.TYPE_FASTEST) 50 else 0
-                strategy = if (entity.type == ProxyEntity.TYPE_WATERFALL) {
-                    "priority"
-                } else {
-                    "fastest"
-                }
-                managed_by_parent = managedByParent
-                wait_for_initial = true
-            })
+            outbounds.add(
+                Outbound_URLTestOptions().apply {
+                    type = "urltest"
+                    tag = groupTag
+                    outbounds = candidateTags
+                    url = DataStore.connectionTestURL
+                    interval = "10m"
+                    idle_timeout = "30m"
+                    timeout = "${DataStore.connectionTestTimeout}ms"
+                    tolerance = if (entity.type == ProxyEntity.TYPE_FASTEST) 50 else 0
+                    strategy = if (entity.type == ProxyEntity.TYPE_WATERFALL) {
+                        "priority"
+                    } else {
+                        "fastest"
+                    }
+                    managed_by_parent = managedByParent
+                    wait_for_initial = true
+                },
+            )
 
             trafficMap[groupTag] = buildList {
                 add(entity)
@@ -1074,7 +1083,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     if (ruleObj.outbound.isNullOrBlank()) {
                         Toast.makeText(
                             SagerNet.application,
-                            "Warning: " + rule.displayName() + ": A non-existent outbound was specified.",
+                            SagerNet.application.getString(R.string.warning_nonexistent_outbound, rule.displayName()),
                             Toast.LENGTH_LONG,
                         ).show()
                     } else {

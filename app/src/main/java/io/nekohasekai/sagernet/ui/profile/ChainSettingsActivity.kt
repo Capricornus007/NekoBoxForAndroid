@@ -106,10 +106,7 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         super.saveAndExit()
     }
 
-    override fun PreferenceFragmentCompat.createPreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-    ) {
+    override fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
         if (currentStrategy != ChainBean.STRATEGY_FASTEST) {
             addPreferencesFromResource(R.xml.name_preferences)
             return
@@ -250,9 +247,8 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         }
     }
 
-    private fun isRegexFastest() =
-        currentStrategy == ChainBean.STRATEGY_FASTEST &&
-            DataStore.fastestCandidateMode == ChainBean.CANDIDATE_MODE_REGEX
+    private fun isRegexFastest() = currentStrategy == ChainBean.STRATEGY_FASTEST &&
+        DataStore.fastestCandidateMode == ChainBean.CANDIDATE_MODE_REGEX
 
     private fun regexFastestBean() = ChainBean().apply {
         strategy = ChainBean.STRATEGY_FASTEST

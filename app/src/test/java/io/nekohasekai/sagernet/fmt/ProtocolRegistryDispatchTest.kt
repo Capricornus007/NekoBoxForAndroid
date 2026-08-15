@@ -12,6 +12,7 @@ import io.nekohasekai.sagernet.fmt.masterdnsvpn.MasterDnsVpnBean
 import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.naive.NaiveBean
 import io.nekohasekai.sagernet.fmt.olcrtc.OlcrtcBean
+import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.toUri
 import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
@@ -21,6 +22,7 @@ import io.nekohasekai.sagernet.fmt.socks.toUri
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.fmt.trojan_go.TrojanGoBean
+import io.nekohasekai.sagernet.fmt.trusttunnel.TrustTunnelBean
 import io.nekohasekai.sagernet.fmt.tuic.TuicBean
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
 import io.nekohasekai.sagernet.fmt.v2ray.toUriVMessVLESSTrojan
@@ -177,6 +179,18 @@ class ProtocolRegistryDispatchTest {
         uuid = "00000000-0000-0000-0000-000000000000"
         password = "p"
     }
+    private fun shadowQuic() = ShadowQUICBean().apply {
+        serverAddress = "192.0.2.21"
+        serverPort = 443
+        username = "u"
+        password = "p"
+    }
+    private fun trustTunnel() = TrustTunnelBean().apply {
+        serverAddress = "192.0.2.22"
+        serverPort = 443
+        username = "u"
+        password = "p"
+    }
     private fun shadowTls() = ShadowTLSBean().apply {
         serverAddress = "192.0.2.16"
         serverPort = 443
@@ -218,6 +232,8 @@ class ProtocolRegistryDispatchTest {
         awg() to ProxyEntity.TYPE_AWG,
         tuic() to ProxyEntity.TYPE_TUIC,
         juicity() to ProxyEntity.TYPE_JUICITY,
+        shadowQuic() to ProxyEntity.TYPE_SHADOWQUIC,
+        trustTunnel() to ProxyEntity.TYPE_TRUSTTUNNEL,
         shadowTls() to ProxyEntity.TYPE_SHADOWTLS,
         anyTls() to ProxyEntity.TYPE_ANYTLS,
         snell() to ProxyEntity.TYPE_SNELL,
@@ -270,6 +286,8 @@ class ProtocolRegistryDispatchTest {
             ProxyEntity.TYPE_AWG to AmneziaWGSettingsActivity::class.java,
             ProxyEntity.TYPE_TUIC to TuicSettingsActivity::class.java,
             ProxyEntity.TYPE_JUICITY to JuicitySettingsActivity::class.java,
+            ProxyEntity.TYPE_SHADOWQUIC to ShadowQUICSettingsActivity::class.java,
+            ProxyEntity.TYPE_TRUSTTUNNEL to TrustTunnelSettingsActivity::class.java,
             ProxyEntity.TYPE_SHADOWTLS to ShadowTLSSettingsActivity::class.java,
             ProxyEntity.TYPE_ANYTLS to AnyTLSSettingsActivity::class.java,
             ProxyEntity.TYPE_CHAIN to ChainSettingsActivity::class.java,
@@ -297,13 +315,15 @@ class ProtocolRegistryDispatchTest {
             ProxyEntity.TYPE_HYSTERIA,
             ProxyEntity.TYPE_TUIC,
             ProxyEntity.TYPE_JUICITY,
+            ProxyEntity.TYPE_SHADOWQUIC,
+            ProxyEntity.TYPE_TRUSTTUNNEL,
             ProxyEntity.TYPE_ANYTLS,
             ProxyEntity.TYPE_SNELL,
             ProxyEntity.TYPE_MASTERDNSVPN,
             ProxyEntity.TYPE_OLCRTC,
         )
 
-        assertEquals(22, allBeans.size)
+        assertEquals(24, allBeans.size)
         assertEquals(allBeans.map { it.second }.toSet(), settingsActivities.keys)
         for ((_, type) in allBeans) {
             val descriptor = ProtocolRegistry.forType(type)!!

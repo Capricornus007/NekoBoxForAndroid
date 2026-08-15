@@ -19,6 +19,7 @@ import io.nekohasekai.sagernet.fmt.mieru.buildMieruConfig
 import io.nekohasekai.sagernet.fmt.naive.NaiveBean
 import io.nekohasekai.sagernet.fmt.naive.buildNaiveConfig
 import io.nekohasekai.sagernet.fmt.olcrtc.OlcrtcBean
+import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.*
 import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
 import io.nekohasekai.sagernet.fmt.snell.SnellBean
@@ -27,6 +28,7 @@ import io.nekohasekai.sagernet.fmt.ssh.SSHBean
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.fmt.trojan_go.TrojanGoBean
 import io.nekohasekai.sagernet.fmt.trojan_go.buildTrojanGoConfig
+import io.nekohasekai.sagernet.fmt.trusttunnel.TrustTunnelBean
 import io.nekohasekai.sagernet.fmt.tuic.TuicBean
 import io.nekohasekai.sagernet.fmt.v2ray.*
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
@@ -92,6 +94,8 @@ data class ProxyEntity(
     var hysteriaBean: HysteriaBean? = null,
     var tuicBean: TuicBean? = null,
     var juicityBean: JuicityBean? = null,
+    var shadowQuicBean: ShadowQUICBean? = null,
+    var trustTunnelBean: TrustTunnelBean? = null,
     var sshBean: SSHBean? = null,
     var wgBean: WireGuardBean? = null,
     var shadowTLSBean: ShadowTLSBean? = null,
@@ -138,6 +142,8 @@ data class ProxyEntity(
         const val TYPE_FASTEST = 29
 
         const val TYPE_BALANCER = 30
+        const val TYPE_SHADOWQUIC = 31
+        const val TYPE_TRUSTTUNNEL = 32
 
         const val TYPE_CONFIG = 998
 
@@ -233,6 +239,8 @@ data class ProxyEntity(
                 TYPE_WG -> wgBean = KryoConverters.wireguardDeserialize(byteArray)
                 TYPE_TUIC -> tuicBean = KryoConverters.tuicDeserialize(byteArray)
                 TYPE_JUICITY -> juicityBean = KryoConverters.juicityDeserialize(byteArray)
+                TYPE_SHADOWQUIC -> shadowQuicBean = KryoConverters.shadowQuicDeserialize(byteArray)
+                TYPE_TRUSTTUNNEL -> trustTunnelBean = KryoConverters.trustTunnelDeserialize(byteArray)
                 TYPE_SHADOWTLS -> shadowTLSBean = KryoConverters.shadowTLSDeserialize(byteArray)
                 TYPE_ANYTLS -> anyTLSBean = KryoConverters.anyTLSDeserialize(byteArray)
                 TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST -> chainBean = KryoConverters.chainDeserialize(byteArray)
@@ -258,6 +266,8 @@ data class ProxyEntity(
             TYPE_WG -> if (wgBean?.isAmneziaWG == true) "AmneziaWG 2.0" else "WireGuard"
             TYPE_TUIC -> "TUIC"
             TYPE_JUICITY -> "Juicity"
+            TYPE_SHADOWQUIC -> "ShadowQUIC"
+            TYPE_TRUSTTUNNEL -> "TrustTunnel"
             TYPE_SHADOWTLS -> "ShadowTLS"
             TYPE_ANYTLS -> "AnyTLS"
             TYPE_CHAIN -> chainName
@@ -292,6 +302,8 @@ data class ProxyEntity(
             TYPE_WG -> wgBean
             TYPE_TUIC -> tuicBean
             TYPE_JUICITY -> juicityBean
+            TYPE_SHADOWQUIC -> shadowQuicBean
+            TYPE_TRUSTTUNNEL -> trustTunnelBean
             TYPE_SHADOWTLS -> shadowTLSBean
             TYPE_ANYTLS -> anyTLSBean
             TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST -> chainBean
@@ -464,6 +476,8 @@ data class ProxyEntity(
         wgBean = null
         tuicBean = null
         juicityBean = null
+        shadowQuicBean = null
+        trustTunnelBean = null
         shadowTLSBean = null
         anyTLSBean = null
         chainBean = null
@@ -573,6 +587,16 @@ data class ProxyEntity(
             is AmneziaWGBean -> {
                 type = TYPE_AWG
                 awgBean = bean
+            }
+
+            is ShadowQUICBean -> {
+                type = TYPE_SHADOWQUIC
+                shadowQuicBean = bean
+            }
+
+            is TrustTunnelBean -> {
+                type = TYPE_TRUSTTUNNEL
+                trustTunnelBean = bean
             }
 
             is OlcrtcBean -> {

@@ -263,7 +263,7 @@ class MainActivity :
         if (name.isNullOrBlank()) return
 
         group.name = group.name.takeIf { !it.isNullOrBlank() }
-            ?: ("Subscription #" + System.currentTimeMillis())
+            ?: getString(R.string.subscription_name, System.currentTimeMillis())
 
         onMainDispatcher {
             displayFragmentWithId(R.id.nav_group)

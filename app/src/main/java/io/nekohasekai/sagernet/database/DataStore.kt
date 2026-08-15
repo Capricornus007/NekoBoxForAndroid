@@ -400,6 +400,14 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     var serverUDPRelayMode by profileCacheStore.string(Key.SERVER_UDP_RELAY_MODE)
     var serverCongestionController by profileCacheStore.string(Key.SERVER_CONGESTION_CONTROLLER)
+    var serverShadowQuicCongestion by profileCacheStore.string("serverShadowQuicCongestion")
+    var serverShadowQuicAlpn by profileCacheStore.string("serverShadowQuicAlpn")
+    var serverShadowQuicUdpOverStream by profileCacheStore.boolean("serverShadowQuicUdpOverStream")
+    var serverShadowQuicZeroRtt by profileCacheStore.boolean("serverShadowQuicZeroRtt")
+    var serverShadowQuicSunny by profileCacheStore.boolean("serverShadowQuicSunny")
+    var serverTrustTunnelQuic by profileCacheStore.boolean("serverTrustTunnelQuic")
+    var serverTrustTunnelQuicCongestion by profileCacheStore.string("serverTrustTunnelQuicCongestion")
+    var serverTrustTunnelHealthCheck by profileCacheStore.boolean("serverTrustTunnelHealthCheck")
     var serverDisableSNI by profileCacheStore.boolean(Key.SERVER_DISABLE_SNI)
     var serverReduceRTT by profileCacheStore.boolean(Key.SERVER_REDUCE_RTT)
 

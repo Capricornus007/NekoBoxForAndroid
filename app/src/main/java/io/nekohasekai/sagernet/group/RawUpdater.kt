@@ -155,7 +155,7 @@ object RawUpdater : GroupUpdater() {
                 Util.getStringBox(response.getHeader("Subscription-Userinfo"))
 
             // modify the default name
-            if (proxyGroup.name?.startsWith("Subscription #") == true) {
+            if (proxyGroup.name?.startsWith(app.getString(R.string.subscription_name, "")) == true) {
                 var remoteName = Util.getStringBox(response.getHeader("content-disposition"))
                 if (remoteName.isNotBlank()) {
                     remoteName = Util.decodeFilename(remoteName)

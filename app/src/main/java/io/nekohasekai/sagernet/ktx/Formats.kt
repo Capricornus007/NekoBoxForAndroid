@@ -11,12 +11,14 @@ import io.nekohasekai.sagernet.fmt.masterdnsvpn.parseMasterDnsVpn
 import io.nekohasekai.sagernet.fmt.naive.parseNaive
 import io.nekohasekai.sagernet.fmt.olcrtc.parseOlcrtc
 import io.nekohasekai.sagernet.fmt.parseUniversal
+import io.nekohasekai.sagernet.fmt.shadowquic.parseShadowQUIC
 import io.nekohasekai.sagernet.fmt.shadowsocks.parseShadowsocks
 import io.nekohasekai.sagernet.fmt.shadowsocksr.parseShadowsocksR
 import io.nekohasekai.sagernet.fmt.snell.parseSnell
 import io.nekohasekai.sagernet.fmt.socks.parseSOCKS
 import io.nekohasekai.sagernet.fmt.trojan.parseTrojan
 import io.nekohasekai.sagernet.fmt.trojan_go.parseTrojanGo
+import io.nekohasekai.sagernet.fmt.trusttunnel.parseTrustTunnel
 import io.nekohasekai.sagernet.fmt.tuic.parseTuic
 import io.nekohasekai.sagernet.fmt.v2ray.parseV2Ray
 import moe.matsuri.nb4a.proxy.anytls.parseAnytls
@@ -234,6 +236,20 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
                 entities.add(parseJuicity(this))
             }.onFailure {
                 Logs.w("Juicity parser rejected input")
+            }
+        } else if (startsWith("shadowquic://")) {
+            Logs.d("Trying ShadowQUIC parser")
+            runCatching {
+                entities.add(parseShadowQUIC(this))
+            }.onFailure {
+                Logs.w("ShadowQUIC parser rejected input")
+            }
+        } else if (startsWith("tt://")) {
+            Logs.d("Trying TrustTunnel parser")
+            runCatching {
+                entities.add(parseTrustTunnel(this))
+            }.onFailure {
+                Logs.w("TrustTunnel parser rejected input")
             }
         } else if (startsWith("snell://")) {
             Logs.d("Trying Snell parser")

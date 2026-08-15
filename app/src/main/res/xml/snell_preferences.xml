@@ -75,7 +75,7 @@
             app:title="@string/snell_mode"
             app:useSimpleSummaryProvider="true" />
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:defaultValue="false"
             app:icon="@drawable/ic_baseline_refresh_24"
             app:key="reuse"
