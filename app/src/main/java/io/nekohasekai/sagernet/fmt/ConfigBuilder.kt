@@ -166,6 +166,24 @@ fun buildConfig(
         return name
     }
 
+    /** Members of a balancer, same filter rules as the main proxy urltest path. */
+    fun balancerMembers(balancerBean: BalancerBean, selfId: Long): List<ProxyEntity> {
+        val beans = if (balancerBean.type == BalancerBean.TYPE_LIST) {
+            SagerDatabase.proxyDao.getEntities(balancerBean.proxies)
+        } else {
+            SagerDatabase.proxyDao.getByGroup(balancerBean.groupId)
+                .filter {
+                    if (balancerBean.nameFilter.isEmpty()) true
+                    else !Regex(balancerBean.nameFilter).containsMatchIn(it.requireBean().name)
+                }
+                .filter {
+                    if (balancerBean.nameFilter1.isEmpty()) true
+                    else Regex(balancerBean.nameFilter1).containsMatchIn(it.requireBean().name)
+                }
+        }
+        return beans.filter { it.id != selfId }
+    }
+
     fun ProxyEntity.resolveChain(): MutableList<ProxyEntity> {
         val thisGroup = SagerDatabase.groupDao.getById(groupId)
         val frontProxy = thisGroup?.frontProxy?.let { SagerDatabase.proxyDao.getById(it) }
@@ -339,6 +357,34 @@ fun buildConfig(
         fun buildChain(
             chainId: Long, entity: ProxyEntity
         ): String {
+            // Nested balancer (route / chain extra): same naming as main proxy group —
+            // group tag = readable displayName, each member built alone so nodes keep displayName.
+            // Main selected balancer still uses fixed TAG_PROXY (libcore binds on "proxy").
+            if (entity.requireBean() is BalancerBean && chainId != 0L) {
+                val balancerBean = entity.requireBean() as BalancerBean
+                val members = balancerMembers(balancerBean, entity.id)
+                val memberTags = ArrayList<String>()
+                members.forEach { member ->
+                    val tag = buildChain(member.id, member)
+                    memberTags.add(tag)
+                    tagMap[member.id] = tag
+                    trafficMap[tag] = listOf(member)
+                }
+                val balancerTag = readableTag(balancerBean.displayName())
+                outbounds.add(Outbound_URLTestOptions().apply {
+                    type = "urltest"
+                    tag = balancerTag
+                    outbounds = memberTags
+                    url = balancerBean.probeUrl.ifEmpty { DataStore.connectionTestURL }
+                    if (balancerBean.probeInterval > 0) {
+                        _hack_config_map["interval"] = "${balancerBean.probeInterval}s"
+                    }
+                    tolerance = 50
+                })
+                trafficMap[balancerTag] = listOf(entity)
+                return balancerTag
+            }
+
             val profileList = entity.resolveChain()
             val chainTrafficSet = HashSet<ProxyEntity>().apply {
                 plusAssign(profileList)
@@ -600,25 +646,6 @@ fun buildConfig(
                 pastEntity = proxyEntity
             }
 
-            // handle balancer for extra proxies
-            if (entity.requireBean() is BalancerBean && chainId != 0L) {
-                val balancerBean = entity.requireBean() as BalancerBean
-                val balancerTags = chainOutbounds.map { it._hack_config_map["tag"] as String }
-                val balancerTag = "balancer-$chainTagOut"
-                outbounds.add(Outbound_URLTestOptions().apply {
-                    type = "urltest"
-                    tag = balancerTag
-                    outbounds = balancerTags
-                    url = balancerBean.probeUrl.ifEmpty { DataStore.connectionTestURL }
-                    if (balancerBean.probeInterval > 0) {
-                        _hack_config_map["interval"] = "${balancerBean.probeInterval}s"
-                    }
-                    tolerance = 50
-                })
-                trafficMap[balancerTag] = chainTrafficSet.toList()
-                return balancerTag
-            }
-
             trafficMap[chainTagOut] = chainTrafficSet.toList()
             return chainTagOut
         }
@@ -637,15 +664,8 @@ fun buildConfig(
             })
         } else if (proxy.requireBean() is BalancerBean) {
             val balancerBean = proxy.requireBean() as BalancerBean
-            val beans = if (balancerBean.type == BalancerBean.TYPE_LIST) {
-                SagerDatabase.proxyDao.getEntities(balancerBean.proxies)
-            } else {
-                SagerDatabase.proxyDao.getByGroup(balancerBean.groupId)
-                    .filter { if (balancerBean.nameFilter.isEmpty()) true else !Regex(balancerBean.nameFilter).containsMatchIn(it.requireBean().name) }
-                    .filter { if (balancerBean.nameFilter1.isEmpty()) true else Regex(balancerBean.nameFilter1).containsMatchIn(it.requireBean().name) }
-            }
+            val beans = balancerMembers(balancerBean, proxy.id)
             beans.forEach {
-                if (it.id == proxy.id) return@forEach
                 tagMap[it.id] = buildChain(it.id, it)
             }
             outbounds.add(0, Outbound_URLTestOptions().apply {
@@ -661,7 +681,7 @@ fun buildConfig(
             // Map balancer traffic to balancer entity, children keep their own traffic
             trafficMap[TAG_PROXY] = listOf(proxy)
             // Also track child nodes individually for their own traffic
-            beans.filter { it.id != proxy.id }.forEach { child ->
+            beans.forEach { child ->
                 val childTag = tagMap[child.id]
                 if (childTag != null) {
                     trafficMap[childTag] = listOf(child)
