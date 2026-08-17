@@ -51,7 +51,8 @@ object Key {
 
     const val MIXED_PORT = "mixedPort"
     const val MIXED_SECRET = "mixedSecret" // storage key for the generated inbound secret
-    const val MIXED_USERNAME = "neko" // username presented to the authed mixed inbound
+    const val MIXED_USERNAME = "neko" // default username presented to the authed mixed inbound
+    const val MIXED_USERNAME_PREF = "mixedUsername" // storage key for the inbound username
     const val ALLOW_ACCESS = "allowAccess"
     const val SPEED_INTERVAL = "speedInterval"
     const val SHOW_DIRECT_SPEED = "showDirectSpeed"
@@ -88,6 +89,7 @@ object Key {
     const val ALLOW_INSECURE_ON_REQUEST = "allowInsecureOnRequest"
 
     const val TUN_IMPLEMENTATION = "tunImplementation"
+    const val ENABLE_HEV_TUN = "enableHevTun"
     const val PROFILE_TRAFFIC_STATISTICS = "profileTrafficStatistics"
 
     const val PROFILE_DIRTY = "profileDirty"

@@ -46,7 +46,7 @@ abstract class BoxInstance(
 
     protected open fun buildConfig() {
         config = buildConfig(profile)
-        DataStore.mixedInboundAuthed = DataStore.mixedInboundNeedsAuth
+        DataStore.mixedInboundAuthed = DataStore.mixedInboundHasAuth
     }
 
     protected open suspend fun loadConfig() {

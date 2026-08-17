@@ -1,23 +1,24 @@
-    package io.nekohasekai.sagernet.bg
+package io.nekohasekai.sagernet.bg
 
-    import android.Manifest
-    import android.annotation.SuppressLint
-    import android.app.Service
-    import android.content.Intent
-    import android.content.pm.PackageManager
-    import android.net.ProxyInfo
-    import android.os.Build
-    import android.os.ParcelFileDescriptor
-    import android.os.PowerManager
-    import io.nekohasekai.sagernet.*
-    import io.nekohasekai.sagernet.database.DataStore
-    import io.nekohasekai.sagernet.fmt.LOCALHOST
-    import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
-    import io.nekohasekai.sagernet.ktx.*
-    import io.nekohasekai.sagernet.root.RootLanSharing
-    import io.nekohasekai.sagernet.ui.VpnRequestActivity
-    import io.nekohasekai.sagernet.utils.Subnet
-    import android.net.VpnService as BaseVpnService
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Service
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.ProxyInfo
+import android.os.Build
+import android.os.ParcelFileDescriptor
+import android.os.PowerManager
+import io.nekohasekai.sagernet.*
+import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.fmt.LOCALHOST
+import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
+import io.nekohasekai.sagernet.ktx.*
+import io.nekohasekai.sagernet.root.RootLanSharing
+import io.nekohasekai.sagernet.ui.VpnRequestActivity
+import io.nekohasekai.sagernet.utils.Subnet
+import moe.matsuri.nb4a.hevtun.HevTunRuntime
+import android.net.VpnService as BaseVpnService
 
 class VpnService : BaseVpnService(),
     BaseService.Interface {
@@ -41,6 +42,13 @@ class VpnService : BaseVpnService(),
     override suspend fun startProcesses() {
         DataStore.vpnService = this
         super.startProcesses() // launch proxy instance
+
+        // Hev path: App owns the system tun fd; sing-box has no tun-in and
+        // traffic is forwarded into mixed via hev-socks5-tunnel.
+        if (DataStore.enableHevTun) {
+            val tunFd = establishTun()
+            HevTunRuntime.start(this, tunFd)
+        }
     }
 
     override var wakeLock: PowerManager.WakeLock? = null
@@ -53,6 +61,7 @@ class VpnService : BaseVpnService(),
 
     @Suppress("EXPERIMENTAL_API_USAGE")
     override fun killProcesses() {
+        HevTunRuntime.stop()
         RootLanSharing.stopClientSharing(this)
         conn?.close()
         conn = null
@@ -93,7 +102,10 @@ class VpnService : BaseVpnService(),
 //        Logs.d(tunPlatformOptionsJson)
 //        val tunOptions = JSONObject(tunOptionsJson)
 
-        // address & route & MTU ...... use NB4A GUI config
+        return establishTun()
+    }
+
+    fun establishTun(): Int {
         val builder = Builder().setConfigureIntent(SagerNet.configureIntent(this))
             .setSession(getString(R.string.app_name))
             .setMtu(DataStore.mtu)

@@ -63,6 +63,10 @@
     <string name="lan_sharing_summary">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
     <string name="lan_sharing_requires_root">Root access is required but not available</string>
     <string name="port_proxy">Proxy Port</string>
+    <string name="port_out_of_range">Port should be in range 1–65535</string>
+    <string name="local_proxy_settings">Local Proxy Settings</string>
+    <string name="proxy_username">Proxy Username</string>
+    <string name="proxy_password">Proxy Password</string>
     <string name="port_http">HTTP Proxy Port</string>
     <string name="port_transproxy">Transproxy Port</string>
     <string name="cag_route">Route Settings</string>
@@ -506,6 +510,8 @@
     <string name="warp_generate">Generate Configuration</string>
     <string name="generating">Generating…</string>
     <string name="tun_implementation">TUN Implementation</string>
+    <string name="enable_hev_tun">Enable Hev TUN</string>
+    <string name="enable_hev_tun_summary">Use hev-socks5-tunnel to create the TUN device</string>
     <string name="destination_override">Override Destination</string>
     <string name="destination_override_summary">Use the sniffed domain to overwrite the destination
         address, not just for routing</string>

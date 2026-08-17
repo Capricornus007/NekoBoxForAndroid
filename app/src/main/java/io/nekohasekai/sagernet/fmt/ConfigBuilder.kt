@@ -195,6 +195,8 @@ fun buildConfig(
     val nonCustomFinalHosts = hashSetOf<String>()
     val groupCache = HashMap<Long, ProxyGroup?>()
     val isVPN = DataStore.serviceMode == Key.MODE_VPN
+    // Hev TUN owns the system tun fd; sing-box must not also create tun-in.
+    val deviceInboundTag = if (isVPN && DataStore.enableHevTun) TAG_MIXED else "tun-in"
     val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST
     val remoteDns = DataStore.remoteDns.split("\n")
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
@@ -271,7 +273,7 @@ fun buildConfig(
         inbounds = mutableListOf()
 
         if (!forTest) {
-            if (isVPN) inbounds.add(Inbound_TunOptions().apply {
+            if (isVPN && !DataStore.enableHevTun) inbounds.add(Inbound_TunOptions().apply {
                 type = "tun"
                 tag = "tun-in"
                 interface_name = "tun0"
@@ -310,9 +312,9 @@ fun buildConfig(
                 domain_strategy = genDomainStrategy(DataStore.resolveDestination)
                 sniff = needSniff
                 sniff_override_destination = needSniffOverride
-                if (DataStore.mixedInboundNeedsAuth) {
+                if (DataStore.mixedInboundHasAuth) {
                     users = listOf(User().also { u ->
-                        u.username = Key.MIXED_USERNAME
+                        u.username = DataStore.mixedUsername
                         u.password = DataStore.mixedSecret
                     })
                 }
@@ -699,7 +701,7 @@ fun buildConfig(
             }
 
             route.rules.add(Rule_DefaultOptions().apply {
-                inbound = listOf("tun-in")
+                inbound = listOf(deviceInboundTag)
                 outbound = mainProxyTag
             })
 
@@ -841,7 +843,7 @@ fun buildConfig(
                             if (shouldAddDnsRule) {
                                 if (useFakeDns) userDNSRuleList += makeDnsRuleObj().apply {
                                     server = "dns-fake"
-                                    inbound = listOf("tun-in")
+                                    inbound = listOf(deviceInboundTag)
                                     query_type = listOf("A", "AAAA")
                                 } else {
                                     userDNSRuleList += makeDnsRuleObj().apply {
@@ -858,7 +860,7 @@ fun buildConfig(
                                             userDNSRuleList += DNSRule_DefaultOptions().apply {
                                                 rule_set = mutableListOf(tag)
                                                 server = "dns-fake"
-                                                inbound = listOf("tun-in")
+                                                inbound = listOf(deviceInboundTag)
                                                 query_type = listOf("A", "AAAA")
                                             }
                                         } else {
@@ -1066,7 +1068,7 @@ fun buildConfig(
                     strategy = "ipv4_only"
                 })
                 dns.rules.add(DNSRule_DefaultOptions().apply {
-                    inbound = listOf("tun-in")
+                    inbound = listOf(deviceInboundTag)
                     server = "dns-fake"
                     disable_cache = true
                     query_type = listOf("A", "AAAA")

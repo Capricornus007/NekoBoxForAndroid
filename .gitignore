@@ -18,3 +18,5 @@ jniLibs/
 
 # submodules
 /external
+
+.hev-build/

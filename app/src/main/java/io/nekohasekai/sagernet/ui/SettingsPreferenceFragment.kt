@@ -21,6 +21,8 @@ import moe.matsuri.nb4a.ui.*
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
+import com.google.android.material.textfield.TextInputEditText
 import java.io.File
 
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
@@ -84,9 +86,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             AppLocale.apply(newValue as String)
             true
         }
-        val mixedPort = findPreference<EditTextPreference>(Key.MIXED_PORT)!!
+        val localProxySettings = findPreference<Preference>("localProxySettings")!!
         val serviceMode = findPreference<Preference>(Key.SERVICE_MODE)!!
-        val allowAccess = findPreference<Preference>(Key.ALLOW_ACCESS)!!
         val appendHttpProxy = findPreference<SwitchPreference>(Key.APPEND_HTTP_PROXY)!!
         val httpProxyBypass = findPreference<EditTextPreference>(Key.HTTP_PROXY_BYPASS)!!
         val dnsHosts = findPreference<EditTextPreference>(Key.DNS_HOSTS)!!
@@ -138,7 +139,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
-        mixedPort.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
         httpProxyBypass.setOnBindEditTextListener(EditTextPreferenceModifiers.Hosts)
         dnsHosts.setOnBindEditTextListener(EditTextPreferenceModifiers.Hosts)
         httpProxyBypass.summaryProvider = ListSummaryProvider(maxLines = 1)
@@ -171,6 +171,13 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
 
         val tunImplementation = findPreference<SimpleMenuPreference>(Key.TUN_IMPLEMENTATION)!!
+        val enableHevTun = findPreference<SwitchPreference>(Key.ENABLE_HEV_TUN)!!
+        tunImplementation.isEnabled = !DataStore.enableHevTun
+        enableHevTun.setOnPreferenceChangeListener { _, newValue ->
+            tunImplementation.isEnabled = !(newValue as Boolean)
+            needReload()
+            true
+        }
         val resolveDestination = findPreference<SwitchPreference>(Key.RESOLVE_DESTINATION)!!
         val acquireWakeLock = findPreference<SwitchPreference>(Key.ACQUIRE_WAKE_LOCK)!!
         val hideFromRecentApps = findPreference<SwitchPreference>(Key.HIDE_FROM_RECENT_APPS)!!
@@ -193,7 +200,11 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
-        mixedPort.onPreferenceChangeListener = reloadListener
+        localProxySettings.summary = localProxySummary()
+        localProxySettings.setOnPreferenceClickListener {
+            showLocalProxySettingsDialog(localProxySettings)
+            true
+        }
         appendHttpProxy.setOnPreferenceChangeListener { _, newValue ->
             if (newValue as Boolean) {
                 MaterialAlertDialogBuilder(requireContext()).apply {
@@ -229,7 +240,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         enableDnsRouting.onPreferenceChangeListener = reloadListener
 
         ipv6Mode.onPreferenceChangeListener = reloadListener
-        allowAccess.onPreferenceChangeListener = reloadListener
 
         resolveDestination.onPreferenceChangeListener = reloadListener
         tunImplementation.onPreferenceChangeListener = reloadListener
@@ -281,6 +291,47 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         if (::globalCustomConfig.isInitialized) {
             globalCustomConfig.notifyChanged()
         }
+    }
+
+    private fun localProxySummary(): String {
+        val host = if (DataStore.allowAccess) "0.0.0.0" else "127.0.0.1"
+        return "$host:${DataStore.mixedPort}"
+    }
+
+    private fun showLocalProxySettingsDialog(preference: Preference) {
+        val view = layoutInflater.inflate(R.layout.layout_local_proxy_dialog, null)
+        val portField = view.findViewById<TextInputEditText>(R.id.proxyPort)
+        val allowAccessSwitch = view.findViewById<SwitchCompat>(R.id.allowAccessSwitch)
+        val usernameField = view.findViewById<TextInputEditText>(R.id.proxyUsername)
+        val passwordField = view.findViewById<TextInputEditText>(R.id.proxyPassword)
+
+        portField.setText(DataStore.mixedPort.toString())
+        allowAccessSwitch.isChecked = DataStore.allowAccess
+        usernameField.setText(DataStore.mixedUsername)
+        passwordField.setText(DataStore.mixedSecret)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.local_proxy_settings)
+            .setView(view)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val port = portField.text.toString().toIntOrNull()
+                if (port == null || port !in 1..65535) {
+                    Toast.makeText(
+                        requireContext(), R.string.port_out_of_range, Toast.LENGTH_SHORT
+                    ).show()
+                    return@setPositiveButton
+                }
+                DataStore.mixedPort = port
+                DataStore.allowAccess = allowAccessSwitch.isChecked
+                DataStore.mixedUsername = usernameField.text.toString().trim()
+                DataStore.configurationStore.putString(
+                    Key.MIXED_SECRET, passwordField.text.toString()
+                )
+                preference.summary = localProxySummary()
+                needReload()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun clearAppCache() {

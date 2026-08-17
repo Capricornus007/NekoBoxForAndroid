@@ -86,3 +86,19 @@ dependencies {
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 }
+
+val buildHevTun by tasks.registering {
+    val hevAbis = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+    doLast {
+        val missing = hevAbis.any { !file("src/main/jniLibs/$it/libhev-socks5-tunnel.so").exists() }
+        if (missing || System.getenv("FORCE_HEV") == "1") {
+            exec {
+                commandLine("bash", rootProject.file("buildScript/compile-hevtun.sh").absolutePath)
+            }
+        }
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn(buildHevTun)
+}

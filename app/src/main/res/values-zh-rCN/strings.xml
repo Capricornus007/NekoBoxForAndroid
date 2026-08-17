@@ -44,6 +44,10 @@
     <string name="lan_sharing_summary">允许通过 Wi-Fi 热点和 USB 共享网络连接的设备走 VPN 代理流量</string>
     <string name="lan_sharing_requires_root">需要 Root 权限但不可用</string>
     <string name="port_proxy">代理端口</string>
+    <string name="port_out_of_range">端口范围应为 1–65535</string>
+    <string name="local_proxy_settings">本地代理设置</string>
+    <string name="proxy_username">代理用户名</string>
+    <string name="proxy_password">代理密码</string>
     <string name="port_http">HTTP 代理端口</string>
     <string name="port_local_dns">本地 DNS 端口</string>
     <string name="allow_access">允许来自局域网的连接</string>
@@ -431,6 +435,8 @@
     <string name="destination_override_summary">使用探测的域来覆盖目标地址, 而不是仅用于路由</string>
     <string name="destination_override">覆盖目标地址</string>
     <string name="tun_implementation">TUN 实现</string>
+    <string name="enable_hev_tun">启用 Hev TUN</string>
+    <string name="enable_hev_tun_summary">使用 hev-socks5-tunnel 创建 TUN 设备</string>
     <string name="generating">正在生成…</string>
     <string name="warp_generate">生成配置</string>
     <string name="warp_license">CloudFlare Warp 是一个免费的 WireGuard VPN 提供源. 使用它, 代表您同意其服务条款。</string>
