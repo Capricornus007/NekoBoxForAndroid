@@ -4,6 +4,43 @@ import org.json.JSONObject
 
 object XhttpExtraConverter {
 
+    // Xray SplitHTTPConfig (camelCase) <-> sing-box V2RayXHTTPBaseOptions (snake_case)
+    private val FIELD_MAPPINGS = arrayOf(
+        "headers" to "headers",
+        "xPaddingBytes" to "x_padding_bytes",
+        "noGRPCHeader" to "no_grpc_header",
+        "noSSEHeader" to "no_sse_header",
+        "scMaxEachPostBytes" to "sc_max_each_post_bytes",
+        "scMinPostsIntervalMs" to "sc_min_posts_interval_ms",
+        "scMaxBufferedPosts" to "sc_max_buffered_posts",
+        "scStreamUpServerSecs" to "sc_stream_up_server_secs",
+        "serverMaxHeaderBytes" to "server_max_header_bytes",
+        "xPaddingObfsMode" to "x_padding_obfs_mode",
+        "xPaddingKey" to "x_padding_key",
+        "xPaddingHeader" to "x_padding_header",
+        "xPaddingPlacement" to "x_padding_placement",
+        "xPaddingMethod" to "x_padding_method",
+        "uplinkHTTPMethod" to "uplink_http_method",
+        "sessionIDPlacement" to "session_placement",
+        "sessionIDKey" to "session_key",
+        "sessionIDTable" to "session_id_table",
+        "sessionIDLength" to "session_id_length",
+        "seqPlacement" to "seq_placement",
+        "seqKey" to "seq_key",
+        "uplinkDataPlacement" to "uplink_data_placement",
+        "uplinkDataKey" to "uplink_data_key",
+        "uplinkChunkSize" to "uplink_chunk_size",
+    )
+
+    private val XMUX_MAPPINGS = arrayOf(
+        "maxConcurrency" to "max_concurrency",
+        "maxConnections" to "max_connections",
+        "cMaxReuseTimes" to "c_max_reuse_times",
+        "hMaxRequestTimes" to "h_max_request_times",
+        "hMaxReusableSecs" to "h_max_reusable_secs",
+        "hKeepAlivePeriod" to "h_keep_alive_period",
+    )
+
     fun xrayToSingBox(xrayExtra: String): String {
         if (xrayExtra.isBlank()) return ""
         return try {
@@ -11,35 +48,9 @@ object XhttpExtraConverter {
             if (isSingBoxFormat(xray)) return xrayExtra
             val singBox = JSONObject()
 
-            convertField(xray, singBox, "xPaddingBytes", "x_padding_bytes")
-            convertField(xray, singBox, "scMaxEachPostBytes", "sc_max_each_post_bytes")
-            convertField(xray, singBox, "scMinPostsIntervalMs", "sc_min_posts_interval_ms")
-            convertField(xray, singBox, "noGRPCHeader", "no_grpc_header")
-            convertField(xray, singBox, "headers", "headers")
-            convertField(xray, singBox, "xPaddingObfsMode", "x_padding_obfs_mode")
-            convertField(xray, singBox, "xPaddingKey", "x_padding_key")
-            convertField(xray, singBox, "xPaddingHeader", "x_padding_header")
-            convertField(xray, singBox, "xPaddingPlacement", "x_padding_placement")
-            convertField(xray, singBox, "xPaddingMethod", "x_padding_method")
-            convertField(xray, singBox, "uplinkHttpMethod", "uplink_http_method")
-            convertField(xray, singBox, "sessionIdPosition", "session_placement")
-            convertField(xray, singBox, "sessionIdName", "session_key")
-            convertField(xray, singBox, "seqPosition", "seq_placement")
-            convertField(xray, singBox, "seqName", "seq_key")
-            convertField(xray, singBox, "dataUpPlacement", "uplink_data_placement")
-            convertField(xray, singBox, "dataUpName", "uplink_data_key")
-            convertField(xray, singBox, "dataUpSplitSize", "uplink_chunk_size")
-
+            convertFields(xray, singBox, FIELD_MAPPINGS)
             if (xray.has("xmux")) {
-                val xrayXmux = xray.getJSONObject("xmux")
-                val singBoxXmux = JSONObject()
-                convertField(xrayXmux, singBoxXmux, "maxConcurrency", "max_concurrency")
-                convertField(xrayXmux, singBoxXmux, "maxConnections", "max_connections")
-                convertField(xrayXmux, singBoxXmux, "cMaxReuseTimes", "c_max_reuse_times")
-                convertField(xrayXmux, singBoxXmux, "hMaxRequestTimes", "h_max_request_times")
-                convertField(xrayXmux, singBoxXmux, "hMaxReusableSecs", "h_max_reusable_secs")
-                convertField(xrayXmux, singBoxXmux, "hKeepAlivePeriod", "h_keep_alive_period")
-                if (singBoxXmux.length() > 0) singBox.put("xmux", singBoxXmux)
+                convertXmux(xray, singBox)
             }
 
             if (xray.has("downloadSettings")) {
@@ -50,6 +61,18 @@ object XhttpExtraConverter {
                     convertField(xhttpSettings, singBoxDown, "mode", "mode")
                     convertField(xhttpSettings, singBoxDown, "host", "host")
                     convertField(xhttpSettings, singBoxDown, "path", "path")
+                    convertFields(xhttpSettings, singBoxDown, FIELD_MAPPINGS)
+                    if (xhttpSettings.has("xmux")) {
+                        convertXmux(xhttpSettings, singBoxDown)
+                    }
+                    // Xray: if "extra" is present it overrides the whole settings
+                    // object (except host/path/mode), so let it win on conflicts
+                    xhttpSettings.optJSONObject("extra")?.let { extra ->
+                        convertFields(extra, singBoxDown, FIELD_MAPPINGS)
+                        if (extra.has("xmux")) {
+                            convertXmux(extra, singBoxDown)
+                        }
+                    }
                 }
                 convertField(xrayDown, singBoxDown, "address", "server")
                 convertField(xrayDown, singBoxDown, "port", "server_port")
@@ -98,38 +121,6 @@ object XhttpExtraConverter {
                     singBoxDown.put("tls", tls)
                 }
 
-                xrayDown.optJSONObject("xhttpSettings")?.optJSONObject("extra")?.let { extra ->
-                    if (extra.has("xmux")) {
-                        val xrayXmux = extra.getJSONObject("xmux")
-                        val downXmux = JSONObject()
-                        convertField(xrayXmux, downXmux, "maxConcurrency", "max_concurrency")
-                        convertField(xrayXmux, downXmux, "maxConnections", "max_connections")
-                        convertField(xrayXmux, downXmux, "cMaxReuseTimes", "c_max_reuse_times")
-                        convertField(xrayXmux, downXmux, "hMaxRequestTimes", "h_max_request_times")
-                        convertField(xrayXmux, downXmux, "hMaxReusableSecs", "h_max_reusable_secs")
-                        convertField(xrayXmux, downXmux, "hKeepAlivePeriod", "h_keep_alive_period")
-                        if (downXmux.length() > 0) singBoxDown.put("xmux", downXmux)
-                    }
-
-                    convertField(extra, singBoxDown, "xPaddingBytes", "x_padding_bytes")
-                    convertField(extra, singBoxDown, "scMaxEachPostBytes", "sc_max_each_post_bytes")
-                    convertField(extra, singBoxDown, "scMinPostsIntervalMs", "sc_min_posts_interval_ms")
-                    convertField(extra, singBoxDown, "noGRPCHeader", "no_grpc_header")
-                    convertField(extra, singBoxDown, "xPaddingObfsMode", "x_padding_obfs_mode")
-                    convertField(extra, singBoxDown, "xPaddingKey", "x_padding_key")
-                    convertField(extra, singBoxDown, "xPaddingHeader", "x_padding_header")
-                    convertField(extra, singBoxDown, "xPaddingPlacement", "x_padding_placement")
-                    convertField(extra, singBoxDown, "xPaddingMethod", "x_padding_method")
-                    convertField(extra, singBoxDown, "uplinkHttpMethod", "uplink_http_method")
-                    convertField(extra, singBoxDown, "sessionIdPosition", "session_placement")
-                    convertField(extra, singBoxDown, "sessionIdName", "session_key")
-                    convertField(extra, singBoxDown, "seqPosition", "seq_placement")
-                    convertField(extra, singBoxDown, "seqName", "seq_key")
-                    convertField(extra, singBoxDown, "dataUpPlacement", "uplink_data_placement")
-                    convertField(extra, singBoxDown, "dataUpName", "uplink_data_key")
-                    convertField(extra, singBoxDown, "dataUpSplitSize", "uplink_chunk_size")
-                }
-
                 if (singBoxDown.length() > 0) singBox.put("download", singBoxDown)
             }
 
@@ -147,35 +138,9 @@ object XhttpExtraConverter {
             if (isXrayFormat(singBox)) return singBoxExtra
             val xray = JSONObject()
 
-            convertField(singBox, xray, "x_padding_bytes", "xPaddingBytes")
-            convertField(singBox, xray, "sc_max_each_post_bytes", "scMaxEachPostBytes")
-            convertField(singBox, xray, "sc_min_posts_interval_ms", "scMinPostsIntervalMs")
-            convertField(singBox, xray, "no_grpc_header", "noGRPCHeader")
-            convertField(singBox, xray, "headers", "headers")
-            convertField(singBox, xray, "x_padding_obfs_mode", "xPaddingObfsMode")
-            convertField(singBox, xray, "x_padding_key", "xPaddingKey")
-            convertField(singBox, xray, "x_padding_header", "xPaddingHeader")
-            convertField(singBox, xray, "x_padding_placement", "xPaddingPlacement")
-            convertField(singBox, xray, "x_padding_method", "xPaddingMethod")
-            convertField(singBox, xray, "uplink_http_method", "uplinkHttpMethod")
-            convertField(singBox, xray, "session_placement", "sessionIdPosition")
-            convertField(singBox, xray, "session_key", "sessionIdName")
-            convertField(singBox, xray, "seq_placement", "seqPosition")
-            convertField(singBox, xray, "seq_key", "seqName")
-            convertField(singBox, xray, "uplink_data_placement", "dataUpPlacement")
-            convertField(singBox, xray, "uplink_data_key", "dataUpName")
-            convertField(singBox, xray, "uplink_chunk_size", "dataUpSplitSize")
-
+            convertFieldsReverse(singBox, xray, FIELD_MAPPINGS)
             if (singBox.has("xmux")) {
-                val singBoxXmux = singBox.getJSONObject("xmux")
-                val xrayXmux = JSONObject()
-                convertField(singBoxXmux, xrayXmux, "max_concurrency", "maxConcurrency")
-                convertField(singBoxXmux, xrayXmux, "max_connections", "maxConnections")
-                convertField(singBoxXmux, xrayXmux, "c_max_reuse_times", "cMaxReuseTimes")
-                convertField(singBoxXmux, xrayXmux, "h_max_request_times", "hMaxRequestTimes")
-                convertField(singBoxXmux, xrayXmux, "h_max_reusable_secs", "hMaxReusableSecs")
-                convertField(singBoxXmux, xrayXmux, "h_keep_alive_period", "hKeepAlivePeriod")
-                if (xrayXmux.length() > 0) xray.put("xmux", xrayXmux)
+                convertXmuxReverse(singBox, xray)
             }
 
             if (singBox.has("download")) {
@@ -215,43 +180,16 @@ object XhttpExtraConverter {
                     }
                 }
 
+                // fields go to xhttpSettings top level: in Xray, "extra" replaces the
+                // whole settings object, so wrapping there would drop the rest
                 val xhttpSettings = JSONObject()
                 convertField(singBoxDown, xhttpSettings, "mode", "mode")
                 convertField(singBoxDown, xhttpSettings, "host", "host")
                 convertField(singBoxDown, xhttpSettings, "path", "path")
-
-                val xhttpExtra = JSONObject()
-                convertField(singBoxDown, xhttpExtra, "x_padding_bytes", "xPaddingBytes")
-                convertField(singBoxDown, xhttpExtra, "sc_max_each_post_bytes", "scMaxEachPostBytes")
-                convertField(singBoxDown, xhttpExtra, "sc_min_posts_interval_ms", "scMinPostsIntervalMs")
-                convertField(singBoxDown, xhttpExtra, "no_grpc_header", "noGRPCHeader")
-                convertField(singBoxDown, xhttpExtra, "x_padding_obfs_mode", "xPaddingObfsMode")
-                convertField(singBoxDown, xhttpExtra, "x_padding_key", "xPaddingKey")
-                convertField(singBoxDown, xhttpExtra, "x_padding_header", "xPaddingHeader")
-                convertField(singBoxDown, xhttpExtra, "x_padding_placement", "xPaddingPlacement")
-                convertField(singBoxDown, xhttpExtra, "x_padding_method", "xPaddingMethod")
-                convertField(singBoxDown, xhttpExtra, "uplink_http_method", "uplinkHttpMethod")
-                convertField(singBoxDown, xhttpExtra, "session_placement", "sessionIdPosition")
-                convertField(singBoxDown, xhttpExtra, "session_key", "sessionIdName")
-                convertField(singBoxDown, xhttpExtra, "seq_placement", "seqPosition")
-                convertField(singBoxDown, xhttpExtra, "seq_key", "seqName")
-                convertField(singBoxDown, xhttpExtra, "uplink_data_placement", "dataUpPlacement")
-                convertField(singBoxDown, xhttpExtra, "uplink_data_key", "dataUpName")
-                convertField(singBoxDown, xhttpExtra, "uplink_chunk_size", "dataUpSplitSize")
-
+                convertFieldsReverse(singBoxDown, xhttpSettings, FIELD_MAPPINGS)
                 if (singBoxDown.has("xmux")) {
-                    val singBoxDownXmux = singBoxDown.getJSONObject("xmux")
-                    val xrayDownXmux = JSONObject()
-                    convertField(singBoxDownXmux, xrayDownXmux, "max_concurrency", "maxConcurrency")
-                    convertField(singBoxDownXmux, xrayDownXmux, "max_connections", "maxConnections")
-                    convertField(singBoxDownXmux, xrayDownXmux, "c_max_reuse_times", "cMaxReuseTimes")
-                    convertField(singBoxDownXmux, xrayDownXmux, "h_max_request_times", "hMaxRequestTimes")
-                    convertField(singBoxDownXmux, xrayDownXmux, "h_max_reusable_secs", "hMaxReusableSecs")
-                    convertField(singBoxDownXmux, xrayDownXmux, "h_keep_alive_period", "hKeepAlivePeriod")
-                    if (xrayDownXmux.length() > 0) xhttpExtra.put("xmux", xrayDownXmux)
+                    convertXmuxReverse(singBoxDown, xhttpSettings)
                 }
-
-                if (xhttpExtra.length() > 0) xhttpSettings.put("extra", xhttpExtra)
                 xrayDown.put("xhttpSettings", xhttpSettings)
 
                 if (xrayDown.length() > 0) xray.put("downloadSettings", xrayDown)
@@ -267,12 +205,14 @@ object XhttpExtraConverter {
     private fun isSingBoxFormat(json: JSONObject): Boolean {
         return json.has("x_padding_bytes") || json.has("sc_max_each_post_bytes") ||
                json.has("sc_min_posts_interval_ms") || json.has("sc_stream_up_server_secs") ||
+               json.has("session_id_table") || json.has("session_id_length") ||
                json.has("download")
     }
 
     private fun isXrayFormat(json: JSONObject): Boolean {
         return json.has("xPaddingBytes") || json.has("scMaxEachPostBytes") ||
                json.has("scMinPostsIntervalMs") || json.has("scStreamUpServerSecs") ||
+               json.has("sessionIDTable") || json.has("sessionIDLength") ||
                json.has("downloadSettings")
     }
 
@@ -280,5 +220,31 @@ object XhttpExtraConverter {
         if (from.has(fromKey)) {
             to.put(toKey, from.get(fromKey))
         }
+    }
+
+    private fun convertFields(from: JSONObject, to: JSONObject, mappings: Array<Pair<String, String>>) {
+        for ((fromKey, toKey) in mappings) {
+            convertField(from, to, fromKey, toKey)
+        }
+    }
+
+    private fun convertFieldsReverse(from: JSONObject, to: JSONObject, mappings: Array<Pair<String, String>>) {
+        for ((fromKey, toKey) in mappings) {
+            convertField(from, to, toKey, fromKey)
+        }
+    }
+
+    private fun convertXmux(from: JSONObject, to: JSONObject) {
+        val xrayXmux = from.getJSONObject("xmux")
+        val singBoxXmux = JSONObject()
+        convertFields(xrayXmux, singBoxXmux, XMUX_MAPPINGS)
+        if (singBoxXmux.length() > 0) to.put("xmux", singBoxXmux)
+    }
+
+    private fun convertXmuxReverse(from: JSONObject, to: JSONObject) {
+        val singBoxXmux = from.getJSONObject("xmux")
+        val xrayXmux = JSONObject()
+        convertFieldsReverse(singBoxXmux, xrayXmux, XMUX_MAPPINGS)
+        if (xrayXmux.length() > 0) to.put("xmux", xrayXmux)
     }
 }
