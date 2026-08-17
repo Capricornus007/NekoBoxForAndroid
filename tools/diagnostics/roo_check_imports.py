@@ -4,14 +4,14 @@
 2. sing-box 子包路径检查：github.com/sagernet/sing-box/xxx 必须在官方源码树中存在对应目录
 3. libcore 内部包路径检查
 
-用法（在仓库根目录执行）：uv run .roo/roo_check_imports.py [sing-box源码目录]
+用法（在仓库根目录执行）：uv run tools/diagnostics/roo_check_imports.py [sing-box源码目录]
 """
 
 import re
 import sys
 from pathlib import Path
 
-REPO = Path(__file__).parent.parent
+REPO = Path(__file__).resolve().parents[2]
 LIBCORE = REPO / "libcore"
 SING_BOX = Path(sys.argv[1]) if len(sys.argv) > 1 else REPO.parent / "sing-box"
 

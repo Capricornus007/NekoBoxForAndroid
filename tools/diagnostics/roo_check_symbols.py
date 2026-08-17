@@ -1,13 +1,13 @@
 """符号级校验：libcore 用到的关键 sing-box 官方符号必须存在于官方源码树。
 
-用法（在仓库根目录执行）：uv run .roo/roo_check_symbols.py [sing-box源码目录]
+用法（在仓库根目录执行）：uv run tools/diagnostics/roo_check_symbols.py [sing-box源码目录]
 """
 
 import re
 import sys
 from pathlib import Path
 
-REPO = Path(__file__).parent.parent
+REPO = Path(__file__).resolve().parents[2]
 SING_BOX = Path(sys.argv[1]) if len(sys.argv) > 1 else REPO.parent / "sing-box"
 
 # (相对路径 glob, 必须匹配的正则, 说明)

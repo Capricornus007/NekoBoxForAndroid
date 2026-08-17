@@ -129,7 +129,7 @@
 ## 4. 实际样本验证
 
 用 Python 按上述布局解析用户真实备份文件
-（解析脚本：[`.roo/roo_parse_thrbackup.py`](.roo/roo_parse_thrbackup.py)，`uv run .roo/roo_parse_thrbackup.py <文件>`）：
+（解析脚本：[`tools/diagnostics/roo_parse_thrbackup.py`](tools/diagnostics/roo_parse_thrbackup.py)，`uv run tools/diagnostics/roo_parse_thrbackup.py <文件>`）：
 
 ```
 file size: 102734 bytes
@@ -197,7 +197,7 @@ settings rows: 151   profiles rows: 92   groups rows: 2   route_profiles rows: 1
 ## 7. 复现 / 互操作参考
 
 用 Python 完整解析 `.thrbackup` 的最小实现见本目录
-[`.roo/roo_parse_thrbackup.py`](.roo/roo_parse_thrbackup.py)（约 60 行，无第三方依赖；在仓库根目录通过 `uv run .roo/roo_parse_thrbackup.py` 执行）。
+[`tools/diagnostics/roo_parse_thrbackup.py`](tools/diagnostics/roo_parse_thrbackup.py)（约 60 行，无第三方依赖；在仓库根目录通过 `uv run tools/diagnostics/roo_parse_thrbackup.py` 执行）。
 若要**程序化生成**兼容备份，反向按第 1 节布局写入即可：
 `"THRN"` + `<I 2` + QString(meta_json) + QMap{"database": <SQLite 文件字节>}`，
 其中内嵌 SQLite 至少需含 `entity_ids / profiles / groups / groups_order / route_profiles / route_rules / settings` 七张表（未备份的类别建空表即可）。

@@ -1,13 +1,13 @@
 """扫码界面静态校验：XML 可解析，悬浮按钮和 Kotlin 接线保持一致。
 
-用法（在仓库根目录执行）：uv run .roo/roo_check_scanner_ui.py
+用法（在仓库根目录执行）：uv run tools/diagnostics/roo_check_scanner_ui.py
 """
 
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-REPO = Path(__file__).parent.parent
+REPO = Path(__file__).resolve().parents[2]
 LAYOUT = REPO / "app/src/main/res/layout/layout_scanner.xml"
 BACKGROUND = REPO / "app/src/main/res/drawable/scanner_action_background.xml"
 ACTIVITY = REPO / "app/src/main/java/io/nekohasekai/sagernet/ui/ScannerActivity.kt"

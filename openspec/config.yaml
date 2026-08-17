@@ -1,32 +1,31 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  ThroneForAndroid (nb4a) 是基于 SagerNet 的 Android 代理客户端。
+  Android 端使用 Kotlin/Java 与传统 View/Fragment；libcore 使用 Go、sing-box 官方内核和 gomobile 生成 AAR。
+  sing-box 版本以 nb4a.properties 的 SINGBOX_VERSION 为唯一真实来源。
+  本地不安装 Go、不克隆 sing-box，也不执行 Android/Go 编译；构建与真机验证交给 GitHub Actions。
+  外部依赖/API 调研应联网查阅官方源码和文档，不假设存在本地依赖仓库。
+  仓库当前能力规范位于 openspec/specs/；历史大型迁移记录位于 openspec/history/。
+  仓库维护用 Python 工具只允许放在 tools/diagnostics/，不得放入 .roo/、openspec/ 或仓库根目录。
+  Python 脚本必须先写成文件，再从仓库根目录使用 uv run <脚本路径> 执行；禁止 python/python3 直接执行以及 python -c。
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - 明确指出受影响的 openspec/specs 能力规范以及是否涉及 libcore、Android、构建链或开发工具布局。
+    - 涉及外部 API 时记录官方来源与目标版本，不依赖未纳入仓库的本地源码。
+  specs:
+    - 使用 RFC 2119 风格的 MUST/SHALL 表达可验证要求。
+    - 每条 requirement 至少包含一个 GIVEN/WHEN/THEN 场景。
+  tasks:
+    - 将规范同步、静态校验和 CI/真机验证显式列为适用任务。
 
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+operations:
+  apply:
+    guidance:
+      - 保持小步、自洽改动；本地仅运行不依赖 Go/Android SDK 的静态校验。
+      - 若改变架构、关键模块、协议、配置、构建流程或维护工具布局，同步更新对应主规范。
+      - Python 辅助程序放入 tools/diagnostics/，通过 uv run 执行；不得向 .roo/ 或 openspec/ 写入运行脚本。
+  archive:
+    guidance:
+      - 归档前确认 delta spec 已准确合入主规范，并区分自动校验结果与待 CI/真机验证事项。
