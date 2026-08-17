@@ -3,24 +3,21 @@ set -e
 
 source "buildScript/init/env.sh"
 ENV_NB4A=1
+
+# Apply upstream.conf (symlink + pin) then ensure libneko.
+bash buildScript/lib/core/switch_upstream.sh
+
 source "buildScript/lib/core/get_source_env.sh"
-pushd ..
-
-####
-
-if [ ! -d "sing-box" ]; then
-  git clone --no-checkout https://github.com/starifly/sing-box.git
-fi
-pushd sing-box
-git checkout "$COMMIT_SING_BOX"
-popd
+pushd "$NEKOBOX_ROOT"
 
 ####
 
 if [ ! -d "libneko" ]; then
-  git clone --no-checkout https://github.com/starifly/libneko.git
+  git clone --no-checkout "$LIBNEKO_REPO" libneko
 fi
 pushd libneko
+git remote get-url origin >/dev/null 2>&1 || git remote add origin "$LIBNEKO_REPO"
+git fetch --tags --force origin 2>/dev/null || git fetch --tags --force
 git checkout "$COMMIT_LIBNEKO"
 popd
 
