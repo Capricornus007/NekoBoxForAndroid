@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_desc">Android용 범용 프록시 툴체인, Kotlin으로 작성됨.</string>
     <string name="project">프로젝트</string>
@@ -19,13 +19,14 @@
     <string name="quick_toggle">전환</string>
     <string name="quick_enable">활성화</string>
     <string name="quick_disable">비활성화</string>
+    <string name="quick_clear_cache_restart">Restart After Clear</string>
     <string name="tile_title">스위처</string>
     <string name="menu_traffic">트래픽</string>
     <string name="menu_dashboard">sing-box 대시보드</string>
-    
+    <!-- externel -->
     <string name="action_copy">복사</string>
     <string name="action_open">열기</string>
-    
+    <!-- group -->
     <string name="group_name">그룹 이름</string>
     <string name="group_update">업데이트</string>
     <string name="group_subscription_link">구독 링크</string>
@@ -42,9 +43,9 @@
     <string name="group_status_empty">빈 그룹</string>
     <string name="group_status_empty_subscription">아직 업데이트되지 않음</string>
     <string name="group_status_proxies">%d 프록시</string>
-    <string name="group_status_proxies_subscription" formatted="false">프록시 %d개 | %s에 업데이트됨</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: 차이 없음</string>
-    <string name="group_updated" formatted="false">%s: 프록시 %d개 업데이트됨</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">차이</string>
     <string name="group_diff">차이 (%s)</string>
     <string name="group_delete_confirm_prompt">이 그룹을 삭제하시겠습니까?</string>
@@ -52,7 +53,7 @@
     <string name="group_changed">업데이트됨: \n%s</string>
     <string name="group_deleted">삭제됨: \n%s</string>
     <string name="group_duplicate">중복: \n%s</string>
-    
+    <!-- misc -->
     <string name="service_mode">서비스 모드</string>
     <string name="service_mode_proxy">프록시만</string>
     <string name="port_proxy">프록시 포트</string>
@@ -83,8 +84,8 @@
     <string name="speed_detail">프록시: %1$s↑ %2$s↓\n직접: %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">테스트 중…</string>
-    <string name="connection_test_available">성공: HTTPS 핸드셰이크 %dms</string>
-    <string name="connection_test_available_http">성공: HTTP 핸드셰이크 %dms</string>
+    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
+    <string name="connection_test_available_http">Success: HTTP handshake took %dms</string>
     <string name="connection_test_error">실패: %s</string>
     <string name="connection_test_fail">인터넷 사용 불가</string>
     <string name="connection_test_error_status_code">오류 코드: #%d</string>
@@ -101,7 +102,10 @@
     <string name="require_transproxy">투명 프록시 인바운드 활성화</string>
     <string name="transproxy_mode">투명 프록시 모드</string>
     <string name="connection_test_url">연결 테스트 URL</string>
-    
+    <string name="auto_switch_timeout">Auto-switch on Timeout</string>
+    <string name="auto_switch_timeout_summary">Automatically switch to next config if no response</string>
+    <string name="auto_switch_timeout_duration">Timeout Duration (seconds)</string>
+    <!-- proxy category -->
     <string name="profile_name">프로필 이름</string>
     <string name="server_address">서버</string>
     <string name="server_port">원격 포트</string>
@@ -139,7 +143,7 @@
     <string name="extra_headers">추가 헤더</string>
     <string name="config_type">구성 유형</string>
     <string name="edit_config">구성 편집</string>
-    
+    <!-- feature category -->
     <string name="ipv6">IPv6 경로</string>
     <string name="prefer">선호</string>
     <string name="only">전용</string>
@@ -199,7 +203,7 @@
     <string name="auto_connect_summary">이전에 실행 중이었으면 시작/앱 업데이트 시 프록시 활성화</string>
     <string name="direct_boot_aware">잠금 화면에서 토글 허용</string>
     <string name="direct_boot_aware_summary">선택한 프로필 정보의 보호 수준이 낮아집니다</string>
-    
+    <!-- notification category -->
     <string name="service_vpn">VPN 서비스</string>
     <string name="service_proxy">프록시 서비스</string>
     <string name="forward_success">프록시가 시작되었습니다.</string>
@@ -210,11 +214,11 @@
     <string name="vpn_error">%s</string>
     <string name="vpn_permission_denied">VPN 서비스를 생성할 권한이 없습니다</string>
     <string name="reboot_required">VPN 서비스를 시작하지 못했습니다. 기기를 다시 시작해야 할 수 있습니다.</string>
-    
+    <!-- alert category -->
     <string name="profile_empty">프로필을 선택해 주세요</string>
     <string name="connect">연결</string>
     <string name="clipboard_empty">클립보드가 비어 있습니다</string>
-    
+    <!-- menu category -->
     <string name="settings">설정</string>
     <string name="edit">편집</string>
     <string name="share">공유</string>
@@ -245,8 +249,8 @@
     <string name="action_import_err">가져오기 실패.</string>
     <string name="file_manager_missing">기기에 Android 표준 파일 선택기가 없습니다.
         Material Files와 같은 앱을 설치해주세요.</string>
-    
-    
+    <!-- share -->
+    <!-- profile -->
     <string name="profile_config">프로필 구성</string>
     <string name="delete">삭제</string>
     <string name="delete_confirm_prompt">이 프로필을 삭제하시겠습니까?</string>
@@ -263,12 +267,12 @@
     <string name="undo">실행 취소</string>
     <string name="insecure">안전하지 않음</string>
     <string name="deprecated">사용 중단됨</string>
-    
-    
+    <!-- tasker -->
+    <!-- status -->
     <string name="connecting">연결 중…</string>
     <string name="vpn_connected">연결됨, 탭하여 연결 확인</string>
     <string name="not_connected">연결되지 않음</string>
-    
+    <!-- subscriptions -->
     <string name="subscriptions">구독</string>
     <string name="cleartext_http_warning">일반 HTTP 트래픽은 안전하지 않습니다</string>
     <string name="error_title">오류</string>
@@ -279,7 +283,7 @@
     <string name="deduplication">중복 제거</string>
     <string name="ignore_battery_optimizations">배터리 최적화 무시</string>
     <string name="ignore_battery_optimizations_sum">일부 제한 제거</string>
-    
+    <!-- plugin -->
     <string name="plugin">플러그인</string>
     <string name="plugin_configure">설정…</string>
     <string name="plugin_disabled">비활성화됨</string>
@@ -323,13 +327,12 @@
     <string name="connection_test_refused">연결 거부됨</string>
     <string name="connection_test_unreachable">도달 불가</string>
     <string name="connection_test_timeout_error">시간 초과</string>
-    <string name="append_http_proxy">VPN에 HTTP 프록시 추가</string>
-    <string name="append_http_proxy_sum">HTTP 프록시는 (브라우저/일부 지원 앱)에서 직접 사용되며, 가상 NIC 장치(Android 10+)를 거치지 않습니다.</string>
+    <string name="mixed_auth_config">Configure authentication</string>
+    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
+    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
+    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="http_proxy_bypass">HTTP 프록시 우회 목록</string>
     <string name="http_proxy_bypass_dialog_message">한 줄에 하나씩. #으로 시작하는 줄은 주석입니다. 예: *zhihu.com</string>
-    <string name="append_http_proxy_security_title">보안 알림</string>
-    <string name="append_http_proxy_security_message">활성화하면 이 기기의 다른 앱이 로컬 프록시 포트를 직접 사용할 수 있습니다.\n\n권장: 설치된 모든 앱을 신뢰하는 경우에만 활성화하세요.</string>
-    <string name="enable_anyway">그래도 활성화</string>
     <string name="strict_route">엄격한 경로</string>
     <string name="protocol_settings">프로토콜 설정</string>
     <string name="trojan_provider">Trojan 제공자</string>
@@ -376,7 +379,7 @@
     <string name="server_dns_subscription_sum">이 구독에서 서버 도메인을 확인하는 데만 사용되는 선택적 DNS입니다. 기본 동작을 사용하려면 비워 둡니다. https://, tls://, quic:// 또는 host[:port] 형식을 허용합니다.</string>
     <string name="server_dns_invalid">잘못된 사용자 지정 서버 DNS입니다. https://, tls://, quic:// 또는 host[:port]를 사용하거나 비워 두세요.</string>
     <string name="subscription_used">%s 사용됨</string>
-    <string name="subscription_traffic" formatted="false">%s 사용됨 / %s 남음</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">만료: %s</string>
     <string name="subscription_import">구독 가져오기</string>
     <string name="subscription_import_message">구독 %s을(를) 가져오시겠습니까? 신뢰할 수 없는 출처에서 오는 경우 이 작업을 수행하면 IP 및 이 동작이 유출될 수 있습니다.</string>
@@ -474,6 +477,12 @@
     <string name="rules_geoip_url">geoip URL</string>
     <string name="tuic_udp_relay_mode">UDP 릴레이 모드</string>
     <string name="tuic_congestion_controller">혼잡 제어기</string>
+    <string name="shadowquic_udp_over_stream">UDP over Stream</string>
+    <string name="shadowquic_zero_rtt">0-RTT Handshake</string>
+    <string name="shadowquic_sunny_quic">Sunny QUIC</string>
+    <string name="trusttunnel_quic">QUIC (HTTP/3)</string>
+    <string name="trusttunnel_health_check">Health Check</string>
+    <string name="trusttunnel_congestion_control">QUIC Congestion Control</string>
     <string name="tuic_disable_sni">SNI 비활성화</string>
     <string name="tuic_reduce_rtt">0-RTT QUIC 핸드셰이크 활성화</string>
     <string name="pinned_certchain_sha256">고정 인증서 SHA256</string>
@@ -511,23 +520,38 @@
     <string name="share_subscription">구독 공유</string>
     <string name="show_group_in_notification">알림에 그룹 이름 표시</string>
     <string name="reset_connections">연결 초기화</string>
-    <string name="reset_connections_done">업스트림 연결 재설정 완료</string>
-    <string name="idle">대기 중</string>
-    <string name="warning_nonexistent_outbound">경고: %1$s: 존재하지 않는 아웃바운드가 지정되었습니다.</string>
-    <string name="imported_profiles">프로파일 %1$d개</string>
-    <string name="please_try_again">나중에 다시 시도해 주세요</string>
-    <string name="conflicting_plugins">다음에서 충돌하는 플러그인을 찾았습니다: %1$s</string>
-    <string name="crash_log_title">NB4A 크래시</string>
-    <string name="rule_default_name">규칙 %1$d</string>
-    <string name="rule_summary_src_ip">소스 IP: %1$s\n</string>
-    <string name="rule_summary_src_port">소스 포트: %1$s\n</string>
-    <string name="rule_summary_dst_port">대상 포트: %1$s\n</string>
-    <string name="rule_summary_network">네트워크: %1$s\n</string>
-    <string name="rule_summary_protocol">프로토콜: %1$s\n</string>
+    <string name="reset_connections_done">Reset upstream connections done</string>
+    <string name="idle">Idle</string>
+    <string name="warning_nonexistent_outbound">Warning: %1$s: A non-existent outbound was specified.</string>
+    <string name="imported_profiles">%1$d profile(s)</string>
+    <string name="please_try_again">Please try again later</string>
+    <string name="conflicting_plugins">Conflicting plugins found from: %1$s</string>
+    <string name="crash_log_title">NB4A Crash</string>
+    <string name="rule_default_name">Rule %1$d</string>
+    <string name="rule_summary_src_ip">src ip: %1$s\n</string>
+    <string name="rule_summary_src_port">src port: %1$s\n</string>
+    <string name="rule_summary_dst_port">dst port: %1$s\n</string>
+    <string name="rule_summary_network">network: %1$s\n</string>
+    <string name="rule_summary_protocol">protocol: %1$s\n</string>
     <string name="version_prefix">v%1$s</string>
-    <string name="subscription_name">구독 #%1$s</string>
-    <string name="my_group">내 그룹</string>
-    <string name="asset_version_unknown">알 수 없음-%1$s</string>
+    <string name="subscription_name">Subscription #%1$s</string>
+    <string name="my_group">My group</string>
+    <string name="asset_version_unknown">Unknown-%1$s</string>
+    <string name="invalid_naive_link">Invalid Naive link: %1$s</string>
+    <string name="invalid_ss_android_link">Invalid ss-android link: %1$s</string>
+    <string name="invalid_jms_link">Invalid JMS link: %1$s</string>
+    <string name="invalid_v2rayn_link">Invalid v2rayN link: %1$s</string>
+    <string name="invalid_snell_url">Invalid Snell URL</string>
+    <string name="not_supported_proxy">Not supported: %1$s</string>
+    <string name="invalid_trojan_link">Invalid Trojan link: %1$s</string>
+    <string name="invalid_http_link">Invalid HTTP(S) link: %1$s</string>
+    <string name="not_http_proxy">Not an HTTP proxy</string>
+    <string name="invalid_hysteria_link">Invalid Hysteria link: %1$s</string>
+    <string name="invalid_masterdns_link">Invalid MasterDNS link: %1$s</string>
+    <string name="masterdns_no_tunnel">MasterDNS link is missing tunnel domain(s)</string>
+    <string name="masterdns_no_key">MasterDNS link is missing the encryption key for method %1$s</string>
+    <string name="webdav_auth_failed">Authentication failed</string>
+    <string name="webdav_check_dir_failed">Failed to check directory (%1$s): %2$s</string>
     <string name="remove_duplicate">중복 서버 제거</string>
     <string name="mtu_help">환경설정을 길게 눌러 사용자 정의 MTU를 설정하세요.</string>
     <string name="log_level_help">환경설정을 길게 눌러 버퍼 크기를 설정하세요.</string>
@@ -543,6 +567,7 @@
     <string name="enable_ech_sum">암호화된 Client Hello 활성화</string>
     <string name="ech_settings">ECH 설정</string>
     <string name="ech_config">ECH 구성</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgrade 호스트</string>
     <string name="http_upgrade_path">HTTPUpgrade 경로</string>
     <string name="update_current_subscription">현재 그룹의 구독 업데이트</string>
@@ -593,19 +618,19 @@
     <string name="clear_cache_confirm">캐시를 지우시겠습니까?</string>
     <string name="clear_cache_success">캐시 지워짐</string>
     <string name="clear_cache_failed">캐시 지우기 실패: %s</string>
-    <string name="dual_network_acceleration">듀얼 네트워크 가속</string>
-    <string name="dual_network_acceleration_summary">Wi-Fi와 모바일 데이터로 동시에 연결합니다. 시스템 설정에서 Wi-Fi와 모바일 데이터를 모두 켜 두어야 하며 배터리 사용량이 증가합니다.</string>
+    <string name="dual_network_acceleration">Dual Network Acceleration</string>
+    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">테스트 시간 초과 (ms)</string>
     <string name="preview_version_hint">이 애플리케이션은 프리뷰 버전이며 많은 문제가 포함될 수 있습니다. 테스트를 원하지 않으시면 GitHub에서 릴리스 버전을 다운로드하세요!</string>
     <string name="preview_hint_dont_show_again">다시 표시하지 않음</string>
     <string name="check_update_preview">프리뷰 버전 업데이트 확인</string>
     <string name="check_update_release">릴리스 버전 업데이트 확인</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">새 버전 사용 가능</string>
-    <string name="update_dialog_message">현재 버전: %1$s\n사용 가능한 버전: %2$s\n다운로드하시겠습니까?</string>
-    <string name="update_downloading">업데이트 다운로드 중…</string>
-    <string name="update_open_page">릴리스 페이지 열기</string>
-    <string name="update_no_apk_for_abi">이 기기(%1$s)에 맞는 APK가 없습니다. 릴리스 페이지를 열까요?</string>
+    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_open_page">Open release page</string>
+    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
     <string name="check_update_no">확인 성공, 업데이트 없음.</string>
     <string name="reset_settings">기본 설정 복원</string>
     <string name="reset_settings_message">기본 설정을 복원하지만 노드 및 그룹과 같은 데이터는 유지됩니다. 데이터를 완전히 지우려면 시스템 설정에서 직접 앱 데이터를 지우십시오.</string>
@@ -619,7 +644,7 @@
     <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
     <string name="app_list_permission_denied">설치된 앱을 읽을 수 없습니다.\n이는 일반적으로 시스템에서 앱 읽기 권한을 제한했기 때문입니다.\n시스템 설정에서 권한을 부여해 주십시오.</string>
     <string name="open_app_settings">시스템 설정 열기</string>
-    
+    <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
     <string name="snell_psk">사전 공유 키</string>
     <string name="snell_userkey">사용자 키</string>
@@ -630,21 +655,6 @@
     <string name="snell_mode">모드</string>
     <string name="snell_reuse">재사용</string>
     <string name="snell_reuse_summary">v4-v6 전용</string>
-    
-    <string name="auto_switch_timeout">시간 초과 시 자동 전환</string>
-    <string name="auto_switch_timeout_summary">응답이 없으면 다음 구성으로 자동 전환</string>
-    <string name="auto_switch_timeout_duration">시간 초과(초)</string>
-    <string name="vpn_watchdog">자동 재연결</string>
-    <string name="vpn_watchdog_summary">연결 끊김 시 VPN 자동 재시작</string>
-    <string name="vpn_watchdog_test">🧪 워치독 테스트</string>
-    <string name="vpn_watchdog_test_summary">워치독 테스트를 위해 VPN 강제 재시작</string>
-    <string name="vpn_watchdog_interval">확인 간격(초)</string>
-    <string name="quick_clear_cache_restart">Restart After Clear</string>
-    <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
-    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
-    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
     <string name="action_close">Close</string>
     <string name="action_masterdnsvpn">MasterDNS VPN</string>
@@ -684,6 +694,8 @@
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Fastest Settings</string>
     <string name="http_proxy_bypass_sum">Bypass proxy for these hosts</string>
+    <string name="append_http_proxy">Append HTTP proxy</string>
+    <string name="append_http_proxy_sum">Append HTTP proxy to all connections</string>
     <string name="hysteria2_ech_config_hint">ECH 구성</string>
     <string name="hysteria2_ech_config_invalid">Invalid ECH config</string>
     <string name="hysteria2_ech_summary">Encrypted Client Hello</string>
@@ -746,6 +758,19 @@
     <string name="probe_url">Probe URL</string>
     <string name="profile_reference_not_allowed">Profile reference not allowed</string>
     <string name="proxy_fastest">Fastest</string>
+    <string name="proxy_fastest_regex">Fastest (regex)</string>
+    <string name="fastest_candidate_mode">Candidate source</string>
+    <string name="fastest_regex_options">Subscription regex</string>
+    <string name="fastest_regex_source_group">Source subscription</string>
+    <string name="fastest_regex_pattern">Regular expression</string>
+    <string name="fastest_regex_ignore_case">Ignore case</string>
+    <string name="fastest_regex_preview">Check regex</string>
+    <string name="fastest_regex_preview_count">Matching proxies: %1$d</string>
+    <string name="fastest_regex_preview_no_matches">No matching proxies</string>
+    <string name="fastest_regex_error_empty">Enter a regular expression</string>
+    <string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string>
+    <string name="fastest_regex_error_source_missing">Select an existing source subscription</string>
+    <string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string>
     <string name="proxy_mode_inbound_auth">Inbound Auth</string>
     <string name="proxy_mode_inbound_auth_sum">Enable inbound authentication</string>
     <string name="proxy_waterfall">Waterfall</string>
@@ -785,4 +810,39 @@
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
-<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="service_mode_vpn">VPN</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink" formatted="false">%s | %s/s ↑</string><string name="traffic_downlink" formatted="false">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string></resources>
+    <string name="append_http_proxy_security_title">Security Warning</string>
+    <string name="append_http_proxy_security_message">Enabling HTTP proxy may expose your traffic.</string>
+    <string name="enable_anyway">Enable Anyway</string>
+    <string name="vpn_watchdog">Auto-reconnect</string>
+    <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
+    <string name="vpn_watchdog_test">🧪 Test watchdog</string>
+    <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
+    <string name="vpn_watchdog_interval">Check interval (sec)</string>
+    <string name="rule_domain">Domain</string>
+    <string name="rule_dst_ip">Destination IP</string>
+    <string name="rule_dst_port">Destination port</string>
+    <string name="rule_src_ip">Source IP</string>
+    <string name="rule_src_port">Source port</string>
+    <string name="rule_ruleset">Rule set (.srs)</string>
+    <string name="rule_network">네트워크</string>
+    <string name="rule_protocol">프로토콜</string>
+    <string name="rule_outbound">Outbound</string>
+    <string name="pref_sing_box_server">sing-box server</string>
+    <string name="udp_over_tcp">UDP over TCP</string>
+    <string name="reality_public_key">Reality Public Key</string>
+    <string name="reality_short_id">Reality Short ID</string>
+    <string name="debug_button_crash_from_kt">Crash from Kotlin</string>
+    <string name="debug_button_reset_settings">Reset Settings</string>
+    <string name="toast_create_preferences_failed">Failed to create preferences. Please try again.</string>
+    <string name="dialog_watchdog_test_title">Test watchdog</string>
+    <string name="dialog_watchdog_vpn_not_running">VPN is not running. Connect to VPN first.</string>
+    <string name="dialog_watchdog_auto_reconnect_title">Test auto-reconnect</string>
+    <string name="dialog_watchdog_force_restart">Watchdog will force-restart the VPN.
+
+VPN will disconnect for 1-3 seconds, then reconnect automatically.
+
+Continue?</string>
+    <string name="dialog_watchdog_start">시작</string>
+    <string name="snackbar_watchdog_test_started">Test started. Restarting within ≤30 s...</string>
+    <string name="dialog_log_buffer_size">Log buffer size (KB)</string>
+</resources>
