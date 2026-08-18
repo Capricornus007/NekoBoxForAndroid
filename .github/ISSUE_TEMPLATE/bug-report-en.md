@@ -17,8 +17,9 @@ Actual behavior:
 
 Provide helpful screenshots, videos, text descriptions, subscription links, etc.
 
-## Logs
+## Logs & Configs
 
-If you have logs, please find Z in [the Dayo Group](https://t.me/nekoray_group) and send them via private message. Check the documentation for detailed steps on how to export logs.
+If logs, subscription links, or config files are available, please DM Z in [the Dayo Group](https://t.me/nekoray_group). Check the documentation for instructions on exporting logs.
 
-- [ ] I have submitted the logs via PM
+- [ ] Submitted logs via DM
+- [ ] (Optional, unless requested by Z) Submitted full JSON config file via DM
