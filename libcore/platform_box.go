@@ -269,6 +269,10 @@ func (w *boxPlatformInterfaceWrapper) SendNotification(notification *adapter.Not
 	return nil
 }
 
+func (w *boxPlatformInterfaceWrapper) CancelNotification(identifier string, typeID int32) error {
+	return nil
+}
+
 // io.Writer
 
 var disableSingBoxLog = false
