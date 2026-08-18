@@ -17,6 +17,8 @@ Actual behavior:
 
 Provide helpful screenshots, videos, text descriptions, subscription links, etc.
 
-## log
+## Logs
 
-If you have logs, please upload them. Please see the detailed steps for exporting logs in the documentation.
+If you have logs, please find Z in [the Dayo Group](https://t.me/nekoray_group) and send them via private message. Check the documentation for detailed steps on how to export logs.
+
+- [ ] I have submitted the logs via PM
