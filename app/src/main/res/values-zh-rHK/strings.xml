@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_desc">用於 Android 嘅通用代理工具鏈，以 Kotlin 編寫。</string>
     <string name="project">專案</string>
@@ -19,13 +19,14 @@
     <string name="quick_toggle">切換</string>
     <string name="quick_enable">啟用</string>
     <string name="quick_disable">停用</string>
+    <string name="quick_clear_cache_restart">Restart After Clear</string>
     <string name="tile_title">開關</string>
     <string name="menu_traffic">流量</string>
     <string name="menu_dashboard">sing-box 儀表板</string>
-    
+    <!-- externel -->
     <string name="action_copy">複製</string>
     <string name="action_open">開啟</string>
-    
+    <!-- group -->
     <string name="group_name">群組名稱</string>
     <string name="group_update">更新</string>
     <string name="group_subscription_link">訂閱連結</string>
@@ -42,9 +43,9 @@
     <string name="group_status_empty">空群組</string>
     <string name="group_status_empty_subscription">尚未更新</string>
     <string name="group_status_proxies">%d 個代理</string>
-    <string name="group_status_proxies_subscription" formatted="false">%d 個代理 | 更新於 %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s：無差異</string>
-    <string name="group_updated" formatted="false">%s：已更新 %d 個代理</string>
+    <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
     <string name="group_show_diff">差異</string>
     <string name="group_diff">差異 (%s)</string>
     <string name="group_delete_confirm_prompt">你確定要移除這個群組嗎？</string>
@@ -52,7 +53,7 @@
     <string name="group_changed">已更新：\n%s</string>
     <string name="group_deleted">已刪除：\n%s</string>
     <string name="group_duplicate">重複：\n%s</string>
-    
+    <!-- misc -->
     <string name="service_mode">服務模式</string>
     <string name="service_mode_proxy">僅代理</string>
     <string name="port_proxy">代理端口</string>
@@ -83,8 +84,8 @@
     <string name="speed_detail">代理：%1$s↑ %2$s↓\n直接：%3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">測試中...</string>
-    <string name="connection_test_available">成功：HTTPS 握手耗時 %dms</string>
-    <string name="connection_test_available_http">成功：HTTP 握手耗時 %dms</string>
+    <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
+    <string name="connection_test_available_http">Success: HTTP handshake took %dms</string>
     <string name="connection_test_error">失敗：%s</string>
     <string name="connection_test_fail">互聯網不可用</string>
     <string name="connection_test_error_status_code">錯誤代碼：#%d</string>
@@ -105,7 +106,10 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="require_transproxy">啟用透明代理入站</string>
     <string name="transproxy_mode">透明代理模式</string>
     <string name="connection_test_url">連線測試 URL</string>
-    
+    <string name="auto_switch_timeout">Auto-switch on Timeout</string>
+    <string name="auto_switch_timeout_summary">Automatically switch to next config if no response</string>
+    <string name="auto_switch_timeout_duration">Timeout Duration (seconds)</string>
+    <!-- proxy category -->
     <string name="profile_name">設定檔名稱</string>
     <string name="server_address">伺服器</string>
     <string name="server_port">遠端連接埠</string>
@@ -143,7 +147,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="extra_headers">額外標頭</string>
     <string name="config_type">配置類型</string>
     <string name="edit_config">編輯配置</string>
-    
+    <!-- feature category -->
     <string name="ipv6">IPv6 路由</string>
     <string name="prefer">偏好</string>
     <string name="only">僅限</string>
@@ -206,7 +210,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="direct_boot_aware">允許在鎖定畫面切換</string>
     <string name="direct_boot_aware_summary">你選擇的設定檔資訊將受到較少
         保護</string>
-    
+    <!-- notification category -->
     <string name="service_vpn">VPN 服務</string>
     <string name="service_proxy">代理服務</string>
     <string name="forward_success">代理已啟動。</string>
@@ -218,11 +222,11 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="vpn_permission_denied">建立 VPN 服務的權限被拒絕</string>
     <string name="reboot_required">無法啟動 VPN 服務。您可能需要重新啟動
         裝置。</string>
-    
+    <!-- alert category -->
     <string name="profile_empty">請選擇一個設定檔</string>
     <string name="connect">連線</string>
     <string name="clipboard_empty">剪貼簿為空</string>
-    
+    <!-- menu category -->
     <string name="settings">設定</string>
     <string name="edit">編輯</string>
     <string name="share">分享</string>
@@ -252,8 +256,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="action_import_msg">匯入成功！</string>
     <string name="action_import_err">匯入失敗。</string>
     <string name="file_manager_missing">你的裝置缺少 Android 標準檔案選擇器，請安裝一個，例如 Material Files。</string>
-    
-    
+    <!-- share -->
+    <!-- profile -->
     <string name="profile_config">設定檔配置</string>
     <string name="delete">移除</string>
     <string name="delete_confirm_prompt">你確定要移除此設定檔嗎？</string>
@@ -270,12 +274,12 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="undo">還原</string>
     <string name="insecure">不安全</string>
     <string name="deprecated">已棄用</string>
-    
-    
+    <!-- tasker -->
+    <!-- status -->
     <string name="connecting">連線中…</string>
     <string name="vpn_connected">已連線，點擊檢查連線</string>
     <string name="not_connected">未連線</string>
-    
+    <!-- subscriptions -->
     <string name="subscriptions">訂閱</string>
     <string name="cleartext_http_warning">明文HTTP流量不安全</string>
     <string name="error_title">錯誤</string>
@@ -286,7 +290,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="deduplication">去重</string>
     <string name="ignore_battery_optimizations">忽略電池最佳化</string>
     <string name="ignore_battery_optimizations_sum">移除部分限制</string>
-    
+    <!-- plugin -->
     <string name="plugin">插件</string>
     <string name="plugin_configure">設定…</string>
     <string name="plugin_disabled">已停用</string>
@@ -328,15 +332,12 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="connection_test_refused">連接被拒絕</string>
     <string name="connection_test_unreachable">無法到達</string>
     <string name="connection_test_timeout_error">超時</string>
-    <string name="append_http_proxy">將 HTTP 代理附加到 VPN</string>
-    <string name="append_http_proxy_sum">HTTP 代理將直接從瀏覽器/一些支援的應用程式使用，而不會經過虛擬網絡介面卡裝置 (Android 10+)</string>
+    <string name="mixed_auth_config">Configure authentication</string>
+    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
+    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
+    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="http_proxy_bypass">HTTP 代理繞過清單</string>
     <string name="http_proxy_bypass_dialog_message">每行一個。以 # 開頭的行是註釋。範例：*zhihu.com</string>
-    <string name="append_http_proxy_security_title">安全提示</string>
-    <string name="append_http_proxy_security_message">啟用後，此裝置上的其他應用程式可直接使用本地代理埠。
-
-建議：僅在您信任所有已安裝應用程式時啟用此選項。</string>
-    <string name="enable_anyway">仍要啟用</string>
     <string name="strict_route">嚴格路由</string>
     <string name="protocol_settings">協定設定</string>
     <string name="trojan_provider">Trojan 提供者</string>
@@ -383,7 +384,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="server_dns_subscription_sum">可選的 DNS，僅用於解析此訂閱中的伺服器域名。留空以使用預設行為。接受 https://、tls://、quic:// 或 host[:port]。</string>
     <string name="server_dns_invalid">無效的自訂伺服器 DNS。請使用 https://、tls://、quic:// 或 host[:port]，或留空。</string>
     <string name="subscription_used">%s 已使用</string>
-    <string name="subscription_traffic" formatted="false">已用 %s / 剩餘 %s</string>
+    <string name="subscription_traffic" formatted="false">%s Used / %s Remaining</string>
     <string name="subscription_expire">到期：%s</string>
     <string name="subscription_import">匯入訂閱</string>
     <string name="subscription_import_message">確認要匯入訂閱 %s？如果您來自不可信來源，這樣做可能導致您的 IP 和此行為洩漏。</string>
@@ -482,6 +483,12 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="rules_geoip_url">geoip URL</string>
     <string name="tuic_udp_relay_mode">UDP 中繼模式</string>
     <string name="tuic_congestion_controller">阻塞控制器</string>
+    <string name="shadowquic_udp_over_stream">UDP over Stream</string>
+    <string name="shadowquic_zero_rtt">0-RTT Handshake</string>
+    <string name="shadowquic_sunny_quic">Sunny QUIC</string>
+    <string name="trusttunnel_quic">QUIC (HTTP/3)</string>
+    <string name="trusttunnel_health_check">Health Check</string>
+    <string name="trusttunnel_congestion_control">QUIC Congestion Control</string>
     <string name="tuic_disable_sni">停用 SNI</string>
     <string name="tuic_reduce_rtt">啟用 0-RTT QUIC 握手</string>
     <string name="pinned_certchain_sha256">釘選憑證 SHA256</string>
@@ -519,23 +526,38 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="share_subscription">分享訂閱</string>
     <string name="show_group_in_notification">在通知中顯示群組名稱</string>
     <string name="reset_connections">重設連接</string>
-    <string name="reset_connections_done">重設出站連接完成</string>
-    <string name="idle">閒置</string>
-    <string name="warning_nonexistent_outbound">警告：%1$s：指定了不存在的出站。</string>
-    <string name="imported_profiles">%1$d 個設定檔</string>
-    <string name="please_try_again">請稍後再試</string>
-    <string name="conflicting_plugins">發現來自 %1$s 的衝突插件</string>
-    <string name="crash_log_title">NB4A 當機</string>
-    <string name="rule_default_name">規則 %1$d</string>
-    <string name="rule_summary_src_ip">來源 IP: %1$s\n</string>
-    <string name="rule_summary_src_port">來源連接埠: %1$s\n</string>
-    <string name="rule_summary_dst_port">目標連接埠: %1$s\n</string>
-    <string name="rule_summary_network">網絡: %1$s\n</string>
-    <string name="rule_summary_protocol">協定: %1$s\n</string>
+    <string name="reset_connections_done">Reset upstream connections done</string>
+    <string name="idle">Idle</string>
+    <string name="warning_nonexistent_outbound">Warning: %1$s: A non-existent outbound was specified.</string>
+    <string name="imported_profiles">%1$d profile(s)</string>
+    <string name="please_try_again">Please try again later</string>
+    <string name="conflicting_plugins">Conflicting plugins found from: %1$s</string>
+    <string name="crash_log_title">NB4A Crash</string>
+    <string name="rule_default_name">Rule %1$d</string>
+    <string name="rule_summary_src_ip">src ip: %1$s\n</string>
+    <string name="rule_summary_src_port">src port: %1$s\n</string>
+    <string name="rule_summary_dst_port">dst port: %1$s\n</string>
+    <string name="rule_summary_network">network: %1$s\n</string>
+    <string name="rule_summary_protocol">protocol: %1$s\n</string>
     <string name="version_prefix">v%1$s</string>
-    <string name="subscription_name">訂閱 #%1$s</string>
-    <string name="my_group">我的群組</string>
-    <string name="asset_version_unknown">未知-%1$s</string>
+    <string name="subscription_name">Subscription #%1$s</string>
+    <string name="my_group">My group</string>
+    <string name="asset_version_unknown">Unknown-%1$s</string>
+    <string name="invalid_naive_link">Invalid Naive link: %1$s</string>
+    <string name="invalid_ss_android_link">Invalid ss-android link: %1$s</string>
+    <string name="invalid_jms_link">Invalid JMS link: %1$s</string>
+    <string name="invalid_v2rayn_link">Invalid v2rayN link: %1$s</string>
+    <string name="invalid_snell_url">Invalid Snell URL</string>
+    <string name="not_supported_proxy">Not supported: %1$s</string>
+    <string name="invalid_trojan_link">Invalid Trojan link: %1$s</string>
+    <string name="invalid_http_link">Invalid HTTP(S) link: %1$s</string>
+    <string name="not_http_proxy">Not an HTTP proxy</string>
+    <string name="invalid_hysteria_link">Invalid Hysteria link: %1$s</string>
+    <string name="invalid_masterdns_link">Invalid MasterDNS link: %1$s</string>
+    <string name="masterdns_no_tunnel">MasterDNS link is missing tunnel domain(s)</string>
+    <string name="masterdns_no_key">MasterDNS link is missing the encryption key for method %1$s</string>
+    <string name="webdav_auth_failed">Authentication failed</string>
+    <string name="webdav_check_dir_failed">Failed to check directory (%1$s): %2$s</string>
     <string name="remove_duplicate">移除重複伺服器</string>
     <string name="mtu_help">長按偏好設定以設定自訂 MTU。</string>
     <string name="log_level_help">長按偏好設定以設定緩衝區大小。</string>
@@ -552,6 +574,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="enable_ech_sum">啟用加密 Client Hello</string>
     <string name="ech_settings">ECH 設定</string>
     <string name="ech_config">ECH 配置</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="http_upgrade_host">HTTPUpgrade 主機</string>
     <string name="http_upgrade_path">HTTPUpgrade 路徑</string>
     <string name="update_current_subscription">更新目前群組的訂閱</string>
@@ -602,19 +625,19 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_cache_confirm">您確定要清除快取嗎？</string>
     <string name="clear_cache_success">快取已清除</string>
     <string name="clear_cache_failed">清除快取失敗：%s</string>
-    <string name="dual_network_acceleration">雙網路加速</string>
-    <string name="dual_network_acceleration_summary">同時透過 Wi-Fi 與行動數據連線。需在系統設定中保持 Wi-Fi 與行動數據皆開啟，並會增加耗電。</string>
+    <string name="dual_network_acceleration">Dual Network Acceleration</string>
+    <string name="dual_network_acceleration_summary">Connect concurrently via Wi-Fi and mobile data. Requires both Wi-Fi and mobile data to stay enabled in system settings, and increases battery usage.</string>
     <string name="connection_test_timeout">測試超時（毫秒）</string>
     <string name="preview_version_hint">此應用程式為預覽版本，可能包含諸多問題。若不想測試，請到GitHub下載Release版本！</string>
     <string name="preview_hint_dont_show_again">唔好再顯示</string>
     <string name="check_update_preview">檢查預覽版本更新</string>
     <string name="check_update_release">檢查發佈版本更新</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
+    <string name="release_not_available">NekoBox has not published a stable release yet</string>
     <string name="update_dialog_title">新版本可用</string>
-    <string name="update_dialog_message">目前版本：%1$s\n可用版本：%2$s\n是否要下載？</string>
-    <string name="update_downloading">正在下載更新…</string>
-    <string name="update_open_page">開啟發佈頁</string>
-    <string name="update_no_apk_for_abi">找不到適用於此裝置（%1$s）的安裝包，您要改為開啟發佈頁嗎？</string>
+    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_open_page">Open release page</string>
+    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
     <string name="check_update_no">檢查成功，但無更新。</string>
     <string name="reset_settings">還原預設設定</string>
     <string name="reset_settings_message">還原預設設定，但節點和群組等資料將被保留。要完全清除資料，請在系統設定中直接清除應用程式資料。</string>
@@ -628,7 +651,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
     <string name="app_list_permission_denied">無法讀取已安裝的應用程式。\n這通常是因為系統限制了應用程式讀取權限。\n請在系統設定中授予權限。</string>
     <string name="open_app_settings">開啟系統設定</string>
-    
+    <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
     <string name="snell_psk">預共享金鑰</string>
     <string name="snell_userkey">用戶金鑰</string>
@@ -639,21 +662,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="snell_mode">模式</string>
     <string name="snell_reuse">重用</string>
     <string name="snell_reuse_summary">僅 v4-v6</string>
-    
-    <string name="auto_switch_timeout">超時自動切換</string>
-    <string name="auto_switch_timeout_summary">無回應時自動切換到下一個設定</string>
-    <string name="auto_switch_timeout_duration">超時時長（秒）</string>
-    <string name="vpn_watchdog">自動重連</string>
-    <string name="vpn_watchdog_summary">連線中斷時自動重啟 VPN</string>
-    <string name="vpn_watchdog_test">🧪 測試看門狗</string>
-    <string name="vpn_watchdog_test_summary">強制重啟 VPN 以測試看門狗</string>
-    <string name="vpn_watchdog_interval">檢查間隔（秒）</string>
-    <string name="quick_clear_cache_restart">Restart After Clear</string>
-    <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
-    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
-    <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
     <string name="action_close">Close</string>
     <string name="action_masterdnsvpn">MasterDNS VPN</string>
@@ -693,6 +701,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Fastest Settings</string>
     <string name="http_proxy_bypass_sum">Bypass proxy for these hosts</string>
+    <string name="append_http_proxy">Append HTTP proxy</string>
+    <string name="append_http_proxy_sum">Append HTTP proxy to all connections</string>
     <string name="hysteria2_ech_config_hint">ECH 配置</string>
     <string name="hysteria2_ech_config_invalid">Invalid ECH config</string>
     <string name="hysteria2_ech_summary">Encrypted Client Hello</string>
@@ -755,6 +765,19 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="probe_url">Probe URL</string>
     <string name="profile_reference_not_allowed">Profile reference not allowed</string>
     <string name="proxy_fastest">Fastest</string>
+    <string name="proxy_fastest_regex">Fastest (regex)</string>
+    <string name="fastest_candidate_mode">Candidate source</string>
+    <string name="fastest_regex_options">Subscription regex</string>
+    <string name="fastest_regex_source_group">Source subscription</string>
+    <string name="fastest_regex_pattern">Regular expression</string>
+    <string name="fastest_regex_ignore_case">Ignore case</string>
+    <string name="fastest_regex_preview">Check regex</string>
+    <string name="fastest_regex_preview_count">Matching proxies: %1$d</string>
+    <string name="fastest_regex_preview_no_matches">No matching proxies</string>
+    <string name="fastest_regex_error_empty">Enter a regular expression</string>
+    <string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string>
+    <string name="fastest_regex_error_source_missing">Select an existing source subscription</string>
+    <string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string>
     <string name="proxy_mode_inbound_auth">Inbound Auth</string>
     <string name="proxy_mode_inbound_auth_sum">Enable inbound authentication</string>
     <string name="proxy_waterfall">Waterfall</string>
@@ -794,4 +817,39 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
-<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="service_mode_vpn">VPN</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink" formatted="false">%s | %s/s ↑</string><string name="traffic_downlink" formatted="false">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string></resources>
+    <string name="append_http_proxy_security_title">Security Warning</string>
+    <string name="append_http_proxy_security_message">Enabling HTTP proxy may expose your traffic.</string>
+    <string name="enable_anyway">Enable Anyway</string>
+    <string name="vpn_watchdog">Auto-reconnect</string>
+    <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
+    <string name="vpn_watchdog_test">🧪 Test watchdog</string>
+    <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
+    <string name="vpn_watchdog_interval">Check interval (sec)</string>
+    <string name="rule_domain">Domain</string>
+    <string name="rule_dst_ip">Destination IP</string>
+    <string name="rule_dst_port">Destination port</string>
+    <string name="rule_src_ip">Source IP</string>
+    <string name="rule_src_port">Source port</string>
+    <string name="rule_ruleset">Rule set (.srs)</string>
+    <string name="rule_network">網絡</string>
+    <string name="rule_protocol">協定</string>
+    <string name="rule_outbound">Outbound</string>
+    <string name="pref_sing_box_server">sing-box server</string>
+    <string name="udp_over_tcp">UDP over TCP</string>
+    <string name="reality_public_key">Reality Public Key</string>
+    <string name="reality_short_id">Reality Short ID</string>
+    <string name="debug_button_crash_from_kt">Crash from Kotlin</string>
+    <string name="debug_button_reset_settings">Reset Settings</string>
+    <string name="toast_create_preferences_failed">Failed to create preferences. Please try again.</string>
+    <string name="dialog_watchdog_test_title">Test watchdog</string>
+    <string name="dialog_watchdog_vpn_not_running">VPN is not running. Connect to VPN first.</string>
+    <string name="dialog_watchdog_auto_reconnect_title">Test auto-reconnect</string>
+    <string name="dialog_watchdog_force_restart">Watchdog will force-restart the VPN.
+
+VPN will disconnect for 1-3 seconds, then reconnect automatically.
+
+Continue?</string>
+    <string name="dialog_watchdog_start">開始</string>
+    <string name="snackbar_watchdog_test_started">Test started. Restarting within ≤30 s...</string>
+    <string name="dialog_log_buffer_size">Log buffer size (KB)</string>
+</resources>
