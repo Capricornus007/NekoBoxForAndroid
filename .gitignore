@@ -77,3 +77,6 @@ app/src/main/java/io/nekohasekai/sagernet/ktx/AgentDebugLog.kt
 # Local on-device DB/config backups (profiles + credentials — never commit)
 device-backups/
 .worklog/
+
+# Local pre-build backups of the gomobile libcore.aar (build artifact, ~19MB — never commit)
+.aar-backups/

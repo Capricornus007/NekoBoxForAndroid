@@ -108,4 +108,79 @@ class SagerDatabaseMigrationTest {
             }
         }
     }
+
+    @Test
+    fun migrateLegacy13To14_addsMissingColumnsAndPreservesRows() {
+        // Recreate the older physical v13 layout: v12 plus balancerBean. ShadowQUIC and
+        // TrustTunnel were later added without first bumping the Room version, so devices that
+        // had already opened v13 legitimately lack those two columns.
+        helper.createDatabase(TEST_DB, 12).use { db ->
+            val values = ContentValues().apply {
+                put("id", 1L)
+                put("groupId", 1L)
+                put("type", 0)
+                put("userOrder", 0L)
+                put("tx", 0L)
+                put("rx", 0L)
+                put("lifetimeRx", 0L)
+                put("lifetimeTx", 0L)
+                put("status", 0)
+                put("ping", 0)
+                put("uuid", "test-uuid-legacy-13to14")
+            }
+            db.insert("proxy_entities", android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE, values)
+            db.execSQL("ALTER TABLE `proxy_entities` ADD COLUMN `balancerBean` BLOB DEFAULT NULL")
+            db.version = 13
+        }
+
+        helper.runMigrationsAndValidate(
+            TEST_DB,
+            14,
+            true,
+            SagerDatabase.Migration13To14,
+        ).use { db ->
+            db.query(
+                "SELECT uuid, shadowQuicBean, trustTunnelBean FROM proxy_entities WHERE id = 1",
+            ).use { cursor ->
+                assertTrue(cursor.moveToFirst())
+                assertEquals("test-uuid-legacy-13to14", cursor.getString(0))
+                assertTrue(cursor.isNull(1))
+                assertTrue(cursor.isNull(2))
+            }
+        }
+    }
+
+    @Test
+    fun migrateNew13To14_acceptsColumnsAlreadyPresentAndPreservesRows() {
+        // The later same-version v13 build already created both columns. The guarded migration
+        // must not attempt duplicate ALTER TABLE statements for those installations.
+        helper.createDatabase(TEST_DB, 13).use { db ->
+            val values = ContentValues().apply {
+                put("id", 1L)
+                put("groupId", 1L)
+                put("type", 0)
+                put("userOrder", 0L)
+                put("tx", 0L)
+                put("rx", 0L)
+                put("lifetimeRx", 0L)
+                put("lifetimeTx", 0L)
+                put("status", 0)
+                put("ping", 0)
+                put("uuid", "test-uuid-new-13to14")
+            }
+            db.insert("proxy_entities", android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE, values)
+        }
+
+        helper.runMigrationsAndValidate(
+            TEST_DB,
+            14,
+            true,
+            SagerDatabase.Migration13To14,
+        ).use { db ->
+            db.query("SELECT uuid FROM proxy_entities WHERE id = 1").use { cursor ->
+                assertTrue(cursor.moveToFirst())
+                assertEquals("test-uuid-new-13to14", cursor.getString(0))
+            }
+        }
+    }
 }

@@ -1,6 +1,8 @@
 package io.nekohasekai.sagernet.bg
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class NetworkChangePolicyTest {
@@ -30,6 +32,34 @@ class NetworkChangePolicyTest {
                 "wlan0",
                 restartProfile = true,
                 resetConnections = true,
+            ),
+        )
+    }
+
+    @Test
+    fun goResetIsOnlyEnabledForResetFallback() {
+        assertFalse(
+            resetConnectionsInGoOnNetworkChange(
+                restartProfile = true,
+                resetConnections = true,
+            ),
+        )
+        assertFalse(
+            resetConnectionsInGoOnNetworkChange(
+                restartProfile = true,
+                resetConnections = false,
+            ),
+        )
+        assertTrue(
+            resetConnectionsInGoOnNetworkChange(
+                restartProfile = false,
+                resetConnections = true,
+            ),
+        )
+        assertFalse(
+            resetConnectionsInGoOnNetworkChange(
+                restartProfile = false,
+                resetConnections = false,
             ),
         )
     }

@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.bg.proto
 
 import io.nekohasekai.sagernet.bg.BaseService
-import io.nekohasekai.sagernet.bg.ServiceNotification
 import io.nekohasekai.sagernet.bg.runRequiredCompletion
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.ktx.Logs
@@ -9,13 +8,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.runBlocking
 
-class ProxyInstance(profile: ProxyEntity, var service: BaseService.Interface? = null) :
+class ProxyInstance(
+    profile: ProxyEntity,
+    var service: BaseService.Interface? = null,
+    initialDisplayProfileName: String = profile.displayName(),
+) :
     BoxInstance(profile) {
 
     var notTmp = true
 
     var lastSelectorGroupId = -1L
-    var displayProfileName = ServiceNotification.genTitle(profile)
+
+    // Keep construction free of database access: BaseService resolves the optional group title
+    // on its existing worker before creating this instance on the service main thread.
+    var displayProfileName = initialDisplayProfileName
 
     // for TrafficLooper
     var looper: TrafficLooper? = null

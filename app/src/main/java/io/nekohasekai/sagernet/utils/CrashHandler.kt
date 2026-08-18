@@ -41,6 +41,12 @@ internal fun formatDiagnosticSettings(rows: Collection<KeyValuePair>): List<Stri
 
 object CrashHandler : Thread.UncaughtExceptionHandler {
 
+    // The platform's KillApplicationHandler, captured before SagerNet installs us as
+    // the default handler. We chain to it so the process is ALWAYS terminated (and a
+    // proper data_app_crash is recorded) even when ProcessPhoenix cannot relaunch us.
+    private val defaultHandler: Thread.UncaughtExceptionHandler? =
+        Thread.getDefaultUncaughtExceptionHandler()
+
     @Suppress("UNNECESSARY_SAFE_CALL")
     override fun uncaughtException(thread: Thread, throwable: Throwable) {
         // note: libc / go panic is in android log
@@ -56,12 +62,58 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
         } catch (e: Exception) {
         }
 
-        ProcessPhoenix.triggerRebirth(
-            app,
-            Intent(app, BlankActivity::class.java).apply {
-                putExtra("sendLog", app.getString(R.string.crash_log_title))
-            },
-        )
+        // The :bg (VpnService) process has no UI. ProcessPhoenix restarts by launching
+        // an Activity, which Android's background-activity-launch rules silently block
+        // whenever the screen is off/locked. triggerRebirth() then no-ops AND — because
+        // the original code never chained to the platform handler — the crashed main
+        // thread leaves the process ALIVE: the gVisor/tun Go threads keep running so the
+        // VPN still reports "connected", while every Looper-bound callback (reconnect,
+        // DNS, profile switch, stopRunner) is dead. That zombie is the "locked for a
+        // while → Telegram won't connect" and "long-press tile → black, unresponsive"
+        // failure, and the source of the repeating "executing service"/"Broadcast
+        // timeout" ANRs. For a background process, skip the Activity dance entirely and
+        // die cleanly; START_STICKY lets the system restart the service afterwards.
+        val restartFromUi = try {
+            !SagerNet.application.isBgProcess
+        } catch (e: Exception) {
+            false
+        }
+
+        if (restartFromUi) {
+            try {
+                ProcessPhoenix.triggerRebirth(
+                    app,
+                    Intent(app, BlankActivity::class.java).apply {
+                        putExtra("sendLog", app.getString(R.string.crash_log_title))
+                    },
+                )
+            } catch (e: Throwable) {
+                try {
+                    Log.e("CrashHandler", "triggerRebirth failed", e)
+                } catch (_: Throwable) {
+                }
+            }
+        }
+
+        // Guarantee the process actually terminates, regardless of whether a UI restart
+        // was scheduled. Prefer the platform handler (kills + logs a real crash); then
+        // force-kill as a hard backstop so we can never leave a half-dead process.
+        val platform = defaultHandler
+        if (platform != null && platform !== this) {
+            try {
+                platform.uncaughtException(thread, throwable)
+            } catch (e: Throwable) {
+            }
+        }
+        try {
+            android.os.Process.killProcess(android.os.Process.myPid())
+        } catch (e: Throwable) {
+        }
+        try {
+            @Suppress("DEPRECATION")
+            System.exit(10)
+        } catch (e: Throwable) {
+        }
     }
 
     fun formatThrowable(throwable: Throwable): String {

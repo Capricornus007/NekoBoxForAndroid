@@ -6,6 +6,9 @@ internal enum class NetworkChangeAction {
     RESTART_PROFILE,
 }
 
+internal fun resetConnectionsInGoOnNetworkChange(restartProfile: Boolean, resetConnections: Boolean): Boolean =
+    !restartProfile && resetConnections
+
 internal fun networkChangeAction(
     oldInterface: String?,
     newInterface: String?,
@@ -17,7 +20,8 @@ internal fun networkChangeAction(
     }
     return when {
         restartProfile -> NetworkChangeAction.RESTART_PROFILE
-        resetConnections -> NetworkChangeAction.RESET_CONNECTIONS
+        resetConnectionsInGoOnNetworkChange(restartProfile, resetConnections) ->
+            NetworkChangeAction.RESET_CONNECTIONS
         else -> NetworkChangeAction.NONE
     }
 }

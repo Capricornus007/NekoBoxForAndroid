@@ -37,16 +37,25 @@ class VpnWatchdog(private val service: BaseService.Interface) {
             Logs.d("VpnWatchdog: запущен (интервал ${intervalSec}с)")
             delay(checkIntervalMs)
             while (isActive) {
-                runCatching { check(minRestartIntervalMs) }
-                    .onFailure { Logs.w("VpnWatchdog error", it) }
+                try {
+                    check(minRestartIntervalMs)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (error: Throwable) {
+                    Logs.w("VpnWatchdog error", error)
+                }
                 delay(checkIntervalMs)
             }
         }
     }
 
-    fun stop() {
-        job?.cancel()
+    suspend fun stop() {
+        // A native urlTest is blocking and does not observe coroutine cancellation until it
+        // returns. Join before BaseService closes the box, otherwise the test can still be using
+        // the native handle concurrently with box.Close().
+        val watchdogJob = job
         job = null
+        watchdogJob?.cancelAndJoin()
         consecutiveFailures = 0
         testModeRequested = false
         Logs.d("VpnWatchdog: остановлен")
@@ -74,7 +83,13 @@ class VpnWatchdog(private val service: BaseService.Interface) {
         } else {
             // Обычная проверка
             try {
-                Libcore.urlTest(box, url, HTTP_TIMEOUT_MS) > 0
+                val result = Libcore.urlTest(box, url, HTTP_TIMEOUT_MS)
+                // urlTest is a blocking native call. Honor a stop request immediately after it
+                // returns, before producing UI/reset side effects against a tearing-down box.
+                currentCoroutineContext().ensureActive()
+                result > 0
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 false
             }

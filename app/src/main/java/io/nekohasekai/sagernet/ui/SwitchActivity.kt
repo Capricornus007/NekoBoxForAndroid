@@ -5,7 +5,7 @@ import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProfileManager
-import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
+import io.nekohasekai.sagernet.ktx.runOnIoDispatcher
 
 class SwitchActivity :
     ThemedActivity(R.layout.layout_empty),
@@ -27,7 +27,9 @@ class SwitchActivity :
     override fun returnProfile(profileId: Long) {
         val old = DataStore.selectedProxy
         DataStore.selectedProxy = profileId
-        runOnMainDispatcher {
+        // postUpdate(profileId) resolves the profile with a synchronous Room query. Listener UI
+        // updates marshal themselves back to Main, so do the lookup and dispatch from IO.
+        runOnIoDispatcher {
             ProfileManager.postUpdate(old, true)
             ProfileManager.postUpdate(profileId, true)
         }

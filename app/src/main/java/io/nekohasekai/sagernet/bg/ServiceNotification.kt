@@ -11,7 +11,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
 import android.os.Build
 import android.text.format.Formatter
-import android.widget.Toast
+import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -51,6 +51,7 @@ class ServiceNotification(
         const val notificationId = 1
         const val flags = PendingIntent.FLAG_IMMUTABLE
 
+        @WorkerThread
         fun genTitle(ent: ProxyEntity): String {
             val gn = if (DataStore.showGroupInNotification) {
                 SagerDatabase.groupDao.getById(ent.groupId)?.displayName()
@@ -135,10 +136,12 @@ class ServiceNotification(
         .setTicker(service.getString(R.string.forward_success))
         .setContentTitle(title)
         .setOnlyAlertOnce(true)
+        .setOngoing(true)
         .setContentIntent(SagerNet.configureIntent(service))
         .setSmallIcon(R.drawable.ic_service_active)
         .setCategory(NotificationCompat.CATEGORY_SERVICE)
         .setPriority(if (visible) NotificationCompat.PRIORITY_LOW else NotificationCompat.PRIORITY_MIN)
+        .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
 
     private val buildLock = Mutex()
 
@@ -155,6 +158,10 @@ class ServiceNotification(
         Theme.apply(service)
         builder.color = service.getColorAttr(R.attr.colorPrimary)
 
+        // startForegroundService() has a strict deadline. Promote synchronously before receiver
+        // registration, coroutine scheduling, database refreshes, or proxy initialization.
+        show()
+
         service.registerReceiver(
             this,
             IntentFilter().apply {
@@ -165,7 +172,7 @@ class ServiceNotification(
 
         runOnMainDispatcher {
             updateActions()
-            show()
+            update()
         }
     }
 
@@ -218,23 +225,16 @@ class ServiceNotification(
         }
     }
 
-    private suspend fun show() = useBuilder {
-        try {
-            if (Build.VERSION.SDK_INT >= 34) {
-                (service as Service).startForeground(
-                    notificationId,
-                    it.build(),
-                    FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
-                )
-            } else {
-                (service as Service).startForeground(notificationId, it.build())
-            }
-        } catch (e: Exception) {
-            Toast.makeText(
-                SagerNet.application,
-                "startForeground: $e",
-                Toast.LENGTH_LONG,
-            ).show()
+    private fun show() {
+        val notification = builder.build()
+        if (Build.VERSION.SDK_INT >= 34) {
+            (service as Service).startForeground(
+                notificationId,
+                notification,
+                FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
+            )
+        } else {
+            (service as Service).startForeground(notificationId, notification)
         }
     }
 

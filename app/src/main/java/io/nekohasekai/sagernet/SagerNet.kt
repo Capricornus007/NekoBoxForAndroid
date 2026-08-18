@@ -169,9 +169,9 @@ class SagerNet :
     // 更新通知頻道，確保 VPN 服務可正確發佈前景通知。
     private fun updateNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            listOf("service-vpn", "service-proxy", "service-subscription", "connection-test").forEach {
-                notification.deleteNotificationChannel(it)
-            }
+            // Channel creation is idempotent. Never delete live foreground-service channels from
+            // Application.onCreate(): main and :bg processes can start concurrently, and one
+            // process deleting the other's active channel makes startForeground() fail.
             notification.createNotificationChannels(
                 listOf(
                     NotificationChannel(
