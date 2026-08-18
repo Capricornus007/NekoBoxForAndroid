@@ -9,4 +9,6 @@ assignees: ''
 
 ## Description suggestions
 
-## Necessity of recommendations
+## Expected priority
+
+P1/P2/P3
