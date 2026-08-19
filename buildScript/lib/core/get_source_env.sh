@@ -1,9 +1,7 @@
-# sing-box 1.14.x fork commit (Capricornus007/sing-box, branch
-# integration/nb4a-beta15-20260819 — NOT 1.14.x, which currently carries
-# unresolved conflict markers in 124 files and cannot compile).
+# sing-box 1.14.x fork commit (Capricornus007/sing-box, branch 1.14.x).
 # Pinned so CI builds are reproducible and so the LibCore cache key
 # (golang_status hashes this file) invalidates when sing-box changes.
-export COMMIT_SING_BOX="68f16614907c3444e7855c1f9a3c889c6771ae4a"
+export COMMIT_SING_BOX="38c28858f8bc1b87fc9af5dceb251f9fcd3dd984"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
