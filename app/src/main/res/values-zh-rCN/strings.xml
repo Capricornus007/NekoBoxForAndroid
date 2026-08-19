@@ -615,12 +615,12 @@
     <string name="check_update_preview">检查预览版更新</string>
     <string name="check_update_release">检查正式版更新</string>
     <string name="release_not_available">NekoBox has not published a stable release yet</string>
-    <string name="update_dialog_title">发现新版本</string>
+    <string name="update_dialog_title">新版本可用</string>
     <string name="update_dialog_message">当前版本：%1$s\n可升级版本：%2$s\n是否下载并安装适配本机架构的安装包？</string>
     <string name="update_downloading">正在下载更新…</string>
     <string name="update_open_page">打开发布页</string>
     <string name="update_no_apk_for_abi">未找到适配本机架构（%1$s）的安装包，是否打开发布页手动选择？</string>
-    <string name="check_update_no">检查成功，但没有更新。</string>
+    <string name="check_update_no">检查成功，但无更新。</string>
     <string name="reset_settings">恢复默认设置</string>
     <string name="reset_settings_message">恢复默认设置，但节点和分组等数据将被保留。要完全清除数据，请在系统设置中直接清除应用数据。</string>
     <string name="minimize">最小化</string>
@@ -711,7 +711,7 @@
     <string name="mdv_encryption_key">加密密钥</string>
     <string name="mdv_encryption_method">加密方式</string>
     <string name="mdv_local_dns_enabled">启用本地 DNS</string>
-    <string name="mdv_local_dns_port">本地 DNS 端口</string>
+    <string name="mdv_local_dns_port">本地DNS端口</string>
     <string name="mdv_log_level">日志级别</string>
     <string name="mdv_max_download_mtu">最大下载 MTU</string>
     <string name="mdv_max_upload_mtu">最大上传 MTU</string>
@@ -795,4 +795,4 @@
     <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
     <string name="mixed_auth_no_auth">Not set (no authentication)</string>
     <string name="mixed_auth_enabled_sum">Username: %1$s</string>
-<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="service_mode_vpn">VPN</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink" formatted="false">%s | %s/s ↑</string><string name="traffic_downlink" formatted="false">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string></resources>
+<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="service_mode_vpn">VPN</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink" formatted="false">%s | %s/s ↑</string><string name="traffic_downlink" formatted="false">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string><string name="dialog_watchdog_start">开始</string><string name="rule_network">网络</string><string name="rule_protocol">协议</string></resources>
