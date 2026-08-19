@@ -818,7 +818,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
     <string name="append_http_proxy_security_title">Security Warning</string>
-    <string name="append_http_proxy_security_message">Enabling HTTP proxy may expose your traffic.</string>
+    <string name="append_http_proxy_security_message">When enabled, other apps on this device can directly use the local proxy port.\n\nRecommendation: Only enable this if you trust all installed apps.</string>
     <string name="enable_anyway">Enable Anyway</string>
     <string name="vpn_watchdog">Auto-reconnect</string>
     <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
