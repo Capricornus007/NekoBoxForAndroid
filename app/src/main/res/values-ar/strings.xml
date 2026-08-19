@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <resources>
     <string name="app_desc">سلسلة أدوات بروكسي عالمية لنظام Android، مكتوبة بلغة Kotlin.</string>
     <string name="project">المشروع</string>
@@ -30,10 +30,8 @@
     <string name="tile_title">المبدل</string>
     <string name="menu_traffic">حركة المرور</string>
     <string name="menu_dashboard">لوحة تحكم sing-box</string>
-    
     <string name="action_copy">نسخ</string>
     <string name="action_open">فتح</string>
-    
     <string name="group_name">اسم المجموعة</string>
     <string name="group_update">تحديث</string>
     <string name="group_subscription_link">رابط الاشتراك</string>
@@ -60,7 +58,6 @@
     <string name="group_changed">تم التحديث: \n%s</string>
     <string name="group_deleted">تم الحذف: \n%s</string>
     <string name="group_duplicate">مكرر: \n%s</string>
-    
     <string name="service_mode">وضع الخدمة</string>
     <string name="service_mode_proxy">وكيل فقط</string>
     <string name="port_proxy">منفذ الوكيل</string>
@@ -113,7 +110,6 @@
     <string name="require_transproxy">تفعيل الوارد عبر Transproxy</string>
     <string name="transproxy_mode">وضع Transproxy</string>
     <string name="connection_test_url">عنوان URL لاختبار الاتصال</string>
-    
     <string name="profile_name">اسم الملف الشخصي</string>
     <string name="server_address">الخادم</string>
     <string name="server_port">المنفذ البعيد</string>
@@ -128,7 +124,7 @@
     <string name="obfs">الإخفاء</string>
     <string name="obfs_param">معامل الإخفاء</string>
     <string name="uuid">معرف المستخدم</string>
-    <string name="alter_id">Alter ID</string>
+    <string name="alter_id">تغيير رقم التعريف</string>
     <string name="security">تشفير طبقة النقل</string>
     <string name="network">الشبكة</string>
     <string name="header_type">نوع الرأس</string>
@@ -151,7 +147,6 @@
     <string name="extra_headers">رؤوس إضافية</string>
     <string name="config_type">نوع التكوين</string>
     <string name="edit_config">تعديل التكوين</string>
-    
     <string name="ipv6">مسار IPv6</string>
     <string name="prefer">تفضيل</string>
     <string name="only">فقط</string>
@@ -212,7 +207,6 @@
     <string name="direct_boot_aware">السماح بالتبديل في شاشة القفل</string>
     <string name="direct_boot_aware_summary">معلومات ملفك الشخصي المحدد
 ستكون أقل حماية</string>
-    
     <string name="service_vpn">خدمة VPN</string>
     <string name="service_proxy">خدمة بروكسي</string>
     <string name="forward_success">تم بدء البروكسي.</string>
@@ -224,11 +218,9 @@
     <string name="vpn_permission_denied">تم رفض الإذن لإنشاء خدمة VPN</string>
     <string name="reboot_required">فشل بدء خدمة VPN. قد تحتاج إلى إعادة تشغيل
 جهازك.</string>
-    
     <string name="profile_empty">يرجى تحديد ملف شخصي</string>
     <string name="connect">اتصال</string>
     <string name="clipboard_empty">الحافظة فارغة</string>
-    
     <string name="settings">الإعدادات</string>
     <string name="edit">تعديل</string>
     <string name="share">مشاركة</string>
@@ -268,8 +260,6 @@
     <string name="action_import_msg">تم الاستيراد بنجاح!</string>
     <string name="action_import_err">فشل الاستيراد.</string>
     <string name="file_manager_missing">جهازك يفتقر إلى محدد ملفات Android قياسي، يرجى تثبيت واحد، مثل Material Files.</string>
-    
-    
     <string name="profile_config">تكوين الملف الشخصي</string>
     <string name="delete">إزالة</string>
     <string name="delete_confirm_prompt">هل أنت متأكد أنك تريد إزالة هذا الملف الشخصي؟</string>
@@ -296,13 +286,10 @@
     <string name="undo">تراجع</string>
     <string name="insecure">غير آمن</string>
     <string name="deprecated">مهمل</string>
-    
-    
     <string name="connecting">جارٍ الاتصال…</string>
     <string name="vpn_connected">متصل، اضغط للتحقق من الاتصال</string>
     <string name="connection_status_connected">متصل</string>
     <string name="not_connected">غير متصل</string>
-    
     <string name="subscriptions">الاشتراكات</string>
     <string name="cleartext_http_warning">حركة مرور HTTP العادية غير آمنة</string>
     <string name="error_title">خطأ</string>
@@ -319,7 +306,6 @@
     <string name="ignore_battery_optimizations_sum">إزالة بعض القيود</string>
     <string name="battery_optimization_enabled">تحسين البطارية: مفعل</string>
     <string name="battery_optimization_disabled">تحسين البطارية: معطل</string>
-    
     <string name="plugin">إضافة</string>
     <string name="plugin_configure">تكوين...</string>
     <string name="plugin_disabled">معطل</string>
@@ -333,7 +319,7 @@
     <string name="plugin_approval_success">تمت الموافقة على حزمة الملحق. اتصل مجددًا لاستخدامه.</string>
     <string name="plugin_approval_failed">تعذّرت الموافقة على حزمة الملحق.</string>
     <string name="plugin_approval_conflict_title">تعارض حزمة الملحق</string>
-    <string name="plugin_approval_conflict_message">توفر أكثر من حزمة غير موثوقة هذا الملحق: %s\n\nأزل التعارض قبل الموافقة على حزمة.</string>
+    <string name="plugin_approval_conflict_message">توفر أكثر من حزمة غير موثوقة هذا الملحق: %1$s\n\nأزل التعارض قبل الموافقة على حزمة.</string>
     <string name="plugin_auto_connect_unlock_only">قد لا تعمل هذه الإضافة مع الاتصال التلقائي</string>
     <string name="proxy_cat">إعدادات الخادم</string>
     <string name="ss_cat">إعدادات Shadowsocks</string>
@@ -363,7 +349,8 @@
     <string name="regular_expression_filter">Regular expression filter</string>
     <string name="regular_expression_filter1">Regular expression include filter</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
-    <string name="balancer_use_front_proxy">Use group front proxy</string>    <string name="standard">قياسي</string>
+    <string name="balancer_use_front_proxy">Use group front proxy</string>
+    <string name="standard">قياسي</string>
     <string name="unavailable">غير متاح</string>
     <string name="always_show_address">عرض العنوان دائمًا</string>
     <string name="always_show_address_sum">عرض عنوان الخادم دائمًا على بطاقة
@@ -752,7 +739,6 @@
     <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
     <string name="app_list_permission_denied">غير قادر على قراءة التطبيقات المثبتة.\nعادةً ما يكون هذا بسبب تقييد النظام لأذونات قراءة التطبيقات.\nيرجى منح الأذونات في إعدادات النظام.</string>
     <string name="open_app_settings">فتح إعدادات النظام</string>
-    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">مفتاح مشترك مسبق</string>
     <string name="snell_userkey">مفتاح المستخدم</string>
@@ -773,7 +759,6 @@
     <string name="dynamic_colors_classic">متاح مع الواجهة الجديدة</string>
     <string name="theme_fallback_summary">اللون عند تعطيل الديناميكي</string>
     <string name="more_options">المزيد</string>
-    
     <string name="auto_switch_timeout">التبديل التلقائي عند انتهاء المهلة</string>
     <string name="auto_switch_timeout_summary">التبديل تلقائيًا إلى الإعداد التالي في حالة عدم الاستجابة</string>
     <string name="auto_switch_timeout_duration">مدة المهلة (ثوانٍ)</string>
@@ -784,4 +769,122 @@
     <string name="vpn_watchdog_interval">فترة الفحص (ثوانٍ)</string>
     <string name="dual_network_acceleration">تسريع الشبكة المزدوجة</string>
     <string name="dual_network_acceleration_summary">الاتصال في وقت واحد عبر Wi-Fi والبيانات الخلوية. يتطلب بقاء كل من Wi-Fi والبيانات الخلوية مفعّلين في إعدادات النظام، ويزيد من استهلاك البطارية.</string>
-<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="use_system_theme">Use system theme</string><string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string><string name="service_mode_vpn">VPN</string><string name="disable_mixed_inbound">Disable Mixed Inbound</string><string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string><string name="mixed_inbound_disabled">Disabled</string><string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="mixed_auth_config">Configure authentication</string><string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string><string name="mixed_auth_no_auth">Not set (no authentication)</string><string name="mixed_auth_enabled_sum">Username: %1$s</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink" formatted="false">%s | %s/s ↑</string><string name="traffic_downlink" formatted="false">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string><string name="ech_query_server_name">ECH Query Server Name</string><string name="preview_hint_dont_show_again">Don\'t show again</string><string name="release_not_available">NekoBox has not published a stable release yet</string><string name="action_amneziawg">AmneziaWG</string><string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string><string name="extra_subscription_links">Extra Subscription Links</string><string name="mal_close">Close</string><string name="proxy_fastest_regex">Fastest (regex)</string><string name="fastest_candidate_mode">Candidate source</string><string name="fastest_regex_options">Subscription regex</string><string name="fastest_regex_source_group">Source subscription</string><string name="fastest_regex_pattern">Regular expression</string><string name="fastest_regex_ignore_case">Ignore case</string><string name="fastest_regex_preview">Check regex</string><string name="fastest_regex_preview_count">Matching proxies: %1$d</string><string name="fastest_regex_preview_no_matches">No matching proxies</string><string name="fastest_regex_error_empty">Enter a regular expression</string><string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string><string name="fastest_regex_error_source_missing">Select an existing source subscription</string><string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string><string name="extra_subscription_links_hint">Enter subscription links, one per line</string><string name="dns_hosts_lines">%d hosts lines</string></resources>
+    <string name="app_name">NekoBox</string>
+    <string name="app_name_long">NekoBox for Android</string>
+    <string name="use_system_theme">استخدام سمة النظام</string>
+    <string name="use_system_theme_summary">استخدام ألوان Monet في النظام (Android 12+)</string>
+    <string name="service_mode_vpn">VPN</string>
+    <string name="disable_mixed_inbound">تعطيل الوارد المختلط</string>
+    <string name="disable_mixed_inbound_sum">وارد TUN خالص؛ لا يستمع على منفذ الوكيل المحلي</string>
+    <string name="mixed_inbound_disabled">معطل</string>
+    <string name="disable_mixed_inbound_proxy_toast">التعطيل يعمل فقط في وضع TUN؛ يتم الاستماع حاليًا على المنفذ: %1$d</string>
+    <string name="ws_max_early_data">Max early data</string>
+    <string name="traffic">%1$s↑ %2$s↓</string>
+    <string name="action_socks">SOCKS</string>
+    <string name="action_http">HTTP</string>
+    <string name="action_shadowsocks">Shadowsocks</string>
+    <string name="action_shadowsocksr">ShadowsocksR</string>
+    <string name="action_vmess">VMess</string>
+    <string name="action_trojan">Trojan</string>
+    <string name="action_trojan_go">Trojan Go</string>
+    <string name="action_mieru">Mieru</string>
+    <string name="action_naive">Naïve</string>
+    <string name="action_anytls">AnyTLS</string>
+    <string name="action_hysteria">Hysteria</string>
+    <string name="action_ssh">SSH</string>
+    <string name="action_wireguard">WireGuard</string>
+    <string name="action_tuic">TUIC</string>
+    <string name="action_juicity">Juicity</string>
+    <string name="leastPing">Ping</string>
+    <string name="v2rayn">V2RayN</string>
+    <string name="available">%dms</string>
+    <string name="connection_test_tcp_ping">TCPing</string>
+    <string name="connection_test_icmp_ping">ICMPing</string>
+    <string name="connection_test_url_test">URL Test</string>
+    <string name="mixed_auth_config">إعداد المصادقة</string>
+    <string name="mixed_auth_username_hint">اسم المستخدم (اترك الحقلين فارغين لعدم المصادقة)</string>
+    <string name="mixed_auth_no_auth">غير مُعد (بدون مصادقة)</string>
+    <string name="mixed_auth_enabled_sum">اسم المستخدم: %1$s</string>
+    <string name="ooc_subscription_token">OOCv1 API Token</string>
+    <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>
+    <string name="traffic_uplink_total">%s ↑</string>
+    <string name="traffic_downlink_total">%s ↓</string>
+    <string name="cloudflare_wrap">Cloudflare Warp</string>
+    <string name="pcap">Pcap</string>
+    <string name="mtu">MTU</string>
+    <string name="action_shadowtls">ShadowTLS</string>
+    <string name="ech_query_server_name">ECH Query Server Name</string>
+    <string name="preview_hint_dont_show_again">لا تظهر مرة أخرى</string>
+    <string name="release_not_available">Throne has not published a stable release yet</string>
+    <string name="action_amneziawg">AmneziaWG</string>
+    <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
+    <string name="extra_subscription_links">Extra Subscription Links</string>
+    <string name="mal_close">Close</string>
+    <string name="proxy_fastest_regex">Fastest (regex)</string>
+    <string name="fastest_candidate_mode">Candidate source</string>
+    <string name="fastest_regex_options">Subscription regex</string>
+    <string name="fastest_regex_source_group">Source subscription</string>
+    <string name="fastest_regex_pattern">Regular expression</string>
+    <string name="fastest_regex_ignore_case">Ignore case</string>
+    <string name="fastest_regex_preview">Check regex</string>
+    <string name="fastest_regex_preview_count">Matching proxies: %1$d</string>
+    <string name="fastest_regex_preview_no_matches">No matching proxies</string>
+    <string name="fastest_regex_error_empty">Enter a regular expression</string>
+    <string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string>
+    <string name="fastest_regex_error_source_missing">Select an existing source subscription</string>
+    <string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string>
+    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
+    <string name="dns_hosts_lines">%d hosts lines</string>
+    <string name="rule_network">الشبكة</string>
+    <string name="rule_protocol">البروتوكول</string>
+    <string name="dialog_watchdog_start">ابدأ</string>
+    <string name="backup_not_throne_desktop">ليست نسخة احتياطية من Throne Desktop: كان المتوقع ملف .thrbackup، ولكن تم العثور على %s</string>
+    <string name="action_import_throne_desktop">الاستيراد من Throne Desktop</string>
+    <string name="backup_import_throne_desktop_summary">استيراد الملفات الشخصية والمسارات والإعدادات من ملف .thrbackup لـ Throne Desktop. سيتم تجاهل الأيقونات المخصصة. ستُستبدل البيانات الحالية في الفئات المحددة.</string>
+    <string name="shadowquic_udp_over_stream">UDP عبر التدفق</string>
+    <string name="shadowquic_zero_rtt">مصافحة 0-RTT</string>
+    <string name="shadowquic_sunny_quic">Sunny QUIC</string>
+    <string name="trusttunnel_quic">QUIC ‏(HTTP/3)</string>
+    <string name="trusttunnel_health_check">فحص السلامة</string>
+    <string name="trusttunnel_congestion_control">التحكم في ازدحام QUIC</string>
+    <string name="invalid_snell_url">عنوان URL لـ Snell غير صالح</string>
+    <string name="not_supported_proxy">غير مدعوم: %1$s</string>
+    <string name="not_http_proxy">ليس وكيلاً لـ HTTP</string>
+    <string name="masterdns_no_tunnel">يفتقد رابط MasterDNS نطاق النفق</string>
+    <string name="masterdns_no_key">يفتقد رابط MasterDNS مفتاح التشفير للطريقة %1$s</string>
+    <string name="webdav_auth_failed">فشلت المصادقة</string>
+    <string name="webdav_check_dir_failed">تعذر التحقق من الدليل (%1$s): %2$s</string>
+    <string name="rule_domain">النطاق</string>
+    <string name="rule_dst_ip">عنوان IP للوجهة</string>
+    <string name="rule_dst_port">منفذ الوجهة</string>
+    <string name="rule_src_ip">عنوان IP للمصدر</string>
+    <string name="rule_src_port">منفذ المصدر</string>
+    <string name="rule_ruleset">مجموعة القواعد (.srs)</string>
+    <string name="rule_outbound">الصادر</string>
+    <string name="pref_sing_box_server">خادم sing-box</string>
+    <string name="udp_over_tcp">UDP عبر TCP</string>
+    <string name="reality_public_key">المفتاح العام لـ Reality</string>
+    <string name="reality_short_id">المعرّف القصير لـ Reality</string>
+    <string name="debug_button_crash_from_kt">إحداث تعطل من Kotlin</string>
+    <string name="debug_button_reset_settings">إعادة ضبط الإعدادات</string>
+    <string name="toast_create_preferences_failed">تعذر إنشاء التفضيلات. يُرجى المحاولة مرة أخرى.</string>
+    <string name="dialog_watchdog_test_title">اختبار Watchdog</string>
+    <string name="dialog_watchdog_vpn_not_running">VPN غير متصل. اتصل بـ VPN أولاً.</string>
+    <string name="dialog_watchdog_auto_reconnect_title">اختبار إعادة الاتصال التلقائي</string>
+    <string name="dialog_watchdog_force_restart">سيعيد Watchdog تشغيل VPN بالقوة.
+
+سينقطع VPN لمدة 1–3 ثوانٍ، ثم سيُعاد الاتصال تلقائيًا.
+
+هل تريد المتابعة؟</string>
+    <string name="snackbar_watchdog_test_started">بدأ الاختبار. ستتم إعادة التشغيل خلال ≤30 ثانية...</string>
+    <string name="dialog_log_buffer_size">حجم مخزن السجل (KB)</string>
+    <string name="invalid_naive_link">رابط Naive غير صالح: %1$s</string>
+    <string name="invalid_ss_android_link">رابط ss-android غير صالح: %1$s</string>
+    <string name="invalid_jms_link">رابط JMS غير صالح: %1$s</string>
+    <string name="invalid_v2rayn_link">رابط v2rayN غير صالح: %1$s</string>
+    <string name="invalid_trojan_link">رابط Trojan غير صالح: %1$s</string>
+    <string name="invalid_http_link">رابط HTTP(S) غير صالح: %1$s</string>
+    <string name="invalid_hysteria_link">رابط Hysteria غير صالح: %1$s</string>
+    <string name="invalid_masterdns_link">رابط MasterDNS غير صالح: %1$s</string>
+</resources>

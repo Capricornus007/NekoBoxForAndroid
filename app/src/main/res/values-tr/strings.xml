@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <resources>
     <string name="app_desc">Android için evrensel proxy araç zinciri, Kotlin ile yazılmıştır.</string>
     <string name="project">Proje</string>
@@ -30,10 +30,8 @@
     <string name="tile_title">Değiştirici</string>
     <string name="menu_traffic">Trafik</string>
     <string name="menu_dashboard">sing-box Kontrol Paneli</string>
-    
     <string name="action_copy">Kopyala</string>
     <string name="action_open">Aç</string>
-    
     <string name="group_name">Grup adı</string>
     <string name="group_update">Güncelle</string>
     <string name="group_subscription_link">Abonelik Bağlantısı</string>
@@ -60,7 +58,6 @@
     <string name="group_changed">Güncellendi: \n%s</string>
     <string name="group_deleted">Silindi: \n%s</string>
     <string name="group_duplicate">Yinelenen: \n%s</string>
-    
     <string name="service_mode">Hizmet Modu</string>
     <string name="service_mode_proxy">Yalnızca Proxy</string>
     <string name="port_proxy">Proxy Bağlantı Noktası</string>
@@ -92,7 +89,8 @@
     <string name="allow_insecure">Güvensiz Bağlantılara İzin Ver</string>
     <string name="allow_insecure_sum">Sertifika kontrolünü devre dışı bırakın. Etkinleştirildiğinde bu yapılandırma, düz metin kadar güvenlidir.</string>
     <string name="lifetime_traffic">Tüm zamanlar: %1$s↑ %2$s↓</string>
-    <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirect： %3$s↑ %4$s↓</string>
+    <string name="speed_detail">Vekil Sunucu： %1$s↑ %2$s↓
+\nDirekt： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Test ediliyor…</string>
     <string name="connection_test_available">Başarılı: HTTPS el sıkışması %dms sürdü</string>
@@ -114,7 +112,6 @@
     <string name="require_transproxy">Transproxy Geleni Etkinleştir</string>
     <string name="transproxy_mode">Transproxy Modu</string>
     <string name="connection_test_url">Bağlantı Testi URL\'si</string>
-    
     <string name="profile_name">Profil Adı</string>
     <string name="server_address">Sunucu</string>
     <string name="server_port">Uzak Port</string>
@@ -126,10 +123,10 @@
     <string name="enc_method">Şifreleme Yöntemi</string>
     <string name="protocol">Protokol</string>
     <string name="protocol_param">Protokol Parametresi</string>
-    <string name="obfs">Obfs</string>
+    <string name="obfs">Şaşırtmaca</string>
     <string name="obfs_param">Obfs Parametresi</string>
     <string name="uuid">Kullanıcı ID</string>
-    <string name="alter_id">Alter ID</string>
+    <string name="alter_id">Alternatif ID</string>
     <string name="security">Taşıma Katmanı Şifrelemesi</string>
     <string name="network">Ağ</string>
     <string name="header_type">Başlık Türü</string>
@@ -152,7 +149,6 @@
     <string name="extra_headers">Ek Başlıklar</string>
     <string name="config_type">Yapılandırma Türü</string>
     <string name="edit_config">Yapılandırmayı Düzenle</string>
-    
     <string name="ipv6">IPv6 Yönlendirme</string>
     <string name="prefer">Tercih Et</string>
     <string name="only">Yalnızca</string>
@@ -162,7 +158,7 @@
     <string name="route_add">Rota Oluştur</string>
     <string name="delete_route_prompt">Bu rotayı kaldırmak istediğinizden emin misiniz?</string>
     <string name="route_name">Rota Adı</string>
-    <string name="route_proxy">Proxy</string>
+    <string name="route_proxy">Vekil Sunucu</string>
     <string name="route_bypass">Atlatma</string>
     <string name="route_block">Engelle</string>
     <string name="route_profile">Profil Seç…</string>
@@ -213,7 +209,6 @@
     <string name="direct_boot_aware">Kilit Ekranında Değiştirmeye İzin Ver</string>
     <string name="direct_boot_aware_summary">Seçili profil bilgileriniz daha az
         korunacak</string>
-    
     <string name="service_vpn">VPN Hizmeti</string>
     <string name="service_proxy">Proxy Hizmeti</string>
     <string name="forward_success">Proxy başlatıldı.</string>
@@ -223,13 +218,10 @@
     <string name="stopping">Kapatılıyor…</string>
     <string name="vpn_error">VPN Hatası: %s</string>
     <string name="vpn_permission_denied">VPN hizmeti oluşturma izni reddedildi</string>
-    <string name="reboot_required">Failed to start VPN service. You might need to reboot your
-        device.</string>
-    
+    <string name="reboot_required">VPN servisi oluşturma başarısız oldu. Cihazınızı yeniden başlatmanız gerekiyor olabilir.</string>
     <string name="profile_empty">Lütfen bir profil seçin</string>
     <string name="connect">Bağlan</string>
     <string name="clipboard_empty">Pano boş</string>
-    
     <string name="settings">Ayarlar</string>
     <string name="edit">Düzenle</string>
     <string name="share">Paylaş</string>
@@ -270,8 +262,6 @@
     <string name="action_import_err">İçe aktarma başarısız.</string>
     <string name="file_manager_missing">Cihazınızda Android standart dosya seçici yok, lütfen
         bir tane kurun, örneğin Material Files.</string>
-    
-    
     <string name="profile_config">Profil yapılandırması</string>
     <string name="delete">Kaldır</string>
     <string name="delete_confirm_prompt">Bu profili kaldırmak istediğinize emin misiniz?</string>
@@ -290,13 +280,10 @@
     <string name="undo">Geri al</string>
     <string name="insecure">Güvensiz</string>
     <string name="deprecated">Kullanımdan kaldırıldı</string>
-    
-    
     <string name="connecting">Bağlanıyor…</string>
     <string name="vpn_connected">Bağlı, bağlantıyı kontrol etmek için dokunun</string>
     <string name="connection_status_connected">Bağlı</string>
     <string name="not_connected">Bağlı değil</string>
-    
     <string name="subscriptions">Abonelikler</string>
     <string name="cleartext_http_warning">Düz metin HTTP trafiği güvensizdir</string>
     <string name="error_title">Hata</string>
@@ -313,7 +300,6 @@
     <string name="ignore_battery_optimizations_sum">Bazı kısıtlamaları kaldır</string>
     <string name="battery_optimization_enabled">Pil Optimizasyonu: açık</string>
     <string name="battery_optimization_disabled">Pil Optimizasyonu: kapalı</string>
-    
     <string name="plugin">Eklenti</string>
     <string name="plugin_configure">Yapılandır…</string>
     <string name="plugin_disabled">Devre Dışı</string>
@@ -328,7 +314,7 @@
     <string name="plugin_approval_success">Eklenti paketi onaylandı. Kullanmak için tekrar bağlanın.</string>
     <string name="plugin_approval_failed">Eklenti paketi onaylanamadı.</string>
     <string name="plugin_approval_conflict_title">Eklenti paketi çakışması</string>
-    <string name="plugin_approval_conflict_message">Birden fazla güvenilmeyen paket bu eklentiyi sağlıyor: %s\n\nPaketi onaylamadan önce çakışmayı giderin.</string>
+    <string name="plugin_approval_conflict_message">Birden fazla güvenilmeyen paket bu eklentiyi sağlıyor: %1$s\n\nPaketi onaylamadan önce çakışmayı giderin.</string>
     <string name="plugin_auto_connect_unlock_only">Bu eklenti Auto Connect ile çalışmayabilir</string>
     <string name="proxy_cat">Sunucu Ayarları</string>
     <string name="ss_cat">Shadowsocks Ayarları</string>
@@ -352,13 +338,14 @@
     <string name="enable_log_sum">Hata ayıklama amacıyla</string>
     <string name="list">Liste</string>
     <string name="random">Rastgele</string>
-    <string name="api_port">API Port</string>
+    <string name="api_port">API Portu</string>
     <string name="probe_interval">Dengeleyici gözlem aralığı</string>
     <string name="probe_url">Probe URL</string>
     <string name="regular_expression_filter">Regular expression filter</string>
     <string name="regular_expression_filter1">Regular expression include filter</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
-    <string name="balancer_use_front_proxy">Use group front proxy</string>    <string name="standard">Standart</string>
+    <string name="balancer_use_front_proxy">Use group front proxy</string>
+    <string name="standard">Standart</string>
     <string name="unavailable">Kullanılamıyor</string>
     <string name="always_show_address">Adresi Her Zaman Göster</string>
     <string name="always_show_address_sum">Yapılandırma kartında sunucu adresini her zaman göster</string>
@@ -408,7 +395,7 @@
     <string name="auto_update_delay">Otomatik Güncelleme Gecikmesi (Dakika)</string>
     <string name="update_when_connected_only">Yalnızca bağlıyken güncelle</string>
     <string name="update_when_connected_only_sum">IP adresi sızıntısını önle</string>
-    <string name="subscription_user_agent">UserAgent</string>
+    <string name="subscription_user_agent">Kullanıcı Kimliği</string>
     <string name="subscription_send_hwid">HWID Gönder</string>
     <string name="subscription_send_hwid_summary">Bu aboneliği güncellerken HWID, Android sürümü ve cihaz modelini gönder</string>
     <string name="subscription_custom_hwid_params">Özel HWID parametreleri</string>
@@ -745,7 +732,6 @@
     <string name="vless_encryption_hint">...0...</string>
     <string name="app_list_permission_denied">Yüklü uygulamalar okunamıyor.\nBu genellikle sistemin uygulama okuma izinlerini kısıtlamış olmasından kaynaklanır.\nLütfen sistem ayarlarından izin verin.</string>
     <string name="open_app_settings">Sistem Ayarlarını Aç</string>
-    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">Ön Paylaşımlı Anahtar</string>
     <string name="snell_userkey">Kullanıcı Anahtarı</string>
@@ -766,7 +752,6 @@
     <string name="dynamic_colors_classic">Yeni arayüzle kullanılabilir</string>
     <string name="theme_fallback_summary">Dinamik devre dışıyken bu renk</string>
     <string name="more_options">Daha Fazla</string>
-    
     <string name="auto_switch_timeout">Zaman aşımında otomatik geçiş</string>
     <string name="auto_switch_timeout_summary">Yanıt yoksa otomatik olarak sonraki yapılandırmaya geç</string>
     <string name="auto_switch_timeout_duration">Zaman aşımı süresi (saniye)</string>
@@ -777,4 +762,122 @@
     <string name="vpn_watchdog_interval">Kontrol aralığı (sn)</string>
     <string name="dual_network_acceleration">Çift ağ hızlandırma</string>
     <string name="dual_network_acceleration_summary">Wi-Fi ve mobil veri üzerinden aynı anda bağlanın. Sistem ayarlarında Wi-Fi ve mobil verinin açık kalmasını gerektirir ve pil tüketimini artırır.</string>
-<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="use_system_theme">Use system theme</string><string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string><string name="service_mode_vpn">VPN</string><string name="disable_mixed_inbound">Disable Mixed Inbound</string><string name="disable_mixed_inbound_sum">Pure TUN inbound; do not listen on the local proxy port</string><string name="mixed_inbound_disabled">Disabled</string><string name="disable_mixed_inbound_proxy_toast">Disabling only takes effect in TUN mode; currently listening on port: %1$d</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="mixed_auth_config">Configure authentication</string><string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string><string name="mixed_auth_no_auth">Not set (no authentication)</string><string name="mixed_auth_enabled_sum">Username: %1$s</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink" formatted="false">%s | %s/s ↑</string><string name="traffic_downlink" formatted="false">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string><string name="ech_query_server_name">ECH Query Server Name</string><string name="preview_hint_dont_show_again">Don\'t show again</string><string name="release_not_available">NekoBox has not published a stable release yet</string><string name="action_amneziawg">AmneziaWG</string><string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string><string name="extra_subscription_links">Extra Subscription Links</string><string name="mal_close">Close</string><string name="proxy_fastest_regex">Fastest (regex)</string><string name="fastest_candidate_mode">Candidate source</string><string name="fastest_regex_options">Subscription regex</string><string name="fastest_regex_source_group">Source subscription</string><string name="fastest_regex_pattern">Regular expression</string><string name="fastest_regex_ignore_case">Ignore case</string><string name="fastest_regex_preview">Check regex</string><string name="fastest_regex_preview_count">Matching proxies: %1$d</string><string name="fastest_regex_preview_no_matches">No matching proxies</string><string name="fastest_regex_error_empty">Enter a regular expression</string><string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string><string name="fastest_regex_error_source_missing">Select an existing source subscription</string><string name="fastest_regex_error_source_not_subscription">Selected source group is not a subscription</string><string name="extra_subscription_links_hint">Enter subscription links, one per line</string><string name="dns_hosts_lines">%d hosts lines</string></resources>
+    <string name="app_name">NekoBox</string>
+    <string name="app_name_long">NekoBox for Android</string>
+    <string name="use_system_theme">Sistem temasını kullan</string>
+    <string name="use_system_theme_summary">Sistem Monet renklerini kullan (Android 12+)</string>
+    <string name="service_mode_vpn">VPN</string>
+    <string name="disable_mixed_inbound">Karma Geleni Devre Dışı Bırak</string>
+    <string name="disable_mixed_inbound_sum">Saf TUN geleni; yerel proxy bağlantı noktasını dinlemez.</string>
+    <string name="mixed_inbound_disabled">Devre Dışı</string>
+    <string name="disable_mixed_inbound_proxy_toast">Devre dışı bırakma yalnızca TUN modunda etkili olur; şu anda %1$d bağlantı noktası dinleniyor.</string>
+    <string name="ws_max_early_data">En fazla erken veri</string>
+    <string name="traffic">%1$s↑ %2$s↓</string>
+    <string name="action_socks">SOCKS</string>
+    <string name="action_http">HTTP</string>
+    <string name="action_shadowsocks">Shadowsocks</string>
+    <string name="action_shadowsocksr">ShadowsocksR</string>
+    <string name="action_vmess">VMess</string>
+    <string name="action_trojan">Trojan</string>
+    <string name="action_trojan_go">Trojan Go</string>
+    <string name="action_mieru">Mieru</string>
+    <string name="action_naive">Naïve</string>
+    <string name="action_anytls">AnyTLS</string>
+    <string name="action_hysteria">Hysteria</string>
+    <string name="action_ssh">SSH</string>
+    <string name="action_wireguard">WireGuard</string>
+    <string name="action_tuic">TUIC</string>
+    <string name="action_juicity">Juicity</string>
+    <string name="leastPing">Ping</string>
+    <string name="v2rayn">V2RayN</string>
+    <string name="available">%dms</string>
+    <string name="connection_test_tcp_ping">TCPing</string>
+    <string name="connection_test_icmp_ping">ICMPing</string>
+    <string name="connection_test_url_test">URL Test</string>
+    <string name="mixed_auth_config">Kimlik doğrulamayı yapılandır</string>
+    <string name="mixed_auth_username_hint">Kullanıcı adı (ikisi de boş bırakılırsa kimlik doğrulama yok)</string>
+    <string name="mixed_auth_no_auth">Ayarlanmadı (kimlik doğrulama yok)</string>
+    <string name="mixed_auth_enabled_sum">Kullanıcı adı: %1$s</string>
+    <string name="ooc_subscription_token">OOCv1 API Token</string>
+    <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>
+    <string name="traffic_uplink_total">%s ↑</string>
+    <string name="traffic_downlink_total">%s ↓</string>
+    <string name="cloudflare_wrap">Cloudflare Warp</string>
+    <string name="pcap">Pcap</string>
+    <string name="mtu">MTU</string>
+    <string name="action_shadowtls">ShadowTLS</string>
+    <string name="ech_query_server_name">ECH sorgu sunucusu adı</string>
+    <string name="preview_hint_dont_show_again">Tekrar gösterme</string>
+    <string name="release_not_available">Throne henüz kararlı bir sürüm yayımlamadı</string>
+    <string name="action_amneziawg">AmneziaWG</string>
+    <string name="bottomsheet_drag_handle_clicked">Sürükleme tutamacına dokunuldu</string>
+    <string name="extra_subscription_links">Ek abonelik bağlantıları</string>
+    <string name="mal_close">Kapat</string>
+    <string name="proxy_fastest_regex">En hızlı (düzenli ifade)</string>
+    <string name="fastest_candidate_mode">Aday kaynağı</string>
+    <string name="fastest_regex_options">Abonelik düzenli ifadesi</string>
+    <string name="fastest_regex_source_group">Kaynak abonelik</string>
+    <string name="fastest_regex_pattern">Düzenli ifade</string>
+    <string name="fastest_regex_ignore_case">Büyük/küçük harfi yoksay</string>
+    <string name="fastest_regex_preview">Düzenli ifadeyi denetle</string>
+    <string name="fastest_regex_preview_count">Eşleşen proxy sayısı: %1$d</string>
+    <string name="fastest_regex_preview_no_matches">Eşleşen proxy yok</string>
+    <string name="fastest_regex_error_empty">Bir düzenli ifade girin</string>
+    <string name="fastest_regex_error_invalid">Geçersiz düzenli ifade: %1$s</string>
+    <string name="fastest_regex_error_source_missing">Mevcut bir kaynak abonelik seçin</string>
+    <string name="fastest_regex_error_source_not_subscription">Seçilen kaynak grubu bir abonelik değil</string>
+    <string name="extra_subscription_links_hint">Her satıra bir abonelik bağlantısı girin</string>
+    <string name="dns_hosts_lines">%d DNS hosts satırı</string>
+    <string name="rule_network">Ağ</string>
+    <string name="rule_protocol">Protokol</string>
+    <string name="dialog_watchdog_start">Başlat</string>
+    <string name="action_import_throne_desktop">Throne Desktop\'tan içe aktar</string>
+    <string name="backup_import_throne_desktop_summary">Throne Desktop .thrbackup dosyasından profilleri, rotaları ve ayarları içe aktarır. Özel simgeler yok sayılır. Seçilen kategorilerdeki mevcut verilerin üzerine yazılır.</string>
+    <string name="backup_not_throne_desktop">Throne Desktop yedeği değil: .thrbackup bekleniyordu, ancak %s bulundu</string>
+    <string name="debug_button_crash_from_kt">Kotlin üzerinden çökert</string>
+    <string name="debug_button_reset_settings">Ayarları sıfırla</string>
+    <string name="dialog_log_buffer_size">Günlük arabelleği boyutu (KB)</string>
+    <string name="dialog_watchdog_auto_reconnect_title">Otomatik yeniden bağlanmayı test et</string>
+    <string name="dialog_watchdog_force_restart">Watchdog VPN\'i zorla yeniden başlatacak.
+
+VPN bağlantısı 1-3 saniye kesilecek ve ardından otomatik olarak yeniden kurulacak.
+
+Devam edilsin mi?</string>
+    <string name="dialog_watchdog_test_title">Watchdog\'u test et</string>
+    <string name="dialog_watchdog_vpn_not_running">VPN çalışmıyor. Önce VPN\'e bağlanın.</string>
+    <string name="invalid_http_link">Geçersiz HTTP(S) bağlantısı: %1$s</string>
+    <string name="invalid_hysteria_link">Geçersiz Hysteria bağlantısı: %1$s</string>
+    <string name="invalid_jms_link">Geçersiz JMS bağlantısı: %1$s</string>
+    <string name="invalid_masterdns_link">Geçersiz MasterDNS bağlantısı: %1$s</string>
+    <string name="invalid_naive_link">Geçersiz Naive bağlantısı: %1$s</string>
+    <string name="invalid_snell_url">Geçersiz Snell URL\'si</string>
+    <string name="invalid_ss_android_link">Geçersiz ss-android bağlantısı: %1$s</string>
+    <string name="invalid_trojan_link">Geçersiz Trojan bağlantısı: %1$s</string>
+    <string name="invalid_v2rayn_link">Geçersiz v2rayN bağlantısı: %1$s</string>
+    <string name="masterdns_no_key">MasterDNS bağlantısında %1$s yöntemi için şifreleme anahtarı eksik</string>
+    <string name="masterdns_no_tunnel">MasterDNS bağlantısında tünel alan adları eksik</string>
+    <string name="not_http_proxy">HTTP proxy değil</string>
+    <string name="not_supported_proxy">Desteklenmiyor: %1$s</string>
+    <string name="pref_sing_box_server">sing-box sunucusu</string>
+    <string name="reality_public_key">Reality ortak anahtarı</string>
+    <string name="reality_short_id">Reality kısa kimliği</string>
+    <string name="rule_domain">Alan adı</string>
+    <string name="rule_dst_ip">Hedef IP</string>
+    <string name="rule_dst_port">Hedef bağlantı noktası</string>
+    <string name="rule_outbound">Giden</string>
+    <string name="rule_ruleset">Kural kümesi (.srs)</string>
+    <string name="rule_src_ip">Kaynak IP</string>
+    <string name="rule_src_port">Kaynak bağlantı noktası</string>
+    <string name="shadowquic_sunny_quic">Sunny QUIC</string>
+    <string name="shadowquic_udp_over_stream">Akış üzerinden UDP</string>
+    <string name="shadowquic_zero_rtt">0-RTT el sıkışması</string>
+    <string name="snackbar_watchdog_test_started">Test başladı. ≤30 sn içinde yeniden başlatılıyor…</string>
+    <string name="toast_create_preferences_failed">Tercihler oluşturulamadı. Lütfen tekrar deneyin.</string>
+    <string name="trusttunnel_congestion_control">QUIC tıkanıklık denetimi</string>
+    <string name="trusttunnel_health_check">Durum denetimi</string>
+    <string name="trusttunnel_quic">QUIC (HTTP/3)</string>
+    <string name="udp_over_tcp">TCP üzerinden UDP</string>
+    <string name="webdav_auth_failed">Kimlik doğrulama başarısız</string>
+    <string name="webdav_check_dir_failed">Dizin denetlenemedi (%1$s): %2$s</string>
+</resources>

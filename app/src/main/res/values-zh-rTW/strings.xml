@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <resources>
     <string name="app_desc">Android 通用代理工具鏈，以 Kotlin 編寫。</string>
     <string name="project">專案</string>
@@ -22,10 +22,8 @@
     <string name="tile_title">切換器</string>
     <string name="menu_traffic">流量</string>
     <string name="menu_dashboard">sing-box 儀表板</string>
-    
     <string name="action_copy">複製</string>
     <string name="action_open">开启</string>
-    
     <string name="group_name">分組名稱</string>
     <string name="group_update">更新</string>
     <string name="group_subscription_link">訂閱連結</string>
@@ -52,7 +50,6 @@
     <string name="group_changed">已更新：\n%s</string>
     <string name="group_deleted">已刪除：\n%s</string>
     <string name="group_duplicate">重複：\n%s</string>
-    
     <string name="service_mode">服務模式</string>
     <string name="service_mode_proxy">僅代理</string>
     <string name="port_proxy">代理連接埠</string>
@@ -101,7 +98,6 @@
     <string name="require_transproxy">啟用透明代理入站</string>
     <string name="transproxy_mode">透明代理模式</string>
     <string name="connection_test_url">連線測試 URL</string>
-    
     <string name="profile_name">設定檔名稱</string>
     <string name="server_address">伺服器</string>
     <string name="server_port">遠端連接埠</string>
@@ -124,10 +120,10 @@
     <string name="ws_path">WebSocket 路徑</string>
     <string name="http_host">HTTP 主機</string>
     <string name="http_path">HTTP 路徑</string>
-    <string name="kcp_seed">mKCP Seed</string>
+    <string name="kcp_seed">KCP 種子</string>
     <string name="kcp_header_type">標頭類型</string>
-    <string name="kcp_mtu">mKCP MTU</string>
-    <string name="kcp_tti">mKCP TTI</string>
+    <string name="kcp_mtu">KCP MTU</string>
+    <string name="kcp_tti">KCP TTI</string>
     <string name="kcp_cwnd_multiplier">CWND 乘數</string>
     <string name="grpc_service_name">gRPC 服務名稱</string>
     <string name="tls">使用 TLS</string>
@@ -139,7 +135,6 @@
     <string name="extra_headers">額外標頭</string>
     <string name="config_type">設定檔類型</string>
     <string name="edit_config">編輯設定檔</string>
-    
     <string name="ipv6">IPv6 路由</string>
     <string name="prefer">優先選擇</string>
     <string name="only">僅</string>
@@ -181,7 +176,7 @@
     <string name="mux_mode_connections">連線</string>
     <string name="mux_max_connections">最大連線</string>
     <string name="mux_min_streams">最小串流數</string>
-    <string name="mux_brutal">TCP Brutal</string>
+    <string name="mux_brutal">TCP Brutal 擁塞控制演算法</string>
     <string name="mux_brutal_up_mbps">上傳 (Mbps)</string>
     <string name="mux_brutal_down_mbps">下載 (Mbps)</string>
     <string name="tcp_keep_alive_interval">TCP 保活封包傳送間隔</string>
@@ -200,7 +195,6 @@
     <string name="direct_boot_aware">允許在鎖定畫面切換</string>
     <string name="direct_boot_aware_summary">您選擇的設定檔資訊將受到較少的保護
         </string>
-    
     <string name="service_vpn">VPN 服務</string>
     <string name="service_proxy">代理服務</string>
     <string name="forward_success">代理已啟動。</string>
@@ -212,11 +206,9 @@
     <string name="vpn_permission_denied">建立 VPN 服務的權限遭拒</string>
     <string name="reboot_required">啟動 VPN 服務失敗。您可能需要重新啟動您的
         裝置。</string>
-    
     <string name="profile_empty">請選擇一個設定檔</string>
     <string name="connect">連線</string>
     <string name="clipboard_empty">剪貼簿為空</string>
-    
     <string name="settings">設定</string>
     <string name="edit">編輯</string>
     <string name="share">共享</string>
@@ -224,7 +216,7 @@
     <string name="select_profile">選取設定檔</string>
     <string name="proxy_chain">代理鏈</string>
     <string name="custom_config">自定義設定檔</string>
-    <string name="balancer">Balancer</string>
+    <string name="balancer">負載平衡器</string>
     <string name="balancer_settings">Balancer 設定</string>
     <string name="balancer_type">類型</string>
     <string name="balancer_strategy">策略</string>
@@ -246,8 +238,6 @@
     <string name="action_import_msg">成功匯入！</string>
     <string name="action_import_err">匯入失敗。</string>
     <string name="file_manager_missing">您的裝置缺少 Android 標準檔案選擇器，請安裝一個，例如 質感文件。</string>
-    
-    
     <string name="profile_config">設定檔配置</string>
     <string name="delete">刪除</string>
     <string name="delete_confirm_prompt">您確定要刪除此設定檔嗎？</string>
@@ -257,19 +247,16 @@
     <string name="add_profile_methods_manual_settings">手動設定</string>
     <plurals name="removed">
         <item quantity="other">已移除 %d 個項目</item>
-    </plurals>
+    <item quantity="one">已移除</item></plurals>
     <plurals name="added">
         <item quantity="other">已新增 %d 個代理</item>
-    </plurals>
+    <item quantity="one">已新增</item></plurals>
     <string name="undo">撤消</string>
     <string name="insecure">不安全</string>
     <string name="deprecated">已棄用</string>
-    
-    
     <string name="connecting">連線中…</string>
     <string name="vpn_connected">已連線，點擊檢查連線</string>
     <string name="not_connected">未連線</string>
-    
     <string name="subscriptions">訂閱</string>
     <string name="cleartext_http_warning">明文 HTTP 流量不安全</string>
     <string name="error_title">錯誤</string>
@@ -280,7 +267,6 @@
     <string name="deduplication">去重</string>
     <string name="ignore_battery_optimizations">忽略電池最佳化</string>
     <string name="ignore_battery_optimizations_sum">移除一些限制</string>
-    
     <string name="plugin">外掛程式</string>
     <string name="plugin_configure">設定…</string>
     <string name="plugin_disabled">已停用</string>
@@ -356,8 +342,7 @@
     <string name="subscription_user_agent">使用者代理</string>
     <string name="confirm">確認</string>
     <string name="missing_plugin">缺失外掛程式</string>
-    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
-        it was not found.</string>
+    <string name="profile_requiring_plugin" formatted="false">設定檔 %s 需要外掛程式 %s，但其未被安裝。</string>
     <string name="action_learn_more">深入了解</string>
     <string name="action_download">下載</string>
     <string name="install_from_play_store">從 Play 商店安裝</string>
@@ -399,9 +384,7 @@
     <string name="group_order_origin">原始</string>
     <string name="group_order_by_name">按名稱</string>
     <string name="group_order_by_delay">按延遲</string>
-    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
-        proprietary equipment vendor (usually surveillance capital giants and malware maker)
-        tampered with your Android, making the plugin unusable.</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">設定檔 %s 需要外掛程式 %s，但是您的專有設備提供商（通常也是監視資本主義巨頭和惡意軟體製造商）篡改了你的 Android 系統，使此外掛程式不可用。</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks Android 外掛程式)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Shadowsocks Android 外掛程式)</string>
     <string name="tcp_connections">%d 個 TCP 連線</string>
@@ -471,17 +454,15 @@
     <string name="hide_from_recent_apps_summary">在背景運行時從最近任務中隱藏應用</string>
     <string name="action_switch">切換</string>
     <string name="custom_rules_provider">自訂</string>
-    <string name="rules_geosite_url">geosite URL</string>
-    <string name="rules_geoip_url">geoip URL</string>
+    <string name="rules_geosite_url">geosite 網址</string>
+    <string name="rules_geoip_url">geoip 網址</string>
     <string name="tuic_udp_relay_mode">UDP 中繼模式</string>
     <string name="tuic_congestion_controller">擁擠控制器</string>
     <string name="tuic_disable_sni">停用 SNI</string>
     <string name="tuic_reduce_rtt">啓用 0-RTT QUIC 握手</string>
     <string name="pinned_certchain_sha256">固定憑證 SHA256</string>
-    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
-        update!</string>
-    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
-        Please update!</string>
+    <string name="please_update" formatted="false">您的 APP (%s) 太舊了喵，%s 再不更新就沒的用了喵～</string>
+    <string name="please_update_force" formatted="false">您的 APP (%s) 版本過舊，已於 %s 停止工作，請立即升級。</string>
     <string name="connection_test_delete_unavailable">清除不可用的</string>
     <string name="move">移動</string>
     <string name="exe_prefer_provider">外掛程式偏好提供者</string>
@@ -542,7 +523,7 @@
     <string name="auto_select_proxy_apps_message">自動選擇代理應用程式，這將清除您
         目前的選擇。</string>
     <string name="enable_ech">啟用 ECH</string>
-    <string name="enable_ech_sum">啟用加密客戶端 Hello</string>
+    <string name="enable_ech_sum">啟用加密 Client Hello</string>
     <string name="ech_settings">ECH 設定</string>
     <string name="ech_config">ECH 配置</string>
     <string name="http_upgrade_host">HTTPUpgrade 主機</string>
@@ -603,7 +584,7 @@
     <string name="preview_hint_dont_show_again">不再顯示</string>
     <string name="check_update_preview">檢查預覽版本更新</string>
     <string name="check_update_release">檢查正式版本更新</string>
-    <string name="release_not_available">NekoBox has not published a stable release yet</string>
+    <string name="release_not_available">Throne 目前尚未發佈正式版</string>
     <string name="update_dialog_title">發現新版本</string>
     <string name="update_dialog_message">目前版本：%1$s\n可用版本：%2$s\n您要下載嗎？</string>
     <string name="update_downloading">正在下載更新…</string>
@@ -619,12 +600,11 @@
     <string name="xhttp_extra">XHTTP 額外</string>
     <string name="xhttp_settings">XHTTP 設定</string>
     <string name="vless_encryption">加密</string>
-    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
+    <string name="vless_encryption_hint">VLESS 加密提示</string>
     <string name="app_list_permission_denied">無法讀取已安裝的應用程式。
 這通常是因為系統限制了應用程式讀取權限。
 請在系統設定中授予權限。</string>
     <string name="open_app_settings">開啟系統設定</string>
-    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">預共享金鑰</string>
     <string name="snell_userkey">使用者金鑰</string>
@@ -733,7 +713,7 @@
     <string name="plugin_approval_message">套件：%1$s\n\nSHA-256 憑證指紋：\n%2$s\n\n已安裝外掛程式的可執行碼可透過應用程式的外掛程式介面執行。僅在您信任此套件時核准。</string>
     <string name="plugin_approval_success">外掛程式已核准</string>
     <string name="plugin_approval_title">外掛程式核准</string>
-    <string name="plugin_signer_rejected">已封鎖簽署者為 %2$s 的外掛程式套件 %1$s。請重新連線以進行審查。</string>
+    <string name="plugin_signer_rejected">已封鎖外掛程式套件 %1$s（簽署者 %2$s）。請重新連線以進行審查。</string>
     <string name="plugin_signer_unreadable">無法讀取外掛程式簽署者</string>
     <string name="probe_url">探測網址</string>
     <string name="profile_reference_not_allowed">不允許設定檔參考</string>
@@ -776,7 +756,6 @@
     <string name="ui_style_expressive">生動</string>
     <string name="waterfall_settings">瀑布式設定</string>
     <string name="webdav_insecure_url">不安全的 WebDAV 網址</string>
-    
     <string name="auto_switch_timeout">超時自動切換</string>
     <string name="auto_switch_timeout_summary">無回應時自動切換到下一個設定</string>
     <string name="auto_switch_timeout_duration">超時時長（秒）</string>
@@ -785,9 +764,105 @@
     <string name="vpn_watchdog_test">🧪 測試看門狗</string>
     <string name="vpn_watchdog_test_summary">強制重啟 VPN 以測試看門狗</string>
     <string name="vpn_watchdog_interval">檢查間隔（秒）</string>
-    <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
-    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
-    <string name="ech_query_server_name">ECH Query Server Name</string>
-<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="service_mode_vpn">VPN</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink" formatted="false">%s | %s/s ↑</string><string name="traffic_downlink" formatted="false">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string><string name="dialog_watchdog_start">開始</string><string name="rule_network">網路</string><string name="rule_protocol">協定</string></resources>
+    <string name="mixed_auth_config">設定身分驗證</string>
+    <string name="mixed_auth_username_hint">使用者名稱（兩項均留空則無認證）</string>
+    <string name="mixed_auth_no_auth">未設定（無認證）</string>
+    <string name="mixed_auth_enabled_sum">使用者名稱：%1$s</string>
+    <string name="ech_query_server_name">ECH 查詢伺服器名稱</string>
+    <string name="app_name">NekoBox</string>
+    <string name="app_name_long">NekoBox for Android</string>
+    <string name="service_mode_vpn">VPN</string>
+    <string name="ws_max_early_data">最大早期資料</string>
+    <string name="traffic">%1$s↑ %2$s↓</string>
+    <string name="action_socks">SOCKS</string>
+    <string name="action_http">HTTP</string>
+    <string name="action_shadowsocks">Shadowsocks</string>
+    <string name="action_shadowsocksr">ShadowsocksR</string>
+    <string name="action_vmess">VMess</string>
+    <string name="action_trojan">Trojan</string>
+    <string name="action_trojan_go">Trojan Go</string>
+    <string name="action_mieru">Mieru</string>
+    <string name="action_naive">Naïve</string>
+    <string name="action_anytls">AnyTLS</string>
+    <string name="action_hysteria">Hysteria</string>
+    <string name="action_ssh">SSH</string>
+    <string name="action_wireguard">WireGuard</string>
+    <string name="action_tuic">TUIC</string>
+    <string name="action_juicity">Juicity</string>
+    <string name="leastPing">Ping</string>
+    <string name="v2rayn">V2RayN</string>
+    <string name="available">%dms</string>
+    <string name="connection_test_tcp_ping">TCPing</string>
+    <string name="connection_test_icmp_ping">ICMPing</string>
+    <string name="connection_test_url_test">URL 測試</string>
+    <string name="ooc_subscription_token">OOCv1 API 權杖</string>
+    <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>
+    <string name="traffic_uplink_total">%s ↑</string>
+    <string name="traffic_downlink_total">%s ↓</string>
+    <string name="cloudflare_wrap">Cloudflare Warp</string>
+    <string name="pcap">Pcap</string>
+    <string name="mtu">MTU</string>
+    <string name="action_shadowtls">ShadowTLS</string>
+    <string name="dialog_watchdog_start">開始</string>
+    <string name="rule_network">網路</string>
+    <string name="rule_protocol">協定</string>
+<string name="backup_not_throne_desktop">不是 Throne 電腦版備份檔案，預期 .thrbackup，但 %s</string>
+    <string name="action_import_throne_desktop">從 Throne 電腦版匯入</string>
+    <string name="backup_import_throne_desktop_summary">從 Throne 電腦版 .thrbackup 匯入設定檔、路由與設定（忽略自訂圖示）。勾選的類別將覆蓋本機現有資料。</string>
+    <string name="not_set">未設定</string>
+    <string name="shadowquic_udp_over_stream">透過串流的 UDP</string>
+    <string name="shadowquic_zero_rtt">0-RTT 握手</string>
+    <string name="shadowquic_sunny_quic">Sunny QUIC</string>
+    <string name="trusttunnel_quic">QUIC（HTTP/3）</string>
+    <string name="trusttunnel_health_check">健康檢查</string>
+    <string name="trusttunnel_congestion_control">QUIC 壅塞控制</string>
+    <string name="invalid_snell_url">無效的 Snell URL</string>
+    <string name="invalid_http_link">無效的 HTTP(S) 連結：%1$s</string>
+    <string name="not_http_proxy">不是 HTTP 代理伺服器</string>
+    <string name="masterdns_no_tunnel">MasterDNS 連結缺少通道網域</string>
+    <string name="webdav_auth_failed">驗證失敗</string>
+    <string name="proxy_fastest_regex">最快（正規表示式）</string>
+    <string name="fastest_candidate_mode">候選來源</string>
+    <string name="fastest_regex_options">訂閱正規表示式</string>
+    <string name="fastest_regex_source_group">來源訂閱</string>
+    <string name="fastest_regex_pattern">正規表示式</string>
+    <string name="fastest_regex_ignore_case">忽略大小寫</string>
+    <string name="fastest_regex_preview">檢查正規表示式</string>
+    <string name="fastest_regex_preview_no_matches">沒有符合的代理伺服器</string>
+    <string name="fastest_regex_error_empty">請輸入正規表示式</string>
+    <string name="fastest_regex_error_source_missing">請選取現有的來源訂閱</string>
+    <string name="fastest_regex_error_source_not_subscription">選取的來源群組不是訂閱</string>
+    <string name="rule_domain">網域</string>
+    <string name="rule_dst_ip">目的地 IP</string>
+    <string name="rule_dst_port">目的地連接埠</string>
+    <string name="rule_src_ip">來源 IP</string>
+    <string name="rule_src_port">來源連接埠</string>
+    <string name="rule_ruleset">規則集（.srs）</string>
+    <string name="rule_outbound">輸出</string>
+    <string name="pref_sing_box_server">sing-box 伺服器</string>
+    <string name="udp_over_tcp">透過 TCP 的 UDP</string>
+    <string name="reality_public_key">Reality 公開金鑰</string>
+    <string name="reality_short_id">Reality Short ID</string>
+    <string name="debug_button_crash_from_kt">從 Kotlin 觸發當機</string>
+    <string name="debug_button_reset_settings">重設設定</string>
+    <string name="toast_create_preferences_failed">建立偏好設定失敗，請再試一次。</string>
+    <string name="dialog_watchdog_test_title">測試看門狗</string>
+    <string name="dialog_watchdog_vpn_not_running">VPN 尚未執行，請先連線 VPN。</string>
+    <string name="dialog_watchdog_auto_reconnect_title">測試自動重新連線</string>
+    <string name="dialog_watchdog_force_restart">看門狗將強制重新啟動 VPN。\n\nVPN 會中斷 1–3 秒，然後自動重新連線。\n\n要繼續嗎？</string>
+    <string name="snackbar_watchdog_test_started">測試已開始，將在 30 秒內重新啟動…</string>
+    <string name="dialog_log_buffer_size">記錄緩衝區大小（KB）</string>
+<string name="invalid_naive_link">無效的 Naive 連結：%1$s</string>
+    <string name="invalid_ss_android_link">無效的 ss-android 連結：%1$s</string>
+    <string name="invalid_jms_link">無效的 JMS 連結：%1$s</string>
+    <string name="invalid_v2rayn_link">無效的 v2rayN 連結：%1$s</string>
+    <string name="not_supported_proxy">不支援：%1$s</string>
+    <string name="invalid_trojan_link">無效的 Trojan 連結：%1$s</string>
+    <string name="invalid_hysteria_link">無效的 Hysteria 連結：%1$s</string>
+    <string name="invalid_masterdns_link">無效的 MasterDNS 連結：%1$s</string>
+    <string name="masterdns_no_key">MasterDNS 連結缺少 %1$s 方式的加密金鑰</string>
+    <string name="webdav_check_dir_failed">檢查目錄失敗（%1$s）：%2$s</string>
+    <string name="fastest_regex_preview_count">符合的代理伺服器：%1$d</string>
+    <string name="fastest_regex_error_invalid">無效的正規表示式：%1$s</string>
+    </resources>

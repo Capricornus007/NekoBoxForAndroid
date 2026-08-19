@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <resources>
     <string name="app_desc">Android用のユニバーサルプロキシツールチェーン、Kotlinで書かれています。</string>
     <string name="project">プロジェクト</string>
@@ -22,10 +22,8 @@
     <string name="tile_title">スイッチャー</string>
     <string name="menu_traffic">トラフィック</string>
     <string name="menu_dashboard">sing-box ダッシュボード</string>
-    
     <string name="action_copy">コピー</string>
     <string name="action_open">開く</string>
-    
     <string name="group_name">グループ名</string>
     <string name="group_update">更新</string>
     <string name="group_subscription_link">サブスクリプションリンク</string>
@@ -52,7 +50,6 @@
     <string name="group_changed">更新: \n%s</string>
     <string name="group_deleted">削除: \n%s</string>
     <string name="group_duplicate">重複: \n%s</string>
-    
     <string name="service_mode">サービスモード</string>
     <string name="service_mode_proxy">プロキシのみ</string>
     <string name="port_proxy">プロキシポート</string>
@@ -80,7 +77,7 @@
     <string name="security_settings">TLSセキュリティ設定</string>
     <string name="allow_insecure">安全でない接続を許可</string>
     <string name="allow_insecure_sum">証明書の確認を無効にします。有効にすると、この設定は平文と同等の安全性になります。</string>
-    <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirect： %3$s↑ %4$s↓</string>
+    <string name="speed_detail">プロキシ：%1$s↑ %2$s↓\nダイレクト：%3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">テスト中…</string>
     <string name="connection_test_available">成功：HTTPS ハンドシェイクに %dms</string>
@@ -103,7 +100,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="require_transproxy">トランスプロキシ受信を有効にする</string>
     <string name="transproxy_mode">トランスプロキシモード</string>
     <string name="connection_test_url">接続テストURL</string>
-    
     <string name="profile_name">プロファイル名</string>
     <string name="server_address">サーバー</string>
     <string name="server_port">リモートポート</string>
@@ -115,33 +111,32 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="enc_method">暗号化方式</string>
     <string name="protocol">プロトコル</string>
     <string name="protocol_param">プロトコルパラメータ</string>
-    <string name="obfs">Obfs</string>
+    <string name="obfs">obfs</string>
     <string name="obfs_param">Obfsパラメータ</string>
     <string name="uuid">ユーザーID</string>
-    <string name="alter_id">Alter ID</string>
+    <string name="alter_id">alter ID</string>
     <string name="security">トランスポート層暗号化</string>
     <string name="network">ネットワーク</string>
     <string name="header_type">ヘッダータイプ</string>
     <string name="ws_host">WebSocketホスト</string>
     <string name="ws_path">WebSocketパス</string>
     <string name="http_host">HTTPホスト</string>
-    <string name="http_path">HTTP Path</string>
-    <string name="kcp_seed">mKCP Seed</string>
+    <string name="http_path">HTTP パス</string>
+    <string name="kcp_seed">mKCPシード</string>
     <string name="kcp_header_type">ヘッダータイプ</string>
-    <string name="kcp_mtu">mKCP MTU</string>
-    <string name="kcp_tti">mKCP TTI</string>
+    <string name="kcp_mtu">kcp mtu</string>
+    <string name="kcp_tti">kcp tti</string>
     <string name="kcp_cwnd_multiplier">CWND乗数</string>
-    <string name="grpc_service_name">gRPC ServiceName</string>
+    <string name="grpc_service_name">gRPCサービス名</string>
     <string name="tls">TLSを使用する</string>
-    <string name="sni">Server Name Indication</string>
-    <string name="alpn">Application-Layer Protocol Negotiation</string>
+    <string name="sni">サーバー Name Indication</string>
+    <string name="alpn">alpn</string>
     <string name="certificates">証明書</string>
-    <string name="early_data_header_name">Early Data Header Name</string>
+    <string name="early_data_header_name">Early Data ヘッダー名</string>
     <string name="encryption">暗号化</string>
     <string name="extra_headers">追加ヘッダー</string>
     <string name="config_type">設定タイプ</string>
     <string name="edit_config">設定を編集</string>
-    
     <string name="ipv6">IPv6ルート</string>
     <string name="prefer">優先</string>
     <string name="only">のみ</string>
@@ -183,7 +178,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="mux_mode_connections">接続数</string>
     <string name="mux_max_connections">最大接続数</string>
     <string name="mux_min_streams">最小ストリーム</string>
-    <string name="mux_brutal">TCP Brutal</string>
+    <string name="mux_brutal">mux brutal</string>
     <string name="mux_brutal_up_mbps">アップロード (Mbps)</string>
     <string name="mux_brutal_down_mbps">ダウンロード (Mbps)</string>
     <string name="tcp_keep_alive_interval">TCP keep alive パケット送信間隔</string>
@@ -201,7 +196,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="auto_connect_summary">起動時やアプリアップデート時に、以前実行中だった場合はプロキシを有効にする</string>
     <string name="direct_boot_aware">ロック画面での切替を許可</string>
     <string name="direct_boot_aware_summary">選択したプロファイル情報の保護が弱まります</string>
-    
     <string name="service_vpn">VPN サービス</string>
     <string name="service_proxy">プロキシ サービス</string>
     <string name="forward_success">プロキシを開始しました。</string>
@@ -212,11 +206,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="vpn_error">%s</string>
     <string name="vpn_permission_denied">VPN サービスを作成する権限がありません</string>
     <string name="reboot_required">VPN サービスの開始に失敗しました。デバイスを再起動する必要があるかもしれません。</string>
-    
     <string name="profile_empty">プロファイルを選択してください</string>
     <string name="connect">接続</string>
     <string name="clipboard_empty">クリップボードは空です</string>
-    
     <string name="settings">設定</string>
     <string name="edit">編集</string>
     <string name="share">共有</string>
@@ -247,8 +239,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="action_import_err">インポートに失敗しました。</string>
     <string name="file_manager_missing">お使いのデバイスにはAndroid標準のファイルセレクターがありません。
         Material Filesなどのファイルセレクターをインストールしてください。</string>
-    
-    
     <string name="profile_config">プロファイル設定</string>
     <string name="delete">削除</string>
     <string name="delete_confirm_prompt">このプロファイルを削除してもよろしいですか？</string>
@@ -258,19 +248,18 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="add_profile_methods_manual_settings">手動設定</string>
     <plurals name="removed">
         <item quantity="other">%d個のアイテムが削除されました</item>
+        <item quantity="one">削除しました</item>
     </plurals>
     <plurals name="added">
         <item quantity="other">%d個のプロキシが追加されました</item>
+        <item quantity="one">追加しました</item>
     </plurals>
     <string name="undo">元に戻す</string>
     <string name="insecure">安全ではない</string>
     <string name="deprecated">非推奨</string>
-    
-    
     <string name="connecting">接続中…</string>
     <string name="vpn_connected">接続済み、タップして接続を確認</string>
     <string name="not_connected">未接続</string>
-    
     <string name="subscriptions">サブスクリプション</string>
     <string name="cleartext_http_warning">平文HTTPトラフィックは安全ではありません</string>
     <string name="error_title">エラー</string>
@@ -281,7 +270,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="deduplication">重複除去</string>
     <string name="ignore_battery_optimizations">バッテリー最適化を無視</string>
     <string name="ignore_battery_optimizations_sum">一部の制限を解除</string>
-    
     <string name="plugin">プラグイン</string>
     <string name="plugin_configure">設定…</string>
     <string name="plugin_disabled">無効</string>
@@ -358,11 +346,10 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="auto_update_delay">自動更新遅延（分）</string>
     <string name="update_when_connected_only">接続時のみ更新</string>
     <string name="update_when_connected_only_sum">IPアドレス漏洩防止</string>
-    <string name="subscription_user_agent">UserAgent</string>
+    <string name="subscription_user_agent">ユーザーエージェント</string>
     <string name="confirm">確認</string>
     <string name="missing_plugin">プラグイン不足</string>
-    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
-        it was not found.</string>
+    <string name="profile_requiring_plugin" formatted="false">プロファイル %s には %s プラグインのインストールが必要ですが、見つかりませんでした。</string>
     <string name="action_learn_more">詳細を見る</string>
     <string name="action_download">ダウンロード</string>
     <string name="install_from_play_store">Play Storeからインストール</string>
@@ -372,8 +359,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="update_subscription_warning">プロキシが接続されていません。本当に
         更新を続行しますか？</string>
     <string name="ooc_warning">警告</string>
-    <string name="ooc_missing_protocol">The subscription requires support for protocol %s, but it
-        cannot be found. Unsupported profiles will be ignored.</string>
+    <string name="ooc_missing_protocol">サブスクリプションはプロトコル %s のサポートを必要としますが、見つかりません。サポートされていないプロファイルは無視されます。</string>
     <string name="service_subscription">サブスクリプション更新サービス</string>
     <string name="subscription_update">サブスクリプション更新</string>
     <string name="subscription_update_message">更新中 %s …</string>
@@ -405,10 +391,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="group_order_origin">元の順序</string>
     <string name="group_order_by_name">名前順</string>
     <string name="group_order_by_delay">遅延順</string>
-    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
-        proprietary equipment vendor (usually surveillance capital giants and malware maker)
-        tampered with your Android, making the plugin unusable.</string>
-    <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks Android Plugin)</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">プロファイル %s には %s プラグインが必要ですが、独自仕様の機器ベンダー (多くは監視資本の巨大企業やマルウェア製造者) が Android を改変したため、プラグインを使用できません。</string>
+    <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks Android プラグイン)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray（Shadowsocks Androidプラグイン）</string>
     <string name="tcp_connections">%d TCP接続</string>
     <string name="udp_connections">%d UDP接続</string>
@@ -477,17 +461,15 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="hide_from_recent_apps_summary">バックグラウンド実行時にアプリを最近のタスクから隠す</string>
     <string name="action_switch">切り替え</string>
     <string name="custom_rules_provider">カスタム</string>
-    <string name="rules_geosite_url">geosite URL</string>
-    <string name="rules_geoip_url">geoip URL</string>
+    <string name="rules_geosite_url">rules geosite URL</string>
+    <string name="rules_geoip_url">rules geoip URL</string>
     <string name="tuic_udp_relay_mode">UDPリレーモード</string>
     <string name="tuic_congestion_controller">輻輳制御</string>
     <string name="tuic_disable_sni">SNIを無効にする</string>
     <string name="tuic_reduce_rtt">0-RTT QUICハンドシェイクを有効にする</string>
     <string name="pinned_certchain_sha256">ピン留め証明書SHA256</string>
-    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
-        update!</string>
-    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
-        Please update!</string>
+    <string name="please_update" formatted="false">お使いのアプリは古すぎます (%s)。%s に動作を停止します。更新してください！</string>
+    <string name="please_update_force" formatted="false">お使いのアプリは古すぎます (%s)。%s に動作を停止しました。更新してください！</string>
     <string name="connection_test_delete_unavailable">利用不可をクリア</string>
     <string name="move">移動</string>
     <string name="exe_prefer_provider">プラグイン優先プロバイダ</string>
@@ -524,7 +506,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="imported_profiles">%1$d プロフィール</string>
     <string name="please_try_again">後でもう一度お試しください</string>
     <string name="conflicting_plugins">競合するプラグインが見つかりました: %1$s</string>
-    <string name="crash_log_title">NB4A Crash</string>
+    <string name="crash_log_title">crash ログ title</string>
     <string name="rule_default_name">ルール %1$d</string>
     <string name="rule_summary_src_ip">送信元IP: %1$s\n</string>
     <string name="rule_summary_src_port">送信元ポート: %1$s\n</string>
@@ -548,7 +530,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="auto_select_proxy_apps_message">プロキシアプリを自動選択します。これにより、
         現在の選択がクリアされます。</string>
     <string name="enable_ech">ECHを有効にする</string>
-    <string name="enable_ech_sum">暗号化されたClient Helloを有効にする</string>
+    <string name="enable_ech_sum">暗号化 Client Hello を有効化</string>
     <string name="ech_settings">ECH設定</string>
     <string name="ech_config">ECH設定</string>
     <string name="http_upgrade_host">HTTPUpgradeホスト</string>
@@ -559,7 +541,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
         証明書チェックを無効にする</string>
     <string name="global_allow_insecure">常に安全でない接続を許可</string>
     <string name="fragment_settings">フラグメント設定</string>
-    <string name="enable_tls_fragment">TLS Client Helloフラグメントを有効にする</string>
+    <string name="enable_tls_fragment">TLS Client Hello のフラグメント化を有効化</string>
     <string name="fragment_length">フラグメント長 (最小-最大)</string>
     <string name="fragment_interval">フラグメント間隔 (最小-最大)</string>
     <string name="backup_local">ローカルバックアップ</string>
@@ -609,7 +591,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="preview_hint_dont_show_again">今後表示しない</string>
     <string name="check_update_preview">プレビューバージョンのアップデートを確認</string>
     <string name="check_update_release">リリースバージョンのアップデートを確認</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
+    <string name="release_not_available">NekoBox はまだ安定版を公開していません</string>
     <string name="update_dialog_title">新しいバージョンがあります</string>
     <string name="update_dialog_message">現在のバージョン: %1$s\n利用可能なバージョン: %2$s\nダウンロードしますか？</string>
     <string name="update_downloading">更新をダウンロード中…</string>
@@ -625,10 +607,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="xhttp_extra">XHTTP エクストラ</string>
     <string name="xhttp_settings">XHTTP 設定</string>
     <string name="vless_encryption">暗号化</string>
-    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
+    <string name="vless_encryption_hint">vless encryption hint</string>
     <string name="app_list_permission_denied">インストールされたアプリを読み取れません。\nこれは通常、システムがアプリの読み取り権限を制限しているためです。\nシステム設定で権限を許可してください。</string>
     <string name="open_app_settings">システム設定を開く</string>
-    
     <string name="action_snell">Snell</string>
     <string name="snell_psk">事前共有キー</string>
     <string name="snell_userkey">ユーザーキー</string>
@@ -737,7 +718,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="plugin_approval_message">パッケージ：%1$s\n\nSHA-256 証明書フィンガープリント：\n%2$s\n\nインストールされたプラグインの実行可能コードは、アプリのプラグインインターフェースを介して実行できます。このパッケージを信頼する場合のみ承認してください。</string>
     <string name="plugin_approval_success">プラグインを承認しました</string>
     <string name="plugin_approval_title">プラグイン承認</string>
-    <string name="plugin_signer_rejected">署名者 %2$s のプラグインパッケージ %1$s をブロックしました。再確認するには再接続してください。</string>
+    <string name="plugin_signer_rejected">プラグインパッケージ %1$s（署名者 %2$s）をブロックしました。再確認するには再接続してください。</string>
     <string name="plugin_signer_unreadable">プラグイン署名者を読み取れません</string>
     <string name="probe_url">プローブ URL</string>
     <string name="profile_reference_not_allowed">プロファイル参照は許可されていません</string>
@@ -780,7 +761,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="ui_style_expressive">エクスプレッシブ</string>
     <string name="waterfall_settings">ウォーターフォール設定</string>
     <string name="webdav_insecure_url">安全でない WebDAV サーバー URL</string>
-    
     <string name="auto_switch_timeout">タイムアウトで自動切り替え</string>
     <string name="auto_switch_timeout_summary">応答がない場合に次の設定へ自動的に切り替える</string>
     <string name="auto_switch_timeout_duration">タイムアウト時間（秒）</string>
@@ -789,9 +769,105 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="vpn_watchdog_test">🧪 ウォッチドッグをテスト</string>
     <string name="vpn_watchdog_test_summary">VPNを強制再起動してウォッチドッグをテストする</string>
     <string name="vpn_watchdog_interval">チェック間隔（秒）</string>
-    <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
-    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
-    <string name="ech_query_server_name">ECH Query Server Name</string>
-<string name="app_name">NekoBox</string><string name="app_name_long">NekoBox for Android</string><string name="service_mode_vpn">VPN</string><string name="ws_max_early_data">Max early data</string><string name="traffic">%1$s↑ %2$s↓</string><string name="action_socks">SOCKS</string><string name="action_http">HTTP</string><string name="action_shadowsocks">Shadowsocks</string><string name="action_shadowsocksr">ShadowsocksR</string><string name="action_vmess">VMess</string><string name="action_trojan">Trojan</string><string name="action_trojan_go">Trojan Go</string><string name="action_mieru">Mieru</string><string name="action_naive">Naïve</string><string name="action_anytls">AnyTLS</string><string name="action_hysteria">Hysteria</string><string name="action_ssh">SSH</string><string name="action_wireguard">WireGuard</string><string name="action_tuic">TUIC</string><string name="action_juicity">Juicity</string><string name="leastPing">Ping</string><string name="v2rayn">V2RayN</string><string name="available">%dms</string><string name="connection_test_tcp_ping">TCPing</string><string name="connection_test_icmp_ping">ICMPing</string><string name="connection_test_url_test">URL Test</string><string name="ooc_subscription_token">OOCv1 API Token</string><string name="traffic_uplink" formatted="false">%s | %s/s ↑</string><string name="traffic_downlink" formatted="false">%s | %s/s ↓</string><string name="traffic_uplink_total">%s ↑</string><string name="traffic_downlink_total">%s ↓</string><string name="cloudflare_wrap">Cloudflare Warp</string><string name="pcap">Pcap</string><string name="mtu">MTU</string><string name="action_shadowtls">ShadowTLS</string><string name="dialog_watchdog_start">開始</string><string name="rule_network">ネットワーク</string><string name="rule_protocol">プロトコル</string></resources>
+    <string name="mixed_auth_config">認証を設定</string>
+    <string name="mixed_auth_username_hint">ユーザー名（両方空欄で認証なし）</string>
+    <string name="mixed_auth_no_auth">未設定（認証なし）</string>
+    <string name="mixed_auth_enabled_sum">ユーザー名: %1$s</string>
+    <string name="ech_query_server_name">ECH クエリサーバー名</string>
+    <string name="app_name">NekoBox</string>
+    <string name="app_name_long">NekoBox for Android</string>
+    <string name="service_mode_vpn">VPN</string>
+    <string name="ws_max_early_data">最大早期データ</string>
+    <string name="traffic">%1$s↑ %2$s↓</string>
+    <string name="action_socks">SOCKS</string>
+    <string name="action_http">HTTP</string>
+    <string name="action_shadowsocks">Shadowsocks</string>
+    <string name="action_shadowsocksr">ShadowsocksR</string>
+    <string name="action_vmess">VMess</string>
+    <string name="action_trojan">Trojan</string>
+    <string name="action_trojan_go">Trojan Go</string>
+    <string name="action_mieru">Mieru</string>
+    <string name="action_naive">Naïve</string>
+    <string name="action_anytls">AnyTLS</string>
+    <string name="action_hysteria">Hysteria</string>
+    <string name="action_ssh">SSH</string>
+    <string name="action_wireguard">WireGuard</string>
+    <string name="action_tuic">TUIC</string>
+    <string name="action_juicity">Juicity</string>
+    <string name="leastPing">Ping</string>
+    <string name="v2rayn">V2RayN</string>
+    <string name="available">%dms</string>
+    <string name="connection_test_tcp_ping">TCPing</string>
+    <string name="connection_test_icmp_ping">ICMPing</string>
+    <string name="connection_test_url_test">URL テスト</string>
+    <string name="ooc_subscription_token">OOCv1 API Token</string>
+    <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>
+    <string name="traffic_uplink_total">%s ↑</string>
+    <string name="traffic_downlink_total">%s ↓</string>
+    <string name="cloudflare_wrap">Cloudflare Warp</string>
+    <string name="pcap">Pcap</string>
+    <string name="mtu">MTU</string>
+    <string name="action_shadowtls">ShadowTLS</string>
+    <string name="dialog_watchdog_start">開始</string>
+    <string name="rule_network">ネットワーク</string>
+    <string name="rule_protocol">プロトコル</string>
+    <string name="backup_not_throne_desktop">Throne デスクトップのバックアップではありません: .thrbackup を期待しましたが %s でした</string>
+    <string name="action_import_throne_desktop">Throne デスクトップからインポート</string>
+    <string name="backup_import_throne_desktop_summary">Throne デスクトップの .thrbackup からプロファイル、ルート、設定をインポートします（カスタムアイコンは無視）。選択したカテゴリの既存データは上書きされます。</string>
+    <string name="reality_public_key">REALITY 公開鍵</string>
+    <string name="reality_short_id">Reality Short ID</string>
+    <string name="not_set">未設定</string>
+    <string name="shadowquic_udp_over_stream">ストリーム経由の UDP</string>
+    <string name="shadowquic_zero_rtt">0-RTT ハンドシェイク</string>
+    <string name="shadowquic_sunny_quic">Sunny QUIC</string>
+    <string name="trusttunnel_quic">QUIC（HTTP/3）</string>
+    <string name="trusttunnel_health_check">ヘルスチェック</string>
+    <string name="trusttunnel_congestion_control">QUIC 輻輳制御</string>
+    <string name="invalid_snell_url">無効な Snell URL</string>
+    <string name="not_http_proxy">HTTP プロキシではありません</string>
+    <string name="masterdns_no_tunnel">MasterDNS リンクにトンネルドメインがありません</string>
+    <string name="webdav_auth_failed">認証に失敗しました</string>
+    <string name="proxy_fastest_regex">最速（正規表現）</string>
+    <string name="fastest_candidate_mode">候補の取得元</string>
+    <string name="fastest_regex_options">サブスクリプションの正規表現</string>
+    <string name="fastest_regex_source_group">参照元サブスクリプション</string>
+    <string name="fastest_regex_pattern">正規表現</string>
+    <string name="fastest_regex_ignore_case">大文字と小文字を区別しない</string>
+    <string name="fastest_regex_preview">正規表現を確認</string>
+    <string name="fastest_regex_preview_no_matches">一致するプロキシはありません</string>
+    <string name="fastest_regex_error_empty">正規表現を入力してください</string>
+    <string name="fastest_regex_error_source_missing">既存の参照元サブスクリプションを選択してください</string>
+    <string name="fastest_regex_error_source_not_subscription">選択した参照元グループはサブスクリプションではありません</string>
+    <string name="rule_domain">ドメイン</string>
+    <string name="rule_dst_ip">宛先 IP</string>
+    <string name="rule_dst_port">宛先ポート</string>
+    <string name="rule_src_ip">送信元 IP</string>
+    <string name="rule_src_port">送信元ポート</string>
+    <string name="rule_ruleset">ルールセット（.srs）</string>
+    <string name="rule_outbound">アウトバウンド</string>
+    <string name="pref_sing_box_server">sing-box サーバー</string>
+    <string name="udp_over_tcp">TCP 経由の UDP</string>
+    <string name="debug_button_crash_from_kt">Kotlin からクラッシュ</string>
+    <string name="debug_button_reset_settings">設定をリセット</string>
+    <string name="toast_create_preferences_failed">設定を作成できませんでした。もう一度お試しください。</string>
+    <string name="dialog_watchdog_test_title">ウォッチドッグをテスト</string>
+    <string name="dialog_watchdog_vpn_not_running">VPN が実行されていません。先に VPN に接続してください。</string>
+    <string name="dialog_watchdog_auto_reconnect_title">自動再接続をテスト</string>
+    <string name="dialog_watchdog_force_restart">ウォッチドッグが VPN を強制的に再起動します。\n\nVPN は 1～3 秒切断された後、自動的に再接続します。\n\n続行しますか？</string>
+    <string name="snackbar_watchdog_test_started">テストを開始しました。30 秒以内に再起動します…</string>
+    <string name="dialog_log_buffer_size">ログバッファサイズ（KB）</string>
+    <string name="invalid_naive_link">無効なNaive：%1$s</string>
+    <string name="invalid_ss_android_link">無効なss-android：%1$s</string>
+    <string name="invalid_jms_link">無効なJMS：%1$s</string>
+    <string name="invalid_v2rayn_link">無効なv2rayN：%1$s</string>
+    <string name="not_supported_proxy">未対応：%1$s</string>
+    <string name="invalid_trojan_link">無効なTrojan：%1$s</string>
+    <string name="invalid_http_link">無効なHTTP(S)：%1$s</string>
+    <string name="invalid_hysteria_link">無効なHysteria：%1$s</string>
+    <string name="invalid_masterdns_link">無効なMasterDNS：%1$s</string>
+    <string name="masterdns_no_key">MasterDNS リンクに方式 %1$s の暗号化キーがありません</string>
+    <string name="webdav_check_dir_failed">ディレクトリの確認に失敗しました（%1$s）：%2$s</string>
+    <string name="fastest_regex_preview_count">一致するプロキシ：%1$d</string>
+    <string name="fastest_regex_error_invalid">無効な正規表現：%1$s</string>
+</resources>
