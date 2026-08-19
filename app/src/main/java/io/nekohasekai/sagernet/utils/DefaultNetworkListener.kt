@@ -19,7 +19,9 @@ import java.net.UnknownHostException
 
 object DefaultNetworkListener {
     private sealed class NetworkMessage {
-        class Start(val key: Any, val listener: (Network?) -> Unit) : NetworkMessage()
+        class Start(val key: Any, val listener: (Network?) -> Unit) : NetworkMessage() {
+            val processed = CompletableDeferred<Unit>()
+        }
         class Get : NetworkMessage() {
             val response = CompletableDeferred<Network>()
         }
@@ -40,17 +42,19 @@ object DefaultNetworkListener {
         val pendingRequests = arrayListOf<NetworkMessage.Get>()
         for (message in channel) when (message) {
             is NetworkMessage.Start -> {
-                if (listeners.isEmpty()) register()
-                listeners[message.key] = message.listener
-                if (network != null) {
-                    message.listener(network)
-                } else if (fallback) {
-                    val activeNetwork = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        SagerNet.connectivity.activeNetwork
-                    } else {
-                        null
+                try {
+                    if (listeners.isEmpty()) register()
+                    listeners[message.key] = message.listener
+                    if (network != null) {
+                        message.listener(network)
+                    } else if (fallback) {
+                        message.listener(SagerNet.connectivity.activeNetwork)
                     }
-                    message.listener(activeNetwork)
+                    message.processed.complete(Unit)
+                } catch (error: Throwable) {
+                    val removed = listeners.remove(message.key) != null
+                    if (removed && listeners.isEmpty()) runCatching { unregister() }
+                    message.processed.completeExceptionally(error)
                 }
             }
             is NetworkMessage.Get -> {
@@ -93,7 +97,15 @@ object DefaultNetworkListener {
         }
     }
 
-    suspend fun start(key: Any, listener: (Network?) -> Unit) = networkActor.send(NetworkMessage.Start(key, listener))
+    suspend fun start(key: Any, listener: (Network?) -> Unit) {
+        val message = NetworkMessage.Start(key, listener)
+        networkActor.send(message)
+        // send only guarantees enqueueing. Wait until registration and the cached
+        // network callback finish, so a newly-created test box cannot dial before
+        // its Go default-interface monitor receives the first network.
+        message.processed.await()
+    }
+
     suspend fun get() = if (fallback) {
         SagerNet.connectivity.activeNetwork
             ?: throw UnknownHostException() // failed to listen, return current if available

@@ -125,6 +125,12 @@ jobs:
         run: ./run lib core
       - name: Verify 16 KB ELF alignment
         run: bash ./scripts/verify-elf-alignment.sh app/libs/libcore.aar
+      - name: Verify LibCore API classes
+        run: |
+          test -s app/libs/libcore.aar
+          unzip -p app/libs/libcore.aar classes.jar > /tmp/libcore-classes.jar
+          unzip -l /tmp/libcore-classes.jar | grep -q 'libcore/Libcore.class'
+          unzip -l /tmp/libcore-classes.jar | grep -q 'go/Seq.class'
       - name: Upload LibCore
         uses: actions/upload-artifact@v4 # v1
         with:
@@ -223,6 +229,12 @@ jobs:
         with:
           name: libcore-aar-ci
           path: app/libs
+      - name: Verify downloaded LibCore API classes
+        run: |
+          test -s app/libs/libcore.aar
+          unzip -p app/libs/libcore.aar classes.jar > /tmp/libcore-classes.jar
+          unzip -l /tmp/libcore-classes.jar | grep -q 'libcore/Libcore.class'
+          unzip -l /tmp/libcore-classes.jar | grep -q 'go/Seq.class'
       - name: Download Sidecars
         uses: actions/download-artifact@v4 # v1
         with:

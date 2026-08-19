@@ -275,7 +275,7 @@
     <string name="action_import_file">Import from file</string>
     <string name="action_export_msg">Successfully export!</string>
     <string name="action_export_err">Failed to export.</string>
-    <string name="action_import_msg">Successfully import!</string>
+    <string name="action_import_msg">Imported successfully!</string>
     <string name="action_import_err">Failed to import.</string>
     <string name="file_manager_missing">Your device lacks an Android standard file selector, please
         install one, such as Material Files.</string>
@@ -532,8 +532,12 @@
     <string name="backup_settings">Settings</string>
     <string name="backup_summary">If the routing settings are not backed up with configurations,
         then custom outbounds will be lost.</string>
-    <string name="backup_not_file">Not an backup file: excepted .json, but %s</string>
+    <string name="backup_not_file">Not a backup file: expected .json, but found %s</string>
+    <string name="backup_not_throne_desktop">Not a Throne Desktop backup: expected .thrbackup, but found %s</string>
+    <string name="action_import_throne_desktop">Import from Throne Desktop</string>
+    <string name="backup_import_throne_desktop_summary">Import profiles, routes, and settings from a Throne Desktop .thrbackup file. Custom icons are ignored. Existing data in the selected categories will be overwritten.</string>
     <string name="invalid_backup_file">Invalid backup file</string>
+    <string name="not_set">Not set</string>
     <string name="backup_import">Import</string>
     <string name="backup_import_summary">Importing will overwrite the existing data.</string>
     <string name="backup_importing">Importing…</string>
