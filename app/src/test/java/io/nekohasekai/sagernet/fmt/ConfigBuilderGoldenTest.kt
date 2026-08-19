@@ -318,6 +318,23 @@ class ConfigBuilderGoldenTest {
     }
 
     @Test
+    fun fakeDns_usesSingBox114ServerFormat() {
+        DataStore.enableFakeDns = true
+        val profile = addSocks(addGroup(), "192.0.2.61", 1080, "fake-dns")
+
+        val dns = JSONObject(build(profile).config).getJSONObject("dns")
+        val fakeIPServer = objects(dns.getJSONArray("servers"))
+            .single { it.optString("tag") == "dns-fake" }
+
+        assertFalse(dns.has("fakeip"))
+        assertEquals("fakeip", fakeIPServer.getString("type"))
+        assertEquals("198.18.0.0/15", fakeIPServer.getString("inet4_range"))
+        assertEquals("fc00::/18", fakeIPServer.getString("inet6_range"))
+        assertFalse(fakeIPServer.has("address"))
+        assertFalse(fakeIPServer.has("strategy"))
+    }
+
+    @Test
     fun populatedDnsHosts_addsPredefinedServerAndScopedRule() {
         DataStore.dnsHosts = "node.example 192.0.2.70 2001:db8::70"
         val profile = addSocks(addGroup(), "192.0.2.71", 1080, "mapped-hosts")

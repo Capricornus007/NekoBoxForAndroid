@@ -1247,16 +1247,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 },
             )
             if (useFakeDns) {
-                dns.fakeip = DNSFakeIPOptions().apply {
-                    enabled = true
-                    inet4_range = "198.18.0.0/15"
-                    inet6_range = "fc00::/18"
-                }
                 dns.servers.add(
                     DNSServerOptions().apply {
-                        address = "fakeip"
+                        _hack_config_map["type"] = "fakeip"
                         tag = "dns-fake"
-                        strategy = "ipv4_only"
+                        _hack_config_map["inet4_range"] = "198.18.0.0/15"
+                        _hack_config_map["inet6_range"] = "fc00::/18"
                     },
                 )
                 dns.rules.add(
