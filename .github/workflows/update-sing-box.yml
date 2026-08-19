@@ -1,0 +1,83 @@
+name: Update sing-box core
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 18 * * *"
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: update-sing-box-core
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve latest maintained core
+        id: core
+        shell: bash
+        run: |
+          set -euo pipefail
+          source buildScript/lib/core/get_source_env.sh
+          latest=$(git ls-remote https://github.com/Capricornus007/sing-box.git refs/heads/1.14.x | cut -f1)
+          test -n "$latest"
+          echo "current=$COMMIT_SING_BOX" >> "$GITHUB_OUTPUT"
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          if [ "$latest" = "$COMMIT_SING_BOX" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            sed -i -E "s/^(export COMMIT_SING_BOX=\").*(\")$/\1${latest}\2/" \
+              buildScript/lib/core/get_source_env.sh
+          fi
+
+      - name: Set up Java
+        if: steps.core.outputs.changed == 'true'
+        uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Go
+        if: steps.core.outputs.changed == 'true'
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: "1.26.6"
+
+      - name: Build and verify LibCore
+        if: steps.core.outputs.changed == 'true'
+        env:
+          ALLOW_UNPINNED_SIBLINGS: "1"
+        run: |
+          ./run lib core
+          bash ./scripts/verify-elf-alignment.sh app/libs/libcore.aar
+          ./run init action gradle
+          ./gradlew spotlessCheck testOssDebugUnitTest --no-daemon
+
+      - name: Commit verified pin
+        if: steps.core.outputs.changed == 'true'
+        env:
+          LATEST: ${{ steps.core.outputs.latest }}
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add buildScript/lib/core/get_source_env.sh
+          git commit -m "chore: follow sing-box 1.14.x ${LATEST:0:9}"
+          git push origin HEAD:main
+
+      - name: Dispatch signed builds
+        if: steps.core.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run build.yml --ref main
+          gh workflow run ci.yml --ref main
