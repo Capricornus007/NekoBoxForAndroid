@@ -247,7 +247,7 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
         } else if (startsWith("tt://")) {
             Logs.d("Trying TrustTunnel parser")
             runCatching {
-                entities.add(parseTrustTunnel(this))
+                entities.addAll(parseTrustTunnel(this))
             }.onFailure {
                 Logs.w("TrustTunnel parser rejected input")
             }
