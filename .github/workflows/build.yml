@@ -42,7 +42,7 @@ jobs:
       - name: Verify 16 KB ELF alignment
         run: bash ./scripts/verify-elf-alignment.sh app/libs/libcore.aar
       - name: Upload LibCore
-        uses: actions/upload-artifact@v4 # v1
+        uses: actions/upload-artifact@v7 # v7
         with:
           name: libcore-aar-build
           path: app/libs/libcore.aar
@@ -92,7 +92,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: ./run lib olcrtc
       - name: Upload Sidecars
-        uses: actions/upload-artifact@v4 # v1
+        uses: actions/upload-artifact@v7 # v7
         with:
           name: sidecars-so-build
           path: app/executableSo
@@ -108,12 +108,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
       - name: Download LibCore
-        uses: actions/download-artifact@v4 # v1
+        uses: actions/download-artifact@v8 # v8
         with:
           name: libcore-aar-build
           path: app/libs
       - name: Download Sidecars
-        uses: actions/download-artifact@v4 # v1
+        uses: actions/download-artifact@v8 # v8
         with:
           name: sidecars-so-build
           path: app/executableSo
