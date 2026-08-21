@@ -73,7 +73,7 @@ func ResetAllConnections(system bool) {
 		log.Println("ResetAllConnections: no main instance, skip system=", system)
 		return
 	}
-	b.Network().ResetNetwork()
+	b.Network().ResetNetwork(context.Background())
 	log.Println("ResetAllConnections: Network.ResetNetwork() done system=", system)
 }
 

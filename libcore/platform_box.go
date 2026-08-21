@@ -1,6 +1,7 @@
 package libcore
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -198,7 +199,7 @@ func (w *boxPlatformInterfaceWrapper) ProcessPlatformOptions(options option.TunP
 	return nil
 }
 
-func (w *boxPlatformInterfaceWrapper) ReadWIFIState() adapter.WIFIState {
+func (w *boxPlatformInterfaceWrapper) ReadWIFIState(_ context.Context) adapter.WIFIState {
 	state := strings.Split(intfBox.WIFIState(), ",")
 	if len(state) < 2 {
 		return adapter.WIFIState{}
