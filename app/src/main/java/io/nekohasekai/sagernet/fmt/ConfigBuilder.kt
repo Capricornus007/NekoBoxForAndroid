@@ -268,12 +268,18 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         } else {
             SagerDatabase.proxyDao.getByGroup(balancerBean.groupId)
                 .filter {
-                    if (balancerBean.nameFilter.isEmpty()) true
-                    else !Regex(balancerBean.nameFilter).containsMatchIn(it.requireBean().name)
+                    if (balancerBean.nameFilter.isEmpty()) {
+                        true
+                    } else {
+                        !Regex(balancerBean.nameFilter).containsMatchIn(it.requireBean().name)
+                    }
                 }
                 .filter {
-                    if (balancerBean.nameFilter1.isEmpty()) true
-                    else Regex(balancerBean.nameFilter1).containsMatchIn(it.requireBean().name)
+                    if (balancerBean.nameFilter1.isEmpty()) {
+                        true
+                    } else {
+                        Regex(balancerBean.nameFilter1).containsMatchIn(it.requireBean().name)
+                    }
                 }
         }
         return beans.filter { it.id != selfId }
@@ -503,16 +509,18 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     trafficMap[tag] = listOf(member)
                 }
                 val balancerTag = readableTag(balancerBean.displayName())
-                outbounds.add(Outbound_URLTestOptions().apply {
-                    type = "urltest"
-                    tag = balancerTag
-                    outbounds = memberTags
-                    url = balancerBean.probeUrl.ifEmpty { DataStore.connectionTestURL }
-                    if (balancerBean.probeInterval > 0) {
-                        _hack_config_map["interval"] = "${balancerBean.probeInterval}s"
-                    }
-                    tolerance = 50
-                })
+                outbounds.add(
+                    Outbound_URLTestOptions().apply {
+                        type = "urltest"
+                        tag = balancerTag
+                        outbounds = memberTags
+                        url = balancerBean.probeUrl.ifEmpty { DataStore.connectionTestURL }
+                        if (balancerBean.probeInterval > 0) {
+                            _hack_config_map["interval"] = "${balancerBean.probeInterval}s"
+                        }
+                        tolerance = 50
+                    },
+                )
                 trafficMap[balancerTag] = listOf(entity)
                 return balancerTag
             }
