@@ -70,6 +70,7 @@ abstract class ThemedActivity : AppCompatActivity {
         }
     }
 
-    internal open fun snackbarInternal(text: CharSequence): Snackbar = throw NotImplementedError()
+    internal open fun snackbarInternal(text: CharSequence): Snackbar =
+        Snackbar.make(window.decorView, text, Snackbar.LENGTH_LONG)
 
 }

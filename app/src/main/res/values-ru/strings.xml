@@ -427,17 +427,7 @@
 <string name="traffic_mode_direct_choice">Напрямую</string>
 <string name="loading_apps">Загрузка приложений…</string>
 <string name="remove_traffic_mode_rule">Убрать правило</string>
-<string name="home_title">VPN и DPI bypass для приложений</string>
-<string name="home_subtitle">Выберите, каким приложениям нужен VPN или DPI bypass.</string>
-<string name="home_routing_summary_empty">Исключений пока нет. Все приложения работают напрямую.</string>
-<string name="home_routing_summary_format">%1$d прилож. через VPN • %2$d через DPI bypass • остальные напрямую.</string>
-<string name="home_vpn_badge_format">VPN %1$d</string>
-<string name="home_bypass_badge_format">DPI %1$d</string>
-<string name="home_direct_badge">Напрямую по умолчанию</string>
 <string name="home_action_apps">Правила приложений</string>
-<string name="home_action_route">Маршруты</string>
-<string name="home_action_settings">Настройки</string>
-<string name="home_profiles_caption">Профили и подписки ниже задают подключения, которые используются в правилах для приложений.</string>
 <string name="nav_header_subtitle">VPN, DPI bypass и прямой трафик в одном месте.</string>
 <string name="ss_cat">Настройки Shadowsocks</string>
 <string name="ssh_auth_type_none">Без аутентификации</string>

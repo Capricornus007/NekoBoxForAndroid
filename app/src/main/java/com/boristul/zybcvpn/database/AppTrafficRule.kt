@@ -2,10 +2,11 @@ package com.boristul.zybcvpn.database
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.reflect.TypeToken
 import com.boristul.zybcvpn.ktx.Logs
 import com.boristul.zybcvpn.utils.PackageCache
 import moe.matsuri.nb4a.utils.JavaUtil
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 enum class TrafficMode {
     REMOTE_VPN,
@@ -147,7 +148,11 @@ object AppTrafficRuleValidator {
 
 object AppTrafficRuleSerializer {
 
-    private val listType = object : TypeToken<List<AppTrafficRule>>() {}.type
+    private val listType: Type = object : ParameterizedType {
+        override fun getActualTypeArguments(): Array<Type> = arrayOf(AppTrafficRule::class.java)
+        override fun getRawType(): Type = List::class.java
+        override fun getOwnerType(): Type? = null
+    }
 
     fun serialize(rules: List<AppTrafficRule>): String {
         if (rules.isEmpty()) return ""

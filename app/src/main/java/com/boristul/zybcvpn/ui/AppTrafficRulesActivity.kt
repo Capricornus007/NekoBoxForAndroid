@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import com.boristul.zybcvpn.BuildConfig
 import com.boristul.zybcvpn.R
@@ -313,5 +314,9 @@ class AppTrafficRulesActivity : ThemedActivity() {
         }
 
         loadApps()
+    }
+
+    override fun snackbarInternal(text: CharSequence): Snackbar {
+        return Snackbar.make(binding.root, text, Snackbar.LENGTH_LONG)
     }
 }

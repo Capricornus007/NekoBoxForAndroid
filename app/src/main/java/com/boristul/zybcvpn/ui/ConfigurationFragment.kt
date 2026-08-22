@@ -53,7 +53,6 @@ import com.boristul.zybcvpn.database.ProfileManager
 import com.boristul.zybcvpn.database.ProxyEntity
 import com.boristul.zybcvpn.database.ProxyGroup
 import com.boristul.zybcvpn.database.SagerDatabase
-import com.boristul.zybcvpn.database.TrafficMode
 import com.boristul.zybcvpn.database.preference.OnPreferenceDataStoreChangeListener
 import com.boristul.zybcvpn.databinding.LayoutProfileListBinding
 import com.boristul.zybcvpn.databinding.LayoutProgressListBinding
@@ -135,7 +134,6 @@ class ConfigurationFragment @JvmOverloads constructor(
     lateinit var tabLayout: TabLayout
     lateinit var groupPager: ViewPager2
     private var homeHeader: View? = null
-    private var homeRoutingSummary: TextView? = null
 
     val alwaysShowAddress by lazy { DataStore.alwaysShowAddress }
 
@@ -207,16 +205,9 @@ class ConfigurationFragment @JvmOverloads constructor(
         groupPager = view.findViewById(R.id.group_pager)
         tabLayout = view.findViewById(R.id.group_tab)
         homeHeader = view.findViewById(R.id.home_header)
-        homeRoutingSummary = view.findViewById(R.id.home_routing_summary)
         homeHeader?.visibility = if (select) View.GONE else View.VISIBLE
         view.findViewById<View>(R.id.home_action_apps)?.setOnClickListener {
             startActivity(Intent(requireActivity(), AppTrafficRulesActivity::class.java))
-        }
-        view.findViewById<View>(R.id.home_action_route)?.setOnClickListener {
-            (requireActivity() as MainActivity).displayFragmentWithId(R.id.nav_route)
-        }
-        view.findViewById<View>(R.id.home_action_settings)?.setOnClickListener {
-            (requireActivity() as MainActivity).displayFragmentWithId(R.id.nav_settings)
         }
         adapter = GroupPagerAdapter()
         ProfileManager.addListener(adapter)
@@ -259,12 +250,10 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
 
         DataStore.profileCacheStore.registerChangeListener(this)
-        updateHomePanel()
     }
 
     override fun onResume() {
         super.onResume()
-        updateHomePanel()
     }
 
     override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {
@@ -294,18 +283,6 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
 
         super.onDestroy()
-    }
-
-    private fun updateHomePanel() {
-        if (select) return
-        val rules = DataStore.appTrafficRules
-        val remoteCount = rules.count { it.trafficMode == TrafficMode.REMOTE_VPN }
-        val dpiCount = rules.count { it.trafficMode == TrafficMode.DPI_BYPASS }
-        homeRoutingSummary?.text = if (rules.isEmpty()) {
-            getString(R.string.home_routing_summary_empty)
-        } else {
-            getString(R.string.home_routing_summary_format, remoteCount, dpiCount)
-        }
     }
 
     override fun onKeyDown(ketCode: Int, event: KeyEvent): Boolean {
@@ -982,7 +959,6 @@ class ConfigurationFragment @JvmOverloads constructor(
                         if (set) groupPager.setCurrentItem(selectedGroupIndex, false)
                         val hideTab = groupList.size < 2
                         tabLayout.isGone = hideTab
-                        updateHomePanel()
                         if (!select) {
                             groupPager.registerOnPageChangeCallback(updateSelectedCallback)
                         }

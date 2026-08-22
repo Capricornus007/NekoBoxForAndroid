@@ -45,7 +45,11 @@
 -dontwarn org.openjsse.javax.net.ssl.SSLSocket
 -dontwarn org.openjsse.net.ssl.OpenJSSE
 
-# Gson TypeToken — R8 strips generic signatures
+# Gson TypeToken — R8 strips generic signatures and renames anonymous subclasses
 -keepattributes Signature
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken { *; }
+-keep class com.boristul.zybcvpn.database.AppTrafficRule { *; }
 -keep class com.boristul.zybcvpn.database.AppTrafficRuleSerializer { *; }
+-keep class com.boristul.zybcvpn.database.AppTrafficRuleValidationReport { *; }
 -dontwarn java.beans.PropertyVetoException

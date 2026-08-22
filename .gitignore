@@ -18,3 +18,7 @@ jniLibs/
 
 # submodules
 /external
+
+# local build tooling / git-nested clones (not part of the app source)
+/libcore/gomobile/
+error_logs.txt
