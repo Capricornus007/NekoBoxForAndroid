@@ -34,7 +34,12 @@ object DefaultNetworkListener {
     }
 
     private val networkActor = GlobalScope.actor<NetworkMessage>(
-        Dispatchers.Unconfined,
+        // NetworkCallback is registered with the main Handler on recent Android
+        // releases.  Unconfined would therefore run the actor inline on the
+        // callback thread, and listener callbacks could block the main looper
+        // (NativeInterface retries link-property discovery with a short sleep).
+        // Keep all registration, event dispatch, and listener work off-main.
+        Dispatchers.Default,
         capacity = Channel.UNLIMITED,
     ) {
         val listeners = mutableMapOf<Any, (Network?) -> Unit>()
