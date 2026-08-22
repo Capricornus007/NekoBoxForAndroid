@@ -76,12 +76,6 @@ fun AlertDialog.tryToShow() {
  * Bare EditText / TextInputLayout set via setView() otherwise sits flush against
  * dialog edges, which looks especially cramped under original (FilledBox) style.
  */
-
-/**
- * Wrap a dialog content view with Material-recommended horizontal padding.
- * Bare EditText / TextInputLayout set via setView() otherwise sits flush against
- * dialog edges, which looks especially cramped under original (FilledBox) style.
- */
 fun Context.wrapDialogContent(content: View, horizontalDp: Int = 20, verticalDp: Int = 8): FrameLayout {
     val h = dp2px(horizontalDp)
     val v = dp2px(verticalDp)
