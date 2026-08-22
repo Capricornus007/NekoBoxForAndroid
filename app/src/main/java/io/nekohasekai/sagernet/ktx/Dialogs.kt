@@ -33,36 +33,36 @@ fun AlertDialog.tryToShow() {
     if (activity == null) {
         Logs.w(
             "AlertDialog.tryToShow skipped: no Activity host; " +
-                    "initialContext=${initialContext.javaClass.name}, " +
-                    "wrapperDepth=${resolution.wrapperDepth}, " +
-                    "loopDetected=${resolution.loopDetected}"
+                "initialContext=${initialContext.javaClass.name}, " +
+                "wrapperDepth=${resolution.wrapperDepth}, " +
+                "loopDetected=${resolution.loopDetected}",
         )
         return
     }
     if (activity.isFinishing) {
         Logs.w(
             "AlertDialog.tryToShow skipped: Activity is finishing; " +
-                    "initialContext=${initialContext.javaClass.name}, " +
-                    "wrapperDepth=${resolution.wrapperDepth}, " +
-                    "activity=${activity.javaClass.name}"
+                "initialContext=${initialContext.javaClass.name}, " +
+                "wrapperDepth=${resolution.wrapperDepth}, " +
+                "activity=${activity.javaClass.name}",
         )
         return
     }
     if (activity.isDestroyed) {
         Logs.w(
             "AlertDialog.tryToShow skipped: Activity is destroyed; " +
-                    "initialContext=${initialContext.javaClass.name}, " +
-                    "wrapperDepth=${resolution.wrapperDepth}, " +
-                    "activity=${activity.javaClass.name}"
+                "initialContext=${initialContext.javaClass.name}, " +
+                "wrapperDepth=${resolution.wrapperDepth}, " +
+                "activity=${activity.javaClass.name}",
         )
         return
     }
 
     Logs.i(
         "AlertDialog.tryToShow resolved host: " +
-                "initialContext=${initialContext.javaClass.name}, " +
-                "wrapperDepth=${resolution.wrapperDepth}, " +
-                "activity=${activity.javaClass.name}"
+            "initialContext=${initialContext.javaClass.name}, " +
+            "wrapperDepth=${resolution.wrapperDepth}, " +
+            "activity=${activity.javaClass.name}",
     )
     try {
         show()
