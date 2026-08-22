@@ -2,6 +2,7 @@ package io.nekohasekai.sagernet.ktx
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -19,16 +20,62 @@ fun Context.alert(text: String): AlertDialog {
 
 fun Fragment.alert(text: String) = requireContext().alert(text)
 
+internal fun Context.resolveActivity(): WrappedHostResolution<Activity> = resolveWrappedHost(
+    initial = this,
+    hostOrNull = { it as? Activity },
+    baseOrNull = { (it as? ContextWrapper)?.baseContext },
+)
+
 fun AlertDialog.tryToShow() {
+    val initialContext = context
+    val resolution = initialContext.resolveActivity()
+    val activity = resolution.host
+    if (activity == null) {
+        Logs.w(
+            "AlertDialog.tryToShow skipped: no Activity host; " +
+                    "initialContext=${initialContext.javaClass.name}, " +
+                    "wrapperDepth=${resolution.wrapperDepth}, " +
+                    "loopDetected=${resolution.loopDetected}"
+        )
+        return
+    }
+    if (activity.isFinishing) {
+        Logs.w(
+            "AlertDialog.tryToShow skipped: Activity is finishing; " +
+                    "initialContext=${initialContext.javaClass.name}, " +
+                    "wrapperDepth=${resolution.wrapperDepth}, " +
+                    "activity=${activity.javaClass.name}"
+        )
+        return
+    }
+    if (activity.isDestroyed) {
+        Logs.w(
+            "AlertDialog.tryToShow skipped: Activity is destroyed; " +
+                    "initialContext=${initialContext.javaClass.name}, " +
+                    "wrapperDepth=${resolution.wrapperDepth}, " +
+                    "activity=${activity.javaClass.name}"
+        )
+        return
+    }
+
+    Logs.i(
+        "AlertDialog.tryToShow resolved host: " +
+                "initialContext=${initialContext.javaClass.name}, " +
+                "wrapperDepth=${resolution.wrapperDepth}, " +
+                "activity=${activity.javaClass.name}"
+    )
     try {
-        val activity = context.unwrap<Activity>()
-        if (!activity.isFinishing) {
-            show()
-        }
+        show()
     } catch (e: Exception) {
-        Logs.e(e)
+        Logs.e("AlertDialog.tryToShow failed while showing on a resolved Activity", e)
     }
 }
+
+/**
+ * Wrap a dialog content view with Material-recommended horizontal padding.
+ * Bare EditText / TextInputLayout set via setView() otherwise sits flush against
+ * dialog edges, which looks especially cramped under original (FilledBox) style.
+ */
 
 /**
  * Wrap a dialog content view with Material-recommended horizontal padding.
