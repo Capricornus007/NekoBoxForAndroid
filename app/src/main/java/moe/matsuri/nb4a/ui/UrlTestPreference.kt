@@ -4,19 +4,18 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.EditText
 import android.widget.LinearLayout
-import androidx.core.content.res.TypedArrayUtils
 import androidx.core.view.isVisible
 import androidx.preference.EditTextPreference
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.ktx.resolveStyleAttr
 
 class UrlTestPreference
 @JvmOverloads
 constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = TypedArrayUtils.getAttr(
-        context,
+    defStyleAttr: Int = context.resolveStyleAttr(
         R.attr.editTextPreferenceStyle,
         android.R.attr.editTextPreferenceStyle,
     ),

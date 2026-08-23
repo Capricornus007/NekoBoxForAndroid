@@ -246,11 +246,9 @@
     <string name="add_profile_methods_manual_settings">수동 설정</string>
     <plurals name="removed">
         <item quantity="other">%d개 항목 삭제됨</item>
-        <item quantity="one">삭제됨</item>
     </plurals>
     <plurals name="added">
         <item quantity="other">%d개 프록시 추가됨</item>
-        <item quantity="one">추가됨</item>
     </plurals>
     <string name="undo">실행 취소</string>
     <string name="insecure">안전하지 않음</string>
@@ -421,7 +419,7 @@
     <string name="wireguard_psk">피어 사전 공유 키</string>
     <string name="warp_license">CloudFlare Warp는 무료 WireGuard VPN 제공업체입니다. 사용함으로써 TOS에 동의하게 됩니다.</string>
     <string name="warp_generate">구성 생성</string>
-    <string name="generating">생성 중...</string>
+    <string name="generating">생성 중…</string>
     <string name="tun_implementation">TUN 구현</string>
     <string name="destination_override">대상 재정의</string>
     <string name="destination_override_summary">스니핑된 도메인을 사용하여 라우팅뿐만 아니라 대상 주소를 덮어씁니다</string>

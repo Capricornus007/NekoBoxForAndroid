@@ -4,9 +4,9 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.text.Editable
 import android.util.Base64
+import androidx.core.net.toUri
 import io.nekohasekai.sagernet.ktx.Logs
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -186,7 +186,7 @@ object NGUtil {
     }
 
     fun openUri(context: Context, uriString: String) {
-        val uri = Uri.parse(uriString)
+        val uri = uriString.toUri()
         context.startActivity(Intent(Intent.ACTION_VIEW, uri))
     }
 

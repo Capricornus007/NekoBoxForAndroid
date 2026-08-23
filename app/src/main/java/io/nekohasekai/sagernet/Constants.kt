@@ -66,6 +66,7 @@ object Key {
     const val MIXED_PASSWORD = "mixedPassword"
     const val MIXED_SECRET = "mixedSecret" // storage key for the generated inbound secret
     const val CLASH_API_SECRET = "clashApiSecret" // per-install secret for the local Clash API
+    const val SUBSCRIPTION_HWID = "subscriptionHwid"
 
     const val ALLOW_ACCESS = "allowAccess"
     const val REQUIRE_PROXY_IN_VPN = "requireProxyInVPN" // keep local mixed inbound open in VPN mode

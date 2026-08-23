@@ -205,6 +205,16 @@ object DataStore : OnPreferenceDataStoreChangeListener {
             return s
         }
 
+    val subscriptionHwid: String
+        @Synchronized get() {
+            var value = configurationStore.getString(Key.SUBSCRIPTION_HWID)
+            if (value.isNullOrEmpty()) {
+                value = java.util.UUID.randomUUID().toString().replace("-", "")
+                configurationStore.putString(Key.SUBSCRIPTION_HWID, value)
+            }
+            return value
+        }
+
     var mixedPort: Int
         get() = getLocalPort(Key.MIXED_PORT, 2080)
         set(value) = saveLocalPort(Key.MIXED_PORT, value)

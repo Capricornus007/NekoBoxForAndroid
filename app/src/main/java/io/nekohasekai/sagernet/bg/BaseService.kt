@@ -21,9 +21,20 @@ import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.plugin.PluginManager
 import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.utils.DefaultNetworkListener
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import libcore.Libcore
 import moe.matsuri.nb4a.Protocols
 import moe.matsuri.nb4a.proxy.config.ConfigBean
@@ -70,7 +81,7 @@ class BaseService {
                     // Connecting (so stop/reload aren't lost), but proxy.box is a lateinit that
                     // isn't built until proxy.init() finishes, so sleep()/wake() here during
                     // startup would throw UninitializedPropertyAccessException.
-                    if (state == State.Connected && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (state == State.Connected) {
                         if (SagerNet.power.isDeviceIdleMode) {
                             proxy?.box?.sleep()
                         } else {
@@ -199,7 +210,7 @@ class BaseService {
 
         override fun close() {
             callbacks.kill()
-            cancel()
+            coroutineContext[Job]?.cancel()
             data = null
         }
     }
@@ -676,27 +687,17 @@ class BaseService {
                 addAction(Intent.ACTION_SHUTDOWN)
                 addAction(Action.CLOSE)
                 // addAction(Action.SWITCH_WAKE_LOCK)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
-                }
+                addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
                 addAction(Action.RESET_UPSTREAM_CONNECTIONS)
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                registerReceiver(
-                    data.receiver,
-                    filter,
-                    "$packageName.SERVICE",
-                    null,
-                    Context.RECEIVER_EXPORTED,
-                )
-            } else {
-                registerReceiver(
-                    data.receiver,
-                    filter,
-                    "$packageName.SERVICE",
-                    null,
-                )
-            }
+            androidx.core.content.ContextCompat.registerReceiver(
+                this,
+                data.receiver,
+                filter,
+                "$packageName.permission.SERVICE_ACCESS",
+                null,
+                androidx.core.content.ContextCompat.RECEIVER_EXPORTED,
+            )
             data.closeReceiverRegistered = true
         }
 
@@ -724,22 +725,14 @@ class BaseService {
                         addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
                         addAction(Action.RESET_UPSTREAM_CONNECTIONS)
                     }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        registerReceiver(
-                            data.receiver,
-                            filter,
-                            "$packageName.SERVICE",
-                            null,
-                            Context.RECEIVER_EXPORTED,
-                        )
-                    } else {
-                        registerReceiver(
-                            data.receiver,
-                            filter,
-                            "$packageName.SERVICE",
-                            null,
-                        )
-                    }
+                    androidx.core.content.ContextCompat.registerReceiver(
+                        this@Interface,
+                        data.receiver,
+                        filter,
+                        "$packageName.permission.SERVICE_ACCESS",
+                        null,
+                        androidx.core.content.ContextCompat.RECEIVER_EXPORTED,
+                    )
                     data.closeReceiverRegistered = true
                 }
 

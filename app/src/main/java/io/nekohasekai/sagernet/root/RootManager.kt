@@ -31,13 +31,23 @@ object RootManager {
             val process = ProcessBuilder("su", "-c", "id -u")
                 .redirectErrorStream(true)
                 .start()
-            val output = process.inputStream.bufferedReader().use { it.readText() }.trim()
-            val finished = process.waitFor(10, TimeUnit.SECONDS)
+            val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10)
+            var finished = false
+            while (System.nanoTime() < deadline) {
+                try {
+                    process.exitValue()
+                    finished = true
+                    break
+                } catch (_: IllegalThreadStateException) {
+                    Thread.sleep(50)
+                }
+            }
             if (!finished) {
                 process.destroy()
                 Logs.w("RootManager: su probe timed out")
                 return false
             }
+            val output = process.inputStream.bufferedReader().use { it.readText() }.trim()
             val isRoot = process.exitValue() == 0 && output.lineSequence().lastOrNull()?.trim() == "0"
             Logs.i("RootManager: root available = $isRoot")
             isRoot

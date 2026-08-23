@@ -122,16 +122,6 @@
 
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="500dp"
-                android:layout_gravity="top"
-                android:layout_marginTop="-500dp"
-                android:background="?attr/uiAppBarBackground"
-                android:clickable="false"
-                android:focusable="false"
-                app:layout_collapseMode="pin" />
-
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>

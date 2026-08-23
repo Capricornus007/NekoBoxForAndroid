@@ -15,14 +15,15 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.content.res.TypedArrayUtils
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.isEmpty
 import androidx.core.view.setPadding
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.ktx.getColorAttr
+import io.nekohasekai.sagernet.ktx.resolveStyleAttr
 import io.nekohasekai.sagernet.utils.Theme
 import kotlin.math.roundToInt
 
@@ -40,8 +41,7 @@ class ThemePickerPreference
 @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyle: Int = TypedArrayUtils.getAttr(
-        context,
+    defStyle: Int = context.resolveStyleAttr(
         androidx.preference.R.attr.editTextPreferenceStyle,
         android.R.attr.editTextPreferenceStyle,
     ),
@@ -62,7 +62,7 @@ class ThemePickerPreference
         // Key off the holder's actual view state, not an instance flag: the
         // RecyclerView can recycle/re-inflate this row's holder, in which case a
         // stale instance flag would leave the new frame without its swatch.
-        if (widgetFrame.childCount == 0) {
+        if (widgetFrame.isEmpty()) {
             widgetFrame.addView(
                 nekoImageView(context.getColorAttr(R.attr.colorPrimary), 48, 0),
             )

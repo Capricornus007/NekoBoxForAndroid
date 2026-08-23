@@ -95,7 +95,7 @@
     <string name="lifetime_traffic">Total : %1$s↑ %2$s↓</string>
     <string name="speed_detail">Proxy : %1$s↑ %2$s↓\nDirect : %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
-    <string name="connection_test_testing">Test en cours...</string>
+    <string name="connection_test_testing">Test en cours…</string>
     <string name="connection_test_available">Succès : la poignée de main HTTPS a pris %dms</string>
     <string name="connection_test_available_http">Succès : la poignée de main HTTP a pris %dms</string>
     <string name="connection_test_error">Échec : %s</string>
@@ -743,7 +743,7 @@
     <string name="xhttp_extra">XHTTP Extra</string>
     <string name="xhttp_settings">Paramètres XHTTP</string>
     <string name="vless_encryption">Chiffrement</string>
-    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
+    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2…</string>
     <string name="app_list_permission_denied">Impossible de lire les applications installées.\nCela est généralement dû au fait que le système a restreint les autorisations de lecture des applications.\nVeuillez accorder les autorisations dans les paramètres système.</string>
     <string name="open_app_settings">Ouvrir les paramètres système</string>
     <string name="action_snell">Snell</string>
@@ -884,7 +884,7 @@
 Le VPN sera déconnecté pendant 1 à 3 secondes, puis se reconnectera automatiquement.
 
 Continuer ?</string>
-    <string name="snackbar_watchdog_test_started">Test démarré. Redémarrage dans ≤30 s...</string>
+    <string name="snackbar_watchdog_test_started">Test démarré. Redémarrage dans ≤30 s…</string>
     <string name="dialog_log_buffer_size">Taille du tampon de journalisation (Ko)</string>
     <string name="invalid_naive_link">Lien Naive non valide : %1$s</string>
     <string name="invalid_ss_android_link">Lien ss-android non valide : %1$s</string>

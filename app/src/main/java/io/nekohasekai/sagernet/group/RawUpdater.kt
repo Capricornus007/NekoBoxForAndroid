@@ -2,7 +2,6 @@ package io.nekohasekai.sagernet.group
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.provider.Settings
 import androidx.core.net.toUri
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SubscriptionFilterMode
@@ -76,7 +75,7 @@ object RawUpdater : GroupUpdater() {
     private fun buildHwidHeaders(customParams: String?): Map<String, String> {
         val params = if (customParams.isNullOrBlank()) {
             mapOf(
-                "hwid" to (Settings.Secure.getString(app.contentResolver, Settings.Secure.ANDROID_ID) ?: ""),
+                "hwid" to DataStore.subscriptionHwid,
                 "os" to "Android",
                 "osversion" to Build.VERSION.RELEASE.orEmpty(),
                 "model" to listOf(Build.MANUFACTURER, Build.MODEL)

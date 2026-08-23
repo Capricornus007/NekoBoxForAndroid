@@ -46,10 +46,7 @@ android {
 
     // 末尾の lint ブロック：プロパティ名を修正
     lint {
-        disable.add("StringFormatMatches")
-        disable.add("StringFormatCount")
-        disable.add("StringFormatInvalid")
-        abortOnError = false
+        abortOnError = true
     }
 }
 
@@ -66,35 +63,35 @@ dependencies {
     implementation(fileTree("libs"))
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.activity:activity-ktx:1.10.1")
-    implementation("androidx.fragment:fragment-ktx:1.8.5")
-    implementation("androidx.browser:browser:1.8.0")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
+    implementation("androidx.core:core-ktx:1.19.0")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
+    implementation("androidx.activity:activity-ktx:1.13.0")
+    implementation("androidx.fragment:fragment-ktx:1.9.0")
+    implementation("androidx.browser:browser:1.10.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.2")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.8")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.8")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.work:work-runtime-ktx:2.9.1")
-    implementation("androidx.work:work-multiprocess:2.9.1")
+    implementation("androidx.appcompat:appcompat:1.8.0")
+    implementation("androidx.work:work-runtime-ktx:2.11.2")
+    implementation("androidx.work:work-multiprocess:2.11.2")
 
     implementation("com.google.android.material:material:1.14.0")
-    implementation("com.google.code.gson:gson:2.11.0")
+    implementation("com.google.code.gson:gson:2.14.0")
 
     // QR scanning: CameraX live preview/analysis + ML Kit bundled barcode model.
     // Bundled (not play-services-*) so detection works fully offline with no Google
     // Play Services dependency - important for de-Googled ROMs. Replaces zxing-lite,
     // which pulled in ancient CameraX 1.0.x and a weaker ZXing decoder.
-    implementation("androidx.camera:camera-core:1.4.1")
-    implementation("androidx.camera:camera-camera2:1.4.1")
-    implementation("androidx.camera:camera-lifecycle:1.4.1")
-    implementation("androidx.camera:camera-view:1.4.1")
+    implementation("androidx.camera:camera-core:1.6.1")
+    implementation("androidx.camera:camera-camera2:1.6.1")
+    implementation("androidx.camera:camera-lifecycle:1.6.1")
+    implementation("androidx.camera:camera-view:1.6.1")
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
     // ZXing core (pure-Java) is kept only for QR *generation* (QRCodeDialog); ML Kit
     // scans but cannot encode. It was previously transitive via zxing-lite.
-    implementation("com.google.zxing:core:3.5.3")
+    implementation("com.google.zxing:core:3.5.4")
     // JSON config editor. sora-editor (Rosemoe) is the actively-maintained code editor
     // widget; it replaces the archived com.blacksquircle.ui:editorkit. Syntax highlighting
     // is provided via TextMate grammars (language-textmate), with JSON grammar + themes
@@ -103,18 +100,18 @@ dependencies {
     implementation("io.github.rosemoe:editor")
     implementation("io.github.rosemoe:language-textmate")
 
-    implementation("com.squareup.okhttp3:okhttp:5.3.0")
-    implementation("org.yaml:snakeyaml:2.3")
-    implementation("com.jakewharton:process-phoenix:2.1.2")
+    implementation("com.squareup.okhttp3:okhttp:5.5.0")
+    implementation("org.yaml:snakeyaml:2.6")
+    implementation("com.jakewharton:process-phoenix:3.0.0")
     implementation("com.esotericsoftware:kryo:5.6.2")
-    implementation("com.google.guava:guava:31.0.1-android")
+    implementation("com.google.guava:guava:33.7.1-android")
     testImplementation("junit:junit:4.13.2")
 
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")
 
-    implementation("androidx.room:room-runtime:2.7.2")
-    ksp("androidx.room:room-compiler:2.7.2")
-    implementation("androidx.room:room-ktx:2.7.2")
+    implementation("androidx.room:room-runtime:2.8.4")
+    ksp("androidx.room:room-compiler:2.8.4")
+    implementation("androidx.room:room-ktx:2.8.4")
 
     // Unit tests (pure-JVM, run via :app:testOssDebugUnitTest — no device/libcore needed).
     testImplementation("junit:junit:4.13.2")
@@ -126,9 +123,9 @@ dependencies {
     // Instrumented tests (androidTest) — Room migration verification on a real SQLite.
     // Runs on the CI "Instrumented (Room migrations)" job when the runner has KVM; otherwise
     // run manually on a device before any Room version or schema bump.
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test:runner:1.6.2")
-    androidTestImplementation("androidx.room:room-testing:2.7.2")
+    androidTestImplementation("androidx.test.ext:junit:1.3.0")
+    androidTestImplementation("androidx.test:runner:1.7.0")
+    androidTestImplementation("androidx.room:room-testing:2.8.4")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }

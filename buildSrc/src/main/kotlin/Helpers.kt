@@ -51,7 +51,7 @@ fun Project.requireLocalProperties(): Properties {
 fun Project.setupCommon() {
     android.apply {
         buildToolsVersion = "36.0.0"
-        compileSdk = 36
+        compileSdk = 37
         defaultConfig {
             minSdk = 23
             targetSdk = 35
@@ -70,7 +70,6 @@ fun Project.setupCommon() {
             checkAllWarnings = true
             checkReleaseBuilds = true
             warningsAsErrors = true
-            baseline = project.file("lint-baseline.xml")
             textOutput = project.file("build/lint.txt")
             htmlOutput = project.file("build/lint.html")
         }

@@ -79,7 +79,7 @@
     <string name="allow_insecure_sum">تعطيل التحقق من الشهادة. عند التمكين، يكون هذا التكوين آمنًا مثل النص العادي</string>
     <string name="speed_detail">الوكيل: %1$s↑ %2$s↓\nمباشر: %3$s↑ %4$s↓</string>
     <string name="speed">%s/ث</string>
-    <string name="connection_test_testing">اختبار...</string>
+    <string name="connection_test_testing">اختبار…</string>
     <string name="connection_test_available">نجاح: استغرقت مصافحة HTTPS %dms</string>
     <string name="connection_test_available_http">نجاح: استغرقت مصافحة HTTP %dms</string>
     <string name="connection_test_error">فشل: %s</string>
@@ -278,7 +278,7 @@
     <string name="ignore_battery_optimizations">تجاهل تحسينات البطارية</string>
     <string name="ignore_battery_optimizations_sum">إزالة بعض القيود</string>
     <string name="plugin">إضافة</string>
-    <string name="plugin_configure">تكوين...</string>
+    <string name="plugin_configure">تكوين…</string>
     <string name="plugin_disabled">معطل</string>
     <string name="plugin_unknown">إضافة غير معروفة %s</string>
     <string name="plugin_untrusted">تحذير: يبدو أن هذه الإضافة لا تأتي من مصدر موثوق معروف.</string>
@@ -450,7 +450,7 @@
     <string name="stun_test_summary">تحديد سلوك تعيين NAT الخاص بالعميل وسلوك تصفية NAT
         المحدد في RFC 3478 باستخدام STUN.</string>
     <string name="start">ابدأ</string>
-    <string name="stun_attest_loading">قد يستغرق هذا بضع دقائق...</string>
+    <string name="stun_attest_loading">قد يستغرق هذا بضع دقائق…</string>
     <string name="nat_stun_server_hint">خادم STUN</string>
     <string name="nat_result_hint">نتيجة فحص NAT</string>
     <string name="tools_network">الشبكة</string>
@@ -620,7 +620,7 @@
     <string name="xhttp_extra">إضافات XHTTP</string>
     <string name="xhttp_settings">إعدادات XHTTP</string>
     <string name="vless_encryption">التشفير</string>
-    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
+    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2…</string>
     <string name="app_list_permission_denied">غير قادر على قراءة التطبيقات المثبتة.\nعادةً ما يكون هذا بسبب تقييد النظام لأذونات قراءة التطبيقات.\nيرجى منح الأذونات في إعدادات النظام.</string>
     <string name="open_app_settings">فتح إعدادات النظام</string>
     <string name="action_snell">Snell</string>
@@ -864,7 +864,7 @@
 سينقطع VPN لمدة 1–3 ثوانٍ، ثم سيُعاد الاتصال تلقائيًا.
 
 هل تريد المتابعة؟</string>
-    <string name="snackbar_watchdog_test_started">بدأ الاختبار. ستتم إعادة التشغيل خلال ≤30 ثانية...</string>
+    <string name="snackbar_watchdog_test_started">بدأ الاختبار. ستتم إعادة التشغيل خلال ≤30 ثانية…</string>
     <string name="dialog_log_buffer_size">حجم مخزن السجل (KB)</string>
     <string name="invalid_naive_link">رابط Naive غير صالح: %1$s</string>
     <string name="invalid_ss_android_link">رابط ss-android غير صالح: %1$s</string>

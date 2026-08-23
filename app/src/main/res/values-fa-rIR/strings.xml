@@ -604,7 +604,7 @@
     <string name="xhttp_extra">اضافی XHTTP</string>
     <string name="xhttp_settings">تنظیمات XHTTP</string>
     <string name="vless_encryption">رمزنگاری</string>
-    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
+    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2…</string>
     <string name="app_list_permission_denied">قادر به خواندن برنامه‌های نصب شده نیست.
 این معمولاً به دلیل محدودیت سیستم در مجوزهای خواندن برنامه است.
 لطفاً در تنظیمات سیستم مجوزها را اعطا کنید.</string>
@@ -849,7 +849,7 @@
 اتصال VPN برای ۱ تا ۳ ثانیه قطع می‌شود و سپس به‌طور خودکار دوباره برقرار خواهد شد.
 
 ادامه می‌دهید؟</string>
-    <string name="snackbar_watchdog_test_started">آزمایش آغاز شد. راه‌اندازی مجدد در ≤۳۰ ثانیه...</string>
+    <string name="snackbar_watchdog_test_started">آزمایش آغاز شد. راه‌اندازی مجدد در ≤۳۰ ثانیه…</string>
     <string name="dialog_log_buffer_size">اندازه بافر گزارش (KB)</string>
     <string name="invalid_naive_link">پیوند Naive نامعتبر است: %1$s</string>
     <string name="invalid_ss_android_link">پیوند ss-android نامعتبر است: %1$s</string>

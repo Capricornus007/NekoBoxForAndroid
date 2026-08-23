@@ -69,6 +69,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:ems="10"
+                            android:hint="@string/nat_stun_server_hint"
                             android:inputType="text"
                             android:text="stun.voipgate.com:3478" />
 

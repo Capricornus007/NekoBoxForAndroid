@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.ui
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.view.MenuItem
@@ -148,7 +147,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
     }
 
     private fun normalizePanelUrl(rawUrl: String): String? {
-        val parsed = runCatching { Uri.parse(rawUrl.trim()) }.getOrNull() ?: return null
+        val parsed = runCatching { rawUrl.trim().toUri() }.getOrNull() ?: return null
         val scheme = parsed.scheme?.lowercase() ?: return null
         if (scheme != "http" && scheme != "https") return null
         if (scheme == "http" && !isLoopbackHost(parsed.host)) return null

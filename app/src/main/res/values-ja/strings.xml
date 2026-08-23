@@ -615,11 +615,9 @@
     <string name="use_system_theme">システムテーマを使用</string>
     <string name="use_system_theme_summary">システムMonetカラーを使用（Android 12以上）</string>
     <plurals name="removed">
-        <item quantity="other">%d個のアイテムが削除されました</item>
-    <item quantity="one">削除しました</item></plurals>
+        <item quantity="other">%d個のアイテムが削除されました</item></plurals>
     <plurals name="added">
-        <item quantity="other">%d個のプロキシが追加されました</item>
-    <item quantity="one">追加しました</item></plurals>
+        <item quantity="other">%d個のプロキシが追加されました</item></plurals>
     <string name="append_http_proxy">HTTPプロキシをVPNに追加</string>
     <string name="append_http_proxy_sum">HTTPプロキシは、仮想NICデバイスを経由せずに（ブラウザ/一部の対応アプリから）直接使用されます（Android 10以上）</string>
     <string name="append_http_proxy_security_title">セキュリティ通知</string>

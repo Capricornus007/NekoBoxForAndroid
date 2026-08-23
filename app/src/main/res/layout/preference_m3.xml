@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
@@ -11,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
+        android:baselineAligned="false"
         android:minHeight="72dp"
         android:orientation="horizontal"
         android:paddingStart="16dp"
@@ -18,6 +20,7 @@
         android:paddingVertical="10dp">
 
         <FrameLayout
+            tools:targetApi="24"
             android:id="@android:id/icon_frame"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -37,7 +40,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:baselineAligned="false"
+        android:orientation="vertical">
 
             <TextView
                 android:id="@android:id/title"

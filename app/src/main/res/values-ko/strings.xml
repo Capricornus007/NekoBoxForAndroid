@@ -611,11 +611,9 @@
     <string name="use_system_theme">시스템 테마 사용</string>
     <string name="use_system_theme_summary">시스템 Monet 색상 사용 (Android 12+)</string>
     <plurals name="removed">
-        <item quantity="other">%d개 항목 삭제됨</item>
-    <item quantity="one">삭제됨</item></plurals>
+        <item quantity="other">%d개 항목 삭제됨</item></plurals>
     <plurals name="added">
-        <item quantity="other">%d개 프록시 추가됨</item>
-    <item quantity="one">추가됨</item></plurals>
+        <item quantity="other">%d개 프록시 추가됨</item></plurals>
     <string name="append_http_proxy">VPN에 HTTP 프록시 추가</string>
     <string name="append_http_proxy_sum">HTTP 프록시는 (브라우저/일부 지원 앱)에서 직접 사용되며, 가상 NIC 장치(Android 10+)를 거치지 않습니다.</string>
     <string name="append_http_proxy_security_title">보안 알림</string>

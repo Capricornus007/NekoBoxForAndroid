@@ -248,11 +248,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="add_profile_methods_manual_settings">手動設定</string>
     <plurals name="removed">
         <item quantity="other">%d個のアイテムが削除されました</item>
-        <item quantity="one">削除しました</item>
     </plurals>
     <plurals name="added">
         <item quantity="other">%d個のプロキシが追加されました</item>
-        <item quantity="one">追加しました</item>
     </plurals>
     <string name="undo">元に戻す</string>
     <string name="insecure">安全ではない</string>

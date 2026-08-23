@@ -79,7 +79,7 @@
     <string name="allow_insecure_sum">停用憑證檢查。啟用後，此配置與明文同樣不安全</string>
     <string name="speed_detail">代理：%1$s↑ %2$s↓\n直接：%3$s↑ %4$s↓</string>
     <string name="speed">每秒 %s</string>
-    <string name="connection_test_testing">測試中...</string>
+    <string name="connection_test_testing">測試中…</string>
     <string name="connection_test_available">成功：HTTPS 握手耗時 %dms</string>
     <string name="connection_test_available_http">成功：HTTP 握手耗時 %dms</string>
     <string name="connection_test_error">失敗：%s</string>
@@ -252,11 +252,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="add_profile_methods_scan_qr_code">掃描 QR 碼</string>
     <string name="add_profile_methods_manual_settings">手動設定</string>
     <plurals name="removed">
-        <item quantity="other">%d 個項目已移除</item>
-    <item quantity="one">已移除</item></plurals>
+        <item quantity="other">%d 個項目已移除</item></plurals>
     <plurals name="added">
-        <item quantity="other">%d 個代理已新增</item>
-    <item quantity="one">已新增</item></plurals>
+        <item quantity="other">%d 個代理已新增</item></plurals>
     <string name="undo">還原</string>
     <string name="insecure">不安全</string>
     <string name="deprecated">已棄用</string>

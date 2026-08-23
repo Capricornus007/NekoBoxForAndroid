@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <string-array name="language_entries">
         <item>@string/follow_system</item>
@@ -274,7 +274,8 @@
         <item>camellia-192-cfb8</item>
         <item>camellia-256-cfb8</item>
         <item>rc4-md5</item>
-        <item>rc4-md5-6</item>
+        <!-- Protocol identifier: the ASCII hyphen is part of the cipher name. -->
+        <item tools:ignore="TypographyDashes">rc4-md5-6</item>
         <item>rc4</item>
         <item>bf-cfb</item>
         <item>cast5-cfb</item>

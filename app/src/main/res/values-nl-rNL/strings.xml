@@ -621,7 +621,7 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="xhttp_extra">XHTTP Extra</string>
     <string name="xhttp_settings">XHTTP Instellingen</string>
     <string name="vless_encryption">Versleuteling</string>
-    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
+    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2…</string>
     <string name="app_list_permission_denied">Kan geïnstalleerde apps niet lezen.\nDit komt meestal doordat het systeem de leesrechten van apps heeft beperkt.\nVerleen toestemming in de systeeminstellingen.</string>
     <string name="open_app_settings">Open systeeminstellingen</string>
     <string name="action_snell">Snell</string>
@@ -865,7 +865,7 @@ De VPN-verbinding wordt 1–3 seconden verbroken en daarna automatisch hersteld.
 
 Doorgaan?</string>
     <string name="dialog_watchdog_start">Starten</string>
-    <string name="snackbar_watchdog_test_started">Test gestart. Herstart binnen ≤30 s...</string>
+    <string name="snackbar_watchdog_test_started">Test gestart. Herstart binnen ≤30 s…</string>
     <string name="dialog_log_buffer_size">Grootte van logbuffer (KB)</string>
     <string name="invalid_naive_link">Ongeldige Naive-link: %1$s</string>
     <string name="invalid_ss_android_link">Ongeldige ss-android-link: %1$s</string>

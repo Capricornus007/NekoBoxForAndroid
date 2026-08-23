@@ -1,15 +1,15 @@
 package io.nekohasekai.sagernet.widget
 
 import android.content.Context
-import android.net.Uri
 import android.util.AttributeSet
-import androidx.core.content.res.TypedArrayUtils
+import androidx.core.net.toUri
 import androidx.core.widget.addTextChangedListener
 import androidx.preference.EditTextPreference
 import com.google.android.material.textfield.TextInputLayout
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.readableMessage
+import io.nekohasekai.sagernet.ktx.resolveStyleAttr
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 class LinkOrContentPreference
@@ -17,8 +17,7 @@ class LinkOrContentPreference
 constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = TypedArrayUtils.getAttr(
-        context,
+    defStyleAttr: Int = context.resolveStyleAttr(
         R.attr.editTextPreferenceStyle,
         android.R.attr.editTextPreferenceStyle,
     ),
@@ -40,7 +39,7 @@ constructor(
                 }
 
                 try {
-                    if (Uri.parse(link.toString()).scheme == "content") {
+                    if (link.toString().toUri().scheme == "content") {
                         linkLayout.isErrorEnabled = false
                         return
                     }

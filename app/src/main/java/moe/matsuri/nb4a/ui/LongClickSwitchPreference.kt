@@ -3,20 +3,16 @@ package moe.matsuri.nb4a.ui
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import androidx.core.content.res.TypedArrayUtils
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.R
 import androidx.preference.SwitchPreferenceCompat
+import io.nekohasekai.sagernet.ktx.resolveStyleAttr
 
 class LongClickSwitchPreference
 @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = TypedArrayUtils.getAttr(
-        context,
-        R.attr.switchPreferenceCompatStyle,
-        R.attr.switchPreferenceStyle,
-    ),
+    defStyleAttr: Int = context.resolveStyleAttr(R.attr.switchPreferenceCompatStyle, R.attr.switchPreferenceStyle),
     defStyleRes: Int = 0,
 ) : SwitchPreferenceCompat(
     context,

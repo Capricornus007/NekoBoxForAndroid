@@ -17,8 +17,18 @@ object RootShell {
             val process = ProcessBuilder("su", "-c", command)
                 .redirectErrorStream(true)
                 .start()
+            val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(timeoutSeconds)
+            var finished = false
+            while (System.nanoTime() < deadline) {
+                try {
+                    process.exitValue()
+                    finished = true
+                    break
+                } catch (_: IllegalThreadStateException) {
+                    Thread.sleep(50)
+                }
+            }
             val output = process.inputStream.bufferedReader().use { it.readText() }
-            val finished = process.waitFor(timeoutSeconds, TimeUnit.SECONDS)
             if (!finished) {
                 process.destroy()
                 Logs.e("RootShell: timed out: $command")

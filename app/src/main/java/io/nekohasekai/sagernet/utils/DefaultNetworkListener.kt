@@ -1,6 +1,5 @@
 package io.nekohasekai.sagernet.utils
 
-import android.annotation.TargetApi
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -8,6 +7,7 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.RequiresApi
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.CompletableDeferred
@@ -186,7 +186,7 @@ object DefaultNetworkListener {
         callbackRegistration.register {
             when (Build.VERSION.SDK_INT) {
                 in 31..Int.MAX_VALUE ->
-                    @TargetApi(31)
+                    @RequiresApi(31)
                     {
                         SagerNet.connectivity.registerBestMatchingNetworkCallback(
                             request,
@@ -195,17 +195,17 @@ object DefaultNetworkListener {
                         )
                     }
                 in 28 until 31 ->
-                    @TargetApi(28)
+                    @RequiresApi(28)
                     { // we want REQUEST here instead of LISTEN
                         SagerNet.connectivity.requestNetwork(request, Callback, mainHandler)
                     }
                 in 26 until 28 ->
-                    @TargetApi(26)
+                    @RequiresApi(26)
                     {
                         SagerNet.connectivity.registerDefaultNetworkCallback(Callback, mainHandler)
                     }
                 in 24 until 26 ->
-                    @TargetApi(24)
+                    @RequiresApi(24)
                     {
                         SagerNet.connectivity.registerDefaultNetworkCallback(Callback)
                     }

@@ -725,7 +725,7 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="xhttp_extra">XHTTP Ekstra</string>
     <string name="xhttp_settings">XHTTP Innstillinger</string>
     <string name="vless_encryption">Kryptering</string>
-    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
+    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2…</string>
     <string name="app_list_permission_denied">Kan ikke lese installerte apper.\nDette skyldes vanligvis at systemet har begrenset appens lesetilgang.\nGi tillatelser i systeminnstillingene.</string>
     <string name="open_app_settings">Åpne systeminnstillinger</string>
     <string name="action_snell">Snell</string>
@@ -869,7 +869,7 @@ VPN kobles fra i 1–3 sekunder og kobles deretter til igjen automatisk.
 
 Fortsette?</string>
     <string name="dialog_watchdog_start">Start</string>
-    <string name="snackbar_watchdog_test_started">Test startet. Starter på nytt innen ≤30 s...</string>
+    <string name="snackbar_watchdog_test_started">Test startet. Starter på nytt innen ≤30 s…</string>
     <string name="dialog_log_buffer_size">Størrelse på loggbuffer (KB)</string>
     <string name="invalid_naive_link">Ugyldig Naive-lenke: %1$s</string>
     <string name="invalid_ss_android_link">Ugyldig ss-android-lenke: %1$s</string>

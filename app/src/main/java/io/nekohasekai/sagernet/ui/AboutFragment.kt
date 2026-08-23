@@ -151,36 +151,24 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
             subText = Libcore.versionBox(),
         )
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val pm = app.getSystemService(Context.POWER_SERVICE) as PowerManager
-            val ignoring = pm.isIgnoringBatteryOptimizations(app.packageName)
-            items += AboutItem(
-                icon = R.drawable.ic_baseline_running_with_errors_24,
-                text = getString(R.string.ignore_battery_optimizations),
-                subText = getString(
-                    if (ignoring) {
-                        R.string.battery_optimization_enabled
-                    } else {
-                        R.string.battery_optimization_disabled
-                    },
-                ),
-                onClick = {
-                    // The ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS dialog only appears while
-                    // the app is still optimized; once exempt it is a no-op. So when already
-                    // exempt, send the user to the battery settings screen where they can toggle
-                    // it back off.
-                    val intent = if (ignoring) {
-                        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-                    } else {
-                        Intent(
-                            Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                            "package:${app.packageName}".toUri(),
-                        )
-                    }
-                    requestIgnoreBatteryOptimizations.launch(intent)
+        val pm = app.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val ignoring = pm.isIgnoringBatteryOptimizations(app.packageName)
+        items += AboutItem(
+            icon = R.drawable.ic_baseline_running_with_errors_24,
+            text = getString(R.string.ignore_battery_optimizations),
+            subText = getString(
+                if (ignoring) {
+                    R.string.battery_optimization_enabled
+                } else {
+                    R.string.battery_optimization_disabled
                 },
-            )
-        }
+            ),
+            onClick = {
+                requestIgnoreBatteryOptimizations.launch(
+                    Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),
+                )
+            },
+        )
 
         return items
     }
@@ -449,8 +437,8 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
 
     private data class AboutItem(
         @DrawableRes val icon: Int = 0,
-        val text: CharSequence,
-        val subText: CharSequence? = null,
+        val text: String,
+        val subText: String? = null,
         val onClick: (() -> Unit)? = null,
     )
 

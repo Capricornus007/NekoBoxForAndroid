@@ -19,7 +19,6 @@
     android:id="@+id/item_title"
     android:layout_width="36dp"
     android:layout_height="36dp"
-    android:background="?selectableItemBackground"
     android:gravity="center"
     android:paddingBottom="2dp"
     android:textSize="16sp"

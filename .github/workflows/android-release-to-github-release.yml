@@ -55,8 +55,8 @@ jobs:
         run: |
           sdkmanager --install \
             "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.1" \
+            "platforms;android-37" \
+            "build-tools;37.0.0" \
             "ndk;25.0.8775105"
 
       - name: Make scripts executable

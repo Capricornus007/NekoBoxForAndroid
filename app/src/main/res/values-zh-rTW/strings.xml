@@ -246,11 +246,9 @@
     <string name="add_profile_methods_scan_qr_code">掃描 QR Code</string>
     <string name="add_profile_methods_manual_settings">手動設定</string>
     <plurals name="removed">
-        <item quantity="other">已移除 %d 個項目</item>
-    <item quantity="one">已移除</item></plurals>
+        <item quantity="other">已移除 %d 個項目</item></plurals>
     <plurals name="added">
-        <item quantity="other">已新增 %d 個代理</item>
-    <item quantity="one">已新增</item></plurals>
+        <item quantity="other">已新增 %d 個代理</item></plurals>
     <string name="undo">撤消</string>
     <string name="insecure">不安全</string>
     <string name="deprecated">已棄用</string>

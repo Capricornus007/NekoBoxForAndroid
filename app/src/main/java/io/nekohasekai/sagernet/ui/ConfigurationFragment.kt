@@ -2,7 +2,6 @@ package io.nekohasekai.sagernet.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.OpenableColumns
@@ -532,7 +531,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 if (e.link.startsWith("sn://")) {
                                     (requireActivity() as MainActivity).importSubscription(e.link.toUri())
                                 } else {
-                                    val subscriptionLink = Uri.parse(e.link).getQueryParameter("url") ?: e.link
+                                    val subscriptionLink = e.link.toUri().getQueryParameter("url") ?: e.link
 
                                     val group = ProxyGroup(type = GroupType.SUBSCRIPTION)
                                     val subscription = SubscriptionBean()

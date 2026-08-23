@@ -110,7 +110,7 @@ public class JavaUtil {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.P)
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.P)
     private static void tryLockOrRecreateFile(File file) {
         try {
             FileLock tryLock = new RandomAccessFile(file, "rw").getChannel().tryLock();

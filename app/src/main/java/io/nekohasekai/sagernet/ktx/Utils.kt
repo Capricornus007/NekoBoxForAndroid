@@ -152,6 +152,11 @@ fun Resources.Theme.resolveResourceId(@AttrRes resId: Int): Int {
     return typedValue.resourceId
 }
 
+fun Context.resolveStyleAttr(@AttrRes primary: Int, @AttrRes fallback: Int): Int {
+    val value = TypedValue()
+    return if (theme.resolveAttribute(primary, value, true) && value.resourceId != 0) primary else fallback
+}
+
 fun Preference.remove() = parent!!.removePreference(this)
 
 /**

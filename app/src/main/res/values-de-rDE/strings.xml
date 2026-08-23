@@ -611,7 +611,7 @@
     <string name="xhttp_extra">XHTTP Extra</string>
     <string name="xhttp_settings">XHTTP Settings</string>
     <string name="vless_encryption">Verschlüsselung</string>
-    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
+    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2…</string>
     <string name="app_list_permission_denied">Installierte Apps können nicht gelesen werden.\nDies liegt normalerweise daran, dass das System die Leseberechtigung für Apps eingeschränkt hat.\nBitte erteilen Sie die Berechtigungen in den Systemeinstellungen.</string>
     <string name="open_app_settings">Systemeinstellungen öffnen</string>
     <string name="action_snell">Snell</string>
@@ -855,7 +855,7 @@
 Die VPN-Verbindung wird für 1–3 Sekunden getrennt und anschließend automatisch wiederhergestellt.
 
 Fortfahren?</string>
-    <string name="snackbar_watchdog_test_started">Test gestartet. Neustart innerhalb von ≤30 s...</string>
+    <string name="snackbar_watchdog_test_started">Test gestartet. Neustart innerhalb von ≤30 s…</string>
     <string name="dialog_log_buffer_size">Protokollpuffergröße (KB)</string>
     <string name="invalid_naive_link">Ungültiger Naive-Link: %1$s</string>
     <string name="invalid_ss_android_link">Ungültiger ss-android-Link: %1$s</string>

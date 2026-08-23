@@ -147,7 +147,7 @@
     <string name="route_proxy">Проксі</string>
     <string name="route_bypass">Абыход</string>
     <string name="route_block">Блакаваць</string>
-    <string name="route_profile">Выбраць профіль...</string>
+    <string name="route_profile">Выбраць профіль…</string>
     <string name="empty_route">Пусты маршрут</string>
     <string name="empty_route_notice">Усталюйце некаторыя правілы перад захаваннем</string>
     <string name="route_bypass_domain">Правіла дамена для %s</string>
@@ -607,7 +607,7 @@
     <string name="xhttp_extra">XHTTP Extra</string>
     <string name="xhttp_settings">XHTTP Налады</string>
     <string name="vless_encryption">Шыфраванне</string>
-    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
+    <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2…</string>
     <string name="app_list_permission_denied">Немагчыма прачытаць усталяваныя праграмы.\nГэта звычайна з-за таго, што сістэма абмежавала правы на чытанне праграм.\nКалі ласка, дайце дазволы ў сістэмных наладах.</string>
     <string name="open_app_settings">Адкрыць сістэмныя налады</string>
     <string name="action_snell">Snell</string>
@@ -851,7 +851,7 @@
 VPN адключыцца на 1–3 секунды, а затым падключыцца аўтаматычна.
 
 Працягнуць?</string>
-    <string name="snackbar_watchdog_test_started">Праверка пачалася. Перазапуск на працягу ≤30 с...</string>
+    <string name="snackbar_watchdog_test_started">Праверка пачалася. Перазапуск на працягу ≤30 с…</string>
     <string name="dialog_log_buffer_size">Памер буфера журнала (КБ)</string>
     <string name="invalid_naive_link">Няправільная спасылка Naive: %1$s</string>
     <string name="invalid_ss_android_link">Няправільная спасылка ss-android: %1$s</string>

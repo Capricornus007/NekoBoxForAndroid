@@ -250,11 +250,9 @@
     <string name="add_profile_methods_scan_qr_code">扫描二维码</string>
     <string name="add_profile_methods_manual_settings">手动设置</string>
     <plurals name="removed">
-        <item quantity="other">%d个项目已移除</item>
-    <item quantity="one">已移除</item></plurals>
+        <item quantity="other">%d个项目已移除</item></plurals>
     <plurals name="added">
-        <item quantity="other">%d个代理已添加</item>
-    <item quantity="one">已添加</item></plurals>
+        <item quantity="other">%d个代理已添加</item></plurals>
     <string name="undo">撤销</string>
     <string name="insecure">不安全</string>
     <string name="deprecated">已弃用</string>
@@ -429,7 +427,7 @@
     <string name="wireguard_persistent_keepalive">持久保活间隔（秒）</string>
     <string name="warp_license">CloudFlare Warp 是一个免费的 WireGuard VPN 提供商。使用即表示同意其服务条款。</string>
     <string name="warp_generate">生成配置</string>
-    <string name="generating">正在生成...</string>
+    <string name="generating">正在生成…</string>
     <string name="tun_implementation">TUN 实现</string>
     <string name="destination_override">覆盖目标</string>
     <string name="destination_override_summary">使用嗅探到的域名覆盖目标地址，不仅用于路由。</string>
