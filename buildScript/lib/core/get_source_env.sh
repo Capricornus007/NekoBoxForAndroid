@@ -11,3 +11,7 @@ export COMMIT_LIBNEKO="705cff5b0a6c144e6b737872ba6f3259955eab64"
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
 # count only successful sends.
 export COMMIT_WIREGUARD_GO="c34eb3a52e4426aff436835351cd86c83b835c3f"
+# sing-box and libcore both replace github.com/sagernet/sing-quic with the
+# sibling checkout at ../../sing-quic. Pin and fetch it explicitly so clean CI
+# runners do not accidentally depend on a developer machine's existing clone.
+export COMMIT_SING_QUIC="66be12d50d0be88be86044b3a34e3d6eb8c42098"

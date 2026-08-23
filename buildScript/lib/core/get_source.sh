@@ -67,4 +67,18 @@ git fetch origin
 git checkout "$COMMIT_WIREGUARD_GO"
 popd >/dev/null
 
+#### sing-quic ####
+SING_QUIC_REPO="https://github.com/Capricornus007/sing-quic.git"
+if [ ! -d "sing-quic" ]; then
+  git clone --no-checkout "$SING_QUIC_REPO" sing-quic
+fi
+pushd sing-quic >/dev/null
+if ! git remote get-url origin 2>/dev/null | grep -q "Capricornus007/sing-quic"; then
+  git remote set-url origin "$SING_QUIC_REPO"
+fi
+git fetch origin
+git checkout -f "$COMMIT_SING_QUIC"
+echo ">> sing-quic at $(git rev-parse --short HEAD)"
+popd >/dev/null
+
 popd >/dev/null
