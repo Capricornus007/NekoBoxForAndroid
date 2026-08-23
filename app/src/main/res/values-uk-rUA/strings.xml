@@ -878,4 +878,7 @@
     <string name="webdav_check_dir_failed">Не вдалося перевірити каталог (%1$s): %2$s</string>
     <string name="fastest_regex_preview_count">Збігів проксі: %1$d</string>
     <string name="fastest_regex_error_invalid">Недійсний регулярний вираз: %1$s</string>
+
+    <string name="wireguard_listen_port">Порт прослуховування</string>
+    <string name="wireguard_persistent_keepalive">Інтервал постійного підтримання з’єднання (секунди)</string>
 </resources>

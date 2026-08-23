@@ -888,4 +888,7 @@ Doorgaan?</string>
     <string name="invalid_http_link">Ongeldige HTTP(S)-link: %1$s</string>
     <string name="invalid_hysteria_link">Ongeldige Hysteria-link: %1$s</string>
     <string name="invalid_masterdns_link">Ongeldige MasterDNS-link: %1$s</string>
+
+    <string name="wireguard_listen_port">Luisterpoort</string>
+    <string name="wireguard_persistent_keepalive">Interval voor permanente keepalive (seconden)</string>
 </resources>

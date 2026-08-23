@@ -881,4 +881,7 @@ Continuar?</string>
     <string name="udp_over_tcp">UDP sobre TCP</string>
     <string name="webdav_auth_failed">Falha na autenticação</string>
     <string name="webdav_check_dir_failed">Falha ao verificar o diretório (%1$s): %2$s</string>
+
+    <string name="wireguard_listen_port">Porta de escuta</string>
+    <string name="wireguard_persistent_keepalive">Intervalo de keepalive persistente (segundos)</string>
 </resources>

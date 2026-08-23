@@ -691,4 +691,7 @@
 <string name="invalid_http_link">پیوند HTTP(S) نامعتبر است: %1$s</string>
 <string name="invalid_hysteria_link">پیوند Hysteria نامعتبر است: %1$s</string>
 <string name="invalid_masterdns_link">پیوند MasterDNS نامعتبر است: %1$s</string>
+
+    <string name="wireguard_listen_port">درگاه شنود</string>
+    <string name="wireguard_persistent_keepalive">فاصلهٔ زنده‌نگه‌داشتن مداوم (ثانیه)</string>
 </resources>

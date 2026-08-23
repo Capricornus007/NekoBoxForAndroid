@@ -929,4 +929,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="search_menu_title">Поиск</string>
     <string name="bottomsheet_action_collapse">Свернуть нижний экран</string>
     <string name="abc_search_hint">Введите запрос</string>
+
+    <string name="wireguard_listen_port">Порт прослушивания</string>
+    <string name="wireguard_persistent_keepalive">Интервал постоянного поддержания соединения (секунды)</string>
 </resources>

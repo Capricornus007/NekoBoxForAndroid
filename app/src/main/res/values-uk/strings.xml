@@ -878,4 +878,7 @@
     <string name="invalid_masterdns_link">Недійсне посилання MasterDNS: %1$s</string>
     <string name="masterdns_no_key">У посиланні MasterDNS відсутній ключ шифрування для методу %1$s</string>
     <string name="webdav_check_dir_failed">Не вдалося перевірити каталог (%1$s): %2$s</string>
+
+    <string name="wireguard_listen_port">Порт прослуховування</string>
+    <string name="wireguard_persistent_keepalive">Інтервал постійного підтримання з’єднання (секунди)</string>
 </resources>

@@ -888,4 +888,7 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
     <string name="fastest_regex_error_empty">Enter a regular expression</string>
     <string name="fastest_regex_pattern">Regular expression</string>
     <string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string>
+
+    <string name="wireguard_listen_port">Puerto de escucha</string>
+    <string name="wireguard_persistent_keepalive">Intervalo de mantenimiento persistente (segundos)</string>
 </resources>

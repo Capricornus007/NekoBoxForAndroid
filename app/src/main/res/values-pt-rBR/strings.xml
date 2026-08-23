@@ -881,4 +881,7 @@ Continuar?</string>
     <string name="shadowquic_sunny_quic">Sunny QUIC</string>
     <string name="dialog_log_buffer_size">Tamanho do buffer de registo (KB)</string>
     <string name="fastest_regex_ignore_case">Ignorar maiúsculas e minúsculas</string>
+
+    <string name="wireguard_listen_port">Porta de escuta</string>
+    <string name="wireguard_persistent_keepalive">Intervalo de keepalive persistente (segundos)</string>
 </resources>

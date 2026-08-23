@@ -880,4 +880,7 @@ Devam edilsin mi?</string>
     <string name="shadowquic_sunny_quic">Sunny QUIC</string>
     <string name="dialog_log_buffer_size">Günlük arabelleği boyutu (KB)</string>
     <string name="fastest_regex_ignore_case">Büyük/küçük harfi yoksay</string>
+
+    <string name="wireguard_listen_port">Dinleme bağlantı noktası</string>
+    <string name="wireguard_persistent_keepalive">Kalıcı bağlantı sürdürme aralığı (saniye)</string>
 </resources>

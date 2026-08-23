@@ -874,4 +874,7 @@ VPN адключыцца на 1–3 секунды, а затым падключ
     <string name="fastest_regex_error_empty">Enter a regular expression</string>
     <string name="fastest_regex_pattern">Regular expression</string>
     <string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string>
+
+    <string name="wireguard_listen_port">Порт праслухоўвання</string>
+    <string name="wireguard_persistent_keepalive">Інтэрвал пастаяннага падтрымання злучэння (у секундах)</string>
 </resources>

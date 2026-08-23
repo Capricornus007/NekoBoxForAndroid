@@ -867,4 +867,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="webdav_check_dir_failed">檢查目錄失敗（%1$s）：%2$s</string>
     <string name="fastest_regex_preview_count">符合的代理伺服器：%1$d</string>
     <string name="fastest_regex_error_invalid">無效的正規表示式：%1$s</string>
+    <string name="wireguard_listen_port">監聽連接埠</string>
+    <string name="wireguard_persistent_keepalive">持續保活間隔（秒）</string>
     </resources>

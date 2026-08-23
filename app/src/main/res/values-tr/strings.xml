@@ -880,4 +880,7 @@ Devam edilsin mi?</string>
     <string name="udp_over_tcp">TCP üzerinden UDP</string>
     <string name="webdav_auth_failed">Kimlik doğrulama başarısız</string>
     <string name="webdav_check_dir_failed">Dizin denetlenemedi (%1$s): %2$s</string>
+
+    <string name="wireguard_listen_port">Dinleme bağlantı noktası</string>
+    <string name="wireguard_persistent_keepalive">Kalıcı bağlantı sürdürme aralığı (saniye)</string>
 </resources>

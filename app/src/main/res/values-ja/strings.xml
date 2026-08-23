@@ -822,4 +822,6 @@
     <string name="webdav_check_dir_failed">ディレクトリの確認に失敗しました（%1$s）：%2$s</string>
     <string name="fastest_regex_preview_count">一致するプロキシ：%1$d</string>
     <string name="fastest_regex_error_invalid">無効な正規表現：%1$s</string>
-    </resources>
+    <string name="wireguard_listen_port">リッスンポート</string>
+    <string name="wireguard_persistent_keepalive">永続キープアライブ間隔（秒）</string>
+</resources>

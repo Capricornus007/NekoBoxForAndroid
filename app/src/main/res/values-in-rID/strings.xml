@@ -889,4 +889,7 @@ Lanjutkan?</string>
     <string name="fastest_regex_error_empty">Enter a regular expression</string>
     <string name="fastest_regex_pattern">Regular expression</string>
     <string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string>
+
+    <string name="wireguard_listen_port">Port dengar</string>
+    <string name="wireguard_persistent_keepalive">Interval keepalive persisten (detik)</string>
 </resources>

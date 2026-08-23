@@ -874,4 +874,7 @@ VPN адключыцца на 1–3 секунды, а затым падключ
     <string name="invalid_http_link">Няправільная спасылка HTTP(S): %1$s</string>
     <string name="invalid_hysteria_link">Няправільная спасылка Hysteria: %1$s</string>
     <string name="invalid_masterdns_link">Няправільная спасылка MasterDNS: %1$s</string>
+
+    <string name="wireguard_listen_port">Порт праслухоўвання</string>
+    <string name="wireguard_persistent_keepalive">Інтэрвал пастаяннага падтрымання злучэння (у секундах)</string>
 </resources>

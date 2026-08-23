@@ -888,4 +888,7 @@ Continuare?</string>
     <string name="invalid_http_link">Link HTTP(S) non valido: %1$s</string>
     <string name="invalid_hysteria_link">Link Hysteria non valido: %1$s</string>
     <string name="invalid_masterdns_link">Link MasterDNS non valido: %1$s</string>
+
+    <string name="wireguard_listen_port">Porta di ascolto</string>
+    <string name="wireguard_persistent_keepalive">Intervallo keepalive persistente (secondi)</string>
 </resources>

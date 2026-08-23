@@ -887,4 +887,7 @@
     <string name="invalid_http_link">رابط HTTP(S) غير صالح: %1$s</string>
     <string name="invalid_hysteria_link">رابط Hysteria غير صالح: %1$s</string>
     <string name="invalid_masterdns_link">رابط MasterDNS غير صالح: %1$s</string>
+
+    <string name="wireguard_listen_port">منفذ الاستماع</string>
+    <string name="wireguard_persistent_keepalive">الفاصل الزمني للإبقاء المستمر على الاتصال (بالثواني)</string>
 </resources>

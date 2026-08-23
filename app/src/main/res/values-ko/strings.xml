@@ -817,4 +817,7 @@
     <string name="fastest_regex_preview_count">일치하는 프록시: %1$d</string>
     <string name="fastest_regex_error_invalid">잘못된 정규식: %1$s</string>
     <string name="theme_classic_color_swatch">클래식 Color Swatch %1$d</string>
-    <string name="dns_hosts_lines">호스트 항목 %d줄</string></resources>
+    <string name="dns_hosts_lines">호스트 항목 %d줄</string>
+    <string name="wireguard_listen_port">수신 포트</string>
+    <string name="wireguard_persistent_keepalive">지속적 연결 유지 간격(초)</string>
+</resources>

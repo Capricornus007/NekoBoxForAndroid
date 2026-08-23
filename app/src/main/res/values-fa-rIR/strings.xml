@@ -873,4 +873,7 @@
     <string name="fastest_regex_error_empty">Enter a regular expression</string>
     <string name="fastest_regex_pattern">Regular expression</string>
     <string name="fastest_regex_error_invalid">Invalid regular expression: %1$s</string>
+
+    <string name="wireguard_listen_port">درگاه شنود</string>
+    <string name="wireguard_persistent_keepalive">فاصلهٔ زنده‌نگه‌داشتن مداوم (ثانیه)</string>
 </resources>

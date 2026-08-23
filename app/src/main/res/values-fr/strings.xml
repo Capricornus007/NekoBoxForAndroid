@@ -894,4 +894,7 @@ Continuer ?</string>
     <string name="invalid_http_link">Lien HTTP(S) non valide : %1$s</string>
     <string name="invalid_hysteria_link">Lien Hysteria non valide : %1$s</string>
     <string name="invalid_masterdns_link">Lien MasterDNS non valide : %1$s</string>
+
+    <string name="wireguard_listen_port">Port d’écoute</string>
+    <string name="wireguard_persistent_keepalive">Intervalle de maintien de connexion persistant (secondes)</string>
 </resources>

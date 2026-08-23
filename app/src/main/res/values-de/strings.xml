@@ -873,4 +873,7 @@ Fortfahren?</string>
     <string name="invalid_http_link">Ungültiger HTTP(S)-Link: %1$s</string>
     <string name="invalid_hysteria_link">Ungültiger Hysteria-Link: %1$s</string>
     <string name="invalid_masterdns_link">Ungültiger MasterDNS-Link: %1$s</string>
+
+    <string name="wireguard_listen_port">Port für eingehende Verbindungen</string>
+    <string name="wireguard_persistent_keepalive">Persistentes Keepalive-Intervall (Sekunden)</string>
 </resources>

@@ -879,4 +879,7 @@ Fortsette?</string>
     <string name="invalid_http_link">Ugyldig HTTP(S)-lenke: %1$s</string>
     <string name="invalid_hysteria_link">Ugyldig Hysteria-lenke: %1$s</string>
     <string name="invalid_masterdns_link">Ugyldig MasterDNS-lenke: %1$s</string>
+
+    <string name="wireguard_listen_port">Lytteport</string>
+    <string name="wireguard_persistent_keepalive">Intervall for vedvarende keepalive (sekunder)</string>
 </resources>
