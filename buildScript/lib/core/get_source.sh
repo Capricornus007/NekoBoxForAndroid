@@ -55,10 +55,15 @@ git checkout "$COMMIT_LIBNEKO"
 popd >/dev/null
 
 #### wireguard-go ####
+WIREGUARD_REPO="https://github.com/Capricornus007/wireguard-go.git"
 if [ ! -d "wireguard-go" ]; then
-  git clone --no-checkout https://github.com/sagernet/wireguard-go.git wireguard-go
+  git clone --no-checkout "$WIREGUARD_REPO" wireguard-go
 fi
 pushd wireguard-go >/dev/null
+if ! git remote get-url origin 2>/dev/null | grep -q "Capricornus007/wireguard-go"; then
+  git remote set-url origin "$WIREGUARD_REPO"
+fi
+git fetch origin
 git checkout "$COMMIT_WIREGUARD_GO"
 popd >/dev/null
 
