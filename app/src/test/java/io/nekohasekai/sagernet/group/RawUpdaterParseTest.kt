@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.group
 
+import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
@@ -107,6 +108,34 @@ class RawUpdaterParseTest {
         assertEquals("edge-one", bean.name)
         assertEquals("192.0.2.9", bean.serverAddress)
         assertEquals(1080, bean.serverPort)
+    }
+
+    @Test
+    fun singboxEndpoints_parsesWireGuardAsNativeBean() = runTest {
+        val config =
+            """{"endpoints":[{"type":"wireguard","tag":"wg-edge","address":["10.0.0.2/32"],"private_key":"private","peers":[{"address":"vpn.example.com","port":51820,"public_key":"public","allowed_ips":["0.0.0.0/0"],"persistent_keepalive_interval":25}]}],"outbounds":[{"type":"direct","tag":"direct"}]}"""
+
+        val bean = RawUpdater.parseRaw(config)!!.single() as WireGuardBean
+        assertEquals("wg-edge", bean.name)
+        assertEquals("vpn.example.com", bean.serverAddress)
+        assertEquals(51820, bean.serverPort)
+        assertEquals(25, bean.persistentKeepaliveInterval)
+    }
+
+    @Test
+    fun singboxEndpoints_parsesAmneziaWireGuardAsNativeBean() = runTest {
+        val config =
+            """{"endpoints":[{"type":"awg","tag":"awg-edge","address":["10.0.0.2/32"],"private_key":"private","listen_port":51821,"jc":4,"h1":"123","peers":[{"address":"vpn.example.com","port":51820,"public_key":"public","preshared_key":"psk","allowed_ips":["0.0.0.0/0"],"persistent_keepalive_interval":25,"reserved":[1,2,3]}]}],"outbounds":[{"type":"direct","tag":"direct"}]}"""
+
+        val bean = RawUpdater.parseRaw(config)!!.single() as AmneziaWGBean
+        assertEquals("awg-edge", bean.name)
+        assertEquals("vpn.example.com", bean.serverAddress)
+        assertEquals(51820, bean.serverPort)
+        assertEquals(51821, bean.listenPort)
+        assertEquals(25, bean.persistentKeepaliveInterval)
+        assertEquals("1, 2, 3", bean.reserved)
+        assertEquals(4, bean.jc)
+        assertEquals("123", bean.h1)
     }
 
     @Test

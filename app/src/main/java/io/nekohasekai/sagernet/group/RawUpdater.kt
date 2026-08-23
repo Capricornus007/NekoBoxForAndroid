@@ -9,10 +9,12 @@ import io.nekohasekai.sagernet.SubscriptionFilterMode
 import io.nekohasekai.sagernet.database.*
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
+import io.nekohasekai.sagernet.fmt.amneziawg.toAmneziaWGBean
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria1Json
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria2Json
+import io.nekohasekai.sagernet.fmt.parseSingBoxEndpoint
 import io.nekohasekai.sagernet.fmt.parseSingBoxOutbound
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.parseShadowsocks
@@ -347,7 +349,11 @@ object RawUpdater : GroupUpdater() {
             } else {
                 AmneziaWireGuardImporter.tryParseUnprefixedVpn(text)
             }
-            if (amneziaProfiles != null) return amneziaProfiles
+            if (amneziaProfiles != null) {
+                return amneziaProfiles.map { bean ->
+                    if (bean.isAmneziaWG) bean.toAmneziaWGBean() else bean
+                }
+            }
         } catch (e: AmneziaWireGuardImporter.ImportException) {
             val message = when (e.reason) {
                 AmneziaWireGuardImporter.ErrorReason.INVALID_CONTAINER ->
@@ -1248,8 +1254,15 @@ object RawUpdater : GroupUpdater() {
                     return listOf(json.parseTrojanGo())
                 }
 
-                json.has("outbounds") -> {
-                    return json.getJSONArray("outbounds")
+                json.has("outbounds") || json.has("endpoints") -> {
+                    val endpointBeans = json.optJSONArray("endpoints")
+                        ?.filterIsInstance<JSONObject>()
+                        ?.mapNotNull { runCatching { parseSingBoxEndpoint(it) }.getOrNull() }
+                        .orEmpty()
+                    val outboundBeans = json.optJSONArray("outbounds")
+                        ?.filterIsInstance<JSONObject>()
+                        .orEmpty()
+                    return endpointBeans + outboundBeans
                         .filterIsInstance<JSONObject>()
                         .mapNotNull {
                             val ty = it.getStr("type")

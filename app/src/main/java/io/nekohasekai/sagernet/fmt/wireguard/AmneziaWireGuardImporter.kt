@@ -68,6 +68,7 @@ object AmneziaWireGuardImporter {
             localAddress = addresses.joinToString("\n")
             this.privateKey = privateKey
             mtu = explicitMtu ?: if (isAmnezia) AMNEZIA_MOBILE_MTU else mtu
+            listenPort = iface.intValue("ListenPort")
             jc = iface.intValue("Jc")
             jmin = iface.intValue("Jmin")
             jmax = iface.intValue("Jmax")
@@ -95,6 +96,8 @@ object AmneziaWireGuardImporter {
                 serverPort = endpoint.port
                 peerPublicKey = publicKey
                 peerPreSharedKey = peer.get("PresharedKey").orEmpty()
+                persistentKeepaliveInterval = peer.intValue("PersistentKeepalive")
+                reserved = peer.get("Reserved").orEmpty()
                 initializeDefaultValues()
             }
         }.ifEmpty {

@@ -182,6 +182,8 @@ public class SingBoxOptions {
 
         public NTPOptions ntp;
 
+        public List<Endpoint> endpoints;
+
         public List<Inbound> inbounds;
 
         public List<SingBoxOption> outbounds;
@@ -193,6 +195,32 @@ public class SingBoxOptions {
     }
 
     // paste generate output here
+
+    public static class Endpoint extends SingBoxOption {
+
+        public String type;
+
+        public String tag;
+
+    }
+
+    public static class DomainResolveOptions extends SingBoxOption {
+
+        public String server;
+
+        public Long timeout;
+
+        public String strategy;
+
+        public Boolean disable_cache;
+
+        public Boolean disable_optimistic_cache;
+
+        public Integer rewrite_ttl;
+
+        public String client_subnet;
+
+    }
 
     public static class ClashAPIOptions extends SingBoxOption {
 
@@ -253,6 +281,8 @@ public class SingBoxOptions {
         public DNSOptions dns;
 
         public NTPOptions ntp;
+
+        public List<Endpoint> endpoints;
 
         public List<Inbound> inbounds;
 
@@ -2910,6 +2940,178 @@ public class SingBoxOptions {
 
         // Generate note: Base64 String
         public String reserved;
+
+    }
+
+    public static class Endpoint_WireGuardPeer extends SingBoxOption {
+
+        public String address;
+
+        public Integer port;
+
+        public String public_key;
+
+        public String pre_shared_key;
+
+        public List<String> allowed_ips;
+
+        public Integer persistent_keepalive_interval;
+
+        public List<Integer> reserved;
+
+    }
+
+    public static class Endpoint_WireGuardOptions extends Endpoint {
+
+        public Boolean system;
+
+        public String name;
+
+        public Integer mtu;
+
+        public List<String> address;
+
+        public String private_key;
+
+        public Integer listen_port;
+
+        public List<Endpoint_WireGuardPeer> peers;
+
+        public Long udp_timeout;
+
+        public String udp_mapping;
+
+        public String udp_filtering;
+
+        public Integer udp_nat_max;
+
+        public Integer workers;
+
+        public String detour;
+
+        public String bind_interface;
+
+        public String inet4_bind_address;
+
+        public String inet6_bind_address;
+
+        public Boolean bind_address_no_port;
+
+        public String protect_path;
+
+        public Integer routing_mark;
+
+        public String netns;
+
+        public Boolean reuse_addr;
+
+        public Long connect_timeout;
+
+        public Boolean tcp_fast_open;
+
+        public Boolean tcp_multi_path;
+
+        public Boolean disable_tcp_keep_alive;
+
+        public String tcp_keep_alive;
+
+        public String tcp_keep_alive_interval;
+
+        public Boolean udp_fragment;
+
+        public DomainResolveOptions domain_resolver;
+
+        public String network_strategy;
+
+        public List<String> network_type;
+
+        public List<String> fallback_network_type;
+
+        public Long fallback_delay;
+
+        public String domain_strategy;
+
+    }
+
+    public static class Endpoint_AwgPeer extends SingBoxOption {
+
+        public String address;
+
+        public Integer port;
+
+        public String public_key;
+
+        public String preshared_key;
+
+        public List<String> allowed_ips;
+
+        public Integer persistent_keepalive_interval;
+
+        public List<Integer> reserved;
+
+    }
+
+    public static class Endpoint_AwgOptions extends Endpoint {
+
+        public Boolean useIntegratedTun;
+
+        public String private_key;
+
+        public Integer mtu;
+
+        public List<String> address;
+
+        public Integer listen_port;
+
+        public Integer jc;
+
+        public Integer jmin;
+
+        public Integer jmax;
+
+        public Integer s1;
+
+        public Integer s2;
+
+        public Integer s3;
+
+        public Integer s4;
+
+        public String h1;
+
+        public String h2;
+
+        public String h3;
+
+        public String h4;
+
+        public String i1;
+
+        public String i2;
+
+        public String i3;
+
+        public String i4;
+
+        public String i5;
+
+        public String header_protection_key;
+
+        public String content_padding_addition;
+
+        public String rekey_after_time;
+
+        public String rekey_timeout;
+
+        public String reject_after_time;
+
+        public String keepalive_timeout;
+
+        public String max_handshake_attempts;
+
+        public List<Endpoint_AwgPeer> peers;
+
+        public String detour;
 
     }
 

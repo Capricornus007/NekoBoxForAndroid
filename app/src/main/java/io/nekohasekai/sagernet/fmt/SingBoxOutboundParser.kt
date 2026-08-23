@@ -1,5 +1,7 @@
 package io.nekohasekai.sagernet.fmt
 
+import com.google.gson.JsonParser
+import io.nekohasekai.sagernet.fmt.amneziawg.parseAmneziaWGEndpoint
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
@@ -10,6 +12,7 @@ import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
 import io.nekohasekai.sagernet.fmt.v2ray.isTLS
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
+import io.nekohasekai.sagernet.fmt.wireguard.parseWireGuardEndpoint
 import io.nekohasekai.sagernet.ktx.getIntNya
 import io.nekohasekai.sagernet.ktx.getStr
 import io.nekohasekai.sagernet.ktx.isIpAddress
@@ -197,6 +200,15 @@ fun parseSingBoxOutbound(json: JSONObject): AbstractBean? {
 
     bean.initializeDefaultValues()
     return bean
+}
+
+fun parseSingBoxEndpoint(json: JSONObject): AbstractBean? {
+    val parsed = JsonParser.parseString(json.toString()).asJsonObject
+    return when (json.getStr("type")) {
+        "wireguard" -> parseWireGuardEndpoint(parsed)
+        "awg" -> parseAmneziaWGEndpoint(parsed)
+        else -> null
+    }
 }
 
 // ---------------------------------------------------------------------------

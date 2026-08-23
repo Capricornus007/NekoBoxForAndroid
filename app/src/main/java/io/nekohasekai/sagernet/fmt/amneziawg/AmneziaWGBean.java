@@ -22,7 +22,7 @@ import io.nekohasekai.sagernet.fmt.KryoConverters;
 /**
  * AmneziaWG: an obfuscated WireGuard variant. Adds the AmneziaWG DPI-evasion
  * parameters (Jc/Jmin/Jmax, S1-S4, H1-H4, I1-I5) on top of the standard
- * WireGuard fields. Runs as a native sing-box "amneziawg" outbound.
+ * WireGuard fields. Runs as a native sing-box "awg" endpoint.
  */
 public class AmneziaWGBean extends AbstractBean {
 
@@ -33,6 +33,8 @@ public class AmneziaWGBean extends AbstractBean {
     public String peerPreSharedKey;
     public Integer mtu;
     public String reserved;
+    public Integer listenPort;
+    public Integer persistentKeepaliveInterval;
 
     // AmneziaWG obfuscation parameters.
     public Integer jc;
@@ -61,6 +63,8 @@ public class AmneziaWGBean extends AbstractBean {
         if (peerPreSharedKey == null) peerPreSharedKey = "";
         if (mtu == null) mtu = 1420;
         if (reserved == null) reserved = "";
+        if (listenPort == null) listenPort = 0;
+        if (persistentKeepaliveInterval == null) persistentKeepaliveInterval = 0;
         if (jc == null) jc = 0;
         if (jmin == null) jmin = 0;
         if (jmax == null) jmax = 0;
@@ -81,7 +85,7 @@ public class AmneziaWGBean extends AbstractBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(0);
+        output.writeInt(1);
         super.serialize(output);
         output.writeString(localAddress);
         output.writeString(privateKey);
@@ -89,6 +93,8 @@ public class AmneziaWGBean extends AbstractBean {
         output.writeString(peerPreSharedKey);
         output.writeInt(mtu);
         output.writeString(reserved);
+        output.writeInt(listenPort);
+        output.writeInt(persistentKeepaliveInterval);
         output.writeInt(jc);
         output.writeInt(jmin);
         output.writeInt(jmax);
@@ -117,6 +123,10 @@ public class AmneziaWGBean extends AbstractBean {
         peerPreSharedKey = input.readString();
         mtu = input.readInt();
         reserved = input.readString();
+        if (version >= 1) {
+            listenPort = input.readInt();
+            persistentKeepaliveInterval = input.readInt();
+        }
         jc = input.readInt();
         jmin = input.readInt();
         jmax = input.readInt();

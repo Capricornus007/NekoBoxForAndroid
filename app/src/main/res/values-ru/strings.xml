@@ -523,6 +523,8 @@
     <string name="warp_generate">Создать конфигурацию</string>
     <string name="warp_license">CloudFlare Warp - это бесплатный VPN-провайдер WireGuard. Используя его, вы соглашаетесь с условиями использования.</string>
     <string name="wireguard_local_address">Частный адрес</string>
+    <string name="wireguard_listen_port">Порт прослушивания</string>
+    <string name="wireguard_persistent_keepalive">Интервал постоянного поддержания соединения (секунды)</string>
     <string name="wireguard_psk">Пароль сервера</string>
     <string name="wireguard_public_key">Открытый ключ сервера</string>
     <string name="ws_browser_forwarding">Пересылка через браузер</string>

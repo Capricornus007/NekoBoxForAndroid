@@ -417,6 +417,8 @@
     <string name="wireguard_local_address">本機位址</string>
     <string name="wireguard_public_key">對端公鑰</string>
     <string name="wireguard_psk">對端預共享金鑰</string>
+    <string name="wireguard_listen_port">監聽連接埠</string>
+    <string name="wireguard_persistent_keepalive">持續保活間隔（秒）</string>
     <string name="warp_license">CloudFlare Warp 是免費的 WireGuard VPN 提供者。使用即表示您同意其服務條款。</string>
     <string name="warp_generate">生成配置</string>
     <string name="generating">生成中…</string>

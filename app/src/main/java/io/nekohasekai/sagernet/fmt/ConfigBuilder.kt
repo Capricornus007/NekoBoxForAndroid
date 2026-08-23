@@ -14,6 +14,8 @@ import io.nekohasekai.sagernet.database.ProxyEntity.Companion.TYPE_CONFIG
 import io.nekohasekai.sagernet.database.ProxyGroup
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.ConfigBuildResult.IndexEntity
+import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
+import io.nekohasekai.sagernet.fmt.amneziawg.buildSingBoxEndpointAmneziaWGBean
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.buildSingBoxOutboundHysteriaBean
 import io.nekohasekai.sagernet.fmt.internal.BalancerBean
@@ -40,7 +42,7 @@ import io.nekohasekai.sagernet.fmt.tuic.buildSingBoxOutboundTuicBean
 import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean
 import io.nekohasekai.sagernet.fmt.v2ray.buildSingBoxOutboundStandardV2RayBean
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
-import io.nekohasekai.sagernet.fmt.wireguard.buildSingBoxOutboundWireguardBean
+import io.nekohasekai.sagernet.fmt.wireguard.buildSingBoxEndpointWireGuardBean
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.isIpAddress
 import io.nekohasekai.sagernet.ktx.mkPort
@@ -71,6 +73,106 @@ const val TAG_FRAGMENT = "fragment"
 const val TAG_DNS_HOSTS = "dns-hosts"
 
 const val LOCALHOST = "127.0.0.1"
+
+private val ENDPOINT_TYPES = setOf("wireguard", "awg")
+
+private fun SingBoxOption.isGeneratedEndpoint(): Boolean = this is Endpoint && type in ENDPOINT_TYPES
+
+internal fun SingBoxOption.detourTo(nextTag: String) {
+    if (this is Endpoint_WireGuardOptions || this is Endpoint_AwgOptions) {
+        val listenPort = asMap()["listen_port"]?.toString()?.toDoubleOrNull()?.toInt() ?: 0
+        if (listenPort > 0) {
+            // sing-box rejects listen_port together with detour. Direct is already the
+            // endpoint default, so keep the listener in that case. For an actual proxy
+            // chain, preserve the requested chain and disable only the incompatible
+            // listener instead of aborting config creation.
+            if (nextTag == TAG_DIRECT) return
+            when (this) {
+                is Endpoint_WireGuardOptions -> listen_port = null
+                is Endpoint_AwgOptions -> listen_port = null
+            }
+        }
+        when (this) {
+            is Endpoint_WireGuardOptions -> detour = nextTag
+            is Endpoint_AwgOptions -> detour = nextTag
+        }
+        return
+    }
+    _hack_config_map["detour"] = nextTag
+}
+
+internal fun RouteOptions.ensureMainRouteFinal(mainProxyTag: String) {
+    if (final_.isNullOrBlank()) final_ = mainProxyTag
+}
+
+internal fun buildSelectorOutbound(defaultTag: String?, memberTags: List<String>) = Outbound_SelectorOptions().apply {
+    type = "selector"
+    tag = TAG_PROXY
+    default_ = defaultTag
+    outbounds = memberTags
+}
+
+private fun endpointTag(value: Any?): String? =
+    (value as? Map<*, *>)?.get("tag")?.toString()?.takeIf { it.isNotBlank() }
+
+private fun mergeEndpointList(existing: List<*>, incoming: List<*>, prependNew: Boolean = false): MutableList<Any?> {
+    val result = existing.toMutableList()
+    val additions = mutableListOf<Any?>()
+    incoming.forEach { endpoint ->
+        val tag = endpointTag(endpoint)
+        val existingIndex = tag?.let { candidate -> result.indexOfFirst { endpointTag(it) == candidate } } ?: -1
+        val additionIndex = tag?.let { candidate -> additions.indexOfFirst { endpointTag(it) == candidate } } ?: -1
+        when {
+            existingIndex >= 0 -> result[existingIndex] = endpoint
+            additionIndex >= 0 -> additions[additionIndex] = endpoint
+            else -> additions.add(endpoint)
+        }
+    }
+    if (prependNew) result.addAll(0, additions) else result.addAll(additions)
+    return result
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun mergeRootConfig(dst: MutableMap<String, Any?>, json: String) {
+    if (json.isBlank()) return
+    val source = gson.fromJson(json, dst.javaClass) as? Map<String, Any?> ?: return
+    val remaining = source.toMutableMap()
+    val replacement = remaining.remove("endpoints")
+    val prepended = remaining.remove("+endpoints")
+    val appended = remaining.remove("endpoints+")
+    Util.mergeMap(dst, remaining)
+
+    fun merge(value: Any?, prependNew: Boolean = false) {
+        if (value !is List<*>) {
+            if (value != null) dst["endpoints"] = value
+            return
+        }
+        val current = dst["endpoints"] as? List<*> ?: emptyList<Any?>()
+        dst["endpoints"] = mergeEndpointList(current, value, prependNew)
+    }
+    merge(replacement)
+    merge(prepended, prependNew = true)
+    merge(appended)
+}
+
+internal fun finalizeRootConfig(
+    options: MyOptions,
+    globalCustomConfig: String = "",
+    profileCustomConfig: String = "",
+): MutableMap<String, Any?> {
+    val generatedEndpoints = options.outbounds.orEmpty().filter { it.isGeneratedEndpoint() }
+    generatedEndpoints
+        .filterIsInstance<Endpoint>()
+        .filter { it.asMap()["detour"]?.toString().isNullOrBlank() }
+        .forEach { it.detourTo(TAG_DIRECT) }
+    options.endpoints = options.endpoints.orEmpty() + generatedEndpoints.map { it as Endpoint }
+    options.outbounds = options.outbounds.orEmpty().filterNot { it.isGeneratedEndpoint() }
+
+    val configMap = options.asMap()
+    mergeRootConfig(configMap, globalCustomConfig)
+    mergeRootConfig(configMap, profileCustomConfig)
+    return configMap
+}
 
 class ConfigBuildResult(
     var config: String,
@@ -449,6 +551,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         }
 
         outbounds = mutableListOf()
+        endpoints = mutableListOf()
 
         route = RouteOptions().apply {
             auto_detect_interface = true
@@ -616,7 +719,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                             },
                         )
                     } else {
-                        pastOutbound._hack_config_map["detour"] = tagOut
+                        pastOutbound.detourTo(tagOut)
                     }
                 } else {
                     chainTagOut = tagOut
@@ -680,7 +783,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                             buildSingBoxOutboundShadowsocksRBean(bean)
 
                         is WireGuardBean ->
-                            buildSingBoxOutboundWireguardBean(bean)
+                            buildSingBoxEndpointWireGuardBean(bean)
+
+                        is AmneziaWGBean ->
+                            buildSingBoxEndpointAmneziaWGBean(bean)
 
                         is SSHBean ->
                             buildSingBoxOutboundSSHBean(bean)
@@ -873,12 +979,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
             outbounds.add(
                 0,
-                Outbound_SelectorOptions().apply {
-                    type = "selector"
-                    tag = TAG_PROXY
-                    default_ = tagMap[proxy.id]
-                    outbounds = tagMap.values.toList()
-                },
+                buildSelectorOutbound(tagMap[proxy.id], tagMap.values.toList()),
             )
         } else if (proxy.requireBean() is BalancerBean) {
             val balancerBean = proxy.requireBean() as BalancerBean
@@ -1119,6 +1220,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 Outbound().apply {
                     tag = freedom
                     type = "direct"
+                    if (freedom == TAG_DIRECT) {
+                        _hack_config_map["network_strategy"] = "default"
+                    }
                 },
             )
         }
@@ -1330,10 +1434,16 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
         }
 
-        if (!forTest) _hack_custom_config = DataStore.globalCustomConfig
-    }.let {
-        val configMap = it.asMap()
-        Util.mergeJSON(configMap, proxy.requireBean().customConfigJson)
+        // Moving WireGuard from outbounds to endpoints removes the old implicit first-outbound
+        // fallback. Keep the selected main tag explicit so endpoint-only profiles do not fall
+        // through to a direct connection.
+        route.ensureMainRouteFinal(mainProxyTag)
+    }.let { options ->
+        val configMap = finalizeRootConfig(
+            options,
+            globalCustomConfig = if (forTest) "" else DataStore.globalCustomConfig,
+            profileCustomConfig = proxy.requireBean().customConfigJson,
+        )
         ConfigBuildResult(
             gson.toJson(configMap),
             externalIndexMap,
