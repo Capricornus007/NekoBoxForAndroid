@@ -86,4 +86,24 @@ class ServiceStopGateTest {
         assertTrue(gate.onStopRequested(restart = true, alreadyStopping = true))
         assertFalse(gate.consumeRestart())
     }
+
+    /** A new foreground-service start during teardown is explicit and must revive the service. */
+    @Test
+    fun explicitStartDuringTeardown_restoresRestart() {
+        val gate = ServiceStopGate()
+        assertFalse(gate.onStopRequested(restart = true, alreadyStopping = false))
+        assertTrue(gate.onStopRequested(restart = false, alreadyStopping = true))
+        gate.onStartRequestedDuringStop()
+        assertTrue(gate.consumeRestart())
+    }
+
+    /** A later explicit stop still wins after a fresh start request during teardown. */
+    @Test
+    fun explicitStopAfterStartDuringTeardown_cancelsRestart() {
+        val gate = ServiceStopGate()
+        assertFalse(gate.onStopRequested(restart = true, alreadyStopping = false))
+        gate.onStartRequestedDuringStop()
+        assertTrue(gate.onStopRequested(restart = false, alreadyStopping = true))
+        assertFalse(gate.consumeRestart())
+    }
 }

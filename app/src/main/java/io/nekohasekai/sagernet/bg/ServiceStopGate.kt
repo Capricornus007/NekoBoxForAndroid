@@ -53,6 +53,15 @@ class ServiceStopGate {
     }
 
     /**
+     * A fresh service start arrived while teardown was already in progress. Unlike a duplicate
+     * internal restart request, this is a new explicit user/system start and must revive the
+     * service after teardown even if an earlier CLOSE had cancelled the old pending restart.
+     */
+    fun onStartRequestedDuringStop() {
+        pendingRestart = true
+    }
+
+    /**
      * Teardown finished: should a restart be launched? Re-reads (does NOT clear)
      * pendingRestart: an explicit CLOSE that raced this teardown may have cleared it.
      */

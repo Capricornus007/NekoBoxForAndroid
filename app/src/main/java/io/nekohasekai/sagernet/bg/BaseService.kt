@@ -209,6 +209,9 @@ class BaseService {
         val tag: String
         fun createNotification(profileName: String): ServiceNotification
 
+        fun ensureForegroundNotification(profileName: String): ServiceNotification =
+            data.notification ?: createNotification(profileName).also { data.notification = it }
+
         fun onBind(intent: Intent): IBinder? = if (intent.action == Action.SERVICE) data.binder else null
 
         fun reload(profileId: Long = -1L) {
@@ -480,6 +483,11 @@ class BaseService {
                 if (data.stopGate.consumeRestart()) {
                     startRunner()
                 } else {
+                    // A startForegroundService request may have recreated the notification while
+                    // teardown was in flight. If a later explicit CLOSE cancelled that restart,
+                    // release the replacement notification and its screen-state receiver too.
+                    data.notification?.destroy()
+                    data.notification = null
                     stopSelf()
                 }
             }
@@ -590,8 +598,23 @@ class BaseService {
             DataStore.baseService = this
 
             val data = data
-            if (data.state != State.Stopped) return Service.START_NOT_STICKY
             this as Context
+            if (data.state != State.Stopped) {
+                // startForegroundService() can race asynchronous teardown. Even when this start
+                // cannot proceed immediately, it still has to promote the service before the
+                // platform deadline and preserve the new request for after teardown.
+                ensureForegroundNotification(
+                    data.proxy?.displayProfileName ?: getString(R.string.app_name),
+                )
+                if (data.state == State.Stopping) {
+                    data.stopGate.onStartRequestedDuringStop()
+                }
+                return Service.START_NOT_STICKY
+            }
+
+            // Do not spend the foreground-service promotion window on configuration refreshes or
+            // database reads. The generic title is replaced after the selected profile resolves.
+            ensureForegroundNotification(getString(R.string.app_name))
 
             // The IPC-carried profile id (when >= 0) is authoritative for a cold start triggered
             // right after a UI profile selection, so :bg does not depend on the UI's async
@@ -681,7 +704,6 @@ class BaseService {
             this as Context
             val data = data
             if (profile == null) {
-                data.notification = createNotification("")
                 stopRunner(false, getString(R.string.profile_empty))
                 return null
             }
@@ -723,7 +745,8 @@ class BaseService {
 
                 data.changeState(State.Connecting)
                 try {
-                    data.notification = createNotification(proxy.displayProfileName)
+                    ensureForegroundNotification(proxy.displayProfileName)
+                        .postNotificationTitle(proxy.displayProfileName)
 
                     Executable.killAll()
                     preInit()
