@@ -1,6 +1,6 @@
 module libcore
 
-go 1.26.6
+go 1.27.0
 
 require (
 	// v0.1.6签名与 v1.13.15 锁定版一致。
@@ -14,7 +14,7 @@ require (
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-tun v0.8.12-0.20260810140529-d67734281390
 	github.com/ulikunitz/xz v0.5.15
-	github.com/xchacha20-poly1305/sing-trusttunnel v0.3.0-beta.5
+	github.com/xchacha20-poly1305/sing-trusttunnel v0.3.0-beta.6
 	golang.org/x/mobile v0.0.0-20240520174638-fa72addaaa1b
 	golang.org/x/net v0.57.0
 	golang.org/x/sys v0.47.0
