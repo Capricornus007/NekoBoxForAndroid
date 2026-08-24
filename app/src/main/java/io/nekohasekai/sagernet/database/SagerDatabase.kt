@@ -17,7 +17,7 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 15,
+    version = 16,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
@@ -30,6 +30,10 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
         AutoMigration(from = 11, to = 12),
         // v13: additive balancerBean column on proxy_entities
         AutoMigration(from = 12, to = 13),
+        AutoMigration(from = 13, to = 14),
+        AutoMigration(from = 14, to = 15),
+        // v16: additive speed-test result columns on proxy_entities (dsf b6fd50cdb)
+        AutoMigration(from = 15, to = 16),
     ],
 )
 @TypeConverters(value = [KryoConverters::class, GsonConverters::class])

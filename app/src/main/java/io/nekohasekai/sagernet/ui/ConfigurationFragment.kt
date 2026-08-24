@@ -32,6 +32,8 @@ import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
+import io.nekohasekai.sagernet.SpeedTestDirection
+import io.nekohasekai.sagernet.SpeedTestOutcome
 import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.proto.AndroidSpeedTestSession
@@ -846,21 +848,7 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             R.id.action_connection_test_clear_results -> {
                 runOnDefaultDispatcher {
-                    val profiles = SagerDatabase.proxyDao.getByGroup(DataStore.currentGroupId())
-                    val toClear = mutableListOf<ProxyEntity>()
-                    if (profiles.isNotEmpty()) {
-                        for (profile in profiles) {
-                            if (profile.status != 0) {
-                                profile.status = 0
-                                profile.ping = 0
-                                profile.error = null
-                                toClear.add(profile)
-                            }
-                        }
-                    }
-                    if (toClear.isNotEmpty()) {
-                        ProfileManager.updateProfile(toClear)
-                    }
+                    SagerDatabase.proxyDao.clearTestResults(DataStore.currentGroupId())
                     onMainDispatcher {
                         getCurrentGroupFragment()?.adapter?.clearTestResults()
                     }
@@ -1040,6 +1028,28 @@ class ConfigurationFragment @JvmOverloads constructor(
                     return@runOnDefaultDispatcher
                 }
                 val results = runner.run(profiles) { index, total, sample ->
+                    val outcome = SpeedTestOutcome.completedOrNull(
+                        mode = sample.mode,
+                        stage = sample.stage,
+                        done = sample.done,
+                        cancelled = sample.cancelled,
+                        error = sample.error,
+                        downloadBitsPerSecond = sample.downloadBitsPerSecond,
+                        uploadBitsPerSecond = sample.uploadBitsPerSecond,
+                    )
+                    if (outcome != null && SagerDatabase.proxyDao.updateSpeedTestResult(
+                            proxyId = sample.profileId,
+                            mode = outcome.mode,
+                            downloadBitsPerSecond = outcome.downloadBitsPerSecond,
+                            uploadBitsPerSecond = outcome.uploadBitsPerSecond,
+                        ) > 0
+                    ) {
+                        runOnMainDispatcher {
+                            adapter.groupFragments.values.forEach { fragment ->
+                                fragment.adapter?.updateSpeedTestResult(sample.profileId, outcome)
+                            }
+                        }
+                    }
                     runOnMainDispatcher {
                         val detail = formatSpeedTestSnapshot(sample)
                         speedTestNotification?.updateNotification(index + 1, total, false, detail)
