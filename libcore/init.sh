@@ -23,6 +23,11 @@ if [ ! -f "$TARGET_BIN/gomobile-matsuri" ] || [ ! -f "$TARGET_BIN/gobind-matsuri
     git -C gomobile checkout -q FETCH_HEAD || exit 1
     pushd gomobile
 
+    # Go 1.27 removed the gotypesalias GODEBUG; drop the now-invalid directive
+    # from the fetched gomobile fork so its go.mod loads under the 1.27 toolchain.
+    # (The x/tools@latest bump below carries the alias-aware bind generator.)
+    sed -i '/^godebug gotypesalias=0$/d' go.mod
+
     # Fix: upgrade x/tools for Go 1.26+ compatibility
     go get golang.org/x/tools@latest
     go mod tidy

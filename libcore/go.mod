@@ -1,10 +1,11 @@
 module libcore
 
-go 1.26.6
+go 1.27.0
 
 require (
 	// v0.1.6签名与 v1.13.15 锁定版一致。
 	github.com/exclavenetwork/sing-juicity v0.3.0-beta.1
+	github.com/exclavenetwork/sing-shadowquic v0.0.0-20260801175020-65c7acc31f93
 	github.com/gofrs/uuid/v5 v5.5.1
 	github.com/miekg/dns v1.1.72
 	github.com/oschwald/maxminddb-golang v1.13.1
@@ -13,14 +14,10 @@ require (
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-tun v0.8.12-0.20260810140529-d67734281390
 	github.com/ulikunitz/xz v0.5.15
-	golang.org/x/mobile v0.0.0-20240520174638-fa72addaaa1b
-	golang.org/x/sys v0.47.0
-)
-
-require (
-	github.com/exclavenetwork/sing-shadowquic v0.0.0-20260801175020-65c7acc31f93
 	github.com/xchacha20-poly1305/sing-trusttunnel v0.3.0-beta.5
+	golang.org/x/mobile v0.0.0-20240520174638-fa72addaaa1b
 	golang.org/x/net v0.57.0
+	golang.org/x/sys v0.47.0
 )
 
 require (
@@ -77,7 +74,7 @@ require (
 	github.com/metacubex/utls v1.8.7 // indirect
 	github.com/mholt/acmez/v3 v3.1.6 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
-	github.com/sagernet/bbolt v0.0.0-20260821040940-d7518b45c52b // indirect
+	github.com/sagernet/bbolt v0.0.0-20260823094646-e24805439c9c // indirect
 	github.com/sagernet/cors v1.2.1 // indirect
 	github.com/sagernet/cronet-go v0.0.0-20260807162344-ec9a39c5ba3b // indirect
 	github.com/sagernet/cronet-go/all v0.0.0-20260807162344-ec9a39c5ba3b // indirect
@@ -174,3 +171,5 @@ replace github.com/sagernet/sing-quic => ../../sing-quic
 
 // sing-quic: SagerNet 版には sing-box 1.14.x が必要とする realm PortMapping が含まれる。
 // replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
+
+replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.0.0-20260824090716-d6ee8f1320b9
