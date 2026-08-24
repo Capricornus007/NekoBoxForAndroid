@@ -1,6 +1,6 @@
 module libcore
 
-go 1.27.0
+go 1.26.6
 
 require (
 	// v0.1.6签名与 v1.13.15 锁定版一致。

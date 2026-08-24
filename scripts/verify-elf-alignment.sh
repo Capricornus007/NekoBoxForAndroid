@@ -25,7 +25,7 @@ trap 'rm -rf -- "$tmp"' EXIT
 unzip -o "$aar" -d "$tmp" >/dev/null
 
 failed=0
-for abi in arm64-v8a armeabi-v7a; do
+for abi in arm64-v8a x86_64; do
     so="$tmp/jni/$abi/libgojni.so"
     if [ ! -f "$so" ]; then
         echo "::error::missing required native lib jni/$abi/libgojni.so" >&2
