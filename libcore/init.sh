@@ -21,6 +21,9 @@ if [ ! -f "$TARGET_BIN/gomobile-matsuri" ] || [ ! -f "$TARGET_BIN/gobind-matsuri
     git -C gomobile remote add origin https://github.com/MatsuriDayo/gomobile.git
     git -C gomobile fetch --depth 1 origin "$GOMOBILE_COMMIT" || exit 1
     git -C gomobile checkout -q FETCH_HEAD || exit 1
+    # Go 1.27 removed the "gotypesalias" GODEBUG knob; drop the now-rejected
+    # directive so gomobile's go.mod loads under Go 1.27+ toolchains.
+    sed -i '/gotypesalias/d' gomobile/go.mod
     pushd gomobile
 
     # Fix: upgrade x/tools for Go 1.26+ compatibility
