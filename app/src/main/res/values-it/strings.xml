@@ -351,8 +351,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_traffic_statistics">Cancella statistiche traffico</string>
     <string name="connection_test">Test connessione</string>
     <string name="connection_test_clear_results">Cancella risultati test</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing non disponibile</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing non disponibile</string>
     <string name="connection_test_domain_not_found">Dominio non trovato</string>
     <string name="connection_test_refused">Connessione rifiutata</string>
     <string name="connection_test_unreachable">Irraggiungibile</string>
@@ -795,8 +793,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="mixed_auth_config">Configure authentication</string>
     <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
     <string name="mixed_auth_no_auth">Not set (no authentication)</string>

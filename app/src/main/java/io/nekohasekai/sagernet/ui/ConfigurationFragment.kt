@@ -1234,7 +1234,7 @@ class ConfigurationFragment @JvmOverloads constructor(
         val test = TestDialog()
         val dialog = test.builder.show()
         val testJobs = mutableListOf<Job>()
-        // See pingTest(): cache the group name off-thread for the minimize callback.
+        // Cache the group name off-thread for the minimize callback.
         var groupName = ""
         Logs.d("URLTest: batch start, concurrent=${DataStore.connectionTestConcurrent}")
 
@@ -1268,7 +1268,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                             } catch (e: Exception) {
                                 // A cancelled test (dialog cancel / teardown) kills the sidecar
                                 // mid-handshake and throws here. Don't record that as a profile
-                                // failure - it isn't one. The pingTest path guards the same way.
+                                // failure - it isn't one. The connection-test path guards the same way.
                                 if (!isActive) break
                                 profile.status = 3
                                 profile.error = e.readableMessage

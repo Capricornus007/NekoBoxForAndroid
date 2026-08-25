@@ -358,8 +358,6 @@
     <string name="clear_traffic_statistics">Effacer les statistiques de trafic</string>
     <string name="connection_test">Test de connexion</string>
     <string name="connection_test_clear_results">Effacer les résultats du test</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing indisponible</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing indisponible</string>
     <string name="connection_test_domain_not_found">Domaine non trouvé</string>
     <string name="connection_test_refused">Connexion refusée</string>
     <string name="connection_test_unreachable">Inaccessible</string>
@@ -805,8 +803,6 @@
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="mixed_auth_config">Configurer l\'authentification</string>
     <string name="mixed_auth_username_hint">Nom d\'utilisateur (laissez les deux vides pour aucune authentification)</string>
     <string name="mixed_auth_no_auth">Non défini (sans authentification)</string>

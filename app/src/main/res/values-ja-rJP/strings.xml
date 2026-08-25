@@ -305,8 +305,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_traffic_statistics">トラフィック統計をクリア</string>
     <string name="connection_test">接続テスト</string>
     <string name="connection_test_clear_results">テスト結果をクリア</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing 利用不可</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing 利用不可</string>
     <string name="connection_test_domain_not_found">ドメインが見つかりません</string>
     <string name="connection_test_refused">接続が拒否されました</string>
     <string name="connection_test_unreachable">到達不能</string>
@@ -795,8 +793,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="connection_test_url_test">URL テスト</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>

@@ -308,8 +308,6 @@
     <string name="clear_traffic_statistics">Limpar estatísticas de tráfego</string>
     <string name="connection_test">Teste de conexão</string>
     <string name="connection_test_clear_results">Limpar resultados do teste</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing indisponível</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing indisponível</string>
     <string name="connection_test_domain_not_found">Domínio não encontrado</string>
     <string name="connection_test_refused">Conexão recusada</string>
     <string name="connection_test_unreachable">Inalcançável</string>

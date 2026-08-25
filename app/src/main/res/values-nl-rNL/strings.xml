@@ -312,8 +312,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_traffic_statistics">Verkeersstatistieken wissen</string>
     <string name="connection_test">Verbindingstest</string>
     <string name="connection_test_clear_results">Testresultaten wissen</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing niet beschikbaar</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing niet beschikbaar</string>
     <string name="connection_test_domain_not_found">Domein niet gevonden</string>
     <string name="connection_test_refused">Verbinding geweigerd</string>
     <string name="connection_test_unreachable">Onbereikbaar</string>
@@ -811,8 +809,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="connection_test_url_test">URL Test</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>

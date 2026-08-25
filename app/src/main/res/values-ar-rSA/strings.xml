@@ -314,8 +314,6 @@
     <string name="clear_traffic_statistics">مسح إحصائيات المرور</string>
     <string name="connection_test">اختبار الاتصال</string>
     <string name="connection_test_clear_results">مسح نتائج الاختبار</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing غير متاح</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing غير متاح</string>
     <string name="connection_test_domain_not_found">النطاق غير موجود</string>
     <string name="connection_test_refused">تم رفض الاتصال</string>
     <string name="connection_test_unreachable">غير قابل للوصول</string>
@@ -810,8 +808,6 @@
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="connection_test_url_test">URL Test</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>

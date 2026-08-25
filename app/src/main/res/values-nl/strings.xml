@@ -352,8 +352,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_traffic_statistics">Verkeersstatistieken wissen</string>
     <string name="connection_test">Verbindingstest</string>
     <string name="connection_test_clear_results">Testresultaten wissen</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing niet beschikbaar</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing niet beschikbaar</string>
     <string name="connection_test_domain_not_found">Domein niet gevonden</string>
     <string name="connection_test_refused">Verbinding geweigerd</string>
     <string name="connection_test_unreachable">Onbereikbaar</string>

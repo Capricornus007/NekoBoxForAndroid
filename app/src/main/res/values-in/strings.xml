@@ -328,8 +328,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_traffic_statistics">Hapus statistik lalu lintas</string>
     <string name="connection_test">Tes koneksi</string>
     <string name="connection_test_clear_results">Hapus hasil tes</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing tidak tersedia</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing tidak tersedia</string>
     <string name="connection_test_domain_not_found">Domain tidak ditemukan</string>
     <string name="connection_test_refused">Koneksi ditolak</string>
     <string name="connection_test_unreachable">Tidak dapat dijangkau</string>
@@ -775,8 +773,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="mixed_auth_config">Configure authentication</string>
     <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
     <string name="mixed_auth_no_auth">Not set (no authentication)</string>

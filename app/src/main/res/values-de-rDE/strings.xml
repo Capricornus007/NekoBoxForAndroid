@@ -306,8 +306,6 @@
     <string name="clear_traffic_statistics">Datenverkehrsstatistiken löschen</string>
     <string name="connection_test">Verbindungstest</string>
     <string name="connection_test_clear_results">Testergebnisse löschen</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing nicht verfügbar</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing nicht verfügbar</string>
     <string name="connection_test_domain_not_found">Domäne nicht gefunden</string>
     <string name="connection_test_refused">Verbindung abgelehnt</string>
     <string name="connection_test_unreachable">Nicht erreichbar</string>
@@ -801,8 +799,6 @@
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="connection_test_url_test">URL Test</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>

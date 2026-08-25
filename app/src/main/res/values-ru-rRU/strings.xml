@@ -313,8 +313,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="clear_traffic_statistics">Очистить статистику трафика</string>
     <string name="connection_test">Тест подключения</string>
     <string name="connection_test_clear_results">Очистить результаты теста</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing недоступен</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing недоступен</string>
     <string name="connection_test_domain_not_found">Домен не найден</string>
     <string name="connection_test_refused">Соединение отклонено</string>
     <string name="connection_test_unreachable">Недоступен</string>
@@ -804,8 +802,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="connection_test_url_test">URL Test</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>

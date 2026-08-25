@@ -309,8 +309,6 @@
     <string name="clear_traffic_statistics">Borrar estadísticas de tráfico</string>
     <string name="connection_test">Prueba de conexión</string>
     <string name="connection_test_clear_results">Borrar resultados de prueba</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing no disponible</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing no disponible</string>
     <string name="connection_test_domain_not_found">Dominio no encontrado</string>
     <string name="connection_test_refused">Conexión rechazada</string>
     <string name="connection_test_unreachable">Inalcanzable</string>
@@ -811,8 +809,6 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="connection_test_url_test">URL Test</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>

@@ -274,8 +274,6 @@
     <string name="regular_expression_filter1">Regular expression include filter</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="balancer_use_front_proxy">Use group front proxy</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing غير متاح</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing غير متاح</string>
     <string name="append_http_proxy">إضافة وكيل HTTP إلى VPN</string>
     <string name="append_http_proxy_sum">سيتم استخدام وكيل HTTP مباشرة من (المتصفح/ بعض التطبيقات المدعومة)، دون المرور عبر جهاز واجهة الشبكة الظاهرية (أندرويد 10+)</string>
     <string name="http_proxy_bypass_dialog_message">سطر واحد لكل إدخال. الأسطر التي تبدأ بـ # هي تعليقات. مثال: *zhihu.com</string>
@@ -674,8 +672,6 @@
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="mixed_auth_config">إعداد المصادقة</string>
     <string name="mixed_auth_username_hint">اسم المستخدم (اترك الحقلين فارغين لعدم المصادقة)</string>
     <string name="mixed_auth_no_auth">غير مُعد (بدون مصادقة)</string>

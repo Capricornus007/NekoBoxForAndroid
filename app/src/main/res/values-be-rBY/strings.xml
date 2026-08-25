@@ -307,8 +307,6 @@
     <string name="clear_traffic_statistics">Ачысціць статыстыку трафіку</string>
     <string name="connection_test">Тэст злучэння</string>
     <string name="connection_test_clear_results">Ачысціць вынікі тэсту</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing недаступны</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing недаступны</string>
     <string name="connection_test_domain_not_found">Дамен не знойдзены</string>
     <string name="connection_test_refused">Злучэнне адхілена</string>
     <string name="connection_test_unreachable">Недаступны</string>
@@ -797,8 +795,6 @@
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="connection_test_url_test">URL Test</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>

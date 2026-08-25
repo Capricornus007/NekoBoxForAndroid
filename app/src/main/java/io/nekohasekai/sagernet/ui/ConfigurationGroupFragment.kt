@@ -26,6 +26,7 @@ import io.nekohasekai.sagernet.GroupOrder
 import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
+import io.nekohasekai.sagernet.SpeedTestDirection
 import io.nekohasekai.sagernet.SpeedTestOutcome
 import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.bg.BaseService
@@ -1244,7 +1245,13 @@ class ConfigurationGroupFragment : Fragment() {
                 else -> View.GONE
             }
 
-            if (proxyEntity.status <= 0) {
+            val speedTestText = speedTestResultText(proxyEntity)
+
+            if (speedTestText != null) {
+                profileStatus.text = speedTestText
+                profileStatus.setTextColor(requireContext().getColorAttr(android.R.attr.textColorSecondary))
+                trafficText.text = ""
+            } else if (proxyEntity.status <= 0) {
                 if (showTraffic) {
                     profileStatus.text = trafficText.text
                     profileStatus.setTextColor(requireContext().getColorAttr(android.R.attr.textColorSecondary))
@@ -1293,6 +1300,24 @@ class ConfigurationGroupFragment : Fragment() {
                 shareButton.setImageResource(R.drawable.ic_social_share)
                 shareButton.setColorFilter(Color.GRAY)
                 shareButton.isVisible = true
+            }
+        }
+
+        private fun speedTestResultText(proxyEntity: ProxyEntity): String? {
+            if (proxyEntity.speedTestMode.isBlank()) return null
+            val outcome = SpeedTestOutcome(
+                mode = proxyEntity.speedTestMode,
+                downloadBitsPerSecond = proxyEntity.speedTestDownloadBitsPerSecond,
+                uploadBitsPerSecond = proxyEntity.speedTestUploadBitsPerSecond,
+            )
+            val rates = outcome.rates()
+            if (rates.isEmpty()) return null
+            return rates.joinToString("  ") { rate ->
+                val direction = when (rate.direction) {
+                    SpeedTestDirection.DOWNLOAD -> "↓"
+                    SpeedTestDirection.UPLOAD -> "↑"
+                }
+                "$direction ${getString(R.string.speed_test_rate_mbps, rate.bitsPerSecond / 1_000_000.0)}"
             }
         }
 

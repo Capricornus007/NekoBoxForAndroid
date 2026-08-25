@@ -129,8 +129,6 @@
     <string name="unavailable">Utilgjengelig</string>
     <string name="connection_test">Tilkoblingstest</string>
     <string name="connection_test_clear_results">Nullstill testresultater</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing utilgjengelig</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing utilgjengelig</string>
     <string name="connection_test_timeout_error">Tidsavbrudd</string>
     <string name="append_http_proxy">Legg til HTTP-proxy til VPN</string>
     <string name="append_http_proxy_sum">HTTP-proxy vil bli brukt direkte fra (nettleser/noen

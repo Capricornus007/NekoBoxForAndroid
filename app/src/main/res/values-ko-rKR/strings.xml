@@ -303,8 +303,6 @@
     <string name="clear_traffic_statistics">트래픽 통계 초기화</string>
     <string name="connection_test">연결 테스트</string>
     <string name="connection_test_clear_results">테스트 결과 지우기</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing 사용 불가</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing 사용 불가</string>
     <string name="connection_test_domain_not_found">도메인을 찾을 수 없음</string>
     <string name="connection_test_refused">연결 거부됨</string>
     <string name="connection_test_unreachable">도달 불가</string>
@@ -787,8 +785,6 @@
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_tcp_ping">TCPing</string>
-    <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="connection_test_url_test">URL Test</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
