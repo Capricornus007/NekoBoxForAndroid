@@ -150,7 +150,7 @@ replace github.com/matsuridayo/libneko => ../../libneko
 
 replace github.com/sagernet/sing-box => ../../sing-box
 
-replace github.com/sagernet/sing-vmess => github.com/Capricornus007/sing-vmess v0.2.8-mod.1-nb4a
+replace github.com/sagernet/sing-vmess => github.com/Capricornus007/sing-vmess v0.2.9-0.20260825051027-dc00ac91b8d1
 
 // sing-juicity was renamed dyhkwong -> exclavenetwork at v0.1.x; the import path
 // in libcore stays dyhkwong. v0.1.4 targets quic-go v0.59 / sing v0.8 / sing-quic v0.6.1.
@@ -172,4 +172,4 @@ replace github.com/sagernet/sing-quic => ../../sing-quic
 // sing-quic: SagerNet 版には sing-box 1.14.x が必要とする realm PortMapping が含まれる。
 // replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
 
-replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.0.0-20260824090716-d6ee8f1320b9
+replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.0.0-20260825051009-072adbecd842
