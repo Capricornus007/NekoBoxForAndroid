@@ -153,20 +153,24 @@ object RawUpdater : GroupUpdater() {
                     }
                 }
             }.execute()
-            proxies = parseRaw(Util.getStringBox(response.getContentStringLimited(10L * 1024 * 1024)))
+            val content = Util.getStringBox(response.getContentStringLimited(10L * 1024 * 1024))
+            proxies = parseRaw(content)
                 ?: error(app.getString(R.string.no_proxies_found))
 
-            subscription.subscriptionUserinfo =
-                Util.getStringBox(response.getHeader("Subscription-Userinfo"))
+            var userinfo = Util.getStringBox(response.getHeader("Subscription-Userinfo"))
+            if (userinfo.isBlank()) {
+                findBodyHeader(content, "subscription-userinfo")?.let { userinfo = it }
+            }
+            subscription.subscriptionUserinfo = userinfo
 
             // modify the default name
             if (proxyGroup.name?.startsWith(app.getString(R.string.subscription_name, "")) == true) {
-                var remoteName = Util.getStringBox(response.getHeader("content-disposition"))
+                var remoteName = parseBodyProfileTitle(content)
+                if (remoteName.isBlank()) {
+                    remoteName = Util.decodeFilename(Util.getStringBox(response.getHeader("content-disposition")))
+                }
                 if (remoteName.isNotBlank()) {
-                    remoteName = Util.decodeFilename(remoteName)
-                    if (remoteName.isNotBlank()) {
-                        proxyGroup.name = remoteName
-                    }
+                    proxyGroup.name = remoteName
                 }
             }
         }
@@ -230,6 +234,10 @@ object RawUpdater : GroupUpdater() {
             }
             uniqueProxies.retainAll(uniqueNames.keys)
             proxies = uniqueProxies.toList().map { it.bean }
+        }
+
+        if (proxies.isEmpty()) {
+            error(app.getString(R.string.no_proxies_found))
         }
 
         Logs.d("New profiles: ${proxies.size}")
@@ -340,6 +348,21 @@ object RawUpdater : GroupUpdater() {
             duplicate,
             byUser,
         )
+    }
+
+    fun findBodyHeader(content: String, name: String): String? {
+        return Regex("(?m)^\\s*#$name:\\s*(.+)$", RegexOption.IGNORE_CASE)
+            .find(content)?.groupValues?.get(1)?.trim()
+    }
+
+    fun parseBodyProfileTitle(content: String): String {
+        var title = findBodyHeader(content, "profile-title") ?: ""
+        if (title.startsWith("base64:")) {
+            title = runCatching {
+                title.removePrefix("base64:").trim().decodeBase64UrlSafe()
+            }.getOrDefault("").trim()
+        }
+        return title
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -1140,7 +1163,8 @@ object RawUpdater : GroupUpdater() {
         }
 
         try {
-            return parseProxies(text.decodeBase64UrlSafe()).takeIf { it.isNotEmpty() }
+            return parseProxies(text.linesNoComments().joinToString("\n").decodeBase64UrlSafe())
+                .takeIf { it.isNotEmpty() }
                 ?: error("Not found")
         } catch (e: Exception) {
             Logs.w(e)
