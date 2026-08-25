@@ -6,6 +6,8 @@ github.com/Capricornus007/sing-tun v0.0.0-20260825051009-072adbecd842 h1:r17IzhT
 github.com/Capricornus007/sing-tun v0.0.0-20260825051009-072adbecd842/go.mod h1:OGwPrtb3NGZdabfLPoXo31rOR7GfZizeZWPqHpjDSSE=
 github.com/Capricornus007/sing-vmess v0.2.9-0.20260825051027-dc00ac91b8d1 h1:8RB6aKWqd3SsqnlRAqg1sUqlzRnqH+TUuCqKbIoRBqA=
 github.com/Capricornus007/sing-vmess v0.2.9-0.20260825051027-dc00ac91b8d1/go.mod h1:8ZD8jr9ePjSoxdyEaEsplHMXnv1oHAu7Vcf7nQM5c04=
+github.com/Mahdi-zarei/speedtest-go v1.7.13-0.20260107171856-79c565dfd83a h1:11VlAp2Xf/V+W4xXYtWwMAkkm2oBcPRB6oZrSxVoFug=
+github.com/Mahdi-zarei/speedtest-go v1.7.13-0.20260107171856-79c565dfd83a/go.mod h1:b1H+UBFUnLKH1YquN2xao8d1hokcnDFFhEKDARTzddM=
 github.com/RyuaNerin/go-krypto v1.3.0 h1:smavTzSMAx8iuVlGb4pEwl9MD2qicqMzuXR2QWp2/Pg=
 github.com/RyuaNerin/go-krypto v1.3.0/go.mod h1:9R9TU936laAIqAmjcHo/LsaXYOZlymudOAxjaBf62UM=
 github.com/ajg/form v1.5.1/go.mod h1:uL1WgH+h2mgNtvBq0339dVnzXdBETtL2LeUXaIv25UY=

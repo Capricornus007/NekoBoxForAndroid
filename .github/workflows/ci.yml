@@ -123,6 +123,9 @@ jobs:
         env:
           ALLOW_UNPINNED_SIBLINGS: 1
         run: ./run lib core
+      - name: Run libcore unit tests (speedtest)
+        working-directory: libcore
+        run: go test . -tags='with_conntrack,with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api' -run '^(Test.*SpeedTest.*|TestSimpleDownload.*|TestDownloadPhase.*|TestTransferPhase.*)$' -count=1
       - name: Verify 16 KB ELF alignment
         run: bash ./scripts/verify-elf-alignment.sh app/libs/libcore.aar
       - name: Verify LibCore API classes

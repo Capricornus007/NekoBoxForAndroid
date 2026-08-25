@@ -3,6 +3,8 @@ module libcore
 go 1.27.0
 
 require (
+	// 与 Throne 2e7182b9ea99947a409fee30f74df83752ab763c 的测速基线一致。
+	github.com/Mahdi-zarei/speedtest-go v1.7.13-0.20260107171856-79c565dfd83a
 	// v0.1.6签名与 v1.13.15 锁定版一致。
 	github.com/exclavenetwork/sing-juicity v0.3.0-beta.1
 	github.com/exclavenetwork/sing-shadowquic v0.0.0-20260801175020-65c7acc31f93
