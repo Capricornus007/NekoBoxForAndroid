@@ -143,3 +143,34 @@ func (c *Client) Keepalive() (*Host, error) {
 	}
 	return resp.mappedAddr, nil
 }
+
+// Binding contacts the STUN server with a single binding request and returns
+// the reflexive (mapped) transport address of the client, skipping the RFC
+// 3489/5780 NAT type and behavior probing performed by Discover/BehaviorTest.
+func (c *Client) Binding() (*Host, error) {
+	if c.serverAddr == "" {
+		c.SetServerAddr(DefaultServerAddr)
+	}
+	serverUDPAddr, err := net.ResolveUDPAddr("udp", c.serverAddr)
+	if err != nil {
+		return nil, err
+	}
+	// Use the connection passed to the client if it is not nil, otherwise
+	// create a connection and close it at the end.
+	conn := c.conn
+	if conn == nil {
+		conn, err = net.ListenUDP("udp", nil)
+		if err != nil {
+			return nil, err
+		}
+		defer conn.Close()
+	}
+	resp, err := c.test1(conn, serverUDPAddr)
+	if err != nil {
+		return nil, err
+	}
+	if resp == nil || resp.packet == nil {
+		return nil, errors.New("no response from STUN server")
+	}
+	return resp.mappedAddr, nil
+}

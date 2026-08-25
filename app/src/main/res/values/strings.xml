@@ -527,6 +527,7 @@
     <string name="stun_test">NAT behaviour discovery</string>
     <string name="stun_test_summary">Determine the client\'s NAT mapping behaviour and the NAT
         filtering behaviour defined in RFC 3478 using STUN.</string>
+    <string name="stun_binding_test">Quick binding (external address only)</string>
     <string name="start">Start</string>
     <string name="stun_attest_loading">This may take a few minutes…</string>
     <string name="nat_stun_server_hint">Stun server</string>

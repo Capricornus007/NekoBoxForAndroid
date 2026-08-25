@@ -430,6 +430,7 @@
     <string name="naive_insecure_concurrency_summary">使用 N 條並發隧道路由，以在惡劣網路條件下更穩健。更多連線會使隧道更容易被偵測且安全性降低。本專案致力於提供最強的流量分析防護。以不安全的方式使用它將違背其目的。\n\n如果您必須使用此功能，請先嘗試 N=2 以查看是否能解決問題。強烈建議不要在此使用超過 4 條連線。</string>
     <string name="stun_test">NAT 行為偵測</string>
     <string name="stun_test_summary">使用 STUN 判斷客戶端的 NAT 對映行為及 RFC 3478 定義的 NAT 過濾行為。</string>
+    <string name="stun_binding_test">快速 Binding（僅取得對外位址）</string>
     <string name="start">開始</string>
     <string name="stun_attest_loading">這可能需要幾分鐘…</string>
     <string name="nat_stun_server_hint">STUN 伺服器</string>

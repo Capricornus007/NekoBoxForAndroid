@@ -440,6 +440,7 @@
 如果你必须使用此功能，请先尝试N=2，看是否能解决你的问题。强烈建议不要在此处使用超过4个连接。</string>
     <string name="stun_test">NAT行为发现</string>
     <string name="stun_test_summary">通过STUN确定客户端的NAT映射行为和RFC 3478定义的NAT过滤行为。</string>
+    <string name="stun_binding_test">快速Binding（仅获取对外地址）</string>
     <string name="start">开始</string>
     <string name="stun_attest_loading">这可能需要几分钟…</string>
     <string name="nat_stun_server_hint">STUN服务器</string>

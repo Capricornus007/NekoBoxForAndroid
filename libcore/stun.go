@@ -53,3 +53,30 @@ func StunTest(server string) *StunResult {
 	ret.Text = strings.TrimRight(text, "\n")
 	return ret
 }
+
+// StunBinding performs only a single STUN binding request to obtain the
+// external (reflexive) mapped address, skipping the slower and less reliable
+// NAT behavior/type probing done by StunTest.
+func StunBinding(server string) *StunResult {
+	ret := &StunResult{}
+
+	client := stun.NewClient()
+	client.SetServerAddr(server)
+	host, err := client.Binding()
+	if err != nil {
+		ret.Success = false
+		ret.Text = fmt.Sprint("Binding Error: ", err.Error())
+		return ret
+	}
+
+	var text string
+	if host != nil {
+		text += fmt.Sprintln("External IP Family:", host.Family())
+		text += fmt.Sprintln("External IP:", host.IP())
+		text += fmt.Sprintln("External Port:", host.Port())
+	}
+
+	ret.Success = true
+	ret.Text = strings.TrimRight(text, "\n")
+	return ret
+}

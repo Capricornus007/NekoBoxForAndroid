@@ -29,6 +29,37 @@ class StunActivity : ThemedActivity() {
         binding.stunTest.setOnClickListener {
             doTest()
         }
+        binding.stunBinding.setOnClickListener {
+            doBinding()
+        }
+    }
+
+    fun doBinding() {
+        binding.waitLayout.isVisible = true
+        runOnDefaultDispatcher {
+            val result = try {
+                val _result = Libcore.stunBinding(binding.natStunServer.text.toString())
+                if (_result!!.success) {
+                    _result.text
+                } else {
+                    throw Exception(_result.text)
+                }
+            } catch (e: Exception) {
+                onMainDispatcher {
+                    AlertDialog.Builder(this@StunActivity)
+                        .setTitle(R.string.error_title)
+                        .setMessage(e.readableMessage)
+                        .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
+                        .setOnCancelListener { finish() }
+                        .runCatching { show() }
+                }
+                return@runOnDefaultDispatcher
+            }
+            onMainDispatcher {
+                binding.waitLayout.isVisible = false
+                binding.natResult.text = result
+            }
+        }
     }
 
     fun doTest() {

@@ -123,6 +123,12 @@
                         android:layout_height="48dp"
                         android:layout_marginEnd="8dp"
                         android:text="@string/start" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/stunBinding"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="@string/stun_binding_test" />
                 </LinearLayout>
 
             </LinearLayout>
