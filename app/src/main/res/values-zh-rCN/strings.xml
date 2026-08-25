@@ -305,11 +305,10 @@
     <string name="always_show_address_sum">始终在配置卡上显示服务器地址</string>
     <string name="clear_traffic_statistics">清除流量统计</string>
     <string name="connection_test">连接测试</string>
-    <string name="connection_test_clear_results">清除测试结果</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing不可用</string>
-    <string name="connection_test_icmp_ping_unavailable">ICMPing不可用</string>
-    <string name="connection_test_domain_not_found">未找到域名</string>
-    <string name="connection_test_refused">连接被拒绝</string>
+    <string name="connection_test_clear_results">清理测试结果</string>
+    <string name="connection_test_domain_not_found">域名不存在</string>
+    <string name="connection_test_refused">连接重置</string>
+    <string name="connection_test_timeout_error">超时</string>
     <string name="connection_test_unreachable">不可达</string>
     <string name="connection_test_timeout_error">超时</string>
     <string name="append_http_proxy">附加HTTP代理到VPN</string>

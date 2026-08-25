@@ -150,11 +150,6 @@ public class WireGuardBean extends AbstractBean {
         return v == null ? "" : v;
     }
 
-    @Override
-    public boolean canTCPing() {
-        return false;
-    }
-
     @NotNull
     @Override
     public WireGuardBean clone() {
