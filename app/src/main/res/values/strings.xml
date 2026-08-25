@@ -110,7 +110,7 @@
     <string name="port_local_dns">Local DNS Port</string>
     <string name="require_transproxy">Enable Transproxy Inbound</string>
     <string name="transproxy_mode">Transproxy Mode</string>
-    <string name="connection_test_url">Connection Test URL</string>
+    <string name="connection_test_url">Latency test URL</string>
     <string name="auto_switch_timeout">Auto-switch on Timeout</string>
     <string name="auto_switch_timeout_summary">Automatically switch to next config if no response</string>
     <string name="auto_switch_timeout_duration">Timeout Duration (seconds)</string>

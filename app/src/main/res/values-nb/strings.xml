@@ -785,7 +785,7 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="leastPing">Ping</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
-    <string name="connection_test_url_test">URL Test</string>
+    <string name="connection_test_url_test">Test URL for denne gruppen</string>
     <string name="mixed_auth_config">Konfigurer autentisering</string>
     <string name="mixed_auth_username_hint">Brukernavn (la begge stå tomme for ingen autentisering)</string>
     <string name="mixed_auth_no_auth">Ikke satt (ingen autentisering)</string>
@@ -879,7 +879,7 @@ Fortsette?</string>
     <string name="wireguard_listen_port">Lytteport</string>
     <string name="wireguard_persistent_keepalive">Intervall for vedvarende keepalive (sekunder)</string>
 
-    <string name="speed_test_group">Speed test this group</string>
+    <string name="speed_test_group">Test hastighet for denne gruppen</string>
     <string name="speed_test_settings">Speed test</string>
     <string name="speed_test_mode">Speed test mode</string>
     <string name="speed_test_mode_download_upload">Download + upload</string>

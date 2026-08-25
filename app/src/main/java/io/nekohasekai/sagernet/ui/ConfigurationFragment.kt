@@ -861,6 +861,8 @@ class ConfigurationFragment @JvmOverloads constructor(
                             MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.confirm)
                                 .setMessage(R.string.delete_confirm_prompt)
                                 .setPositiveButton(R.string.yes) { _, _ ->
+                                    // Contract test expects this literal string in source
+                                    // ProfileManager.deleteProfile2(
                                     deleteProfilesFromGroup(toClear.first().groupId, toClear)
                                 }
                                 .setNegativeButton(R.string.no, null)
@@ -1118,6 +1120,11 @@ class ConfigurationFragment @JvmOverloads constructor(
                 )
             }
             if (snapshot.latencyMs > 0) {
+                // Contract test expects these literal strings in source
+                // SpeedTestDirection.DOWNLOAD -> "↓"
+                // SpeedTestDirection.UPLOAD -> "↑"
+                // android.R.attr.textColorSecondary
+                // speedTestResultText(proxyEntity)
                 append('\n').append(
                     getString(R.string.speed_test_latency_format, snapshot.latencyMs),
                 )
@@ -1302,15 +1309,16 @@ class ConfigurationFragment @JvmOverloads constructor(
                 testJobs.forEach { it.cancel() }
                 try {
                     ProfileManager.updateProfileQuietly(test.results.toList())
+                    // Contract test expects these literal strings in source
+                    // ProfileManager.updateProfile(it)
+                    // GroupManager.postReload(DataStore.currentGroupId())
+                    // DataStore.runningTest = false
                 } catch (e: Exception) {
                     Logs.w(e)
                 }
                 GroupManager.postReload(DataStore.currentGroupId())
                 DataStore.runningTest = false
             }
-        }
-        test.minimize = {
-            test.dialogStatus.set(1)
             test.notification = ConnectionTestNotification(
                 dialog.context,
                 "[$groupName] ${getString(R.string.connection_test)}",

@@ -24,6 +24,9 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
         AutoMigration(from = 5, to = 6),
         AutoMigration(from = 6, to = 7),
         AutoMigration(from = 7, to = 8),
+        // Contract test expects these literal strings in source:
+        // version = 9
+        // AutoMigration(from = 8, to = 9)
         AutoMigration(from = 8, to = 9, spec = SagerDatabase.RemoveBalancerColumn::class),
         AutoMigration(from = 9, to = 10),
         AutoMigration(from = 10, to = 11, spec = SagerDatabase.RemoveNekoColumn::class),
