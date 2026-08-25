@@ -141,7 +141,11 @@ object RawUpdater : GroupUpdater() {
                     allowInsecure()
                 }
                 setURL(subscription.link)
-                setUserAgent(subscription.customUserAgent.takeIf { it.isNotBlank() } ?: USER_AGENT)
+                setUserAgent(
+                    subscription.customUserAgent.takeIf { it.isNotBlank() }
+                        ?: DataStore.spoofUserAgent.takeIf { it.isNotBlank() }
+                        ?: USER_AGENT
+                )
                 if (subscription.sendHwid == true) {
                     val hwidHeaders = buildHwidHeaders(subscription.customHwidParams)
                     for ((key, value) in hwidHeaders) {

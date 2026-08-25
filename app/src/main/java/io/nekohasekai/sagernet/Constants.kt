@@ -247,6 +247,7 @@ object Key {
     const val SUBSCRIPTION_UPDATE = "subscriptionUpdate"
     const val SUBSCRIPTION_UPDATE_WHEN_CONNECTED_ONLY = "subscriptionUpdateWhenConnectedOnly"
     const val SUBSCRIPTION_USER_AGENT = "subscriptionUserAgent"
+    const val SPOOF_USER_AGENT = "spoofUserAgent"
     const val SUBSCRIPTION_SEND_HWID = "subscriptionSendHwid"
     const val SUBSCRIPTION_CUSTOM_HWID_PARAMS = "subscriptionCustomHwidParams"
     const val SUBSCRIPTION_AUTO_UPDATE = "subscriptionAutoUpdate"
