@@ -149,7 +149,7 @@ abstract class BoxInstance(
         loadConfig()
     }
 
-    override fun launch() {
+    protected fun launchExternal() {
         // TODO move, this is not box
         val cacheDir = File(SagerNet.application.cacheDir, "tmpcfg")
         cacheDir.mkdirs()
@@ -331,7 +331,10 @@ abstract class BoxInstance(
                 }
             }
         }
+    }
 
+    override fun launch() {
+        launchExternal()
         box.start()
     }
 

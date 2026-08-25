@@ -77,6 +77,7 @@ class TestInstance(profile: ProxyEntity, val link: String, private val timeout: 
     }
 
     override fun buildConfig() {
+        val started = SystemClock.elapsedRealtime()
         config = buildConfig(profile, true)
     }
 
