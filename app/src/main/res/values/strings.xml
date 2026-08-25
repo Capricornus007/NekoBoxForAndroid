@@ -400,6 +400,10 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="spoof_user_agent">Default User-Agent</string>
     <string name="spoof_user_agent_summary">Used for subscription updates when the subscription has no User-Agent of its own. Leave empty to use the real client identity.</string>
+    <string name="spoof_device_os">Spoofed Device OS</string>
+    <string name="spoof_device_os_summary">Overrides the x-device-os HWID header sent on subscription updates. Leave empty to report the real OS (Android).</string>
+    <string name="spoof_device_os_version">Spoofed OS Version</string>
+    <string name="spoof_device_model">Spoofed Device Model</string>
     <string name="confirm">Confirm</string>
     <string name="missing_plugin">Missing Plugin</string>
     <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but

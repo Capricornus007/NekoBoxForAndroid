@@ -113,6 +113,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     var appTLSVersion by configurationStore.string(Key.APP_TLS_VERSION)
     var spoofUserAgent by configurationStore.string(Key.SPOOF_USER_AGENT) { "" }
+    var spoofDeviceOs by configurationStore.string(Key.SPOOF_DEVICE_OS) { "" }
+    var spoofDeviceOsVersion by configurationStore.string(Key.SPOOF_DEVICE_OS_VERSION) { "" }
+    var spoofDeviceModel by configurationStore.string(Key.SPOOF_DEVICE_MODEL) { "" }
     var enableClashAPI by configurationStore.boolean(Key.ENABLE_CLASH_API)
     var showBottomBar by configurationStore.boolean(Key.SHOW_BOTTOM_BAR)
     var confirmProfileDelete by configurationStore.boolean(Key.CONFIRM_PROFILE_DELETE) { true }

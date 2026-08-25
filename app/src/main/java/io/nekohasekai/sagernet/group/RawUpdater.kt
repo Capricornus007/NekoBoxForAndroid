@@ -76,11 +76,13 @@ object RawUpdater : GroupUpdater() {
         val params = if (customParams.isNullOrBlank()) {
             mapOf(
                 "hwid" to DataStore.subscriptionHwid,
-                "os" to "Android",
-                "osversion" to Build.VERSION.RELEASE.orEmpty(),
-                "model" to listOf(Build.MANUFACTURER, Build.MODEL)
-                    .filter { it.isNotBlank() }
-                    .joinToString(" "),
+                "os" to (DataStore.spoofDeviceOs.takeIf { it.isNotBlank() } ?: "Android"),
+                "osversion" to (DataStore.spoofDeviceOsVersion.takeIf { it.isNotBlank() }
+                    ?: Build.VERSION.RELEASE.orEmpty()),
+                "model" to (DataStore.spoofDeviceModel.takeIf { it.isNotBlank() }
+                    ?: listOf(Build.MANUFACTURER, Build.MODEL)
+                        .filter { it.isNotBlank() }
+                        .joinToString(" ")),
             )
         } else {
             buildMap {
@@ -119,9 +121,11 @@ object RawUpdater : GroupUpdater() {
     ) {
         val link = subscription.link
         var proxies: List<AbstractBean>
+        var rawText: String? = null
         if (link.startsWith("content://")) {
             val contentText = app.contentResolver.openInputStream(link.toUri())
                 ?.use { it.readTextBounded() }
+            rawText = contentText
 
             proxies = contentText?.let { parseRaw(contentText) }
                 ?: error(app.getString(R.string.no_proxies_found_in_subscription))
@@ -154,6 +158,7 @@ object RawUpdater : GroupUpdater() {
                 }
             }.execute()
             val content = Util.getStringBox(response.getContentStringLimited(10L * 1024 * 1024))
+            rawText = content
             proxies = parseRaw(content)
                 ?: error(app.getString(R.string.no_proxies_found))
 
@@ -334,6 +339,8 @@ object RawUpdater : GroupUpdater() {
             SagerDatabase.groupDao.updateGroup(proxyGroup)
         }
 
+        importClashRouting(proxyGroup, rawText)
+
         Logs.d("Inserted profiles: ${toInsert.size}")
         Logs.d("Updated profiles: $updatedCount")
         Logs.d("Deleted profiles: $deletedCount")
@@ -363,6 +370,34 @@ object RawUpdater : GroupUpdater() {
             }.getOrDefault("").trim()
         }
         return title
+    }
+
+    // Best-effort import of mihomo/clash-meta `proxy-groups` + `rules` as native routing
+    // rules; see ClashRoutingParser's kdoc for exactly what is and isn't translated.
+    // Rows are tagged with a per-group name prefix and replaced on each refresh.
+    // Failures here must never fail the subscription update itself.
+    private fun importClashRouting(proxyGroup: ProxyGroup, rawText: String?) {
+        if (rawText == null) return
+        val namePrefix = "[Mihomo ${proxyGroup.id}]"
+        try {
+            val yaml = parseClashYaml(rawText) ?: return
+            if (yaml["rules"] !is List<*>) return // not a mihomo-style profile, nothing to import
+            val result = ClashRoutingParser.parse(yaml, proxyGroup.id, namePrefix)
+            SagerDatabase.rulesDao.deleteByNamePrefix(namePrefix)
+            if (result.rules.isNotEmpty()) {
+                SagerDatabase.rulesDao.insert(result.rules)
+            }
+        } catch (e: Exception) {
+            Logs.w("importClashRouting failed", e)
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun parseClashYaml(text: String): Map<String, Any?>? {
+        val loaderOptions = LoaderOptions().apply {
+            codePointLimit = 100 * 1024 * 1024
+        }
+        return Yaml(SafeConstructor(loaderOptions)).load<Any?>(text) as? Map<String, Any?>
     }
 
     @Suppress("UNCHECKED_CAST")

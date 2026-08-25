@@ -360,6 +360,22 @@
             app:summary="@string/spoof_user_agent_summary"
             app:title="@string/spoof_user_agent"
             app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_grid_3x3_24"
+            app:key="spoofDeviceOs"
+            app:summary="@string/spoof_device_os_summary"
+            app:title="@string/spoof_device_os"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_grid_3x3_24"
+            app:key="spoofDeviceOsVersion"
+            app:title="@string/spoof_device_os_version"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_grid_3x3_24"
+            app:key="spoofDeviceModel"
+            app:title="@string/spoof_device_model"
+            app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
             app:key="showBottomBar"
             app:title="@string/show_bottom_bar" />
