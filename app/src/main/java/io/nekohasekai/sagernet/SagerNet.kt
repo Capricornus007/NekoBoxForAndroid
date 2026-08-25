@@ -28,18 +28,33 @@ import io.nekohasekai.sagernet.ui.MainActivity
 import io.nekohasekai.sagernet.utils.*
 import kotlinx.coroutines.DEBUG_PROPERTY_NAME
 import kotlinx.coroutines.DEBUG_PROPERTY_VALUE_ON
+import libcore.AndroidCAStore
 import libcore.Libcore
 import moe.matsuri.nb4a.NativeInterface
 import moe.matsuri.nb4a.net.LocalResolverImpl
 import moe.matsuri.nb4a.utils.JavaUtil
 import moe.matsuri.nb4a.utils.cleanAppUpdateCache
 import moe.matsuri.nb4a.utils.cleanWebview
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.security.KeyStore
 import androidx.work.Configuration as WorkConfiguration
 
 class SagerNet :
     Application(),
+    AndroidCAStore,
     WorkConfiguration.Provider {
+    override fun certificates(): ByteArray {
+        val keyStore = KeyStore.getInstance("AndroidCAStore").apply { load(null, null) }
+        val byteArrayStream = ByteArrayOutputStream()
+        val aliases = keyStore.aliases()
+        while (aliases.hasMoreElements()) {
+            val cert = keyStore.getCertificate(aliases.nextElement()) ?: continue
+            val b64 = android.util.Base64.encodeToString(cert.encoded, android.util.Base64.NO_WRAP)
+            byteArrayStream.write(("-----BEGIN CERTIFICATE-----\n$b64\n-----END CERTIFICATE-----\n").toByteArray())
+        }
+        return byteArrayStream.toByteArray()
+    }
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
@@ -62,6 +77,7 @@ class SagerNet :
         if (isMainProcess || isBgProcess) {
             externalAssets.mkdirs()
             Seq.setContext(this)
+            Libcore.registerAndroidCAStore(this)
             // notification channels MUST exist before :bg calls startForeground()
             // (Android 16 enforces this strictly, CannotPostForegroundServiceNotificationException)
             updateNotificationChannels()

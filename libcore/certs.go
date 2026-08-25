@@ -22,3 +22,16 @@ func updateRootCACerts(pem []byte) {
 
 //go:linkname initSystemRoots crypto/x509.initSystemRoots
 func initSystemRoots()
+
+// AndroidCAStore is implemented by the Android app to supply the system
+// trust anchors (AndroidCAStore KeyStore) through a Java callback, so
+// user-added CAs are honored as well. It replaces the handmade Go CA store.
+type AndroidCAStore interface {
+	Certificates() []byte
+}
+
+var androidCAStore AndroidCAStore
+
+func RegisterAndroidCAStore(store AndroidCAStore) {
+	androidCAStore = store
+}

@@ -63,9 +63,13 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 		defer device.DeferPanicToError("InitCore-go", func(err error) { log.Println(err) })
 		device.GoDebug(process)
 
-		// certs
-		pem, err := os.ReadFile(externalAssetsPath + "ca.pem")
-		if err == nil {
+		// certs: use the Java-provided system trust anchors when registered,
+		// otherwise fall back to an exported ca.pem bundle.
+		if androidCAStore != nil {
+			if pem := androidCAStore.Certificates(); len(pem) > 0 {
+				updateRootCACerts(pem)
+			}
+		} else if pem, err := os.ReadFile(externalAssetsPath + "ca.pem"); err == nil {
 			updateRootCACerts(pem)
 		}
 
