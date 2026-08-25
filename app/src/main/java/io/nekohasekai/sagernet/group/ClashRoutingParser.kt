@@ -147,7 +147,12 @@ object ClashRoutingParser {
         val skippedHttpProviders = LinkedHashSet<String>()
 
         fun addRule(type: String, payload: String, target: String) {
-            val entity = RuleEntity(name = "$namePrefix ${type.lowercase()}:$payload".take(255), userOrder = userOrder++, enabled = true)
+            val entity =
+                RuleEntity(
+                    name = "$namePrefix ${type.lowercase()}:$payload".take(255),
+                    userOrder = userOrder++,
+                    enabled = true,
+                )
             when (type) {
                 "DOMAIN" -> entity.domains = "full:$payload"
                 "DOMAIN-SUFFIX" -> entity.domains = "domain:$payload"
@@ -156,7 +161,9 @@ object ClashRoutingParser {
                 "DST-PORT" -> entity.port = payload
                 "MATCH" -> {} // no matcher fields: matches everything
                 else -> {
-                    skipped++; skippedTypes.add(type); return
+                    skipped++
+                    skippedTypes.add(type)
+                    return
                 }
             }
             entity.outbound = resolveOutbound(target)
@@ -186,7 +193,8 @@ object ClashRoutingParser {
                         }
                         httpProviderNames.contains(providerName) -> skippedHttpProviders.add(providerName)
                         else -> {
-                            skipped++; skippedTypes.add("RULE-SET:$providerName")
+                            skipped++
+                            skippedTypes.add("RULE-SET:$providerName")
                         }
                     }
                 }
@@ -211,16 +219,19 @@ object ClashRoutingParser {
         if (skippedHttpProviders.isNotEmpty()) {
             warnings.add(
                 "Skipped remote rule-provider(s) (no reliable geosite/geoip category mapping): " +
-                    skippedHttpProviders.joinToString(", ")
+                    skippedHttpProviders.joinToString(", "),
             )
         }
         if (warnings.isNotEmpty()) {
             Logs.i("ClashRoutingParser: ${warnings.joinToString(" | ")}")
-            out.add(0, RuleEntity(
-                name = "$namePrefix ${warnings.size} warning(s), see logcat".take(255),
-                userOrder = -1,
-                enabled = false,
-            ))
+            out.add(
+                0,
+                RuleEntity(
+                    name = "$namePrefix ${warnings.size} warning(s), see logcat".take(255),
+                    userOrder = -1,
+                    enabled = false,
+                ),
+            )
         }
 
         return ParsedRouting(out, warnings)

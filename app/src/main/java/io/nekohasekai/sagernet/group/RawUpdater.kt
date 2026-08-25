@@ -77,12 +77,16 @@ object RawUpdater : GroupUpdater() {
             mapOf(
                 "hwid" to DataStore.subscriptionHwid,
                 "os" to (DataStore.spoofDeviceOs.takeIf { it.isNotBlank() } ?: "Android"),
-                "osversion" to (DataStore.spoofDeviceOsVersion.takeIf { it.isNotBlank() }
-                    ?: Build.VERSION.RELEASE.orEmpty()),
-                "model" to (DataStore.spoofDeviceModel.takeIf { it.isNotBlank() }
-                    ?: listOf(Build.MANUFACTURER, Build.MODEL)
-                        .filter { it.isNotBlank() }
-                        .joinToString(" ")),
+                "osversion" to (
+                    DataStore.spoofDeviceOsVersion.takeIf { it.isNotBlank() }
+                        ?: Build.VERSION.RELEASE.orEmpty()
+                    ),
+                "model" to (
+                    DataStore.spoofDeviceModel.takeIf { it.isNotBlank() }
+                        ?: listOf(Build.MANUFACTURER, Build.MODEL)
+                            .filter { it.isNotBlank() }
+                            .joinToString(" ")
+                    ),
             )
         } else {
             buildMap {
@@ -148,7 +152,7 @@ object RawUpdater : GroupUpdater() {
                 setUserAgent(
                     subscription.customUserAgent.takeIf { it.isNotBlank() }
                         ?: DataStore.spoofUserAgent.takeIf { it.isNotBlank() }
-                        ?: USER_AGENT
+                        ?: USER_AGENT,
                 )
                 if (subscription.sendHwid == true) {
                     val hwidHeaders = buildHwidHeaders(subscription.customHwidParams)

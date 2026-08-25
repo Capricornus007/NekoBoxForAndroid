@@ -51,6 +51,7 @@ import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
 import io.nekohasekai.sagernet.ktx.SubscriptionFoundException
+import io.nekohasekai.sagernet.ktx.USER_AGENT
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.ktx.getColour
@@ -63,12 +64,6 @@ import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.runOnLifecycleDispatcher
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.ktx.scrollTo
-import io.nekohasekai.sagernet.ktx.USER_AGENT
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import moe.matsuri.nb4a.utils.Util
-import libcore.Libcore
-import java.net.URLDecoder
 import io.nekohasekai.sagernet.plugin.PluginManager
 import io.nekohasekai.sagernet.ui.profile.AmneziaWGSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.BalancerSettingsActivity
@@ -98,15 +93,20 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import libcore.Libcore
 import moe.matsuri.nb4a.Protocols
 import moe.matsuri.nb4a.Protocols.getProtocolColor
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSSettingsActivity
 import moe.matsuri.nb4a.proxy.config.ConfigSettingActivity
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSSettingsActivity
 import moe.matsuri.nb4a.ui.ConnectionTestNotification
+import moe.matsuri.nb4a.utils.Util
 import java.io.Closeable
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.URLDecoder
 import java.net.UnknownHostException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -533,7 +533,9 @@ class ConfigurationFragment @JvmOverloads constructor(
                 setUserAgent(USER_AGENT)
             }.execute()
 
-            var remoteName = RawUpdater.parseBodyProfileTitle(Util.getStringBox(response.getContentStringLimited(10L * 1024 * 1024)))
+            var remoteName = RawUpdater.parseBodyProfileTitle(
+                Util.getStringBox(response.getContentStringLimited(10L * 1024 * 1024)),
+            )
             if (remoteName.isBlank()) {
                 remoteName = parseContentDisposition(Util.getStringBox(response.getHeader("content-disposition")))
             }
