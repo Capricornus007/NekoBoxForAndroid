@@ -26,6 +26,7 @@ import io.nekohasekai.sagernet.GroupOrder
 import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
+import io.nekohasekai.sagernet.SpeedTestOutcome
 import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.database.DataStore
@@ -635,6 +636,15 @@ class ConfigurationGroupFragment : Fragment() {
 
         override fun getItemCount(): Int {
             return configurationIdList.size
+        }
+
+        fun updateSpeedTestResult(profileId: Long, outcome: SpeedTestOutcome) {
+            val profile = configurationList[profileId] ?: return
+            profile.speedTestMode = outcome.mode
+            profile.speedTestDownloadBitsPerSecond = outcome.downloadBitsPerSecond
+            profile.speedTestUploadBitsPerSecond = outcome.uploadBitsPerSecond
+            val index = configurationIdList.indexOf(profileId)
+            if (index >= 0) notifyItemChanged(index)
         }
 
         fun refreshProfileState(profileIds: Set<Long>) {

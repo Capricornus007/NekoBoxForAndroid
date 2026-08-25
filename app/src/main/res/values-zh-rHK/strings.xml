@@ -36,7 +36,6 @@
     <string name="layout">佈局</string>
     <string name="layout_single_column">單欄</string>
     <string name="layout_double_column">雙欄</string>
-    <string name="sort_and_layout">排序同外觀</string>
     <string name="group_status_empty">空群組</string>
     <string name="group_status_empty_subscription">尚未更新</string>
     <string name="group_status_proxies">%d 個代理</string>
@@ -101,7 +100,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="port_local_dns">本地 DNS 連接埠</string>
     <string name="require_transproxy">啟用透明代理入站</string>
     <string name="transproxy_mode">透明代理模式</string>
-    <string name="connection_test_url">連線測試 URL</string>
     <string name="profile_name">設定檔名稱</string>
     <string name="server_address">伺服器</string>
     <string name="server_port">遠端連接埠</string>

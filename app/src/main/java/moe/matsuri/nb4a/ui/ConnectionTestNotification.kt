@@ -31,7 +31,7 @@ class ConnectionTestNotification(val context: Context, val title: String) {
                         0,
                         Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-                    )
+                    ),
                 )
                 .setProgress(max, progress, false)
             SagerNet.notification.notify(notificationId, builder.build())

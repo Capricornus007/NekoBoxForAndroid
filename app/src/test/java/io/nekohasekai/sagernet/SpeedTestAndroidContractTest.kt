@@ -1,7 +1,7 @@
 package io.nekohasekai.sagernet
 
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -230,7 +230,11 @@ class SpeedTestAndroidContractTest {
 
         forbidden.forEach { term ->
             assertFalse(
-                "legacy connection/speed-test term remains in ${checkedFiles.firstOrNull { it.readText().contains(term) }}: $term",
+                "legacy connection/speed-test term remains in ${checkedFiles.firstOrNull {
+                    it.readText().contains(
+                        term,
+                    )
+                }}: $term",
                 checkedFiles.any { it.readText().contains(term) },
             )
         }

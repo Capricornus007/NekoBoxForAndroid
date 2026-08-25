@@ -1,6 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-    <string name="app_desc">Універсальны інструментарый проксі для Android, напісаны на Kotlin.</string>
     <string name="project">Праект</string>
     <string name="app_desc">Універсальны набор інструментаў проксі для Android, напісаны на Kotlin.</string>
     <string name="ws_path">Шлях WebSocket</string>

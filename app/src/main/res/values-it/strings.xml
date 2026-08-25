@@ -110,7 +110,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="port_local_dns">Porta DNS locale</string>
     <string name="require_transproxy">Abilita inbound Transproxy</string>
     <string name="transproxy_mode">Modalità Transproxy</string>
-    <string name="connection_test_url">URL test connessione</string>
     <string name="profile_name">Nome del profilo</string>
     <string name="server_address">Server</string>
     <string name="server_port">Porta remota</string>
@@ -798,7 +797,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="available">%dms</string>
     <string name="connection_test_tcp_ping">TCPing</string>
     <string name="connection_test_icmp_ping">ICMPing</string>
-    <string name="connection_test_url_test">URL Test</string>
     <string name="mixed_auth_config">Configure authentication</string>
     <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
     <string name="mixed_auth_no_auth">Not set (no authentication)</string>

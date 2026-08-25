@@ -108,7 +108,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="port_local_dns">Lokale DNS-poort</string>
     <string name="require_transproxy">Transproxy-inbound inschakelen</string>
     <string name="transproxy_mode">Transproxy-modus</string>
-    <string name="connection_test_url">Verbindingstest-URL</string>
     <string name="profile_name">Profielnaam</string>
     <string name="server_address">Server</string>
     <string name="server_port">Poort</string>

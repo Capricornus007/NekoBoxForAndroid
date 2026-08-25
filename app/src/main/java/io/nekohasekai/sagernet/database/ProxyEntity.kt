@@ -735,7 +735,7 @@ data class ProxyEntity(
                 speedTestMode = :mode,
                 speedTestDownloadBitsPerSecond = :downloadBitsPerSecond,
                 speedTestUploadBitsPerSecond = :uploadBitsPerSecond
-                WHERE id = :proxyId"""
+                WHERE id = :proxyId""",
         )
         fun updateSpeedTestResult(
             proxyId: Long,
@@ -752,7 +752,7 @@ data class ProxyEntity(
                 speedTestMode = '',
                 speedTestDownloadBitsPerSecond = 0,
                 speedTestUploadBitsPerSecond = 0
-                WHERE groupId = :groupId"""
+                WHERE groupId = :groupId""",
         )
         fun clearTestResults(groupId: Long): Int
 

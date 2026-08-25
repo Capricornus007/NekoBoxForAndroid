@@ -339,12 +339,8 @@
     <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>
     <string name="traffic_uplink_total">%s ↑</string>
     <string name="traffic_downlink_total">%s ↓</string>
-    <string name="cloudflare_wrap">Cloudflare Warp</string>
-    <string name="pcap">Pcap</string>
-    <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
     <string name="ech_query_server_name">ECH Query Server Name</string>
-    <string name="preview_hint_dont_show_again">No mostrar de nuevo</string>
     <string name="release_not_available">Throne has not published a stable release yet</string>
     <string name="action_amneziawg">AmneziaWG</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
@@ -369,9 +365,6 @@
     <string name="rule_protocol">Protocolo</string>
     <string name="udp_over_tcp">UDP sobre TCP</string>
     <string name="dialog_watchdog_start">Iniciar</string>
-    <string name="backup_not_throne_desktop">No es una copia de seguridad de Throne Desktop: se esperaba .thrbackup, pero se encontró %s</string>
-    <string name="action_import_throne_desktop">Importar desde Throne Desktop</string>
-    <string name="backup_import_throne_desktop_summary">Importa perfiles, rutas y ajustes desde un archivo .thrbackup de Throne Desktop. Se ignorarán los iconos personalizados. Se sobrescribirán los datos existentes en las categorías seleccionadas.</string>
     <string name="shadowquic_udp_over_stream">UDP sobre flujo</string>
     <string name="shadowquic_zero_rtt">Enlace 0-RTT</string>
     <string name="shadowquic_sunny_quic">Sunny QUIC</string>

@@ -130,11 +130,7 @@ class TestSettingsContractTest {
         }
     }
 
-    private fun <T : Any> proxy(
-        values: MutableMap<String, Any>,
-        key: String,
-        default: T,
-    ) = PreferenceProxy(
+    private fun <T : Any> proxy(values: MutableMap<String, Any>, key: String, default: T) = PreferenceProxy(
         name = key,
         defaultValue = { default },
         getter = { name, fallback -> values[name] as? T ?: fallback },

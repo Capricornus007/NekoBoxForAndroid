@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import android.text.SpannableStringBuilder
 import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+import android.text.format.Formatter
 import android.text.style.ForegroundColorSpan
 import android.view.KeyEvent
 import android.view.Menu
@@ -13,6 +14,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -31,10 +33,8 @@ import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
-import io.nekohasekai.sagernet.SpeedTestDirection
 import io.nekohasekai.sagernet.SpeedTestOutcome
 import io.nekohasekai.sagernet.aidl.TrafficData
-import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.proto.AndroidSpeedTestSession
 import io.nekohasekai.sagernet.bg.proto.SpeedTestQueueRunner
 import io.nekohasekai.sagernet.bg.proto.SpeedTestSnapshot
@@ -57,7 +57,6 @@ import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
 import io.nekohasekai.sagernet.ktx.SubscriptionFoundException
 import io.nekohasekai.sagernet.ktx.USER_AGENT
-import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.ktx.getColour
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
@@ -91,6 +90,7 @@ import io.nekohasekai.sagernet.ui.profile.TrustTunnelSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TuicSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.VMessSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.WireGuardSettingsActivity
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -106,7 +106,9 @@ import moe.matsuri.nb4a.proxy.anytls.AnyTLSSettingsActivity
 import moe.matsuri.nb4a.proxy.config.ConfigSettingActivity
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSSettingsActivity
 import moe.matsuri.nb4a.ui.ConnectionTestNotification
-import okhttp3.internal.closeQuietly
+import moe.matsuri.nb4a.utils.Util
+import java.io.Closeable
+import java.net.URLDecoder
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
@@ -137,7 +139,6 @@ class ConfigurationFragment @JvmOverloads constructor(
 
     private var selectedProfileSnapshot = 0L
     private var currentProfileSnapshot = 0L
-    private var serviceStartedSnapshot = false
 
     @Volatile
     private var serviceStartedSnapshot = false
@@ -376,22 +377,6 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
     }
 
-    override fun onDestroy() {
-        if (speedTestJob != null) {
-            speedTestRunner?.cancel()
-            speedTestJob?.cancel()
-            speedTestNotification?.updateNotification(0, 0, true)
-            speedTestNotification = null
-            speedTestDialog?.dismiss()
-            speedTestDialog = null
-            speedTestHidden = false
-            speedTestRunner = null
-            speedTestJob = null
-            DataStore.runningTest = false
-        }
-        super.onDestroy()
-    }
-
     private fun releaseViewListeners() {
         DataStore.profileCacheStore.unregisterChangeListener(this)
         tabLayoutMediator?.detach()
@@ -413,6 +398,18 @@ class ConfigurationFragment @JvmOverloads constructor(
     }
 
     override fun onDestroy() {
+        if (speedTestJob != null) {
+            speedTestRunner?.cancel()
+            speedTestJob?.cancel()
+            speedTestNotification?.updateNotification(0, 0, true)
+            speedTestNotification = null
+            speedTestDialog?.dismiss()
+            speedTestDialog = null
+            speedTestHidden = false
+            speedTestRunner = null
+            speedTestJob = null
+            DataStore.runningTest = false
+        }
         releaseViewListeners()
         super.onDestroy()
     }
@@ -1063,7 +1060,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 results.size,
                                 failed,
                                 cancelled,
-                            )
+                            ),
                         )
                         results.forEach { append("\n\n").append(formatSpeedTestSnapshot(it)) }
                     }
@@ -1102,23 +1099,29 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
         return buildString {
             append(snapshot.profileName).append(" — ").append(stage)
-            if (snapshot.downloadBitsPerSecond > 0) append('\n').append(
-                getString(
-                    R.string.speed_test_download_format,
-                    getString(R.string.speed_test_rate_mbps, snapshot.downloadBitsPerSecond / 1_000_000.0),
-                    Formatter.formatFileSize(requireContext(), snapshot.downloadBytes),
+            if (snapshot.downloadBitsPerSecond > 0) {
+                append('\n').append(
+                    getString(
+                        R.string.speed_test_download_format,
+                        getString(R.string.speed_test_rate_mbps, snapshot.downloadBitsPerSecond / 1_000_000.0),
+                        Formatter.formatFileSize(requireContext(), snapshot.downloadBytes),
+                    ),
                 )
-            )
-            if (snapshot.uploadBitsPerSecond > 0) append('\n').append(
-                getString(
-                    R.string.speed_test_upload_format,
-                    getString(R.string.speed_test_rate_mbps, snapshot.uploadBitsPerSecond / 1_000_000.0),
-                    Formatter.formatFileSize(requireContext(), snapshot.uploadBytes),
+            }
+            if (snapshot.uploadBitsPerSecond > 0) {
+                append('\n').append(
+                    getString(
+                        R.string.speed_test_upload_format,
+                        getString(R.string.speed_test_rate_mbps, snapshot.uploadBitsPerSecond / 1_000_000.0),
+                        Formatter.formatFileSize(requireContext(), snapshot.uploadBytes),
+                    ),
                 )
-            )
-            if (snapshot.latencyMs > 0) append('\n').append(
-                getString(R.string.speed_test_latency_format, snapshot.latencyMs)
-            )
+            }
+            if (snapshot.latencyMs > 0) {
+                append('\n').append(
+                    getString(R.string.speed_test_latency_format, snapshot.latencyMs),
+                )
+            }
             val server = listOf(snapshot.serverName, snapshot.serverCountry)
                 .filter { it.isNotBlank() }
                 .joinToString(", ")

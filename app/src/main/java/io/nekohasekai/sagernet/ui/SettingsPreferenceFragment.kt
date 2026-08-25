@@ -159,8 +159,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
         httpProxyBypass.setOnBindEditTextListener(EditTextPreferenceModifiers.Hosts)
         dnsHosts.setOnBindEditTextListener(EditTextPreferenceModifiers.Hosts)
-        httpProxyBypass.summaryProvider = ListSummaryProvider(maxLines = 1)
-        dnsHosts.summaryProvider = ListSummaryProvider(maxLines = 1)
 
         speedTestMode.setOnPreferenceChangeListener { _, newValue ->
             SpeedTestSettings.isValidMode(newValue.toString())

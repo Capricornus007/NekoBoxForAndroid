@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.bg.proto
 
+import android.os.SystemClock
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.bg.GuardedProcessPool
 import io.nekohasekai.sagernet.database.ProxyEntity

@@ -109,7 +109,6 @@
     <string name="port_local_dns">Lokaler DNS-Port</string>
     <string name="require_transproxy">Transproxy eingehend aktivieren</string>
     <string name="transproxy_mode">Transproxy-Modus</string>
-    <string name="connection_test_url">Verbindungstest-URL</string>
     <string name="profile_name">Profilname</string>
     <string name="server_address">Server</string>
     <string name="server_port">Remote-Port</string>
@@ -332,7 +331,6 @@
     <string name="disable">Deaktivieren</string>
     <string name="auto">Automatisch</string>
     <string name="enable_log">Protokoll aktivieren</string>
-    <string name="enable_log_sum">Zu Debugging-Zwecken</string>
     <string name="list">Liste</string>
     <string name="random">Zufällig</string>
     <string name="enable_log_sum">Für Debugging-Zwecken</string>

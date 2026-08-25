@@ -6,15 +6,10 @@
     <string name="telegram">Telegram 更新频道</string>
     <string name="oss_licenses">开源许可证</string>
     <string name="app_version">版本</string>
-    <string name="version_x">版本 (%s)</string>
     <string name="logcat">导出调试信息</string>
     <string name="menu_configuration">配置</string>
     <string name="menu_group">分组</string>
     <string name="menu_about">关于</string>
-    <string name="theme">主题</string>
-    <string name="use_system_theme">使用系统主题</string>
-    <string name="use_system_theme_summary">使用系统 Monet 颜色（Android 12+）</string>
-    <string name="document">文档</string>
     <string name="group_default">未分组</string>
     <string name="quick_toggle">切换</string>
     <string name="quick_enable">启用</string>
@@ -44,12 +39,10 @@
     <string name="group_no_difference">%s: 无差异</string>
     <string name="group_updated" formatted="false">%s：已更新 %d 个代理</string>
     <string name="group_show_diff">差异</string>
-    <string name="group_diff">差异 (%s)</string>
     <string name="group_delete_confirm_prompt">确定要删除此分组吗？</string>
     <string name="group_added">已添加: \n%s</string>
     <string name="group_changed">已更新: \n%s</string>
     <string name="group_deleted">已删除: \n%s</string>
-    <string name="group_duplicate">重复: \n%s</string>
     <string name="service_mode">服务模式</string>
     <string name="service_mode_proxy">仅代理</string>
     <string name="port_proxy">代理端口</string>
@@ -58,7 +51,6 @@
     <string name="disable_mixed_inbound_sum">纯TUN入站；不监听本地代理端口</string>
     <string name="mixed_inbound_disabled">已禁用</string>
     <string name="disable_mixed_inbound_proxy_toast">禁用仅在TUN模式下生效；当前监听端口：%1$d</string>
-    <string name="port_transproxy">透明代理端口</string>
     <string name="cag_route">路由设置</string>
     <string name="allow_access">允许来自局域网的连接</string>
     <string name="allow_access_sum">将入站服务器绑定到 0.0.0.0</string>
@@ -69,11 +61,6 @@
     <string name="ws_browser_forwarding">浏览器转发</string>
     <string name="ws_browser_forwarding_sum">通过浏览器转发相应的 WebSocket。</string>
     <string name="speed_interval">速度通知更新间隔</string>
-    <string name="cag_misc">杂项设置</string>
-    <string name="show_stop">显示停止按钮</string>
-    <string name="show_stop_sum">如果你不想使用快捷面板作为开关</string>
-    <string name="show_direct_speed">显示直连速度</string>
-    <string name="show_direct_speed_sum">同时在通知中显示未经过代理的流量速度</string>
     <string name="security_settings">TLS 安全设置</string>
     <string name="allow_insecure">允许不安全连接</string>
     <string name="allow_insecure_sum">禁用证书检查。启用后，此配置与明文一样安全。</string>
@@ -81,7 +68,6 @@
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">测试中…</string>
     <string name="connection_test_available">成功：耗时 %d 毫秒</string>
-    <string name="connection_test_available_http">成功：耗时 %d 毫秒</string>
     <string name="connection_test_error">失败：%s</string>
     <string name="connection_test_fail">网络不可用</string>
     <string name="connection_test_error_status_code">错误代码：#%d</string>
@@ -96,16 +82,11 @@
     <string name="dns_hosts">域名重写</string>
     <string name="dns_hosts_dialog_message">每行一个。以 # 开头的行是注释。示例：\nexample.com 1.1.1.1\nwww.example.com 1.1.1.1 1.1.1.2</string>
     <string name="port_local_dns">本地DNS端口</string>
-    <string name="require_transproxy">启用透明代理入站</string>
-    <string name="transproxy_mode">透明代理模式</string>
-    <string name="connection_test_url">连接测试URL</string>
     <string name="profile_name">配置文件名称</string>
     <string name="server_address">服务器</string>
     <string name="server_port">远程端口</string>
-    <string name="username">用户名</string>
     <string name="username_opt">用户名（可选）</string>
     <string name="password_opt">密码（可选）</string>
-    <string name="key_opt">密钥（可选）</string>
     <string name="password">密码</string>
     <string name="enc_method">加密方式</string>
     <string name="protocol">协议</string>
@@ -117,23 +98,10 @@
     <string name="security">传输层加密</string>
     <string name="network">网络</string>
     <string name="header_type">头部类型</string>
-    <string name="ws_host">WebSocket主机</string>
-    <string name="ws_path">WebSocket路径</string>
-    <string name="http_host">HTTP主机</string>
-    <string name="http_path">HTTP 路径</string>
     <string name="kcp_seed">KCP 种子</string>
-    <string name="kcp_header_type">头部类型</string>
-    <string name="kcp_mtu">KCP MTU</string>
-    <string name="kcp_tti">KCP TTI</string>
-    <string name="kcp_cwnd_multiplier">CWND 乘数</string>
-    <string name="grpc_service_name">gRPC 服务名称</string>
     <string name="tls">使用 TLS</string>
     <string name="sni">服务器名称指示</string>
-    <string name="alpn">应用层协议协商</string>
-    <string name="certificates">证书</string>
-    <string name="early_data_header_name">早期数据头部名称</string>
     <string name="encryption">加密</string>
-    <string name="extra_headers">额外头部</string>
     <string name="config_type">配置类型</string>
     <string name="edit_config">编辑配置</string>
     <string name="ipv6">IPv6 路由</string>
@@ -142,19 +110,7 @@
     <string name="metered">计费提示</string>
     <string name="metered_summary">提示系统将 VPN 视为按量计费</string>
     <string name="menu_route">路由</string>
-    <string name="route_add">创建路由</string>
-    <string name="delete_route_prompt">你确定要移除此路由吗？</string>
-    <string name="route_name">路由名称</string>
-    <string name="route_proxy">代理</string>
-    <string name="route_bypass">绕过</string>
-    <string name="route_block">阻断</string>
-    <string name="route_profile">选择配置文件…</string>
-    <string name="empty_route">空路由</string>
-    <string name="empty_route_notice">保存前请先设置一些规则</string>
-    <string name="route_bypass_domain">%s的域名规则</string>
     <string name="route_play_store">%s的 Play 商店规则</string>
-    <string name="route_bypass_ip">%s的 IP 规则</string>
-    <string name="route_reset">重置</string>
     <string name="route_manage_assets">管理路由资源</string>
     <string name="route_assets">资源</string>
     <string name="route_rules_provider">规则资源提供者</string>
@@ -163,26 +119,7 @@
     <string name="route_asset_no_update">无更新</string>
     <string name="route_asset_updated">已更新</string>
     <string name="route_not_asset">不是资产文件：期望 .db，但为 %s</string>
-    <string name="route_opt_bypass_lan">绕过局域网</string>
-    <string name="route_opt_block_ads">拦截广告</string>
     <string name="route_opt_block_analysis">拦截分析</string>
-    <string name="route_opt_block_quic">拦截 QUIC</string>
-    <string name="domain_strategy">域名解析策略</string>
-    <string name="traffic_sniffing">启用流量嗅探</string>
-    <string name="enable_mux">启用多路复用</string>
-    <string name="mux_sum">多路复用旨在减少 TCP 握手延迟，而非提高连接吞吐量。
-        使用多路复用来观看视频、下载或测速通常适得其反。
-        如果服务器不支持，您将无法访问互联网。</string>
-    <string name="mux_concurrency">最大流数</string>
-    <string name="mux_mode">模式</string>
-    <string name="mux_mode_max_streams">最大流数</string>
-    <string name="mux_mode_connections">连接</string>
-    <string name="mux_max_connections">最大连接数</string>
-    <string name="mux_min_streams">最小流数</string>
-    <string name="mux_brutal">TCP Brutal 拥塞控制算法</string>
-    <string name="mux_brutal_up_mbps">上传 (Mbps)</string>
-    <string name="mux_brutal_down_mbps">下载 (Mbps)</string>
-    <string name="tcp_keep_alive_interval">TCP 保活包发送间隔</string>
     <string name="proxied_apps">应用 VPN 模式</string>
     <string name="proxied_apps_summary">配置选定应用的 VPN 模式</string>
     <string name="on">开启</string>
@@ -216,18 +153,10 @@
     <string name="edit">编辑</string>
     <string name="share">分享</string>
     <string name="add_profile">添加配置</string>
-    <string name="select_profile">选择配置</string>
-    <string name="proxy_chain">代理链</string>
-    <string name="custom_config">自定义配置</string>
     <string name="balancer">均衡器</string>
     <string name="balancer_settings">均衡器设置</string>
     <string name="balancer_type">类型</string>
     <string name="balancer_strategy">策略</string>
-    <string name="chain_settings">链设置</string>
-    <string name="config_settings">配置设置</string>
-    <string name="circular_reference">循环引用</string>
-    <string name="circular_reference_sum">路由不能包含自身。</string>
-    <string name="clear_profiles">清除</string>
     <string name="action_create_group">空组</string>
     <string name="action_from_link">从订阅</string>
     <string name="action_scan_china_apps">扫描中国应用</string>
@@ -240,8 +169,6 @@
     <string name="action_export_err">导出失败。</string>
     <string name="action_import_msg">导入成功！</string>
     <string name="action_import_err">导入失败。</string>
-    <string name="file_manager_missing">您的设备缺少Android标准文件选择器，请
-        安装一个，例如Material Files。</string>
     <string name="profile_config">配置文件</string>
     <string name="delete">删除</string>
     <string name="delete_confirm_prompt">确定要删除此配置文件吗？</string>
@@ -254,8 +181,6 @@
     <plurals name="added">
         <item quantity="other">%d个代理已添加</item></plurals>
     <string name="undo">撤销</string>
-    <string name="insecure">不安全</string>
-    <string name="deprecated">已弃用</string>
     <string name="connecting">连接中…</string>
     <string name="vpn_connected">已连接，点击检查连接</string>
     <string name="not_connected">未连接</string>
@@ -264,11 +189,6 @@
     <string name="error_title">错误</string>
     <string name="no_proxies_found">链接中未找到代理</string>
     <string name="no_proxies_found_in_subscription">订阅中未找到代理</string>
-    <string name="no_proxies_found_in_file">文件中未找到代理</string>
-    <string name="no_proxies_found_in_clipboard">剪贴板中未找到代理</string>
-    <string name="deduplication">去重</string>
-    <string name="ignore_battery_optimizations">忽略电池优化</string>
-    <string name="ignore_battery_optimizations_sum">移除一些限制</string>
     <string name="plugin">插件</string>
     <string name="plugin_configure">配置…</string>
     <string name="plugin_disabled">已禁用</string>
@@ -277,7 +197,6 @@
         来源。</string>
     <string name="plugin_auto_connect_unlock_only">此插件可能无法与自动连接一起使用</string>
     <string name="proxy_cat">服务器设置</string>
-    <string name="ss_cat">Shadowsocks 设置</string>
     <string name="unsaved_changes_prompt">更改未保存，是否保存？</string>
     <string name="yes">是</string>
     <string name="no">否</string>
@@ -291,7 +210,6 @@
     <string name="route_opt_block_quic">屏蔽 QUIC</string>
     <string name="domain_strategy">域名解析策略</string>
     <string name="traffic_sniffing">启用流量探测</string>
-    <string name="disable">禁用</string>
     <string name="cag_misc">杂项</string>
     <string name="enable_mux">启用多路复用</string>
     <string name="mux_concurrency">最大流数</string>
@@ -311,8 +229,6 @@
     <string name="kcp_mtu">mKCP MTU</string>
     <string name="kcp_tti">mKCP TTI</string>
     <string name="kcp_cwnd_multiplier">拥塞窗口倍数</string>
-    <string name="show_bottom_bar">像 SagerNet 一样显示底栏</string>
-    <string name="utls_fingerprint">uTLS 指纹</string>
     <string name="grpc_service_name">gRPC 服务名称</string>
     <string name="alpn">应用层协议协商</string>
     <string name="group_duplicate">重复:
@@ -361,7 +277,6 @@
     <string name="connection_test_url">延迟测试 URL</string>
     <string name="connection_test_available_http">连接成功: HTTP 握手耗时 %dms</string>
     <string name="certificates">证书 (链)</string>
-    <string name="bypass_lan_in_core">在核心中绕过 LAN</string>
     <string name="ignore_battery_optimizations">忽略电池优化</string>
     <string name="ignore_battery_optimizations_sum">移除一些限制</string>
     <string name="document">文档</string>
@@ -389,7 +304,6 @@
     <string name="connection_test_clear_results">清理测试结果</string>
     <string name="connection_test_domain_not_found">域名不存在</string>
     <string name="connection_test_refused">连接重置</string>
-    <string name="connection_test_timeout_error">超时</string>
     <string name="connection_test_unreachable">不可达</string>
     <string name="connection_test_timeout_error">超时</string>
     <string name="append_http_proxy">附加HTTP代理到VPN</string>
@@ -503,8 +417,6 @@
     <string name="wireguard_local_address">本地地址</string>
     <string name="wireguard_public_key">对端公钥</string>
     <string name="wireguard_psk">对端预共享密钥</string>
-    <string name="wireguard_listen_port">监听端口</string>
-    <string name="wireguard_persistent_keepalive">持久保活间隔（秒）</string>
     <string name="warp_license">CloudFlare Warp 是一个免费的 WireGuard VPN 提供商。使用即表示同意其服务条款。</string>
     <string name="warp_generate">生成配置</string>
     <string name="generating">正在生成…</string>

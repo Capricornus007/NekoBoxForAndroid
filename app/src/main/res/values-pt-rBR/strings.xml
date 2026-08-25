@@ -99,7 +99,6 @@
     <string name="port_local_dns">Porta DNS Local</string>
     <string name="require_transproxy">Ativar Entrada Transproxy</string>
     <string name="transproxy_mode">Modo Transproxy</string>
-    <string name="connection_test_url">URL de Teste de Conexão</string>
     <string name="profile_name">Nome do Perfil</string>
     <string name="server_address">Servidor</string>
     <string name="server_port">Porta Remota</string>
