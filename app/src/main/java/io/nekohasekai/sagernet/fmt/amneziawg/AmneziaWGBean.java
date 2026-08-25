@@ -145,11 +145,6 @@ public class AmneziaWGBean extends AbstractBean {
         i5 = input.readString();
     }
 
-    @Override
-    public boolean canTCPing() {
-        return false;
-    }
-
     @NotNull
     @Override
     public AmneziaWGBean clone() {

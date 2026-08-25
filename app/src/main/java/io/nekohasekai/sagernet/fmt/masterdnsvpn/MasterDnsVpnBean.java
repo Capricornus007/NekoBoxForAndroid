@@ -154,11 +154,6 @@ public class MasterDnsVpnBean extends AbstractBean {
     }
 
     @Override
-    public boolean canTCPing() {
-        return false;
-    }
-
-    @Override
     public boolean canMapping() {
         // The sidecar connects directly to the configured DNS resolvers with sockets
         // protected via FD_CONTROL_UNIX_SOCKET, so no dokodemo-door mapping is needed.

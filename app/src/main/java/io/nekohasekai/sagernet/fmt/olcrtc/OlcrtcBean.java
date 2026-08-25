@@ -100,11 +100,6 @@ public class OlcrtcBean extends AbstractBean {
     }
 
     @Override
-    public boolean canTCPing() {
-        return false;
-    }
-
-    @Override
     public boolean canMapping() {
         // The library connects directly to the carrier with sockets protected via the
         // Protector fd-hook, so no dokodemo-door mapping is needed.

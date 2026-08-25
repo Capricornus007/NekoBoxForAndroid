@@ -62,11 +62,6 @@ public class TrustTunnelBean extends AbstractBean {
         allowInsecure = input.readBoolean();
     }
 
-    @Override
-    public boolean canTCPing() {
-        return false;
-    }
-
     @NotNull
     @Override
     public TrustTunnelBean clone() {

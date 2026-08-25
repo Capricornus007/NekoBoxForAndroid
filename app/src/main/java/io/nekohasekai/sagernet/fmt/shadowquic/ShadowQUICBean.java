@@ -65,11 +65,6 @@ public class ShadowQUICBean extends AbstractBean {
         sunnyQUIC = input.readBoolean();
     }
 
-    @Override
-    public boolean canTCPing() {
-        return false;
-    }
-
     @NotNull
     @Override
     public ShadowQUICBean clone() {
