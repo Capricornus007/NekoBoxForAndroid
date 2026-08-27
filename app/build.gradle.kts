@@ -47,6 +47,9 @@ android {
     // 末尾の lint ブロック：プロパティ名を修正
     lint {
         abortOnError = true
+        // GradleDependency 检查会提示依赖有更新版本，但 navigation 2.10.0 要求 minSdk 24
+        // （本项目 minSdk 23），无法升级。禁用该检查避免 CI 误报。
+        disable += "GradleDependency"
     }
 }
 
@@ -70,8 +73,8 @@ dependencies {
     implementation("androidx.browser:browser:1.10.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.2")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.10.0")
-    implementation("androidx.navigation:navigation-ui-ktx:2.10.0")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.8")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.8")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.appcompat:appcompat:1.8.0")
     implementation("androidx.work:work-runtime-ktx:2.11.2")
