@@ -2,6 +2,8 @@ code.pfad.fr/check v1.1.0 h1:GWvjdzhSEgHvEHe2uJujDcpmZoySKuHQNrZMfzfO0bE=
 code.pfad.fr/check v1.1.0/go.mod h1:NiUH13DtYsb7xp5wll0U4SXx7KhXQVCtRgdC96IPfoM=
 filippo.io/edwards25519 v1.2.0 h1:crnVqOiS4jqYleHd9vaKZ+HKtHfllngJIiOpNpoJsjo=
 filippo.io/edwards25519 v1.2.0/go.mod h1:xzAOLCNug/yB62zG1bQ8uziwrIqIuxhctzJT18Q77mc=
+github.com/Capricornus007/sing-snell v0.0.0-20260825050901-5b38d63aef7b h1:/sc/+mzqFCzaYz9T82CBb2bacC6SXVjDXohgIRYpO6s=
+github.com/Capricornus007/sing-snell v0.0.0-20260825050901-5b38d63aef7b/go.mod h1:PtKGT3plHywLBo6Y35ZGrlB7WjFcTf2F8ucPRToEZB8=
 github.com/Capricornus007/sing-tun v0.0.0-20260825051009-072adbecd842 h1:r17IzhTNJHlMbu5rCwvf7PY03SiyqmnxmL99uVv51xE=
 github.com/Capricornus007/sing-tun v0.0.0-20260825051009-072adbecd842/go.mod h1:OGwPrtb3NGZdabfLPoXo31rOR7GfZizeZWPqHpjDSSE=
 github.com/Capricornus007/sing-vmess v0.2.9-0.20260825051027-dc00ac91b8d1 h1:8RB6aKWqd3SsqnlRAqg1sUqlzRnqH+TUuCqKbIoRBqA=
@@ -220,8 +222,6 @@ github.com/pkg/sftp v1.13.10/go.mod h1:bJ1a7uDhrX/4OII+agvy28lzRvQrmIQuaHrcI1Hbe
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/quic-go/qpack v0.6.0 h1:g7W+BMYynC1LbYLSqRt8PBg5Tgwxn214ZZR34VIOjz8=
 github.com/quic-go/qpack v0.6.0/go.mod h1:lUpLKChi8njB4ty2bFLX2x4gzDqXwUpaO1DP9qMDZII=
-github.com/reF1nd/sing-snell v0.0.0-20260713132549-9711346e2b35 h1:KxGLtbRXuJi03bYfa48DsLAXeZ4Bc7Q1a4f669xPAp8=
-github.com/reF1nd/sing-snell v0.0.0-20260713132549-9711346e2b35/go.mod h1:KVhUab4T1LXivZtOPzhqEJo29araU9mp9YtMeiGPY8k=
 github.com/safchain/ethtool v0.3.0 h1:gimQJpsI6sc1yIqP/y8GYgiXn/NjgvpM0RNoWLVVmP0=
 github.com/safchain/ethtool v0.3.0/go.mod h1:SA9BwrgyAqNo7M+uaL6IYbxpm5wk3L7Mm6ocLW+CJUs=
 github.com/sagernet/bbolt v0.0.0-20260823094646-e24805439c9c h1:JdEDkgiwsDxiZb4+dQYgVOU/lND+jZxFmN5y/q49EXk=
