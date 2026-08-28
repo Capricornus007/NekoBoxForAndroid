@@ -25,6 +25,11 @@
 -dontobfuscate
 -keepattributes SourceFile
 
+# Gson TypeToken 依赖运行时的泛型签名信息，R8 默认会剥掉 Signature
+# attribute，导致 TypeToken<List<T>> 之类解析失败直接崩溃（boristul 分支
+# 踩过：备份还原时 TypeToken getGenericSuperclass 返回 null）。
+-keepattributes Signature
+
 -dontwarn java.beans.BeanInfo
 -dontwarn java.beans.FeatureDescriptor
 -dontwarn java.beans.IntrospectionException
