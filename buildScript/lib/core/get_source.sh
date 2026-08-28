@@ -81,4 +81,32 @@ git checkout -f "$COMMIT_SING_QUIC"
 echo ">> sing-quic at $(git rev-parse --short HEAD)"
 popd >/dev/null
 
+#### sing-juicity ####
+SING_JUICITY_REPO="https://github.com/Capricornus007/sing-juicity.git"
+if [ ! -d "sing-juicity" ]; then
+  git clone --no-checkout "$SING_JUICITY_REPO" sing-juicity
+fi
+pushd sing-juicity >/dev/null
+if ! git remote get-url origin 2>/dev/null | grep -q "Capricornus007/sing-juicity"; then
+  git remote set-url origin "$SING_JUICITY_REPO"
+fi
+git fetch origin
+git checkout -f "$COMMIT_SING_JUICITY"
+echo ">> sing-juicity at $(git rev-parse --short HEAD)"
+popd >/dev/null
+
+#### sing-trusttunnel ####
+SING_TRUSTTUNNEL_REPO="https://github.com/Capricornus007/sing-trusttunnel.git"
+if [ ! -d "sing-trusttunnel" ]; then
+  git clone --no-checkout "$SING_TRUSTTUNNEL_REPO" sing-trusttunnel
+fi
+pushd sing-trusttunnel >/dev/null
+if ! git remote get-url origin 2>/dev/null | grep -q "Capricornus007/sing-trusttunnel"; then
+  git remote set-url origin "$SING_TRUSTTUNNEL_REPO"
+fi
+git fetch origin
+git checkout -f "$COMMIT_SING_TRUSTTUNNEL"
+echo ">> sing-trusttunnel at $(git rev-parse --short HEAD)"
+popd >/dev/null
+
 popd >/dev/null

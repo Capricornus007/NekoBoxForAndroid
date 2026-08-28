@@ -15,3 +15,5 @@ export COMMIT_WIREGUARD_GO="a9ace872067dcf7aca7da798e334820655b8adc0"
 # sibling checkout at ../../sing-quic. Pin and fetch it explicitly so clean CI
 # runners do not accidentally depend on a developer machine's existing clone.
 export COMMIT_SING_QUIC="772d0bf130cd4140b580d146f8b42981b07aef32"
+export COMMIT_SING_JUICITY="9c78cf6bb8bb74a12b3bd8ba0f50f7167f2e3a9c"
+export COMMIT_SING_TRUSTTUNNEL="fbe0359574151a10b82cfbb80ee13fc6b01f46df"
