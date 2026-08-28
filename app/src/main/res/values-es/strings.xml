@@ -498,4 +498,10 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
     <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
+    <string name="enable_hev_tun">Activar Hev TUN</string>
+    <string name="enable_hev_tun_summary">Crear el dispositivo TUN con hev-socks5-tunnel</string>
+    <string name="tun_implementation_hev_override">Lo gestiona Hev TUN: desactívalo para elegir</string>
+    <string name="lan_sharing">Compartir en LAN</string>
+    <string name="lan_sharing_summary">Permitir que los dispositivos de la red local se conecten</string>
+    <string name="lan_sharing_requires_root">Compartir en LAN requiere root</string>
 </resources>

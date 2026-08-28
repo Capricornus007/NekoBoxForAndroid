@@ -706,4 +706,8 @@
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
         <string name="enable_hev_tun">Включить Hev TUN</string>
         <string name="enable_hev_tun_summary">Создавать TUN-устройство с помощью hev-socks5-tunnel</string>
+    <string name="tun_implementation_hev_override">Управляется Hev TUN — выключите, чтобы выбрать</string>
+    <string name="lan_sharing">Общий доступ по LAN</string>
+    <string name="lan_sharing_summary">Разрешить подключение устройств из локальной сети</string>
+    <string name="lan_sharing_requires_root">Общий доступ по LAN требует root</string>
 </resources>

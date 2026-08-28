@@ -624,4 +624,10 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
+    <string name="enable_hev_tun">Ativar Hev TUN</string>
+    <string name="enable_hev_tun_summary">Criar o dispositivo TUN com hev-socks5-tunnel</string>
+    <string name="tun_implementation_hev_override">Gerenciado pelo Hev TUN — desative para escolher</string>
+    <string name="lan_sharing">Compartilhar pela LAN</string>
+    <string name="lan_sharing_summary">Permitir que dispositivos da LAN se conectem</string>
+    <string name="lan_sharing_requires_root">Compartilhar pela LAN requer root</string>
 </resources>

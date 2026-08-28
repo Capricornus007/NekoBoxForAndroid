@@ -905,4 +905,7 @@ Fortsette?</string>
     <string name="speed_test_stage_complete">Complete</string>
     <string name="speed_test_stage_cancelled">Cancelled</string>
     <string name="speed_test_stage_error">Failed</string>
+    <string name="enable_hev_tun">Aktiver Hev TUN</string>
+    <string name="enable_hev_tun_summary">Opprett TUN-enheten med hev-socks5-tunnel</string>
+    <string name="tun_implementation_hev_override">Styres av Hev TUN – slå den av for å velge</string>
 </resources>

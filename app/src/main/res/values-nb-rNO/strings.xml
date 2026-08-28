@@ -668,4 +668,10 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
+    <string name="enable_hev_tun">Aktiver Hev TUN</string>
+    <string name="enable_hev_tun_summary">Opprett TUN-enheten med hev-socks5-tunnel</string>
+    <string name="tun_implementation_hev_override">Styres av Hev TUN – slå den av for å velge</string>
+    <string name="lan_sharing">LAN-deling</string>
+    <string name="lan_sharing_summary">Tillat LAN-enheter å koble til</string>
+    <string name="lan_sharing_requires_root">LAN-deling krever root</string>
 </resources>

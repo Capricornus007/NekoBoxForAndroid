@@ -905,4 +905,7 @@ Devam edilsin mi?</string>
     <string name="speed_test_timeout_ms">Speed test timeout (ms)</string>
     <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
     <string name="speed_test_url_invalid">Enter a valid HTTP or HTTPS URL</string>
+    <string name="enable_hev_tun">Hev TUN\'u etkinleştir</string>
+    <string name="enable_hev_tun_summary">TUN aygıtını hev-socks5-tunnel ile oluştur</string>
+    <string name="tun_implementation_hev_override">Hev TUN tarafından yönetiliyor — seçmek için kapatın</string>
 </resources>

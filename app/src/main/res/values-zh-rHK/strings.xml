@@ -292,4 +292,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="speed_test_upload_format">上載：%1$s（%2$s）</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="tun_implementation_hev_override">已由「啟用 Hev TUN」接管，關閉該開關即可選擇</string>
+    <string name="enable_hev_tun">啟用 Hev TUN</string>
+    <string name="enable_hev_tun_summary">使用 hev-socks5-tunnel 建立 TUN 裝置</string>
+    <string name="lan_sharing">LAN 分享</string>
+    <string name="lan_sharing_summary">允許區域網路裝置連入</string>
+    <string name="lan_sharing_requires_root">LAN 分享需要 Root 權限</string>
 </resources>

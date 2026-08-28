@@ -805,4 +805,10 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
+    <string name="enable_hev_tun">Hev TUN inschakelen</string>
+    <string name="enable_hev_tun_summary">Het TUN-apparaat aanmaken via hev-socks5-tunnel</string>
+    <string name="tun_implementation_hev_override">Wordt beheerd door Hev TUN – zet uit om te kiezen</string>
+    <string name="lan_sharing">LAN-delen</string>
+    <string name="lan_sharing_summary">LAN-apparaten toestaan om te verbinden</string>
+    <string name="lan_sharing_requires_root">LAN-delen vereist root</string>
 </resources>

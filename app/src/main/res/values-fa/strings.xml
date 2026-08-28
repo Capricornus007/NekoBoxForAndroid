@@ -659,4 +659,8 @@
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
         <string name="enable_hev_tun">فعال‌سازی Hev TUN</string>
         <string name="enable_hev_tun_summary">ایجاد دستگاه TUN با hev-socks5-tunnel</string>
+    <string name="tun_implementation_hev_override">مدیریت‌شده توسط Hev TUN — برای انتخاب خاموشش کنید</string>
+    <string name="lan_sharing">اشتراک LAN</string>
+    <string name="lan_sharing_summary">اجازه دادن به دستگاه‌های شبکه محلی برای اتصال</string>
+    <string name="lan_sharing_requires_root">اشتراک LAN به root نیاز دارد</string>
 </resources>

@@ -691,4 +691,10 @@
     <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
+    <string name="enable_hev_tun">Увімкнути Hev TUN</string>
+    <string name="enable_hev_tun_summary">Створювати TUN-пристрій через hev-socks5-tunnel</string>
+    <string name="tun_implementation_hev_override">Керується Hev TUN — вимкніть, щоб обрати</string>
+    <string name="lan_sharing">Спільний доступ через LAN</string>
+    <string name="lan_sharing_summary">Дозволити підключення пристроїв локальної мережі</string>
+    <string name="lan_sharing_requires_root">Спільний доступ через LAN потребує root</string>
 </resources>

@@ -630,4 +630,8 @@
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
         <string name="enable_hev_tun">Hev TUN を有効化</string>
         <string name="enable_hev_tun_summary">hev-socks5-tunnel で TUN デバイスを作成</string>
+    <string name="tun_implementation_hev_override">Hev TUN が管理しています。選択するには無効にしてください</string>
+    <string name="lan_sharing">LAN共有</string>
+    <string name="lan_sharing_summary">LANデバイスの接続を許可</string>
+    <string name="lan_sharing_requires_root">LAN共有にはrootが必要</string>
 </resources>
