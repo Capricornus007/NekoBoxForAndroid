@@ -215,6 +215,13 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
 
         val tunImplementation = findPreference<SimpleMenuPreference>(Key.TUN_IMPLEMENTATION)!!
+        val enableHevTun = findPreference<SwitchPreferenceCompat>(Key.ENABLE_HEV_TUN)!!
+        tunImplementation.isEnabled = !DataStore.enableHevTun
+        enableHevTun.setOnPreferenceChangeListener { _, newValue ->
+            tunImplementation.isEnabled = !(newValue as Boolean)
+            needReload()
+            true
+        }
         val resolveDestination = findPreference<SwitchPreferenceCompat>(Key.RESOLVE_DESTINATION)!!
         val acquireWakeLock = findPreference<SwitchPreferenceCompat>(Key.ACQUIRE_WAKE_LOCK)!!
         val hideFromRecentApps = findPreference<SwitchPreferenceCompat>(Key.HIDE_FROM_RECENT_APPS)!!

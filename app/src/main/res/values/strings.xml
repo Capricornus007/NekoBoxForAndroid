@@ -964,4 +964,6 @@ Continue?</string>
     <string name="dialog_watchdog_start">Start</string>
     <string name="snackbar_watchdog_test_started">Test started. Restarting within ≤30 s…</string>
     <string name="dialog_log_buffer_size">Log buffer size (KB)</string>
+        <string name="enable_hev_tun">Enable Hev TUN</string>
+        <string name="enable_hev_tun_summary">Use hev-socks5-tunnel to create the TUN device</string>
 </resources>

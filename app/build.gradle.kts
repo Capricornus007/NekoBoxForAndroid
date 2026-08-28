@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+import java.io.File
+
 plugins {
     id("com.android.application")
     // kotlin-android is no longer applied: AGP 9.0+ provides built-in Kotlin support
@@ -131,4 +133,34 @@ dependencies {
     androidTestImplementation("androidx.room:room-testing:2.8.4")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+}
+
+// hev-socks5-tunnel 原生库：缺 .so 时用 NDK 编译（产物不进 git）。
+// JNI 侧通过 RegisterNatives 绑定到 moe.matsuri.nb4a.hevtun.HevTunNative，
+// 包名/类名由 compile-hevtun.sh 的 -DPKGNAME/-DCLSNAME 决定，两边必须同步。
+// 注意：Gradle 9 移除了任务作用域的 Project.exec，这里用 ProcessBuilder；
+// configuration cache 禁止 doLast 捕获脚本对象，所有路径在配置期固化为字符串。
+val buildHevTun = tasks.register("buildHevTun") {
+    val hevAbis = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+    val scriptPath = rootProject.file("buildScript/compile-hevtun.sh").absolutePath
+    val appDirPath = projectDir.absolutePath
+    val soPaths = hevAbis.map { "$appDirPath/src/main/jniLibs/$it/libhev-socks5-tunnel.so" }
+    inputs.file(scriptPath)
+    outputs.files(soPaths)
+    doLast {
+        val missing = soPaths.any { !File(it).exists() }
+        if (missing || System.getenv("FORCE_HEV") == "1") {
+            val proc = ProcessBuilder("bash", scriptPath)
+                .inheritIO()
+                .start()
+            val code = proc.waitFor()
+            if (code != 0) {
+                throw GradleException("compile-hevtun.sh failed with exit code $code")
+            }
+        }
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn(buildHevTun)
 }

@@ -422,6 +422,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     val nonCustomFinalHosts = hashSetOf<String>()
     val groupCache = HashMap<Long, ProxyGroup?>()
     val isVPN = DataStore.serviceMode == Key.MODE_VPN
+    // hev 模式下没有 tun inbound，设备流量从 loopback 的 mixed 入站进来，
+    // 路由/DNS 规则里的入站匹配要跟着改，否则规则挂在根本不存在的入站上。
+    val deviceInboundTag = if (isVPN && DataStore.enableHevTun) TAG_MIXED else "tun-in"
     val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST
     val remoteDns = DataStore.remoteDns.split("\n")
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
@@ -498,7 +501,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         inbounds = mutableListOf()
 
         if (!forTest) {
-            if (isVPN) {
+            if (isVPN && !DataStore.enableHevTun) {
                 inbounds.add(
                     Inbound_TunOptions().apply {
                         type = "tun"
@@ -1041,7 +1044,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
             route.rules.add(
                 Rule_DefaultOptions().apply {
-                    inbound = listOf("tun-in")
+                    inbound = listOf(deviceInboundTag)
                     outbound = mainProxyTag
                 },
             )
@@ -1172,7 +1175,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                             if (useFakeDns) {
                                 userDNSRuleList += makeDnsRuleObj().apply {
                                     server = "dns-fake"
-                                    inbound = listOf("tun-in")
+                                    inbound = listOf(deviceInboundTag)
                                     query_type = listOf("A", "AAAA")
                                 }
                             } else {
@@ -1373,7 +1376,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 )
                 dns.rules.add(
                     DNSRule_DefaultOptions().apply {
-                        inbound = listOf("tun-in")
+                        inbound = listOf(deviceInboundTag)
                         server = "dns-fake"
                         disable_cache = true
                         query_type = listOf("A", "AAAA")

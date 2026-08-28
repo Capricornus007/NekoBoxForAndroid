@@ -80,3 +80,6 @@ device-backups/
 
 # Local pre-build backups of the gomobile libcore.aar (build artifact, ~19MB — never commit)
 .aar-backups/
+
+# hev-socks5-tunnel 增量构建目录
+.hev-build/

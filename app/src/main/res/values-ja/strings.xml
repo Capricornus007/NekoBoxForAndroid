@@ -628,4 +628,6 @@
     <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
+        <string name="enable_hev_tun">Hev TUN を有効化</string>
+        <string name="enable_hev_tun_summary">hev-socks5-tunnel で TUN デバイスを作成</string>
 </resources>

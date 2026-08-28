@@ -17,6 +17,7 @@ import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.ui.VpnRequestActivity
 import io.nekohasekai.sagernet.utils.Subnet
+import moe.matsuri.nb4a.hevtun.HevTunRuntime
 import kotlinx.coroutines.GlobalScope
 import android.net.VpnService as BaseVpnService
 
@@ -31,6 +32,7 @@ class VpnService :
         const val PRIVATE_VLAN4_CLIENT = "172.19.0.1"
         const val PRIVATE_VLAN4_ROUTER = "172.19.0.2"
         const val FAKEDNS_VLAN4_CLIENT = "198.18.0.0"
+        const val HEV_MAPDNS_VLAN4 = "100.64.0.0"
         const val PRIVATE_VLAN6_CLIENT = "fdfe:dcba:9876::1"
         const val PRIVATE_VLAN6_ROUTER = "fdfe:dcba:9876::2"
         private val ANDROID_DNS_PACKAGES = listOf(
@@ -56,6 +58,12 @@ class VpnService :
     override suspend fun startProcesses() {
         DataStore.vpnService = this
         super.startProcesses()
+        if (DataStore.enableHevTun) {
+            // hev 模式：由 app 自己建 TUN 并把 fd 交给原生 hev-socks5-tunnel，
+            // sing-box 不建 tun inbound，流量从 loopback 的 mixed 入站进来。
+            val tunFd = establishTun()
+            HevTunRuntime.start(this, tunFd)
+        }
         watchdog.start(GlobalScope)
     }
 
@@ -69,6 +77,7 @@ class VpnService :
 
     @Suppress("EXPERIMENTAL_API_USAGE")
     override suspend fun killProcesses() {
+        HevTunRuntime.stop()
         RootLanSharing.stopClientSharing(this)
         watchdog.stop()
         conn?.close()
@@ -113,7 +122,11 @@ class VpnService :
 //        Logs.d(tunPlatformOptionsJson)
 //        val tunOptions = JSONObject(tunOptionsJson)
 
-        // address & route & MTU ...... use NB4A GUI config
+        return establishTun()
+    }
+
+    // address & route & MTU ...... use NB4A GUI config
+    fun establishTun(): Int {
         val builder = Builder().setConfigureIntent(SagerNet.configureIntent(this))
             .setSession(getString(R.string.app_name))
             .setMtu(DataStore.mtu)
@@ -134,6 +147,11 @@ class VpnService :
             }
             builder.addRoute(PRIVATE_VLAN4_ROUTER, 32)
             builder.addRoute(FAKEDNS_VLAN4_CLIENT, 15)
+            if (DataStore.enableHevTun && DataStore.enableFakeDns) {
+                // hev 的 mapdns 监听 100.64.0.0/10 段的 DNS 查询；bypass 模式下
+                // 没有默认路由，必须显式把这个段送进 TUN。
+                builder.addRoute(HEV_MAPDNS_VLAN4, 10)
+            }
             // https://issuetracker.google.com/issues/149636790
             if (ipv6Mode != IPv6Mode.DISABLE) {
                 builder.addRoute("2000::", 3)
