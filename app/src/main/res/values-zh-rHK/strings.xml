@@ -291,4 +291,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="speed_test_download_format">下載：%1$s（%2$s）</string>
     <string name="speed_test_upload_format">上載：%1$s（%2$s）</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
+    <string name="tun_implementation_hev_override">已由「啟用 Hev TUN」接管，關閉該開關即可選擇</string>
 </resources>

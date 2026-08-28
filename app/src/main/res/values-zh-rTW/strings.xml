@@ -20,7 +20,7 @@
     <string name="menu_traffic">流量</string>
     <string name="menu_dashboard">sing-box 儀表板</string>
     <string name="action_copy">複製</string>
-    <string name="action_open">开启</string>
+    <string name="action_open">開啟</string>
     <string name="group_name">分組名稱</string>
     <string name="group_update">更新</string>
     <string name="group_subscription_link">訂閱連結</string>
@@ -115,7 +115,7 @@
     <string name="enable_dns_routing">啟用 DNS 路由</string>
     <string name="direct_dns">直連 DNS</string>
     <string name="remote_dns">遠端 DNS</string>
-    <string name="connection_test_available_http">成功：HTTP 握手花費 %d 毫秒</string>
+    <string name="connection_test_available_http">成功：耗時 %d 毫秒</string>
     <string name="allow_insecure_sum">停用憑證檢查。當啟用時，此設定檔將和純文字同等安全</string>
     <string name="allow_insecure">允許不安全的連線</string>
     <string name="security_settings">安全設定</string>
@@ -158,7 +158,7 @@
     <string name="route_rules_provider">規則資源提供者</string>
     <string name="route_rules_official">官方</string>
     <string name="route_asset_status">本地版本：%s</string>
-    <string name="route_asset_no_update">无更新</string>
+    <string name="route_asset_no_update">無更新</string>
     <string name="route_asset_updated">已更新</string>
     <string name="route_not_asset">不是資產文檔：應爲 .db，但實際爲 %s</string>
     <string name="route_opt_bypass_lan">繞過局域網</string>
@@ -168,10 +168,10 @@
     <string name="domain_strategy">域名解析策略</string>
     <string name="traffic_sniffing">啓用流量嗅探</string>
     <string name="enable_mux">啓用多路復用</string>
-    <string name="mux_sum">Mux 爲减少 TCP 握手延遲而設計，而非增加連結吞吐量。使用 Mux 觀看視頻、下載或測速通常適得其反。若伺服器不支援，您将無法訪問網際網路。</string>
-    <string name="mux_concurrency">最大流数</string>
+    <string name="mux_sum">Mux 是為了降低 TCP 握手延遲而設計的，而非提升連線吞吐量；用來看影片、下載或測速通常反而變慢。若伺服器不支援，將無法上網。</string>
+    <string name="mux_concurrency">最大流數</string>
     <string name="mux_mode">模式</string>
-    <string name="mux_mode_max_streams">最大串流数</string>
+    <string name="mux_mode_max_streams">最大串流數</string>
     <string name="mux_mode_connections">連線</string>
     <string name="mux_max_connections">最大連線</string>
     <string name="mux_min_streams">最小串流數</string>
@@ -642,4 +642,8 @@
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
         <string name="enable_hev_tun">啟用 Hev TUN</string>
         <string name="enable_hev_tun_summary">使用 hev-socks5-tunnel 建立 TUN 裝置</string>
+    <string name="lan_sharing">LAN 分享</string>
+    <string name="lan_sharing_summary">允許區域網路裝置連入</string>
+    <string name="lan_sharing_requires_root">LAN 分享需要 Root 權限</string>
+    <string name="tun_implementation_hev_override">已由「啟用 Hev TUN」接管，關閉該開關即可選擇</string>
 </resources>

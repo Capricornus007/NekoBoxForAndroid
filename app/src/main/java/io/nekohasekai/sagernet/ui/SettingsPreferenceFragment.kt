@@ -216,9 +216,16 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         val tunImplementation = findPreference<SimpleMenuPreference>(Key.TUN_IMPLEMENTATION)!!
         val enableHevTun = findPreference<SwitchPreferenceCompat>(Key.ENABLE_HEV_TUN)!!
-        tunImplementation.isEnabled = !DataStore.enableHevTun
+        fun applyHevTunOverride(hevOn: Boolean) {
+            // isEnabled 只擋點擊，這個主題下看不太出來變灰；把摘要直接寫成
+            // 接管提示才夠醒目。清空 summary 可還原 SimpleSummaryProvider。
+            tunImplementation.isEnabled = !hevOn
+            tunImplementation.summary =
+                if (hevOn) getString(R.string.tun_implementation_hev_override) else null
+        }
+        applyHevTunOverride(DataStore.enableHevTun)
         enableHevTun.setOnPreferenceChangeListener { _, newValue ->
-            tunImplementation.isEnabled = !(newValue as Boolean)
+            applyHevTunOverride(newValue as Boolean)
             needReload()
             true
         }
