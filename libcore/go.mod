@@ -11,7 +11,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.5.1
 	github.com/miekg/dns v1.1.72
 	github.com/oschwald/maxminddb-golang v1.13.1
-	github.com/sagernet/quic-go v0.61.0-sing-box-mod.5
+	github.com/sagernet/quic-go v0.61.0-sing-box-mod.6
 	github.com/sagernet/sing v0.9.0-beta.4
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-tun v0.8.12-0.20260810140529-d67734281390
@@ -177,3 +177,7 @@ replace github.com/sagernet/sing-quic => ../../sing-quic
 replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.0.0-20260825051009-072adbecd842
 
 replace github.com/metacubex/utls => github.com/Capricornus007/utls v0.0.0-20260827224231-78b6cc0a0cd3
+
+replace github.com/exclavenetwork/sing-juicity => ../../sing-juicity
+
+replace github.com/xchacha20-poly1305/sing-trusttunnel => ../../sing-trusttunnel

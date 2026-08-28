@@ -77,8 +77,6 @@ github.com/ebitengine/purego v0.10.0 h1:QIw4xfpWT6GWTzaW5XEKy3HXoqrJGx1ijYHzTF0/
 github.com/ebitengine/purego v0.10.0/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 github.com/enfein/mieru/v3 v3.36.0 h1:kTXfBSV6Dajk09yBYMeI1r4WAuAtMCKqZ42X5BrQZV8=
 github.com/enfein/mieru/v3 v3.36.0/go.mod h1:zJBUCsi5rxyvHM8fjFf+GLaEl4OEjjBXr1s5F6Qd3hM=
-github.com/exclavenetwork/sing-juicity v0.3.0-beta.1 h1:AxtQxij0lzp4pvR27hO21CFnCKzaL0upYYD4ZY1tAVI=
-github.com/exclavenetwork/sing-juicity v0.3.0-beta.1/go.mod h1:TJOvVyUtrcxm3ZrYsOKnVrp21mSXWRA8ncooBQPM/s8=
 github.com/exclavenetwork/sing-shadowquic v0.0.0-20260801175020-65c7acc31f93 h1:AX+VsiUxCs9HV5NfiFOSQySe/1dCXxnYBCYAMLdrFsg=
 github.com/exclavenetwork/sing-shadowquic v0.0.0-20260801175020-65c7acc31f93/go.mod h1:dnogioLE7ZFypHbYHMFo2NMvzUniEdhht0qKlN0IlIM=
 github.com/florianl/go-nfqueue/v2 v2.1.0 h1:Fywt30TY/evxyDySpXjxQ1jsRW7nQbLpOhELqpr4068=
@@ -197,8 +195,6 @@ github.com/metacubex/randv2 v0.2.1-0.20260726125100-81aa96a9b1a5 h1:DZld5uIHc1YJ
 github.com/metacubex/randv2 v0.2.1-0.20260726125100-81aa96a9b1a5/go.mod h1:kFi2SzrQ5WuneuoLLCMkABtiBu6VRrMrWFqSPyj2cxY=
 github.com/metacubex/sing v0.5.7 h1:8OC+fhKFSv/l9ehEhJRaZZAOuthfZo68SteBVLe8QqM=
 github.com/metacubex/sing v0.5.7/go.mod h1:ypf0mjwlZm0sKdQSY+yQvmsbWa0hNPtkeqyRMGgoN+w=
-github.com/metacubex/utls v1.8.7 h1:Cp+yWkNTFkSihETgGWq34hlVFds5HpYWVOR1xovUVTs=
-github.com/metacubex/utls v1.8.7/go.mod h1:kncGGVhFaoGn5M3pFe3SXhZCzsbCJayNOH4UEqTKTko=
 github.com/mholt/acmez/v3 v3.1.6 h1:eGVQNObP0pBN4sxqrXeg7MYqTOWyoiYpQqITVWlrevk=
 github.com/mholt/acmez/v3 v3.1.6/go.mod h1:5nTPosTGosLxF3+LU4ygbgMRFDhbAVpqMI4+a4aHLBY=
 github.com/miekg/dns v1.1.72 h1:vhmr+TF2A3tuoGNkLDFK9zi36F2LS+hKTRW0Uf8kbzI=
@@ -302,8 +298,8 @@ github.com/sagernet/netlink v0.0.0-20260814022025-64455d367bbf h1:b/3rm+KvxzuYRc
 github.com/sagernet/netlink v0.0.0-20260814022025-64455d367bbf/go.mod h1:xLnfdiJbSp8rNqYEdIW/6eDO4mVoogml14Bh2hSiFpM=
 github.com/sagernet/nftables v0.3.0-mod.4 h1:vnOtcDYeSXv2e5RoRuGH0lrpttQFJ8iC4ICS2nhlDSo=
 github.com/sagernet/nftables v0.3.0-mod.4/go.mod h1:8kslHG4VvYNihcco+i6uxIX7qbT8A56T0y5q7U44ZaQ=
-github.com/sagernet/quic-go v0.61.0-sing-box-mod.5 h1:D41e0fUHgdiYV2r4eGF3LgnBWNjYHm781dNW87IDzWc=
-github.com/sagernet/quic-go v0.61.0-sing-box-mod.5/go.mod h1:hmLC8GJPp+BrpBgrgJnacvI4fZGIhasuy1ROJJ8GR4E=
+github.com/sagernet/quic-go v0.61.0-sing-box-mod.6 h1:67bgUBU2QKK6jNz46GB5919wwRHcOHSafgmhD2gVf2Y=
+github.com/sagernet/quic-go v0.61.0-sing-box-mod.6/go.mod h1:hmLC8GJPp+BrpBgrgJnacvI4fZGIhasuy1ROJJ8GR4E=
 github.com/sagernet/sing v0.9.0-beta.4 h1:DYoEzb3FeCZ9bA66hJmL0NFDXckZpa4oYF/VpbFJEkE=
 github.com/sagernet/sing v0.9.0-beta.4/go.mod h1:K3Owt3xPhHugvlnlPPxZJ/exXdaJfEPOTNorGk4AXjo=
 github.com/sagernet/sing-cloudflared v0.1.3-0.20260706062323-d9787e794aa3 h1:3y6++yIa8XlDhxPkpR4p+7RUHVY2KTP9CPIGnWmOlO8=
@@ -374,8 +370,6 @@ github.com/wasilibs/wazero-helpers v0.0.0-20250123031827-cd30c44769bb h1:gQ+ZV4w
 github.com/wasilibs/wazero-helpers v0.0.0-20250123031827-cd30c44769bb/go.mod h1:jMeV4Vpbi8osrE/pKUxRZkVaA0EX7NZN0A9/oRzgpgY=
 github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
 github.com/x448/float16 v0.8.4/go.mod h1:14CWIYCyZA/cWjXOioeEpHeN/83MdbZDRQHoFcYsOfg=
-github.com/xchacha20-poly1305/sing-trusttunnel v0.3.0-beta.6 h1:EGivdgJ+rgTT/Qvv30VSiZYm6wsbshjQNLlRjeKO1Xk=
-github.com/xchacha20-poly1305/sing-trusttunnel v0.3.0-beta.6/go.mod h1:SoqpenmZmeeyQq1UQlrf9vHkUo4tEiSkw0C7Gi89RUw=
 github.com/xyproto/randomstring v1.0.5 h1:YtlWPoRdgMu3NZtP45drfy1GKoojuR7hmRcnhZqKjWU=
 github.com/xyproto/randomstring v1.0.5/go.mod h1:rgmS5DeNXLivK7YprL0pY+lTuhNQW3iGxZ18UQApw/E=
 github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 h1:ilQV1hzziu+LLM3zUTJ0trRztfwgjqKnBWNtSRkbmwM=
