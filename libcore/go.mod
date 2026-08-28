@@ -158,7 +158,7 @@ replace github.com/sagernet/sing-vmess => github.com/Capricornus007/sing-vmess v
 // in libcore stays dyhkwong. v0.1.4 targets quic-go v0.59 / sing v0.8 / sing-quic v0.6.1.
 replace github.com/dyhkwong/sing-juicity => github.com/exclavenetwork/sing-juicity v0.1.4
 
-replace github.com/sagernet/sing-snell => github.com/Capricornus007/sing-snell v0.0.0-20260825050901-5b38d63aef7b
+replace github.com/sagernet/sing-snell => github.com/Capricornus007/sing-snell v0.0.0-20260828060917-2b971cd668db
 
 replace github.com/sagernet/wireguard-go => ../../wireguard-go
 
