@@ -5,8 +5,8 @@ export COMMIT_SING_BOX="8274e925f390fb467b6eb17f39144b122a0e73fd"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.14.0-beta.17-mod.2"
-export COMMIT_LIBNEKO="705cff5b0a6c144e6b737872ba6f3259955eab64"
+export VERSION_SING_BOX="1.14.0-beta.17-mod.3"
+export COMMIT_LIBNEKO="ca7786f10ba67f7f0e679ec1de0809c5c5875537"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
 # count only successful sends.
