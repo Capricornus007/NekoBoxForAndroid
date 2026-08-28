@@ -352,8 +352,6 @@
     <string name="subscription_user_agent">وكيل المستخدم</string>
     <string name="confirm">تأكيد</string>
     <string name="missing_plugin">المكون الإضافي المفقود</string>
-    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
-        it was not found.</string>
     <string name="action_learn_more">معرفة المزيد</string>
     <string name="action_download">تحميل</string>
     <string name="install_from_play_store">التثبيت من متجر Play</string>
@@ -394,9 +392,6 @@
     <string name="group_order_origin">الأصل</string>
     <string name="group_order_by_name">حسب الاسم</string>
     <string name="group_order_by_delay">حسب التأخير</string>
-    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
-        proprietary equipment vendor (usually surveillance capital giants and malware maker)
-        tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (مكون Shadowsocks الإضافي لنظام Android)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (مكون Shadowsocks الإضافي لنظام Android)</string>
     <string name="tcp_connections">اتصالات TCP %d</string>
@@ -478,10 +473,6 @@
     <string name="tuic_disable_sni">تعطيل SNI</string>
     <string name="tuic_reduce_rtt">تمكين مصافحة QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">شهادة SHA256 المثبتة</string>
-    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
-        update!</string>
-    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
-        Please update!</string>
     <string name="connection_test_delete_unavailable">مسح غير المتاح</string>
     <string name="move">نقل</string>
     <string name="exe_prefer_provider">المزود المفضل للإضافة</string>
@@ -681,7 +672,6 @@
     <string name="dynamic_colors_classic">متاح مع الواجهة الجديدة</string>
     <string name="dynamic_colors_summary">استخدام لوحة ألوان Material You للنظام</string>
     <string name="dynamic_colors_unavailable">متاح على Android 12 والإصدارات الأحدث</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">إعدادات الأسرع</string>
     <string name="http_proxy_bypass_sum">المضيفات التي تتجاوز وكيل HTTP النظامي وتتصل مباشرة عند تفعيل \'إلحاق وكيل HTTP بـ VPN\'. نمط واحد في كل سطر، مثل 192.168.* أو 10.*. القيمة الافتراضية نطاقات خاصة ونطاقات الاسترجاع.</string>
     <string name="hysteria2_ech_config_hint">تكوين ECH</string>
@@ -735,7 +725,6 @@
     <string name="olcrtc_vp8_batch">حجم دفعة VP8</string>
     <string name="olcrtc_vp8_fps">VP8 FPS</string>
     <string name="plugin_approval_action">موافقة</string>
-    <string name="plugin_approval_conflict_message">More than one untrusted package provides this plugin: %1$s\n\nResolve the conflict before approving a package.</string>
     <string name="plugin_approval_conflict_title">تعارض حزمة الملحق</string>
     <string name="plugin_approval_failed">تعذّرت الموافقة على حزمة الملحق.</string>
     <string name="plugin_approval_message">الحزمة: %1$s\n\nبصمة(بصمات) شهادة SHA-256:\n%2$s\n\nيمكن تشغيل الكود التنفيذي للملحق من خلال واجهة التطبيق الخاصة بالمُلحقات. وافق فقط إذا كنت تثق بهذه الحزمة.</string>
@@ -783,12 +772,10 @@
     <string name="ui_style_expressive">جديد</string>
     <string name="waterfall_settings">إعدادات التسلسلي</string>
     <string name="webdav_insecure_url">عنوان خادم WebDAV غير آمن. استخدم عنوان https://؛ فاستخدام http:// العادي سينقل بيانات اعتمادك والنسخة الاحتياطية (التي تحتوي على جميع أسرار الملفات) بنص واضح.</string>
-    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
     <string name="app_name">NekoBox</string>
     <string name="app_name_long">NekoBox for Android</string>
     <string name="service_mode_vpn">VPN</string>
-    <string name="ws_max_early_data">Max early data</string>
     <string name="traffic">%1$s↑ %2$s↓</string>
     <string name="action_socks">SOCKS</string>
     <string name="action_http">HTTP</string>
@@ -887,32 +874,40 @@
     <string name="wireguard_listen_port">منفذ الاستماع</string>
     <string name="wireguard_persistent_keepalive">الفاصل الزمني للإبقاء المستمر على الاتصال (بالثواني)</string>
     <string name="simple_download_url">Simple download URL</string>
-    <string name="speed_test_confirm_message">Speed testing can use significant data. Profiles are tested one at a time through their own proxy.</string>
-    <string name="speed_test_confirm_title">Run speed test?</string>
-    <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_group">اختبار سرعة هذه المجموعة</string>
-    <string name="speed_test_latency_format">Latency: %1$d ms</string>
-    <string name="speed_test_mode">Speed test mode</string>
-    <string name="speed_test_mode_download">Download only</string>
-    <string name="speed_test_mode_download_upload">Download + upload</string>
-    <string name="speed_test_mode_simple_download">Simple download</string>
-    <string name="speed_test_mode_upload">Upload only</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
-    <string name="speed_test_server_format">Server: %1$s</string>
-    <string name="speed_test_settings">Speed test</string>
-    <string name="speed_test_stage_cancelled">Cancelled</string>
-    <string name="speed_test_stage_complete">Complete</string>
-    <string name="speed_test_stage_discovery">Finding a test server</string>
-    <string name="speed_test_stage_download">Downloading</string>
-    <string name="speed_test_stage_error">Failed</string>
-    <string name="speed_test_stage_latency">Measuring server latency</string>
-    <string name="speed_test_stage_pending">Waiting</string>
-    <string name="speed_test_stage_upload">Uploading</string>
-    <string name="speed_test_timeout_invalid">Enter a timeout greater than zero milliseconds</string>
-    <string name="speed_test_timeout_ms">Speed test timeout (ms)</string>
-    <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
-    <string name="speed_test_url_invalid">Enter a valid HTTP or HTTPS URL</string>
     <string name="enable_hev_tun">تمكين Hev TUN</string>
     <string name="enable_hev_tun_summary">إنشاء جهاز TUN عبر hev-socks5-tunnel</string>
     <string name="tun_implementation_hev_override">تتم الإدارة عبر Hev TUN — أوقفه للاختيار</string>
+    <string name="speed_test_mode">وضع اختبار السرعة</string>
+    <string name="speed_test_mode_download">تنزيل فقط</string>
+    <string name="speed_test_mode_download_upload">تنزيل + رفع</string>
+    <string name="speed_test_mode_simple_download">تنزيل بسيط</string>
+    <string name="speed_test_mode_upload">رفع فقط</string>
+    <string name="speed_test_timeout_ms">مهلة اختبار السرعة (ms)</string>
+    <string name="speed_test_timeout_invalid">أدخل مهلة أكبر من صفر مللي ثانية</string>
+    <string name="speed_test_confirm_title">تشغيل اختبار السرعة؟</string>
+    <string name="speed_test_confirm_message">قد يستهلك اختبار السرعة الكثير من البيانات. يتم اختبار كل ملف تعريف على حدة من خلال وكيله الخاص.</string>
+    <string name="speed_test_settings">اختبار السرعة</string>
+    <string name="speed_test_latency_format">الكمون: %1$d ms</string>
+    <string name="speed_test_download_format">تنزيل: %1$s (%2$s)</string>
+    <string name="speed_test_upload_format">رفع: %1$s (%2$s)</string>
+    <string name="speed_test_server_format">الخادم: %1$s</string>
+    <string name="speed_test_stage_pending">في الانتظار</string>
+    <string name="speed_test_stage_discovery">البحث عن خادم اختبار</string>
+    <string name="speed_test_stage_latency">قياس كمون الخادم</string>
+    <string name="speed_test_stage_download">جارٍ التنزيل</string>
+    <string name="speed_test_stage_upload">جارٍ الرفع</string>
+    <string name="speed_test_stage_complete">اكتمل</string>
+    <string name="speed_test_stage_cancelled">أُلغيت</string>
+    <string name="speed_test_stage_error">خطأ</string>
+    <string name="speed_test_url_invalid">أدخل رابط HTTP أو HTTPS صالحًا</string>
+    <string name="please_update">تطبيقك قديم جدًا (%s) وسيتوقف عن العمل في %s. يرجى التحديث!</string>
+    <string name="please_update_force">تطبيقك قديم جدًا (%s) وقد توقف عن العمل في %s. يرجى التحديث!</string>
+    <string name="profile_requiring_plugin">الملف التعريفي %s يتطلب تثبيت الإضافة %s، ولكنها غير موجودة.</string>
+    <string name="extra_subscription_links">روابط اشتراك إضافية</string>
+    <string name="extra_subscription_links_hint">أدخل روابط الاشتراك، رابط لكل سطر</string>
+    <string name="plugin_exists_but_on_shit_system">يتطلب الملف التعریف %s المكوّن الإضافي %s، لكن بائع المعدات المملوكة لك (عادةً عمالقة المراقبة وصانع البرامج الضارة) تلاعب بجهاز أندرويد، مما يجعل المكون الإضافي غير قابل للاستخدام.</string>
+    <string name="plugin_approval_conflict_message">توفر أكثر من حزمة غير موثوقة هذا الملحق: %1$s\n\nأزل التعارض قبل الموافقة على حزمة.</string>
+    <string name="ws_max_early_data">الحد الأقصى للبيانات المبكرة</string>
 </resources>

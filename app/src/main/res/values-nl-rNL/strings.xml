@@ -354,8 +354,6 @@ Aanbeveling: Schakel dit alleen in als u alle geïnstalleerde apps vertrouwt.</s
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Bevestigen</string>
     <string name="missing_plugin">Ontbrekende plugin</string>
-    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
-        it was not found.</string>
     <string name="action_learn_more">MEER INFORMATIE</string>
     <string name="action_download">DOWNLOADEN</string>
     <string name="install_from_play_store">Installeren vanuit Play Store</string>
@@ -399,9 +397,6 @@ Aanbeveling: Schakel dit alleen in als u alle geïnstalleerde apps vertrouwt.</s
     <string name="group_order_origin">Oorsprong</string>
     <string name="group_order_by_name">Op naam</string>
     <string name="group_order_by_delay">Op vertraging</string>
-    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
-        proprietary equipment vendor (usually surveillance capital giants and malware maker)
-        tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks Android-plugin)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Shadowsocks Android Plugin)</string>
     <string name="tcp_connections">%d TCP-verbindingen</string>
@@ -479,10 +474,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="tuic_disable_sni">SNI uitschakelen</string>
     <string name="tuic_reduce_rtt">0-RTT QUIC-handshake inschakelen</string>
     <string name="pinned_certchain_sha256">Pinned Certificate SHA256</string>
-    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
-        update!</string>
-    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
-        Please update!</string>
     <string name="connection_test_delete_unavailable">Wis niet beschikbaar</string>
     <string name="move">Verplaatsen</string>
     <string name="exe_prefer_provider">Plugin voorkeursprovider</string>
@@ -642,8 +633,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="vpn_watchdog_interval">Controle-interval (sec)</string>
     <string name="quick_clear_cache_restart">Cache legen &amp; Herstarten</string>
     <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
     <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
@@ -682,7 +671,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="dynamic_colors_classic">Beschikbaar met de nieuwe interface</string>
     <string name="dynamic_colors_summary">Gebruik het systeem-Material You-palet</string>
     <string name="dynamic_colors_unavailable">Beschikbaar op Android 12 en nieuwer</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Instellingen voor snelste</string>
     <string name="http_proxy_bypass_sum">Hosts die de systeem-HTTP-proxy overslaan en direct verbinden wanneer Append HTTP Proxy to VPN is ingeschakeld. Eén patroon per regel, bijvoorbeeld 192.168.* of 10.*. Standaard worden privé- en loopback-bereiken gebruikt.</string>
     <string name="hysteria2_ech_config_hint">ECH-configuratie</string>
@@ -694,9 +682,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="interface_settings">Interface</string>
     <string name="invalid_amnezia_config">Ongeldige of beschadigde Amnezia-configuratie</string>
     <string name="invalid_panel_url">Ongeldige paneel-URL. Gebruik alleen HTTPS of localhost HTTP.</string>
-    <string name="lan_sharing">LAN Sharing</string>
-    <string name="lan_sharing_requires_root">LAN sharing requires root</string>
-    <string name="lan_sharing_summary">Allow LAN devices to connect</string>
     <string name="lifetime_traffic">Altijd: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>
     <string name="mdv_advanced_json">Geavanceerde JSON-overschrijving</string>
@@ -736,7 +721,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="olcrtc_vp8_batch">VP8 Batchgrootte</string>
     <string name="olcrtc_vp8_fps">VP8 FPS</string>
     <string name="plugin_approval_action">Goedkeuren</string>
-    <string name="plugin_approval_conflict_message">More than one untrusted package provides this plugin: %1$s\n\nResolve the conflict before approving a package.</string>
     <string name="plugin_approval_conflict_title">Conflict met plug-inpakket</string>
     <string name="plugin_approval_failed">Het plug-inpakket kon niet worden goedgekeurd.</string>
     <string name="plugin_approval_message">Pakket: %1$s\n\nSHA-256-certificaatvingerafdruk(ken):\n%2$s\n\nDe uitvoerbare code van de geïnstalleerde plug-in kan via de plug-ininterface van de app worden uitgevoerd. Keur alleen goed als u dit pakket vertrouwt.</string>
@@ -784,12 +768,10 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="ui_style_expressive">Nieuw</string>
     <string name="waterfall_settings">Waterval-instellingen</string>
     <string name="webdav_insecure_url">Onveilige WebDAV-server-URL. Gebruik een https://-adres; gewoon http:// verzendt uw inloggegevens en back-up (die alle profielgeheimen bevat) in leesbare tekst.</string>
-    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
     <string name="app_name">NekoBox</string>
     <string name="app_name_long">NekoBox for Android</string>
     <string name="service_mode_vpn">VPN</string>
-    <string name="ws_max_early_data">Max early data</string>
     <string name="traffic">%1$s↑ %2$s↓</string>
     <string name="action_socks">SOCKS</string>
     <string name="action_http">HTTP</string>
@@ -888,32 +870,50 @@ Doorgaan?</string>
     <string name="wireguard_listen_port">Luisterpoort</string>
     <string name="wireguard_persistent_keepalive">Interval voor permanente keepalive (seconden)</string>
     <string name="simple_download_url">Simple download URL</string>
-    <string name="speed_test_confirm_message">Speed testing can use significant data. Profiles are tested one at a time through their own proxy.</string>
-    <string name="speed_test_confirm_title">Run speed test?</string>
-    <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_group">Snelheidstest voor deze groep</string>
-    <string name="speed_test_latency_format">Latency: %1$d ms</string>
-    <string name="speed_test_mode">Speed test mode</string>
-    <string name="speed_test_mode_download">Download only</string>
-    <string name="speed_test_mode_download_upload">Download + upload</string>
-    <string name="speed_test_mode_simple_download">Simple download</string>
-    <string name="speed_test_mode_upload">Upload only</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
-    <string name="speed_test_server_format">Server: %1$s</string>
-    <string name="speed_test_settings">Speed test</string>
-    <string name="speed_test_stage_cancelled">Cancelled</string>
-    <string name="speed_test_stage_complete">Complete</string>
-    <string name="speed_test_stage_discovery">Finding a test server</string>
-    <string name="speed_test_stage_download">Downloading</string>
-    <string name="speed_test_stage_error">Failed</string>
-    <string name="speed_test_stage_latency">Measuring server latency</string>
-    <string name="speed_test_stage_pending">Waiting</string>
-    <string name="speed_test_stage_upload">Uploading</string>
-    <string name="speed_test_timeout_invalid">Enter a timeout greater than zero milliseconds</string>
-    <string name="speed_test_timeout_ms">Speed test timeout (ms)</string>
-    <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
-    <string name="speed_test_url_invalid">Enter a valid HTTP or HTTPS URL</string>
     <string name="enable_hev_tun">Hev TUN inschakelen</string>
     <string name="enable_hev_tun_summary">Het TUN-apparaat aanmaken via hev-socks5-tunnel</string>
     <string name="tun_implementation_hev_override">Wordt beheerd door Hev TUN – zet uit om te kiezen</string>
+    <string name="speed_test_mode">Snelheidstestmodus</string>
+    <string name="speed_test_mode_download">Alleen downloaden</string>
+    <string name="speed_test_mode_download_upload">Downloaden + uploaden</string>
+    <string name="speed_test_mode_simple_download">Eenvoudige download</string>
+    <string name="speed_test_mode_upload">Alleen uploaden</string>
+    <string name="speed_test_timeout_ms">Time-out snelheidstest (ms)</string>
+    <string name="speed_test_timeout_invalid">Voer een time-out in van meer dan nul milliseconden</string>
+    <string name="speed_test_confirm_title">Snelheidstest uitvoeren?</string>
+    <string name="speed_test_confirm_message">Een snelheidstest kan veel data verbruiken. Profielen worden één voor één via hun eigen proxy getest.</string>
+    <string name="speed_test_settings">Snelheidstest</string>
+    <string name="speed_test_latency_format">Latentie: %1$d ms</string>
+    <string name="speed_test_download_format">Downloaden: %1$s (%2$s)</string>
+    <string name="speed_test_upload_format">Uploaden: %1$s (%2$s)</string>
+    <string name="speed_test_server_format">Server: %1$s</string>
+    <string name="speed_test_stage_pending">Wachten</string>
+    <string name="speed_test_stage_discovery">Testserver zoeken</string>
+    <string name="speed_test_stage_latency">Serverlatentie meten</string>
+    <string name="speed_test_stage_download">Downloaden</string>
+    <string name="speed_test_stage_upload">Uploaden</string>
+    <string name="speed_test_stage_complete">Voltooid</string>
+    <string name="speed_test_stage_cancelled">Geannuleerd</string>
+    <string name="speed_test_stage_error">Fout</string>
+    <string name="speed_test_url_invalid">Voer een geldige HTTP- of HTTPS-URL in</string>
+    <string name="mixed_auth_username_hint">Gebruikersnaam (laat beide leeg voor geen authenticatie)</string>
+    <string name="mixed_auth_no_auth">Niet ingesteld (geen authenticatie)</string>
+    <string name="extra_subscription_links">Extra abonnementslinks</string>
+    <string name="extra_subscription_links_hint">Voer abonnementslinks in, één per regel</string>
+    <string name="profile_requiring_plugin">Profiel %1$s vereist de %2$s-plug-in, maar
+        deze is niet gevonden.</string>
+    <string name="plugin_exists_but_on_shit_system">Profiel %1$s vereist de %2$s-plug-in, maar uw
+        eigenaar van propriëtaire apparatuur (meestal surveillance kapitaalreuzen en malwaremakers)
+        heeft met uw Android geknoeid, waardoor de plug-in onbruikbaar is.</string>
+    <string name="please_update">Uw APP is te oud (%1$s). En zal stoppen met werken op %2$s. Gelieve
+        te updaten!</string>
+    <string name="please_update_force">Uw APP is te oud (%1$s). En is gestopt met werken op %2$s.
+        Gelieve te updaten!</string>
+    <string name="lan_sharing">LAN-delen</string>
+    <string name="lan_sharing_requires_root">LAN-delen vereist root</string>
+    <string name="lan_sharing_summary">LAN-apparaten toestaan om te verbinden</string>
+    <string name="plugin_approval_conflict_message">Meer dan één onbetrouwbaar pakket biedt deze plug-in: %1$s\n\nLos het conflict op voordat u een pakket goedkeurt.</string>
+    <string name="ws_max_early_data">Max. early data</string>
 </resources>

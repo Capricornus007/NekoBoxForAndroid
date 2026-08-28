@@ -352,8 +352,6 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Confirmer</string>
     <string name="missing_plugin">Plugin manquant</string>
-    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
-        it was not found.</string>
     <string name="action_learn_more">EN SAVOIR PLUS</string>
     <string name="action_download">TÉLÉCHARGER</string>
     <string name="install_from_play_store">Installer depuis le Play Store</string>
@@ -397,9 +395,6 @@
     <string name="group_order_origin">Origine</string>
     <string name="group_order_by_name">Par nom</string>
     <string name="group_order_by_delay">Par délai</string>
-    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
-        proprietary equipment vendor (usually surveillance capital giants and malware maker)
-        tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Plugin Android Shadowsocks)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (plugin Shadowsocks pour Android)</string>
     <string name="tcp_connections">%d connexions TCP</string>
@@ -484,10 +479,6 @@
     <string name="tuic_disable_sni">Désactiver SNI</string>
     <string name="tuic_reduce_rtt">Activer la poignée de main QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">Certificat épinglé SHA256</string>
-    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
-        update!</string>
-    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
-        Please update!</string>
     <string name="connection_test_delete_unavailable">Effacer les indisponibles</string>
     <string name="move">Déplacer</string>
     <string name="exe_prefer_provider">Fournisseur préféré du plugin</string>
@@ -688,7 +679,6 @@
     <string name="dynamic_colors_classic">Disponible avec la nouvelle interface</string>
     <string name="dynamic_colors_summary">Utiliser la palette Material You du système</string>
     <string name="dynamic_colors_unavailable">Disponible sur Android 12 et versions ultérieures</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Paramètres du plus rapide</string>
     <string name="http_proxy_bypass_sum">Hôtes qui contournent le proxy HTTP système et se connectent directement lorsque l\'option Ajouter le proxy HTTP au VPN est activée. Un motif par ligne, par ex. 192.168.* ou 10.*. Par défaut, les plages privées et de boucle locale.</string>
     <string name="hysteria2_ech_config_hint">Configuration ECH</string>
@@ -742,7 +732,6 @@
     <string name="olcrtc_vp8_batch">Taille de lot VP8</string>
     <string name="olcrtc_vp8_fps">VP8 FPS</string>
     <string name="plugin_approval_action">Approuver</string>
-    <string name="plugin_approval_conflict_message">More than one untrusted package provides this plugin: %1$s\n\nResolve the conflict before approving a package.</string>
     <string name="plugin_approval_conflict_title">Conflit de paquet de plugin</string>
     <string name="plugin_approval_failed">Le paquet de plugin n\'a pas pu être approuvé.</string>
     <string name="plugin_approval_message">Paquet : %1$s\n\nEmpreinte(s) du certificat SHA-256 :\n%2$s\n\nLe code exécutable du plugin installé peut s\'exécuter via l\'interface de plugin de l\'application. N\'approuvez que si vous faites confiance à ce paquet.</string>
@@ -790,12 +779,10 @@
     <string name="ui_style_expressive">Nouveau</string>
     <string name="waterfall_settings">Paramètres Waterfall</string>
     <string name="webdav_insecure_url">URL de serveur WebDAV non sécurisé. Utilisez une adresse https:// ; le http:// brut transmettrait vos identifiants et la sauvegarde (qui contient tous les secrets de profil) en clair.</string>
-    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
     <string name="app_name">NekoBox</string>
     <string name="app_name_long">NekoBox for Android</string>
     <string name="service_mode_vpn">VPN</string>
-    <string name="ws_max_early_data">Max early data</string>
     <string name="traffic">%1$s↑ %2$s↓</string>
     <string name="action_socks">SOCKS</string>
     <string name="action_http">HTTP</string>
@@ -894,32 +881,42 @@ Continuer ?</string>
     <string name="wireguard_listen_port">Port d’écoute</string>
     <string name="wireguard_persistent_keepalive">Intervalle de maintien de connexion persistant (secondes)</string>
     <string name="simple_download_url">Simple download URL</string>
-    <string name="speed_test_confirm_message">Speed testing can use significant data. Profiles are tested one at a time through their own proxy.</string>
-    <string name="speed_test_confirm_title">Run speed test?</string>
-    <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_group">Tester la vitesse de ce groupe</string>
-    <string name="speed_test_latency_format">Latency: %1$d ms</string>
-    <string name="speed_test_mode">Speed test mode</string>
-    <string name="speed_test_mode_download">Download only</string>
-    <string name="speed_test_mode_download_upload">Download + upload</string>
-    <string name="speed_test_mode_simple_download">Simple download</string>
-    <string name="speed_test_mode_upload">Upload only</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
-    <string name="speed_test_server_format">Server: %1$s</string>
-    <string name="speed_test_settings">Speed test</string>
-    <string name="speed_test_stage_cancelled">Cancelled</string>
-    <string name="speed_test_stage_complete">Complete</string>
-    <string name="speed_test_stage_discovery">Finding a test server</string>
-    <string name="speed_test_stage_download">Downloading</string>
-    <string name="speed_test_stage_error">Failed</string>
-    <string name="speed_test_stage_latency">Measuring server latency</string>
-    <string name="speed_test_stage_pending">Waiting</string>
-    <string name="speed_test_stage_upload">Uploading</string>
-    <string name="speed_test_timeout_invalid">Enter a timeout greater than zero milliseconds</string>
-    <string name="speed_test_timeout_ms">Speed test timeout (ms)</string>
-    <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
-    <string name="speed_test_url_invalid">Enter a valid HTTP or HTTPS URL</string>
     <string name="enable_hev_tun">Activer Hev TUN</string>
     <string name="enable_hev_tun_summary">Créer l\'interface TUN via hev-socks5-tunnel</string>
     <string name="tun_implementation_hev_override">Géré par Hev TUN — désactivez-le pour choisir</string>
+    <string name="speed_test_mode">Mode de test de vitesse</string>
+    <string name="speed_test_mode_download">Téléchargement seulement</string>
+    <string name="speed_test_mode_download_upload">Téléchargement + envoi</string>
+    <string name="speed_test_mode_simple_download">Téléchargement simple</string>
+    <string name="speed_test_mode_upload">Envoi seulement</string>
+    <string name="speed_test_timeout_ms">Délai du test de vitesse (ms)</string>
+    <string name="speed_test_timeout_invalid">Saisissez un délai supérieur à zéro milliseconde</string>
+    <string name="speed_test_confirm_title">Lancer le test de vitesse ?</string>
+    <string name="speed_test_confirm_message">Le test de vitesse peut consommer beaucoup de données. Les profils sont testés un par un via leur propre proxy.</string>
+    <string name="speed_test_settings">Test de vitesse</string>
+    <string name="speed_test_latency_format">Latence : %1$d ms</string>
+    <string name="speed_test_download_format">Téléchargement : %1$s (%2$s)</string>
+    <string name="speed_test_upload_format">Envoi : %1$s (%2$s)</string>
+    <string name="speed_test_server_format">Serveur : %1$s</string>
+    <string name="speed_test_stage_pending">En attente</string>
+    <string name="speed_test_stage_discovery">Recherche d\'un serveur de test</string>
+    <string name="speed_test_stage_latency">Mesure de la latence du serveur</string>
+    <string name="speed_test_stage_download">Téléchargement</string>
+    <string name="speed_test_stage_upload">Envoi</string>
+    <string name="speed_test_stage_complete">Terminé</string>
+    <string name="speed_test_stage_cancelled">Annulé</string>
+    <string name="speed_test_stage_error">Erreur</string>
+    <string name="speed_test_url_invalid">Saisissez une URL HTTP ou HTTPS valide</string>
+    <string name="please_update">Votre app est trop ancienne (%s) et cessera de fonctionner à partir du %s. Merci de la mettre à jour !</string>
+    <string name="please_update_force">Votre app est trop ancienne (%s) et a cessé de fonctionner le %s. Merci de la mettre à jour !</string>
+    <string name="profile_requiring_plugin">Le profil %s nécessite l\'installation du plugin %s, mais il est introuvable.</string>
+    <string name="extra_subscription_links">Liens d\'abonnement supplémentaires</string>
+    <string name="extra_subscription_links_hint">Saisissez les liens d\'abonnement, un par ligne</string>
+    <string name="plugin_exists_but_on_shit_system">Le profil %1$s nécessite le plugin %2$s, mais votre
+        fournisseur d\'équipement propriétaire (généralement des géants du capital de surveillance et des créateurs de logiciels malveillants)
+        a altéré votre Android, rendant le plugin inutilisable.</string>
+    <string name="plugin_approval_conflict_message">Plus d\'un paquet non approuvé fournit ce plugin : %1$s\n\nRésolvez le conflit avant d\'approuver un paquet.</string>
+    <string name="ws_max_early_data">Early data maximale</string>
 </resources>

@@ -351,8 +351,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Conferma</string>
     <string name="missing_plugin">Plugin mancante</string>
-    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
-        it was not found.</string>
     <string name="action_learn_more">SCOPRI DI PIÙ</string>
     <string name="action_download">SCARICA</string>
     <string name="install_from_play_store">Installa da Play Store</string>
@@ -394,9 +392,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="group_order_origin">Origine</string>
     <string name="group_order_by_name">Per nome</string>
     <string name="group_order_by_delay">Per ritardo</string>
-    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
-        proprietary equipment vendor (usually surveillance capital giants and malware maker)
-        tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Plugin Android per Shadowsocks)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Plugin Android per Shadowsocks)</string>
     <string name="tcp_connections">%d connessioni TCP</string>
@@ -480,10 +475,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="tuic_disable_sni">Disabilita SNI</string>
     <string name="tuic_reduce_rtt">Abilita handshake QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">SHA256 del certificato fissato</string>
-    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
-        update!</string>
-    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
-        Please update!</string>
     <string name="connection_test_delete_unavailable">Cancella non disponibili</string>
     <string name="move">Sposta</string>
     <string name="exe_prefer_provider">Provider preferito del plugin</string>
@@ -642,8 +633,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="vpn_watchdog_interval">Intervallo di controllo (s)</string>
     <string name="quick_clear_cache_restart">Svuota cache e riavvia</string>
     <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
     <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
@@ -682,7 +671,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="dynamic_colors_classic">Disponibile con la nuova interfaccia</string>
     <string name="dynamic_colors_summary">Usa la tavolozza Material You di sistema</string>
     <string name="dynamic_colors_unavailable">Disponibile su Android 12 e versioni successive</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Impostazioni Più veloce</string>
     <string name="http_proxy_bypass_sum">Host che saltano il proxy HTTP di sistema e si connettono direttamente quando Aggiungi proxy HTTP alla VPN è attivo. Un modello per riga, ad es. 192.168.* o 10.*. Predefinito per intervalli privati e di loopback.</string>
     <string name="hysteria2_ech_config_hint">Configurazione ECH</string>
@@ -694,9 +682,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="interface_settings">Interfaccia</string>
     <string name="invalid_amnezia_config">Configurazione Amnezia non valida o danneggiata</string>
     <string name="invalid_panel_url">URL pannello non valido. Utilizza solo HTTPS o localhost HTTP.</string>
-    <string name="lan_sharing">LAN Sharing</string>
-    <string name="lan_sharing_requires_root">LAN sharing requires root</string>
-    <string name="lan_sharing_summary">Allow LAN devices to connect</string>
     <string name="lifetime_traffic">Totale: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>
     <string name="mdv_advanced_json">Override JSON avanzato</string>
@@ -736,7 +721,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="olcrtc_vp8_batch">Dimensione batch VP8</string>
     <string name="olcrtc_vp8_fps">FPS VP8</string>
     <string name="plugin_approval_action">Approva</string>
-    <string name="plugin_approval_conflict_message">More than one untrusted package provides this plugin: %1$s\n\nResolve the conflict before approving a package.</string>
     <string name="plugin_approval_conflict_title">Conflitto pacchetto plugin</string>
     <string name="plugin_approval_failed">Impossibile approvare il pacchetto plugin.</string>
     <string name="plugin_approval_message">Pacchetto: %1$s\n\nImpronta/e digitale/i del certificato SHA-256:\n%2$s\n\nIl codice eseguibile del plugin installato può essere eseguito tramite l\'interfaccia plugin dell\'app. Approva solo se ti fidi di questo pacchetto.</string>
@@ -784,12 +768,10 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="ui_style_expressive">Nuovo</string>
     <string name="waterfall_settings">Impostazioni Waterfall</string>
     <string name="webdav_insecure_url">URL del server WebDAV non sicuro. Utilizza un indirizzo https://; un semplice http:// trasmetterebbe le credenziali e il backup (che contiene tutti i segreti del profilo) in chiaro.</string>
-    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
     <string name="app_name">NekoBox</string>
     <string name="app_name_long">NekoBox for Android</string>
     <string name="service_mode_vpn">VPN</string>
-    <string name="ws_max_early_data">Max early data</string>
     <string name="traffic">%1$s↑ %2$s↓</string>
     <string name="action_socks">SOCKS</string>
     <string name="action_http">HTTP</string>
@@ -888,32 +870,50 @@ Continuare?</string>
     <string name="wireguard_listen_port">Porta di ascolto</string>
     <string name="wireguard_persistent_keepalive">Intervallo keepalive persistente (secondi)</string>
     <string name="simple_download_url">Simple download URL</string>
-    <string name="speed_test_confirm_message">Speed testing can use significant data. Profiles are tested one at a time through their own proxy.</string>
-    <string name="speed_test_confirm_title">Run speed test?</string>
-    <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_group">Test velocità di questo gruppo</string>
-    <string name="speed_test_latency_format">Latency: %1$d ms</string>
-    <string name="speed_test_mode">Speed test mode</string>
-    <string name="speed_test_mode_download">Download only</string>
-    <string name="speed_test_mode_download_upload">Download + upload</string>
-    <string name="speed_test_mode_simple_download">Simple download</string>
-    <string name="speed_test_mode_upload">Upload only</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
-    <string name="speed_test_server_format">Server: %1$s</string>
-    <string name="speed_test_settings">Speed test</string>
-    <string name="speed_test_stage_cancelled">Cancelled</string>
-    <string name="speed_test_stage_complete">Complete</string>
-    <string name="speed_test_stage_discovery">Finding a test server</string>
-    <string name="speed_test_stage_download">Downloading</string>
-    <string name="speed_test_stage_error">Failed</string>
-    <string name="speed_test_stage_latency">Measuring server latency</string>
-    <string name="speed_test_stage_pending">Waiting</string>
-    <string name="speed_test_stage_upload">Uploading</string>
-    <string name="speed_test_timeout_invalid">Enter a timeout greater than zero milliseconds</string>
-    <string name="speed_test_timeout_ms">Speed test timeout (ms)</string>
-    <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
-    <string name="speed_test_url_invalid">Enter a valid HTTP or HTTPS URL</string>
     <string name="enable_hev_tun">Attiva Hev TUN</string>
     <string name="enable_hev_tun_summary">Crea il dispositivo TUN con hev-socks5-tunnel</string>
     <string name="tun_implementation_hev_override">Gestito da Hev TUN: disattivalo per scegliere</string>
+    <string name="speed_test_mode">Modalità speed test</string>
+    <string name="speed_test_mode_download">Solo download</string>
+    <string name="speed_test_mode_download_upload">Download + upload</string>
+    <string name="speed_test_mode_simple_download">Download semplice</string>
+    <string name="speed_test_mode_upload">Solo upload</string>
+    <string name="speed_test_timeout_ms">Timeout speed test (ms)</string>
+    <string name="speed_test_timeout_invalid">Inserisci un timeout maggiore di zero millisecondi</string>
+    <string name="speed_test_confirm_title">Eseguire lo speed test?</string>
+    <string name="speed_test_confirm_message">Lo speed test può usare molti dati. I profili vengono testati uno alla volta attraverso il proprio proxy.</string>
+    <string name="speed_test_settings">Speed test</string>
+    <string name="speed_test_latency_format">Latenza: %1$d ms</string>
+    <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
+    <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
+    <string name="speed_test_server_format">Server: %1$s</string>
+    <string name="speed_test_stage_pending">In attesa</string>
+    <string name="speed_test_stage_discovery">Ricerca di un server di test</string>
+    <string name="speed_test_stage_latency">Misura della latenza del server</string>
+    <string name="speed_test_stage_download">Download in corso</string>
+    <string name="speed_test_stage_upload">Upload in corso</string>
+    <string name="speed_test_stage_complete">Completato</string>
+    <string name="speed_test_stage_cancelled">Annullato</string>
+    <string name="speed_test_stage_error">Errore</string>
+    <string name="speed_test_url_invalid">Inserisci un URL HTTP o HTTPS valido</string>
+    <string name="mixed_auth_username_hint">Nome utente (lascia entrambi vuoti per nessuna autenticazione)</string>
+    <string name="mixed_auth_no_auth">Non impostato (nessuna autenticazione)</string>
+    <string name="extra_subscription_links">Link di abbonamento extra</string>
+    <string name="extra_subscription_links_hint">Inserisci i link di abbonamento, uno per riga</string>
+    <string name="profile_requiring_plugin">Il profilo %1$s richiede l\'installazione del plugin %2$s, ma
+        non è stato trovato.</string>
+    <string name="plugin_exists_but_on_shit_system">Il profilo %1$s richiede il plugin %2$s, ma il tuo
+        fornitore di apparecchiature proprietarie (di solito giganti del capitale di sorveglianza e produttori di malware)
+        ha manomesso il tuo Android, rendendo il plugin inutilizzabile.</string>
+    <string name="please_update">La tua app è troppo vecchia (%1$s). Smetterà di funzionare il %2$s. Per favore,
+        aggiornala!</string>
+    <string name="please_update_force">La tua app è troppo vecchia (%1$s). Ha smesso di funzionare il %2$s.
+        Per favore, aggiornala!</string>
+    <string name="lan_sharing">Condivisione LAN</string>
+    <string name="lan_sharing_requires_root">La condivisione LAN richiede i permessi di root</string>
+    <string name="lan_sharing_summary">Consenti ai dispositivi LAN di connettersi</string>
+    <string name="plugin_approval_conflict_message">Più di un pacchetto non attendibile fornisce questo plugin: %1$s\n\nRimuovi il conflitto prima di approvare un pacchetto.</string>
+    <string name="ws_max_early_data">Early data massima</string>
 </resources>

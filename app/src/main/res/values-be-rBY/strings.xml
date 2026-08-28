@@ -345,8 +345,6 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Пацвердзіць</string>
     <string name="missing_plugin">Адсутны плагін</string>
-    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
-        it was not found.</string>
     <string name="action_learn_more">ДАВЕДАЦЦА БОЛЬШ</string>
     <string name="action_download">ЗАГРУЗІЦЬ</string>
     <string name="install_from_play_store">Усталяваць з Play Store</string>
@@ -466,10 +464,6 @@
     <string name="tuic_disable_sni">Адключыць SNI</string>
     <string name="tuic_reduce_rtt">Уключыць 0-RTT QUIC рукапацісканне</string>
     <string name="pinned_certchain_sha256">Замацаваны сертыфікат SHA256</string>
-    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
-        update!</string>
-    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
-        Please update!</string>
     <string name="connection_test_delete_unavailable">Ачысціць недаступныя</string>
     <string name="move">Перамясціць</string>
     <string name="exe_prefer_provider">Прадпачытальны пастаўшчык плагінаў</string>
@@ -628,8 +622,6 @@
     <string name="vpn_watchdog_interval">Інтэрвал праверкі (сек)</string>
     <string name="quick_clear_cache_restart">Ачысціць кэш і перазапусціць</string>
     <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
     <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
@@ -668,7 +660,6 @@
     <string name="dynamic_colors_classic">Даступна з новым інтэрфейсам</string>
     <string name="dynamic_colors_summary">Выкарыстоўваць сістэмную палітру Material You</string>
     <string name="dynamic_colors_unavailable">Даступна на Android 12 і навей</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Настройкі найхутчэйшага</string>
     <string name="http_proxy_bypass_sum">Хосты, якія абыходзяць сістэмны HTTP-проксі і падключаюцца напрамую, калі ўключана функцыя «Дадаць HTTP-проксі да VPN». Адзін шаблон на радок, напр. 192.168.* ці 10.*. Па змаўчанні выкарыстоўваюцца прыватныя і зацыкленыя дыяпазоны.</string>
     <string name="hysteria2_ech_config_hint">Канфіг ECH</string>
@@ -680,9 +671,6 @@
     <string name="interface_settings">Інтэрфейс</string>
     <string name="invalid_amnezia_config">Несапраўдная або пашкоджаная канфігурацыя Amnezia</string>
     <string name="invalid_panel_url">Несапраўдны URL панэлі. Выкарыстоўвайце толькі HTTPS або лакальны HTTP.</string>
-    <string name="lan_sharing">LAN Sharing</string>
-    <string name="lan_sharing_requires_root">LAN sharing requires root</string>
-    <string name="lan_sharing_summary">Allow LAN devices to connect</string>
     <string name="lifetime_traffic">За ўвесь час: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>
     <string name="mdv_advanced_json">Пашыранае пераазначэнне JSON</string>
@@ -722,7 +710,6 @@
     <string name="olcrtc_vp8_batch">Памер пакета VP8</string>
     <string name="olcrtc_vp8_fps">VP8 FPS</string>
     <string name="plugin_approval_action">Ухваліць</string>
-    <string name="plugin_approval_conflict_message">More than one untrusted package provides this plugin: %1$s\n\nResolve the conflict before approving a package.</string>
     <string name="plugin_approval_conflict_title">Канфлікт пакетаў плагіна</string>
     <string name="plugin_approval_failed">Не атрымалася ўхваліць пакет плагіна.</string>
     <string name="plugin_approval_message">Пакет: %1$s\n\nЛічбавы адбітак(і) сертыфіката SHA-256:\n%2$s\n\nВыканальны код усталяванага плагіна можа выконвацца праз інтэрфейс плагінаў праграмы. Ухваляйце, толькі калі давяраеце гэтаму пакету.</string>
@@ -770,12 +757,10 @@
     <string name="ui_style_expressive">Новы</string>
     <string name="waterfall_settings">Настройкі вадаспаду</string>
     <string name="webdav_insecure_url">Ненадзейны URL сервера WebDAV. Выкарыстоўвайце адрас https://; просты http:// перадасць вашы ўліковыя даныя і рэзервовую копію (якая змяшчае ўсе сакрэты профіляў) у адкрытым выглядзе.</string>
-    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
     <string name="app_name">NekoBox</string>
     <string name="app_name_long">NekoBox for Android</string>
     <string name="service_mode_vpn">VPN</string>
-    <string name="ws_max_early_data">Max early data</string>
     <string name="traffic">%1$s↑ %2$s↓</string>
     <string name="action_socks">SOCKS</string>
     <string name="action_http">HTTP</string>
@@ -874,32 +859,44 @@ VPN адключыцца на 1–3 секунды, а затым падключ
     <string name="wireguard_listen_port">Порт праслухоўвання</string>
     <string name="wireguard_persistent_keepalive">Інтэрвал пастаяннага падтрымання злучэння (у секундах)</string>
     <string name="simple_download_url">Simple download URL</string>
-    <string name="speed_test_confirm_message">Speed testing can use significant data. Profiles are tested one at a time through their own proxy.</string>
-    <string name="speed_test_confirm_title">Run speed test?</string>
-    <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_group">Тэст хуткасці гэтай групы</string>
-    <string name="speed_test_latency_format">Latency: %1$d ms</string>
-    <string name="speed_test_mode">Speed test mode</string>
-    <string name="speed_test_mode_download">Download only</string>
-    <string name="speed_test_mode_download_upload">Download + upload</string>
-    <string name="speed_test_mode_simple_download">Simple download</string>
-    <string name="speed_test_mode_upload">Upload only</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
-    <string name="speed_test_server_format">Server: %1$s</string>
-    <string name="speed_test_settings">Speed test</string>
-    <string name="speed_test_stage_cancelled">Cancelled</string>
-    <string name="speed_test_stage_complete">Complete</string>
-    <string name="speed_test_stage_discovery">Finding a test server</string>
-    <string name="speed_test_stage_download">Downloading</string>
-    <string name="speed_test_stage_error">Failed</string>
-    <string name="speed_test_stage_latency">Measuring server latency</string>
-    <string name="speed_test_stage_pending">Waiting</string>
-    <string name="speed_test_stage_upload">Uploading</string>
-    <string name="speed_test_timeout_invalid">Enter a timeout greater than zero milliseconds</string>
-    <string name="speed_test_timeout_ms">Speed test timeout (ms)</string>
-    <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
-    <string name="speed_test_url_invalid">Enter a valid HTTP or HTTPS URL</string>
     <string name="enable_hev_tun">Уключыць Hev TUN</string>
     <string name="enable_hev_tun_summary">Ствараць TUN-прыладу праз hev-socks5-tunnel</string>
     <string name="tun_implementation_hev_override">Кіруецца праз Hev TUN — выключыце, каб выбраць</string>
+    <string name="speed_test_mode">Рэжым тэсту хуткасці</string>
+    <string name="speed_test_mode_download">Толькі спампоўка</string>
+    <string name="speed_test_mode_download_upload">Спампоўка + аддача</string>
+    <string name="speed_test_mode_simple_download">Простая спампоўка</string>
+    <string name="speed_test_mode_upload">Толькі аддача</string>
+    <string name="speed_test_timeout_ms">Тайм-аут тэсту хуткасці (мс)</string>
+    <string name="speed_test_timeout_invalid">Укажыце тайм-аут большы за нуль мілісекунд</string>
+    <string name="speed_test_confirm_title">Запусціць тэст хуткасці?</string>
+    <string name="speed_test_confirm_message">Тэст хуткасці можа выдаткаваць шмат трафіку. Профілі тэстуюцца па адным праз уласны проксі.</string>
+    <string name="speed_test_settings">Тэст хуткасці</string>
+    <string name="speed_test_latency_format">Затрымка: %1$d мс</string>
+    <string name="speed_test_download_format">Спампоўка: %1$s (%2$s)</string>
+    <string name="speed_test_upload_format">Аддача: %1$s (%2$s)</string>
+    <string name="speed_test_server_format">Сервер: %1$s</string>
+    <string name="speed_test_stage_pending">Чаканне</string>
+    <string name="speed_test_stage_discovery">Пошук тэставага сервера</string>
+    <string name="speed_test_stage_latency">Вымярэнне затрымкі сервера</string>
+    <string name="speed_test_stage_download">Спампоўка</string>
+    <string name="speed_test_stage_upload">Аддача</string>
+    <string name="speed_test_stage_complete">Гатова</string>
+    <string name="speed_test_stage_cancelled">Скасавана</string>
+    <string name="speed_test_stage_error">Памылка</string>
+    <string name="speed_test_url_invalid">Увядзіце карэктны HTTP- ці HTTPS-URL</string>
+    <string name="please_update">Ваша праграма занадта старая (%s) і перастане працаваць %s. Абнавіце яе!</string>
+    <string name="please_update_force">Ваша праграма занадта старая (%s) і перастала працаваць %s. Абнавіце яе!</string>
+    <string name="profile_requiring_plugin">Профіль %s патрабуе ўсталёўкі плагіна %s, але ён не знойдзен.</string>
+    <string name="mixed_auth_username_hint">Імя карыстальніка (пакіньце абодва поля пустымі, каб без аўтэнтыфікацыі)</string>
+    <string name="mixed_auth_no_auth">Не зададзена (без аўтэнтыфікацыі)</string>
+    <string name="extra_subscription_links">Дадатковыя спасылкі на падпіскі</string>
+    <string name="extra_subscription_links_hint">Увядзіце спасылкі на падпіскі, па адной у радку</string>
+    <string name="lan_sharing">Агульны доступ па LAN</string>
+    <string name="lan_sharing_requires_root">Агульны доступ па LAN патрабуе root</string>
+    <string name="lan_sharing_summary">Дазволіць падключэнне прылад лакальнай сеткі</string>
+    <string name="plugin_approval_conflict_message">Гэты плагін прадастаўляюць некалькі ненадзейных пакетаў: %1$s\n\nВырашыце канфлікт, перш чым ухваляць пакет.</string>
+    <string name="ws_max_early_data">Макс. early data</string>
 </resources>

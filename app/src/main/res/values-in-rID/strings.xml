@@ -348,8 +348,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Konfirmasi</string>
     <string name="missing_plugin">Plugin Hilang</string>
-    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
-        it was not found.</string>
     <string name="action_learn_more">PELAJARI LEBIH LANJUT</string>
     <string name="action_download">UNDUH</string>
     <string name="install_from_play_store">Instal dari Play Store</string>
@@ -394,9 +392,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="group_order_origin">Asal</string>
     <string name="group_order_by_name">Berdasarkan Nama</string>
     <string name="group_order_by_delay">Berdasarkan Latensi</string>
-    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
-        proprietary equipment vendor (usually surveillance capital giants and malware maker)
-        tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Plugin Android Shadowsocks)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Plugin Android Shadowsocks)</string>
     <string name="tcp_connections">%d koneksi TCP</string>
@@ -480,10 +475,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="tuic_disable_sni">Nonaktifkan SNI</string>
     <string name="tuic_reduce_rtt">Aktifkan handshake QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">Sertifikat PIN SHA256</string>
-    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
-        update!</string>
-    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
-        Please update!</string>
     <string name="connection_test_delete_unavailable">Hapus yang tidak tersedia</string>
     <string name="move">Pindahkan</string>
     <string name="exe_prefer_provider">Penyedia Pilihan Plugin</string>
@@ -643,8 +634,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="vpn_watchdog_interval">Interval pemeriksaan (dtk)</string>
     <string name="quick_clear_cache_restart">Hapus Cache &amp; Mulai Ulang</string>
     <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
     <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
@@ -683,7 +672,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="dynamic_colors_classic">Tersedia dengan antarmuka baru</string>
     <string name="dynamic_colors_summary">Gunakan palet Material You sistem</string>
     <string name="dynamic_colors_unavailable">Tersedia di Android 12 dan yang lebih baru</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Pengaturan Fastest</string>
     <string name="http_proxy_bypass_sum">Host yang melewati proxy HTTP sistem dan terhubung langsung saat Tambahkan HTTP Proxy ke VPN diaktifkan. Satu pola per baris, mis. 192.168.* atau 10.*. Default ke rentang privat dan loopback.</string>
     <string name="hysteria2_ech_config_hint">Konfigurasi ECH</string>
@@ -695,9 +683,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="interface_settings">Antarmuka</string>
     <string name="invalid_amnezia_config">Konfigurasi Amnezia tidak valid atau rusak</string>
     <string name="invalid_panel_url">URL panel tidak valid. Gunakan HTTPS atau HTTP localhost saja.</string>
-    <string name="lan_sharing">LAN Sharing</string>
-    <string name="lan_sharing_requires_root">LAN sharing requires root</string>
-    <string name="lan_sharing_summary">Allow LAN devices to connect</string>
     <string name="lifetime_traffic">Sepanjang waktu: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>
     <string name="mdv_advanced_json">Override JSON Lanjutan</string>
@@ -737,7 +722,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="olcrtc_vp8_batch">Ukuran Batch VP8</string>
     <string name="olcrtc_vp8_fps">VP8 FPS</string>
     <string name="plugin_approval_action">Setujui</string>
-    <string name="plugin_approval_conflict_message">More than one untrusted package provides this plugin: %1$s\n\nResolve the conflict before approving a package.</string>
     <string name="plugin_approval_conflict_title">Konflik paket plugin</string>
     <string name="plugin_approval_failed">Paket plugin tidak dapat disetujui.</string>
     <string name="plugin_approval_message">Paket: %1$s\n\nSidik jari sertifikat SHA-256:\n%2$s\n\nKode yang dapat dijalankan dari plugin yang terinstal dapat berjalan melalui antarmuka plugin aplikasi. Setujui hanya jika Anda mempercayai paket ini.</string>
@@ -785,12 +769,10 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="ui_style_expressive">Baru</string>
     <string name="waterfall_settings">Pengaturan Waterfall</string>
     <string name="webdav_insecure_url">URL server WebDAV tidak aman. Gunakan alamat https://; http:// biasa akan mengirimkan kredensial dan cadangan Anda (yang berisi semua rahasia profil) dalam teks biasa.</string>
-    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
     <string name="app_name">NekoBox</string>
     <string name="app_name_long">NekoBox for Android</string>
     <string name="service_mode_vpn">VPN</string>
-    <string name="ws_max_early_data">Max early data</string>
     <string name="traffic">%1$s↑ %2$s↓</string>
     <string name="action_socks">SOCKS</string>
     <string name="action_http">HTTP</string>
@@ -889,32 +871,49 @@ Lanjutkan?</string>
     <string name="wireguard_listen_port">Port dengar</string>
     <string name="wireguard_persistent_keepalive">Interval keepalive persisten (detik)</string>
     <string name="simple_download_url">Simple download URL</string>
-    <string name="speed_test_confirm_message">Speed testing can use significant data. Profiles are tested one at a time through their own proxy.</string>
-    <string name="speed_test_confirm_title">Run speed test?</string>
-    <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_group">Uji kecepatan grup ini</string>
-    <string name="speed_test_latency_format">Latency: %1$d ms</string>
-    <string name="speed_test_mode">Speed test mode</string>
-    <string name="speed_test_mode_download">Download only</string>
-    <string name="speed_test_mode_download_upload">Download + upload</string>
-    <string name="speed_test_mode_simple_download">Simple download</string>
-    <string name="speed_test_mode_upload">Upload only</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
-    <string name="speed_test_server_format">Server: %1$s</string>
-    <string name="speed_test_settings">Speed test</string>
-    <string name="speed_test_stage_cancelled">Cancelled</string>
-    <string name="speed_test_stage_complete">Complete</string>
-    <string name="speed_test_stage_discovery">Finding a test server</string>
-    <string name="speed_test_stage_download">Downloading</string>
-    <string name="speed_test_stage_error">Failed</string>
-    <string name="speed_test_stage_latency">Measuring server latency</string>
-    <string name="speed_test_stage_pending">Waiting</string>
-    <string name="speed_test_stage_upload">Uploading</string>
-    <string name="speed_test_timeout_invalid">Enter a timeout greater than zero milliseconds</string>
-    <string name="speed_test_timeout_ms">Speed test timeout (ms)</string>
-    <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
-    <string name="speed_test_url_invalid">Enter a valid HTTP or HTTPS URL</string>
     <string name="enable_hev_tun">Aktifkan Hev TUN</string>
     <string name="enable_hev_tun_summary">Buat perangkat TUN dengan hev-socks5-tunnel</string>
     <string name="tun_implementation_hev_override">Dikelola oleh Hev TUN — matikan untuk memilih</string>
+    <string name="speed_test_mode">Mode uji kecepatan</string>
+    <string name="speed_test_mode_download">Hanya unduh</string>
+    <string name="speed_test_mode_download_upload">Unduh + unggah</string>
+    <string name="speed_test_mode_simple_download">Unduh sederhana</string>
+    <string name="speed_test_mode_upload">Hanya unggah</string>
+    <string name="speed_test_timeout_ms">Batas waktu uji kecepatan (ms)</string>
+    <string name="speed_test_timeout_invalid">Masukkan batas waktu lebih dari nol milidetik</string>
+    <string name="speed_test_confirm_title">Jalankan uji kecepatan?</string>
+    <string name="speed_test_confirm_message">Uji kecepatan dapat menggunakan banyak data. Profil diuji satu per satu melalui proksinya masing-masing.</string>
+    <string name="speed_test_settings">Uji kecepatan</string>
+    <string name="speed_test_latency_format">Latensi: %1$d ms</string>
+    <string name="speed_test_download_format">Unduh: %1$s (%2$s)</string>
+    <string name="speed_test_upload_format">Unggah: %1$s (%2$s)</string>
+    <string name="speed_test_server_format">Server: %1$s</string>
+    <string name="speed_test_stage_pending">Menunggu</string>
+    <string name="speed_test_stage_discovery">Mencari server uji</string>
+    <string name="speed_test_stage_latency">Mengukur latensi server</string>
+    <string name="speed_test_stage_download">Mengunduh</string>
+    <string name="speed_test_stage_upload">Mengunggah</string>
+    <string name="speed_test_stage_complete">Selesai</string>
+    <string name="speed_test_stage_cancelled">Dibatalkan</string>
+    <string name="speed_test_stage_error">Galat</string>
+    <string name="speed_test_url_invalid">Masukkan URL HTTP atau HTTPS yang valid</string>
+    <string name="mixed_auth_username_hint">Nama pengguna (biarkan keduanya kosong tanpa autentikasi)</string>
+    <string name="mixed_auth_no_auth">Belum diatur (tanpa autentikasi)</string>
+    <string name="extra_subscription_links">Tautan langganan tambahan</string>
+    <string name="extra_subscription_links_hint">Masukkan tautan langganan, satu per baris</string>
+    <string name="profile_requiring_plugin">Profil %1$s memerlukan plugin %2$s untuk diinstal, tetapi
+        tidak ditemukan.</string>
+    <string name="plugin_exists_but_on_shit_system">Profil %1$s memerlukan plugin %2$s, tetapi vendor peralatan berpemilik Anda (biasanya raksasa kapital pengawasan dan pembuat malware)
+        merusak Android Anda, membuat plugin tidak dapat digunakan.</string>
+    <string name="please_update">APLIKASI Anda terlalu lama (%1$s). Dan akan berhenti bekerja pada %2$s. Tolong
+        perbarui!</string>
+    <string name="please_update_force">APLIKASI Anda terlalu lama (%1$s). Dan telah berhenti bekerja pada %2$s.
+        Tolong perbarui!</string>
+    <string name="lan_sharing">Berbagi LAN</string>
+    <string name="lan_sharing_requires_root">Berbagi LAN membutuhkan root</string>
+    <string name="lan_sharing_summary">Izinkan perangkat LAN terhubung</string>
+    <string name="plugin_approval_conflict_message">Lebih dari satu paket yang tidak dipercaya menyediakan plugin ini: %1$s\n\nHapus konflik sebelum menyetujui paket.</string>
+    <string name="ws_max_early_data">Early data maksimum</string>
 </resources>

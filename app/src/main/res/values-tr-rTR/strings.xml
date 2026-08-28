@@ -77,7 +77,6 @@
     <string name="security_settings">TLS Güvenlik Ayarları</string>
     <string name="allow_insecure">Güvensiz Bağlantılara İzin Ver</string>
     <string name="allow_insecure_sum">Sertifika kontrolünü devre dışı bırakın. Etkinleştirildiğinde bu yapılandırma, düz metin kadar güvenlidir.</string>
-    <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirect： %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Test ediliyor…</string>
     <string name="connection_test_available">Başarılı: HTTPS el sıkışması %dms sürdü</string>
@@ -110,10 +109,8 @@
     <string name="enc_method">Şifreleme Yöntemi</string>
     <string name="protocol">Protokol</string>
     <string name="protocol_param">Protokol Parametresi</string>
-    <string name="obfs">Obfs</string>
     <string name="obfs_param">Obfs Parametresi</string>
     <string name="uuid">Kullanıcı ID</string>
-    <string name="alter_id">Alter ID</string>
     <string name="security">Taşıma Katmanı Şifrelemesi</string>
     <string name="network">Ağ</string>
     <string name="header_type">Başlık Türü</string>
@@ -145,7 +142,6 @@
     <string name="route_add">Rota Oluştur</string>
     <string name="delete_route_prompt">Bu rotayı kaldırmak istediğinizden emin misiniz?</string>
     <string name="route_name">Rota Adı</string>
-    <string name="route_proxy">Proxy</string>
     <string name="route_bypass">Atla</string>
     <string name="route_block">Engelle</string>
     <string name="route_profile">Profil Seç…</string>
@@ -205,8 +201,6 @@
     <string name="stopping">Kapatılıyor…</string>
     <string name="vpn_error">VPN Hatası: %s</string>
     <string name="vpn_permission_denied">VPN hizmeti oluşturma izni reddedildi</string>
-    <string name="reboot_required">Failed to start VPN service. You might need to reboot your
-        device.</string>
     <string name="profile_empty">Lütfen bir profil seçin</string>
     <string name="connect">Bağlan</string>
     <string name="clipboard_empty">Pano boş</string>
@@ -299,7 +293,6 @@
     <string name="enable_log_sum">Hata ayıklama amacıyla</string>
     <string name="list">Liste</string>
     <string name="random">Rastgele</string>
-    <string name="api_port">API Port</string>
     <string name="probe_interval">Dengeleyici gözlem aralığı</string>
     <string name="standard">Standart</string>
     <string name="unavailable">Kullanılamıyor</string>
@@ -345,11 +338,8 @@
     <string name="auto_update_delay">Otomatik Güncelleme Gecikmesi (Dakika)</string>
     <string name="update_when_connected_only">Yalnızca bağlıyken güncelle</string>
     <string name="update_when_connected_only_sum">IP adresi sızıntısını önle</string>
-    <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Onayla</string>
     <string name="missing_plugin">Eksik Eklenti</string>
-    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
-        it was not found.</string>
     <string name="action_learn_more">DAHA FAZLA BİLGİ</string>
     <string name="action_download">İNDİR</string>
     <string name="install_from_play_store">Play Store\'dan Yükle</string>
@@ -393,9 +383,6 @@
     <string name="group_order_origin">Köken</string>
     <string name="group_order_by_name">Ada Göre</string>
     <string name="group_order_by_delay">Gecikmeye Göre</string>
-    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
-        proprietary equipment vendor (usually surveillance capital giants and malware maker)
-        tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Basit Obfs (Shadowsocks Android Eklentisi)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Shadowsocks Android Eklentisi)</string>
     <string name="tcp_connections">%d TCP bağlantısı</string>
@@ -472,10 +459,6 @@
     <string name="tuic_disable_sni">SNI\'yi Devre Dışı Bırak</string>
     <string name="tuic_reduce_rtt">0-RTT QUIC El Sıkışmasını Etkinleştir</string>
     <string name="pinned_certchain_sha256">Sabitlenmiş Sertifika SHA256</string>
-    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
-        update!</string>
-    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
-        Please update!</string>
     <string name="connection_test_delete_unavailable">Kullanılamayanları Temizle</string>
     <string name="move">Taşı</string>
     <string name="exe_prefer_provider">Eklenti Tercih Edilen Sağlayıcı</string>
@@ -633,10 +616,6 @@
     <string name="vpn_watchdog_test_summary">Watchdog\'u test etmek için VPN\'i yeniden başlatmaya zorla</string>
     <string name="vpn_watchdog_interval">Kontrol aralığı (sn)</string>
     <string name="quick_clear_cache_restart">Önbelleği Temizle &amp; Yeniden Başlat</string>
-    <string name="mixed_auth_config">Configure authentication</string>
-    <string name="mixed_auth_username_hint">Username (leave both blank for no auth)</string>
-    <string name="mixed_auth_no_auth">Not set (no authentication)</string>
-    <string name="mixed_auth_enabled_sum">Username: %1$s</string>
     <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
     <string name="action_close">Kapat</string>
@@ -674,7 +653,6 @@
     <string name="dynamic_colors_classic">Yeni arayüzle kullanılabilir</string>
     <string name="dynamic_colors_summary">Sistem Material You paletini kullan</string>
     <string name="dynamic_colors_unavailable">Android 12 ve daha yenisinde kullanılabilir</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">En Hızlı Ayarları</string>
     <string name="http_proxy_bypass_sum">Append HTTP Proxy to VPN açıkken sistem HTTP proxy\'sini atlayıp doğrudan bağlanan ana bilgisayarlar. Satır başına bir desen, örn. 192.168.* veya 10.*. Varsayılan olarak özel ve geri döngü aralıkları.</string>
     <string name="hysteria2_ech_config_hint">ECH Yapılandırması</string>
@@ -728,7 +706,6 @@
     <string name="olcrtc_vp8_batch">VP8 Yığın Boyutu</string>
     <string name="olcrtc_vp8_fps">VP8 FPS</string>
     <string name="plugin_approval_action">Onayla</string>
-    <string name="plugin_approval_conflict_message">More than one untrusted package provides this plugin: %1$s\n\nResolve the conflict before approving a package.</string>
     <string name="plugin_approval_conflict_title">Eklenti paketi çakışması</string>
     <string name="plugin_approval_failed">Eklenti paketi onaylanamadı.</string>
     <string name="plugin_approval_message">Paket: %1$s\n\nSHA-256 sertifika parmak izi(leri):\n%2$s\n\nYüklenen eklentinin çalıştırılabilir kodu uygulamanın eklenti arayüzü üzerinden çalışabilir. Yalnızca bu pakete güveniyorsanız onaylayın.</string>
@@ -776,12 +753,10 @@
     <string name="ui_style_expressive">Yeni</string>
     <string name="waterfall_settings">Şelale Ayarları</string>
     <string name="webdav_insecure_url">Güvensiz WebDAV sunucu URL\'si. Bir https:// adresi kullanın; düz http:// kimlik bilgilerinizi ve tüm profil sırlarını içeren yedeğinizi düz metin olarak iletir.</string>
-    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
     <string name="app_name">NekoBox</string>
     <string name="app_name_long">NekoBox for Android</string>
     <string name="service_mode_vpn">VPN</string>
-    <string name="ws_max_early_data">Max early data</string>
     <string name="traffic">%1$s↑ %2$s↓</string>
     <string name="action_socks">SOCKS</string>
     <string name="action_http">HTTP</string>
@@ -880,32 +855,53 @@ Devam edilsin mi?</string>
     <string name="wireguard_listen_port">Dinleme bağlantı noktası</string>
     <string name="wireguard_persistent_keepalive">Kalıcı bağlantı sürdürme aralığı (saniye)</string>
     <string name="simple_download_url">Simple download URL</string>
-    <string name="speed_test_confirm_message">Speed testing can use significant data. Profiles are tested one at a time through their own proxy.</string>
-    <string name="speed_test_confirm_title">Run speed test?</string>
-    <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
     <string name="speed_test_group">Bu grubun hızını test et</string>
-    <string name="speed_test_latency_format">Latency: %1$d ms</string>
-    <string name="speed_test_mode">Speed test mode</string>
-    <string name="speed_test_mode_download">Download only</string>
-    <string name="speed_test_mode_download_upload">Download + upload</string>
-    <string name="speed_test_mode_simple_download">Simple download</string>
-    <string name="speed_test_mode_upload">Upload only</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
-    <string name="speed_test_server_format">Server: %1$s</string>
-    <string name="speed_test_settings">Speed test</string>
-    <string name="speed_test_stage_cancelled">Cancelled</string>
-    <string name="speed_test_stage_complete">Complete</string>
-    <string name="speed_test_stage_discovery">Finding a test server</string>
-    <string name="speed_test_stage_download">Downloading</string>
-    <string name="speed_test_stage_error">Failed</string>
-    <string name="speed_test_stage_latency">Measuring server latency</string>
-    <string name="speed_test_stage_pending">Waiting</string>
-    <string name="speed_test_stage_upload">Uploading</string>
-    <string name="speed_test_timeout_invalid">Enter a timeout greater than zero milliseconds</string>
-    <string name="speed_test_timeout_ms">Speed test timeout (ms)</string>
-    <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
-    <string name="speed_test_url_invalid">Enter a valid HTTP or HTTPS URL</string>
     <string name="enable_hev_tun">Hev TUN\'u etkinleştir</string>
     <string name="enable_hev_tun_summary">TUN aygıtını hev-socks5-tunnel ile oluştur</string>
     <string name="tun_implementation_hev_override">Hev TUN tarafından yönetiliyor — seçmek için kapatın</string>
+    <string name="speed_test_mode">Hız testi modu</string>
+    <string name="speed_test_mode_download">Yalnızca indirme</string>
+    <string name="speed_test_mode_download_upload">İndirme + yükleme</string>
+    <string name="speed_test_mode_simple_download">Basit indirme</string>
+    <string name="speed_test_mode_upload">Yalnızca yükleme</string>
+    <string name="speed_test_timeout_ms">Hız testi zaman aşımı (ms)</string>
+    <string name="speed_test_timeout_invalid">Sıfırdan büyük bir zaman aşımı girin</string>
+    <string name="speed_test_confirm_title">Hız testi çalıştırılsın mı?</string>
+    <string name="speed_test_confirm_message">Hız testi önemli miktarda veri kullanabilir. Profiller kendi proxy\'leri üzerinden tek tek test edilir.</string>
+    <string name="speed_test_settings">Hız testi</string>
+    <string name="speed_test_latency_format">Gecikme: %1$d ms</string>
+    <string name="speed_test_download_format">İndirme: %1$s (%2$s)</string>
+    <string name="speed_test_upload_format">Yükleme: %1$s (%2$s)</string>
+    <string name="speed_test_server_format">Sunucu: %1$s</string>
+    <string name="speed_test_stage_pending">Bekliyor</string>
+    <string name="speed_test_stage_discovery">Test sunucusu aranıyor</string>
+    <string name="speed_test_stage_latency">Sunucu gecikmesi ölçülüyor</string>
+    <string name="speed_test_stage_download">İndiriliyor</string>
+    <string name="speed_test_stage_upload">Yükleniyor</string>
+    <string name="speed_test_stage_complete">Tamamlandı</string>
+    <string name="speed_test_stage_cancelled">İptal edildi</string>
+    <string name="speed_test_stage_error">Hata</string>
+    <string name="speed_test_url_invalid">Geçerli bir HTTP veya HTTPS URL\'si girin</string>
+    <string name="reboot_required">VPN hizmeti başlatılamadı. Cihazı yeniden başlatmanız gerekebilir.</string>
+    <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirekt： %3$s↑ %4$s↓</string>
+    <string name="please_update">Uygulamanız çok eski (%s) ve %s tarihinde çalışmayı durduracak. Lütfen güncelleyin!</string>
+    <string name="please_update_force">Uygulamanız çok eski (%s) ve %s tarihinden itibaren çalışmıyor. Lütfen güncelleyin!</string>
+    <string name="profile_requiring_plugin">%s profili, %s eklentisinin yüklü olmasını gerektiriyor, ancak bulunamadı.</string>
+    <string name="mixed_auth_username_hint">Kullanıcı adı (kimlik doğrulaması yoksa ikisini de boş bırakın)</string>
+    <string name="mixed_auth_no_auth">Ayarlanmadı (kimlik doğrulaması yok)</string>
+    <string name="extra_subscription_links">Ek abonelik bağlantıları</string>
+    <string name="extra_subscription_links_hint">Abonelik bağlantılarını satır başına bir tane olacak şekilde girin</string>
+    <string name="obfs">Şaşırtmaca</string>
+    <string name="alter_id">Alternatif ID</string>
+    <string name="route_proxy">Vekil Sunucu</string>
+    <string name="api_port">API Portu</string>
+    <string name="subscription_user_agent">Kullanıcı Kimliği</string>
+    <string name="plugin_exists_but_on_shit_system">Profil %1$s, %2$s eklentisini gerektiriyor, ancak
+        tescilli ekipman sağlayıcınız (genellikle gözetim kapitalizmi devleri ve kötü amaçlı yazılım üreticileri)
+        Android\'inize müdahale ederek eklentiyi kullanılamaz hale getirdi.</string>
+    <string name="mixed_auth_config">Kimlik doğrulamayı yapılandır</string>
+    <string name="mixed_auth_enabled_sum">Kullanıcı adı: %1$s</string>
+    <string name="plugin_approval_conflict_message">Birden fazla güvenilmeyen paket bu eklentiyi sağlıyor: %1$s\n\nPaketi onaylamadan önce çakışmayı giderin.</string>
+    <string name="ws_max_early_data">Maks. early data</string>
 </resources>

@@ -348,8 +348,6 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Confirmar</string>
     <string name="missing_plugin">Plugin Ausente</string>
-    <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
-        it was not found.</string>
     <string name="action_learn_more">SAIBA MAIS</string>
     <string name="action_download">BAIXAR</string>
     <string name="install_from_play_store">Instalar da Play Store</string>
@@ -393,9 +391,6 @@
     <string name="group_order_origin">Origem</string>
     <string name="group_order_by_name">Por Nome</string>
     <string name="group_order_by_delay">Por Atraso</string>
-    <string name="plugin_exists_but_on_shit_system" formatted="false">Profile %s requires the %s plugin, but your
-        proprietary equipment vendor (usually surveillance capital giants and malware maker)
-        tampered with your Android, making the plugin unusable.</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Plugin do Shadowsocks para Android)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Plugin Android do Shadowsocks)</string>
     <string name="tcp_connections">%d conexões TCP</string>
@@ -472,10 +467,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="tuic_disable_sni">Desabilitar SNI</string>
     <string name="tuic_reduce_rtt">Habilitar handshake QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">Certificado Fixado SHA256</string>
-    <string name="please_update" formatted="false">Your APP is too old (%s). And will stop working at %s. Please
-        update!</string>
-    <string name="please_update_force" formatted="false">Your APP is too old (%s). And has been stopped working at %s.
-        Please update!</string>
     <string name="connection_test_delete_unavailable">Limpar indisponíveis</string>
     <string name="move">Mover</string>
     <string name="exe_prefer_provider">Provedor Preferido de Plugin</string>
@@ -598,31 +589,8 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="backup_import_throne_desktop_summary">Importa perfis, rotas e configurações de um arquivo .thrbackup do Throne para desktop. Ícones personalizados são ignorados. Os dados existentes das categorias selecionadas serão sobrescritos.</string>
     <string name="connection_test_url">URL do teste de latência</string>
     <string name="connection_test_url_test">Testar URL deste grupo</string>
-    <string name="speed_test_settings">Speed test</string>
-    <string name="speed_test_mode">Speed test mode</string>
-    <string name="speed_test_mode_download_upload">Download + upload</string>
-    <string name="speed_test_mode_download">Download only</string>
-    <string name="speed_test_mode_upload">Upload only</string>
-    <string name="speed_test_mode_simple_download">Simple download</string>
-    <string name="speed_test_timeout_ms">Speed test timeout (ms)</string>
-    <string name="speed_test_timeout_invalid">Enter a timeout greater than zero milliseconds</string>
     <string name="simple_download_url">Simple download URL</string>
-    <string name="speed_test_url_invalid">Enter a valid HTTP or HTTPS URL</string>
     <string name="speed_test_group">Testar velocidade deste grupo</string>
-    <string name="speed_test_confirm_title">Run speed test?</string>
-    <string name="speed_test_confirm_message">Speed testing can use significant data. Profiles are tested one at a time through their own proxy.</string>
-    <string name="speed_test_stage_pending">Waiting</string>
-    <string name="speed_test_stage_discovery">Finding a test server</string>
-    <string name="speed_test_stage_latency">Measuring server latency</string>
-    <string name="speed_test_stage_download">Downloading</string>
-    <string name="speed_test_stage_upload">Uploading</string>
-    <string name="speed_test_stage_complete">Complete</string>
-    <string name="speed_test_stage_cancelled">Cancelled</string>
-    <string name="speed_test_stage_error">Failed</string>
-    <string name="speed_test_latency_format">Latency: %1$d ms</string>
-    <string name="speed_test_server_format">Server: %1$s</string>
-    <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
-    <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Ativar Hev TUN</string>
     <string name="enable_hev_tun_summary">Criar o dispositivo TUN com hev-socks5-tunnel</string>
@@ -630,4 +598,36 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="lan_sharing">Compartilhar pela LAN</string>
     <string name="lan_sharing_summary">Permitir que dispositivos da LAN se conectem</string>
     <string name="lan_sharing_requires_root">Compartilhar pela LAN requer root</string>
+    <string name="speed_test_mode">Modo de teste de velocidade</string>
+    <string name="speed_test_mode_download">Apenas download</string>
+    <string name="speed_test_mode_download_upload">Download + upload</string>
+    <string name="speed_test_mode_simple_download">Download simples</string>
+    <string name="speed_test_mode_upload">Apenas upload</string>
+    <string name="speed_test_timeout_ms">Tempo limite do teste (ms)</string>
+    <string name="speed_test_timeout_invalid">Informe um tempo limite maior que zero milissegundos</string>
+    <string name="speed_test_confirm_title">Executar teste de velocidade?</string>
+    <string name="speed_test_confirm_message">O teste de velocidade pode consumir muitos dados. Os perfis são testados um por vez pelo próprio proxy.</string>
+    <string name="speed_test_settings">Teste de velocidade</string>
+    <string name="speed_test_latency_format">Latência: %1$d ms</string>
+    <string name="speed_test_download_format">Download: %1$s (%2$s)</string>
+    <string name="speed_test_upload_format">Upload: %1$s (%2$s)</string>
+    <string name="speed_test_server_format">Servidor: %1$s</string>
+    <string name="speed_test_stage_pending">Aguardando</string>
+    <string name="speed_test_stage_discovery">Procurando servidor de teste</string>
+    <string name="speed_test_stage_latency">Medindo latência do servidor</string>
+    <string name="speed_test_stage_download">Baixando</string>
+    <string name="speed_test_stage_upload">Enviando</string>
+    <string name="speed_test_stage_complete">Concluído</string>
+    <string name="speed_test_stage_cancelled">Cancelado</string>
+    <string name="speed_test_stage_error">Erro</string>
+    <string name="speed_test_url_invalid">Informe uma URL HTTP ou HTTPS válida</string>
+    <string name="profile_requiring_plugin">O perfil %1$s requer que o plugin %2$s esteja instalado, mas
+        não foi encontrado.</string>
+    <string name="plugin_exists_but_on_shit_system">O perfil %1$s requer o plugin %2$s, mas o seu
+        fabricante de equipamento proprietário (geralmente gigantes do capital de vigilância e criadores de malware)
+        adulterou seu Android, tornando o plugin inutilizável.</string>
+    <string name="please_update">Seu APP é muito antigo (%1$s). E deixará de funcionar em %2$s. Por favor,
+        atualize!</string>
+    <string name="please_update_force">Seu APP é muito antigo (%1$s). E parou de funcionar em %2$s.
+        Por favor, atualize!</string>
 </resources>
