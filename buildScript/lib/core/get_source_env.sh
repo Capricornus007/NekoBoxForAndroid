@@ -14,4 +14,4 @@ export COMMIT_WIREGUARD_GO="a9ace872067dcf7aca7da798e334820655b8adc0"
 # sing-box and libcore both replace github.com/sagernet/sing-quic with the
 # sibling checkout at ../../sing-quic. Pin and fetch it explicitly so clean CI
 # runners do not accidentally depend on a developer machine's existing clone.
-export COMMIT_SING_QUIC="737a38c7e5cec64552a5e326eae62c45010f13a3"
+export COMMIT_SING_QUIC="772d0bf130cd4140b580d146f8b42981b07aef32"
