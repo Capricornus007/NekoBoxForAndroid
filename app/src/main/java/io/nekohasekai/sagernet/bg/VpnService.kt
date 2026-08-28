@@ -17,8 +17,8 @@ import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.ui.VpnRequestActivity
 import io.nekohasekai.sagernet.utils.Subnet
-import moe.matsuri.nb4a.hevtun.HevTunRuntime
 import kotlinx.coroutines.GlobalScope
+import moe.matsuri.nb4a.hevtun.HevTunRuntime
 import android.net.VpnService as BaseVpnService
 
 class VpnService :
