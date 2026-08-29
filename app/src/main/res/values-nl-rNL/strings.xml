@@ -916,4 +916,12 @@ Doorgaan?</string>
     <string name="lan_sharing_summary">LAN-apparaten toestaan om te verbinden</string>
     <string name="plugin_approval_conflict_message">Meer dan één onbetrouwbaar pakket biedt deze plug-in: %1$s\n\nLos het conflict op voordat u een pakket goedkeurt.</string>
     <string name="ws_max_early_data">Max. early data</string>
+    <string name="speed_test_finished_summary">Voltooid: %1$d, mislukt: %2$d, geannuleerd: %3$d</string>
+    <string name="spoof_user_agent">Standaard User-Agent</string>
+    <string name="spoof_user_agent_summary">Wordt gebruikt voor abonnementsupdates wanneer het abonnement geen eigen User-Agent heeft</string>
+    <string name="spoof_device_os">Vervalst apparaat-OS</string>
+    <string name="spoof_device_os_summary">Overschrijft de x-device-os HWID-header die bij abonnementsupdates wordt verzonden. Laat leeg om het echte OS (Android) te melden.</string>
+    <string name="spoof_device_os_version">Vervalste OS-versie</string>
+    <string name="spoof_device_model">Vervalst apparaatmodel</string>
+    <string name="stun_binding_test">Snelle binding (alleen extern adres)</string>
 </resources>

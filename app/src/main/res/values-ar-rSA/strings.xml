@@ -910,4 +910,12 @@
     <string name="plugin_exists_but_on_shit_system">يتطلب الملف التعریف %s المكوّن الإضافي %s، لكن بائع المعدات المملوكة لك (عادةً عمالقة المراقبة وصانع البرامج الضارة) تلاعب بجهاز أندرويد، مما يجعل المكون الإضافي غير قابل للاستخدام.</string>
     <string name="plugin_approval_conflict_message">توفر أكثر من حزمة غير موثوقة هذا الملحق: %1$s\n\nأزل التعارض قبل الموافقة على حزمة.</string>
     <string name="ws_max_early_data">الحد الأقصى للبيانات المبكرة</string>
+    <string name="speed_test_finished_summary">انتهى: %1$d، فشل: %2$d، أُلغي: %3$d</string>
+    <string name="spoof_user_agent">User-Agent الافتراضي</string>
+    <string name="spoof_user_agent_summary">يُستخدم لتحديثات الاشتراك عندما لا يكون للاشتراك User-Agent خاص به</string>
+    <string name="spoof_device_os">انتحال نظام تشغيل الجهاز</string>
+    <string name="spoof_device_os_summary">يتجاوز ترويسة x-device-os HWID المرسلة في تحديثات الاشتراك. اتركه فارغًا للإبلاغ عن نظام التشغيل الحقيقي (Android).</string>
+    <string name="spoof_device_os_version">انتحال إصدار نظام التشغيل</string>
+    <string name="spoof_device_model">انتحال طراز الجهاز</string>
+    <string name="stun_binding_test">ربط سريع (العنوان الخارجي فقط)</string>
 </resources>

@@ -824,4 +824,12 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="mixed_auth_username_hint">Nama pengguna (biarkan keduanya kosong tanpa autentikasi)</string>
     <string name="mixed_auth_no_auth">Belum diatur (tanpa autentikasi)</string>
     <string name="ws_max_early_data">Early data maksimum</string>
+    <string name="speed_test_finished_summary">Selesai: %1$d, gagal: %2$d, dibatalkan: %3$d</string>
+    <string name="spoof_user_agent">User-Agent bawaan</string>
+    <string name="spoof_user_agent_summary">Digunakan untuk pembaruan langganan saat langganan tidak memiliki User-Agent sendiri</string>
+    <string name="spoof_device_os">OS perangkat yang dipalsukan</string>
+    <string name="spoof_device_os_summary">Menimpa header x-device-os HWID yang dikirim pada pembaruan langganan. Biarkan kosong untuk melaporkan OS asli (Android).</string>
+    <string name="spoof_device_os_version">Versi OS yang dipalsukan</string>
+    <string name="spoof_device_model">Model perangkat yang dipalsukan</string>
+    <string name="stun_binding_test">Pengikatan cepat (hanya alamat eksternal)</string>
 </resources>

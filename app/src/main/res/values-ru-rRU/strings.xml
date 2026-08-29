@@ -957,4 +957,12 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="speed_test_url_invalid">Введите корректный HTTP- или HTTPS-URL</string>
     <string name="app_name">Throne</string>
     <string name="app_name_long">Throne для Android</string>
+    <string name="speed_test_finished_summary">Завершено: %1$d, с ошибкой: %2$d, отменено: %3$d</string>
+    <string name="spoof_user_agent">User-Agent по умолчанию</string>
+    <string name="spoof_user_agent_summary">Используется при обновлениях подписки, если у подписки нет своего User-Agent</string>
+    <string name="spoof_device_os">Поддельная ОС устройства</string>
+    <string name="spoof_device_os_summary">Переопределяет заголовок x-device-os HWID, отправляемый при обновлениях подписки. Оставьте пустым, чтобы сообщать реальную ОС (Android).</string>
+    <string name="spoof_device_os_version">Поддельная версия ОС</string>
+    <string name="spoof_device_model">Поддельная модель устройства</string>
+    <string name="stun_binding_test">Быстрая привязка (только внешний адрес)</string>
 </resources>

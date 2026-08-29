@@ -904,4 +904,12 @@ Devam edilsin mi?</string>
     <string name="mixed_auth_enabled_sum">Kullanıcı adı: %1$s</string>
     <string name="plugin_approval_conflict_message">Birden fazla güvenilmeyen paket bu eklentiyi sağlıyor: %1$s\n\nPaketi onaylamadan önce çakışmayı giderin.</string>
     <string name="ws_max_early_data">Maks. early data</string>
+    <string name="speed_test_finished_summary">Tamamlanan: %1$d, başarısız: %2$d, iptal: %3$d</string>
+    <string name="spoof_user_agent">Varsayılan User-Agent</string>
+    <string name="spoof_user_agent_summary">Aboneliğin kendi User-Agent'ı olmadığında abonelik güncellemelerinde kullanılır</string>
+    <string name="spoof_device_os">Sahte cihaz işletim sistemi</string>
+    <string name="spoof_device_os_summary">Abonelik güncellemelerinde gönderilen x-device-os HWID başlığını geçersiz kılar. Gerçek işletim sistemini (Android) bildirmek için boş bırakın.</string>
+    <string name="spoof_device_os_version">Sahte işletim sistemi sürümü</string>
+    <string name="spoof_device_model">Sahte cihaz modeli</string>
+    <string name="stun_binding_test">Hızlı bağlama (yalnızca harici adres)</string>
 </resources>

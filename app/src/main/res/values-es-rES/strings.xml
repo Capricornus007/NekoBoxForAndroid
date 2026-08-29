@@ -913,4 +913,12 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
     <string name="extra_subscription_links_hint">Introduce enlaces de suscripción, uno por línea</string>
     <string name="plugin_approval_conflict_message">Más de un paquete no confiable proporciona este plugin: %1$s\n\nResuelve el conflicto antes de aprobar un paquete.</string>
     <string name="ws_max_early_data">Early data máxima</string>
+    <string name="speed_test_finished_summary">Finalizado: %1$d, fallidos: %2$d, cancelados: %3$d</string>
+    <string name="spoof_user_agent">User-Agent predeterminado</string>
+    <string name="spoof_user_agent_summary">Se usa en las actualizaciones de suscripción cuando la suscripción no tiene User-Agent propio</string>
+    <string name="spoof_device_os">SO del dispositivo suplantado</string>
+    <string name="spoof_device_os_summary">Sustituye la cabecera x-device-os HWID enviada en las actualizaciones de suscripción. Déjalo vacío para informar del SO real (Android).</string>
+    <string name="spoof_device_os_version">Versión del SO suplantada</string>
+    <string name="spoof_device_model">Modelo de dispositivo suplantado</string>
+    <string name="stun_binding_test">Vinculación rápida (solo dirección externa)</string>
 </resources>

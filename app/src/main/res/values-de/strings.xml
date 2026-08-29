@@ -369,4 +369,12 @@
     <string name="speed_test_stage_cancelled">Abgebrochen</string>
     <string name="speed_test_stage_error">Fehler</string>
     <string name="speed_test_url_invalid">Gib eine gültige HTTP- oder HTTPS-URL ein</string>
+    <string name="speed_test_finished_summary">Abgeschlossen: %1$d, fehlgeschlagen: %2$d, abgebrochen: %3$d</string>
+    <string name="spoof_user_agent">Standard-User-Agent</string>
+    <string name="spoof_user_agent_summary">Wird für Abo-Aktualisierungen verwendet, wenn das Abo keinen eigenen User-Agent hat</string>
+    <string name="spoof_device_os">Gefälschtes Geräte-OS</string>
+    <string name="spoof_device_os_summary">Überschreibt den x-device-os-HWID-Header bei Abo-Aktualisierungen. Leer lassen, um das echte OS (Android) zu melden.</string>
+    <string name="spoof_device_os_version">Gefälschte OS-Version</string>
+    <string name="spoof_device_model">Gefälschtes Gerätemodell</string>
+    <string name="stun_binding_test">Schnelle Bindung (nur externe Adresse)</string>
 </resources>

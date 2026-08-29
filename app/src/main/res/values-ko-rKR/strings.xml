@@ -888,4 +888,12 @@
     <string name="speed_test_stage_error">오류</string>
     <string name="speed_test_url_invalid">유효한 HTTP 또는 HTTPS URL을 입력하세요</string>
     <string name="ws_max_early_data">최대 early data</string>
+    <string name="speed_test_finished_summary">완료: %1$d, 실패: %2$d, 취소: %3$d</string>
+    <string name="spoof_user_agent">기본 User-Agent</string>
+    <string name="spoof_user_agent_summary">구독에 자체 User-Agent가 없을 때 구독 업데이트에 사용됩니다</string>
+    <string name="spoof_device_os">스푸핑된 기기 OS</string>
+    <string name="spoof_device_os_summary">구독 업데이트 시 전송되는 x-device-os HWID 헤더를 대체합니다. 비워 두면 실제 OS(Android)를 보고합니다.</string>
+    <string name="spoof_device_os_version">스푸핑된 OS 버전</string>
+    <string name="spoof_device_model">스푸핑된 기기 모델</string>
+    <string name="stun_binding_test">빠른 바인딩(외부 주소만)</string>
 </resources>

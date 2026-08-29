@@ -634,4 +634,12 @@
     <string name="speed_test_stage_cancelled">キャンセル</string>
     <string name="speed_test_stage_error">エラー</string>
     <string name="speed_test_url_invalid">有効な HTTP または HTTPS の URL を入力してください</string>
+    <string name="speed_test_finished_summary">完了: %1$d、失敗: %2$d、キャンセル: %3$d</string>
+    <string name="spoof_user_agent">既定の User-Agent</string>
+    <string name="spoof_user_agent_summary">サブスクリプションが独自の User-Agent を持たない場合の更新に使用されます</string>
+    <string name="spoof_device_os">偽装デバイス OS</string>
+    <string name="spoof_device_os_summary">サブスクリプション更新時に送信される x-device-os HWID ヘッダーを上書きします。空のままにすると実際の OS (Android) を報告します。</string>
+    <string name="spoof_device_os_version">偽装 OS バージョン</string>
+    <string name="spoof_device_model">偽装デバイスモデル</string>
+    <string name="stun_binding_test">クイックバインド（外部アドレスのみ）</string>
 </resources>

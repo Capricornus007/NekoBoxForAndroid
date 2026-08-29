@@ -899,4 +899,12 @@ VPN адключыцца на 1–3 секунды, а затым падключ
     <string name="lan_sharing_summary">Дазволіць падключэнне прылад лакальнай сеткі</string>
     <string name="plugin_approval_conflict_message">Гэты плагін прадастаўляюць некалькі ненадзейных пакетаў: %1$s\n\nВырашыце канфлікт, перш чым ухваляць пакет.</string>
     <string name="ws_max_early_data">Макс. early data</string>
+    <string name="speed_test_finished_summary">Завершана: %1$d, з правалам: %2$d, скасавана: %3$d</string>
+    <string name="spoof_user_agent">User-Agent па змаўчанні</string>
+    <string name="spoof_user_agent_summary">Выкарыстоўваецца для абнаўленняў падпіскі, калі ў падпіскі няма ўласнага User-Agent</string>
+    <string name="spoof_device_os">Падроблены OS прылады</string>
+    <string name="spoof_device_os_summary">Перавызначае загаловак x-device-os HWID, які адсылаецца пры абнаўленні падпіскі. Пакіньце пустым, каб паведамляць рэальны OS (Android).</string>
+    <string name="spoof_device_os_version">Падробленая версія OS</string>
+    <string name="spoof_device_model">Падробленая мадэль прылады</string>
+    <string name="stun_binding_test">Хуткая привязка (толькі знешні адрас)</string>
 </resources>

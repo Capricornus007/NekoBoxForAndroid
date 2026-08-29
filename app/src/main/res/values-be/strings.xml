@@ -143,4 +143,12 @@
     <string name="speed_test_stage_cancelled">Скасавана</string>
     <string name="speed_test_stage_error">Памылка</string>
     <string name="speed_test_url_invalid">Увядзіце карэктны HTTP- ці HTTPS-URL</string>
+    <string name="speed_test_finished_summary">Завершана: %1$d, з правалам: %2$d, скасавана: %3$d</string>
+    <string name="spoof_user_agent">User-Agent па змаўчанні</string>
+    <string name="spoof_user_agent_summary">Выкарыстоўваецца для абнаўленняў падпіскі, калі ў падпіскі няма ўласнага User-Agent</string>
+    <string name="spoof_device_os">Падроблены OS прылады</string>
+    <string name="spoof_device_os_summary">Перавызначае загаловак x-device-os HWID, які адсылаецца пры абнаўленні падпіскі. Пакіньце пустым, каб паведамляць рэальны OS (Android).</string>
+    <string name="spoof_device_os_version">Падробленая версія OS</string>
+    <string name="spoof_device_model">Падробленая мадэль прылады</string>
+    <string name="stun_binding_test">Хуткая привязка (толькі знешні адрас)</string>
 </resources>

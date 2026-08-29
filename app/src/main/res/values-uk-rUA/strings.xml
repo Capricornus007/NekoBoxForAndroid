@@ -906,4 +906,12 @@
     <string name="action_masterdnsvpn">MasterDnsVPN</string>
     <string name="action_olcrtc">olcRTC</string>
     <string name="ws_max_early_data">Макс. early data</string>
+    <string name="speed_test_finished_summary">Завершено: %1$d, з помилкою: %2$d, скасовано: %3$d</string>
+    <string name="spoof_user_agent">User-Agent за замовчуванням</string>
+    <string name="spoof_user_agent_summary">Використовується для оновлень підписки, якщо підписка не має власного User-Agent</string>
+    <string name="spoof_device_os">Підроблена ОС пристрою</string>
+    <string name="spoof_device_os_summary">Перевизначає заголовок x-device-os HWID, що надсилається під час оновлень підписки. Залиште порожнім, щоб повідомляти реальну ОС (Android).</string>
+    <string name="spoof_device_os_version">Підроблена версія ОС</string>
+    <string name="spoof_device_model">Підроблена модель пристрою</string>
+    <string name="stun_binding_test">Швидка прив'язка (лише зовнішня адреса)</string>
 </resources>

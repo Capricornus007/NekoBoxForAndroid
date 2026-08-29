@@ -630,4 +630,12 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
         atualize!</string>
     <string name="please_update_force">Seu APP é muito antigo (%1$s). E parou de funcionar em %2$s.
         Por favor, atualize!</string>
+    <string name="speed_test_finished_summary">Concluídos: %1$d, falharam: %2$d, cancelados: %3$d</string>
+    <string name="spoof_user_agent">User-Agent predefinido</string>
+    <string name="spoof_user_agent_summary">Usado nas atualizações de subscrição quando a subscrição não tem User-Agent próprio</string>
+    <string name="spoof_device_os">SO do dispositivo falsificado</string>
+    <string name="spoof_device_os_summary">Substitui o cabeçalho x-device-os HWID enviado nas atualizações de subscrição. Deixe vazio para reportar o SO real (Android).</string>
+    <string name="spoof_device_os_version">Versão do SO falsificada</string>
+    <string name="spoof_device_model">Modelo do dispositivo falsificado</string>
+    <string name="stun_binding_test">Ligação rápida (apenas endereço externo)</string>
 </resources>

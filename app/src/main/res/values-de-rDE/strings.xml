@@ -903,4 +903,12 @@ Fortfahren?</string>
     <string name="extra_subscription_links_hint">Abonnement-Links eingeben, einen pro Zeile</string>
     <string name="plugin_approval_conflict_message">Mehr als ein nicht vertrauenswürdiges Paket stellt dieses Plugin bereit: %1$s\n\nBeseitigen Sie den Konflikt, bevor Sie ein Paket genehmigen.</string>
     <string name="ws_max_early_data">Max. Early Data</string>
+    <string name="speed_test_finished_summary">Abgeschlossen: %1$d, fehlgeschlagen: %2$d, abgebrochen: %3$d</string>
+    <string name="spoof_user_agent">Standard-User-Agent</string>
+    <string name="spoof_user_agent_summary">Wird für Abo-Aktualisierungen verwendet, wenn das Abo keinen eigenen User-Agent hat</string>
+    <string name="spoof_device_os">Gefälschtes Geräte-OS</string>
+    <string name="spoof_device_os_summary">Überschreibt den x-device-os-HWID-Header bei Abo-Aktualisierungen. Leer lassen, um das echte OS (Android) zu melden.</string>
+    <string name="spoof_device_os_version">Gefälschte OS-Version</string>
+    <string name="spoof_device_model">Gefälschtes Gerätemodell</string>
+    <string name="stun_binding_test">Schnelle Bindung (nur externe Adresse)</string>
 </resources>

@@ -672,4 +672,12 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="speed_test_url_invalid">Oppgi en gyldig HTTP- eller HTTPS-URL</string>
     <string name="please_update">Appen din er for gammel (%1$s). Den vil slutte å fungere %2$s. Vennligst oppdater!</string>
     <string name="please_update_force">Appen din er for gammel (%1$s). Den har sluttet å fungere fra %2$s. Vennligst oppdater!</string>
+    <string name="speed_test_finished_summary">Fullført: %1$d, mislyktes: %2$d, avbrutt: %3$d</string>
+    <string name="spoof_user_agent">Standard User-Agent</string>
+    <string name="spoof_user_agent_summary">Brukes for abonnementsoppdateringer når abonnementet ikke har egen User-Agent</string>
+    <string name="spoof_device_os">Forfalsket enhets-OS</string>
+    <string name="spoof_device_os_summary">Overstyrer x-device-os HWID-headeren sendt i abonnementsoppdateringer. La stå tom for å rapportere ekte OS (Android).</string>
+    <string name="spoof_device_os_version">Forfalsket OS-versjon</string>
+    <string name="spoof_device_model">Forfalsket enhetsmodell</string>
+    <string name="stun_binding_test">Hurtigbinding (kun ekstern adresse)</string>
 </resources>

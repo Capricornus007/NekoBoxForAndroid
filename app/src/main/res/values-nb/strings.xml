@@ -908,4 +908,12 @@ Fortsette?</string>
     <string name="ws_max_early_data">Maks early data</string>
     <string name="extra_subscription_links">Ekstra abonnementslenker</string>
     <string name="extra_subscription_links_hint">Skriv inn abonnementslenker, én per linje</string>
+    <string name="speed_test_finished_summary">Fullført: %1$d, mislyktes: %2$d, avbrutt: %3$d</string>
+    <string name="spoof_user_agent">Standard User-Agent</string>
+    <string name="spoof_user_agent_summary">Brukes for abonnementsoppdateringer når abonnementet ikke har egen User-Agent</string>
+    <string name="spoof_device_os">Forfalsket enhets-OS</string>
+    <string name="spoof_device_os_summary">Overstyrer x-device-os HWID-headeren sendt i abonnementsoppdateringer. La stå tom for å rapportere ekte OS (Android).</string>
+    <string name="spoof_device_os_version">Forfalsket OS-versjon</string>
+    <string name="spoof_device_model">Forfalsket enhetsmodell</string>
+    <string name="stun_binding_test">Hurtigbinding (kun ekstern adresse)</string>
 </resources>

@@ -901,4 +901,12 @@
     <string name="lan_sharing_summary">اجازه دادن به دستگاه‌های شبکه محلی برای اتصال</string>
     <string name="plugin_approval_conflict_message">بیش از یک بسته نامعتبر این افزونه را فراهم می‌کند: %1$s\n\nقبل از تأیید یک بسته، تعارض را حل کنید.</string>
     <string name="ws_max_early_data">حداکثر early data</string>
+    <string name="speed_test_finished_summary">پایان‌یافته: %1$d، ناموفق: %2$d، لغوشده: %3$d</string>
+    <string name="spoof_user_agent">User-Agent پیش‌فرض</string>
+    <string name="spoof_user_agent_summary">برای به‌روزرسانی‌های اشتراک استفاده می‌شود وقتی اشتراک User-Agent خودش را ندارد</string>
+    <string name="spoof_device_os">جعل سیستم‌عامل دستگاه</string>
+    <string name="spoof_device_os_summary">هدر x-device-os HWID ارسالی در به‌روزرسانی‌های اشتراک را بازنویسی می‌کند. برای گزارش سیستم‌عامل واقعی (Android) خالی بگذارید.</string>
+    <string name="spoof_device_os_version">جعل نسخه سیستم‌عامل</string>
+    <string name="spoof_device_model">جعل مدل دستگاه</string>
+    <string name="stun_binding_test">اتصال سریع (فقط آدرس خارجی)</string>
 </resources>
