@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import io.nekohasekai.sagernet.GroupType
@@ -1293,7 +1294,17 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             testJobs.joinAll()
 
+            // 完成摘要：不滾動列表也能一眼看到測試結果
             runOnMainDispatcher {
+                if (isAdded && test.dialogStatus.get() != 2) {
+                    val ok = test.results.count { it.status == 1 }
+                    val bad = test.results.count { it.status != 1 }
+                    Snackbar.make(
+                        requireView(),
+                        getString(R.string.url_test_finished_summary, ok, bad),
+                        Snackbar.LENGTH_LONG,
+                    ).show()
+                }
                 test.cancel()
             }
         }

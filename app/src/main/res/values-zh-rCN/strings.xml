@@ -837,4 +837,5 @@
     <string name="amneziawg_jmin">垃圾包最小</string>
     <string name="amneziawg_jmax">垃圾包最大</string>
     <string name="bottomsheet_drag_handle_clicked">已点击拖动手柄</string>
+    <string name="url_test_finished_summary">URL 测试完成：%1$d 成功 / %2$d 失败</string>
 </resources>

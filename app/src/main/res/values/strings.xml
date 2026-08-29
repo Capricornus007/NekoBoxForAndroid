@@ -967,4 +967,5 @@ Continue?</string>
         <string name="enable_hev_tun">Enable Hev TUN</string>
         <string name="enable_hev_tun_summary">Use hev-socks5-tunnel to create the TUN device</string>
     <string name="tun_implementation_hev_override">Managed by Hev TUN — turn it off to choose</string>
+    <string name="url_test_finished_summary">URL test finished: %1$d succeeded / %2$d failed</string>
 </resources>
