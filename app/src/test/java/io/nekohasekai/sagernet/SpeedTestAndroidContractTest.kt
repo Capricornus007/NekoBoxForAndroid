@@ -93,13 +93,15 @@ class SpeedTestAndroidContractTest {
     }
 
     @Test
-    fun menuIsRewiredWithDataUsageConfirmation() {
+    fun menuKeepsUrlTestAndSpeedTestRetired() {
         val menu = source("main/res/menu/add_profile_menu.xml")
         val strings = source("main/res/values/strings.xml")
         val urlTestPosition = menu.indexOf("android:id=\"@+id/action_connection_url_test\"")
         val speedTestPosition = menu.indexOf("android:id=\"@+id/action_speed_test_group\"")
-        assertTrue(menu.contains("android:id=\"@+id/action_speed_test_group\""))
-        assertTrue(menu.contains("android:title=\"@string/speed_test_group\""))
+        // 速度測試已按用戶要求從菜單回退移除（實現保留在代碼裡，需要時可恢復）；
+        // URL 測試必須保留。
+        assertTrue(urlTestPosition >= 0)
+        assertTrue(speedTestPosition < 0)
         assertTrue(strings.contains("name=\"speed_test_confirm_message\""))
     }
 
