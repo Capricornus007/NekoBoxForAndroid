@@ -566,6 +566,22 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             // longer supported by the upstream core.
             // concurrent_dial = DataStore.concurrentDial
 
+            // DNS 劫持：把 53 端口的查询显式交给 sing-box 的 DNS 模块。
+            // 没有这条规则时，TUN 模式依赖 TUN 栈对网关地址的自动拦截，
+            // hev 模式下发往 172.19.0.2:53 的 UDP 会被当成普通流量转出去
+            // （目标是 VPN 内部地址，远程节点不可达）→ DNS 全灭。
+            // 三种模式（gVisor/system/hev-mixed）都走这条确定性路径；
+            // 用户设置的 DNS（如本机 AdGuardHome）照常生效。
+            if (isVPN) {
+                rules.add(
+                    Rule_DefaultOptions().apply {
+                        inbound = listOf(deviceInboundTag)
+                        port = listOf(53)
+                        action = "dns"
+                    },
+                )
+            }
+
             if (needSniff) {
                 rules.add(
                     Rule_DefaultOptions().apply {

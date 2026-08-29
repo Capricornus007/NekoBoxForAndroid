@@ -69,14 +69,17 @@ object HevTunRuntime {
                 appendLine("  username: '${Key.MIXED_USERNAME.yamlEscape()}'")
                 appendLine("  password: '${DataStore.mixedSecret.yamlEscape()}'")
             }
-            if (DataStore.enableFakeDns) {
-                appendLine("mapdns:")
-                appendLine("  address: '${VpnService.PRIVATE_VLAN4_ROUTER}'")
-                appendLine("  port: 53")
-                appendLine("  network: '${VpnService.HEV_MAPDNS_VLAN4}'")
-                appendLine("  netmask: '255.192.0.0'")
-                appendLine("  cache-size: 10000")
-            }
+            // mapdns 是 hev 模式唯一的 DNS 引擎：sing-box TUN 的「網關地址自動
+            // 應答 DNS」在 mixed 入站下不存在，若關掉 mapdns，應用發往
+            // 172.19.0.2:53 的查詢會被原樣轉發成一個發往 VPN 內部地址的 UDP，
+            // 直接石沉大海（實機故障：DNS 全滅、萬物皆斷）。所以永遠啟用，
+            // 與 FakeDNS 開關解耦。
+            appendLine("mapdns:")
+            appendLine("  address: '${VpnService.PRIVATE_VLAN4_ROUTER}'")
+            appendLine("  port: 53")
+            appendLine("  network: '${VpnService.HEV_MAPDNS_VLAN4}'")
+            appendLine("  netmask: '255.192.0.0'")
+            appendLine("  cache-size: 10000")
             appendLine("misc:")
             appendLine("  log-level: 'warn'")
         }

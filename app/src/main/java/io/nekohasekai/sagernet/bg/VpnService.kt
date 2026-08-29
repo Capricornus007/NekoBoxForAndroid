@@ -147,9 +147,9 @@ class VpnService :
             }
             builder.addRoute(PRIVATE_VLAN4_ROUTER, 32)
             builder.addRoute(FAKEDNS_VLAN4_CLIENT, 15)
-            if (DataStore.enableHevTun && DataStore.enableFakeDns) {
-                // hev 的 mapdns 监听 100.64.0.0/10 段的 DNS 查询；bypass 模式下
-                // 没有默认路由，必须显式把这个段送进 TUN。
+            if (DataStore.enableHevTun) {
+                // hev 的 mapdns 会给应用下发 100.64.0.0/10 段的虚拟 IP；
+                // bypass 模式下没有默认路由，必须显式把这个段送进 TUN。
                 builder.addRoute(HEV_MAPDNS_VLAN4, 10)
             }
             // https://issuetracker.google.com/issues/149636790
