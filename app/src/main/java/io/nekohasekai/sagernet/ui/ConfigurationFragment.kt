@@ -909,10 +909,6 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
             }
 
-            R.id.action_speed_test_group -> {
-                confirmSpeedTest()
-            }
-
             R.id.action_connection_url_test -> {
                 urlTest()
             }
@@ -1142,15 +1138,16 @@ class ConfigurationFragment @JvmOverloads constructor(
         val binding = LayoutProgressListBinding.inflate(layoutInflater)
         val builder = MaterialAlertDialogBuilder(requireContext()).setView(binding.root)
             .setPositiveButton(R.string.minimize) { _, _ ->
-                minimize()
+                // 按钮点击可能早于下方回调赋值（真机 NPE 实锤），可空调用
+                minimize?.invoke()
             }
             .setNegativeButton(android.R.string.cancel) { _, _ ->
-                cancel()
+                cancel?.invoke()
             }
             .setCancelable(false)
 
-        lateinit var cancel: () -> Unit
-        lateinit var minimize: () -> Unit
+        var cancel: (() -> Unit)? = null
+        var minimize: (() -> Unit)? = null
 
         val dialogStatus = AtomicInteger(0) // 1: hidden 2: cancelled
         var notification: ConnectionTestNotification? = null
@@ -1305,7 +1302,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                         Snackbar.LENGTH_LONG,
                     ).show()
                 }
-                test.cancel()
+                test.cancel?.invoke()
             }
         }
         test.cancel = {
