@@ -913,5 +913,5 @@
     <string name="spoof_device_os_summary">Перевизначає заголовок x-device-os HWID, що надсилається під час оновлень підписки. Залиште порожнім, щоб повідомляти реальну ОС (Android).</string>
     <string name="spoof_device_os_version">Підроблена версія ОС</string>
     <string name="spoof_device_model">Підроблена модель пристрою</string>
-    <string name="stun_binding_test">Швидка прив'язка (лише зовнішня адреса)</string>
+    <string name="stun_binding_test">Швидка прив\'язка (лише зовнішня адреса)</string>
 </resources>

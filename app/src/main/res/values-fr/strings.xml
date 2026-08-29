@@ -850,11 +850,11 @@
     <string name="ws_max_early_data">Early data maximale</string>
     <string name="speed_test_finished_summary">Terminés : %1$d, échoués : %2$d, annulés : %3$d</string>
     <string name="spoof_user_agent">User-Agent par défaut</string>
-    <string name="spoof_user_agent_summary">Utilisé pour les mises à jour d'abonnement quand l'abonnement n'a pas son propre User-Agent</string>
-    <string name="spoof_device_os">OS de l'appareil usurpé</string>
-    <string name="spoof_device_os_summary">Remplace l'en-tête x-device-os HWID envoyé lors des mises à jour d'abonnement. Laissez vide pour signaler l'OS réel (Android).</string>
-    <string name="spoof_device_os_version">Version de l'OS usurpée</string>
-    <string name="spoof_device_model">Modèle d'appareil usurpé</string>
+    <string name="spoof_user_agent_summary">Utilisé pour les mises à jour d\'abonnement quand l\'abonnement n\'a pas son propre User-Agent</string>
+    <string name="spoof_device_os">OS de l\'appareil usurpé</string>
+    <string name="spoof_device_os_summary">Remplace l\'en-tête x-device-os HWID envoyé lors des mises à jour d\'abonnement. Laissez vide pour signaler l\'OS réel (Android).</string>
+    <string name="spoof_device_os_version">Version de l\'OS usurpée</string>
+    <string name="spoof_device_model">Modèle d\'appareil usurpé</string>
     <string name="stun_binding_test">Liaison rapide (adresse externe uniquement)</string>
     <string name="wireguard_listen_port">Port d\'écoute</string>
     <string name="wireguard_persistent_keepalive">Intervalle de keepalive persistant (secondes)</string>

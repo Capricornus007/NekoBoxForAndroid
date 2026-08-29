@@ -704,7 +704,7 @@
     <string name="spoof_device_os_summary">Перевизначає заголовок x-device-os HWID, що надсилається під час оновлень підписки. Залиште порожнім, щоб повідомляти реальну ОС (Android).</string>
     <string name="spoof_device_os_version">Підроблена версія ОС</string>
     <string name="spoof_device_model">Підроблена модель пристрою</string>
-    <string name="stun_binding_test">Швидка прив'язка (лише зовнішня адреса)</string>
+    <string name="stun_binding_test">Швидка прив\'язка (лише зовнішня адреса)</string>
     <string name="use_system_theme">Використовувати системну тему</string>
     <string name="use_system_theme_summary">Використовувати системні кольори Monet (Android 12+)</string>
     <string name="disable_mixed_inbound">Вимкнути змішаний вхід</string>
@@ -723,7 +723,7 @@
     <string name="backup_not_throne_desktop">Це не резервна копія Throne Desktop: очікувався .thrbackup, але знайдено %s</string>
     <string name="action_import_throne_desktop">Імпортувати з Throne Desktop</string>
     <string name="backup_import_throne_desktop_summary">Імпортувати профілі, маршрути та налаштування з файлу .thrbackup Throne Desktop</string>
-    <string name="trusttunnel_health_check">Перевірка здоров'я</string>
+    <string name="trusttunnel_health_check">Перевірка здоров\'я</string>
     <string name="trusttunnel_congestion_control">Керування перевантаженням QUIC</string>
     <string name="invalid_naive_link">Недійсне посилання Naive: %1$s</string>
     <string name="invalid_ss_android_link">Недійсне посилання ss-android: %1$s</string>

@@ -847,9 +847,9 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="ws_max_early_data">Early data massima</string>
     <string name="speed_test_finished_summary">Completati: %1$d, falliti: %2$d, annullati: %3$d</string>
     <string name="spoof_user_agent">User-Agent predefinito</string>
-    <string name="spoof_user_agent_summary">Usato per gli aggiornamenti dell'abbonamento quando l'abbonamento non ha un proprio User-Agent</string>
+    <string name="spoof_user_agent_summary">Usato per gli aggiornamenti dell\'abbonamento quando l\'abbonamento non ha un proprio User-Agent</string>
     <string name="spoof_device_os">OS del dispositivo falsificato</string>
-    <string name="spoof_device_os_summary">Sostituisce l'header x-device-os HWID inviato negli aggiornamenti dell'abbonamento. Lascia vuoto per riportare il SO reale (Android).</string>
+    <string name="spoof_device_os_summary">Sostituisce l\'header x-device-os HWID inviato negli aggiornamenti dell\'abbonamento. Lascia vuoto per riportare il SO reale (Android).</string>
     <string name="spoof_device_os_version">Versione del SO falsificata</string>
     <string name="spoof_device_model">Modello del dispositivo falsificato</string>
     <string name="stun_binding_test">Binding rapido (solo indirizzo esterno)</string>
