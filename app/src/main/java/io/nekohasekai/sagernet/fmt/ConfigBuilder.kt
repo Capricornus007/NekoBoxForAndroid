@@ -577,7 +577,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     Rule_DefaultOptions().apply {
                         inbound = listOf(deviceInboundTag)
                         port = listOf(53)
-                        action = "dns"
+                        action = "hijack-dns"
                     },
                 )
             }
