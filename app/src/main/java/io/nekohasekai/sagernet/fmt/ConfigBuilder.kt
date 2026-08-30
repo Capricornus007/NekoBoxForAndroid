@@ -74,6 +74,18 @@ const val TAG_DNS_HOSTS = "dns-hosts"
 
 const val LOCALHOST = "127.0.0.1"
 
+// selector/urltest 分组出站不支持 domain_strategy 字段（sing-box 1.14 解码
+// 直接拒绝），只有真实出站才能带。来自 isai 分支的修复
+// （1d9328380 Fix domain strategy on group outbounds）。
+private val GROUP_OUTBOUND_TYPES = setOf("selector", "urltest")
+
+internal fun SingBoxOption.applyDomainStrategyIfSupported(domainStrategy: String) {
+    val outboundType = asMap()["type"] as? String
+    if (outboundType !in GROUP_OUTBOUND_TYPES) {
+        _hack_config_map["domain_strategy"] = domainStrategy
+    }
+}
+
 private val ENDPOINT_TYPES = setOf("wireguard", "awg")
 
 private fun SingBoxOption.isGeneratedEndpoint(): Boolean = this is Endpoint && type in ENDPOINT_TYPES
@@ -852,11 +864,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     }
                     // 测速配置必须与正式连接一致（对齐 husi）：沿用统一的服务器
                     // 域名解析策略。曾强制空——测速解析出的 IP/协议族与真实路径不同。
-                    _hack_config_map["domain_strategy"] = defaultServerDomainStrategy
+                    _hack_custom_config = bean.customOutboundJson
+                    applyDomainStrategyIfSupported(defaultServerDomainStrategy)
 
                     _hack_config_map["tag"] = tagOut
-
-                    _hack_custom_config = bean.customOutboundJson
                 }
 
                 bean.finalAddress = bean.serverAddress

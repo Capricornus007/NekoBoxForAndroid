@@ -630,7 +630,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 val subscriptionUri = e.link.toUri()
                                 val subscriptionLink = subscriptionUri.getQueryParameter("url") ?: e.link
                                 val airportName = subscriptionUri.getQueryParameter("name")?.takeIf { it.isNotBlank() }
-                                    ?: withTimeoutOrNull(10_000L) {
+                                    ?: withTimeoutOrNull(5_000L) {
                                         withContext(Dispatchers.IO) { fetchAirportName(subscriptionLink) }
                                     }
 
