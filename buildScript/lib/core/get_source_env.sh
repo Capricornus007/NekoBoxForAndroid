@@ -1,7 +1,7 @@
 # sing-box 1.14.x fork commit (Capricornus007/sing-box, branch 1.14.x).
 # Pinned so CI builds are reproducible and so the LibCore cache key
 # (golang_status hashes this file) invalidates when sing-box changes.
-export COMMIT_SING_BOX="aa347f1e4725f6ccf9d82782eeb29f0bccde5b86"
+export COMMIT_SING_BOX="b7173277323386355bde8bc3ac398e095f5a8e70"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
