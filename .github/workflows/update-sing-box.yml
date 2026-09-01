@@ -40,21 +40,45 @@ jobs:
               buildScript/lib/core/get_source_env.sh
           fi
 
+      - name: Sync displayed core version with upstream release
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The displayed version must track the newest upstream release on the tracked
+          # branch line (SINGBOX_BRANCH=1.14.x -> newest v1.14.* stable tag), keeping the
+          # local -mod.N suffix so builds stay distinguishable from official ones.
+          branch=$(grep -E '^SINGBOX_BRANCH=' nb4a.properties | cut -d= -f2 | tr -d '\r[:space:]')
+          line=${branch%.x}
+          upstream=$(git ls-remote --tags --refs https://github.com/SagerNet/sing-box.git "refs/tags/v${line}.*" \
+            | sed 's#.*refs/tags/##' | grep -vE 'alpha|beta|rc' | sort -V | tail -n1)
+          test -n "$upstream"
+          current=$(grep -E '^SINGBOX_VERSION=' nb4a.properties | cut -d= -f2 | tr -d '\r[:space:]')
+          mod=$(printf '%s' "$current" | grep -oE -- '-mod\.[0-9]+$' || true)
+          want="${upstream}${mod}"
+          echo "current=$current  upstream=$upstream  want=$want"
+          if [ "$current" = "$want" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            sed -i -E "s/^SINGBOX_VERSION=.*/SINGBOX_VERSION=${want}/" nb4a.properties
+          fi
+
       - name: Set up Java
-        if: steps.core.outputs.changed == 'true'
+        if: steps.core.outputs.changed == 'true' || steps.version.outputs.changed == 'true'
         uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Go
-        if: steps.core.outputs.changed == 'true'
+        if: steps.core.outputs.changed == 'true' || steps.version.outputs.changed == 'true'
         uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
           go-version: "1.27.0"
 
       - name: Build and verify LibCore
-        if: steps.core.outputs.changed == 'true'
+        if: steps.core.outputs.changed == 'true' || steps.version.outputs.changed == 'true'
         env:
           ALLOW_UNPINNED_SIBLINGS: "1"
         run: |
@@ -64,18 +88,28 @@ jobs:
           ./gradlew spotlessCheck testOssDebugUnitTest --no-daemon
 
       - name: Commit verified pin
-        if: steps.core.outputs.changed == 'true'
+        if: steps.core.outputs.changed == 'true' || steps.version.outputs.changed == 'true'
         env:
           LATEST: ${{ steps.core.outputs.latest }}
+          CORE_CHANGED: ${{ steps.core.outputs.changed }}
+          VERSION_CHANGED: ${{ steps.version.outputs.changed }}
         run: |
+          set -euo pipefail
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add buildScript/lib/core/get_source_env.sh
-          git commit -m "chore: follow sing-box 1.14.x ${LATEST:0:9}"
+          git add buildScript/lib/core/get_source_env.sh nb4a.properties
+          if [ "$CORE_CHANGED" = "true" ] && [ "$VERSION_CHANGED" = "true" ]; then
+            msg="chore: follow sing-box 1.14.x ${LATEST:0:9}; sync displayed core version"
+          elif [ "$CORE_CHANGED" = "true" ]; then
+            msg="chore: follow sing-box 1.14.x ${LATEST:0:9}"
+          else
+            msg="chore: sync displayed core version with upstream release"
+          fi
+          git commit -m "$msg"
           git push origin HEAD:main
 
       - name: Dispatch signed builds
-        if: steps.core.outputs.changed == 'true'
+        if: steps.core.outputs.changed == 'true' || steps.version.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"runtime"
 	"runtime/debug"
 	"strings"
@@ -36,6 +37,36 @@ import (
 // boxPlatformInterfaceWrapper.UsePlatformNetworkInterfaces() = false で無効化済み）。
 
 var mainInstance *BoxInstance
+
+type boxLifecycleState uint8
+
+const (
+	boxStateNew boxLifecycleState = iota
+	boxStateStarting
+	boxStateStarted
+	boxStateStartFailed
+	boxStateClosing
+	boxStateClosed
+)
+
+func (s boxLifecycleState) String() string {
+	switch s {
+	case boxStateNew:
+		return "new"
+	case boxStateStarting:
+		return "starting"
+	case boxStateStarted:
+		return "started"
+	case boxStateStartFailed:
+		return "start-failed"
+	case boxStateClosing:
+		return "closing"
+	case boxStateClosed:
+		return "closed"
+	default:
+		return fmt.Sprintf("unknown(%d)", uint8(s))
+	}
+}
 
 func VersionBox() string {
 	version := []string{
@@ -82,7 +113,13 @@ type BoxInstance struct {
 
 	*box.Box
 	cancel context.CancelFunc
-	state  int
+	state  boxLifecycleState
+
+	// startBox/closeBox indirect the underlying box lifecycle so the wrapper's
+	// state machine can be unit-tested without a real sing-box instance.
+	startBox func() error
+	closeBox func() error
+	startErr error
 
 	v2api        *boxapi.SbV2rayServer
 	selector     *group.Selector
@@ -164,6 +201,8 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 	b = &BoxInstance{
 		Box:          instance,
 		cancel:       cancel,
+		startBox:     instance.Start,
+		closeBox:     instance.Close,
 		pauseManager: service.FromContext[pause.Manager](ctx),
 	}
 
@@ -183,26 +222,52 @@ func (b *BoxInstance) Start() (err error) {
 	b.access.Lock()
 	defer b.access.Unlock()
 
+	if b.state != boxStateNew {
+		return errors.New("already started")
+	}
+
+	b.state = boxStateStarting
+	defer func() {
+		if err != nil {
+			b.state = boxStateStartFailed
+			b.startErr = err
+		} else {
+			b.state = boxStateStarted
+		}
+	}()
 	defer device.DeferPanicToError("box.Start", func(err_ error) { err = err_ })
 
-	if b.state == 0 {
-		b.state = 1
-		return b.Box.Start()
+	if b.startBox != nil {
+		err = b.startBox()
+	} else if b.Box != nil {
+		err = b.Box.Start()
+	} else {
+		err = errors.New("box is nil")
 	}
-	return errors.New("already started")
+	return err
 }
 
 func (b *BoxInstance) Close() (err error) {
 	b.access.Lock()
 	defer b.access.Unlock()
 
-	defer device.DeferPanicToError("box.Close", func(err_ error) { err = err_ })
-
 	// no double close
-	if b.state == 2 {
+	if b.state == boxStateClosed {
 		return nil
 	}
-	b.state = 2
+	previousState := b.state
+	b.state = boxStateClosing
+	defer func() {
+		b.state = boxStateClosed
+		// A partially started box already rolled its own resources back, so the
+		// underlying Close reports os.ErrClosed. That is expected here and must not
+		// mask the original start failure recorded in b.startErr.
+		if errors.Is(err, os.ErrClosed) {
+			log.Printf("box.Close: normalized already-closed previous=%s startError=%v", previousState, b.startErr)
+			err = nil
+		}
+	}()
+	defer device.DeferPanicToError("box.Close", func(err_ error) { err = err_ })
 
 	// clear main instance
 	if mainInstance == b {
@@ -214,11 +279,13 @@ func (b *BoxInstance) Close() (err error) {
 	if b.cancel != nil {
 		b.cancel()
 	}
-	if b.Box != nil {
-		b.Box.Close()
+	if b.closeBox != nil {
+		err = b.closeBox()
+	} else if b.Box != nil {
+		err = b.Box.Close()
 	}
 
-	return nil
+	return err
 }
 
 func (b *BoxInstance) Sleep() {

@@ -113,6 +113,26 @@ internal fun SingBoxOption.detourTo(nextTag: String) {
     _hack_config_map["detour"] = nextTag
 }
 
+internal data class ChainHopTag(
+    val tag: String,
+    val reused: Boolean,
+)
+
+internal fun resolveChainHopTag(
+    profileId: Long,
+    proposedTag: String,
+    needGlobal: Boolean,
+    globalOutbounds: MutableMap<Long, String>,
+): ChainHopTag {
+    if (!needGlobal) return ChainHopTag(proposedTag, reused = false)
+
+    val existingTag = globalOutbounds[profileId]
+    if (existingTag != null) return ChainHopTag(existingTag, reused = true)
+
+    globalOutbounds[profileId] = proposedTag
+    return ChainHopTag(proposedTag, reused = false)
+}
+
 internal fun RouteOptions.ensureMainRouteFinal(mainProxyTag: String) {
     if (final_.isNullOrBlank()) final_ = mainProxyTag
 }
@@ -741,6 +761,17 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     tagOut = readableTag(bean.displayName())
                 }
 
+                // Resolve a globally shared hop before writing the edge that references it.
+                // A hop built by an earlier rule may use a readable or endpoint tag instead of
+                // this chain's proposed g-<id> tag; the global map is the source of truth.
+                val resolvedTag = resolveChainHopTag(
+                    proxyEntity.id,
+                    tagOut,
+                    needGlobal,
+                    globalOutbounds,
+                )
+                tagOut = resolvedTag.tag
+
                 if (index > 0) {
                     if (pastEntity!!.needExternal()) {
                         route.rules.add(
@@ -756,13 +787,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     chainTagOut = tagOut
                 }
 
-                if (needGlobal) {
-                    globalOutbounds[proxyEntity.id]?.let {
-                        if (index == 0) chainTagOut = it
-                        return@forEachIndexed
-                    }
-                    globalOutbounds[proxyEntity.id] = tagOut
-                }
+                // The edge now points at the previously generated final tag, so the duplicate
+                // object can be skipped without leaving a dangling detour.
+                if (resolvedTag.reused) return@forEachIndexed
 
                 if (proxyEntity.needExternal()) {
                     val localPort = mkPort()
