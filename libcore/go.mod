@@ -1,6 +1,6 @@
 module libcore
 
-go 1.27.0
+go 1.27.1
 
 require (
 	// 与 Throne 2e7182b9ea99947a409fee30f74df83752ab763c 的测速基线一致。
