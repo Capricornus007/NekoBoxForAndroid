@@ -1,7 +1,7 @@
 # sing-box 1.14.x fork commit (Capricornus007/sing-box, branch 1.14.x).
 # Pinned so CI builds are reproducible and so the LibCore cache key
 # (golang_status hashes this file) invalidates when sing-box changes.
-export COMMIT_SING_BOX="182b9abead650a3080b8612629f132fa31e7d62c"
+export COMMIT_SING_BOX="d8bdd3eedd487e664402c5280935c784784fc5a8"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
@@ -10,10 +10,10 @@ export COMMIT_LIBNEKO="ca7786f10ba67f7f0e679ec1de0809c5c5875537"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
 # count only successful sends.
-export COMMIT_WIREGUARD_GO="a9ace872067dcf7aca7da798e334820655b8adc0"
+export COMMIT_WIREGUARD_GO="50e7da80384befcf96c83a044505c78ed954b842"
 # sing-box and libcore both replace github.com/sagernet/sing-quic with the
 # sibling checkout at ../../sing-quic. Pin and fetch it explicitly so clean CI
 # runners do not accidentally depend on a developer machine's existing clone.
-export COMMIT_SING_QUIC="f2d9d4b93a5b1bd966b9ef1a3e6bd28d4195fee8"
-export COMMIT_SING_JUICITY="2cfb90230367219ead326f8bfcb090ed08c3f9e0"
-export COMMIT_SING_TRUSTTUNNEL="b96f8c0141bf5639147f427e2b3fb197aba93adc"
+export COMMIT_SING_QUIC="7f405db6b742088e36b471f4bd0a4331ad5b1436"
+export COMMIT_SING_JUICITY="19d4f674d8e7a4f4311adde332b8668041dff1c7"
+export COMMIT_SING_TRUSTTUNNEL="305963e0cb8b4e00874797e306a0f355098c1654"
