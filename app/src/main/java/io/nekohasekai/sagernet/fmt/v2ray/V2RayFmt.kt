@@ -177,8 +177,16 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
         path = url.pathSegments.joinToString("/")
     }
 
-    type = url.queryParameter("type") ?: "tcp"
-    if (type == "h2" || url.queryParameter("headerType") == "http") type = "http"
+    // 传输别名归一（OwnBox 5c1455201）：xray 链接里 splithttp 是旧名、
+    // transport= 是部分客户端的写法，统一归到 sing-box 的 xhttp
+    val rawType = url.queryParameter("type")
+        ?: url.queryParameter("transport")
+        ?: "tcp"
+    type = when (rawType.lowercase()) {
+        "splithttp", "xhttp" -> "xhttp"
+        "h2" -> "http"
+        else -> if (url.queryParameter("headerType") == "http") "http" else rawType
+    }
 
     security = url.queryParameter("security")
     if (security.isNullOrBlank()) {

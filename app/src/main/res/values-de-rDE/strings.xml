@@ -788,6 +788,9 @@
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">URL-Test für diese Gruppe</string>
+    <string name="url_test_finished_summary">URL-Test abgeschlossen: %1$d erfolgreich / %2$d fehlgeschlagen</string>
+    <string name="tcp_ping_finished_summary">TCP-Ping-Test abgeschlossen: %1$d erfolgreich / %2$d fehlgeschlagen</string>
+    <string name="connection_test_tcp_ping">TCP-Ping-Test für diese Gruppe</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
     <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>

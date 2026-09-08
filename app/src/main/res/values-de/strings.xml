@@ -340,6 +340,9 @@
     <string name="backup_import_throne_desktop_summary">Importiert Profile, Routen und Einstellungen aus einer Throne-Desktop-.thrbackup-Datei. Benutzerdefinierte Symbole werden ignoriert. Vorhandene Daten der ausgewählten Kategorien werden überschrieben.</string>
     <string name="connection_test_url">URL für Latenztest</string>
     <string name="connection_test_url_test">URL-Test für diese Gruppe</string>
+    <string name="url_test_finished_summary">URL-Test abgeschlossen: %1$d erfolgreich / %2$d fehlgeschlagen</string>
+    <string name="tcp_ping_finished_summary">TCP-Ping-Test abgeschlossen: %1$d erfolgreich / %2$d fehlgeschlagen</string>
+    <string name="connection_test_tcp_ping">TCP-Ping-Test für diese Gruppe</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Geschwindigkeitstest für diese Gruppe</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

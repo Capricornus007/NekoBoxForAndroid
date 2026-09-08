@@ -359,6 +359,9 @@
     <string name="connection_test">Тест з\'єднання</string>
     <string name="connection_test_clear_results">Очистити результати тесту</string>
     <string name="connection_test_url_test">Перевірити URL цієї групи</string>
+    <string name="url_test_finished_summary">Тест URL завершено: %1$d успішно / %2$d не вдалося</string>
+    <string name="tcp_ping_finished_summary">TCP Ping завершено: %1$d успішно / %2$d не вдалося</string>
+    <string name="connection_test_tcp_ping">Перевірити TCP Ping цієї групи</string>
     <string name="connection_test_domain_not_found">Домен не знайдено</string>
     <string name="connection_test_refused">З\'єднання відхилено</string>
     <string name="connection_test_unreachable">Недоступний</string>

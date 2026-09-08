@@ -818,6 +818,9 @@
     <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="preview_hint_dont_show_again">Ne plus afficher</string>
     <string name="connection_test_url_test">Tester l’URL de ce groupe</string>
+    <string name="url_test_finished_summary">Test d’URL terminé : %1$d réussi(s) / %2$d en échec</string>
+    <string name="tcp_ping_finished_summary">Test TCP Ping terminé : %1$d réussi(s) / %2$d en échec</string>
+    <string name="connection_test_tcp_ping">Tester le TCP Ping de ce groupe</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Tester la vitesse de ce groupe</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

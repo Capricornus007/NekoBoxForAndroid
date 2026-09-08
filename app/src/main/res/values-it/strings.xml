@@ -810,6 +810,9 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="backup_import_throne_desktop_summary">Importa profili, route e impostazioni da un file .thrbackup di Throne desktop. Le icone personalizzate vengono ignorate. I dati esistenti delle categorie selezionate verranno sovrascritti.</string>
     <string name="connection_test_url">URL test latenza</string>
     <string name="connection_test_url_test">Test URL di questo gruppo</string>
+    <string name="url_test_finished_summary">Test URL completato: %1$d riusciti / %2$d non riusciti</string>
+    <string name="tcp_ping_finished_summary">Test TCP Ping completato: %1$d riusciti / %2$d non riusciti</string>
+    <string name="connection_test_tcp_ping">Test TCP Ping di questo gruppo</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Test velocità di questo gruppo</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

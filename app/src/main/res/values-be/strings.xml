@@ -111,6 +111,8 @@
     <string name="action_import_throne_desktop">Імпарт з Throne для ПК</string>
     <string name="backup_import_throne_desktop_summary">Імпарт профіляў, маршрутаў і налад з .thrbackup Throne для ПК. Карыстальніцкія значкі ігнаруюцца. Існуючыя даныя выбраных катэгорый будуць перазапісаны.</string>
     <string name="connection_test_url_test">Тэст URL для гэтай групы</string>
+    <string name="tcp_ping_finished_summary">TCP Ping завершаны: паспяхова %1$d / няўдала %2$d</string>
+    <string name="connection_test_tcp_ping">Тэст TCP Ping для гэтай групы</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Тэст хуткасці гэтай групы</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

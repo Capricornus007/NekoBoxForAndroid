@@ -602,6 +602,9 @@
     <string name="snell_reuse">再利用</string>
     <string name="snell_reuse_summary">v4-v6 のみ</string>
     <string name="connection_test_url_test">このグループの URL テスト</string>
+    <string name="url_test_finished_summary">URL テスト完了：%1$d 成功 / %2$d 失敗</string>
+    <string name="tcp_ping_finished_summary">TCP Ping 完了：%1$d 成功 / %2$d 失敗</string>
+    <string name="connection_test_tcp_ping">このグループの TCP Ping</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">このグループの速度テスト</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

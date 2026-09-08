@@ -789,6 +789,9 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="action_import_throne_desktop">Impor dari Throne desktop</string>
     <string name="backup_import_throne_desktop_summary">Mengimpor profil, rute, dan pengaturan dari file .thrbackup Throne desktop. Ikon kustom diabaikan. Data yang ada pada kategori terpilih akan ditimpa.</string>
     <string name="connection_test_url_test">Uji URL grup ini</string>
+    <string name="url_test_finished_summary">Uji URL selesai: %1$d berhasil / %2$d gagal</string>
+    <string name="tcp_ping_finished_summary">Uji TCP Ping selesai: %1$d berhasil / %2$d gagal</string>
+    <string name="connection_test_tcp_ping">Uji TCP Ping grup ini</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Uji kecepatan grup ini</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

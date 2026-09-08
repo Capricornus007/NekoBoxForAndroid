@@ -526,6 +526,9 @@
     <string name="action_import_throne_desktop">Throne masaüstünden içe aktar</string>
     <string name="backup_import_throne_desktop_summary">Throne masaüstü .thrbackup dosyasından profilleri, rotaları ve ayarları içe aktarır. Özel simgeler yok sayılır. Seçili kategorilerdeki mevcut verilerin üzerine yazılır.</string>
     <string name="connection_test_url_test">Bu grubun URL\'sini test et</string>
+    <string name="url_test_finished_summary">URL testi bitti: %1$d başarılı / %2$d başarısız</string>
+    <string name="tcp_ping_finished_summary">TCP Ping bitti: %1$d başarılı / %2$d başarısız</string>
+    <string name="connection_test_tcp_ping">Bu grubun TCP Ping testi</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Bu grubun hızını test et</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

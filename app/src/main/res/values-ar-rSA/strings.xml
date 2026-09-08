@@ -796,6 +796,9 @@
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">اختبار URL لهذه المجموعة</string>
+    <string name="url_test_finished_summary">انتهى اختبار URL: نجح %1$d / فشل %2$d</string>
+    <string name="tcp_ping_finished_summary">انتهى TCP Ping: نجح %1$d / فشل %2$d</string>
+    <string name="connection_test_tcp_ping">اختبار TCP Ping لهذه المجموعة</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
     <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>

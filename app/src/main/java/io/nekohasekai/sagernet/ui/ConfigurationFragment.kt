@@ -39,6 +39,7 @@ import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.bg.proto.AndroidSpeedTestSession
 import io.nekohasekai.sagernet.bg.proto.SpeedTestQueueRunner
 import io.nekohasekai.sagernet.bg.proto.SpeedTestSnapshot
+import io.nekohasekai.sagernet.bg.proto.TcpPing
 import io.nekohasekai.sagernet.bg.proto.UrlTest
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.GroupManager
@@ -913,6 +914,10 @@ class ConfigurationFragment @JvmOverloads constructor(
                 urlTest()
             }
 
+            R.id.action_connection_tcp_ping -> {
+                tcpPingTest()
+            }
+
             R.id.action_global_mode -> {
                 item.isChecked = !item.isChecked
                 DataStore.globalMode = item.isChecked
@@ -1528,6 +1533,84 @@ class ConfigurationFragment @JvmOverloads constructor(
     private fun cancelSearch(searchView: SearchView) {
         searchView.onActionViewCollapsed()
         searchView.clearFocus()
+    }
+
+    // TCP Ping 批量測試：直連節點伺服器的 TCP 握手延遲（不經代理、不發 HTTP）。
+    // 移植自 OwnBoxForAndroid 48cc1e43a，與 urlTest() 同構（同一 worker pool 模式）。
+    @OptIn(DelicateCoroutinesApi::class)
+    fun tcpPingTest() {
+        if (DataStore.runningTest) return else DataStore.runningTest = true
+        val test = TestDialog()
+        val dialog = test.builder.show()
+        val testJobs = mutableListOf<Job>()
+        Logs.d("TcpPing: batch start, concurrent=${DataStore.connectionTestConcurrent}")
+
+        val mainJob = runOnDefaultDispatcher {
+            val group = DataStore.currentGroup()
+            val profilesList = SagerDatabase.proxyDao.getByGroup(group.id)
+            test.proxyN = profilesList.size
+            val profiles = ConcurrentLinkedQueue(profilesList)
+            val tcpPing = TcpPing()
+            repeat(DataStore.connectionTestConcurrent) {
+                testJobs.add(
+                    launch(Dispatchers.IO) {
+                        while (isActive) {
+                            val profile = profiles.poll() ?: break
+                            profile.status = 0
+                            try {
+                                val result = tcpPing.doTest(profile)
+                                profile.status = 1
+                                profile.ping = result
+                                profile.error = null
+                                Logs.d("TcpPing ${profile.displayName()}: done, ping=${result}ms")
+                            } catch (e: Exception) {
+                                if (!isActive) break
+                                profile.status = 3
+                                profile.error = e.readableMessage
+                                Logs.w("TcpPing ${profile.displayName()}: ${e.readableMessage}")
+                            }
+                            if (!isActive) break
+                            test.update(profile)
+                        }
+                    },
+                )
+            }
+
+            testJobs.joinAll()
+
+            // 完成摘要（同 urlTest：不滾動列表也能一眼看到結果）
+            runOnMainDispatcher {
+                if (isAdded && test.dialogStatus.get() != 2) {
+                    val ok = test.results.count { it.status == 1 }
+                    val bad = test.results.count { it.status != 1 }
+                    Snackbar.make(
+                        requireView(),
+                        getString(R.string.tcp_ping_finished_summary, ok, bad),
+                        Snackbar.LENGTH_LONG,
+                    ).show()
+                }
+                test.cancel?.invoke()
+            }
+        }
+        test.cancel = {
+            test.dialogStatus.set(2)
+            try {
+                dialog.dismiss()
+            } catch (e: IllegalStateException) {
+                Logs.w(e)
+            }
+            runOnDefaultDispatcher {
+                mainJob.cancel()
+                testJobs.forEach { it.cancel() }
+                try {
+                    ProfileManager.updateProfileQuietly(test.results.toList())
+                } catch (e: Exception) {
+                    Logs.w(e)
+                }
+                GroupManager.postReload(DataStore.currentGroupId())
+                DataStore.runningTest = false
+            }
+        }
     }
 }
 

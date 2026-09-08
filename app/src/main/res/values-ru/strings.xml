@@ -115,6 +115,9 @@
     <string name="connection_test_unreachable">Недоступен</string>
     <string name="connection_test_url">URL проверки задержки</string>
     <string name="connection_test_url_test">Проверить URL этой группы</string>
+    <string name="url_test_finished_summary">Тест URL завершён: %1$d успешно / %2$d не удалось</string>
+    <string name="tcp_ping_finished_summary">TCP Ping завершён: %1$d успешно / %2$d не удалось</string>
+    <string name="connection_test_tcp_ping">TCP Ping this group</string>
     <string name="copy">Копировать</string>
     <string name="copy_toast_msg">Ссылка скопирована в буфер обмена.</string>
     <string name="create_shortcut">Создать ярлык</string>
