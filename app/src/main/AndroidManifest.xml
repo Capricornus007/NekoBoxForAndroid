@@ -243,6 +243,11 @@
             android:name="io.nekohasekai.sagernet.ui.AssetsActivity"
             android:configChanges="uiMode" />
         <activity
+            android:name="io.nekohasekai.sagernet.ui.TrafficChartActivity"
+            android:configChanges="uiMode"
+            android:label="@string/traffic_chart_title"
+            android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
+        <activity
             android:name="io.nekohasekai.sagernet.ui.AppListActivity"
             android:configChanges="uiMode" />
         <activity
