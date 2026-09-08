@@ -8,6 +8,7 @@ import (
 	"libcore/procfs"
 	"log"
 	"net/netip"
+	"os"
 	"strings"
 	"sync/atomic"
 	"syscall"
@@ -257,9 +258,20 @@ func (w *boxPlatformInterfaceWrapper) FindConnectionOwner(request *adapter.FindC
 		UserId: uid,
 	}
 	if packageName, err := intfBox.PackageNameByUid(uid); err == nil && packageName != "" {
-		owner.AndroidPackageNames = []string{packageName}
+		owner.PackageNames = []string{packageName}
 	}
 	return owner, nil
+}
+
+func (w *boxPlatformInterfaceWrapper) UsePlatformAutoRedirect() bool {
+	return false
+}
+
+func (w *boxPlatformInterfaceWrapper) CreateAutoRedirect(options adapter.AutoRedirectOptions) (adapter.AutoRedirectSession, error) {
+	// sing-box 全功能 auto redirect 需要配合 Kotlin Bridge 側的
+	// AutoRedirectHandler 才有完整實作；UI 目前不生成該選項，
+	// 先回 stub 滿足 adapter.PlatformInterface（同上游 platformInterfaceStub）。
+	return nil, os.ErrInvalid
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformNotification() bool {
