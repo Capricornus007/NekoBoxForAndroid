@@ -340,6 +340,14 @@
     <string name="backup_import_throne_desktop_summary">Importiert Profile, Routen und Einstellungen aus einer Throne-Desktop-.thrbackup-Datei. Benutzerdefinierte Symbole werden ignoriert. Vorhandene Daten der ausgewählten Kategorien werden überschrieben.</string>
     <string name="connection_test_url">URL für Latenztest</string>
     <string name="connection_test_url_test">URL-Test für diese Gruppe</string>
+
+    <string name="action_auto_lowest_latency">Automatisch niedrigste Latenz wählen (URL-Test)</string>
+    <string name="route_preset_title">Routing-Regel-Vorlagen</string>
+    <string name="preset_bypass_cn_apps">Vorlage: Häufige Inlands-Apps umgehen</string>
+    <string name="preset_proxy_foreign_apps">Vorlage: Häufige internationale Apps über Proxy</string>
+    <string name="preset_applied_toast">Vorlagen-Regeln erfolgreich hinzugefügt</string>
+    <string name="preset_cn_apps">Inlands-Apps auswählen</string>
+    <string name="preset_foreign_apps">Internationale Apps auswählen</string>
     <string name="url_test_finished_summary">URL-Test abgeschlossen: %1$d erfolgreich / %2$d fehlgeschlagen</string>
     <string name="tcp_ping_finished_summary">TCP-Ping-Test abgeschlossen: %1$d erfolgreich / %2$d fehlgeschlagen</string>
     <string name="connection_test_tcp_ping">TCP-Ping-Test für diese Gruppe</string>

@@ -248,6 +248,7 @@ class ConfigurationFragment @JvmOverloads constructor(
             toolbar.title = ""
             toolbar.inflateMenu(R.menu.add_profile_menu)
             toolbar.menu.findItem(R.id.action_global_mode)?.isChecked = DataStore.globalMode
+            toolbar.menu.findItem(R.id.action_auto_lowest_latency)?.isChecked = DataStore.autoSelectLowestLatency
             toolbar.setOnMenuItemClickListener(this)
         } else {
             toolbar.setTitle(titleRes)
@@ -916,6 +917,26 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             R.id.action_connection_tcp_ping -> {
                 tcpPingTest()
+            }
+
+            R.id.action_auto_lowest_latency -> {
+                item.isChecked = !item.isChecked
+                DataStore.autoSelectLowestLatency = item.isChecked
+                if (DataStore.serviceState.canStop) {
+                    runOnDefaultDispatcher {
+                        try {
+                            DataStore.configurationStore.awaitWrites()
+                            snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {
+                                runOnDefaultDispatcher {
+                                    SagerNet.reloadService()
+                                }
+                            }.show()
+                        } catch (e: Exception) {
+                            Logs.w(e)
+                        }
+                    }
+                }
+                return true
             }
 
             R.id.action_global_mode -> {

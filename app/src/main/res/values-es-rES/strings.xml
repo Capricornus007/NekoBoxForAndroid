@@ -800,6 +800,14 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Probar URL de este grupo</string>
+
+    <string name="action_auto_lowest_latency">Selección automática de la menor latencia (URL-Test)</string>
+    <string name="route_preset_title">Plantillas de reglas de enrutado</string>
+    <string name="preset_bypass_cn_apps">Plantilla: omitir apps nacionales comunes</string>
+    <string name="preset_proxy_foreign_apps">Plantilla: apps internacionales comunes vía proxy</string>
+    <string name="preset_applied_toast">Reglas de plantilla añadidas correctamente</string>
+    <string name="preset_cn_apps">Seleccionar apps nacionales</string>
+    <string name="preset_foreign_apps">Seleccionar apps internacionales</string>
     <string name="url_test_finished_summary">Prueba de URL finalizada: %1$d con éxito / %2$d fallidas</string>
     <string name="tcp_ping_finished_summary">Prueba de TCP Ping finalizada: %1$d con éxito / %2$d fallidas</string>
     <string name="connection_test_tcp_ping">Probar TCP Ping de este grupo</string>

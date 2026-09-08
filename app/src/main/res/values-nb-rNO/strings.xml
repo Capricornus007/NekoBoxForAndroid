@@ -638,6 +638,14 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="action_import_throne_desktop">Importer fra Throne-skrivebord</string>
     <string name="backup_import_throne_desktop_summary">Importerer profiler, ruter og innstillinger fra en Throne-skrivebord .thrbackup-fil. Egendefinerte ikoner ignoreres. Eksisterende data i valgte kategorier overskrives.</string>
     <string name="connection_test_url_test">Test URL for denne gruppen</string>
+
+    <string name="action_auto_lowest_latency">Velg laveste latens automatisk (URL-Test)</string>
+    <string name="route_preset_title">Forhåndssatte rutingregler</string>
+    <string name="preset_bypass_cn_apps">Forhåndssatt: Omgå vanlige innenlandske apper</string>
+    <string name="preset_proxy_foreign_apps">Forhåndssatt: Vanlige internasjonale apper via proxy</string>
+    <string name="preset_applied_toast">Forhåndssatte regler lagt til</string>
+    <string name="preset_cn_apps">Velg innenlandske apper</string>
+    <string name="preset_foreign_apps">Velg utenlandske apper</string>
     <string name="url_test_finished_summary">URL-test fullført: %1$d vellykket / %2$d mislykket</string>
     <string name="tcp_ping_finished_summary">TCP Ping fullført: %1$d vellykket / %2$d mislykket</string>
     <string name="connection_test_tcp_ping">Test TCP Ping for denne gruppen</string>

@@ -1,6 +1,5 @@
 package io.nekohasekai.sagernet.bg.proto
 
-import android.os.Build
 import android.os.SystemClock
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
@@ -30,9 +29,7 @@ class TcpPing {
         Logs.d("TcpPing ${profile.displayName()}: start, host=$host, port=$port, timeout=${timeout}ms")
         val socket = Socket()
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                runCatching { SagerNet.underlyingNetwork?.bindSocket(socket) }
-            }
+            runCatching { SagerNet.underlyingNetwork?.bindSocket(socket) }
             runCatching { DataStore.vpnService?.protect(socket) }
 
             val startTime = SystemClock.elapsedRealtime()
@@ -44,5 +41,4 @@ class TcpPing {
             runCatching { socket.close() }
         }
     }
-
 }

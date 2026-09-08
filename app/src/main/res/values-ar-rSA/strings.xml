@@ -796,6 +796,14 @@
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">اختبار URL لهذه المجموعة</string>
+
+    <string name="action_auto_lowest_latency">الاختيار التلقائي لأقل زمن استجابة (URL-Test)</string>
+    <string name="route_preset_title">قوالب قواعد التوجيه الجاهزة</string>
+    <string name="preset_bypass_cn_apps">قالب: تجاوز التطبيقات المحلية الشائعة</string>
+    <string name="preset_proxy_foreign_apps">قالب: توجيه التطبيقات العالمية الشائعة عبر الوكيل</string>
+    <string name="preset_applied_toast">تمت إضافة قواعد القالب بنجاح</string>
+    <string name="preset_cn_apps">تحديد التطبيقات المحلية</string>
+    <string name="preset_foreign_apps">تحديد التطبيقات العالمية</string>
     <string name="url_test_finished_summary">انتهى اختبار URL: نجح %1$d / فشل %2$d</string>
     <string name="tcp_ping_finished_summary">انتهى TCP Ping: نجح %1$d / فشل %2$d</string>
     <string name="connection_test_tcp_ping">اختبار TCP Ping لهذه المجموعة</string>

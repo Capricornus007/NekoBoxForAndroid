@@ -790,6 +790,14 @@
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">آزمون URL این گروه</string>
+
+    <string name="action_auto_lowest_latency">انتخاب خودکار کم‌ترین تأخیر (URL-Test)</string>
+    <string name="route_preset_title">قالب‌های آماده قواعد مسیریابی</string>
+    <string name="preset_bypass_cn_apps">قالب: دور زدن برنامه‌های داخلی پرکاربرد</string>
+    <string name="preset_proxy_foreign_apps">قالب: برنامه‌های بین‌المللی پرکاربرد از طریق پروکسی</string>
+    <string name="preset_applied_toast">قواعد قالب با موفقیت اضافه شد</string>
+    <string name="preset_cn_apps">انتخاب برنامه‌های داخلی</string>
+    <string name="preset_foreign_apps">انتخاب برنامه‌های بین‌المللی</string>
     <string name="url_test_finished_summary">آزمون URL تمام شد: %1$d موفق / %2$d ناموفق</string>
     <string name="tcp_ping_finished_summary">TCP Ping تمام شد: %1$d موفق / %2$d ناموفق</string>
     <string name="connection_test_tcp_ping">آزمون TCP Ping این گروه</string>

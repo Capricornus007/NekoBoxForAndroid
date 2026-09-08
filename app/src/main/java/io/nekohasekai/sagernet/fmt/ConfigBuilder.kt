@@ -144,6 +144,18 @@ internal fun buildSelectorOutbound(defaultTag: String?, memberTags: List<String>
     outbounds = memberTags
 }
 
+// 自动优选最低延迟（OwnBox F01）：开启后本组出站从 selector 换成 urltest，
+// 内核自动健康检查并毫秒级切换到最低延迟节点。
+internal fun buildUrlTestOutbound(memberTags: List<String>) = Outbound_URLTestOptions().apply {
+    type = "urltest"
+    tag = TAG_PROXY
+    outbounds = memberTags
+    url = DataStore.connectionTestURL.takeIf { it.isNotBlank() }
+        ?: "https://www.gstatic.com/generate_204"
+    interval = "5m"
+    tolerance = 50
+}
+
 private fun endpointTag(value: Any?): String? =
     (value as? Map<*, *>)?.get("tag")?.toString()?.takeIf { it.isNotBlank() }
 
@@ -1029,14 +1041,19 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         }
         buildDynamicGroupImpl = ::buildDynamicGroup
 
-        if (buildSelector) {
-            val list = group.id.let { SagerDatabase.proxyDao.getByGroup(it) }
+        val useAutoSelect = !forTest && !forExport && DataStore.autoSelectLowestLatency
+        if (buildSelector || useAutoSelect) {
+            val list = group?.id?.let { SagerDatabase.proxyDao.getByGroup(it) } ?: listOf(proxy)
             list.forEach {
                 tagMap[it.id] = buildChain(it.id, it)
             }
             outbounds.add(
                 0,
-                buildSelectorOutbound(tagMap[proxy.id], tagMap.values.toList()),
+                if (useAutoSelect && tagMap.isNotEmpty()) {
+                    buildUrlTestOutbound(tagMap.values.toList())
+                } else {
+                    buildSelectorOutbound(tagMap[proxy.id], tagMap.values.toList())
+                },
             )
         } else if (proxy.requireBean() is BalancerBean) {
             val balancerBean = proxy.requireBean() as BalancerBean
@@ -1074,7 +1091,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             tagMap[key] = buildChain(key, p)
         }
 
-        val mainProxyTag = (if (buildSelector) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
+        val mainProxyTag = (if (buildSelector || useAutoSelect) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
 
         if (!forTest && DataStore.globalMode) {
             if (DataStore.bypassLan) {

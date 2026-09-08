@@ -111,6 +111,14 @@
     <string name="action_import_throne_desktop">Імпарт з Throne для ПК</string>
     <string name="backup_import_throne_desktop_summary">Імпарт профіляў, маршрутаў і налад з .thrbackup Throne для ПК. Карыстальніцкія значкі ігнаруюцца. Існуючыя даныя выбраных катэгорый будуць перазапісаны.</string>
     <string name="connection_test_url_test">Тэст URL для гэтай групы</string>
+
+    <string name="action_auto_lowest_latency">Аўтавыбар вузла з найменшай затрымкай (URL-Test)</string>
+    <string name="route_preset_title">Гатовыя шаблоны правілаў маршрутызацыі</string>
+    <string name="preset_bypass_cn_apps">Шаблон: абход распаўсюджаных лакальных прыкладанняў</string>
+    <string name="preset_proxy_foreign_apps">Шаблон: проксі для распаўсюджаных міжнародных прыкладанняў</string>
+    <string name="preset_applied_toast">Правілы шаблона паспяхова дададзены</string>
+    <string name="preset_cn_apps">Выбраць лакальныя прыкладанні</string>
+    <string name="preset_foreign_apps">Выбраць міжнародныя прыкладанні</string>
     <string name="tcp_ping_finished_summary">TCP Ping завершаны: паспяхова %1$d / няўдала %2$d</string>
     <string name="connection_test_tcp_ping">Тэст TCP Ping для гэтай групы</string>
     <string name="simple_download_url">Simple download URL</string>

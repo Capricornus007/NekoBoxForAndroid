@@ -247,6 +247,40 @@ class AppListActivity : ThemedActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.action_preset_cn_apps -> {
+                runOnDefaultDispatcher {
+                    for (app in apps) {
+                        if (RouteFragment.CN_APPS.contains(app.packageName)) {
+                            proxiedUids[app.uid] = true
+                        }
+                    }
+                    DataStore.routePackages = apps.filter { isProxiedApp(it) }
+                        .joinToString("\n") { it.packageName }
+                    apps = apps.sortedWith(compareBy({ !isProxiedApp(it) }, { it.name.toString() }))
+                    onMainDispatcher {
+                        applyFilter()
+                    }
+                }
+                return true
+            }
+
+            R.id.action_preset_foreign_apps -> {
+                runOnDefaultDispatcher {
+                    for (app in apps) {
+                        if (RouteFragment.FOREIGN_APPS.contains(app.packageName)) {
+                            proxiedUids[app.uid] = true
+                        }
+                    }
+                    DataStore.routePackages = apps.filter { isProxiedApp(it) }
+                        .joinToString("\n") { it.packageName }
+                    apps = apps.sortedWith(compareBy({ !isProxiedApp(it) }, { it.name.toString() }))
+                    onMainDispatcher {
+                        applyFilter()
+                    }
+                }
+                return true
+            }
+
             R.id.action_invert_selections -> {
                 runOnDefaultDispatcher {
                     for (app in apps) {

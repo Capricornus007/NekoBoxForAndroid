@@ -789,6 +789,14 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="action_import_throne_desktop">Impor dari Throne desktop</string>
     <string name="backup_import_throne_desktop_summary">Mengimpor profil, rute, dan pengaturan dari file .thrbackup Throne desktop. Ikon kustom diabaikan. Data yang ada pada kategori terpilih akan ditimpa.</string>
     <string name="connection_test_url_test">Uji URL grup ini</string>
+
+    <string name="action_auto_lowest_latency">Pilih latensi terendah otomatis (URL-Test)</string>
+    <string name="route_preset_title">Preset aturan perutean</string>
+    <string name="preset_bypass_cn_apps">Preset: Lewati aplikasi domestik populer</string>
+    <string name="preset_proxy_foreign_apps">Preset: Aplikasi global populer via proxy</string>
+    <string name="preset_applied_toast">Aturan preset berhasil ditambahkan</string>
+    <string name="preset_cn_apps">Pilih aplikasi domestik</string>
+    <string name="preset_foreign_apps">Pilih aplikasi luar negeri</string>
     <string name="url_test_finished_summary">Uji URL selesai: %1$d berhasil / %2$d gagal</string>
     <string name="tcp_ping_finished_summary">Uji TCP Ping selesai: %1$d berhasil / %2$d gagal</string>
     <string name="connection_test_tcp_ping">Uji TCP Ping grup ini</string>

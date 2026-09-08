@@ -777,6 +777,14 @@
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Bu grubun URL\'sini test et</string>
+
+    <string name="action_auto_lowest_latency">En düşük gecikmeyi otomatik seç (URL-Test)</string>
+    <string name="route_preset_title">Yönlendirme kuralı hazır ayarları</string>
+    <string name="preset_bypass_cn_apps">Hazır ayar: Yaygın yerel uygulamaları atla</string>
+    <string name="preset_proxy_foreign_apps">Hazır ayar: Yaygın uluslararası uygulamalar proxy üzerinden</string>
+    <string name="preset_applied_toast">Hazır ayar kuralları eklendi</string>
+    <string name="preset_cn_apps">Yerel uygulamaları seç</string>
+    <string name="preset_foreign_apps">Uluslararası uygulamaları seç</string>
     <string name="url_test_finished_summary">URL testi bitti: %1$d başarılı / %2$d başarısız</string>
     <string name="tcp_ping_finished_summary">TCP Ping bitti: %1$d başarılı / %2$d başarısız</string>
     <string name="connection_test_tcp_ping">Bu grubun TCP Ping testi</string>

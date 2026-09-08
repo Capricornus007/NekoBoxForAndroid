@@ -254,6 +254,7 @@ object Key {
     const val SUBSCRIPTION_UPDATE_WHEN_CONNECTED_ONLY = "subscriptionUpdateWhenConnectedOnly"
     const val SUBSCRIPTION_USER_AGENT = "subscriptionUserAgent"
     const val SPOOF_USER_AGENT = "spoofUserAgent"
+    const val AUTO_SELECT_LOWEST_LATENCY = "autoSelectLowestLatency"
     const val SPOOF_DEVICE_OS = "spoofDeviceOs"
     const val SPOOF_DEVICE_OS_VERSION = "spoofDeviceOsVersion"
     const val SPOOF_DEVICE_MODEL = "spoofDeviceModel"

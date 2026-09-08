@@ -107,13 +107,13 @@ class SpeedTestAndroidContractTest {
 
     @Test
     fun legacyDirectPingCodeResourcesAndMenuIdsAreAbsent() {
+        // 2026-09-08：TCP Ping 按 OwnBox 48cc1e43a 重新引入（用户指示全量移植
+        // OwnBox 功能），其菜单/字符串符号从禁止清单放行；ICMP Ping 与旧版
+        // pingTest 实现维持移除状态。
         val deprecatedSymbols = listOf(
             "pingTest(",
-            "canTCPing(",
             "canICMPing(",
-            "action_connection_tcp_ping",
             "action_connection_icmp_ping",
-            "connection_test_tcp_ping",
             "connection_test_icmp_ping",
         )
         val productionFiles = File("src/main").walkTopDown()
@@ -217,9 +217,7 @@ class SpeedTestAndroidContractTest {
         val forbidden = listOf(
             "http://www.gstatic.com/generate_204",
             "URL Test",
-            "connection_test_tcp_ping",
             "connection_test_icmp_ping",
-            "action_connection_tcp_ping",
             "action_connection_icmp_ping",
         )
         val checkedFiles = buildList {

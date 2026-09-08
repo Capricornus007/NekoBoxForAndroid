@@ -589,6 +589,14 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="backup_import_throne_desktop_summary">Importa perfis, rotas e configurações de um arquivo .thrbackup do Throne para desktop. Ícones personalizados são ignorados. Os dados existentes das categorias selecionadas serão sobrescritos.</string>
     <string name="connection_test_url">URL do teste de latência</string>
     <string name="connection_test_url_test">Testar URL deste grupo</string>
+
+    <string name="action_auto_lowest_latency">Selecionar automaticamente a menor latência (URL-Test)</string>
+    <string name="route_preset_title">Predefinições de regras de roteamento</string>
+    <string name="preset_bypass_cn_apps">Predefinição: contornar apps nacionais comuns</string>
+    <string name="preset_proxy_foreign_apps">Predefinição: apps internacionais comuns via proxy</string>
+    <string name="preset_applied_toast">Regras predefinidas adicionadas com sucesso</string>
+    <string name="preset_cn_apps">Selecionar apps nacionais</string>
+    <string name="preset_foreign_apps">Selecionar apps internacionais</string>
     <string name="url_test_finished_summary">Teste de URL concluído: %1$d bem-sucedido / %2$d falhou</string>
     <string name="tcp_ping_finished_summary">Teste de TCP Ping concluído: %1$d bem-sucedido / %2$d falhou</string>
     <string name="connection_test_tcp_ping">Testar TCP Ping deste grupo</string>

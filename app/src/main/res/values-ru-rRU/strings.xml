@@ -801,6 +801,14 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Проверить URL этой группы</string>
+
+    <string name="action_auto_lowest_latency">Автовыбор узла с наименьшей задержкой (URL-Test)</string>
+    <string name="route_preset_title">Готовые шаблоны правил маршрутизации</string>
+    <string name="preset_bypass_cn_apps">Шаблон: обход популярных местных приложений</string>
+    <string name="preset_proxy_foreign_apps">Шаблон: популярные международные приложения через прокси</string>
+    <string name="preset_applied_toast">Правила шаблона успешно добавлены</string>
+    <string name="preset_cn_apps">Выбрать местные приложения</string>
+    <string name="preset_foreign_apps">Выбрать международные приложения</string>
     <string name="url_test_finished_summary">Тест URL завершён: %1$d успешно / %2$d не удалось</string>
     <string name="tcp_ping_finished_summary">TCP Ping завершён: %1$d успешно / %2$d не удалось</string>
     <string name="connection_test_tcp_ping">TCP Ping this group</string>

@@ -598,6 +598,14 @@
     <string name="snell_reuse">재사용</string>
     <string name="snell_reuse_summary">v4-v6만</string>
     <string name="connection_test_url_test">이 그룹 URL 테스트</string>
+
+    <string name="action_auto_lowest_latency">최저 지연 노드 자동 선택 (URL-Test)</string>
+    <string name="route_preset_title">라우팅 규칙 프리셋</string>
+    <string name="preset_bypass_cn_apps">프리셋: 자주 쓰는 국내 앱 직접 연결</string>
+    <string name="preset_proxy_foreign_apps">프리셋: 자주 쓰는 해외 앱 프록시 연결</string>
+    <string name="preset_applied_toast">프리셋 규칙이 추가되었습니다</string>
+    <string name="preset_cn_apps">국내 앱 선택</string>
+    <string name="preset_foreign_apps">해외 앱 선택</string>
     <string name="url_test_finished_summary">URL 테스트 완료: %1$d 성공 / %2$d 실패</string>
     <string name="tcp_ping_finished_summary">TCP Ping 테스트 완료: %1$d 성공 / %2$d 실패</string>
     <string name="connection_test_tcp_ping">이 그룹 TCP Ping 테스트</string>

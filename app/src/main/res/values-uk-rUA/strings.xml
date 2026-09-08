@@ -801,6 +801,14 @@
     <string name="v2rayn">V2RayN</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Перевірити URL цієї групи</string>
+
+    <string name="action_auto_lowest_latency">Автовибір вузла з найменшою затримкою (URL-Test)</string>
+    <string name="route_preset_title">Готові шаблони правил маршрутизації</string>
+    <string name="preset_bypass_cn_apps">Шаблон: обхід популярних місцевих застосунків</string>
+    <string name="preset_proxy_foreign_apps">Шаблон: популярні міжнародні застосунки через проксі</string>
+    <string name="preset_applied_toast">Правила шаблона успішно додано</string>
+    <string name="preset_cn_apps">Вибрати місцеві застосунки</string>
+    <string name="preset_foreign_apps">Вибрати міжнародні застосунки</string>
     <string name="url_test_finished_summary">Тест URL завершено: %1$d успішно / %2$d не вдалося</string>
     <string name="tcp_ping_finished_summary">TCP Ping завершено: %1$d успішно / %2$d не вдалося</string>
     <string name="connection_test_tcp_ping">Перевірити TCP Ping цієї групи</string>

@@ -810,6 +810,14 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="backup_import_throne_desktop_summary">Importa profili, route e impostazioni da un file .thrbackup di Throne desktop. Le icone personalizzate vengono ignorate. I dati esistenti delle categorie selezionate verranno sovrascritti.</string>
     <string name="connection_test_url">URL test latenza</string>
     <string name="connection_test_url_test">Test URL di questo gruppo</string>
+
+    <string name="action_auto_lowest_latency">Selezione automatica della latenza più bassa (URL-Test)</string>
+    <string name="route_preset_title">Modelli di regole di routing</string>
+    <string name="preset_bypass_cn_apps">Modello: bypassa le app nazionali comuni</string>
+    <string name="preset_proxy_foreign_apps">Modello: app internazionali comuni via proxy</string>
+    <string name="preset_applied_toast">Regole del modello aggiunte correttamente</string>
+    <string name="preset_cn_apps">Seleziona app nazionali</string>
+    <string name="preset_foreign_apps">Seleziona app internazionali</string>
     <string name="url_test_finished_summary">Test URL completato: %1$d riusciti / %2$d non riusciti</string>
     <string name="tcp_ping_finished_summary">Test TCP Ping completato: %1$d riusciti / %2$d non riusciti</string>
     <string name="connection_test_tcp_ping">Test TCP Ping di questo gruppo</string>

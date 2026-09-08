@@ -114,6 +114,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     var appTLSVersion by configurationStore.string(Key.APP_TLS_VERSION)
     var spoofUserAgent by configurationStore.string(Key.SPOOF_USER_AGENT) { "" }
+    var autoSelectLowestLatency by configurationStore.boolean(Key.AUTO_SELECT_LOWEST_LATENCY)
     var spoofDeviceOs by configurationStore.string(Key.SPOOF_DEVICE_OS) { "" }
     var spoofDeviceOsVersion by configurationStore.string(Key.SPOOF_DEVICE_OS_VERSION) { "" }
     var spoofDeviceModel by configurationStore.string(Key.SPOOF_DEVICE_MODEL) { "" }
