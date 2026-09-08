@@ -14,6 +14,7 @@ require (
 	github.com/sagernet/quic-go v0.61.0-sing-box-mod.7
 	github.com/sagernet/sing v0.9.4-0.20260908053243-3e69d072c058
 	github.com/sagernet/sing-box v1.0.0 // replaced
+	github.com/sagernet/sing-snell v0.0.0-20260904135315-6a3b5987bb76
 	github.com/sagernet/sing-tun v0.9.1-0.20260902150540-98e457e39c90
 	github.com/ulikunitz/xz v0.5.15
 	github.com/xchacha20-poly1305/sing-trusttunnel v0.3.0-beta.6
@@ -118,7 +119,6 @@ require (
 	github.com/sagernet/sing-shadowsocks v0.2.8 // indirect
 	github.com/sagernet/sing-shadowsocks2 v0.2.1 // indirect
 	github.com/sagernet/sing-shadowtls v0.2.1 // indirect
-	github.com/sagernet/sing-snell v0.0.0-20260904135315-6a3b5987bb76 // indirect
 	github.com/sagernet/sing-usbip v0.0.0-20260817040617-28bd42667eca // indirect
 	github.com/sagernet/sing-vmess v0.2.8-0.20250909125414-3aed155119a1 // indirect
 	github.com/sagernet/smux v1.5.50-sing-box-mod.1 // indirect

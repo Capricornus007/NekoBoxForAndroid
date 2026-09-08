@@ -42,6 +42,7 @@ import (
 
 	"libcore/protocol/juicity"
 	"libcore/protocol/shadowquic"
+	"libcore/protocol/snell"
 	"libcore/protocol/trusttunnel"
 
 	_ "github.com/sagernet/sing-box/experimental/clashapi"
@@ -77,9 +78,12 @@ func nekoboxAndroidOutboundRegistry() *outbound.Registry {
 	socks.RegisterOutbound(registry)
 	http.RegisterOutbound(registry)
 	shadowsocks.RegisterOutbound(registry)
-	// 官方内核无 shadowsocksr / snell（starifly fork 私有），按迁移方针先摘除；
-	// 配置中含这两类 outbound 时 box.New 会报 "unknown outbound type" 直接失败，
+	// 官方内核无 shadowsocksr（starifly fork 私有），按迁移方针先摘除；
+	// 配置中含 shadowsocksr outbound 时 box.New 会报 "unknown outbound type" 直接失败，
 	// 待有具体用户案例再评估替代实现。
+	// Snell 已接回：libcore/protocol/snell 桥接 Capricornus007/sing-snell
+	// （v4/v5/v6 + KeepIdleConnections），Kotlin 侧 SnellBuildConfig 生成 type=snell。
+	snell.RegisterOutbound(registry)
 	vmess.RegisterOutbound(registry)
 	trojan.RegisterOutbound(registry)
 	tor.RegisterOutbound(registry)
