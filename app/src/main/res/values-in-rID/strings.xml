@@ -403,6 +403,18 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="open_market">Buka Market</string>
     <string name="create_rule">Buat Aturan</string>
     <string name="copy_success">Salin berhasil!</string>
+
+    <string name="copy">Salin</string>
+    <string name="done">Selesai</string>
+    <string name="retest">Uji ulang</string>
+    <string name="unknown">Tidak diketahui</string>
+    <string name="landing_ip_details_title">Detail IP landing</string>
+    <string name="landing_ip_address">IP keluar</string>
+    <string name="landing_ip_isp">ISP / Operator</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Latensi</string>
+    <string name="landing_ip_querying">Mengquery IP landing…</string>
+    <string name="landing_ip_failed">Gagal: node tidak terjangkau</string>
     <string name="copy_failed">Salin gagal.</string>
     <string name="app_no_launcher">Aplikasi tidak memiliki antarmuka.</string>
     <string name="route_for">Aturan untuk %s</string>

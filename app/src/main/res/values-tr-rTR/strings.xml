@@ -394,6 +394,18 @@
     <string name="open_market">Mağazayı Aç</string>
     <string name="create_rule">Kural Oluştur</string>
     <string name="copy_success">Kopyalama başarılı!</string>
+
+    <string name="copy">Kopyala</string>
+    <string name="done">Tamam</string>
+    <string name="retest">Yeniden test et</string>
+    <string name="unknown">Bilinmiyor</string>
+    <string name="landing_ip_details_title">Çıkış IP ayrıntıları</string>
+    <string name="landing_ip_address">Çıkış IP</string>
+    <string name="landing_ip_isp">ISP / Operatör</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Gecikme</string>
+    <string name="landing_ip_querying">Çıkış IP sorgulanıyor…</string>
+    <string name="landing_ip_failed">Sorgu başarısız: düğüm erişilemez</string>
     <string name="copy_failed">Kopyalama başarısız.</string>
     <string name="app_no_launcher">Uygulamanın arayüzü yok.</string>
     <string name="route_for">%s için Kural</string>

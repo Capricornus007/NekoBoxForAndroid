@@ -752,6 +752,18 @@
     <string name="app_no_launcher">التطبيق ليس له واجهة.</string>
     <string name="copy_failed">فشل النسخ.</string>
     <string name="copy_success">تم النسخ بنجاح!</string>
+
+    <string name="copy">نسخ</string>
+    <string name="done">تم</string>
+    <string name="retest">إعادة الاختبار</string>
+    <string name="unknown">غير معروف</string>
+    <string name="landing_ip_details_title">تفاصيل IP الهبوط</string>
+    <string name="landing_ip_address">IP الخارج</string>
+    <string name="landing_ip_isp">مزود الخدمة</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">زمن الاستجابة</string>
+    <string name="landing_ip_querying">جارٍ الاستعلام عن IP الهبوط…</string>
+    <string name="landing_ip_failed">فشل الاستعلام: العقدة غير متاحة</string>
     <string name="create_rule">إنشاء قاعدة</string>
     <string name="open_market">السوق المفتوح</string>
     <string name="open_settings">أفتح الإعدادات</string>

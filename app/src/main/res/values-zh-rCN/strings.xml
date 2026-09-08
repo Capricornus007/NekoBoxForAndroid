@@ -396,6 +396,18 @@
     <string name="open_market">打开市场</string>
     <string name="create_rule">创建规则</string>
     <string name="copy_success">复制成功！</string>
+
+    <string name="copy">复制</string>
+    <string name="done">完成</string>
+    <string name="retest">重新测试</string>
+    <string name="unknown">未知</string>
+    <string name="landing_ip_details_title">落地 IP 详情</string>
+    <string name="landing_ip_address">出口 IP</string>
+    <string name="landing_ip_isp">ISP / 运营商</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">延迟</string>
+    <string name="landing_ip_querying">正在查询落地 IP…</string>
+    <string name="landing_ip_failed">查询失败：节点不可达</string>
     <string name="copy_failed">复制失败。</string>
     <string name="app_no_launcher">该应用无界面。</string>
     <string name="route_for">%s 的规则</string>

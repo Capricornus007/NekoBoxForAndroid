@@ -403,6 +403,18 @@
     <string name="open_market">Markt öffnen</string>
     <string name="create_rule">Regel erstellen</string>
     <string name="copy_success">Kopieren erfolgreich!</string>
+
+    <string name="copy">Kopieren</string>
+    <string name="done">Fertig</string>
+    <string name="retest">Erneut testen</string>
+    <string name="unknown">Unbekannt</string>
+    <string name="landing_ip_details_title">Landing-IP-Details</string>
+    <string name="landing_ip_address">Ausgehende IP</string>
+    <string name="landing_ip_isp">ISP / Betreiber</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Latenz</string>
+    <string name="landing_ip_querying">Landing-IP wird abgefragt…</string>
+    <string name="landing_ip_failed">Abfrage fehlgeschlagen: Knoten nicht erreichbar</string>
     <string name="copy_failed">Kopieren fehlgeschlagen.</string>
     <string name="app_no_launcher">Die App hat keine Benutzeroberfläche.</string>
     <string name="route_for">Regel für %s</string>

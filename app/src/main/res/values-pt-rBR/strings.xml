@@ -402,6 +402,18 @@
     <string name="open_market">Abrir loja</string>
     <string name="create_rule">Criar regra</string>
     <string name="copy_success">Cópia bem-sucedida!</string>
+
+    <string name="copy">Copiar</string>
+    <string name="done">Concluído</string>
+    <string name="retest">Testar novamente</string>
+    <string name="unknown">Desconhecido</string>
+    <string name="landing_ip_details_title">Detalhes do IP de saída</string>
+    <string name="landing_ip_address">IP de saída</string>
+    <string name="landing_ip_isp">ISP / Operadora</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Latência</string>
+    <string name="landing_ip_querying">Consultando IP de saída…</string>
+    <string name="landing_ip_failed">Falha na consulta: nó inacessível</string>
     <string name="copy_failed">Falha na cópia.</string>
     <string name="app_no_launcher">O aplicativo não possui interface.</string>
     <string name="route_for">Regra para %s</string>

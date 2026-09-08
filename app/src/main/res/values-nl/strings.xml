@@ -503,6 +503,18 @@ Aanbeveling: Schakel dit alleen in als u alle geïnstalleerde apps vertrouwt.</s
     <string name="open_market">Market openen</string>
     <string name="create_rule">Regel maken</string>
     <string name="copy_success">Kopiëren gelukt!</string>
+
+    <string name="copy">Kopiëren</string>
+    <string name="done">Klaar</string>
+    <string name="retest">Opnieuw testen</string>
+    <string name="unknown">Onbekend</string>
+    <string name="landing_ip_details_title">Landing-IP-details</string>
+    <string name="landing_ip_address">Uitgaande IP</string>
+    <string name="landing_ip_isp">ISP / Provider</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Latentie</string>
+    <string name="landing_ip_querying">Landing-IP wordt opgevraagd…</string>
+    <string name="landing_ip_failed">Query mislukt: node onbereikbaar</string>
     <string name="copy_failed">Kopiëren mislukt.</string>
     <string name="app_no_launcher">De app heeft geen interface.</string>
     <string name="route_for">Regel voor %s</string>

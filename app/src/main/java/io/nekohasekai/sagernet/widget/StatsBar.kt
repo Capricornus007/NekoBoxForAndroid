@@ -21,6 +21,7 @@ import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.MainActivity
+import io.nekohasekai.sagernet.utils.LandingIpManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,6 +33,7 @@ class StatsBar @JvmOverloads constructor(
 ) : MaterialCardView(context, attrs, defStyleAttr), CoordinatorLayout.AttachedBehavior {
 
     private lateinit var statusText: TextView
+    private var lastMeasuredLatency = 0
     private lateinit var txText: TextView
     private lateinit var rxText: TextView
     private lateinit var speedRow: View
@@ -223,7 +225,11 @@ class StatsBar @JvmOverloads constructor(
                     R.attr.statusConnectedColor,
                     R.attr.statusDetailColor,
                 )
+                // 連線後台查落地 IP，到了就把狀態行換成「國旗 國碼 IP」
+                refreshLandingIp(forceRefresh = false)
             } else {
+                LandingIpManager.clearCache()
+                lastMeasuredLatency = 0
                 updateSpeed(0, 0)
                 setStatusColorByState(state)
                 setStatus(
@@ -271,20 +277,35 @@ class StatsBar @JvmOverloads constructor(
                 val elapsed = activity.urlTest()
                 onMainDispatcher {
                     isEnabled = true
-                    // "Success:" in green; the handshake detail in detail color.
-                    setStatusTwoTone(
-                        app.getString(
-                            if (DataStore.connectionTestURL.startsWith("https://")) {
-                                R.string.connection_test_available
-                            } else {
-                                R.string.connection_test_available_http
-                            },
-                            elapsed,
-                        ),
-                        ':',
-                        R.attr.statusConnectedColor,
-                        R.attr.statusDetailColor,
-                    )
+                    lastMeasuredLatency = elapsed
+                    LandingIpManager.updateCachedDuration(elapsed.toLong())
+                    val landing = landingStatusLine(elapsed)
+                    if (landing != null) {
+                        // 落地 IP 在快取：直接顯示「國旗 國碼 IP · 握手延遲」
+                        setStatusTwoTone(
+                            landing,
+                            '·',
+                            R.attr.statusConnectedColor,
+                            R.attr.statusDetailColor,
+                        )
+                    } else {
+                        // "Success:" in green; the handshake detail in detail color.
+                        setStatusTwoTone(
+                            app.getString(
+                                if (DataStore.connectionTestURL.startsWith("https://")) {
+                                    R.string.connection_test_available
+                                } else {
+                                    R.string.connection_test_available_http
+                                },
+                                elapsed,
+                            ),
+                            ':',
+                            R.attr.statusConnectedColor,
+                            R.attr.statusDetailColor,
+                        )
+                        // 沒有落地 IP 快取：順手補一次查詢，下次顯示就是完整形態
+                        refreshLandingIp(forceRefresh = true)
+                    }
                 }
             } catch (e: Exception) {
                 Logs.w(e.toString())
@@ -300,6 +321,42 @@ class StatsBar @JvmOverloads constructor(
                     ).show()
                 }
             }
+        }
+    }
+
+    // 「🇯🇵 JP 1.2.3.4 · 123 ms」——無快取回 null（調用方退回既有文案）
+    private fun landingStatusLine(latency: Int = lastMeasuredLatency): String? {
+        val cached = LandingIpManager.getCachedInfo() ?: return null
+        if (cached.ip.isBlank()) return null
+        val base = "${cached.countryFlag} ${cached.countryCode} ${cached.ip}"
+        return if (latency > 0) "$base · $latency ms" else base
+    }
+
+    private fun refreshLandingIp(forceRefresh: Boolean) {
+        val activity = mainActivity
+        if (!DataStore.serviceState.connected) return
+        activity.lifecycleScope.launch(Dispatchers.Main) {
+            val result = LandingIpManager.queryLandingIp(DataStore.selectedProxy, forceRefresh)
+            if (result.isSuccess && DataStore.serviceState.connected) {
+                ensureViews()
+                landingStatusLine()?.let {
+                    setStatusTwoTone(it, '·', R.attr.statusConnectedColor, R.attr.statusDetailColor)
+                }
+            }
+        }
+    }
+
+    // 狀態欄點擊：有落地 IP 快取 → 詳情 BottomSheet；沒有 → 走測速
+    fun onStatusClick() {
+        val activity = mainActivity
+        val cached = LandingIpManager.getCachedInfo()
+        if (cached != null && cached.ip.isNotBlank() && DataStore.serviceState.connected) {
+            LandingIpBottomSheet.show(activity, cached) {
+                refreshLandingIp(forceRefresh = true)
+                testConnection()
+            }
+        } else {
+            testConnection()
         }
     }
 

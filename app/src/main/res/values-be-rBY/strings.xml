@@ -399,6 +399,18 @@
     <string name="open_market">Адкрыць маркет</string>
     <string name="create_rule">Стварыць правіла</string>
     <string name="copy_success">Капіяванне паспяхова!</string>
+
+    <string name="copy">Капіраваць</string>
+    <string name="done">Гатова</string>
+    <string name="retest">Ператэсціраваць</string>
+    <string name="unknown">Невядома</string>
+    <string name="landing_ip_details_title">Звесткі пра выходны IP</string>
+    <string name="landing_ip_address">Выходны IP</string>
+    <string name="landing_ip_isp">Правайдэр</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Затрымка</string>
+    <string name="landing_ip_querying">Запыт выходнага IP…</string>
+    <string name="landing_ip_failed">Памылка запыту: вузел недаступны</string>
     <string name="copy_failed">Капіяванне не ўдалося.</string>
     <string name="app_no_launcher">Праграма не мае інтэрфейсу.</string>
     <string name="route_for">Правіла для %s</string>

@@ -396,6 +396,18 @@
     <string name="create_rule">افزودن دستورالعمل</string>
 
     <string name="copy_success">کپی موفق!</string>
+
+    <string name="copy">کپی</string>
+    <string name="done">تمام</string>
+    <string name="retest">آزمون مجدد</string>
+    <string name="unknown">نامشخص</string>
+    <string name="landing_ip_details_title">جزئیات IP خروجی</string>
+    <string name="landing_ip_address">IP خروجی</string>
+    <string name="landing_ip_isp">ISP / اپراتور</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">تأخیر</string>
+    <string name="landing_ip_querying">در حال استعلام IP خروجی…</string>
+    <string name="landing_ip_failed">استعلام ناموفق: گره در دسترس نیست</string>
     <string name="copy_failed">کپی ناموفق.</string>
     <string name="app_no_launcher">این برنامه، رابط کاربری ندارد.</string>
     <string name="route_for">دستورالعمل برای %s</string>

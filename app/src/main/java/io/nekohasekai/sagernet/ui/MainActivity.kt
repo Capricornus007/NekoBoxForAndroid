@@ -113,7 +113,7 @@ class MainActivity :
                 )
             }
         }
-        binding.stats.setOnClickListener { if (DataStore.serviceState.connected) binding.stats.testConnection() }
+        binding.stats.setOnClickListener { if (DataStore.serviceState.connected) binding.stats.onStatusClick() }
 
         setContentView(binding.root)
         currentMainFragment =

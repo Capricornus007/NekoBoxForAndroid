@@ -536,5 +536,6 @@
     <color name="statusTestingColor">@color/ui_secondary</color>
     <color name="routeProxyColor">@color/ui_primary</color>
     <color name="navSelectedColor">@color/ui_primary</color>
+    <color name="card_stroke">#29000000</color>
 
 </resources>

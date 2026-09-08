@@ -510,6 +510,18 @@
     <string name="create_rule">Create Rule</string>
 
     <string name="copy_success">Copy success!</string>
+
+    <string name="copy">Copy</string>
+    <string name="done">Done</string>
+    <string name="retest">Retest</string>
+    <string name="unknown">Unknown</string>
+    <string name="landing_ip_details_title">Landing IP Details</string>
+    <string name="landing_ip_address">Outbound IP</string>
+    <string name="landing_ip_isp">ISP / Operator</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Latency</string>
+    <string name="landing_ip_querying">Querying landing IP…</string>
+    <string name="landing_ip_failed">Query failed: node unreachable</string>
     <string name="copy_failed">Copy failed.</string>
     <string name="app_no_launcher">The app has no interface.</string>
     <string name="route_for">Rule for %s</string>

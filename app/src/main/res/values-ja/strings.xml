@@ -386,6 +386,18 @@
     <string name="open_market">マーケットを開く</string>
     <string name="create_rule">ルールを作成</string>
     <string name="copy_success">コピーに成功しました！</string>
+
+    <string name="copy">コピー</string>
+    <string name="done">完了</string>
+    <string name="retest">再テスト</string>
+    <string name="unknown">不明</string>
+    <string name="landing_ip_details_title">出口 IP の詳細</string>
+    <string name="landing_ip_address">出口 IP</string>
+    <string name="landing_ip_isp">ISP / 事業者</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">レイテンシ</string>
+    <string name="landing_ip_querying">出口 IP を照会中…</string>
+    <string name="landing_ip_failed">照会失敗: ノード到達不可</string>
     <string name="copy_failed">コピーに失敗しました。</string>
     <string name="app_no_launcher">このアプリにはインターフェースがありません。</string>
     <string name="route_for">%s のルール</string>

@@ -495,6 +495,18 @@
     <string name="open_market">Åpne marked</string>
     <string name="create_rule">Opprett regel</string>
     <string name="copy_success">Kopiering vellykket!</string>
+
+    <string name="copy">Kopier</string>
+    <string name="done">Ferdig</string>
+    <string name="retest">Test på nytt</string>
+    <string name="unknown">Ukjent</string>
+    <string name="landing_ip_details_title">Detaljer for utgående IP</string>
+    <string name="landing_ip_address">Utgående IP</string>
+    <string name="landing_ip_isp">ISP / Operatør</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Latens</string>
+    <string name="landing_ip_querying">Spør utgående IP…</string>
+    <string name="landing_ip_failed">Spørring mislyktes: node utilgjengelig</string>
     <string name="copy_failed">Kopiering mislyktes.</string>
     <string name="app_no_launcher">Appen har ikke noe grensesnitt.</string>
     <string name="route_for">Regel for %s</string>

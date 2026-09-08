@@ -516,6 +516,18 @@
     <string name="open_market">Відкрити магазин</string>
     <string name="create_rule">Створити правило</string>
     <string name="copy_success">Успішно скопійовано!</string>
+
+    <string name="copy">Копіювати</string>
+    <string name="done">Готово</string>
+    <string name="retest">Повторити тест</string>
+    <string name="unknown">Невідомо</string>
+    <string name="landing_ip_details_title">Відомості про вихідний IP</string>
+    <string name="landing_ip_address">Вихідний IP</string>
+    <string name="landing_ip_isp">Провайдер</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Затримка</string>
+    <string name="landing_ip_querying">Запит вихідного IP…</string>
+    <string name="landing_ip_failed">Помилка запиту: вузол недоступний</string>
     <string name="copy_failed">Не вдалося скопіювати.</string>
     <string name="app_no_launcher">Застосунок не має інтерфейсу.</string>
     <string name="route_for">Правило для %s</string>

@@ -448,6 +448,18 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="open_market">開啟商店</string>
     <string name="create_rule">創建規則</string>
     <string name="copy_success">複製成功！</string>
+
+    <string name="copy">複製</string>
+    <string name="done">完成</string>
+    <string name="retest">重新測試</string>
+    <string name="unknown">未知</string>
+    <string name="landing_ip_details_title">落地 IP 詳情</string>
+    <string name="landing_ip_address">出口 IP</string>
+    <string name="landing_ip_isp">ISP / 營運商</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">延遲</string>
+    <string name="landing_ip_querying">正在查詢落地 IP…</string>
+    <string name="landing_ip_failed">查詢失敗：節點不可達</string>
     <string name="copy_failed">複製失敗。</string>
     <string name="app_no_launcher">此應用程式沒有介面。</string>
     <string name="route_for">%s 的規則</string>

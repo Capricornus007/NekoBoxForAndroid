@@ -406,6 +406,18 @@
     <string name="open_market">Ouvrir le Market</string>
     <string name="create_rule">Créer une règle</string>
     <string name="copy_success">Copie réussie !</string>
+
+    <string name="copy">Copier</string>
+    <string name="done">Terminé</string>
+    <string name="retest">Retester</string>
+    <string name="unknown">Inconnu</string>
+    <string name="landing_ip_details_title">Détails de l’IP de sortie</string>
+    <string name="landing_ip_address">IP sortante</string>
+    <string name="landing_ip_isp">FAI / Opérateur</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Latence</string>
+    <string name="landing_ip_querying">Interrogation de l’IP de sortie…</string>
+    <string name="landing_ip_failed">Échec : nœud injoignable</string>
     <string name="copy_failed">Échec de la copie.</string>
     <string name="app_no_launcher">L\'application n\'a pas d\'interface.</string>
     <string name="route_for">Règle pour %s</string>

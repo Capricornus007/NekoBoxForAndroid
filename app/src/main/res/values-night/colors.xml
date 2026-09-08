@@ -69,4 +69,6 @@
     <color name="statusTestingColor">@color/colorSecondary</color>
     <color name="routeProxyColor">@color/colorPrimary</color>
     <color name="navSelectedColor">@color/colorPrimary</color>
+    <color name="card_stroke">#29FFFFFF</color>
+
 </resources>

@@ -403,6 +403,18 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="open_market">Apri market</string>
     <string name="create_rule">Crea regola</string>
     <string name="copy_success">Copia riuscita!</string>
+
+    <string name="copy">Copia</string>
+    <string name="done">Fatto</string>
+    <string name="retest">Ritesta</string>
+    <string name="unknown">Sconosciuto</string>
+    <string name="landing_ip_details_title">Dettagli IP di uscita</string>
+    <string name="landing_ip_address">IP in uscita</string>
+    <string name="landing_ip_isp">ISP / Operatore</string>
+    <string name="landing_ip_asn">ASN</string>
+    <string name="landing_ip_query_time">Latenza</string>
+    <string name="landing_ip_querying">Query IP di uscita…</string>
+    <string name="landing_ip_failed">Query fallita: nodo non raggiungibile</string>
     <string name="copy_failed">Copia fallita.</string>
     <string name="app_no_launcher">L\'app non ha interfaccia.</string>
     <string name="route_for">Regola per %s</string>
