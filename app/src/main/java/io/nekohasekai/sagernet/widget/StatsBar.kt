@@ -251,18 +251,8 @@ class StatsBar @JvmOverloads constructor(
         val speedColor = context.getColorAttr(R.attr.speedTextColor)
         txText.setTextColor(speedColor)
         rxText.setTextColor(speedColor)
-        txText.text = "▲  ${
-            context.getString(
-                R.string.speed,
-                Formatter.formatFileSize(context, txRate),
-            )
-        }"
-        rxText.text = "▼  ${
-            context.getString(
-                R.string.speed,
-                Formatter.formatFileSize(context, rxRate),
-            )
-        }"
+        txText.text = "▲ ${Formatter.formatFileSize(context, txRate)}/s"
+        rxText.text = "▼ ${Formatter.formatFileSize(context, rxRate)}/s"
     }
 
     fun testConnection() {
