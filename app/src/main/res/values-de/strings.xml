@@ -538,6 +538,25 @@
     <string name="naive_insecure_concurrency">Unsichere Nebenläufigkeit</string>
     <string name="naive_insecure_concurrency_summary">N gleichzeitige Tunnelverbindungen für mehr Robustheit bei schlechten Bedingungen verwenden</string>
     <string name="stun_test">NAT-Verhalten ermitteln</string>
+
+    <string name="traffic_chart_title">Echtzeit-Traffic &amp; Verbindungen</string>
+    <string name="traffic_chart_summary">Echtzeit-Geschwindigkeitsdiagramm anzeigen und aktive Verbindungen verwalten</string>
+    <string name="traffic_chart_open">Öffnen</string>
+    <string name="traffic_current_up">Upload-Geschwindigkeit</string>
+    <string name="traffic_current_down">Download-Geschwindigkeit</string>
+    <string name="traffic_peak">Spitze</string>
+    <string name="traffic_active_connections">Aktive Verbindungen</string>
+    <string name="traffic_close_all">Alle schließen</string>
+    <string name="traffic_close_all_confirm">Alle aktiven Verbindungen schließen?</string>
+    <string name="traffic_no_connections">Keine aktiven Verbindungen</string>
+    <string name="traffic_waiting_clash">Warte auf Clash API oder VPN nicht gestartet…</string>
+    <string name="traffic_chart_monitor_active">● Live-Monitor aktiv</string>
+    <string name="traffic_chart_not_connected_hint">Proxy-Dienst getrennt. Bitte auf dem Hauptbildschirm verbinden.</string>
+    <string name="traffic_chart_go_connect">Verbinden</string>
+    <string name="traffic_chart_refresh">Aktualisieren</string>
+    <string name="traffic_monitor_waiting">● Überwachung pausiert (VPN nicht verbunden)</string>
+    <string name="traffic_connecting_api">Verbinde mit Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Gesamt-Upload: %1$s  |  Gesamt-Download: %2$s</string>
     <string name="stun_test_summary">NAT-Mapping-Verhalten und NAT-Filterung des Clients bestimmen</string>
     <string name="stun_attest_loading">Das kann einige Minuten dauern…</string>
     <string name="nat_stun_server_hint">STUN-Server</string>

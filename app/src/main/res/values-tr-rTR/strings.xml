@@ -439,6 +439,25 @@
     <string name="naive_insecure_concurrency">Güvensiz Eşzamanlılık</string>
     <string name="naive_insecure_concurrency_summary">Daha kötü ağ koşullarında daha sağlam olmak için N adet eşzamanlı tünel bağlantısı kullanın. Daha fazla bağlantı, tünellemenin tespit edilmesini kolaylaştırır ve daha az güvenlidir. Bu proje, trafik analizine karşı en güçlü güvenliği hedefler. Güvensiz bir şekilde kullanmak amacını bozar. \n\nBunu kullanmanız gerekiyorsa, sorunlarınızı çözüp çözmediğini görmek için önce N=2\'yi deneyin. Burada 4\'ten fazla bağlantı kullanmanızı kesinlikle önermiyoruz.</string>
     <string name="stun_test">NAT davranış keşfi</string>
+
+    <string name="traffic_chart_title">Gerçek zamanlı trafik ve bağlantılar</string>
+    <string name="traffic_chart_summary">Gerçek zamanlı hız grafiğini görüntüle ve etkin bağlantıları yönet</string>
+    <string name="traffic_chart_open">Aç</string>
+    <string name="traffic_current_up">Yükleme hızı</string>
+    <string name="traffic_current_down">İndirme hızı</string>
+    <string name="traffic_peak">Tepe</string>
+    <string name="traffic_active_connections">Etkin bağlantılar</string>
+    <string name="traffic_close_all">Tümünü kapat</string>
+    <string name="traffic_close_all_confirm">Tüm etkin bağlantılar kapatılsın mı?</string>
+    <string name="traffic_no_connections">Etkin bağlantı yok</string>
+    <string name="traffic_waiting_clash">Clash API bekleniyor veya VPN başlamadı…</string>
+    <string name="traffic_chart_monitor_active">● Canlı izleme etkin</string>
+    <string name="traffic_chart_not_connected_hint">Proxy hizmeti bağlı değil. Ana ekrandan bağlanın.</string>
+    <string name="traffic_chart_go_connect">Bağlan</string>
+    <string name="traffic_chart_refresh">Yenile</string>
+    <string name="traffic_monitor_waiting">● İzleme duraklatıldı (VPN bağlı değil)</string>
+    <string name="traffic_connecting_api">Clash API\'ye bağlanılıyor (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Toplam yükleme: %1$s  |  Toplam indirme: %2$s</string>
     <string name="stun_test_summary">İstemcinin NAT eşleme davranışını ve RFC 3478\'de tanımlanan NAT filtreleme davranışını STUN kullanarak belirleyin.</string>
     <string name="start">Başlat</string>
     <string name="stun_attest_loading">Bu birkaç dakika sürebilir…</string>

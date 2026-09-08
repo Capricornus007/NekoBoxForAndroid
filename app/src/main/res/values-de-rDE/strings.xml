@@ -449,6 +449,25 @@
     <string name="naive_insecure_concurrency">Unsicheres Concurrency</string>
     <string name="naive_insecure_concurrency_summary">Verwenden Sie N gleichzeitige Tunnelverbindungen, um unter schlechten Netzwerkbedingungen robuster zu sein. Mehr Verbindungen machen das Tunneling leichter erkennbar und weniger sicher. Dieses Projekt strebt die stärkste Sicherheit gegen Verkehrsanalyse an. Die Verwendung auf unsichere Weise widerspricht seinem Zweck. \n\nWenn Sie dies verwenden müssen, versuchen Sie zuerst N=2, um zu sehen, ob es Ihre Probleme löst. Es wird dringend davon abgeraten, hier mehr als 4 Verbindungen zu verwenden.</string>
     <string name="stun_test">NAT-Verhaltenserkennung</string>
+
+    <string name="traffic_chart_title">Echtzeit-Traffic &amp; Verbindungen</string>
+    <string name="traffic_chart_summary">Echtzeit-Geschwindigkeitsdiagramm anzeigen und aktive Verbindungen verwalten</string>
+    <string name="traffic_chart_open">Öffnen</string>
+    <string name="traffic_current_up">Upload-Geschwindigkeit</string>
+    <string name="traffic_current_down">Download-Geschwindigkeit</string>
+    <string name="traffic_peak">Spitze</string>
+    <string name="traffic_active_connections">Aktive Verbindungen</string>
+    <string name="traffic_close_all">Alle schließen</string>
+    <string name="traffic_close_all_confirm">Alle aktiven Verbindungen schließen?</string>
+    <string name="traffic_no_connections">Keine aktiven Verbindungen</string>
+    <string name="traffic_waiting_clash">Warte auf Clash API oder VPN nicht gestartet…</string>
+    <string name="traffic_chart_monitor_active">● Live-Monitor aktiv</string>
+    <string name="traffic_chart_not_connected_hint">Proxy-Dienst getrennt. Bitte auf dem Hauptbildschirm verbinden.</string>
+    <string name="traffic_chart_go_connect">Verbinden</string>
+    <string name="traffic_chart_refresh">Aktualisieren</string>
+    <string name="traffic_monitor_waiting">● Überwachung pausiert (VPN nicht verbunden)</string>
+    <string name="traffic_connecting_api">Verbinde mit Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Gesamt-Upload: %1$s  |  Gesamt-Download: %2$s</string>
     <string name="stun_test_summary">Bestimmen Sie das NAT-Mapping-Verhalten und das NAT-Filterverhalten des Clients gemäß RFC 3478 mit STUN.</string>
     <string name="start">Starten</string>
     <string name="stun_attest_loading">Dies kann einige Minuten dauern…</string>

@@ -622,6 +622,25 @@
     <string name="add_profile_methods_scan_qr_code">QR kodu tara</string>
     <string name="add_profile_methods_manual_settings">Manuel ayarlar</string>
     <string name="stun_test">STUN testi</string>
+
+    <string name="traffic_chart_title">Gerçek zamanlı trafik ve bağlantılar</string>
+    <string name="traffic_chart_summary">Gerçek zamanlı hız grafiğini görüntüle ve etkin bağlantıları yönet</string>
+    <string name="traffic_chart_open">Aç</string>
+    <string name="traffic_current_up">Yükleme hızı</string>
+    <string name="traffic_current_down">İndirme hızı</string>
+    <string name="traffic_peak">Tepe</string>
+    <string name="traffic_active_connections">Etkin bağlantılar</string>
+    <string name="traffic_close_all">Tümünü kapat</string>
+    <string name="traffic_close_all_confirm">Tüm etkin bağlantılar kapatılsın mı?</string>
+    <string name="traffic_no_connections">Etkin bağlantı yok</string>
+    <string name="traffic_waiting_clash">Clash API bekleniyor veya VPN başlamadı…</string>
+    <string name="traffic_chart_monitor_active">● Canlı izleme etkin</string>
+    <string name="traffic_chart_not_connected_hint">Proxy hizmeti bağlı değil. Ana ekrandan bağlanın.</string>
+    <string name="traffic_chart_go_connect">Bağlan</string>
+    <string name="traffic_chart_refresh">Yenile</string>
+    <string name="traffic_monitor_waiting">● İzleme duraklatıldı (VPN bağlı değil)</string>
+    <string name="traffic_connecting_api">Clash API\'ye bağlanılıyor (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Toplam yükleme: %1$s  |  Toplam indirme: %2$s</string>
     <string name="stun_test_summary">NAT türünü harici adresle birlikte test et</string>
     <string name="start">Başlat</string>
     <string name="stun_attest_loading">STUN testi yapılıyor…</string>

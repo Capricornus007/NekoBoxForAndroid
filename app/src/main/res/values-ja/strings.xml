@@ -429,6 +429,25 @@
     <string name="naive_insecure_concurrency">安全でない同時接続</string>
     <string name="naive_insecure_concurrency_summary">悪いネットワーク状況下での堅牢性を高めるため、N 個の同時トンネル接続を使用します。接続数が増えるとトンネリングが検出されやすくなり、安全性が低下します。本プロジェクトはトラフィック解析に対する最強のセキュリティを目指しています。安全でない方法で使用すると、その目的が損なわれます。\n\nどうしても使用する必要がある場合は、まず N=2 を試して問題が解決するか確認してください。ここで 4 接続を超えて使用することは強くお勧めしません。</string>
     <string name="stun_test">NAT 動作の検出</string>
+
+    <string name="traffic_chart_title">リアルタイム通信量と接続</string>
+    <string name="traffic_chart_summary">リアルタイム速度グラフの表示とアクティブ接続の管理</string>
+    <string name="traffic_chart_open">開く</string>
+    <string name="traffic_current_up">アップロード速度</string>
+    <string name="traffic_current_down">ダウンロード速度</string>
+    <string name="traffic_peak">ピーク</string>
+    <string name="traffic_active_connections">アクティブ接続</string>
+    <string name="traffic_close_all">すべて閉じる</string>
+    <string name="traffic_close_all_confirm">すべてのアクティブ接続を閉じますか？</string>
+    <string name="traffic_no_connections">アクティブな接続はありません</string>
+    <string name="traffic_waiting_clash">Clash API 待機中、または VPN 未起動…</string>
+    <string name="traffic_chart_monitor_active">● ライブモニター稼働中</string>
+    <string name="traffic_chart_not_connected_hint">プロキシサービスは切断されています。メイン画面で接続してください。</string>
+    <string name="traffic_chart_go_connect">接続する</string>
+    <string name="traffic_chart_refresh">更新</string>
+    <string name="traffic_monitor_waiting">● 監視一時停止（VPN 未接続）</string>
+    <string name="traffic_connecting_api">Clash API (127.0.0.1:9090) に接続中…</string>
+    <string name="traffic_total_updown">合計アップ: %1$s ｜ 合計ダウン: %2$s</string>
     <string name="stun_test_summary">STUN を使用して、RFC 3478 で定義されたクライアントの NAT マッピング動作と NAT フィルタリング動作を判定します。</string>
     <string name="start">開始</string>
     <string name="stun_attest_loading">数分かかる場合があります…</string>

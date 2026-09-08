@@ -453,6 +453,25 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="naive_insecure_concurrency">Небезопасный параллелизм</string>
     <string name="naive_insecure_concurrency_summary">Использовать N параллельных туннельных соединений для повышения устойчивости при плохих сетевых условиях. Больше соединений облегчает обнаружение туннелирования и снижает безопасность. \n\nЕсли вы должны использовать это, начните с N=2, чтобы проверить, решает ли это ваши проблемы. Настоятельно не рекомендуется использовать более 4 соединений.</string>
     <string name="stun_test">Обнаружение поведения NAT</string>
+
+    <string name="traffic_chart_title">Трафик и соединения в реальном времени</string>
+    <string name="traffic_chart_summary">График скорости в реальном времени и управление активными соединениями</string>
+    <string name="traffic_chart_open">Открыть</string>
+    <string name="traffic_current_up">Скорость отдачи</string>
+    <string name="traffic_current_down">Скорость загрузки</string>
+    <string name="traffic_peak">Пик</string>
+    <string name="traffic_active_connections">Активные соединения</string>
+    <string name="traffic_close_all">Закрыть все</string>
+    <string name="traffic_close_all_confirm">Закрыть все активные соединения?</string>
+    <string name="traffic_no_connections">Нет активных соединений</string>
+    <string name="traffic_waiting_clash">Ожидание Clash API или VPN не запущен…</string>
+    <string name="traffic_chart_monitor_active">● Мониторинг в реальном времени активен</string>
+    <string name="traffic_chart_not_connected_hint">Прокси-сервис отключён. Подключитесь на главном экране.</string>
+    <string name="traffic_chart_go_connect">Подключиться</string>
+    <string name="traffic_chart_refresh">Обновить</string>
+    <string name="traffic_monitor_waiting">● Мониторинг приостановлен (VPN не подключён)</string>
+    <string name="traffic_connecting_api">Подключение к Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Всего отдано: %1$s  |  Всего загружено: %2$s</string>
     <string name="stun_test_summary">Определить поведение NAT-маппинга и фильтрации NAT, описанное в RFC 3478, с помощью STUN.</string>
     <string name="start">Запустить</string>
     <string name="stun_attest_loading">Это может занять несколько минут…</string>

@@ -446,6 +446,25 @@
     <string name="naive_insecure_concurrency">هم‌روندی ناامن</string>
     <string name="naive_insecure_concurrency_summary">از N اتصال تونل هم‌روند استفاده کنید تا در شرایط بد شبکه مقاوم‌تر باشید. اتصالات بیشتر تونل‌زنی را قابل تشخیص‌تر و کمتر امن می‌کند. این پروژه برای قوی‌ترین امنیت در برابر تحلیل ترافیک تلاش می‌کند. استفاده از آن به روش ناامن، هدف آن را بی‌اثر می‌کند. \n\nاگر مجبور به استفاده از این هستید، ابتدا N=2 را امتحان کنید تا ببینید آیا مشکلات شما را حل می‌کند. به شدت توصیه می‌شود از بیش از 4 اتصال در اینجا استفاده نکنید.</string>
     <string name="stun_test">کشف رفتار NAT</string>
+
+    <string name="traffic_chart_title">ترافیک و اتصالات لحظه‌ای</string>
+    <string name="traffic_chart_summary">نمودار سرعت لحظه‌ای و مدیریت اتصالات فعال</string>
+    <string name="traffic_chart_open">باز کردن</string>
+    <string name="traffic_current_up">سرعت آپلود</string>
+    <string name="traffic_current_down">سرعت دانلود</string>
+    <string name="traffic_peak">اوج</string>
+    <string name="traffic_active_connections">اتصالات فعال</string>
+    <string name="traffic_close_all">بستن همه</string>
+    <string name="traffic_close_all_confirm">همه اتصالات فعال بسته شوند؟</string>
+    <string name="traffic_no_connections">اتصال فعالی نیست</string>
+    <string name="traffic_waiting_clash">در انتظار Clash API یا VPN روشن نیست…</string>
+    <string name="traffic_chart_monitor_active">● پایش زنده فعال</string>
+    <string name="traffic_chart_not_connected_hint">سرویس پراکسی قطع است. از صفحه اصلی متصل شوید.</string>
+    <string name="traffic_chart_go_connect">اتصال</string>
+    <string name="traffic_chart_refresh">به‌روزرسانی</string>
+    <string name="traffic_monitor_waiting">● پایش متوقف (VPN متصل نیست)</string>
+    <string name="traffic_connecting_api">در حال اتصال به Clash API ‏(127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">مجموع آپلود: %1$s  |  مجموع دانلود: %2$s</string>
     <string name="stun_test_summary">رفتار نگاشت NAT و رفتار فیلتر کردن NAT تعریف شده در RFC 3478 را با استفاده از STUN تعیین کنید.</string>
     <string name="start">شروع</string>
     <string name="stun_attest_loading">این ممکن است چند دقیقه طول بکشد…</string>

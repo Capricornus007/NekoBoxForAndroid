@@ -481,6 +481,25 @@
     <string name="stopping">Выключение…</string>
     <string name="stun_attest_loading">Пожалуйста, подождите…</string>
     <string name="stun_test">Обнаружение поведения NAT</string>
+
+    <string name="traffic_chart_title">Трафик и соединения в реальном времени</string>
+    <string name="traffic_chart_summary">График скорости в реальном времени и управление активными соединениями</string>
+    <string name="traffic_chart_open">Открыть</string>
+    <string name="traffic_current_up">Скорость отдачи</string>
+    <string name="traffic_current_down">Скорость загрузки</string>
+    <string name="traffic_peak">Пик</string>
+    <string name="traffic_active_connections">Активные соединения</string>
+    <string name="traffic_close_all">Закрыть все</string>
+    <string name="traffic_close_all_confirm">Закрыть все активные соединения?</string>
+    <string name="traffic_no_connections">Нет активных соединений</string>
+    <string name="traffic_waiting_clash">Ожидание Clash API или VPN не запущен…</string>
+    <string name="traffic_chart_monitor_active">● Мониторинг в реальном времени активен</string>
+    <string name="traffic_chart_not_connected_hint">Прокси-сервис отключён. Подключитесь на главном экране.</string>
+    <string name="traffic_chart_go_connect">Подключиться</string>
+    <string name="traffic_chart_refresh">Обновить</string>
+    <string name="traffic_monitor_waiting">● Мониторинг приостановлен (VPN не подключён)</string>
+    <string name="traffic_connecting_api">Подключение к Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Всего отдано: %1$s  |  Всего загружено: %2$s</string>
     <string name="stun_test_summary">Определить поведение сопоставления адресов NAT и поведение фильтрации NAT в соответствии с RFC 5780 при помощи STUN.</string>
     <string name="subscription">Подписка</string>
     <string name="subscription_expire">Истекает: %s</string>

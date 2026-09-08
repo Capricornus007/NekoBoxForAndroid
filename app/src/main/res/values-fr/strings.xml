@@ -574,6 +574,25 @@
         L\'utiliser de manière non sécurisée va à l\'encontre de son but. \n\nSi vous devez l\'utiliser, essayez d\'abord N=2 pour
         voir si cela résout vos problèmes. Il est fortement déconseillé d\'utiliser plus de 4 connexions ici.</string>
     <string name="stun_test">Découverte du comportement NAT</string>
+
+    <string name="traffic_chart_title">Trafic et connexions en temps réel</string>
+    <string name="traffic_chart_summary">Voir le graphique de vitesse en temps réel et gérer les connexions actives</string>
+    <string name="traffic_chart_open">Ouvrir</string>
+    <string name="traffic_current_up">Vitesse d’envoi</string>
+    <string name="traffic_current_down">Vitesse de réception</string>
+    <string name="traffic_peak">Pic</string>
+    <string name="traffic_active_connections">Connexions actives</string>
+    <string name="traffic_close_all">Tout fermer</string>
+    <string name="traffic_close_all_confirm">Fermer toutes les connexions actives ?</string>
+    <string name="traffic_no_connections">Aucune connexion active</string>
+    <string name="traffic_waiting_clash">En attente de Clash API ou VPN non démarré…</string>
+    <string name="traffic_chart_monitor_active">● Surveillance en direct active</string>
+    <string name="traffic_chart_not_connected_hint">Service proxy déconnecté. Connectez-vous sur l’écran principal.</string>
+    <string name="traffic_chart_go_connect">Se connecter</string>
+    <string name="traffic_chart_refresh">Actualiser</string>
+    <string name="traffic_monitor_waiting">● Surveillance en pause (VPN non connecté)</string>
+    <string name="traffic_connecting_api">Connexion à Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Total envoyé : %1$s  |  Total reçu : %2$s</string>
     <string name="stun_test_summary">Détermine le comportement de mappage NAT du client et le comportement de
         filtrage NAT défini dans la RFC 3478 à l\'aide de STUN.</string>
     <string name="start">Démarrer</string>

@@ -455,6 +455,25 @@ Aanbeveling: Schakel dit alleen in als u alle geïnstalleerde apps vertrouwt.</s
 
 Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen oplost. Sterk afgeraden om hier meer dan 4 verbindingen te gebruiken.</string>
     <string name="stun_test">NAT-gedrag detectie</string>
+
+    <string name="traffic_chart_title">Realtime verkeer &amp; verbindingen</string>
+    <string name="traffic_chart_summary">Bekijk realtime snelheidsgrafiek en beheer actieve verbindingen</string>
+    <string name="traffic_chart_open">Openen</string>
+    <string name="traffic_current_up">Uploadsnelheid</string>
+    <string name="traffic_current_down">Downloadsnelheid</string>
+    <string name="traffic_peak">Piek</string>
+    <string name="traffic_active_connections">Actieve verbindingen</string>
+    <string name="traffic_close_all">Alles sluiten</string>
+    <string name="traffic_close_all_confirm">Alle actieve verbindingen sluiten?</string>
+    <string name="traffic_no_connections">Geen actieve verbindingen</string>
+    <string name="traffic_waiting_clash">Wachten op Clash API of VPN niet gestart…</string>
+    <string name="traffic_chart_monitor_active">● Livemonitor actief</string>
+    <string name="traffic_chart_not_connected_hint"> proxyservice niet verbonden. Verbind op het hoofdscherm.</string>
+    <string name="traffic_chart_go_connect">Verbinden</string>
+    <string name="traffic_chart_refresh">Vernieuwen</string>
+    <string name="traffic_monitor_waiting">● Monitoring gepauzeerd (VPN niet verbonden)</string>
+    <string name="traffic_connecting_api">Verbinden met Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Totaal upload: %1$s  |  Totaal download: %2$s</string>
     <string name="stun_test_summary">Bepaal het NAT-mappinggedrag van de client en het NAT-filtergedrag zoals gedefinieerd in RFC 3478 met behulp van STUN.</string>
     <string name="start">Start</string>
     <string name="stun_attest_loading">Dit kan een paar minuten duren…</string>

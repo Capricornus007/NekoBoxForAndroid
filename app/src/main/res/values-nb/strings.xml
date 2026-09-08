@@ -561,6 +561,25 @@
 
 Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene dine. Anbefaler sterkt å ikke bruke mer enn 4 forbindelser her.</string>
     <string name="stun_test">NAT-atferdsoppdagelse</string>
+
+    <string name="traffic_chart_title">Trafikk og tilkoblinger i sanntid</string>
+    <string name="traffic_chart_summary">Se hastighetsgraf i sanntid og administrer aktive tilkoblinger</string>
+    <string name="traffic_chart_open">Åpne</string>
+    <string name="traffic_current_up">Opplastingshastighet</string>
+    <string name="traffic_current_down">Nedlastingshastighet</string>
+    <string name="traffic_peak">Topp</string>
+    <string name="traffic_active_connections">Aktive tilkoblinger</string>
+    <string name="traffic_close_all">Lukk alle</string>
+    <string name="traffic_close_all_confirm">Lukke alle aktive tilkoblinger?</string>
+    <string name="traffic_no_connections">Ingen aktive tilkoblinger</string>
+    <string name="traffic_waiting_clash">Venter på Clash API eller VPN ikke startet…</string>
+    <string name="traffic_chart_monitor_active">● Sanntidsovervåking aktiv</string>
+    <string name="traffic_chart_not_connected_hint">Proxy-tjenestekobling brutt. Koble til fra hovedskjermen.</string>
+    <string name="traffic_chart_go_connect">Koble til</string>
+    <string name="traffic_chart_refresh">Oppdater</string>
+    <string name="traffic_monitor_waiting">● Overvåking satt på pause (VPN ikke tilkoblet)</string>
+    <string name="traffic_connecting_api">Kobler til Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Totalt opp: %1$s  |  Totalt ned: %2$s</string>
     <string name="stun_test_summary">Bestem kundens NAT-kartleggingsatferd og NAT-filtreringsatferd definert i RFC 3478 ved hjelp av STUN.</string>
     <string name="start">Start</string>
     <string name="stun_attest_loading">Dette kan ta noen minutter…</string>

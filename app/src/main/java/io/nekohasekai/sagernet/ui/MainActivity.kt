@@ -114,6 +114,10 @@ class MainActivity :
             }
         }
         binding.stats.setOnClickListener { if (DataStore.serviceState.connected) binding.stats.onStatusClick() }
+        binding.stats.setOnLongClickListener {
+            startActivity(Intent(this, TrafficChartActivity::class.java))
+            true
+        }
 
         setContentView(binding.root)
         currentMainFragment =

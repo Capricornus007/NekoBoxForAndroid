@@ -545,6 +545,25 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
         Menggunakannya dengan cara yang tidak aman akan mengalahkan tujuannya. \n\nJika Anda harus menggunakannya, coba N=2 terlebih dahulu untuk
         melihat apakah itu menyelesaikan masalah Anda. Sangat disarankan untuk tidak menggunakan lebih dari 4 koneksi di sini.</string>
     <string name="stun_test">Deteksi Perilaku NAT</string>
+
+    <string name="traffic_chart_title">Trafik &amp; koneksi real-time</string>
+    <string name="traffic_chart_summary">Lihat grafik kecepatan real-time dan kelola koneksi aktif</string>
+    <string name="traffic_chart_open">Buka</string>
+    <string name="traffic_current_up">Kecepatan unggah</string>
+    <string name="traffic_current_down">Kecepatan unduh</string>
+    <string name="traffic_peak">Puncak</string>
+    <string name="traffic_active_connections">Koneksi aktif</string>
+    <string name="traffic_close_all">Tutup semua</string>
+    <string name="traffic_close_all_confirm">Tutup semua koneksi aktif?</string>
+    <string name="traffic_no_connections">Tidak ada koneksi aktif</string>
+    <string name="traffic_waiting_clash">Menunggu Clash API atau VPN belum mulai…</string>
+    <string name="traffic_chart_monitor_active">● Monitor langsung aktif</string>
+    <string name="traffic_chart_not_connected_hint">Layanan proxy terputus. Sambungkan dari layar utama.</string>
+    <string name="traffic_chart_go_connect">Sambungkan</string>
+    <string name="traffic_chart_refresh">Segarkan</string>
+    <string name="traffic_monitor_waiting">● Monitor dijeda (VPN belum tersambung)</string>
+    <string name="traffic_connecting_api">Menyambung ke Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Total unggah: %1$s  |  Total unduh: %2$s</string>
     <string name="stun_test_summary">Tentukan perilaku pemetaan NAT klien dan perilaku
         penyaringan NAT yang didefinisikan dalam RFC 3478 menggunakan STUN.</string>
     <string name="start">Mulai</string>

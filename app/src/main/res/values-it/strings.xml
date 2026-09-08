@@ -567,6 +567,25 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
         Usarlo in modo non sicuro vanifica il suo scopo. \n\nSe devi usarlo, prova prima N=2 per
         vedere se risolve i tuoi problemi. Si consiglia vivamente di non usare più di 4 connessioni qui.</string>
     <string name="stun_test">Rilevamento comportamento NAT</string>
+
+    <string name="traffic_chart_title">Traffico e connessioni in tempo reale</string>
+    <string name="traffic_chart_summary">Grafico velocità in tempo reale e gestione connessioni attive</string>
+    <string name="traffic_chart_open">Apri</string>
+    <string name="traffic_current_up">Velocità di caricamento</string>
+    <string name="traffic_current_down">Velocità di scaricamento</string>
+    <string name="traffic_peak">Picco</string>
+    <string name="traffic_active_connections">Connessioni attive</string>
+    <string name="traffic_close_all">Chiudi tutto</string>
+    <string name="traffic_close_all_confirm">Chiudere tutte le connessioni attive?</string>
+    <string name="traffic_no_connections">Nessuna connessione attiva</string>
+    <string name="traffic_waiting_clash">In attesa di Clash API o VPN non avviata…</string>
+    <string name="traffic_chart_monitor_active">● Monitor live attivo</string>
+    <string name="traffic_chart_not_connected_hint">Servizio proxy disconnesso. Connettersi dalla schermata principale.</string>
+    <string name="traffic_chart_go_connect">Connetti</string>
+    <string name="traffic_chart_refresh">Aggiorna</string>
+    <string name="traffic_monitor_waiting">● Monitoraggio in pausa (VPN non connessa)</string>
+    <string name="traffic_connecting_api">Connessione a Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Totale inviato: %1$s  |  Totale ricevuto: %2$s</string>
     <string name="stun_test_summary">Determina il comportamento di mappatura NAT del client e il comportamento
         di filtraggio NAT definito in RFC 3478 utilizzando STUN.</string>
     <string name="start">Avvia</string>

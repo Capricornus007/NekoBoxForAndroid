@@ -570,6 +570,25 @@
         see if it solves your issues. Strongly recommend against using more than 4 connections here.</string>
 
     <string name="stun_test">NAT behaviour discovery</string>
+
+    <string name="traffic_chart_title">Real-time Traffic &amp; Connections</string>
+    <string name="traffic_chart_summary">View real-time speed chart and manage active connections</string>
+    <string name="traffic_chart_open">Open</string>
+    <string name="traffic_current_up">Upload Speed</string>
+    <string name="traffic_current_down">Download Speed</string>
+    <string name="traffic_peak">Peak</string>
+    <string name="traffic_active_connections">Active Connections</string>
+    <string name="traffic_close_all">Close All</string>
+    <string name="traffic_close_all_confirm">Close all active connections?</string>
+    <string name="traffic_no_connections">No active connections</string>
+    <string name="traffic_waiting_clash">Waiting for Clash API or VPN not started…</string>
+    <string name="traffic_chart_monitor_active">● Live Monitor Active</string>
+    <string name="traffic_chart_not_connected_hint">Proxy service is disconnected. Please connect on main screen to monitor traffic and connections.</string>
+    <string name="traffic_chart_go_connect">Go Connect</string>
+    <string name="traffic_chart_refresh">Refresh</string>
+    <string name="traffic_monitor_waiting">● Monitoring paused (VPN not connected)</string>
+    <string name="traffic_connecting_api">Connecting to Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Total up: %1$s  |  Total down: %2$s</string>
     <string name="stun_test_summary">Determine the client\'s NAT mapping behaviour and the NAT
         filtering behaviour defined in RFC 3478 using STUN.</string>
     <string name="stun_binding_test">Quick binding (external address only)</string>

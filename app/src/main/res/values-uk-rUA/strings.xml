@@ -455,6 +455,25 @@
     <string name="naive_insecure_concurrency">Небезпечна одночасність</string>
     <string name="naive_insecure_concurrency_summary">Використовуйте N одночасних тунельних з\'єднань для підвищення стійкості в поганих мережевих умовах. Більше з\'єднань робить тунелювання більш помітним і менш безпечним. Цей проект прагне до найсильнішої безпеки проти аналізу трафіку. Використання його в небезпечний спосіб зводить нанівець його мету. \n\nЯкщо ви повинні використовувати це, спробуйте спочатку N=2, щоб побачити, чи вирішить це ваші проблеми. Наполегливо рекомендуємо не використовувати більше 4 з\'єднань.</string>
     <string name="stun_test">Визначення поведінки NAT</string>
+
+    <string name="traffic_chart_title">Трафік і з\'єднання в реальному часі</string>
+    <string name="traffic_chart_summary">Графік швидкості в реальному часі та керування активними з\'єднаннями</string>
+    <string name="traffic_chart_open">Відкрити</string>
+    <string name="traffic_current_up">Швидкість віддачі</string>
+    <string name="traffic_current_down">Швидкість завантаження</string>
+    <string name="traffic_peak">Пік</string>
+    <string name="traffic_active_connections">Активні з\'єднання</string>
+    <string name="traffic_close_all">Закрити всі</string>
+    <string name="traffic_close_all_confirm">Закрити всі активні з\'єднання?</string>
+    <string name="traffic_no_connections">Немає активних з\'єднань</string>
+    <string name="traffic_waiting_clash">Очікування Clash API або VPN не запущено…</string>
+    <string name="traffic_chart_monitor_active">● Моніторинг у реальному часі активний</string>
+    <string name="traffic_chart_not_connected_hint">Проксі-сервіс відключено. Підключіться на головному екрані.</string>
+    <string name="traffic_chart_go_connect">Підключитися</string>
+    <string name="traffic_chart_refresh">Оновити</string>
+    <string name="traffic_monitor_waiting">● Моніторинг призупинено (VPN не підключено)</string>
+    <string name="traffic_connecting_api">З\'єднання з Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">Всього віддано: %1$s  |  Всього завантажено: %2$s</string>
     <string name="stun_test_summary">Визначення поведінки NAT-мапування та NAT-фільтрації клієнта, визначеної в RFC 3478, за допомогою STUN.</string>
     <string name="start">Почати</string>
     <string name="stun_attest_loading">Це може зайняти кілька хвилин…</string>

@@ -452,6 +452,25 @@
         استخدامه بطريقة غير آمنة يبطل الغرض منه. \n\nإذا كان عليك استخدام هذا، جرب N=2 أولاً
         لترى إذا كان يحل مشاكلك. نوصي بشدة بعدم استخدام أكثر من 4 اتصالات هنا.</string>
     <string name="stun_test">اكتشاف سلوك NAT</string>
+
+    <string name="traffic_chart_title">حركة المرور والاتصالات في الوقت الفعلي</string>
+    <string name="traffic_chart_summary">عرض مخطط السرعة اللحظي وإدارة الاتصالات النشطة</string>
+    <string name="traffic_chart_open">فتح</string>
+    <string name="traffic_current_up">سرعة الرفع</string>
+    <string name="traffic_current_down">سرعة التنزيل</string>
+    <string name="traffic_peak">الذروة</string>
+    <string name="traffic_active_connections">الاتصالات النشطة</string>
+    <string name="traffic_close_all">إغلاق الكل</string>
+    <string name="traffic_close_all_confirm">إغلاق كل الاتصالات النشطة؟</string>
+    <string name="traffic_no_connections">لا توجد اتصالات نشطة</string>
+    <string name="traffic_waiting_clash">بانتظار Clash API أو لم يبدأ VPN…</string>
+    <string name="traffic_chart_monitor_active">● المراقبة الحية نشطة</string>
+    <string name="traffic_chart_not_connected_hint">خدمة الوكيل غير متصلة. اتصل من الشاشة الرئيسية لمراقبة الحركة والاتصالات.</string>
+    <string name="traffic_chart_go_connect">اتصل الآن</string>
+    <string name="traffic_chart_refresh">تحديث</string>
+    <string name="traffic_monitor_waiting">● المراقبة متوقفة (VPN غير متصل)</string>
+    <string name="traffic_connecting_api">الاتصال بـ Clash API (127.0.0.1:9090)…</string>
+    <string name="traffic_total_updown">إجمالي الرفع: %1$s  |  إجمالي التنزيل: %2$s</string>
     <string name="stun_test_summary">تحديد سلوك تعيين NAT الخاص بالعميل وسلوك تصفية NAT
         المحدد في RFC 3478 باستخدام STUN.</string>
     <string name="start">ابدأ</string>

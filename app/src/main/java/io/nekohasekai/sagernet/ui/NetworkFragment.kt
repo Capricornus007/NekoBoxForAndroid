@@ -18,5 +18,11 @@ class NetworkFragment : NamedFragment(R.layout.layout_network) {
         binding.stunTest.setOnClickListener {
             startActivity(Intent(requireContext(), StunActivity::class.java))
         }
+
+        val openTrafficChart = View.OnClickListener {
+            startActivity(Intent(requireContext(), TrafficChartActivity::class.java))
+        }
+        binding.trafficChartCard.setOnClickListener(openTrafficChart)
+        binding.trafficChartBtn.setOnClickListener(openTrafficChart)
     }
 }
