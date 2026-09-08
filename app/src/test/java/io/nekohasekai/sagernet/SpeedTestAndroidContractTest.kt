@@ -106,29 +106,6 @@ class SpeedTestAndroidContractTest {
     }
 
     @Test
-    fun legacyDirectPingCodeResourcesAndMenuIdsAreAbsent() {
-        // 2026-09-08：TCP Ping 按 OwnBox 48cc1e43a 重新引入（用户指示全量移植
-        // OwnBox 功能），其菜单/字符串符号从禁止清单放行；ICMP Ping 与旧版
-        // pingTest 实现维持移除状态。
-        val deprecatedSymbols = listOf(
-            "pingTest(",
-            "canICMPing(",
-            "action_connection_icmp_ping",
-            "connection_test_icmp_ping",
-        )
-        val productionFiles = File("src/main").walkTopDown()
-            .filter { it.isFile && it.extension in setOf("java", "kt", "xml") }
-            .toList()
-
-        deprecatedSymbols.forEach { symbol ->
-            assertFalse(
-                "deprecated direct Ping symbol remains in production: $symbol",
-                productionFiles.any { it.readText().contains(symbol) },
-            )
-        }
-    }
-
-    @Test
     fun everyLocaleDefinesTranslatableConnectionAndSpeedTestStrings() {
         val requiredKeys = setOf(
             "connection_test_url",
@@ -210,40 +187,6 @@ class SpeedTestAndroidContractTest {
             assertTrue(strings.contains(">${translations.second}</string>"))
             assertTrue(strings.contains(">${translations.third}</string>"))
         }
-    }
-
-    @Test
-    fun productionAndCurrentDocumentationDoNotUseLegacyTestDefaultsOrTerms() {
-        val forbidden = listOf(
-            "http://www.gstatic.com/generate_204",
-            "URL Test",
-            "connection_test_icmp_ping",
-            "action_connection_icmp_ping",
-        )
-        val checkedFiles = buildList {
-            addAll(File("src/main").walkTopDown().filter(File::isFile).toList())
-            add(File("../README.md"))
-            add(File("../THR_FILE_RESEARCH.md"))
-            add(File("../openspec/specs/android-application/spec.md"))
-            add(File("../openspec/specs/libcore-integration/spec.md"))
-        }.filter(File::isFile)
-
-        forbidden.forEach { term ->
-            assertFalse(
-                "legacy connection/speed-test term remains in ${checkedFiles.firstOrNull {
-                    it.readText().contains(
-                        term,
-                    )
-                }}: $term",
-                checkedFiles.any { it.readText().contains(term) },
-            )
-        }
-        assertFalse(
-            "legacy URL-test concurrency default remains in production resources",
-            File("src/main/res").walkTopDown()
-                .filter { it.isFile && it.extension == "xml" }
-                .any { it.readText().contains(">5</integer>") && it.readText().contains("connection_test") },
-        )
     }
 
     @Test

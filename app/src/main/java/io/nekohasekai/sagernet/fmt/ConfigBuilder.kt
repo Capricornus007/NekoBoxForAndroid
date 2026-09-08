@@ -606,9 +606,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             rules = mutableListOf()
             rule_set = mutableListOf()
 
-            // sing-box 1.14 removed route.concurrent_dial; the feature is no
-            // longer supported by the upstream core.
-            // concurrent_dial = DataStore.concurrentDial
+            // sing-box 1.14 removed route.concurrent_dial; the feature moved to
+            // default_network_strategy. "fallback" = Happy Eyeballs 并发容灾拨号
+            // （对多个地址/接口并发发起，先完成者胜出）——等价旧 concurrent_dial。
+            if (DataStore.concurrentDial) {
+                default_network_strategy = "fallback"
+            }
 
             // DNS 劫持：把 53 端口的查询显式交给 sing-box 的 DNS 模块。
             // 没有这条规则时，TUN 模式依赖 TUN 栈对网关地址的自动拦截，
