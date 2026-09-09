@@ -41,6 +41,7 @@ import (
 	"github.com/sagernet/sing-box/protocol/wireguard"
 
 	"libcore/protocol/juicity"
+	"libcore/protocol/loadbalance"
 	"libcore/protocol/shadowquic"
 	"libcore/protocol/snell"
 	"libcore/protocol/trusttunnel"
@@ -84,6 +85,7 @@ func nekoboxAndroidOutboundRegistry() *outbound.Registry {
 	// Snell 已接回：libcore/protocol/snell 桥接 Capricornus007/sing-snell
 	// （v4/v5/v6 + KeepIdleConnections），Kotlin 侧 SnellBuildConfig 生成 type=snell。
 	snell.RegisterOutbound(registry)
+	loadbalance.RegisterLoadBalance(registry)
 	vmess.RegisterOutbound(registry)
 	trojan.RegisterOutbound(registry)
 	tor.RegisterOutbound(registry)

@@ -820,6 +820,9 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Testar URL deste grupo</string>
 
+    <string name="group_is_load_balance">Balanceamento de carga (Round-Robin)</string>
+    <string name="group_is_load_balance_sum">Distribuir conexões entre todos os nós do grupo</string>
+
     <string name="action_auto_lowest_latency">Selecionar automaticamente a menor latência (URL-Test)</string>
     <string name="route_preset_title">Predefinições de regras de roteamento</string>
     <string name="preset_bypass_cn_apps">Predefinição: contornar apps nacionais comuns</string>

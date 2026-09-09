@@ -817,6 +817,9 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Test URL for denne gruppen</string>
 
+    <string name="group_is_load_balance">Lastbalansering (Round-Robin)</string>
+    <string name="group_is_load_balance_sum">Fordel tilkoblinger over alle noder i denne gruppen</string>
+
     <string name="action_auto_lowest_latency">Velg laveste latens automatisk (URL-Test)</string>
     <string name="route_preset_title">Forhåndssatte rutingregler</string>
     <string name="preset_bypass_cn_apps">Forhåndssatt: Omgå vanlige innenlandske apper</string>

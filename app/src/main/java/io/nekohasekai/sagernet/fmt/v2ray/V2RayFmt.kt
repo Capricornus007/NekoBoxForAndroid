@@ -771,6 +771,14 @@ fun buildSingBoxOutboundStreamSettings(bean: StandardV2RayBean): V2RayTransportO
                         "uplink_data_placement",
                         "uplink_data_key",
                         "uplink_chunk_size",
+                        "no_sse_header",
+                        "sc_max_buffered_posts",
+                        "sc_stream_up_server_secs",
+                        "server_max_header_bytes",
+                        "session_id_table",
+                        "session_id_length",
+                        "congestion_controller",
+                        "cwnd",
                     )
                     allowedKeys.forEach { key ->
                         if (extraJson.has(key)) {

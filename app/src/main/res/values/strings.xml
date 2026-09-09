@@ -386,6 +386,9 @@
     <string name="connection_test_clear_results">Clear test results</string>
     <string name="connection_test_url_test">URL test this group</string>
 
+    <string name="group_is_load_balance">Load Balance (Round-Robin)</string>
+    <string name="group_is_load_balance_sum">Distribute connections across all nodes in this group</string>
+
     <string name="action_auto_lowest_latency">Auto-select lowest latency (URL-Test)</string>
     <string name="route_preset_title">Routing rule presets</string>
     <string name="preset_bypass_cn_apps">Preset: Bypass common domestic apps</string>

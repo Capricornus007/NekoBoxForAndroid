@@ -833,6 +833,9 @@
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Перевірити URL цієї групи</string>
 
+    <string name="group_is_load_balance">Балансування навантаження (Round-Robin)</string>
+    <string name="group_is_load_balance_sum">Розподіляти з\'єднання між усіма вузлами групи</string>
+
     <string name="action_auto_lowest_latency">Автовибір вузла з найменшою затримкою (URL-Test)</string>
     <string name="route_preset_title">Готові шаблони правил маршрутизації</string>
     <string name="preset_bypass_cn_apps">Шаблон: обхід популярних місцевих застосунків</string>

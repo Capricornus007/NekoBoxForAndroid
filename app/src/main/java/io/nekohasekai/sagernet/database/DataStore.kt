@@ -115,6 +115,13 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var appTLSVersion by configurationStore.string(Key.APP_TLS_VERSION)
     var spoofUserAgent by configurationStore.string(Key.SPOOF_USER_AGENT) { "" }
     var autoSelectLowestLatency by configurationStore.boolean(Key.AUTO_SELECT_LOWEST_LATENCY)
+
+    // 負載平衡（round-robin）：per-group 開關，與 autoSelect 互斥使用
+    fun isGroupLoadBalance(groupId: Long): Boolean = profileCacheStore.getBoolean("groupIsLoadBalance_$groupId", false)
+
+    fun setGroupLoadBalance(groupId: Long, value: Boolean) {
+        profileCacheStore.putBoolean("groupIsLoadBalance_$groupId", value)
+    }
     var spoofDeviceOs by configurationStore.string(Key.SPOOF_DEVICE_OS) { "" }
     var spoofDeviceOsVersion by configurationStore.string(Key.SPOOF_DEVICE_OS_VERSION) { "" }
     var spoofDeviceModel by configurationStore.string(Key.SPOOF_DEVICE_MODEL) { "" }

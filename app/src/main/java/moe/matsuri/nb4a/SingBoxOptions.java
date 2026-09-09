@@ -5226,7 +5226,16 @@ public class SingBoxOptions {
         public com.google.gson.JsonElement uplink_data_key;
         public com.google.gson.JsonElement uplink_chunk_size;
 
-    }
+    
+        public com.google.gson.JsonElement session_id_table;
+        public com.google.gson.JsonElement session_id_length;
+        public com.google.gson.JsonElement congestion_controller;
+        public com.google.gson.JsonElement cwnd;
+        public com.google.gson.JsonElement no_sse_header;
+        public com.google.gson.JsonElement sc_max_buffered_posts;
+        public com.google.gson.JsonElement sc_stream_up_server_secs;
+        public com.google.gson.JsonElement server_max_header_bytes;
+}
 
     public static class V2RayTransportOptions_KCPOptions extends V2RayTransportOptions {
 

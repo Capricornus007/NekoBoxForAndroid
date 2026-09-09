@@ -820,6 +820,9 @@
     <string name="available">%dms</string>
     <string name="connection_test_url_test">URL-Test für diese Gruppe</string>
 
+    <string name="group_is_load_balance">Lastverteilung (Round-Robin)</string>
+    <string name="group_is_load_balance_sum">Verbindungen über alle Knoten dieser Gruppe verteilen</string>
+
     <string name="action_auto_lowest_latency">Automatisch niedrigste Latenz wählen (URL-Test)</string>
     <string name="route_preset_title">Routing-Regel-Vorlagen</string>
     <string name="preset_bypass_cn_apps">Vorlage: Häufige Inlands-Apps umgehen</string>

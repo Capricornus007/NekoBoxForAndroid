@@ -850,6 +850,9 @@
     <string name="preview_hint_dont_show_again">Ne plus afficher</string>
     <string name="connection_test_url_test">Tester l’URL de ce groupe</string>
 
+    <string name="group_is_load_balance">Répartition de charge (Round-Robin)</string>
+    <string name="group_is_load_balance_sum">Répartir les connexions sur tous les nœuds du groupe</string>
+
     <string name="action_auto_lowest_latency">Sélection auto de la latence la plus basse (URL-Test)</string>
     <string name="route_preset_title">Modèles de règles de routage</string>
     <string name="preset_bypass_cn_apps">Modèle : contourner les applis locales courantes</string>

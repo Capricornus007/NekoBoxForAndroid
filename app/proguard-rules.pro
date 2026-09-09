@@ -29,6 +29,8 @@
 # attribute，导致 TypeToken<List<T>> 之类解析失败直接崩溃（boristul 分支
 # 踩过：备份还原时 TypeToken getGenericSuperclass 返回 null）。
 -keepattributes Signature
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken { *; }
 
 -dontwarn java.beans.BeanInfo
 -dontwarn java.beans.FeatureDescriptor

@@ -652,6 +652,9 @@
     <string name="wireguard_persistent_keepalive">持久保活间隔</string>
     <string name="connection_test_url_test">URL 测试本组</string>
 
+    <string name="group_is_load_balance">负载均衡（轮询）</string>
+    <string name="group_is_load_balance_sum">将连接轮询分发到本组所有节点</string>
+
     <string name="action_auto_lowest_latency">自动优选最低延迟节点 (URL-Test)</string>
     <string name="route_preset_title">分流规则一键预设</string>
     <string name="preset_bypass_cn_apps">预设：常用国内应用直连白名单 (微信/支付宝/淘宝/抖音等)</string>

@@ -842,6 +842,9 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="connection_test_url">URL test latenza</string>
     <string name="connection_test_url_test">Test URL di questo gruppo</string>
 
+    <string name="group_is_load_balance">Bilanciamento del carico (Round-Robin)</string>
+    <string name="group_is_load_balance_sum">Distribuire le connessioni su tutti i nodi del gruppo</string>
+
     <string name="action_auto_lowest_latency">Selezione automatica della latenza più bassa (URL-Test)</string>
     <string name="route_preset_title">Modelli di regole di routing</string>
     <string name="preset_bypass_cn_apps">Modello: bypassa le app nazionali comuni</string>

@@ -634,6 +634,9 @@
     <string name="snell_reuse_summary">v4-v6 のみ</string>
     <string name="connection_test_url_test">このグループの URL テスト</string>
 
+    <string name="group_is_load_balance">ロードバランス（ラウンドロビン）</string>
+    <string name="group_is_load_balance_sum">このグループの全ノードに接続を分散</string>
+
     <string name="action_auto_lowest_latency">最低遅延ノードを自動選択 (URL-Test)</string>
     <string name="route_preset_title">ルーティングルールのプリセット</string>
     <string name="preset_bypass_cn_apps">プリセット：よく使う国内アプリを直接接続</string>

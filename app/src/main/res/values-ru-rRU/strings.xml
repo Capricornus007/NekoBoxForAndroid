@@ -833,6 +833,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Проверить URL этой группы</string>
 
+    <string name="group_is_load_balance">Балансировка нагрузки (Round-Robin)</string>
+    <string name="group_is_load_balance_sum">Распределять соединения по всем узлам группы</string>
+
     <string name="action_auto_lowest_latency">Автовыбор узла с наименьшей задержкой (URL-Test)</string>
     <string name="route_preset_title">Готовые шаблоны правил маршрутизации</string>
     <string name="preset_bypass_cn_apps">Шаблон: обход популярных местных приложений</string>

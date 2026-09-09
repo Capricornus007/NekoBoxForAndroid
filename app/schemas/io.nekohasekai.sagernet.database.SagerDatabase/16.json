@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 16,
-    "identityHash": "1fc4091be2764195cf5e27077ba250b3",
+    "identityHash": "703ff22472d1512e458ebd13804b0cef",
     "entities": [
       {
         "tableName": "proxy_groups",
@@ -76,7 +76,7 @@
       },
       {
         "tableName": "proxy_entities",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `groupId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `userOrder` INTEGER NOT NULL, `tx` INTEGER NOT NULL, `rx` INTEGER NOT NULL, `lifetimeRx` INTEGER NOT NULL DEFAULT 0, `lifetimeTx` INTEGER NOT NULL DEFAULT 0, `status` INTEGER NOT NULL, `ping` INTEGER NOT NULL, `uuid` TEXT NOT NULL, `error` TEXT, `speedTestMode` TEXT NOT NULL DEFAULT '', `speedTestDownloadBitsPerSecond` INTEGER NOT NULL DEFAULT 0, `speedTestUploadBitsPerSecond` INTEGER NOT NULL DEFAULT 0, `socksBean` BLOB, `httpBean` BLOB, `ssBean` BLOB, `ssrBean` BLOB, `vmessBean` BLOB, `trojanBean` BLOB, `trojanGoBean` BLOB, `mieruBean` BLOB, `naiveBean` BLOB, `hysteriaBean` BLOB, `tuicBean` BLOB, `juicityBean` BLOB, `shadowQuicBean` BLOB, `trustTunnelBean` BLOB, `sshBean` BLOB, `wgBean` BLOB, `shadowTLSBean` BLOB, `anyTLSBean` BLOB, `chainBean` BLOB, `balancerBean` BLOB, `configBean` BLOB, `snellBean` BLOB, `masterDnsVpnBean` BLOB, `awgBean` BLOB, `olcrtcBean` BLOB)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `groupId` INTEGER NOT NULL, `type` INTEGER NOT NULL, `userOrder` INTEGER NOT NULL, `tx` INTEGER NOT NULL, `rx` INTEGER NOT NULL, `lifetimeRx` INTEGER NOT NULL DEFAULT 0, `lifetimeTx` INTEGER NOT NULL DEFAULT 0, `status` INTEGER NOT NULL, `ping` INTEGER NOT NULL, `uuid` TEXT NOT NULL, `error` TEXT, `speedTestMode` TEXT NOT NULL DEFAULT '', `speedTestDownloadBitsPerSecond` INTEGER NOT NULL DEFAULT 0, `speedTestUploadBitsPerSecond` INTEGER NOT NULL DEFAULT 0, `socksBean` BLOB, `httpBean` BLOB, `ssBean` BLOB, `ssrBean` BLOB DEFAULT NULL, `vmessBean` BLOB, `trojanBean` BLOB, `trojanGoBean` BLOB, `mieruBean` BLOB, `naiveBean` BLOB, `hysteriaBean` BLOB, `tuicBean` BLOB, `juicityBean` BLOB, `shadowQuicBean` BLOB, `trustTunnelBean` BLOB, `sshBean` BLOB, `wgBean` BLOB, `shadowTLSBean` BLOB, `anyTLSBean` BLOB, `chainBean` BLOB, `balancerBean` BLOB, `configBean` BLOB, `snellBean` BLOB DEFAULT NULL, `masterDnsVpnBean` BLOB, `awgBean` BLOB, `olcrtcBean` BLOB)",
         "fields": [
           {
             "fieldPath": "id",
@@ -190,7 +190,8 @@
           {
             "fieldPath": "ssrBean",
             "columnName": "ssrBean",
-            "affinity": "BLOB"
+            "affinity": "BLOB",
+            "defaultValue": "NULL"
           },
           {
             "fieldPath": "vmessBean",
@@ -280,7 +281,8 @@
           {
             "fieldPath": "snellBean",
             "columnName": "snellBean",
-            "affinity": "BLOB"
+            "affinity": "BLOB",
+            "defaultValue": "NULL"
           },
           {
             "fieldPath": "masterDnsVpnBean",
@@ -423,7 +425,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1fc4091be2764195cf5e27077ba250b3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '703ff22472d1512e458ebd13804b0cef')"
     ]
   }
 }
