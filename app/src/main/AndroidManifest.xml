@@ -248,6 +248,16 @@
             android:label="@string/traffic_chart_title"
             android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
         <activity
+            android:name="io.nekohasekai.sagernet.ui.IpPurityActivity"
+            android:configChanges="uiMode"
+            android:label="@string/ip_purity_title"
+            android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
+        <activity
+            android:name="io.nekohasekai.sagernet.ui.MediaUnlockActivity"
+            android:configChanges="uiMode"
+            android:label="@string/media_unlock_title"
+            android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
+        <activity
             android:name="io.nekohasekai.sagernet.ui.AppListActivity"
             android:configChanges="uiMode" />
         <activity

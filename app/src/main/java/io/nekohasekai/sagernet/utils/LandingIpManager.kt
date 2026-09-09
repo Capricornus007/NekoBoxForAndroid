@@ -22,6 +22,13 @@ data class LandingIpInfo(
     val queryTimestamp: Long = System.currentTimeMillis(),
 ) {
 
+    val briefText: String
+        get() = if (durationMs > 0) {
+            "$countryFlag $countryCode $ip · HTTP ${durationMs}ms".trim()
+        } else {
+            "$countryFlag $countryCode $ip".trim()
+        }
+
     val locationText: String
         get() {
             val parts = mutableListOf<String>()
