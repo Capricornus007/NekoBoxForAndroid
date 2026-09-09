@@ -628,11 +628,23 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             // （目标是 VPN 内部地址，远程节点不可达）→ DNS 全灭。
             // 三种模式（gVisor/system/hev-mixed）都走这条确定性路径；
             // 用户设置的 DNS（如本机 AdGuardHome）照常生效。
+            //
+            // hev 模式必须把劫持目标收窄到 VPN DNS（172.19.0.2）本身：hev 的
+            // socks5 转发保留了原始目的地址，本机解析器（AdGuardHome 等）的
+            // UDP:53 上游查询会从 mixed 入站进来，广域 port-53 劫持会把它们也
+            // 攥进 sing-box DNS → 127.0.0.1:5591 → 又回到本机解析器 → 无限
+            // 迴圈；迴圈中 fake-ip 服务器抢答（dns.google → fc00::2）还会毒死
+            // DoH 上游自举，外站域名随机超时（真机 tcpdump 实证）。收窄后：
+            // 应用查询（dst 172.19.0.2:53）照旧劫持进用户 DNS；解析器上游
+            // （dst 8.8.8.8:53 等）走正常出站，与其 TCP DoH 同路。
             if (isVPN) {
                 rules.add(
                     Rule_DefaultOptions().apply {
                         inbound = listOf(deviceInboundTag)
                         port = listOf(53)
+                        if (DataStore.enableHevTun) {
+                            ip_cidr = listOf(VpnService.PRIVATE_VLAN4_ROUTER + "/32")
+                        }
                         action = "hijack-dns"
                     },
                 )
