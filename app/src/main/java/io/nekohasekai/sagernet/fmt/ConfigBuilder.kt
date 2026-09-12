@@ -1539,6 +1539,19 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         // fallback. Keep the selected main tag explicit so endpoint-only profiles do not fall
         // through to a direct connection.
         route.ensureMainRouteFinal(mainProxyTag)
+
+        // OwnBox 移植（5efd05bcd）：IPv6 關閉時在最前 reject AAAA 查詢。
+        // genDomainStrategy 的 ipv4_only 只管出站/DNS 解析策略，hijack 或自訂
+        // server 的 AAAA 響應仍會透傳給應用；直接拒絕讓應用立即走 v4。
+        if (!forTest && ipv6Mode == IPv6Mode.DISABLE) {
+            dns.rules.add(
+                0,
+                DNSRule_DefaultOptions().apply {
+                    query_type = listOf("AAAA")
+                    action = "reject"
+                },
+            )
+        }
     }.let { options ->
         val configMap = finalizeRootConfig(
             options,

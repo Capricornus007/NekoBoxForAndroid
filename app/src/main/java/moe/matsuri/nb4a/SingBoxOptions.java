@@ -5142,6 +5142,9 @@ public class SingBoxOptions {
 
         public Integer rewrite_ttl;
 
+        // OwnBox 移植：DNS 規則 action（sing-box 1.12+，如 reject AAAA）
+        public String action;
+
     }
 
     public static class V2RayTransportOptions_HTTPOptions extends V2RayTransportOptions {

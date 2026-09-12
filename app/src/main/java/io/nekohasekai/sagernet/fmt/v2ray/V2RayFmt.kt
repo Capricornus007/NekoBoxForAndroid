@@ -801,11 +801,13 @@ fun buildSingBoxOutboundStreamSettings(bean: StandardV2RayBean): V2RayTransportO
 }
 
 fun buildSingBoxOutboundTLS(bean: StandardV2RayBean): OutboundTLSOptions? {
-    if (bean.security != "tls") return null
+    // OwnBox 移植（5efd05bcd）：trojan 恆為 TLS，不依賴 security 標記；
+    // SNI 留空時回退伺服器地址，避免無 SNI 被服務端拒絕。
+    if (bean !is TrojanBean && bean.security != "tls") return null
     return OutboundTLSOptions().apply {
         enabled = true
         insecure = bean.allowInsecure || DataStore.globalAllowInsecure
-        if (bean.sni.isNotBlank()) server_name = bean.sni
+        server_name = bean.sni.takeIf { it.isNotBlank() } ?: bean.serverAddress
         if (bean.alpn.isNotBlank()) {
             // when the transport protocol is WebSocket, filter out h2 and h3
             val alpnList = bean.alpn.listByLineOrComma()
