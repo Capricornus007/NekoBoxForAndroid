@@ -949,4 +949,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="spoof_device_os_version">偽装 OS バージョン</string>
     <string name="spoof_device_model">偽装デバイスモデル</string>
     <string name="stun_binding_test">クイックバインド（外部アドレスのみ）</string>
+    <string name="hide_unavailable_profiles">利用不可のノードを非表示</string>
 </resources>

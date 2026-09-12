@@ -956,4 +956,5 @@ Fortfahren?</string>
     <string name="spoof_device_os_version">Gefälschte OS-Version</string>
     <string name="spoof_device_model">Gefälschtes Gerätemodell</string>
     <string name="stun_binding_test">Schnelle Bindung (nur externe Adresse)</string>
+    <string name="hide_unavailable_profiles">Nicht verfügbare Profile ausblenden</string>
 </resources>

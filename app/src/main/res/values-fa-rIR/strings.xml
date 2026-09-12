@@ -954,4 +954,5 @@
     <string name="spoof_device_os_version">جعل نسخه سیستم‌عامل</string>
     <string name="spoof_device_model">جعل مدل دستگاه</string>
     <string name="stun_binding_test">اتصال سریع (فقط آدرس خارجی)</string>
+    <string name="hide_unavailable_profiles">پنهان کردن نمایه‌های در دسترس نیست</string>
 </resources>

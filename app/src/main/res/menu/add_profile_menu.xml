@@ -186,4 +186,10 @@
         </menu>
     </item>
 
+    <item
+        android:id="@+id/action_hide_unavailable"
+        android:title="@string/hide_unavailable_profiles"
+        android:checkable="true"
+        android:checked="false"
+        app:showAsAction="never" />
 </menu>

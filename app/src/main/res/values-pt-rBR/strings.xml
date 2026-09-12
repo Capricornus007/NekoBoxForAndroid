@@ -915,4 +915,5 @@ Continuar?</string>
     <string name="dialog_watchdog_start">Iniciar</string>
     <string name="snackbar_watchdog_test_started">Teste iniciado. A reiniciar dentro de ≤30 s…</string>
     <string name="dialog_log_buffer_size">Tamanho do buffer de registo (KB)</string>
+    <string name="hide_unavailable_profiles">Ocultar perfis indisponíveis</string>
 </resources>

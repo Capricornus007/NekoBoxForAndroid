@@ -1009,4 +1009,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="spoof_device_os_version">Поддельная версия ОС</string>
     <string name="spoof_device_model">Поддельная модель устройства</string>
     <string name="stun_binding_test">Быстрая привязка (только внешний адрес)</string>
+    <string name="hide_unavailable_profiles">Скрыть недоступные профили</string>
 </resources>

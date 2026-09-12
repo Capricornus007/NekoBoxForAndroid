@@ -358,12 +358,17 @@ class ConfigurationFragment @JvmOverloads constructor(
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.findItem(R.id.action_global_mode)?.isChecked = DataStore.globalMode
+        menu.findItem(R.id.action_hide_unavailable)?.isChecked = DataStore.hideUnavailableProfiles
         super.onPrepareOptionsMenu(menu)
     }
 
     override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {
         runOnMainDispatcher {
             if (view == null || !::adapter.isInitialized) return@runOnMainDispatcher
+            // OwnBox 移植：軟隱藏開關變更時全組重載
+            if (key == Key.HIDE_UNAVAILABLE_PROFILES) {
+                adapter.groupFragments.values.forEach { it.adapter?.reloadProfiles() }
+            }
             // editingGroup
             if (key == Key.PROFILE_GROUP) {
                 val targetId = DataStore.editingGroup
@@ -935,6 +940,15 @@ class ConfigurationFragment @JvmOverloads constructor(
                             Logs.w(e)
                         }
                     }
+                }
+                return true
+            }
+
+            R.id.action_hide_unavailable -> {
+                item.isChecked = !item.isChecked
+                DataStore.hideUnavailableProfiles = item.isChecked
+                runOnDefaultDispatcher {
+                    adapter.groupFragments.values.forEach { it.adapter?.reloadProfiles() }
                 }
                 return true
             }

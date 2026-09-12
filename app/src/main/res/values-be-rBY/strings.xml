@@ -952,4 +952,5 @@ VPN адключыцца на 1–3 секунды, а затым падключ
     <string name="spoof_device_os_version">Падробленая версія OS</string>
     <string name="spoof_device_model">Падробленая мадэль прылады</string>
     <string name="stun_binding_test">Хуткая привязка (толькі знешні адрас)</string>
+    <string name="hide_unavailable_profiles">Схаваць недаступныя профілі</string>
 </resources>

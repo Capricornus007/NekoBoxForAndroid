@@ -957,4 +957,5 @@ Devam edilsin mi?</string>
     <string name="spoof_device_os_version">Sahte işletim sistemi sürümü</string>
     <string name="spoof_device_model">Sahte cihaz modeli</string>
     <string name="stun_binding_test">Hızlı bağlama (yalnızca harici adres)</string>
+    <string name="hide_unavailable_profiles">Kullanılamayan profilleri gizle</string>
 </resources>

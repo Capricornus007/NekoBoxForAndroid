@@ -974,6 +974,15 @@ class ConfigurationGroupFragment : Fragment() {
                     }
                     else -> profiles
                 }
+                // OwnBox 移植：軟隱藏測試不可用的節點（保留當前選中節點作兜底，
+                // 整組全掛時展示全部，避免列表空白）
+                if (DataStore.hideUnavailableProfiles) {
+                    val selectedProxy = DataStore.selectedProxy
+                    val available = profiles.filter { it.status == 0 || it.status == 1 || it.id == selectedProxy }
+                    if (available.isNotEmpty()) {
+                        profiles = available
+                    }
+                }
                 Triple(
                     profiles.associateBy { it.id },
                     profiles.map { it.id },

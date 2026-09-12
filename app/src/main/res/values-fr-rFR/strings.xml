@@ -972,4 +972,5 @@ Continuer ?</string>
     <string name="spoof_device_os_version">Version de l\'OS usurpée</string>
     <string name="spoof_device_model">Modèle d\'appareil usurpé</string>
     <string name="stun_binding_test">Liaison rapide (adresse externe uniquement)</string>
+    <string name="hide_unavailable_profiles">Masquer les profils indisponibles</string>
 </resources>

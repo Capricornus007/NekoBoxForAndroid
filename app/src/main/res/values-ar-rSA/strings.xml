@@ -963,4 +963,5 @@
     <string name="spoof_device_os_version">انتحال إصدار نظام التشغيل</string>
     <string name="spoof_device_model">انتحال طراز الجهاز</string>
     <string name="stun_binding_test">ربط سريع (العنوان الخارجي فقط)</string>
+    <string name="hide_unavailable_profiles">إخفاء الملفات غير المتاحة</string>
 </resources>

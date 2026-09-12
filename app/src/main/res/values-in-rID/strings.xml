@@ -969,4 +969,5 @@ Lanjutkan?</string>
     <string name="spoof_device_os_version">Versi OS yang dipalsukan</string>
     <string name="spoof_device_model">Model perangkat yang dipalsukan</string>
     <string name="stun_binding_test">Pengikatan cepat (hanya alamat eksternal)</string>
+    <string name="hide_unavailable_profiles">Sembunyikan profil yang tidak tersedia</string>
 </resources>

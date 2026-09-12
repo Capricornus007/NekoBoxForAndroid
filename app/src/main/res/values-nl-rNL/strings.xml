@@ -969,4 +969,5 @@ Doorgaan?</string>
     <string name="spoof_device_os_version">Vervalste OS-versie</string>
     <string name="spoof_device_model">Vervalst apparaatmodel</string>
     <string name="stun_binding_test">Snelle binding (alleen extern adres)</string>
+    <string name="hide_unavailable_profiles">Niet-beschikbare profilen verbergen</string>
 </resources>
