@@ -36,10 +36,10 @@ import moe.matsuri.nb4a.Protocols
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSBean
 import moe.matsuri.nb4a.proxy.config.ConfigBean
 import moe.matsuri.nb4a.utils.Util
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
@@ -403,7 +403,9 @@ object RawUpdater : GroupUpdater() {
             currentName.startsWith("订阅 #") ||
             currentName.startsWith("Group #") ||
             currentName.startsWith("分组 #")
-        ) return true
+        ) {
+            return true
+        }
         return false
     }
 
@@ -432,8 +434,12 @@ object RawUpdater : GroupUpdater() {
             if (extracted.isNullOrBlank()) {
                 extracted = Util.decodeFilename(filenameHeader).trim()
             }
-            val cleanName = extracted.replace(Regex("\\.(ya?ml|txt|json|conf|sub)$", RegexOption.IGNORE_CASE), "").trim()
-            val genericNames = setOf("subscription", "clash", "sub", "config", "nodes", "default", "proxies", "subscribe")
+            val cleanName = extracted.replace(
+                Regex("\\.(ya?ml|txt|json|conf|sub)$", RegexOption.IGNORE_CASE),
+                "",
+            ).trim()
+            val genericNames =
+                setOf("subscription", "clash", "sub", "config", "nodes", "default", "proxies", "subscribe")
             if (cleanName.isNotBlank() && !genericNames.contains(cleanName.lowercase())) {
                 return cleanName
             }
@@ -482,12 +488,18 @@ object RawUpdater : GroupUpdater() {
                     "vercel.app", "netlify.app", "render.com", "herokuapp.com", "jsdelivr.net",
                     "aliyuncs.com", "myqcloud.com", "amazonaws.com", "azure.com", "google.com",
                 )
-                val isCommon = commonDomains.any { host.equals(it, ignoreCase = true) || host.endsWith(".$it", ignoreCase = true) }
+                val isCommon = commonDomains.any {
+                    host.equals(
+                        it,
+                        ignoreCase = true,
+                    ) || host.endsWith(".$it", ignoreCase = true)
+                }
                 if (!isCommon) {
                     val parts = host.split(".")
                     if (parts.size >= 2) {
                         val candidate = if (parts.size >= 3) parts[parts.size - 2] else parts[0]
-                        val genericNames = setOf("sub", "subscribe", "subscription", "api", "node", "link", "app", "v2", "clash")
+                        val genericNames =
+                            setOf("sub", "subscribe", "subscription", "api", "node", "link", "app", "v2", "clash")
                         if (!genericNames.contains(candidate.lowercase()) && candidate.length >= 2) {
                             return candidate
                         }
@@ -505,7 +517,10 @@ object RawUpdater : GroupUpdater() {
                 val firstMatch = bracketPattern.find(names.first())
                 if (firstMatch != null) {
                     val tag = (firstMatch.groups[1] ?: firstMatch.groups[2] ?: firstMatch.groups[3])?.value?.trim()
-                    if (!tag.isNullOrBlank() && names.all { it.startsWith("[${tag}]") || it.startsWith("【${tag}】") || it.startsWith("(${tag})") }) {
+                    if (!tag.isNullOrBlank() && names.all {
+                            it.startsWith("[$tag]") || it.startsWith("【$tag】") || it.startsWith("($tag)")
+                        }
+                    ) {
                         return tag
                     }
                 }

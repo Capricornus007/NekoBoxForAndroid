@@ -22,7 +22,9 @@ class SubscriptionUserAgentPreference @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = TypedArrayUtils.getAttr(
-        context, androidx.preference.R.attr.preferenceStyle, android.R.attr.preferenceStyle
+        context,
+        androidx.preference.R.attr.preferenceStyle,
+        android.R.attr.preferenceStyle,
     ),
     defStyleRes: Int = 0,
 ) : Preference(context, attrs, defStyleAttr, defStyleRes) {
