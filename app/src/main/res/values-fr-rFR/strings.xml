@@ -974,4 +974,6 @@ Continuer ?</string>
     <string name="stun_binding_test">Liaison rapide (adresse externe uniquement)</string>
     <string name="hide_unavailable_profiles">Masquer les profils indisponibles</string>
     <string name="default_subscription_user_agent">User-Agent d\'abonnement par défaut</string>
+    <string name="ua_updated_toast">User-Agent mis à jour</string>
+    <string name="reset_to_default">Rétablir la valeur par défaut</string>
 </resources>

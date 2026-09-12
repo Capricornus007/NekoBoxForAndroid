@@ -965,4 +965,6 @@
     <string name="stun_binding_test">ربط سريع (العنوان الخارجي فقط)</string>
     <string name="hide_unavailable_profiles">إخفاء الملفات غير المتاحة</string>
     <string name="default_subscription_user_agent">وكيل المستخدم الافتراضي للاشتراك</string>
+    <string name="ua_updated_toast">تم تحديث User-Agent</string>
+    <string name="reset_to_default">إعادة التعيين إلى الافتراضي</string>
 </resources>

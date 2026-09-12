@@ -917,4 +917,6 @@ Continuar?</string>
     <string name="dialog_log_buffer_size">Tamanho do buffer de registo (KB)</string>
     <string name="hide_unavailable_profiles">Ocultar perfis indisponíveis</string>
     <string name="default_subscription_user_agent">User-Agent de assinatura padrão</string>
+    <string name="ua_updated_toast">User-Agent atualizado</string>
+    <string name="reset_to_default">Restaurar o padrão</string>
 </resources>

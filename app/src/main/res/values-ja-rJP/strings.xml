@@ -951,4 +951,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="stun_binding_test">クイックバインド（外部アドレスのみ）</string>
     <string name="hide_unavailable_profiles">利用不可のノードを非表示</string>
     <string name="default_subscription_user_agent">デフォルトの購読 User-Agent</string>
+    <string name="ua_updated_toast">User-Agent を更新しました</string>
+    <string name="reset_to_default">デフォルトに戻す</string>
 </resources>

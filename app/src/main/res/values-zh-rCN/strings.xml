@@ -965,4 +965,6 @@
     <string name="url_test_finished_summary">URL 测试完成：%1$d 成功 / %2$d 失败</string>
     <string name="hide_unavailable_profiles">隐藏不可用节点</string>
     <string name="default_subscription_user_agent">默认订阅 User-Agent</string>
+    <string name="ua_updated_toast">User-Agent 已更新</string>
+    <string name="reset_to_default">重置为默认</string>
 </resources>

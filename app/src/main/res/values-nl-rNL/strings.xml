@@ -971,4 +971,6 @@ Doorgaan?</string>
     <string name="stun_binding_test">Snelle binding (alleen extern adres)</string>
     <string name="hide_unavailable_profiles">Niet-beschikbare profilen verbergen</string>
     <string name="default_subscription_user_agent">Standaard abonnements-User-Agent</string>
+    <string name="ua_updated_toast">User-Agent bijgewerkt</string>
+    <string name="reset_to_default">Terugzetten op standaard</string>
 </resources>

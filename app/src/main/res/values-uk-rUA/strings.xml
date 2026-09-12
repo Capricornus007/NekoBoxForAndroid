@@ -961,4 +961,6 @@
     <string name="stun_binding_test">Швидка прив\'язка (лише зовнішня адреса)</string>
     <string name="hide_unavailable_profiles">Приховати недоступні профілі</string>
     <string name="default_subscription_user_agent">Типовий User-Agent підписки</string>
+    <string name="ua_updated_toast">User-Agent оновлено</string>
+    <string name="reset_to_default">Скинути до типового</string>
 </resources>

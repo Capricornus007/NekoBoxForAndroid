@@ -971,4 +971,6 @@ Lanjutkan?</string>
     <string name="stun_binding_test">Pengikatan cepat (hanya alamat eksternal)</string>
     <string name="hide_unavailable_profiles">Sembunyikan profil yang tidak tersedia</string>
     <string name="default_subscription_user_agent">User-Agent langganan bawaan</string>
+    <string name="ua_updated_toast">User-Agent diperbarui</string>
+    <string name="reset_to_default">Reset ke bawaan</string>
 </resources>

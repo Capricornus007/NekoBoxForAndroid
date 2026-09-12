@@ -943,4 +943,6 @@
     <string name="stun_binding_test">빠른 바인딩(외부 주소만)</string>
     <string name="hide_unavailable_profiles">사용 불가 프로필 숨기기</string>
     <string name="default_subscription_user_agent">기본 구독 User-Agent</string>
+    <string name="ua_updated_toast">User-Agent 업데이트됨</string>
+    <string name="reset_to_default">기본값으로 초기화</string>
 </resources>

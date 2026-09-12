@@ -893,4 +893,6 @@ Fortsette?</string>
     <string name="dialog_log_buffer_size">Størrelse på loggbuffer (KB)</string>
     <string name="hide_unavailable_profiles">Skjul utilgjengelige profiler</string>
     <string name="default_subscription_user_agent">Standard User-Agent for abonnement</string>
+    <string name="ua_updated_toast">User-Agent oppdatert</string>
+    <string name="reset_to_default">Tilbakestill til standard</string>
 </resources>

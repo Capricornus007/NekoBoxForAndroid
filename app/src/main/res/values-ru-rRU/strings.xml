@@ -1011,4 +1011,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="stun_binding_test">Быстрая привязка (только внешний адрес)</string>
     <string name="hide_unavailable_profiles">Скрыть недоступные профили</string>
     <string name="default_subscription_user_agent">User-Agent подписки по умолчанию</string>
+    <string name="ua_updated_toast">User-Agent обновлён</string>
+    <string name="reset_to_default">Сбросить по умолчанию</string>
 </resources>

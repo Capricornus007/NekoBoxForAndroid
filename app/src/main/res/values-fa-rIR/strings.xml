@@ -956,4 +956,6 @@
     <string name="stun_binding_test">اتصال سریع (فقط آدرس خارجی)</string>
     <string name="hide_unavailable_profiles">پنهان کردن نمایه‌های در دسترس نیست</string>
     <string name="default_subscription_user_agent">User-Agent پیش‌فرض اشتراک</string>
+    <string name="ua_updated_toast">User-Agent به‌روزرسانی شد</string>
+    <string name="reset_to_default">بازنشانی به پیش‌فرض</string>
 </resources>

@@ -954,4 +954,6 @@ VPN адключыцца на 1–3 секунды, а затым падключ
     <string name="stun_binding_test">Хуткая привязка (толькі знешні адрас)</string>
     <string name="hide_unavailable_profiles">Схаваць недаступныя профілі</string>
     <string name="default_subscription_user_agent">User-Agent падпіскі па змаўчанні</string>
+    <string name="ua_updated_toast">User-Agent абноўлены</string>
+    <string name="reset_to_default">Скінуць па змаўчанні</string>
 </resources>
