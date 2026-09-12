@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
           source buildScript/lib/core/get_source_env.sh
-          latest=$(git ls-remote https://github.com/Capricornus007/sing-box.git refs/heads/1.14.x | cut -f1)
+          latest=$(git ls-remote https://github.com/Capricornus007/sing-box.git refs/heads/1.15.x | cut -f1)
           test -n "$latest"
           echo "current=$COMMIT_SING_BOX" >> "$GITHUB_OUTPUT"
           echo "latest=$latest" >> "$GITHUB_OUTPUT"
