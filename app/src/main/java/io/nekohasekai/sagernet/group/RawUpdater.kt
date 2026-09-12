@@ -39,6 +39,7 @@ import moe.matsuri.nb4a.utils.Util
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
@@ -172,14 +173,15 @@ object RawUpdater : GroupUpdater() {
             }
             subscription.subscriptionUserinfo = userinfo
 
-            // modify the default name
-            if (proxyGroup.name?.startsWith(app.getString(R.string.subscription_name, "")) == true) {
+            // modify the default name (broadened default-name detection, from OwnBox)
+            if (isDefaultGroupName(proxyGroup.name)) {
                 var remoteName = parseBodyProfileTitle(content)
                 if (remoteName.isBlank()) {
                     remoteName = Util.decodeFilename(Util.getStringBox(response.getHeader("content-disposition")))
                 }
                 if (remoteName.isNotBlank()) {
                     proxyGroup.name = remoteName
+                    Logs.i("RawUpdater: Auto-extracted airport name for group: $remoteName")
                 }
             }
         }
@@ -374,6 +376,153 @@ object RawUpdater : GroupUpdater() {
             }.getOrDefault("").trim()
         }
         return title
+    }
+
+    /**
+     * Whether the group name still looks like a untouched default (never renamed by the user).
+     * Broadened from OwnBox: covers stock NB4A subscription/group placeholders across the
+     * shipped locales plus numbered variants, so auto-rename can safely take over.
+     */
+    fun isDefaultGroupName(name: String?): Boolean {
+        val currentName = name.orEmpty().trim()
+        if (currentName.isEmpty()) return true
+        val defaultKeywords = listOf(
+            "My group",
+            "我的分组",
+            "Group",
+            "分组",
+            "Subscription",
+            "订阅",
+            "Default",
+            "默认",
+            "Ungrouped",
+            "未分组",
+        )
+        if (defaultKeywords.any { currentName.equals(it, ignoreCase = true) }) return true
+        if (currentName.startsWith("Subscription #") ||
+            currentName.startsWith("订阅 #") ||
+            currentName.startsWith("Group #") ||
+            currentName.startsWith("分组 #")
+        ) return true
+        return false
+    }
+
+    /**
+     * Best-effort airport name extraction, ported from OwnBox: try the
+     * content-disposition filename, the profile-title header, name/title query
+     * parameters, the subscription host's second-level domain and finally the
+     * common prefix of all node names. Returns null when nothing convincing.
+     */
+    fun extractAirportName(
+        subscriptionLink: String,
+        filenameHeader: String? = null,
+        profileTitleHeader: String? = null,
+        proxies: List<AbstractBean> = emptyList(),
+    ): String? {
+        // 1. HTTP response headers: content-disposition filename
+        if (!filenameHeader.isNullOrBlank()) {
+            var extracted: String? = null
+            if (filenameHeader.contains("filename*=", ignoreCase = true)) {
+                val starPart = filenameHeader.substringAfter("filename*=", "").substringBefore(";").trim()
+                val rawEncoded = starPart.substringAfter("''", starPart)
+                try {
+                    extracted = java.net.URLDecoder.decode(rawEncoded.replace("\"", ""), "UTF-8").trim()
+                } catch (_: Throwable) {}
+            }
+            if (extracted.isNullOrBlank()) {
+                extracted = Util.decodeFilename(filenameHeader).trim()
+            }
+            val cleanName = extracted.replace(Regex("\\.(ya?ml|txt|json|conf|sub)$", RegexOption.IGNORE_CASE), "").trim()
+            val genericNames = setOf("subscription", "clash", "sub", "config", "nodes", "default", "proxies", "subscribe")
+            if (cleanName.isNotBlank() && !genericNames.contains(cleanName.lowercase())) {
+                return cleanName
+            }
+        }
+
+        // 1.2 profile-title / x-profile-title
+        if (!profileTitleHeader.isNullOrBlank()) {
+            var title = profileTitleHeader.trim()
+            if (title.startsWith("base64:", ignoreCase = true)) {
+                try {
+                    val decodedBytes = android.util.Base64.decode(title.substring(7), android.util.Base64.DEFAULT)
+                    title = String(decodedBytes, Charsets.UTF_8).trim()
+                } catch (_: Throwable) {
+                }
+            } else {
+                try {
+                    title = java.net.URLDecoder.decode(title, "UTF-8").trim()
+                } catch (_: Throwable) {
+                }
+            }
+            if (title.isNotBlank()) {
+                return title
+            }
+        }
+
+        // 2. URL query parameters: name or title
+        try {
+            val httpUrl = subscriptionLink.toHttpUrlOrNull()
+            if (httpUrl != null) {
+                val nameParam = httpUrl.queryParameter("name")?.trim()
+                if (!nameParam.isNullOrBlank()) return nameParam
+                val titleParam = httpUrl.queryParameter("title")?.trim()
+                if (!titleParam.isNullOrBlank()) return titleParam
+            }
+        } catch (_: Throwable) {
+        }
+
+        // 3. Second-level domain of the subscription link (filter common CDN/OSS hosts)
+        try {
+            val httpUrl = subscriptionLink.toHttpUrlOrNull()
+            val host = httpUrl?.host?.trim()
+            if (!host.isNullOrBlank() && !host.isIpAddress() && host != "localhost") {
+                val commonDomains = setOf(
+                    "github.com", "raw.githubusercontent.com", "github.io", "gitlab.com", "gitlab.io",
+                    "workers.dev", "pages.dev", "cloudflare.com", "cloudfront.net", "fastly.net",
+                    "vercel.app", "netlify.app", "render.com", "herokuapp.com", "jsdelivr.net",
+                    "aliyuncs.com", "myqcloud.com", "amazonaws.com", "azure.com", "google.com",
+                )
+                val isCommon = commonDomains.any { host.equals(it, ignoreCase = true) || host.endsWith(".$it", ignoreCase = true) }
+                if (!isCommon) {
+                    val parts = host.split(".")
+                    if (parts.size >= 2) {
+                        val candidate = if (parts.size >= 3) parts[parts.size - 2] else parts[0]
+                        val genericNames = setOf("sub", "subscribe", "subscription", "api", "node", "link", "app", "v2", "clash")
+                        if (!genericNames.contains(candidate.lowercase()) && candidate.length >= 2) {
+                            return candidate
+                        }
+                    }
+                }
+            }
+        } catch (_: Throwable) {
+        }
+
+        // 4. Common bracket prefix of all node names, e.g. [Airport] or 【Airport】
+        if (proxies.isNotEmpty()) {
+            val names = proxies.map { it.displayName().trim() }.filter { it.isNotBlank() }
+            if (names.isNotEmpty()) {
+                val bracketPattern = Regex("^\\[([^\\]]+)\\]|^【([^】]+)】|^\\(([^\\)]+)\\)")
+                val firstMatch = bracketPattern.find(names.first())
+                if (firstMatch != null) {
+                    val tag = (firstMatch.groups[1] ?: firstMatch.groups[2] ?: firstMatch.groups[3])?.value?.trim()
+                    if (!tag.isNullOrBlank() && names.all { it.startsWith("[${tag}]") || it.startsWith("【${tag}】") || it.startsWith("(${tag})") }) {
+                        return tag
+                    }
+                }
+
+                val first = names.first()
+                for (sep in listOf(" - ", " | ", "-", "|", "_")) {
+                    if (first.contains(sep)) {
+                        val candidatePrefix = first.substringBefore(sep).trim()
+                        if (candidatePrefix.length in 2..20 && names.all { it.startsWith(candidatePrefix) }) {
+                            return candidatePrefix
+                        }
+                    }
+                }
+            }
+        }
+
+        return null
     }
 
     // Best-effort import of mihomo/clash-meta `proxy-groups` + `rules` as native routing
