@@ -137,18 +137,19 @@ class GroupFragment :
                     val profiles = SagerDatabase.proxyDao.getByGroup(selectedGroup.id)
                     val links = profiles.joinToString("\n") { it.toStdLink(compact = true) }
                     try {
-                        (requireActivity() as MainActivity).contentResolver.openOutputStream(
+                        val resolver = (context ?: MessageStore.getCurrentActivity() ?: SagerNet.application).contentResolver
+                        resolver.openOutputStream(
                             data,
                         )!!.bufferedWriter().use {
                             it.write(links)
                         }
                         onMainDispatcher {
-                            snackbar(getString(R.string.action_export_msg)).show()
+                            safeSnackbar(R.string.action_export_msg)
                         }
                     } catch (e: Exception) {
                         Logs.w(e)
                         onMainDispatcher {
-                            snackbar(e.readableMessage).show()
+                            safeSnackbar(e.readableMessage)
                         }
                     }
                 }
@@ -337,8 +338,7 @@ class GroupFragment :
         override fun onMenuItemClick(item: MenuItem): Boolean {
             fun export(link: String) {
                 val success = SagerNet.trySetPrimaryClip(link)
-                activity.snackbar(if (success) R.string.action_export_msg else R.string.action_export_err)
-                    .show()
+                safeSnackbar(if (success) R.string.action_export_msg else R.string.action_export_err)
             }
 
             when (item.itemId) {
@@ -359,7 +359,7 @@ class GroupFragment :
                         val links = profiles.joinToString("\n") { it.toStdLink(compact = true) }
                         onMainDispatcher {
                             SagerNet.trySetPrimaryClip(links)
-                            snackbar(getString(R.string.copy_toast_msg)).show()
+                            safeSnackbar(R.string.copy_toast_msg)
                         }
                     }
                 }

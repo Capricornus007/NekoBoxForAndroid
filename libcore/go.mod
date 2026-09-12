@@ -114,7 +114,7 @@ require (
 	github.com/sagernet/netlink v0.0.0-20260814022025-64455d367bbf // indirect
 	github.com/sagernet/nftables v0.3.0-mod.4 // indirect
 	github.com/sagernet/sing-anytls v0.0.0-20260904135308-cec2d74334be // indirect
-	github.com/sagernet/sing-mux v0.3.6-0.20260904135310-c47e98c5f2c6 // indirect
+	github.com/sagernet/sing-mux v0.3.7-0.20260905054442-91d1502591ce // indirect
 	github.com/sagernet/sing-quic v0.7.1-0.20260904135313-497364e8ee3e // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.8 // indirect
 	github.com/sagernet/sing-shadowsocks2 v0.2.1 // indirect
@@ -122,7 +122,7 @@ require (
 	github.com/sagernet/sing-usbip v0.0.0-20260817040617-28bd42667eca // indirect
 	github.com/sagernet/sing-vmess v0.2.8-0.20250909125414-3aed155119a1 // indirect
 	github.com/sagernet/smux v1.5.50-sing-box-mod.1 // indirect
-	github.com/sagernet/wireguard-go v0.0.5-0.20260823125007-8bd032a91a30 // indirect
+	github.com/sagernet/wireguard-go v0.0.6 // indirect
 	github.com/sagernet/ws v0.0.0-20231204124109-acfe8907c854 // indirect
 	github.com/tetratelabs/wazero v1.12.0 // indirect
 	github.com/tevino/abool v1.2.0 // indirect
@@ -159,7 +159,7 @@ replace github.com/sagernet/sing-vmess => github.com/Capricornus007/sing-vmess v
 // in libcore stays dyhkwong. v0.1.4 targets quic-go v0.59 / sing v0.8 / sing-quic v0.6.1.
 replace github.com/dyhkwong/sing-juicity => github.com/exclavenetwork/sing-juicity v0.1.4
 
-replace github.com/sagernet/sing-snell => github.com/Capricornus007/sing-snell v0.0.0-20260905060428-6a3b5987bb76
+replace github.com/sagernet/sing-snell => github.com/Capricornus007/sing-snell v0.0.0-20260912032209-0db01b393680
 
 replace github.com/sagernet/wireguard-go => ../../wireguard-go
 
