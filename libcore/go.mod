@@ -12,7 +12,7 @@ require (
 	github.com/miekg/dns v1.1.72
 	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/sagernet/quic-go v0.61.0-sing-box-mod.7
-	github.com/sagernet/sing v0.9.4-0.20260909041121-b9fce5efdd99
+	github.com/sagernet/sing v0.9.4-0.20260910135123-2148fb758d91
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-snell v0.0.0-20260904135315-6a3b5987bb76
 	github.com/sagernet/sing-tun v0.9.1-0.20260902150540-98e457e39c90
