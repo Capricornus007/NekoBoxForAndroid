@@ -957,4 +957,5 @@ Fortfahren?</string>
     <string name="spoof_device_model">Gefälschtes Gerätemodell</string>
     <string name="stun_binding_test">Schnelle Bindung (nur externe Adresse)</string>
     <string name="hide_unavailable_profiles">Nicht verfügbare Profile ausblenden</string>
+    <string name="default_subscription_user_agent">Standard-Abonnement-User-Agent</string>
 </resources>

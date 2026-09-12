@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.preference.EditTextPreference
 import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.ktx.USER_AGENT
+import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ktx.resolveStyleAttr
 
 class UserAgentPreference
@@ -19,9 +19,10 @@ class UserAgentPreference
     }
 
     override fun getSummary(): CharSequence? {
-        if (text.isNullOrBlank()) {
-            return USER_AGENT
+        val custom = text?.trim()
+        if (custom.isNullOrBlank()) {
+            return DataStore.defaultSubscriptionUserAgent
         }
-        return super.getSummary()
+        return custom
     }
 }

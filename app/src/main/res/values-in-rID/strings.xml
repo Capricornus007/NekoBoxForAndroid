@@ -970,4 +970,5 @@ Lanjutkan?</string>
     <string name="spoof_device_model">Model perangkat yang dipalsukan</string>
     <string name="stun_binding_test">Pengikatan cepat (hanya alamat eksternal)</string>
     <string name="hide_unavailable_profiles">Sembunyikan profil yang tidak tersedia</string>
+    <string name="default_subscription_user_agent">User-Agent langganan bawaan</string>
 </resources>

@@ -973,4 +973,5 @@ Continuer ?</string>
     <string name="spoof_device_model">Modèle d\'appareil usurpé</string>
     <string name="stun_binding_test">Liaison rapide (adresse externe uniquement)</string>
     <string name="hide_unavailable_profiles">Masquer les profils indisponibles</string>
+    <string name="default_subscription_user_agent">User-Agent d'abonnement par défaut</string>
 </resources>

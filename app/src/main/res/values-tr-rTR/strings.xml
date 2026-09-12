@@ -958,4 +958,5 @@ Devam edilsin mi?</string>
     <string name="spoof_device_model">Sahte cihaz modeli</string>
     <string name="stun_binding_test">Hızlı bağlama (yalnızca harici adres)</string>
     <string name="hide_unavailable_profiles">Kullanılamayan profilleri gizle</string>
+    <string name="default_subscription_user_agent">Varsayılan abonelik User-Agent'ı</string>
 </resources>

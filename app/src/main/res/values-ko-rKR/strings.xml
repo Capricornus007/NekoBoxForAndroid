@@ -942,4 +942,5 @@
     <string name="spoof_device_model">스푸핑된 기기 모델</string>
     <string name="stun_binding_test">빠른 바인딩(외부 주소만)</string>
     <string name="hide_unavailable_profiles">사용 불가 프로필 숨기기</string>
+    <string name="default_subscription_user_agent">기본 구독 User-Agent</string>
 </resources>

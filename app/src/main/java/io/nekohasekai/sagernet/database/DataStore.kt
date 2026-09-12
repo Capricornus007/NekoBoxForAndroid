@@ -11,7 +11,9 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.TunImplementation
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.VpnService
+import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
+import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.database.preference.PublicDatabase
 import io.nekohasekai.sagernet.database.preference.RoomPreferenceDataStore
 import io.nekohasekai.sagernet.ktx.boolean
@@ -491,6 +493,37 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var subscriptionUpdateWhenConnectedOnly by profileCacheStore.boolean(Key.SUBSCRIPTION_UPDATE_WHEN_CONNECTED_ONLY)
     var subscriptionUserAgent by profileCacheStore.string(Key.SUBSCRIPTION_USER_AGENT)
     var hideUnavailableProfiles by profileCacheStore.boolean(Key.HIDE_UNAVAILABLE_PROFILES) { false }
+
+    var defaultSubscriptionUserAgent: String
+        get() {
+            val stored = configurationStore.getString(Key.DEFAULT_SUBSCRIPTION_USER_AGENT, "")
+            return if (!stored.isNullOrBlank()) stored else "NekoBox/Android/" + BuildConfig.VERSION_NAME + " (Prefer ClashMeta Format)"
+        }
+        set(value) = configurationStore.putString(Key.DEFAULT_SUBSCRIPTION_USER_AGENT, value)
+
+    /** OwnBox 移植：把未鎖定 UA 的訂閱組批量同步到新的默認 UA。 */
+    fun migrateSubscriptionUserAgents(targetUa: String? = null, forceAll: Boolean = false) {
+        val newUa = targetUa?.takeIf { it.isNotBlank() } ?: defaultSubscriptionUserAgent
+        try {
+            val groupDao = SagerDatabase.groupDao
+            val allGroups = groupDao.allGroups()
+            var changed = false
+            for (group in allGroups) {
+                val sub = group.subscription ?: continue
+                val ua = sub.customUserAgent
+                if (forceAll || ua.isNullOrBlank()) {
+                    sub.customUserAgent = newUa
+                    groupDao.updateGroup(group)
+                    changed = true
+                }
+            }
+            if (changed) {
+                Logs.d("Updated subscription User-Agents to: $newUa")
+            }
+        } catch (e: Throwable) {
+            Logs.w(e)
+        }
+    }
     var subscriptionSendHwid by profileCacheStore.boolean(Key.SUBSCRIPTION_SEND_HWID)
     var subscriptionCustomHwidParams by profileCacheStore.string(Key.SUBSCRIPTION_CUSTOM_HWID_PARAMS)
     var subscriptionAutoUpdate by profileCacheStore.boolean(Key.SUBSCRIPTION_AUTO_UPDATE)

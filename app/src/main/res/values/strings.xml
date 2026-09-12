@@ -1094,4 +1094,5 @@ Continue?</string>
     <string name="tun_implementation_hev_override">Managed by Hev TUN — turn it off to choose</string>
     <string name="url_test_finished_summary">URL test finished: %1$d succeeded / %2$d failed</string>
     <string name="hide_unavailable_profiles">Hide unavailable profiles</string>
+    <string name="default_subscription_user_agent">Default subscription User-Agent</string>
 </resources>

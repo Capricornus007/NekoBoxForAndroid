@@ -127,6 +127,7 @@ class SagerNet :
             Theme.apply(this)
             Theme.applyNightTheme()
             AppLocale.apply()
+            DataStore.migrateSubscriptionUserAgents()
             runOnDefaultDispatcher {
                 // Staged update APK: keep if still newer than installed; clean only after catch-up.
                 val staged = DataStore.pendingUpdateVersion

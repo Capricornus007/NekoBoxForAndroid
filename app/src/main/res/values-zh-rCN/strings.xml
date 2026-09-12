@@ -964,4 +964,5 @@
     <string name="bottomsheet_drag_handle_clicked">已点击拖动手柄</string>
     <string name="url_test_finished_summary">URL 测试完成：%1$d 成功 / %2$d 失败</string>
     <string name="hide_unavailable_profiles">隐藏不可用节点</string>
+    <string name="default_subscription_user_agent">默认订阅 User-Agent</string>
 </resources>

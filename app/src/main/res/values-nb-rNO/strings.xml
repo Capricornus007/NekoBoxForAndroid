@@ -892,4 +892,5 @@ Fortsette?</string>
     <string name="snackbar_watchdog_test_started">Test startet. Starter på nytt innen ≤30 s…</string>
     <string name="dialog_log_buffer_size">Størrelse på loggbuffer (KB)</string>
     <string name="hide_unavailable_profiles">Skjul utilgjengelige profiler</string>
+    <string name="default_subscription_user_agent">Standard User-Agent for abonnement</string>
 </resources>

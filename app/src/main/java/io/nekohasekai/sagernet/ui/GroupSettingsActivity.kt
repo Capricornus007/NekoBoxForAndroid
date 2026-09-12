@@ -90,7 +90,18 @@ class GroupSettingsActivity(
     }
 
     fun ProxyGroup.serialize() {
-        name = DataStore.groupName.takeIf { it.isNotBlank() } ?: app.getString(R.string.my_group)
+        // OwnBox 移植：新建訂閱組時自動從訂閱連結提取機場名
+        val rawName = DataStore.groupName.trim()
+        name = if (rawName.isNotBlank()) {
+            rawName
+        } else if (type == GroupType.SUBSCRIPTION) {
+            val candidate = DataStore.subscriptionLink.takeIf { it.isNotBlank() }?.let { link ->
+                io.nekohasekai.sagernet.group.RawUpdater.extractAirportName(link)
+            }
+            candidate ?: ("Subscription #" + System.currentTimeMillis())
+        } else {
+            app.getString(R.string.my_group)
+        }
         type = DataStore.groupType
         order = DataStore.groupOrder
         isSelector = DataStore.groupIsSelector

@@ -916,4 +916,5 @@ Continuar?</string>
     <string name="snackbar_watchdog_test_started">Teste iniciado. A reiniciar dentro de ≤30 s…</string>
     <string name="dialog_log_buffer_size">Tamanho do buffer de registo (KB)</string>
     <string name="hide_unavailable_profiles">Ocultar perfis indisponíveis</string>
+    <string name="default_subscription_user_agent">User-Agent de assinatura padrão</string>
 </resources>
