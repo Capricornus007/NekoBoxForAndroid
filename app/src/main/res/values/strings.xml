@@ -1097,4 +1097,7 @@ Continue?</string>
     <string name="default_subscription_user_agent">Default subscription User-Agent</string>
     <string name="ua_updated_toast">UA updated</string>
     <string name="reset_to_default">Reset to default</string>
+    <string name="select_ua_preset">Select preset User-Agent</string>
+    <string name="custom_ua_hint">Custom User-Agent</string>
+    <string name="update_existing_subscriptions_ua">Update existing subscriptions\' UA</string>
 </resources>

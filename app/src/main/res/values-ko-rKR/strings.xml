@@ -945,4 +945,7 @@
     <string name="default_subscription_user_agent">기본 구독 User-Agent</string>
     <string name="ua_updated_toast">User-Agent 업데이트됨</string>
     <string name="reset_to_default">기본값으로 초기화</string>
+    <string name="select_ua_preset">프리셋 User-Agent 선택</string>
+    <string name="custom_ua_hint">사용자 지정 User-Agent</string>
+    <string name="update_existing_subscriptions_ua">기존 구독의 User-Agent 업데이트</string>
 </resources>

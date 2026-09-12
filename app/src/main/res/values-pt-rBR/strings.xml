@@ -919,4 +919,7 @@ Continuar?</string>
     <string name="default_subscription_user_agent">User-Agent de assinatura padrão</string>
     <string name="ua_updated_toast">User-Agent atualizado</string>
     <string name="reset_to_default">Restaurar o padrão</string>
+    <string name="select_ua_preset">Escolher User-Agent predefinido</string>
+    <string name="custom_ua_hint">User-Agent personalizado</string>
+    <string name="update_existing_subscriptions_ua">Atualizar o User-Agent das assinaturas existentes</string>
 </resources>

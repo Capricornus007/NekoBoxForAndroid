@@ -973,4 +973,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="default_subscription_user_agent">預設訂閱 User-Agent</string>
     <string name="ua_updated_toast">User-Agent 已更新</string>
     <string name="reset_to_default">重設為預設</string>
+    <string name="select_ua_preset">選擇預設 User-Agent</string>
+    <string name="custom_ua_hint">自訂 User-Agent</string>
+    <string name="update_existing_subscriptions_ua">更新既有訂閱的 User-Agent</string>
 </resources>

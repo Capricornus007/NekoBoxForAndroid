@@ -967,4 +967,7 @@
     <string name="default_subscription_user_agent">默认订阅 User-Agent</string>
     <string name="ua_updated_toast">User-Agent 已更新</string>
     <string name="reset_to_default">重置为默认</string>
+    <string name="select_ua_preset">选择预设 User-Agent</string>
+    <string name="custom_ua_hint">自定义 User-Agent</string>
+    <string name="update_existing_subscriptions_ua">更新已有订阅的 User-Agent</string>
 </resources>

@@ -956,4 +956,7 @@ VPN адключыцца на 1–3 секунды, а затым падключ
     <string name="default_subscription_user_agent">User-Agent падпіскі па змаўчанні</string>
     <string name="ua_updated_toast">User-Agent абноўлены</string>
     <string name="reset_to_default">Скінуць па змаўчанні</string>
+    <string name="select_ua_preset">Выбраць прадвызначаны User-Agent</string>
+    <string name="custom_ua_hint">Уласны User-Agent</string>
+    <string name="update_existing_subscriptions_ua">Абнавіць User-Agent існых падпісак</string>
 </resources>

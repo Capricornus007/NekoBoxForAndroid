@@ -958,4 +958,7 @@
     <string name="default_subscription_user_agent">User-Agent پیش‌فرض اشتراک</string>
     <string name="ua_updated_toast">User-Agent به‌روزرسانی شد</string>
     <string name="reset_to_default">بازنشانی به پیش‌فرض</string>
+    <string name="select_ua_preset">انتخاب User-Agent پیش‌فرض</string>
+    <string name="custom_ua_hint">User-Agent سفارشی</string>
+    <string name="update_existing_subscriptions_ua">به‌روزرسانی User-Agent اشتراک‌های موجود</string>
 </resources>

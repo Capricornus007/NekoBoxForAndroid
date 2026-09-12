@@ -1013,4 +1013,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="default_subscription_user_agent">User-Agent подписки по умолчанию</string>
     <string name="ua_updated_toast">User-Agent обновлён</string>
     <string name="reset_to_default">Сбросить по умолчанию</string>
+    <string name="select_ua_preset">Выбрать предустановленный User-Agent</string>
+    <string name="custom_ua_hint">Свой User-Agent</string>
+    <string name="update_existing_subscriptions_ua">Обновить User-Agent существующих подписок</string>
 </resources>

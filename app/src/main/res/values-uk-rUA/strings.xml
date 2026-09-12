@@ -963,4 +963,7 @@
     <string name="default_subscription_user_agent">Типовий User-Agent підписки</string>
     <string name="ua_updated_toast">User-Agent оновлено</string>
     <string name="reset_to_default">Скинути до типового</string>
+    <string name="select_ua_preset">Вибрати типовий User-Agent</string>
+    <string name="custom_ua_hint">Власний User-Agent</string>
+    <string name="update_existing_subscriptions_ua">Оновити User-Agent наявних підписок</string>
 </resources>

@@ -973,4 +973,7 @@ Doorgaan?</string>
     <string name="default_subscription_user_agent">Standaard abonnements-User-Agent</string>
     <string name="ua_updated_toast">User-Agent bijgewerkt</string>
     <string name="reset_to_default">Terugzetten op standaard</string>
+    <string name="select_ua_preset">Standaard User-Agent kiezen</string>
+    <string name="custom_ua_hint">Aangepaste User-Agent</string>
+    <string name="update_existing_subscriptions_ua">User-Agent van bestaande abonnementen bijwerken</string>
 </resources>

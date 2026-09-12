@@ -895,4 +895,7 @@ Fortsette?</string>
     <string name="default_subscription_user_agent">Standard User-Agent for abonnement</string>
     <string name="ua_updated_toast">User-Agent oppdatert</string>
     <string name="reset_to_default">Tilbakestill til standard</string>
+    <string name="select_ua_preset">Velg forhåndssatt User-Agent</string>
+    <string name="custom_ua_hint">Egendefinert User-Agent</string>
+    <string name="update_existing_subscriptions_ua">Oppdater User-Agent for eksisterende abonnementer</string>
 </resources>

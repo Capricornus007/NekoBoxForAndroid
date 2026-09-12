@@ -953,4 +953,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="default_subscription_user_agent">デフォルトの購読 User-Agent</string>
     <string name="ua_updated_toast">User-Agent を更新しました</string>
     <string name="reset_to_default">デフォルトに戻す</string>
+    <string name="select_ua_preset">プリセット User-Agent を選択</string>
+    <string name="custom_ua_hint">カスタム User-Agent</string>
+    <string name="update_existing_subscriptions_ua">既存の購読の User-Agent を更新</string>
 </resources>

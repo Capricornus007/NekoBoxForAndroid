@@ -973,4 +973,7 @@ Continuare?</string>
     <string name="default_subscription_user_agent">User-Agent di abbonamento predefinito</string>
     <string name="ua_updated_toast">User-Agent aggiornato</string>
     <string name="reset_to_default">Ripristina il valore predefinito</string>
+    <string name="select_ua_preset">Scegli User-Agent predefinito</string>
+    <string name="custom_ua_hint">User-Agent personalizzato</string>
+    <string name="update_existing_subscriptions_ua">Aggiorna lo User-Agent degli abbonamenti esistenti</string>
 </resources>

@@ -967,4 +967,7 @@
     <string name="default_subscription_user_agent">وكيل المستخدم الافتراضي للاشتراك</string>
     <string name="ua_updated_toast">تم تحديث User-Agent</string>
     <string name="reset_to_default">إعادة التعيين إلى الافتراضي</string>
+    <string name="select_ua_preset">اختر User-Agent جاهزًا</string>
+    <string name="custom_ua_hint">User-Agent مخصص</string>
+    <string name="update_existing_subscriptions_ua">تحديث User-Agent للاشتراكات الحالية</string>
 </resources>
