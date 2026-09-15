@@ -12,7 +12,7 @@ require (
 	github.com/miekg/dns v1.1.72
 	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/sagernet/quic-go v0.61.0-sing-box-mod.7
-	github.com/sagernet/sing v0.9.4-0.20260910135123-2148fb758d91
+	github.com/sagernet/sing v0.9.4-0.20260915105322-987a74fd832a
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-snell v0.0.0-20260904135315-6a3b5987bb76
 	github.com/sagernet/sing-tun v0.9.1-0.20260902150540-98e457e39c90
@@ -175,10 +175,12 @@ replace github.com/sagernet/sing-quic => ../../sing-quic
 // sing-quic: SagerNet 版には sing-box 1.14.x が必要とする realm PortMapping が含まれる。
 // replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
 
-replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.0.0-20260909051620-3ea2085191eb
+replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.0.0-20260915105610-c76c82104e59
 
 replace github.com/metacubex/utls => github.com/Capricornus007/utls v0.0.0-20260902105251-72874de6c685
 
 replace github.com/exclavenetwork/sing-juicity => ../../sing-juicity
 
 replace github.com/xchacha20-poly1305/sing-trusttunnel => ../../sing-trusttunnel
+
+replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.4-0.20260915105322-987a74fd832a
