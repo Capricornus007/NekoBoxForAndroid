@@ -17,7 +17,7 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 16,
+    version = 17,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
@@ -135,12 +135,29 @@ abstract class SagerDatabase : RoomDatabase() {
         }
     }
 
+    /**
+     * Version 17 repairs the v16 identity-hash divergence introduced by 246cb1041,
+     * which added `@ColumnInfo(defaultValue = "NULL")` to ssrBean/snellBean and
+     * regenerated 16.json (hash 1fc40… → 703ff…) WITHOUT bumping the version.
+     * Devices holding a pre-246cb1041 v16 database (hash 1fc40…) hard-crash at
+     * open against current binaries. No physical change is needed: DEFAULT NULL
+     * on a nullable column is a SQL no-op, and Room's TableInfo comparison
+     * treats an entity-declared "NULL" default as equal to an absent one. The
+     * bump just forces the migration path so room_master_table is rewritten
+     * with the v17 hash (same mechanism as Migration14To15).
+     */
+    object Migration16To17 : Migration(16, 17) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Intentionally empty — see kdoc.
+        }
+    }
+
     companion object {
         val instance by lazy {
             SagerNet.application.getDatabasePath(Key.DB_PROFILE).parentFile?.mkdirs()
             Room.databaseBuilder(SagerNet.application, SagerDatabase::class.java, Key.DB_PROFILE)
                 .setJournalMode(JournalMode.TRUNCATE)
-                .addMigrations(Migration13To14, Migration14To15)
+                .addMigrations(Migration13To14, Migration14To15, Migration16To17)
                 // Plan 027 Stage 3: the main-thread-DB allowance is behind a build flag so it can
                 // be removed once the app runs StrictMode-clean (debug already ships with it off).
                 .apply { if (BuildConfig.ALLOW_MAIN_THREAD_DB) allowMainThreadQueries() }
