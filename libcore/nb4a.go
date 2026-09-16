@@ -37,6 +37,12 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 	defer device.DeferPanicToError("InitCore", func(err error) { log.Println(err) })
 	isBgProcess = strings.HasSuffix(process, ":bg")
 
+	// 記憶體軟上限：Go runtime 預設讓 heap 無界擴張——Linux 上虛擬位址空間尤其兇
+	// （使用者實測 VSS 曾達 ~19GB、VmData ~3.8GB，手機因而卡頓）。SetMemoryLimit
+	// 讓 GC 在逼近上限前提前回收，heap 不再無限成長，RSS/VSS 一併壓住。
+	// 128MB 對本 app 正常用量（數十 MB）留足餘裕，又不至於 GC 抖動。
+	debug.SetMemoryLimit(128 << 20)
+
 	intfNB4A = if1
 	intfBox = if2
 	useProcfs = intfBox.UseProcFS()
