@@ -40,8 +40,11 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 	// 記憶體軟上限：Go runtime 預設讓 heap 無界擴張——Linux 上虛擬位址空間尤其兇
 	// （使用者實測 VSS 曾達 ~19GB、VmData ~3.8GB，手機因而卡頓）。SetMemoryLimit
 	// 讓 GC 在逼近上限前提前回收，heap 不再無限成長，RSS/VSS 一併壓住。
-	// 128MB 對本 app 正常用量（數十 MB）留足餘裕，又不至於 GC 抖動。
-	debug.SetMemoryLimit(128 << 20)
+	// 1GB：本核心存活堆（geo 檔 + gvisor 緩存 + 連線表）實測 ~700MB
+	// （clash /memory inuse 739MB 穩定值），上限必須留足餘裕——設低於存活堆會觸發
+	// Go 的 gcpacer 永久滿轉追趕達不到的目標（mod-47 實測 128MB：8 個 GC worker
+	// 線程從啟動轉到關機、全核 75°C，即「手機摸起來一直發燙」的根因）。
+	debug.SetMemoryLimit(1 << 30)
 
 	intfNB4A = if1
 	intfBox = if2
