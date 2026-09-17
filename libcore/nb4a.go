@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"runtime/debug"
 	"strings"
+	"time"
 	_ "unsafe"
 
 	"log"
@@ -37,14 +38,30 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 	defer device.DeferPanicToError("InitCore", func(err error) { log.Println(err) })
 	isBgProcess = strings.HasSuffix(process, ":bg")
 
-	// 記憶體軟上限：Go runtime 預設讓 heap 無界擴張——Linux 上虛擬位址空間尤其兇
-	// （使用者實測 VSS 曾達 ~19GB、VmData ~3.8GB，手機因而卡頓）。SetMemoryLimit
-	// 讓 GC 在逼近上限前提前回收，heap 不再無限成長，RSS/VSS 一併壓住。
-	// 1GB：本核心存活堆（geo 檔 + gvisor 緩存 + 連線表）實測 ~700MB
-	// （clash /memory inuse 739MB 穩定值），上限必須留足餘裕——設低於存活堆會觸發
-	// Go 的 gcpacer 永久滿轉追趕達不到的目標（mod-47 實測 128MB：8 個 GC worker
-	// 線程從啟動轉到關機、全核 75°C，即「手機摸起來一直發燙」的根因）。
-	debug.SetMemoryLimit(1 << 30)
+	// 記憶體策略（mod-49，2026-09-17 真機實測修訂）：
+	// 空載存活堆僅 ~40MB、6×20MB 併發穿透下載峰值 ~47MB（clash /memory inuse）。
+	// mod-47 教訓：上限設低於存活堆會觸發 gcpacer 永久滿轉（8 個 GC worker 全核
+	// 滿載、手機發燙），上限必須遠高於存活堆。mod-48 的 1GB 修復了 CPU，但預設
+	// GCPercent=100 讓堆可膨脹到存活兩倍、且 Go 的 scavenger 遲遲不把空頁歸還
+	// 作業系統，下載後 RSS 仍高居不下。
+	// 現行三道槓桿：
+	//   1. GCPercent=40：堆只漲到存活 1.4 倍就回收，壓住 RSS 上緣；
+	//   2. 512MB 軟上限：為觀測峰值的 10 倍餘裕，任何正規用量都碰不到，
+	//      只在病態膨脹時兜底，gcpacer 絕不會追趕達不到的目標；
+	//   3. bg 進程每 60s FreeOSMemory()：主動把已釋放頁歸還 OS（Go 預設
+	//      打散歸還，空載時 RSS 會滯留在歷史高點）。小堆上 GC 僅毫秒級，
+	//      CPU 開銷可忽略。
+	debug.SetGCPercent(40)
+	debug.SetMemoryLimit(512 << 20)
+	if isBgProcess {
+		go func() {
+			defer device.DeferPanicToError("freeMemoryLoop", func(err error) { log.Println(err) })
+			for {
+				time.Sleep(60 * time.Second)
+				debug.FreeOSMemory()
+			}
+		}()
+	}
 
 	intfNB4A = if1
 	intfBox = if2
