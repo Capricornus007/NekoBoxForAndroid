@@ -75,6 +75,13 @@ class BaseService {
                 Action.RELOAD -> service.reload(
                     intent.getLongExtra(Action.EXTRA_PROFILE_ID, -1L),
                 )
+                // Ported from own/54c76ba71 (LAN sharing group): a reload keeps the tunnel
+                // object alive, so changes that need a brand new core (e.g. exposing the
+                // inbound to the LAN) use this hard restart instead.
+                Action.RESTART -> {
+                    Logs.i("BaseService: Action.RESTART received, forcing stopRunner(restart = true)")
+                    service.stopRunner(restart = true)
+                }
                 // Action.SWITCH_WAKE_LOCK -> runOnDefaultDispatcher { service.switchWakeLock() }
                 PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
                     // Only act once fully Connected: the close receiver is now registered during
@@ -684,6 +691,7 @@ class BaseService {
             if (data.closeReceiverRegistered) return
             val filter = IntentFilter().apply {
                 addAction(Action.RELOAD)
+                addAction(Action.RESTART)
                 addAction(Intent.ACTION_SHUTDOWN)
                 addAction(Action.CLOSE)
                 // addAction(Action.SWITCH_WAKE_LOCK)
@@ -720,6 +728,7 @@ class BaseService {
                 if (!data.closeReceiverRegistered) {
                     val filter = IntentFilter().apply {
                         addAction(Action.RELOAD)
+                        addAction(Action.RESTART)
                         addAction(Intent.ACTION_SHUTDOWN)
                         addAction(Action.CLOSE)
                         addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)

@@ -340,6 +340,7 @@ object Action {
     const val SERVICE = "io.nekohasekai.sagernet.SERVICE"
     const val CLOSE = "io.nekohasekai.sagernet.CLOSE"
     const val RELOAD = "io.nekohasekai.sagernet.RELOAD"
+    const val RESTART = "io.nekohasekai.sagernet.RESTART"
 
     // Optional Long extra carrying the freshly-selected profile id across the start/reload IPC,
     // so the :bg process does not depend on the UI's async write-through DB commit having landed

@@ -276,6 +276,9 @@ class SagerNet :
             },
         )
 
+        fun restartService() =
+            application.sendBroadcast(Intent(Action.RESTART).setPackage(application.packageName))
+
         fun stopService() = application.sendBroadcast(Intent(Action.CLOSE).setPackage(application.packageName))
 
         var underlyingNetwork: Network? = null
