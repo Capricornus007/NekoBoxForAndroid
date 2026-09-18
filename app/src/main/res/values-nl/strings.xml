@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_desc">De universele proxy-toolchain voor Android, geschreven in Kotlin.</string>
     <string name="project">Project</string>
     <string name="github">Broncode</string>
@@ -922,4 +922,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="dialog_log_buffer_size">Logbuffergrootte (KB)</string>
     <string name="batch_update_summary" formatted="false">Batchupdate voltooid: %1$d geslaagd, %2$d mislukt</string>
     <string name="probe_tolerance">Balancer-schakeltolerantie (ms)</string>
+    <string name="byedpi_cli_strategy">CLI-strategie</string>
+    <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Opties voor ingebed byeDPI, bv. --split 0 --disorder 1</string>
 </resources>

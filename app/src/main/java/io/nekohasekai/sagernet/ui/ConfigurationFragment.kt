@@ -72,6 +72,7 @@ import io.nekohasekai.sagernet.ktx.scrollTo
 import io.nekohasekai.sagernet.plugin.PluginManager
 import io.nekohasekai.sagernet.ui.profile.AmneziaWGSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.BalancerSettingsActivity
+import io.nekohasekai.sagernet.ui.profile.ByeDPISettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ChainSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.HttpSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.HysteriaSettingsActivity
@@ -754,6 +755,10 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             R.id.action_new_olcrtc -> {
                 startActivity(Intent(requireActivity(), OlcrtcSettingsActivity::class.java))
+            }
+
+            R.id.action_new_byedpi -> {
+                startActivity(Intent(requireActivity(), ByeDPISettingsActivity::class.java))
             }
 
             R.id.action_new_wg -> {

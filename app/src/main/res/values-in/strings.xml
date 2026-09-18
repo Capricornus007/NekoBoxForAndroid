@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="scanner_toggle_flashlight">Alihkan senter</string>
     <string name="scanner_select_image">Pilih gambar</string>
     <string name="quick_toggle">Beralih</string>
@@ -935,4 +935,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="dialog_log_buffer_size">Ukuran buffer log (KB)</string>
     <string name="batch_update_summary" formatted="false">Pembaruan batch selesai: %1$d berhasil, %2$d gagal</string>
     <string name="probe_tolerance">Toleransi alih penyeimbang (ms)</string>
+    <string name="byedpi_cli_strategy">Strategi CLI</string>
+    <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Flag untuk byeDPI bawaan, mis. --split 0 --disorder 1</string>
 </resources>

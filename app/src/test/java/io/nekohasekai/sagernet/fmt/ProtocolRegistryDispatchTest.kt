@@ -3,6 +3,7 @@ package io.nekohasekai.sagernet.fmt
 import io.nekohasekai.sagernet.database.ProtocolRegistry
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
+import io.nekohasekai.sagernet.fmt.byedpi.ByeDPIBean
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.toUri
@@ -213,6 +214,9 @@ class ProtocolRegistryDispatchTest {
         serverAddress = "192.0.2.20"
         serverPort = 443
     }
+    private fun byedpi() = ByeDPIBean().apply {
+        cliStrategy = "--split 0 --disorder 1"
+    }
     private fun chain() = ChainBean().apply { name = "chain" }
     private fun config() = ConfigBean().apply { name = "config" }
 
@@ -239,6 +243,7 @@ class ProtocolRegistryDispatchTest {
         snell() to ProxyEntity.TYPE_SNELL,
         masterDnsVpn() to ProxyEntity.TYPE_MASTERDNSVPN,
         olcrtc() to ProxyEntity.TYPE_OLCRTC,
+        byedpi() to ProxyEntity.TYPE_BYEDPI,
         chain() to ProxyEntity.TYPE_CHAIN,
         config() to ProxyEntity.TYPE_CONFIG,
     )
@@ -295,6 +300,7 @@ class ProtocolRegistryDispatchTest {
             ProxyEntity.TYPE_SNELL to SnellSettingsActivity::class.java,
             ProxyEntity.TYPE_MASTERDNSVPN to MasterDnsVpnSettingsActivity::class.java,
             ProxyEntity.TYPE_OLCRTC to OlcrtcSettingsActivity::class.java,
+            ProxyEntity.TYPE_BYEDPI to ByeDPISettingsActivity::class.java,
         )
         val nonStandardLinkTypes = setOf(
             ProxyEntity.TYPE_SSH,
@@ -321,9 +327,10 @@ class ProtocolRegistryDispatchTest {
             ProxyEntity.TYPE_SNELL,
             ProxyEntity.TYPE_MASTERDNSVPN,
             ProxyEntity.TYPE_OLCRTC,
+            ProxyEntity.TYPE_BYEDPI,
         )
 
-        assertEquals(24, allBeans.size)
+        assertEquals(25, allBeans.size)
         assertEquals(allBeans.map { it.second }.toSet(), settingsActivities.keys)
         for ((_, type) in allBeans) {
             val descriptor = ProtocolRegistry.forType(type)!!

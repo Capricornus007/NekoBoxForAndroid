@@ -8,6 +8,7 @@ import com.esotericsoftware.kryo.io.ByteBufferOutput
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.fmt.*
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
+import io.nekohasekai.sagernet.fmt.byedpi.ByeDPIBean
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.hysteria.*
 import io.nekohasekai.sagernet.fmt.internal.BalancerBean
@@ -110,6 +111,7 @@ data class ProxyEntity(
     var masterDnsVpnBean: MasterDnsVpnBean? = null,
     var awgBean: AmneziaWGBean? = null,
     var olcrtcBean: OlcrtcBean? = null,
+    @ColumnInfo(defaultValue = "NULL") var byedpiBean: ByeDPIBean? = null,
 ) : Serializable() {
 
     companion object {
@@ -147,6 +149,9 @@ data class ProxyEntity(
         const val TYPE_BALANCER = 30
         const val TYPE_SHADOWQUIC = 31
         const val TYPE_TRUSTTUNNEL = 32
+
+        // byeDPI 深度包检测规避层：不是代理节点，而是链路最末一跳（出口层）。
+        const val TYPE_BYEDPI = 33
 
         const val TYPE_CONFIG = 998
 
@@ -613,6 +618,11 @@ data class ProxyEntity(
             is OlcrtcBean -> {
                 type = TYPE_OLCRTC
                 olcrtcBean = bean
+            }
+
+            is ByeDPIBean -> {
+                type = TYPE_BYEDPI
+                byedpiBean = bean
             }
 
             is BalancerBean -> {

@@ -17,7 +17,7 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 17,
+    version = 18,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
@@ -168,12 +168,23 @@ abstract class SagerDatabase : RoomDatabase() {
         }
     }
 
+    /**
+     * Version 18: additive `byedpiBean` column on proxy_entities for the embedded byeDPI
+     * egress protocol. Matches the @ColumnInfo(defaultValue = "NULL") on the entity field
+     * (DEFAULT NULL records dflt_value "NULL", same as the Migration14To15 repair columns).
+     */
+    object Migration17To18 : Migration(17, 18) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `proxy_entities` ADD COLUMN `byedpiBean` BLOB DEFAULT NULL")
+        }
+    }
+
     companion object {
         val instance by lazy {
             SagerNet.application.getDatabasePath(Key.DB_PROFILE).parentFile?.mkdirs()
             Room.databaseBuilder(SagerNet.application, SagerDatabase::class.java, Key.DB_PROFILE)
                 .setJournalMode(JournalMode.TRUNCATE)
-                .addMigrations(Migration13To14, Migration14To15, Migration16To17)
+                .addMigrations(Migration13To14, Migration14To15, Migration16To17, Migration17To18)
                 // Plan 027 Stage 3: the main-thread-DB allowance is behind a build flag so it can
                 // be removed once the app runs StrictMode-clean (debug already ships with it off).
                 .apply { if (BuildConfig.ALLOW_MAIN_THREAD_DB) allowMainThreadQueries() }

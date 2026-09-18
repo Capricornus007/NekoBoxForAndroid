@@ -16,6 +16,8 @@ import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.ConfigBuildResult.IndexEntity
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
 import io.nekohasekai.sagernet.fmt.amneziawg.buildSingBoxEndpointAmneziaWGBean
+import io.nekohasekai.sagernet.fmt.byedpi.ByeDPIBean
+import io.nekohasekai.sagernet.fmt.byedpi.buildSingBoxOutboundByeDPIBean
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.buildSingBoxOutboundHysteriaBean
 import io.nekohasekai.sagernet.fmt.internal.BalancerBean
@@ -890,6 +892,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
                         is SnellBean ->
                             buildSingBoxOutboundSnellBean(bean)
+
+                        is ByeDPIBean ->
+                            buildSingBoxOutboundByeDPIBean(bean)
 
                         else -> throw IllegalStateException("can't reach")
                     }

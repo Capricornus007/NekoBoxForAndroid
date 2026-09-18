@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_desc">Универсальная прокси-платформа для Android, написанная на Kotlin.</string>
     <string name="project">Проект</string>
     <string name="github">Исходный код</string>
@@ -1018,4 +1018,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="update_existing_subscriptions_ua">Обновить User-Agent существующих подписок</string>
     <string name="batch_update_summary" formatted="false">Пакетное обновление завершено: успешно %1$d, с ошибками %2$d</string>
     <string name="probe_tolerance">Допуск переключения балансировщика (мс)</string>
+    <string name="byedpi_cli_strategy">Стратегия CLI</string>
+    <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Флаги встроенного byeDPI, например --split 0 --disorder 1</string>
 </resources>

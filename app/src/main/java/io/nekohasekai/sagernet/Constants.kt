@@ -215,6 +215,9 @@ object Key {
     const val OLCRTC_VP8_BATCH = "olcrtcVp8Batch"
     const val OLCRTC_DNS_SERVER = "olcrtcDnsServer"
 
+    // byeDPI
+    const val BYEDPI_CLI = "byedpiCli"
+
     const val SERVER_PRIVATE_KEY = "serverPrivateKey"
     const val SERVER_INSECURE_CONCURRENCY = "serverInsecureConcurrency"
 

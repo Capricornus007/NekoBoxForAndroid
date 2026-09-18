@@ -3,6 +3,7 @@ package io.nekohasekai.sagernet.ktx
 import com.google.gson.JsonParser
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.Serializable
+import io.nekohasekai.sagernet.fmt.byedpi.parseByeDPI
 import io.nekohasekai.sagernet.fmt.http.parseHttp
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria1
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria2
@@ -283,6 +284,13 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
                 entities.add(parseOlcrtc(this))
             }.onFailure {
                 Logs.w("olcRTC parser rejected input")
+            }
+        } else if (startsWith("byedpi://")) {
+            Logs.d("Trying byeDPI parser")
+            runCatching {
+                entities.add(parseByeDPI(this))
+            }.onFailure {
+                Logs.w("byeDPI parser rejected input")
             }
         }
     }

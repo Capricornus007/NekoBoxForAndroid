@@ -4,6 +4,7 @@ import android.app.Activity
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
+import io.nekohasekai.sagernet.fmt.byedpi.ByeDPIBean
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.http.toUri
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
@@ -46,6 +47,7 @@ import moe.matsuri.nb4a.proxy.config.ConfigBean
 import moe.matsuri.nb4a.proxy.config.ConfigSettingActivity
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSBean
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSSettingsActivity
+import io.nekohasekai.sagernet.fmt.byedpi.toUri as toByeDpiUri
 import io.nekohasekai.sagernet.fmt.masterdnsvpn.toUri as toMasterDnsVpnUri
 import io.nekohasekai.sagernet.fmt.olcrtc.toUri as toOlcrtcUri
 import io.nekohasekai.sagernet.fmt.shadowquic.toUri as toShadowQuicUri
@@ -339,6 +341,16 @@ object ProtocolRegistry {
             needExternal = { true },
             settingsActivityClass = OlcrtcSettingsActivity::class.java,
             toStandardLink = { (it as OlcrtcBean).toOlcrtcUri() },
+        ),
+        ProtocolDescriptor(
+            type = ProxyEntity.TYPE_BYEDPI,
+            deserialize = { KryoConverters.byeDPIDeserialize(it) },
+            beanClass = ByeDPIBean::class.java,
+            getBean = { it.byedpiBean },
+            setBean = { e, b -> e.byedpiBean = b as ByeDPIBean? },
+            displayType = { "byeDPI" },
+            settingsActivityClass = ByeDPISettingsActivity::class.java,
+            toStandardLink = { (it as ByeDPIBean).toByeDpiUri() },
         ),
         ProtocolDescriptor(
             type = ProxyEntity.TYPE_AWG,

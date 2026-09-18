@@ -437,6 +437,8 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var olcrtcVp8Batch by profileCacheStore.stringToInt(Key.OLCRTC_VP8_BATCH) { 8 }
     var olcrtcDnsServer by profileCacheStore.string(Key.OLCRTC_DNS_SERVER) { "" }
 
+    var byedpiCli by profileCacheStore.string(Key.BYEDPI_CLI) { "" }
+
     var protocolVersion by profileCacheStore.stringToInt(Key.PROTOCOL_VERSION) { 2 } // default is SOCKS5
 
     var serverProtocolInt by profileCacheStore.stringToInt(Key.SERVER_PROTOCOL)
@@ -540,6 +542,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var balancerStrategy by profileCacheStore.string(Key.BALANCER_STRATEGY)
     var balancerProbeUrl by profileCacheStore.string(Key.PROBE_URL)
     var balancerProbeInterval by profileCacheStore.stringToInt(Key.PROBE_INTERVAL) { 300 }
+
     // Same default as BalancerBean.DEFAULT_TOLERANCE, which is the value this fork used to hardcode.
     var balancerProbeTolerance by profileCacheStore.stringToInt(Key.PROBE_TOLERANCE) { 50 }
     var balancerNameFilter by profileCacheStore.string(Key.BALANCER_NAME_FILTER)

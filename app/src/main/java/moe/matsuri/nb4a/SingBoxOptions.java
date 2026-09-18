@@ -5376,4 +5376,47 @@ public class SingBoxOptions {
 
     }
 
+    public static class Outbound_ByeDPIOptions extends Outbound {
+
+        // Generate note: nested type DialerOptions
+        public String detour;
+
+        public String bind_interface;
+
+        public String inet4_bind_address;
+
+        public String inet6_bind_address;
+
+        public String protect_path;
+
+        public Integer routing_mark;
+
+        public Boolean reuse_addr;
+
+        public String connect_timeout;
+
+        public Boolean tcp_fast_open;
+
+        public Boolean tcp_multi_path;
+
+        public Boolean udp_fragment;
+
+        public String domain_strategy;
+
+        public String network_strategy;
+
+        public List<String> network_type;
+
+        public List<String> fallback_network_type;
+
+        public String fallback_delay;
+
+        // End of public DialerOptions ;
+
+        // byeDPI 是规避层而非代理节点，没有 server/server_port：
+        // 唯一实体参数是原样交给内嵌 byeDPI 的命令行串。
+        public String cli;
+
+    }
+
 }

@@ -85,6 +85,9 @@
                         android:id="@+id/action_new_olcrtc"
                         android:title="@string/action_olcrtc" />
                     <item
+                        android:id="@+id/action_new_byedpi"
+                        android:title="@string/action_byedpi" />
+                    <item
                         android:id="@+id/action_new_ssh"
                         android:title="@string/action_ssh" />
                     <item

@@ -219,6 +219,9 @@
             android:name="io.nekohasekai.sagernet.ui.profile.OlcrtcSettingsActivity"
             android:configChanges="uiMode" />
         <activity
+            android:name="io.nekohasekai.sagernet.ui.profile.ByeDPISettingsActivity"
+            android:configChanges="uiMode" />
+        <activity
             android:name="io.nekohasekai.sagernet.ui.profile.ChainSettingsActivity"
             android:configChanges="uiMode" />
         <activity

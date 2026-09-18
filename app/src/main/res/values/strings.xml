@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">NekoBox</string>
     <string name="app_name_long" translatable="false">NekoBox for Android</string>
     <string name="app_desc">The universal proxy toolchain for Android, written in Kotlin.</string>
@@ -1110,4 +1110,7 @@ Continue?</string>
     <string name="select_ua_preset">Select preset User-Agent</string>
     <string name="custom_ua_hint">Custom User-Agent</string>
     <string name="update_existing_subscriptions_ua">Update existing subscriptions\' UA</string>
+    <string name="action_byedpi" translatable="false">byeDPI</string>
+    <string name="byedpi_cli_strategy">CLI strategy</string>
+    <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Flags for embedded byeDPI, e.g. --split 0 --disorder 1</string>
 </resources>

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="project">Prosjekt</string>
     <string name="github">Kildekode</string>
     <string name="telegram">Telegram-oppdateringskanal</string>
@@ -900,4 +900,6 @@ Fortsette?</string>
     <string name="update_existing_subscriptions_ua">Oppdater User-Agent for eksisterende abonnementer</string>
     <string name="batch_update_summary" formatted="false">Batchoppdatering fullført: %1$d vellykket, %2$d mislykket</string>
     <string name="probe_tolerance">Toleranse for balanserbytte (ms)</string>
+    <string name="byedpi_cli_strategy">CLI-strategi</string>
+    <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Flagg for innebygd byeDPI, f.eks. --split 0 --disorder 1</string>
 </resources>

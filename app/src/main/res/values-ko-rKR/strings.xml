@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_desc">Android용 범용 프록시 툴체인, Kotlin으로 작성됨.</string>
     <string name="project">프로젝트</string>
     <string name="github">소스 코드</string>
@@ -950,4 +950,6 @@
     <string name="update_existing_subscriptions_ua">기존 구독의 User-Agent 업데이트</string>
     <string name="batch_update_summary" formatted="false">일괄 업데이트 완료: %1$d개 성공, %2$d개 실패</string>
     <string name="probe_tolerance">부하 분산 전환 허용 오차(ms)</string>
+    <string name="byedpi_cli_strategy">CLI 전략</string>
+    <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">내장 byeDPI에 전달할 인수, 예: --split 0 --disorder 1</string>
 </resources>
