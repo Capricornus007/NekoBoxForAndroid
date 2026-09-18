@@ -149,7 +149,7 @@ require (
 	lukechampine.com/blake3 v1.3.0 // indirect
 )
 
-replace github.com/matsuridayo/libneko => ../../libneko
+replace github.com/matsuridayo/libneko => github.com/Capricornus007/libneko v0.0.0-20260902104842-d5ae8b4d046a
 
 replace github.com/amnezia-vpn/amneziawg-go/v3 => github.com/Capricornus007/amneziawg-go/v3 v3.1.20260828-mod.1
 
