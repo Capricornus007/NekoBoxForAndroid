@@ -49,7 +49,7 @@ class ServiceNotification(
 ) : BroadcastReceiver() {
     companion object {
         const val notificationId = 1
-        const val flags = PendingIntent.FLAG_IMMUTABLE
+        const val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
         @WorkerThread
         fun genTitle(ent: ProxyEntity): String {
@@ -198,7 +198,7 @@ class ServiceNotification(
                 service.getString(R.string.action_switch),
                 PendingIntent.getActivity(
                     service,
-                    0,
+                    1,
                     Intent(service, SwitchActivity::class.java),
                     flags,
                 ),
@@ -210,8 +210,8 @@ class ServiceNotification(
                 service.getString(R.string.reset_connections),
                 PendingIntent.getBroadcast(
                     service,
-                    0,
-                    Intent(Action.RESET_UPSTREAM_CONNECTIONS),
+                    2,
+                    Intent(Action.RESET_UPSTREAM_CONNECTIONS).setPackage(service.packageName),
                     flags,
                 ),
             ).setShowsUserInterface(false).build()
