@@ -142,11 +142,7 @@ object XhttpExtraConverter {
         }
     }
 
-    private fun convertClashFields(
-        from: Map<*, *>,
-        to: JSONObject,
-        mappings: Array<Pair<String, String>>,
-    ) {
+    private fun convertClashFields(from: Map<*, *>, to: JSONObject, mappings: Array<Pair<String, String>>) {
         for ((fromKey, toKey) in mappings) {
             copyClashValue(from, to, fromKey, toKey)
         }

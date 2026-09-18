@@ -11,7 +11,9 @@ import moe.matsuri.nb4a.utils.NGUtil
 import moe.matsuri.nb4a.utils.listByLineOrComma
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONObject
+import java.net.URI
 
 private val supportedKcpHeaderType = arrayOf(
     "none",
@@ -89,7 +91,7 @@ fun parseV2Ray(link: String): StandardV2RayBean {
     // "std" format
 
     val bean = VMessBean().apply { if (link.startsWith("vless://")) alterId = -1 }
-    val url = link.replace("vmess://", "https://").replace("vless://", "https://").toHttpUrl()
+    val url = parseV2RayHttpUrl(link) ?: error("invalid v2ray link $link")
 
     if (url.password.isNotBlank()) {
         // https://github.com/v2fly/v2fly-github-io/issues/26 (rarely use)
@@ -168,7 +170,7 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                     bean.xhttpMode = normalizeXhttpMode(it)
                 }
                 url.queryParameter("extra")?.let {
-                    bean.xhttpExtra = XhttpExtraConverter.xrayToSingBox(it)
+                    bean.xhttpExtra = runCatching { XhttpExtraConverter.xrayToSingBox(it) }.getOrDefault(it)
                 }
             }
         }
@@ -178,6 +180,62 @@ fun parseV2Ray(link: String): StandardV2RayBean {
     }
 
     return bean
+}
+
+/**
+ * OkHttp's HttpUrl rejects a few characters that show up in the wild inside the query string
+ * (raw braces in `host=`, spaces or CJK in `remark=`, ...). Rather than losing the whole link,
+ * percent-encode the offenders and retry, then fall back to java.net.URI, which is more lenient.
+ */
+private val queryCharsToEscape = charArrayOf('{', '}', '|', '\\', '^', '<', '>', '`', '"')
+
+private fun percentEncode(text: String): String {
+    val bytes = text.toByteArray(Charsets.UTF_8)
+    return buildString(bytes.size * 3) {
+        for (byte in bytes) {
+            append('%')
+            append((byte.toInt() and 0xFF).toString(16).uppercase().padStart(2, '0'))
+        }
+    }
+}
+
+private fun parseV2RayHttpUrl(link: String): HttpUrl? {
+    val httpsUrl = link.replace("vmess://", "https://").replace("vless://", "https://")
+    httpsUrl.toHttpUrlOrNull()?.let { return it }
+
+    // Walk by code point, not by Char: a CJK remark is a surrogate pair and encoding the two
+    // halves separately would turn them into '?' and destroy the value.
+    val encoded = buildString {
+        var index = 0
+        while (index < httpsUrl.length) {
+            val codePoint = Character.codePointAt(httpsUrl, index)
+            val charCount = Character.charCount(codePoint)
+            val slice = httpsUrl.substring(index, index + charCount)
+            index += charCount
+            val mustEscape = codePoint <= 0x20 || codePoint >= 0x7F ||
+                queryCharsToEscape.any { it in slice }
+            append(if (mustEscape) percentEncode(slice) else slice)
+        }
+    }
+    encoded.toHttpUrlOrNull()?.let { return it }
+
+    return runCatching {
+        val uri = URI(encoded)
+        val host = uri.host ?: return@runCatching null
+        HttpUrl.Builder()
+            .scheme("https")
+            .host(host)
+            .port(if (uri.port == -1) 443 else uri.port)
+            .encodedPath(uri.rawPath?.ifBlank { "/" } ?: "/")
+            .apply {
+                uri.rawUserInfo?.let { info ->
+                    encodedUsername(info.substringBefore(":"))
+                    if (info.contains(":")) encodedPassword(info.substringAfter(":", ""))
+                }
+                uri.rawQuery?.let { encodedQuery(it) }
+            }
+            .build()
+    }.getOrNull()
 }
 
 // https://github.com/XTLS/Xray-core/issues/91
@@ -201,6 +259,7 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
     // transport= 是部分客户端的写法，统一归到 sing-box 的 xhttp
     val rawType = url.queryParameter("type")
         ?: url.queryParameter("transport")
+        ?: url.queryParameter("net")
         ?: "tcp"
     type = when (rawType.lowercase()) {
         "splithttp", "xhttp" -> "xhttp"
@@ -267,8 +326,14 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
             }
             url.queryParameter("headerType")?.let {
                 if (it.isNotBlank()) {
-                    if (it !in supportedKcpHeaderType) error("unsupported headerType")
-                    headerType = it
+                    if (it !in supportedKcpHeaderType) {
+                        // An unknown header type must not cost the whole node: "none" is the
+                        // Xray default and still connects against a header-less server.
+                        Logs.w("unsupported kcp headerType: $it, fallback to none")
+                        headerType = "none"
+                    } else {
+                        headerType = it
+                    }
                 }
             }
             url.queryParameter("mtu")?.let {
@@ -324,7 +389,7 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
                 xhttpMode = normalizeXhttpMode(it)
             }
             url.queryParameter("extra")?.let {
-                xhttpExtra = XhttpExtraConverter.xrayToSingBox(it)
+                xhttpExtra = runCatching { XhttpExtraConverter.xrayToSingBox(it) }.getOrDefault(it)
             }
         }
     }
