@@ -289,11 +289,23 @@ class BaseService {
             // instance. In those states fall through to the state machine below. selectorTag was
             // resolved off the main thread by the caller (null => no fast-path).
             if (s == State.Connected && selectorTag != null && selectorTag.isNotBlank()) {
-                // select from GUI
-                data.proxy!!.box.selectOutbound(selectorTag)
-                // or select from webui
-                // => selector_OnProxySelected
-                return
+                val proxy = data.proxy
+                if (proxy != null && proxy.isInitialized()) {
+                    try {
+                        // select from GUI
+                        proxy.box.selectOutbound(selectorTag)
+                        // or select from webui
+                        // => selector_OnProxySelected
+                        return
+                    } catch (e: Exception) {
+                        // The core refused the tag (selector group changed underneath us) or the
+                        // box went away while we were switching. Either way this runs on the main
+                        // thread, so an uncaught exception here kills the whole process instead of
+                        // just costing a fast path: log it and fall through to the full reload.
+                        // (OwnBox 7fe530afd "node switch crash".)
+                        Logs.w("selectOutbound($selectorTag) failed, reloading instead: ${e.readableMessage}")
+                    }
+                }
             }
             when {
                 s == State.Stopped -> startRunner()
