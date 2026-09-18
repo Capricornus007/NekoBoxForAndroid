@@ -340,7 +340,7 @@ class StatsBar @JvmOverloads constructor(
         return if (latency > 0) "$base · $latency ms" else base
     }
 
-    private fun refreshLandingIp(forceRefresh: Boolean) {
+    fun refreshLandingIp(forceRefresh: Boolean) {
         val activity = mainActivity
         if (!DataStore.serviceState.connected) return
         activity.lifecycleScope.launch(Dispatchers.Main) {

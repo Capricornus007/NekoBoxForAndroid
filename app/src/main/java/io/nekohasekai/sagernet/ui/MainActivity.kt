@@ -55,6 +55,7 @@ import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.plugin.PluginTrust
+import io.nekohasekai.sagernet.utils.LandingIpManager
 import moe.matsuri.nb4a.plugin.Plugins
 import moe.matsuri.nb4a.utils.Util
 import java.util.Locale
@@ -647,6 +648,14 @@ class MainActivity :
             if (isDestroyed || isFinishing) return@runOnMainDispatcher
             when (key) {
                 Key.SERVICE_MODE -> onBinderDied()
+                Key.PROFILE_ID -> {
+                    // Ported from own/2f0ec0d7b: switching node must invalidate the landing IP
+                    // immediately instead of waiting for the cache TTL.
+                    LandingIpManager.clearCache()
+                    if (DataStore.serviceState.connected) {
+                        binding.stats.refreshLandingIp(forceRefresh = true)
+                    }
+                }
                 Key.SHOW_BOTTOM_BAR -> syncMainControls(
                     showWhenConnected = DataStore.showBottomBar,
                     animate = true,
