@@ -87,201 +87,203 @@ object LandingIpManager {
         }.getOrNull() ?: fallbackName
     }
 
-    suspend fun queryLandingIp(
-        profileId: Long,
-        forceRefresh: Boolean = false,
-    ): Result<LandingIpInfo> = withContext(Dispatchers.IO) {
-        if (!DataStore.serviceState.connected) {
-            return@withContext Result.failure(IllegalStateException("VPN not connected"))
-        }
-
-        val now = System.currentTimeMillis()
-        if (forceRefresh) {
-            clearCache()
-        } else {
-            val cache = currentCache
-            if (cache != null && cachedProfileId == profileId && now - cache.queryTimestamp < CACHE_TTL_MS) {
-                return@withContext Result.success(cache)
+    suspend fun queryLandingIp(profileId: Long, forceRefresh: Boolean = false): Result<LandingIpInfo> =
+        withContext(Dispatchers.IO) {
+            if (!DataStore.serviceState.connected) {
+                return@withContext Result.failure(IllegalStateException("VPN not connected"))
             }
-        }
 
-        if (isQuerying && !forceRefresh) {
-            currentCache?.let { return@withContext Result.success(it) }
-        }
-
-        isQuerying = true
-        val startTime = System.currentTimeMillis()
-        var client: libcore.HTTPClient? = null
-
-        try {
-            val c = Libcore.newHttpClient().apply {
-                modernTLS()
-                tryProxyOutbound()
+            val now = System.currentTimeMillis()
+            if (forceRefresh) {
+                clearCache()
+            } else {
+                val cache = currentCache
+                if (cache != null && cachedProfileId == profileId && now - cache.queryTimestamp < CACHE_TTL_MS) {
+                    return@withContext Result.success(cache)
+                }
             }
-            client = c
 
-            val ua = USER_AGENT.takeIf { it.isNotBlank() }
-                ?: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+            if (isQuerying && !forceRefresh) {
+                currentCache?.let { return@withContext Result.success(it) }
+            }
 
-            var info: LandingIpInfo? = null
+            isQuerying = true
+            val startTime = System.currentTimeMillis()
+            var client: libcore.HTTPClient? = null
 
-            // 1. api.ip.sb - proxy-friendly, high precision
             try {
-                val req = client.newRequest().apply {
-                    setURL("https://api.ip.sb/geoip")
-                    setUserAgent(ua)
+                val c = Libcore.newHttpClient().apply {
+                    modernTLS()
+                    tryProxyOutbound()
                 }
-                val resp = req.execute()
-                val body = Util.getStringBox(resp.contentString)
-                val json = JSONObject(body)
-                val ip = json.optString("ip")
-                if (ip.isNotBlank()) {
-                    val countryCode = json.optString("country_code").uppercase()
-                    val country = localizeCountry(countryCode, json.optString("country"))
-                    val city = json.optString("city")
-                    val isp = json.optString("isp")
-                    val asnNum = json.optInt("asn", 0)
-                    val asnOrg = json.optString("asn_organization")
-                    val asn = if (asnNum > 0) "AS$asnNum $asnOrg".trim() else asnOrg
+                client = c
 
-                    info = LandingIpInfo(
-                        ip = ip,
-                        country = country,
-                        countryCode = countryCode,
-                        countryFlag = countryCodeToFlagEmoji(countryCode),
-                        city = city,
-                        region = json.optString("region"),
-                        isp = isp,
-                        org = json.optString("organization"),
-                        asn = asn,
-                        durationMs = System.currentTimeMillis() - startTime,
-                    )
-                }
-            } catch (_: Throwable) {
-            }
+                val ua = USER_AGENT.takeIf { it.isNotBlank() }
+                    ?: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 
-            // 2. ipwho.is
-            if (info == null) {
+                var info: LandingIpInfo? = null
+
+                // 1. api.ip.sb - proxy-friendly, high precision
                 try {
                     val req = client.newRequest().apply {
-                        setURL("https://ipwho.is/")
+                        setURL("https://api.ip.sb/geoip")
                         setUserAgent(ua)
                     }
                     val resp = req.execute()
                     val body = Util.getStringBox(resp.contentString)
                     val json = JSONObject(body)
-                    if (json.optBoolean("success", false)) {
-                        val ip = json.optString("ip")
-                        if (ip.isNotBlank()) {
-                            val countryCode = json.optString("country_code").uppercase()
-                            val country = localizeCountry(countryCode, json.optString("country"))
-                            val city = json.optString("city")
-                            val conn = json.optJSONObject("connection")
-                            val isp = conn?.optString("isp").orEmpty()
-                            val org = conn?.optString("org").orEmpty()
-                            val asnNum = conn?.optInt("asn", 0) ?: 0
-                            val asn = if (asnNum > 0) "AS$asnNum $org".trim() else org
-
-                            info = LandingIpInfo(
-                                ip = ip,
-                                country = country,
-                                countryCode = countryCode,
-                                countryFlag = countryCodeToFlagEmoji(countryCode),
-                                city = city,
-                                region = json.optString("region"),
-                                isp = isp,
-                                org = org,
-                                asn = asn,
-                                durationMs = System.currentTimeMillis() - startTime,
-                            )
-                        }
-                    }
-                } catch (_: Throwable) {
-                }
-            }
-
-            // 3. cloudflare trace - the authoritative edge actually serving this outbound
-            if (info == null) {
-                try {
-                    val req = client.newRequest().apply {
-                        setURL("https://cloudflare.com/cdn-cgi/trace")
-                        setUserAgent(ua)
-                    }
-                    val resp = req.execute()
-                    val body = Util.getStringBox(resp.contentString)
-                    var cfIp = ""
-                    var cfLoc = ""
-                    var cfColo = ""
-                    for (line in body.lines()) {
-                        val trimmed = line.trim()
-                        if (trimmed.startsWith("ip=")) cfIp = trimmed.substring(3).trim()
-                        else if (trimmed.startsWith("loc=")) cfLoc = trimmed.substring(4).trim().uppercase()
-                        else if (trimmed.startsWith("colo=")) cfColo = trimmed.substring(5).trim().uppercase()
-                    }
-                    if (cfIp.isNotBlank()) {
-                        info = LandingIpInfo(
-                            ip = cfIp,
-                            country = localizeCountry(cfLoc, cfLoc),
-                            countryCode = cfLoc,
-                            countryFlag = countryCodeToFlagEmoji(cfLoc),
-                            city = if (cfColo.isNotBlank()) "Cloudflare ($cfColo)" else "",
-                            region = "",
-                            isp = "Cloudflare Edge",
-                            org = "Cloudflare Anycast",
-                            asn = if (cfColo.isNotBlank()) "Cloudflare $cfColo" else "Cloudflare",
-                            durationMs = System.currentTimeMillis() - startTime,
-                        )
-                    }
-                } catch (_: Throwable) {
-                }
-            }
-
-            // 4. legacy fallback: ip-api.com
-            if (info == null) {
-                try {
-                    val req = client.newRequest().apply {
-                        setURL(
-                            "http://ip-api.com/json?fields=status,message,country,countryCode,regionName,city,isp,org,as,query",
-                        )
-                        setUserAgent(ua)
-                    }
-                    val resp = req.execute()
-                    val body = Util.getStringBox(resp.contentString)
-                    val json = JSONObject(body)
-                    if (json.optString("status") == "success") {
-                        val ip = json.optString("query")
-                        val countryCode = json.optString("countryCode").uppercase()
+                    val ip = json.optString("ip")
+                    if (ip.isNotBlank()) {
+                        val countryCode = json.optString("country_code").uppercase()
                         val country = localizeCountry(countryCode, json.optString("country"))
+                        val city = json.optString("city")
+                        val isp = json.optString("isp")
+                        val asnNum = json.optInt("asn", 0)
+                        val asnOrg = json.optString("asn_organization")
+                        val asn = if (asnNum > 0) "AS$asnNum $asnOrg".trim() else asnOrg
 
                         info = LandingIpInfo(
                             ip = ip,
                             country = country,
                             countryCode = countryCode,
                             countryFlag = countryCodeToFlagEmoji(countryCode),
-                            city = json.optString("city"),
-                            region = json.optString("regionName"),
-                            isp = json.optString("isp"),
-                            org = json.optString("org"),
-                            asn = json.optString("as"),
+                            city = city,
+                            region = json.optString("region"),
+                            isp = isp,
+                            org = json.optString("organization"),
+                            asn = asn,
                             durationMs = System.currentTimeMillis() - startTime,
                         )
                     }
                 } catch (_: Throwable) {
                 }
-            }
 
-            if (info != null) {
-                currentCache = info
-                cachedProfileId = profileId
-                Result.success(info)
-            } else {
-                Result.failure(Exception("failed to fetch landing IP"))
+                // 2. ipwho.is
+                if (info == null) {
+                    try {
+                        val req = client.newRequest().apply {
+                            setURL("https://ipwho.is/")
+                            setUserAgent(ua)
+                        }
+                        val resp = req.execute()
+                        val body = Util.getStringBox(resp.contentString)
+                        val json = JSONObject(body)
+                        if (json.optBoolean("success", false)) {
+                            val ip = json.optString("ip")
+                            if (ip.isNotBlank()) {
+                                val countryCode = json.optString("country_code").uppercase()
+                                val country = localizeCountry(countryCode, json.optString("country"))
+                                val city = json.optString("city")
+                                val conn = json.optJSONObject("connection")
+                                val isp = conn?.optString("isp").orEmpty()
+                                val org = conn?.optString("org").orEmpty()
+                                val asnNum = conn?.optInt("asn", 0) ?: 0
+                                val asn = if (asnNum > 0) "AS$asnNum $org".trim() else org
+
+                                info = LandingIpInfo(
+                                    ip = ip,
+                                    country = country,
+                                    countryCode = countryCode,
+                                    countryFlag = countryCodeToFlagEmoji(countryCode),
+                                    city = city,
+                                    region = json.optString("region"),
+                                    isp = isp,
+                                    org = org,
+                                    asn = asn,
+                                    durationMs = System.currentTimeMillis() - startTime,
+                                )
+                            }
+                        }
+                    } catch (_: Throwable) {
+                    }
+                }
+
+                // 3. cloudflare trace - the authoritative edge actually serving this outbound
+                if (info == null) {
+                    try {
+                        val req = client.newRequest().apply {
+                            setURL("https://cloudflare.com/cdn-cgi/trace")
+                            setUserAgent(ua)
+                        }
+                        val resp = req.execute()
+                        val body = Util.getStringBox(resp.contentString)
+                        var cfIp = ""
+                        var cfLoc = ""
+                        var cfColo = ""
+                        for (line in body.lines()) {
+                            val trimmed = line.trim()
+                            if (trimmed.startsWith("ip=")) {
+                                cfIp = trimmed.substring(3).trim()
+                            } else if (trimmed.startsWith("loc=")) {
+                                cfLoc = trimmed.substring(4).trim().uppercase()
+                            } else if (trimmed.startsWith("colo=")) {
+                                cfColo = trimmed.substring(5).trim().uppercase()
+                            }
+                        }
+                        if (cfIp.isNotBlank()) {
+                            info = LandingIpInfo(
+                                ip = cfIp,
+                                country = localizeCountry(cfLoc, cfLoc),
+                                countryCode = cfLoc,
+                                countryFlag = countryCodeToFlagEmoji(cfLoc),
+                                city = if (cfColo.isNotBlank()) "Cloudflare ($cfColo)" else "",
+                                region = "",
+                                isp = "Cloudflare Edge",
+                                org = "Cloudflare Anycast",
+                                asn = if (cfColo.isNotBlank()) "Cloudflare $cfColo" else "Cloudflare",
+                                durationMs = System.currentTimeMillis() - startTime,
+                            )
+                        }
+                    } catch (_: Throwable) {
+                    }
+                }
+
+                // 4. legacy fallback: ip-api.com
+                if (info == null) {
+                    try {
+                        val req = client.newRequest().apply {
+                            setURL(
+                                "http://ip-api.com/json?fields=status,message,country,countryCode,regionName,city,isp,org,as,query",
+                            )
+                            setUserAgent(ua)
+                        }
+                        val resp = req.execute()
+                        val body = Util.getStringBox(resp.contentString)
+                        val json = JSONObject(body)
+                        if (json.optString("status") == "success") {
+                            val ip = json.optString("query")
+                            val countryCode = json.optString("countryCode").uppercase()
+                            val country = localizeCountry(countryCode, json.optString("country"))
+
+                            info = LandingIpInfo(
+                                ip = ip,
+                                country = country,
+                                countryCode = countryCode,
+                                countryFlag = countryCodeToFlagEmoji(countryCode),
+                                city = json.optString("city"),
+                                region = json.optString("regionName"),
+                                isp = json.optString("isp"),
+                                org = json.optString("org"),
+                                asn = json.optString("as"),
+                                durationMs = System.currentTimeMillis() - startTime,
+                            )
+                        }
+                    } catch (_: Throwable) {
+                    }
+                }
+
+                if (info != null) {
+                    currentCache = info
+                    cachedProfileId = profileId
+                    Result.success(info)
+                } else {
+                    Result.failure(Exception("failed to fetch landing IP"))
+                }
+            } catch (e: Throwable) {
+                Result.failure(e)
+            } finally {
+                isQuerying = false
+                runCatching { client?.close() }
             }
-        } catch (e: Throwable) {
-            Result.failure(e)
-        } finally {
-            isQuerying = false
-            runCatching { client?.close() }
         }
-    }
 }

@@ -91,11 +91,13 @@ class TileService : BaseTileService(), SagerConnection.Callback {
             }
             label = label ?: getString(R.string.app_name)
             if (hasSubtitle) {
-                setSubtitle(when (serviceState) {
-                    BaseService.State.Connected, BaseService.State.Connecting -> validProfileName
-                    BaseService.State.Stopped -> getString(R.string.not_connected)
-                    else -> null
-                })
+                setSubtitle(
+                    when (serviceState) {
+                        BaseService.State.Connected, BaseService.State.Connecting -> validProfileName
+                        BaseService.State.Stopped -> getString(R.string.not_connected)
+                        else -> null
+                    },
+                )
             }
             updateTile()
         }

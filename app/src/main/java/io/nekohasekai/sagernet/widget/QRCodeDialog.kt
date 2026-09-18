@@ -28,8 +28,8 @@ import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnLifecycleDispatcher
 import io.nekohasekai.sagernet.ui.MainActivity
-import java.nio.charset.StandardCharsets
 import moe.matsuri.nb4a.Protocols.getProtocolColor
+import java.nio.charset.StandardCharsets
 
 /**
  * Multi-format node QR dialog (ported from OwnBox 205cc7c42 / a15b23e7a).
@@ -77,11 +77,7 @@ class QRCodeDialog() : DialogFragment() {
         )
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.dialog_qrcode, container, false)
     }
 
@@ -205,8 +201,11 @@ class QRCodeDialog() : DialogFragment() {
             tabs.getTabAt(1)?.select()
         }
         updateCode(
-            if (isInitialSn) (universalUrl ?: currentUrl)
-            else (if (hasStd) stdUrl!! else (universalUrl ?: currentUrl)),
+            if (isInitialSn) {
+                (universalUrl ?: currentUrl)
+            } else {
+                (if (hasStd) stdUrl!! else (universalUrl ?: currentUrl))
+            },
             isSn = isInitialSn,
         )
 

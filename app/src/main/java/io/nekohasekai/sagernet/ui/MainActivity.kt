@@ -18,6 +18,8 @@ import androidx.activity.addCallback
 import androidx.annotation.IdRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
+import androidx.core.view.size
 import androidx.preference.PreferenceDataStore
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
@@ -510,8 +512,8 @@ class MainActivity :
     fun setCheckedItem(@IdRes id: Int) {
         val menu = navigation.menu
         fun uncheckAll(m: Menu) {
-            for (i in 0 until m.size()) {
-                val item = m.getItem(i)
+            for (i in 0 until m.size) {
+                val item = m[i]
                 if (item.hasSubMenu()) {
                     item.subMenu?.let { uncheckAll(it) }
                 }
