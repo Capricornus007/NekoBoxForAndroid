@@ -540,6 +540,8 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var balancerStrategy by profileCacheStore.string(Key.BALANCER_STRATEGY)
     var balancerProbeUrl by profileCacheStore.string(Key.PROBE_URL)
     var balancerProbeInterval by profileCacheStore.stringToInt(Key.PROBE_INTERVAL) { 300 }
+    // Same default as BalancerBean.DEFAULT_TOLERANCE, which is the value this fork used to hardcode.
+    var balancerProbeTolerance by profileCacheStore.stringToInt(Key.PROBE_TOLERANCE) { 50 }
     var balancerNameFilter by profileCacheStore.string(Key.BALANCER_NAME_FILTER)
     var balancerNameFilter1 by profileCacheStore.string(Key.BALANCER_NAME_FILTER1)
     var balancerUseLandingProxy by profileCacheStore.boolean(Key.BALANCER_USE_LANDING_PROXY)

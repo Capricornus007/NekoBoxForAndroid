@@ -16,6 +16,11 @@ public class BalancerBean extends InternalBean {
     public static final int TYPE_LIST = 0;
     public static final int TYPE_GROUP = 1;
 
+    // Kept at the value this fork always hardcoded so existing balancers behave the same.
+    public static final int DEFAULT_TOLERANCE = 50;
+    // The core stores urltest tolerance as a uint16 number of milliseconds.
+    public static final int MAX_TOLERANCE = 65535;
+
     public Integer type;
     public String strategy;
     public List<Long> proxies;
@@ -23,6 +28,10 @@ public class BalancerBean extends InternalBean {
 
     public String probeUrl;
     public Integer probeInterval;
+    // urltest switching tolerance in milliseconds: a member is only taken over
+    // when it is faster than the current one by more than this much.
+    // (OwnBox 934eb6fd2 made the previously hardcoded 50 configurable.)
+    public Integer probeTolerance;
     public String nameFilter;
     public String nameFilter1;
     public Boolean useLandingProxy;
@@ -38,6 +47,7 @@ public class BalancerBean extends InternalBean {
         if (groupId == null) groupId = 0L;
         if (probeUrl == null) probeUrl = "";
         if (probeInterval == null) probeInterval = 300;
+        if (probeTolerance == null) probeTolerance = DEFAULT_TOLERANCE;
         if (nameFilter == null) nameFilter = "";
         if (nameFilter1 == null) nameFilter1 = "";
         if (useLandingProxy == null) useLandingProxy = false;
@@ -55,7 +65,7 @@ public class BalancerBean extends InternalBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(5);
+        output.writeInt(6);
         output.writeInt(type);
         output.writeString(strategy);
         switch (type) {
@@ -80,6 +90,7 @@ public class BalancerBean extends InternalBean {
             output.writeBoolean(useLandingProxy);
             output.writeBoolean(useFrontProxy);
         }
+        output.writeInt(toleranceMs());
     }
 
     @Override
@@ -117,6 +128,22 @@ public class BalancerBean extends InternalBean {
         if (version >= 5 && type == TYPE_GROUP) {
             useFrontProxy = input.readBoolean();
         }
+        if (version >= 6) {
+            probeTolerance = input.readInt();
+        }
+    }
+
+    /**
+     * urltest tolerance in milliseconds, clamped into the range the core can store.
+     */
+    public int toleranceMs() {
+        int value = probeTolerance == null ? DEFAULT_TOLERANCE : probeTolerance;
+        if (value < 0) {
+            value = 0;
+        } else if (value > MAX_TOLERANCE) {
+            value = MAX_TOLERANCE;
+        }
+        return value;
     }
 
     @NonNull

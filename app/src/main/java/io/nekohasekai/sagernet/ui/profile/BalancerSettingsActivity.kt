@@ -55,6 +55,7 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         DataStore.serverProtocol = proxies.joinToString(",")
         DataStore.balancerProbeUrl = probeUrl
         DataStore.balancerProbeInterval = probeInterval
+        DataStore.balancerProbeTolerance = toleranceMs()
         DataStore.balancerNameFilter = nameFilter
         DataStore.balancerNameFilter1 = nameFilter1
         DataStore.balancerUseLandingProxy = useLandingProxy
@@ -69,6 +70,7 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         proxies = proxyList.map { it.id }
         probeUrl = DataStore.balancerProbeUrl
         probeInterval = DataStore.balancerProbeInterval
+        probeTolerance = DataStore.balancerProbeTolerance
         nameFilter = DataStore.balancerNameFilter
         nameFilter1 = DataStore.balancerNameFilter1
         useLandingProxy = DataStore.balancerUseLandingProxy
@@ -82,6 +84,7 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
     lateinit var balancerUseLandingProxy: SwitchPreference
     lateinit var balancerUseFrontProxy: SwitchPreference
     lateinit var probeInterval: EditTextPreference
+    lateinit var probeTolerance: EditTextPreference
 
     override fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.balancer_preferences)
@@ -94,6 +97,8 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         balancerUseFrontProxy = findPreference(Key.BALANCER_USE_FRONT_PROXY)!!
         probeInterval = findPreference(Key.PROBE_INTERVAL)!!
         probeInterval.setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+        probeTolerance = findPreference(Key.PROBE_TOLERANCE)!!
+        probeTolerance.setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
 
         itemView = findViewById(R.id.list_cell)
 

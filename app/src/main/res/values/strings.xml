@@ -375,6 +375,7 @@
     <string name="leastPing" translatable="false">Ping</string>
     <string name="api_port">API Port</string>
     <string name="probe_interval">Balancer observation interval</string>
+    <string name="probe_tolerance">Balancer switch tolerance (ms)</string>
     <string name="standard">Standard</string>
     <string name="v2rayn" translatable="false">V2RayN</string>
     <string name="available" translatable="false">%dms</string>

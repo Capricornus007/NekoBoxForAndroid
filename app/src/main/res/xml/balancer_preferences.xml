@@ -65,4 +65,11 @@
         app:title="@string/probe_interval"
         app:useSimpleSummaryProvider="true" />
 
+    <EditTextPreference
+        app:defaultValue="50"
+        app:icon="@drawable/ic_baseline_speed_24"
+        app:key="probeTolerance"
+        app:title="@string/probe_tolerance"
+        app:useSimpleSummaryProvider="true" />
+
 </PreferenceScreen>

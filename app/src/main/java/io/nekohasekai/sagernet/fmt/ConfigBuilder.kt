@@ -708,7 +708,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         if (balancerBean.probeInterval > 0) {
                             _hack_config_map["interval"] = "${balancerBean.probeInterval}s"
                         }
-                        tolerance = 50
+                        tolerance = balancerBean.toleranceMs()
                     },
                 )
                 trafficMap[balancerTag] = listOf(entity)
@@ -1098,7 +1098,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     if (balancerBean.probeInterval > 0) {
                         _hack_config_map["interval"] = "${balancerBean.probeInterval}s"
                     }
-                    tolerance = 50
+                    tolerance = balancerBean.toleranceMs()
                 },
             )
             trafficMap[TAG_PROXY] = listOf(proxy)

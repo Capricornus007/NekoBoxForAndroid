@@ -279,6 +279,7 @@ object Key {
     const val BALANCER_USE_FRONT_PROXY = "balancerUseFrontProxy"
     const val PROBE_URL = "probeUrl"
     const val PROBE_INTERVAL = "probeInterval"
+    const val PROBE_TOLERANCE = "probeTolerance"
 
     const val USE_IEC_UNIT = "useIECUnit"
 
