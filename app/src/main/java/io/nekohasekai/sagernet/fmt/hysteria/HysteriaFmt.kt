@@ -512,15 +512,36 @@ fun HysteriaBean.buildHysteria1Config(port: Int, cacheFile: (() -> File)?): Stri
     }.toStringPretty()
 }
 
+// Hysteria 端口范围可以用 ASCII 连字符（-）写，但订阅、手输链接、复制粘贴经常混进
+// 各种“破折号/全形连字符”（en dash、em dash、minus sign、U+FF0D 等）。这些字符
+// 若不先归一成 ASCII "-"，下面的端口解析函数就会把整个范围当成无效端口而回落到
+// 默认值，或干脆漏掉范围，导致节点连不上。这里统一做一次字符替换。
+private fun normalizePortDashes(portStr: String): String {
+    if (portStr.isEmpty()) return portStr
+    val sb = StringBuilder(portStr.length)
+    for (c in portStr) {
+        sb.append(
+            when (c) {
+                '-', '‐', '‑', '‒', '–',
+                '—', '―', '−', '－', '⸺', '⸻',
+                -> '-'
+                else -> c
+            },
+        )
+    }
+    return sb.toString()
+}
+
 fun isMultiPort(hyAddr: String): Boolean {
     if (!hyAddr.contains(":")) return false
-    val p = hyAddr.substringAfterLast(":")
+    val p = normalizePortDashes(hyAddr.substringAfterLast(":"))
     if (p.contains("-") || p.contains(",")) return true
     return false
 }
 
 fun getFirstPort(portStr: String): Int {
-    return portStr.substringBefore(":").substringBefore(",").toIntOrNull() ?: 443
+    val normalized = normalizePortDashes(portStr)
+    return normalized.substringBefore(":").substringBefore(",").substringBefore("-").toIntOrNull() ?: 443
 }
 
 fun HysteriaBean.canUseSingBox(): Boolean {
@@ -639,8 +660,8 @@ fun buildSingBoxOutboundHysteriaBean(bean: HysteriaBean): SingBoxOptions.SingBox
 }
 
 fun hopPortsToSingboxList(s: String): List<String> {
-    return s.split(",").mapNotNull {
-        val pRange = it.replace("-", ":")
+    return normalizePortDashes(s).split(",").mapNotNull {
+        val pRange = it.trim().replace("-", ":")
         if (pRange.split(":").size == 2) {
             pRange
         } else {
