@@ -1304,6 +1304,27 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         if (ruleObj.outbound == TAG_BLOCK) {
                             ruleObj.outbound = null
                             ruleObj.action = "reject"
+                        } else {
+                            // Ported from miku/UwU a97f23892: if the rule's custom JSON config
+                            // carries an "action" (e.g. sniff, resolve), the generated rule must
+                            // not keep an "outbound" field at the same time.
+                            var hasCustomAction = false
+                            if (!rule.config.isNullOrBlank()) {
+                                try {
+                                    // Only parsed as a generic Map to check for the "action" key.
+                                    @Suppress("UNCHECKED_CAST")
+                                    val customMap = gson.fromJson(rule.config, Map::class.java) as? Map<String, Any>
+                                    if (customMap?.containsKey("action") == true) {
+                                        hasCustomAction = true
+                                    }
+                                } catch (e: Exception) {
+                                    // JSON parse failed or shape mismatch: ignore.
+                                }
+                            }
+
+                            if (hasCustomAction) {
+                                ruleObj.outbound = null
+                            }
                         }
                         route.rules.add(ruleObj)
                         route.rule_set.addAll(ruleSets)
