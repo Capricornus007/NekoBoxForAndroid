@@ -78,12 +78,50 @@ func (s *LoadBalance) pick() adapter.Outbound {
 	return s.outbounds[idx]
 }
 
+// hashDestination is FNV-1a over the destination host, ported from own/dcd786819.
+func hashDestination(dest M.Socksaddr) uint32 {
+	var key string
+	if dest.Fqdn != "" {
+		key = dest.Fqdn
+	} else if dest.IsIP() {
+		key = dest.Addr.String()
+	} else {
+		key = dest.String()
+	}
+	var h uint32 = 2166136261
+	for i := 0; i < len(key); i++ {
+		h ^= uint32(key[i])
+		h *= 16777619
+	}
+	return h
+}
+
+// startIndexOf returns the outbound that owns destination: hashing the host keeps every
+// connection to the same server on the same node, which is what stops chunked/multipart
+// uploads, WebSockets and TLS session resumption from hopping across nodes.
+func (s *LoadBalance) startIndexOf(destination M.Socksaddr, n int) int {
+	if destination.Fqdn != "" || destination.IsIP() {
+		return int(hashDestination(destination) % uint32(n))
+	}
+	return int(atomic.AddUint64(&s.counter, 1) % uint64(n))
+}
+
+// pickByDestination is used by the handler path, where the connection is already open and
+// only the metadata carries the destination.
+func (s *LoadBalance) pickByDestination(destination M.Socksaddr) adapter.Outbound {
+	n := len(s.outbounds)
+	if n == 0 {
+		return nil
+	}
+	return s.outbounds[s.startIndexOf(destination, n)]
+}
+
 func (s *LoadBalance) DialContext(ctx context.Context, network string, destination M.Socksaddr) (net.Conn, error) {
 	n := len(s.outbounds)
 	if n == 0 {
 		return nil, E.New("no outbounds available")
 	}
-	startIdx := int(atomic.AddUint64(&s.counter, 1) % uint64(n))
+	startIdx := s.startIndexOf(destination, n)
 	var lastErr error
 	for i := 0; i < n; i++ {
 		candidate := s.outbounds[(startIdx+i)%n]
@@ -101,7 +139,7 @@ func (s *LoadBalance) ListenPacket(ctx context.Context, destination M.Socksaddr)
 	if n == 0 {
 		return nil, E.New("no outbounds available")
 	}
-	startIdx := int(atomic.AddUint64(&s.counter, 1) % uint64(n))
+	startIdx := s.startIndexOf(destination, n)
 	var lastErr error
 	for i := 0; i < n; i++ {
 		candidate := s.outbounds[(startIdx+i)%n]
@@ -116,7 +154,7 @@ func (s *LoadBalance) ListenPacket(ctx context.Context, destination M.Socksaddr)
 
 func (s *LoadBalance) NewConnection(ctx context.Context, conn net.Conn, metadata adapter.InboundContext, onClose N.CloseHandlerFunc) {
 	ctx = interrupt.ContextWithIsExternalConnection(ctx)
-	selected := s.pick()
+	selected := s.pickByDestination(metadata.Destination)
 	if selected == nil {
 		conn.Close()
 		return
@@ -130,7 +168,7 @@ func (s *LoadBalance) NewConnection(ctx context.Context, conn net.Conn, metadata
 
 func (s *LoadBalance) NewPacketConnection(ctx context.Context, conn N.PacketConn, metadata adapter.InboundContext, onClose N.CloseHandlerFunc) {
 	ctx = interrupt.ContextWithIsExternalConnection(ctx)
-	selected := s.pick()
+	selected := s.pickByDestination(metadata.Destination)
 	if selected == nil {
 		conn.Close()
 		return
