@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.InputType
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.*
 import android.widget.EditText
 import android.widget.Toast
@@ -15,6 +16,7 @@ import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.databinding.LayoutWebviewBinding
+import io.nekohasekai.sagernet.ktx.Logs
 import moe.matsuri.nb4a.utils.onReceivedError
 
 // Fragment must have a no-argument public constructor, otherwise it will crash during data restoration
@@ -101,6 +103,40 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
             .toString()
     }
 
+    /**
+     * Back inside the dashboard walks the SPA history instead of dropping the whole screen,
+     * so leaving a dashboard page behaves like a browser. (OwnBox 28213adc3)
+     */
+    override fun onBackPressed(): Boolean {
+        if (::mWebView.isInitialized && mWebView.canGoBack()) {
+            mWebView.goBack()
+            return true
+        }
+        return false
+    }
+
+    /**
+     * The WebView has to go away with the view: it is a native view holding a renderer
+     * process, and a destroyed-but-still-attached instance makes the next visit to this
+     * screen render nothing.
+     */
+    override fun onDestroyView() {
+        if (::mWebView.isInitialized) {
+            try {
+                mWebView.onPause()
+                mWebView.stopLoading()
+                mWebView.loadUrl("about:blank")
+                mWebView.clearHistory()
+                mWebView.removeAllViews()
+                (mWebView.parent as? ViewGroup)?.removeView(mWebView)
+                mWebView.destroy()
+            } catch (e: Exception) {
+                Logs.w("Failed to destroy dashboard WebView: ${e.message}")
+            }
+        }
+        super.onDestroyView()
+    }
+
     @SuppressLint("CheckResult")
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -132,9 +168,10 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
                     .show()
             }
             R.id.close -> {
-                mWebView.onPause()
-                mWebView.removeAllViews()
-                mWebView.destroy()
+                // onDestroyView tears the WebView down; this only leaves the screen. Destroying
+                // the view in place used to keep the (now dead) fragment on screen and left the
+                // drawer entry checked, so the dashboard could not be opened again.
+                (activity as? MainActivity)?.displayFragmentWithId(R.id.nav_configuration)
             }
         }
         return true
