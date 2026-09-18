@@ -46,12 +46,24 @@ jobs:
         run: |
           set -euo pipefail
           # The displayed version must track the newest upstream release on the tracked
-          # branch line (SINGBOX_BRANCH=1.14.x -> newest v1.14.* stable tag), keeping the
-          # local -mod.N suffix so builds stay distinguishable from official ones.
+          # branch line, keeping the local -mod.N suffix so builds stay distinguishable
+          # from official ones.
+          #
+          # Prefer the newest *stable* tag, but fall back to the newest tag of any kind
+          # when the tracked line has no stable release yet. The fork tracks 1.15.x, and
+          # upstream has only ever cut v1.15.0-alpha.* on that line (no v1.15.0 stable as
+          # of 2026-09-18) — the old stable-only `grep -vE 'alpha|beta|rc'` filtered every
+          # tag out, leaving $upstream empty and tripping `test -n` (run 35276186828, exit 1).
+          # The fork already pins v1.15.0-alpha.4, so a pre-release line must resolve here.
           branch=$(grep -E '^SINGBOX_BRANCH=' nb4a.properties | cut -d= -f2 | tr -d '\r[:space:]')
           line=${branch%.x}
-          upstream=$(git ls-remote --tags --refs https://github.com/SagerNet/sing-box.git "refs/tags/v${line}.*" \
-            | sed 's#.*refs/tags/##' | grep -vE 'alpha|beta|rc' | sort -V | tail -n1)
+          all=$(git ls-remote --tags --refs https://github.com/SagerNet/sing-box.git "refs/tags/v${line}.*" \
+            | sed 's#.*refs/tags/##' | sort -V)
+          # `|| true` is load-bearing: the step runs under `set -euo pipefail`, so a
+          # `grep` with no match aborts the whole assignment (that, not `test -n`, is
+          # what killed run 35276186828 — the log shows exit 1 before any echo output).
+          upstream=$(printf '%s\n' "$all" | { grep -vE 'alpha|beta|rc' || true; } | tail -n1)
+          [ -n "$upstream" ] || upstream=$(printf '%s\n' "$all" | tail -n1)
           test -n "$upstream"
           current=$(grep -E '^SINGBOX_VERSION=' nb4a.properties | cut -d= -f2 | tr -d '\r[:space:]')
           mod=$(printf '%s' "$current" | grep -oE -- '-mod\.[0-9]+$' || true)

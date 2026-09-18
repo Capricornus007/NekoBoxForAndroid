@@ -312,11 +312,33 @@ jobs:
           sleep 3
 
       - name: Release APK
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: nightly
-          name: Nightly Build
-          body: Automated build from main branch. Updated on every push.
-          files: ${{ env.APK }}/*.apk
-          prerelease: true
-          make_latest: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # softprops/action-gh-release@v3 has no internal retry. On 2026-09-17 the
+        # arm64 APK uploaded fine, then the next asset PUT hung ~9 minutes and came
+        # back as a GitHub 5xx HTML error page (run 35247917268) — a transient
+        # blob-storage blip. A `uses:` step can't re-dial, so one blip reddened the
+        # whole job after a full successful build. Create the release empty and upload
+        # each APK through gh with per-asset backoff so a blip retries instead of fails.
+        run: |
+          set -uo pipefail
+          # 上一步删 nightly 带 continue-on-error，可能没删成；create 撞已存在会红。
+          # 建不成但 release 确实在，就直接进 --clobber 上传，保持幂等。
+          gh release create nightly --prerelease --latest \
+            --title "Nightly Build" \
+            --notes "Automated build from main branch. Updated on every push." \
+            || gh release view nightly >/dev/null 2>&1 \
+            || { echo "::error::nightly release 既建不起来也不存在"; exit 1; }
+          shopt -s nullglob
+          apks=( ${{ env.APK }}/*.apk )
+          [ "${#apks[@]}" -gt 0 ] || { echo "::error::找不到 APK 产物（${{ env.APK }}/*.apk）"; exit 1; }
+          for apk in "${apks[@]}"; do
+            ok=false
+            for attempt in 1 2 3 4 5; do
+              if gh release upload nightly "$apk" --clobber; then ok=true; break; fi
+              echo "上传 $(basename "$apk") 失败（第 ${attempt}/5 次），GitHub 资产存储多半在抖动，退避重试"
+              sleep $(( attempt * 15 ))
+            done
+            [ "$ok" = true ] || { echo "::error::上传 $(basename "$apk") 连续 5 次失败"; exit 1; }
+          done
+          echo "Nightly release 已更新：${#apks[@]} 个 APK"
