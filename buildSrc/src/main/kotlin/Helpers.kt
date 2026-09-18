@@ -149,6 +149,8 @@ fun Project.setupAppCommon() {
                     storePassword = keystorePwd
                     keyAlias = alias
                     keyPassword = pwd
+                    enableV1Signing = true
+                    enableV2Signing = true
                 }
             }
             if (debugKeystoreFile.isFile) {
