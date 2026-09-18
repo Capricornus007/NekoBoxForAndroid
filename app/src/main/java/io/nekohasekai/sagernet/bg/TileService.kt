@@ -57,6 +57,13 @@ class TileService : BaseTileService(), SagerConnection.Callback {
     }
 
     private fun updateTile(serviceState: BaseService.State, profileName: String?) {
+        // Ported from own/8a483574e: defensive blank / literal "null" filtering, and on
+        // Android 14+ the profile name moves to the tile subtitle so the label no longer
+        // repeats it. (Their guard used SDK Q; Tile.setSubtitle is API 34, so it is U here.)
+        val validProfileName = profileName?.trim()?.takeIf {
+            it.isNotEmpty() && !it.equals("null", ignoreCase = true)
+        }
+        val hasSubtitle = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE
         qsTile?.apply {
             label = null
             when (serviceState) {
@@ -68,7 +75,7 @@ class TileService : BaseTileService(), SagerConnection.Callback {
 
                 BaseService.State.Connected -> {
                     icon = iconConnected
-                    label = profileName
+                    label = if (hasSubtitle) getString(R.string.connection_status_connected) else validProfileName
                     state = Tile.STATE_ACTIVE
                 }
 
@@ -83,6 +90,13 @@ class TileService : BaseTileService(), SagerConnection.Callback {
                 }
             }
             label = label ?: getString(R.string.app_name)
+            if (hasSubtitle) {
+                setSubtitle(when (serviceState) {
+                    BaseService.State.Connected, BaseService.State.Connecting -> validProfileName
+                    BaseService.State.Stopped -> getString(R.string.not_connected)
+                    else -> null
+                })
+            }
             updateTile()
         }
     }
