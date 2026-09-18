@@ -132,15 +132,26 @@ abstract class GroupUpdater {
             }
         }
 
+        /**
+         * Runs one group update to completion and reports success.
+         *
+         * supervisorScope (Throne b7c1b911c): a caller that launches several of these in
+         * parallel - "update all subscriptions" - must not have its other updates cancelled
+         * just because one group failed.
+         */
         suspend fun executeUpdate(proxyGroup: ProxyGroup, byUser: Boolean): Boolean {
-            return coroutineScope {
+            return supervisorScope {
                 if (!updating.add(proxyGroup.id)) {
                     // already updating this group in another run; skip quietly
-                    return@coroutineScope false
+                    return@supervisorScope false
                 }
                 GroupManager.postReload(proxyGroup.id)
 
-                val subscription = proxyGroup.subscription!!
+                val subscription = proxyGroup.subscription ?: run {
+                    Logs.w("Group ${proxyGroup.id} (${proxyGroup.displayName()}) has no subscription, skip update")
+                    finishUpdate(proxyGroup)
+                    return@supervisorScope false
+                }
                 val connected = DataStore.serviceState.connected
                 val userInterface = GroupManager.userInterface
 
@@ -155,7 +166,7 @@ abstract class GroupUpdater {
                         )
                     ) {
                         finishUpdate(proxyGroup)
-                        return@coroutineScope true
+                        return@supervisorScope true
                     }
                 }
 
@@ -167,7 +178,9 @@ abstract class GroupUpdater {
                     throw e
                 } catch (e: Throwable) {
                     Logs.w(e)
-                    userInterface?.onUpdateFailure(proxyGroup, e.readableMessage)
+                    // Background/scheduled refreshes have nobody looking at the screen: only a
+                    // user-initiated update reports the failure, everything else just logs it.
+                    if (byUser) userInterface?.onUpdateFailure(proxyGroup, e.readableMessage)
                     finishUpdate(proxyGroup)
                     false
                 }

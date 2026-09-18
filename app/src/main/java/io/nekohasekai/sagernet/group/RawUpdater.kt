@@ -49,6 +49,10 @@ import org.yaml.snakeyaml.error.YAMLException
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 object RawUpdater : GroupUpdater() {
+    // Deletion circuit breaker: only guards groups of at least this many nodes, and trips as
+    // soon as the fetched unique node count falls below this share of what is stored.
+    private const val CIRCUIT_BREAK_MIN_PROFILES = 10
+    private const val CIRCUIT_BREAK_MAX_DROP_RATIO = 0.7
 
     internal data class ReconciliationResult(
         val contentChanged: Boolean,
@@ -276,6 +280,22 @@ object RawUpdater : GroupUpdater() {
             }
         }
 
+        // Circuit breaker (Throne b7c1b911c): when an endpoint that used to serve a full list
+        // suddenly returns a heavily truncated one (partial page, server hiccup, geo-blocked
+        // response), the "unmatched" rows are not really gone. Deleting them would wipe a
+        // working group, so above a minimum size and past the drop ratio we keep every row
+        // that the new list does not mention and only add/update what came back.
+        val circuitBreak = exists.size >= CIRCUIT_BREAK_MIN_PROFILES &&
+            nameMap.size < exists.size * CIRCUIT_BREAK_MAX_DROP_RATIO
+        if (circuitBreak) {
+            Logs.w(
+                "Subscription diff circuit breaker tripped: exists=${exists.size}, " +
+                    "fetched=${nameMap.size}, skipping deletion of ${toDelete.size} profiles",
+            )
+        }
+        val keptByCircuitBreak = if (circuitBreak) toDelete.size else 0
+        if (circuitBreak) toDelete.clear()
+
         Logs.d("toDelete profiles: ${toDelete.size}")
         Logs.d("toReplace profiles: ${toReplace.size}")
 
@@ -338,7 +358,7 @@ object RawUpdater : GroupUpdater() {
             }
 
             val existCount = SagerDatabase.proxyDao.countByGroup(proxyGroup.id).toInt()
-            if (existCount != proxies.size) {
+            if (existCount != proxies.size + keptByCircuitBreak) {
                 val message = "Exist profiles: $existCount, new profiles: ${proxies.size}"
                 Logs.e(message)
                 error(message)

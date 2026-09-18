@@ -27,7 +27,12 @@ import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.widget.ListListener
 import io.nekohasekai.sagernet.widget.QRCodeDialog
 import io.nekohasekai.sagernet.widget.UndoSnackbarManager
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import moe.matsuri.nb4a.utils.Util
 import moe.matsuri.nb4a.utils.toBytesString
@@ -43,6 +48,11 @@ class GroupFragment :
     lateinit var layoutManager: LinearLayoutManager
     lateinit var groupAdapter: GroupAdapter
     lateinit var undoManager: UndoSnackbarManager<ProxyGroup>
+
+    private companion object {
+        // How many subscriptions "update all" refreshes at the same time.
+        const val BATCH_UPDATE_PARALLELISM = 4
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -115,11 +125,39 @@ class GroupFragment :
                 MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.confirm)
                     .setMessage(R.string.update_all_subscription)
                     .setPositiveButton(R.string.yes) { _, _ ->
-                        SagerDatabase.groupDao.allGroups()
-                            .filter { it.type == GroupType.SUBSCRIPTION }
-                            .forEach {
-                                GroupUpdater.startUpdate(it, true)
+                        runOnDefaultDispatcher {
+                            val groups = SagerDatabase.groupDao.allGroups()
+                                .filter { it.type == GroupType.SUBSCRIPTION }
+                            if (groups.isEmpty()) return@runOnDefaultDispatcher
+                            // supervisorScope + bounded concurrency (Throne b7c1b911c): one
+                            // broken subscription must not cancel or block the rest, but
+                            // hammering every endpoint at once is its own failure mode.
+                            val limiter = Semaphore(BATCH_UPDATE_PARALLELISM)
+                            val results = supervisorScope {
+                                groups.map { group ->
+                                    async {
+                                        try {
+                                            limiter.withPermit {
+                                                GroupUpdater.executeUpdate(group, true)
+                                            }
+                                        } catch (e: Exception) {
+                                            Logs.w(e)
+                                            false
+                                        }
+                                    }
+                                }.awaitAll()
                             }
+                            val success = results.count { it }
+                            val failure = results.size - success
+                            onMainDispatcher {
+                                val text = context?.getString(
+                                    R.string.batch_update_summary,
+                                    success,
+                                    failure,
+                                ).orEmpty()
+                                safeSnackbar(text)
+                            }
+                        }
                     }
                     .setNegativeButton(R.string.no, null)
                     .show()

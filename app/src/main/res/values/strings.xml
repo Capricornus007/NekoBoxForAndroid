@@ -48,6 +48,7 @@
     <string name="group_status_proxies_subscription" formatted="false">%d Proxies | Updated on %s</string>
     <string name="group_no_difference">%s: No difference</string>
     <string name="group_updated" formatted="false">%s: Updated %d proxies</string>
+    <string name="batch_update_summary" formatted="false">Batch update finished: %1$d succeeded, %2$d failed</string>
     <string name="group_show_diff">Diff</string>
     <string name="group_diff">Diff (%s)</string>
     <string name="group_delete_confirm_prompt">Are you sure you want to remove this group?</string>
