@@ -45,6 +45,7 @@ import (
 	"libcore/protocol/shadowquic"
 	"libcore/protocol/snell"
 	"libcore/protocol/trusttunnel"
+	customUrltest "libcore/protocol/urltest"
 
 	_ "github.com/sagernet/sing-box/experimental/clashapi"
 	_ "github.com/sagernet/sing-box/transport/v2rayquic"
@@ -75,6 +76,11 @@ func nekoboxAndroidOutboundRegistry() *outbound.Registry {
 
 	group.RegisterSelector(registry)
 	group.RegisterURLTest(registry)
+	// Override the stock urltest outbound: a single failed dial must not erase a good node's
+	// measured latency, tolerance=0 has to survive to the group, InterfaceUpdated must not
+	// force a full re-test on every network event, and a selection change must not interrupt
+	// connections the user never asked to interrupt.
+	customUrltest.RegisterURLTest(registry)
 
 	socks.RegisterOutbound(registry)
 	http.RegisterOutbound(registry)
