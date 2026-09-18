@@ -23,6 +23,22 @@ private val supportedKcpHeaderType = arrayOf(
     "dns",
 )
 
+private val supportedXhttpMode = arrayOf(
+    "auto",
+    "packet-up",
+    "stream-up",
+    "stream-one",
+)
+
+/**
+ * XHTTP mode whitelist. Anything the core does not understand is downgraded to "auto" so a
+ * typo in a subscription cannot produce a config the core rejects at start-up.
+ */
+fun normalizeXhttpMode(mode: String?): String {
+    val normalized = mode?.trim()
+    return if (normalized.isNullOrEmpty() || normalized !in supportedXhttpMode) "auto" else normalized
+}
+
 data class VmessQRCode(
     var v: String = "",
     var ps: String = "",
@@ -60,10 +76,14 @@ fun parseV2Ray(link: String): StandardV2RayBean {
         }
     }
 
-    try {
-        return tryResolveVmess4Kitsunebi(link)
-    } catch (_: Exception) {
-        Logs.i("Kitsunebi parser rejected input")
+    // The Kitsunebi flavour is a vmess:// variant only; running it over a vless:// or
+    // plain-base64 link just wastes a decode attempt and can mis-parse it.
+    if (link.startsWith("vmess://")) {
+        try {
+            return tryResolveVmess4Kitsunebi(link)
+        } catch (_: Exception) {
+            Logs.i("Kitsunebi parser rejected input")
+        }
     }
 
     // "std" format
@@ -145,7 +165,7 @@ fun parseV2Ray(link: String): StandardV2RayBean {
                     bean.path = it
                 }
                 url.queryParameter("mode")?.let {
-                    bean.xhttpMode = it
+                    bean.xhttpMode = normalizeXhttpMode(it)
                 }
                 url.queryParameter("extra")?.let {
                     bean.xhttpExtra = XhttpExtraConverter.xrayToSingBox(it)
@@ -301,7 +321,7 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
                 path = it
             }
             url.queryParameter("mode")?.let {
-                xhttpMode = it
+                xhttpMode = normalizeXhttpMode(it)
             }
             url.queryParameter("extra")?.let {
                 xhttpExtra = XhttpExtraConverter.xrayToSingBox(it)
@@ -734,7 +754,7 @@ fun buildSingBoxOutboundStreamSettings(bean: StandardV2RayBean): V2RayTransportO
         "xhttp" -> {
             val baseConfig = V2RayTransportOptions_XHTTPOptions().apply {
                 type = "xhttp"
-                mode = bean.xhttpMode.takeIf { it.isNotBlank() } ?: "auto"
+                mode = normalizeXhttpMode(bean.xhttpMode)
                 host = bean.host.takeIf { it.isNotBlank() }
                 path = bean.path.takeIf { it.isNotBlank() } ?: "/"
             }

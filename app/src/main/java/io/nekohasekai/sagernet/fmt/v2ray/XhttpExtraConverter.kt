@@ -41,6 +41,142 @@ object XhttpExtraConverter {
         "hKeepAlivePeriod" to "h_keep_alive_period",
     )
 
+    // mihomo / Clash Meta "xhttp-opts" (kebab-case) -> sing-box V2RayXHTTPBaseOptions
+    private val CLASH_FIELD_MAPPINGS = arrayOf(
+        "headers" to "headers",
+        "x-padding-bytes" to "x_padding_bytes",
+        "no-grpc-header" to "no_grpc_header",
+        "no-sse-header" to "no_sse_header",
+        "sc-max-each-post-bytes" to "sc_max_each_post_bytes",
+        "sc-min-posts-interval-ms" to "sc_min_posts_interval_ms",
+        "sc-max-buffered-posts" to "sc_max_buffered_posts",
+        "sc-stream-up-server-secs" to "sc_stream_up_server_secs",
+        "server-max-header-bytes" to "server_max_header_bytes",
+        "x-padding-obfs-mode" to "x_padding_obfs_mode",
+        "x-padding-key" to "x_padding_key",
+        "x-padding-header" to "x_padding_header",
+        "x-padding-placement" to "x_padding_placement",
+        "x-padding-method" to "x_padding_method",
+        "uplink-http-method" to "uplink_http_method",
+        "session-placement" to "session_placement",
+        "session-key" to "session_key",
+        "session-id-table" to "session_id_table",
+        "session-id-length" to "session_id_length",
+        "seq-placement" to "seq_placement",
+        "seq-key" to "seq_key",
+        "uplink-data-placement" to "uplink_data_placement",
+        "uplink-data-key" to "uplink_data_key",
+        "uplink-chunk-size" to "uplink_chunk_size",
+    )
+
+    private val CLASH_XMUX_MAPPINGS = arrayOf(
+        "max-concurrency" to "max_concurrency",
+        "max-connections" to "max_connections",
+        "c-max-reuse-times" to "c_max_reuse_times",
+        "h-max-request-times" to "h_max_request_times",
+        "h-max-reusable-secs" to "h_max_reusable_secs",
+        "h-keep-alive-period" to "h_keep_alive_period",
+    )
+
+    /**
+     * mihomo "xhttp-opts" mapping block -> sing-box XHTTP transport options JSON.
+     *
+     * Values are kept in their YAML type (number stays number, boolean stays boolean): the
+     * core reads most of these as "number or range string", while e.g.
+     * sc_max_buffered_posts is a plain int64 and would be rejected as a string.
+     * Returns "" when nothing mapped, so the caller can leave the field untouched.
+     */
+    fun clashToSingBox(xhttpOpts: Map<String, Any?>): String {
+        if (xhttpOpts.isEmpty()) return ""
+        return try {
+            val singBox = JSONObject()
+
+            convertClashFields(xhttpOpts, singBox, CLASH_FIELD_MAPPINGS)
+            convertClashXmux(xhttpOpts["reuse-settings"], singBox)
+
+            (xhttpOpts["download-settings"] as? Map<*, *>)?.let { downloadSettings ->
+                val download = JSONObject()
+
+                copyClashValue(downloadSettings, download, "mode", "mode") { normalizeXhttpMode(it) }
+                copyClashValue(downloadSettings, download, "host", "host")
+                copyClashValue(downloadSettings, download, "path", "path")
+                convertClashFields(downloadSettings, download, CLASH_FIELD_MAPPINGS)
+                convertClashXmux(downloadSettings["reuse-settings"], download)
+                copyClashValue(downloadSettings, download, "server", "server")
+                copyClashValue(downloadSettings, download, "port", "server_port")
+
+                val realityOptions = downloadSettings["reality-opts"] as? Map<*, *>
+                val tlsEnabled = downloadSettings["tls"]?.toString()?.toBooleanStrictOrNull() == true ||
+                    realityOptions != null
+                if (tlsEnabled) {
+                    val tls = JSONObject()
+                    tls.put("enabled", true)
+                    copyClashValue(downloadSettings, tls, "servername", "server_name")
+                    copyClashValue(downloadSettings, tls, "alpn", "alpn")
+                    copyClashValue(downloadSettings, tls, "skip-cert-verify", "insecure")
+                    val fingerprint = downloadSettings["client-fingerprint"]?.toString()
+                        ?.takeIf { it.isNotBlank() }
+                    if (fingerprint != null) {
+                        val utls = JSONObject()
+                        utls.put("enabled", true)
+                        utls.put("fingerprint", fingerprint)
+                        tls.put("utls", utls)
+                    }
+                    if (realityOptions != null) {
+                        val realityJson = JSONObject()
+                        realityJson.put("enabled", true)
+                        copyClashValue(realityOptions, realityJson, "public-key", "public_key")
+                        copyClashValue(realityOptions, realityJson, "short-id", "short_id")
+                        tls.put("reality", realityJson)
+                    }
+                    download.put("tls", tls)
+                }
+
+                if (download.length() > 0) singBox.put("download", download)
+            }
+
+            if (singBox.length() > 0) singBox.toString(2).replace("\\/", "/") else ""
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ""
+        }
+    }
+
+    private fun convertClashFields(
+        from: Map<*, *>,
+        to: JSONObject,
+        mappings: Array<Pair<String, String>>,
+    ) {
+        for ((fromKey, toKey) in mappings) {
+            copyClashValue(from, to, fromKey, toKey)
+        }
+    }
+
+    private fun convertClashXmux(value: Any?, to: JSONObject) {
+        val clashXmux = value as? Map<*, *> ?: return
+        val singBoxXmux = JSONObject()
+        convertClashFields(clashXmux, singBoxXmux, CLASH_XMUX_MAPPINGS)
+        if (singBoxXmux.length() > 0) to.put("xmux", singBoxXmux)
+    }
+
+    private fun copyClashValue(
+        from: Map<*, *>,
+        to: JSONObject,
+        fromKey: String,
+        toKey: String,
+        transform: ((String) -> String)? = null,
+    ) {
+        val value = from[fromKey] ?: return
+        val wrapped = (
+            if (transform == null) {
+                JSONObject.wrap(value)
+            } else {
+                transform(value.toString())
+            }
+            ) ?: return
+        to.put(toKey, wrapped)
+    }
+
     fun xrayToSingBox(xrayExtra: String): String {
         if (xrayExtra.isBlank()) return ""
         return try {
