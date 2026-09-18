@@ -9,7 +9,7 @@
                 android:title="@string/standard" />
             <item
                 android:id="@+id/action_universal_qr"
-                android:title="SN Link" />
+                android:title="@string/format_snlink_upper" />
         </menu>
     </item>
     <item
@@ -21,7 +21,7 @@
                 android:title="@string/standard" />
             <item
                 android:id="@+id/action_universal_clipboard"
-                android:title="SN Link" />
+                android:title="@string/format_snlink_lower" />
         </menu>
     </item>
     <item

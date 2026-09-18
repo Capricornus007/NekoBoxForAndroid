@@ -345,7 +345,14 @@ class ConfigurationGroupFragment : Fragment() {
         }
     }
 
+    // Popup menus are window attachments: if the view goes away while one is open (rotation,
+    // tab switch, back), the window leaks. Track the live popup and dismiss it on teardown
+    // (OwnBox a15b23e7a anti-leak hardening).
+    private var activePopupMenu: PopupMenu? = null
+
     override fun onDestroyView() {
+        activePopupMenu?.dismiss()
+        activePopupMenu = null
         undoManager?.flush()
         undoManager = null
         adapter?.let {
@@ -359,6 +366,8 @@ class ConfigurationGroupFragment : Fragment() {
     }
 
     override fun onDestroy() {
+        activePopupMenu?.dismiss()
+        activePopupMenu = null
         adapter?.let {
             ProfileManager.removeListener(it)
             GroupManager.removeListener(it)
@@ -1032,7 +1041,12 @@ class ConfigurationGroupFragment : Fragment() {
 
         private fun showShareMenu(anchor: View, profileId: Long) {
             val profile = adapter?.profileById(profileId) ?: return
+            activePopupMenu?.dismiss()
             val popup = PopupMenu(requireContext(), anchor)
+            activePopupMenu = popup
+            popup.setOnDismissListener {
+                if (activePopupMenu === popup) activePopupMenu = null
+            }
             popup.menuInflater.inflate(R.menu.profile_share_menu, popup.menu)
 
             when {
@@ -1123,7 +1137,12 @@ class ConfigurationGroupFragment : Fragment() {
 
         private fun showDoubleColumnMenu(anchor: View, profileId: Long) {
             val host = parentFragment as? ConfigurationFragment ?: return
+            activePopupMenu?.dismiss()
             val popup = PopupMenu(requireContext(), anchor)
+            activePopupMenu = popup
+            popup.setOnDismissListener {
+                if (activePopupMenu === popup) activePopupMenu = null
+            }
             popup.menuInflater.inflate(R.menu.double_column_item_menu, popup.menu)
             if (select) popup.menu.removeItem(R.id.action_delete)
             val running = host.isRunningProfile(profileId)
@@ -1330,8 +1349,17 @@ class ConfigurationGroupFragment : Fragment() {
             }
         }
 
-        private fun showCode(link: String, name: String) {
-            QRCodeDialog(link, name).showAllowingStateLoss(parentFragmentManager)
+        private fun showMultiFormatCode(profile: ProxyEntity, name: String, initialIsSn: Boolean) {
+            val stdLink = if (profile.haveStandardLink()) profile.toStdLink() else null
+            val universalLink = if (profile.haveLink()) profile.requireBean().toUniversalLink() else null
+            QRCodeDialog(
+                stdLink = stdLink,
+                universalLink = universalLink,
+                displayName = name,
+                displayType = profile.displayType(),
+                typeInt = profile.type,
+                initialIsSn = initialIsSn,
+            ).showAllowingStateLoss(parentFragmentManager)
         }
 
         private fun export(link: String) {
@@ -1346,9 +1374,9 @@ class ConfigurationGroupFragment : Fragment() {
             try {
                 val name = profile.displayName().orEmpty()
                 when (item.itemId) {
-                    R.id.action_standard_qr -> showCode(profile.toStdLink(), name)
+                    R.id.action_standard_qr -> showMultiFormatCode(profile, name, initialIsSn = false)
                     R.id.action_standard_clipboard -> export(profile.toStdLink())
-                    R.id.action_universal_qr -> showCode(profile.requireBean().toUniversalLink(), name)
+                    R.id.action_universal_qr -> showMultiFormatCode(profile, name, initialIsSn = true)
                     R.id.action_universal_clipboard -> export(
                         profile.requireBean().toUniversalLink(),
                     )

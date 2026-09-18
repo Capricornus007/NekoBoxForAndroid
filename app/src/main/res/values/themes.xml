@@ -117,6 +117,25 @@
          instead, the M3 replacement for the old ThemeOverlay.AppCompat.DayNight. -->
     <style name="ThemeOverlay.SagerNet.Toolbar.Popup" parent="ThemeOverlay.Material3" />
 
+    <!-- TabLayout styles from OwnBox a15b23e7a: a globally declared tabTextAppearance keeps
+         Material TabLayouts from crashing with IllegalArgumentException when a layout forgets to
+         set one, and pins the lower-case tab labels used across the app. -->
+    <style name="Widget.SagerNet.TabLayout" parent="Widget.MaterialComponents.TabLayout">
+        <item name="tabTextAppearance">@style/Widget.SagerNet.TabLayout.TextAppearance</item>
+        <item name="tabTextColor">?android:attr/textColorSecondary</item>
+        <item name="tabSelectedTextColor">?colorPrimary</item>
+        <item name="tabIndicatorColor">?colorPrimary</item>
+        <item name="tabRippleColor">?colorPrimary</item>
+        <item name="tabIndicatorHeight">3dp</item>
+        <item name="tabIndicatorFullWidth">false</item>
+    </style>
+
+    <style name="Widget.SagerNet.TabLayout.TextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="PopupMenuAnimation">
         <item name="android:windowEnterAnimation">@anim/popup_enter</item>
         <item name="android:windowExitAnimation">@anim/popup_exit</item>

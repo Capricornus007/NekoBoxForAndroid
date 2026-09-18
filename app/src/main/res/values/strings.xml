@@ -303,6 +303,14 @@
     <string name="action_import_file">Import from file</string>
     <string name="action_export_msg">Successfully export!</string>
     <string name="action_export_err">Failed to export.</string>
+    <string name="close">Close</string>
+    <string name="copy_current_link">Copy Link</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="qrcode_format_standard">Standard</string>
+    <string name="qrcode_format_sn">SN Link</string>
+    <string name="qrcode_standard_hint">Standard URI format (compatible with general clients)</string>
+    <string name="qrcode_sn_hint">Sing-box &amp; Neko dedicated serialized link (sn://)</string>
     <string name="action_import_msg">Imported successfully!</string>
     <string name="action_import_err">Failed to import.</string>
     <string name="file_manager_missing">Your device lacks an Android standard file selector, please
