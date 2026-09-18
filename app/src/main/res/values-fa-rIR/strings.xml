@@ -961,4 +961,6 @@
     <string name="select_ua_preset">انتخاب User-Agent پیش‌فرض</string>
     <string name="custom_ua_hint">User-Agent سفارشی</string>
     <string name="update_existing_subscriptions_ua">به‌روزرسانی User-Agent اشتراک‌های موجود</string>
+    <string name="batch_update_summary" formatted="false">به‌روزرسانی دسته‌ای انجام شد: %1$d موفق، %2$d ناموفق</string>
+    <string name="probe_tolerance">تلورانس تغییر بالانسر (میلی‌ثانیه)</string>
 </resources>

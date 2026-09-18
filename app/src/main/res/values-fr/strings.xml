@@ -961,4 +961,6 @@
     <string name="dialog_watchdog_start">Démarrer</string>
     <string name="snackbar_watchdog_test_started">Test lancé. Redémarrage dans ≤30 s…</string>
     <string name="dialog_log_buffer_size">Taille du tampon de journal (Ko)</string>
+    <string name="batch_update_summary" formatted="false">Mise à jour par lot terminée : %1$d réussies, %2$d échouées</string>
+    <string name="probe_tolerance">Tolérance de bascule du répartiteur (ms)</string>
 </resources>

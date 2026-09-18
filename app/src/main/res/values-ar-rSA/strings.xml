@@ -970,4 +970,6 @@
     <string name="select_ua_preset">اختر User-Agent جاهزًا</string>
     <string name="custom_ua_hint">User-Agent مخصص</string>
     <string name="update_existing_subscriptions_ua">تحديث User-Agent للاشتراكات الحالية</string>
+    <string name="batch_update_summary" formatted="false">اكتمل التحديث الجماعي: %1$d نجح، %2$d فشل</string>
+    <string name="probe_tolerance">سماح تبديل موازن الأحمال (مللي ثانية)</string>
 </resources>

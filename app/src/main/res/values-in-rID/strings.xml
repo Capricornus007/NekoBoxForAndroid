@@ -976,4 +976,6 @@ Lanjutkan?</string>
     <string name="select_ua_preset">Pilih User-Agent bawaan</string>
     <string name="custom_ua_hint">User-Agent kustom</string>
     <string name="update_existing_subscriptions_ua">Perbarui User-Agent langganan yang ada</string>
+    <string name="batch_update_summary" formatted="false">Pembaruan batch selesai: %1$d berhasil, %2$d gagal</string>
+    <string name="probe_tolerance">Toleransi alih penyeimbang (ms)</string>
 </resources>

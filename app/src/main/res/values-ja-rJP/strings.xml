@@ -956,4 +956,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="select_ua_preset">プリセット User-Agent を選択</string>
     <string name="custom_ua_hint">カスタム User-Agent</string>
     <string name="update_existing_subscriptions_ua">既存の購読の User-Agent を更新</string>
+    <string name="batch_update_summary" formatted="false">バッチ更新完了：%1$d 件成功、%2$d 件失敗</string>
+    <string name="probe_tolerance">バランサースイッチ許容差（ミリ秒）</string>
 </resources>

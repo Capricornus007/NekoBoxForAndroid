@@ -872,4 +872,6 @@
     <string name="dialog_watchdog_start">Starten</string>
     <string name="snackbar_watchdog_test_started">Test gestartet. Neustart innerhalb ≤30 s…</string>
     <string name="dialog_log_buffer_size">Log-Puffergröße (KB)</string>
+    <string name="batch_update_summary" formatted="false">Stapelaktualisierung abgeschlossen: %1$d erfolgreich, %2$d fehlgeschlagen</string>
+    <string name="probe_tolerance">Balancer-Wechseltoleranz (ms)</string>
 </resources>

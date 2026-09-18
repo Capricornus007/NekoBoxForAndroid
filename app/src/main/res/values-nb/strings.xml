@@ -961,4 +961,6 @@ Fortsette?</string>
     <string name="spoof_device_os_version">Forfalsket OS-versjon</string>
     <string name="spoof_device_model">Forfalsket enhetsmodell</string>
     <string name="stun_binding_test">Hurtigbinding (kun ekstern adresse)</string>
+    <string name="batch_update_summary" formatted="false">Batchoppdatering fullført: %1$d vellykket, %2$d mislykket</string>
+    <string name="probe_tolerance">Toleranse for balanserbytte (ms)</string>
 </resources>

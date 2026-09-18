@@ -973,4 +973,6 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
     <string name="select_ua_preset">Elegir User-Agent predefinido</string>
     <string name="custom_ua_hint">User-Agent personalizado</string>
     <string name="update_existing_subscriptions_ua">Actualizar el User-Agent de las suscripciones existentes</string>
+    <string name="batch_update_summary" formatted="false">Actualización por lotes finalizada: %1$d correctas, %2$d fallidas</string>
+    <string name="probe_tolerance">Tolerancia de cambio del balanceador (ms)</string>
 </resources>

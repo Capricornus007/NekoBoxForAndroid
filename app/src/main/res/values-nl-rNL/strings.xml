@@ -976,4 +976,6 @@ Doorgaan?</string>
     <string name="select_ua_preset">Standaard User-Agent kiezen</string>
     <string name="custom_ua_hint">Aangepaste User-Agent</string>
     <string name="update_existing_subscriptions_ua">User-Agent van bestaande abonnementen bijwerken</string>
+    <string name="batch_update_summary" formatted="false">Batchupdate voltooid: %1$d geslaagd, %2$d mislukt</string>
+    <string name="probe_tolerance">Balancer-schakeltolerantie (ms)</string>
 </resources>

@@ -742,4 +742,6 @@
     <string name="dialog_watchdog_start">開始</string>
     <string name="snackbar_watchdog_test_started">テスト開始。30 秒以内に再起動…</string>
     <string name="dialog_log_buffer_size">ログバッファサイズ (KB)</string>
+    <string name="batch_update_summary" formatted="false">バッチ更新完了：%1$d 件成功、%2$d 件失敗</string>
+    <string name="probe_tolerance">バランサースイッチ許容差（ミリ秒）</string>
 </resources>

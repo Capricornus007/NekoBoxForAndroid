@@ -933,4 +933,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="dialog_watchdog_start">Mulai</string>
     <string name="snackbar_watchdog_test_started">Uji dimulai. Memulai ulang dalam ≤30 dtk…</string>
     <string name="dialog_log_buffer_size">Ukuran buffer log (KB)</string>
+    <string name="batch_update_summary" formatted="false">Pembaruan batch selesai: %1$d berhasil, %2$d gagal</string>
+    <string name="probe_tolerance">Toleransi alih penyeimbang (ms)</string>
 </resources>

@@ -970,4 +970,6 @@
     <string name="select_ua_preset">选择预设 User-Agent</string>
     <string name="custom_ua_hint">自定义 User-Agent</string>
     <string name="update_existing_subscriptions_ua">更新已有订阅的 User-Agent</string>
+    <string name="batch_update_summary" formatted="false">批量更新完成：%1$d 个成功，%2$d 个失败</string>
+    <string name="probe_tolerance">负载均衡切换容差（毫秒）</string>
 </resources>

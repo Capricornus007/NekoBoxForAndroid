@@ -954,4 +954,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="dialog_watchdog_start">Avvia</string>
     <string name="snackbar_watchdog_test_started">Test avviato. Riavvio entro ≤30 s…</string>
     <string name="dialog_log_buffer_size">Dimensione buffer log (KB)</string>
+    <string name="batch_update_summary" formatted="false">Aggiornamento batch completato: %1$d riuscite, %2$d fallite</string>
+    <string name="probe_tolerance">Tolleranza di cambio del bilanciatore (ms)</string>
 </resources>

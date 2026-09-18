@@ -1016,4 +1016,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="select_ua_preset">Выбрать предустановленный User-Agent</string>
     <string name="custom_ua_hint">Свой User-Agent</string>
     <string name="update_existing_subscriptions_ua">Обновить User-Agent существующих подписок</string>
+    <string name="batch_update_summary" formatted="false">Пакетное обновление завершено: успешно %1$d, с ошибками %2$d</string>
+    <string name="probe_tolerance">Допуск переключения балансировщика (мс)</string>
 </resources>

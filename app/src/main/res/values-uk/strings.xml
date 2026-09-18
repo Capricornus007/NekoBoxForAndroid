@@ -914,4 +914,6 @@
     <string name="dialog_watchdog_start">Почати</string>
     <string name="snackbar_watchdog_test_started">Тест почато. Перезапуск протягом ≤30 с…</string>
     <string name="dialog_log_buffer_size">Розмір буфера журналу (КБ)</string>
+    <string name="batch_update_summary" formatted="false">Пакетне оновлення завершено: успішно %1$d, з помилками %2$d</string>
+    <string name="probe_tolerance">Допустимість перемикання балансувальника (мс)</string>
 </resources>

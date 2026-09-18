@@ -859,4 +859,6 @@
     <string name="olcrtc_key_hex">Ключ (HEX)</string>
     <string name="olcrtc_vp8_batch">Пакет VP8</string>
     <string name="olcrtc_vp8_fps">VP8 FPS</string>
+    <string name="batch_update_summary" formatted="false">Пакетнае абнаўленне заверана: паспяхова %1$d, з памылкамі %2$d</string>
+    <string name="probe_tolerance">Допуск пераключэння балансiроўшчыка (мс)</string>
 </resources>

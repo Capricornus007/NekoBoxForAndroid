@@ -963,4 +963,6 @@ Fortfahren?</string>
     <string name="select_ua_preset">User-Agent-Voreinstellung wählen</string>
     <string name="custom_ua_hint">Benutzerdefinierter User-Agent</string>
     <string name="update_existing_subscriptions_ua">User-Agent bestehender Abos aktualisieren</string>
+    <string name="batch_update_summary" formatted="false">Stapelaktualisierung abgeschlossen: %1$d erfolgreich, %2$d fehlgeschlagen</string>
+    <string name="probe_tolerance">Balancer-Wechseltoleranz (ms)</string>
 </resources>

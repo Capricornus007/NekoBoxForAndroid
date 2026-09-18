@@ -920,4 +920,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="dialog_watchdog_start">Start</string>
     <string name="snackbar_watchdog_test_started">Test gestart. Herstart binnen ≤30 s…</string>
     <string name="dialog_log_buffer_size">Logbuffergrootte (KB)</string>
+    <string name="batch_update_summary" formatted="false">Batchupdate voltooid: %1$d geslaagd, %2$d mislukt</string>
+    <string name="probe_tolerance">Balancer-schakeltolerantie (ms)</string>
 </resources>

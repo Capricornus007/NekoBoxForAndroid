@@ -910,4 +910,6 @@
     <string name="trusttunnel_congestion_control">QUIC tıkanıklık kontrolü</string>
     <string name="wireguard_listen_port">Dinleme portu</string>
     <string name="wireguard_persistent_keepalive">Kalıcı keepalive aralığı (saniye)</string>
+    <string name="batch_update_summary" formatted="false">Toplu güncelleme bitti: %1$d başarılı, %2$d başarısız</string>
+    <string name="probe_tolerance">Dengelerleyici geçiş toleransı (ms)</string>
 </resources>

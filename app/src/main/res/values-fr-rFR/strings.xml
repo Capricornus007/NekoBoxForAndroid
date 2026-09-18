@@ -979,4 +979,6 @@ Continuer ?</string>
     <string name="select_ua_preset">Choisir un User-Agent prédéfini</string>
     <string name="custom_ua_hint">User-Agent personnalisé</string>
     <string name="update_existing_subscriptions_ua">Mettre à jour le User-Agent des abonnements existants</string>
+    <string name="batch_update_summary" formatted="false">Mise à jour par lot terminée : %1$d réussies, %2$d échouées</string>
+    <string name="probe_tolerance">Tolérance de bascule du répartiteur (ms)</string>
 </resources>

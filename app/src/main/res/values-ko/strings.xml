@@ -738,4 +738,6 @@
     <string name="dialog_watchdog_start">시작</string>
     <string name="snackbar_watchdog_test_started">테스트 시작. 30초 이내 재시작…</string>
     <string name="dialog_log_buffer_size">로그 버퍼 크기 (KB)</string>
+    <string name="batch_update_summary" formatted="false">일괄 업데이트 완료: %1$d개 성공, %2$d개 실패</string>
+    <string name="probe_tolerance">부하 분산 전환 허용 오차(ms)</string>
 </resources>

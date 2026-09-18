@@ -922,4 +922,6 @@ Continuar?</string>
     <string name="select_ua_preset">Escolher User-Agent predefinido</string>
     <string name="custom_ua_hint">User-Agent personalizado</string>
     <string name="update_existing_subscriptions_ua">Atualizar o User-Agent das assinaturas existentes</string>
+    <string name="batch_update_summary" formatted="false">Atualização em lote concluída: %1$d sucesso(s), %2$d falha(s)</string>
+    <string name="probe_tolerance">Tolerância de alternância do balanceador (ms)</string>
 </resources>

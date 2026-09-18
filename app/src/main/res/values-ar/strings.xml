@@ -924,4 +924,6 @@
     <string name="dialog_watchdog_start">ابدأ</string>
     <string name="snackbar_watchdog_test_started">بدأ الاختبار. إعادة التشغيل خلال ≤30 ث…</string>
     <string name="dialog_log_buffer_size">حجم مخزن السجل (KB)</string>
+    <string name="batch_update_summary" formatted="false">اكتمل التحديث الجماعي: %1$d نجح، %2$d فشل</string>
+    <string name="probe_tolerance">سماح تبديل موازن الأحمال (مللي ثانية)</string>
 </resources>

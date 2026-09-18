@@ -887,4 +887,6 @@
     <string name="wireguard_persistent_keepalive">فاصله keepalive پایدار (ثانیه)</string>
     <string name="trusttunnel_health_check">بررسی سلامت</string>
     <string name="trusttunnel_congestion_control">کنترل ازدحام QUIC</string>
+    <string name="batch_update_summary" formatted="false">به‌روزرسانی دسته‌ای انجام شد: %1$d موفق، %2$d ناموفق</string>
+    <string name="probe_tolerance">تلورانس تغییر بالانسر (میلی‌ثانیه)</string>
 </resources>

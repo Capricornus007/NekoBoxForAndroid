@@ -976,4 +976,6 @@ Continuare?</string>
     <string name="select_ua_preset">Scegli User-Agent predefinito</string>
     <string name="custom_ua_hint">User-Agent personalizzato</string>
     <string name="update_existing_subscriptions_ua">Aggiorna lo User-Agent degli abbonamenti esistenti</string>
+    <string name="batch_update_summary" formatted="false">Aggiornamento batch completato: %1$d riuscite, %2$d fallite</string>
+    <string name="probe_tolerance">Tolleranza di cambio del bilanciatore (ms)</string>
 </resources>

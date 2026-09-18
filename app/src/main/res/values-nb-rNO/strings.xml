@@ -898,4 +898,6 @@ Fortsette?</string>
     <string name="select_ua_preset">Velg forhåndssatt User-Agent</string>
     <string name="custom_ua_hint">Egendefinert User-Agent</string>
     <string name="update_existing_subscriptions_ua">Oppdater User-Agent for eksisterende abonnementer</string>
+    <string name="batch_update_summary" formatted="false">Batchoppdatering fullført: %1$d vellykket, %2$d mislykket</string>
+    <string name="probe_tolerance">Toleranse for balanserbytte (ms)</string>
 </resources>

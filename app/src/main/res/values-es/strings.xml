@@ -1118,4 +1118,6 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
     <string name="vpn_watchdog_test">🧪 Probar watchdog</string>
     <string name="vpn_watchdog_test_summary">Reiniciar la VPN a la fuerza para probar el watchdog</string>
     <string name="vpn_watchdog_interval">Intervalo de comprobación (seg)</string>
+    <string name="batch_update_summary" formatted="false">Actualización por lotes finalizada: %1$d correctas, %2$d fallidas</string>
+    <string name="probe_tolerance">Tolerancia de cambio del balanceador (ms)</string>
 </resources>

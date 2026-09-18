@@ -962,4 +962,6 @@ Continuar?</string>
     <string name="spoof_device_os_version">Versão do SO falsificada</string>
     <string name="spoof_device_model">Modelo do dispositivo falsificado</string>
     <string name="stun_binding_test">Ligação rápida (apenas endereço externo)</string>
+    <string name="batch_update_summary" formatted="false">Atualização em lote concluída: %1$d êxitos, %2$d falhas</string>
+    <string name="probe_tolerance">Tolerância de alternância do balanceador (ms)</string>
 </resources>

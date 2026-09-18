@@ -966,4 +966,6 @@
     <string name="select_ua_preset">Вибрати типовий User-Agent</string>
     <string name="custom_ua_hint">Власний User-Agent</string>
     <string name="update_existing_subscriptions_ua">Оновити User-Agent наявних підписок</string>
+    <string name="batch_update_summary" formatted="false">Пакетне оновлення завершено: успішно %1$d, з помилками %2$d</string>
+    <string name="probe_tolerance">Допустимість перемикання балансувальника (мс)</string>
 </resources>

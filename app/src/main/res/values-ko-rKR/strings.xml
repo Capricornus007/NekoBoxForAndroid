@@ -948,4 +948,6 @@
     <string name="select_ua_preset">프리셋 User-Agent 선택</string>
     <string name="custom_ua_hint">사용자 지정 User-Agent</string>
     <string name="update_existing_subscriptions_ua">기존 구독의 User-Agent 업데이트</string>
+    <string name="batch_update_summary" formatted="false">일괄 업데이트 완료: %1$d개 성공, %2$d개 실패</string>
+    <string name="probe_tolerance">부하 분산 전환 허용 오차(ms)</string>
 </resources>

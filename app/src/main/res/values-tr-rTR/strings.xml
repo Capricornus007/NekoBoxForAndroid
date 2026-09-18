@@ -964,4 +964,6 @@ Devam edilsin mi?</string>
     <string name="select_ua_preset">Hazır User-Agent seç</string>
     <string name="custom_ua_hint">Özel User-Agent</string>
     <string name="update_existing_subscriptions_ua">Mevcut aboneliklerin User-Agent\'ını güncelle</string>
+    <string name="batch_update_summary" formatted="false">Toplu güncelleme bitti: %1$d başarılı, %2$d başarısız</string>
+    <string name="probe_tolerance">Dengelerleyici geçiş toleransı (ms)</string>
 </resources>
