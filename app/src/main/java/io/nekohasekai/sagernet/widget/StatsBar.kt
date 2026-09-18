@@ -3,6 +3,8 @@ package io.nekohasekai.sagernet.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContextWrapper
+import android.os.Handler
+import android.os.Looper
 import android.text.SpannableStringBuilder
 import android.text.format.Formatter
 import android.text.style.ForegroundColorSpan
@@ -52,6 +54,18 @@ class StatsBar @JvmOverloads constructor(
 
     var allowShow = true
     private var hideOnScroll = true
+
+    // Ported from own/7343f15a9: service/binder callbacks can reach this view off the
+    // main thread; touch the view tree only when we are really on it.
+    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+
+    private fun runOnUi(block: () -> Unit) {
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            block()
+        } else {
+            mainHandler.post(block)
+        }
+    }
 
     private fun ensureViews() {
         if (!::statusText.isInitialized) {
@@ -152,8 +166,10 @@ class StatsBar @JvmOverloads constructor(
     }
 
     fun refreshSpeedVisibility() {
-        ensureViews()
-        if (this::speedRow.isInitialized) speedRow.isVisible = DataStore.speedInterval > 0
+        runOnUi {
+            ensureViews()
+            if (this::speedRow.isInitialized) speedRow.isVisible = DataStore.speedInterval > 0
+        }
     }
 
     // Two-tone status: color the lead segment (split at [sep], kept with the lead)
@@ -247,12 +263,14 @@ class StatsBar @JvmOverloads constructor(
 
     @SuppressLint("SetTextI18n")
     fun updateSpeed(txRate: Long, rxRate: Long) {
-        ensureViews()
-        val speedColor = context.getColorAttr(R.attr.speedTextColor)
-        txText.setTextColor(speedColor)
-        rxText.setTextColor(speedColor)
-        txText.text = "▲ ${Formatter.formatFileSize(context, txRate)}/s"
-        rxText.text = "▼ ${Formatter.formatFileSize(context, rxRate)}/s"
+        runOnUi {
+            ensureViews()
+            val speedColor = context.getColorAttr(R.attr.speedTextColor)
+            txText.setTextColor(speedColor)
+            rxText.setTextColor(speedColor)
+            txText.text = "▲ ${Formatter.formatFileSize(context, txRate)}/s"
+            rxText.text = "▼ ${Formatter.formatFileSize(context, rxRate)}/s"
+        }
     }
 
     fun testConnection() {
