@@ -54,6 +54,45 @@ object RawUpdater : GroupUpdater() {
     private const val CIRCUIT_BREAK_MIN_PROFILES = 10
     private const val CIRCUIT_BREAK_MAX_DROP_RATIO = 0.7
 
+    internal fun subscriptionFilterActive(filterMode: Int, filterRegex: String): Boolean {
+        return filterMode != SubscriptionFilterMode.DISABLED && filterRegex.isNotBlank()
+    }
+
+    /**
+     * Apply the subscription name filter. Matching ignores case - people type "hk" for a
+     * subscription that labels its nodes "Hong Kong" - and a pattern the regex engine
+     * rejects is logged and skipped instead of aborting the whole update.
+     */
+    internal fun applySubscriptionFilter(
+        proxies: List<AbstractBean>,
+        filterMode: Int,
+        filterRegex: String,
+    ): List<AbstractBean> {
+        if (!subscriptionFilterActive(filterMode, filterRegex)) return proxies
+        val regex = try {
+            filterRegex.trim().toRegex(RegexOption.IGNORE_CASE)
+        } catch (e: Exception) {
+            Logs.w("Invalid subscription filter regex '$filterRegex': ${e.readableMessage}")
+            return proxies
+        }
+        val filtered = when (filterMode) {
+            SubscriptionFilterMode.INCLUDE -> proxies.filter { regex.containsMatchIn(it.displayName()) }
+            SubscriptionFilterMode.EXCLUDE -> proxies.filterNot { regex.containsMatchIn(it.displayName()) }
+            else -> proxies
+        }
+        Logs.d("After filter (mode=$filterMode): ${filtered.size}")
+        return filtered
+    }
+
+    /**
+     * An include/exclude filter is the user asking for a smaller group, so its result must
+     * never be read as a truncated subscription response.
+     */
+    internal fun deletionCircuitBreak(existsSize: Int, fetchedSize: Int, filterActive: Boolean): Boolean {
+        return !filterActive && existsSize >= CIRCUIT_BREAK_MIN_PROFILES &&
+            fetchedSize < existsSize * CIRCUIT_BREAK_MAX_DROP_RATIO
+    }
+
     internal data class ReconciliationResult(
         val contentChanged: Boolean,
         val orderChanged: Boolean,
@@ -212,15 +251,8 @@ object RawUpdater : GroupUpdater() {
 
         val filterMode = subscription.filterMode ?: SubscriptionFilterMode.DISABLED
         val filterRegex = subscription.filterRegex ?: ""
-        if (filterMode != SubscriptionFilterMode.DISABLED && filterRegex.isNotBlank()) {
-            val regex = filterRegex.toRegex()
-            proxies = when (filterMode) {
-                SubscriptionFilterMode.INCLUDE -> proxies.filter { regex.containsMatchIn(it.displayName()) }
-                SubscriptionFilterMode.EXCLUDE -> proxies.filterNot { regex.containsMatchIn(it.displayName()) }
-                else -> proxies
-            }
-            Logs.d("After filter (mode=$filterMode): ${proxies.size}")
-        }
+        val filterActive = subscriptionFilterActive(filterMode, filterRegex)
+        proxies = applySubscriptionFilter(proxies, filterMode, filterRegex)
 
         val exists = SagerDatabase.proxyDao.getByGroup(proxyGroup.id)
         val duplicate = ArrayList<String>()
@@ -285,8 +317,11 @@ object RawUpdater : GroupUpdater() {
         // response), the "unmatched" rows are not really gone. Deleting them would wipe a
         // working group, so above a minimum size and past the drop ratio we keep every row
         // that the new list does not mention and only add/update what came back.
-        val circuitBreak = exists.size >= CIRCUIT_BREAK_MIN_PROFILES &&
-            nameMap.size < exists.size * CIRCUIT_BREAK_MAX_DROP_RATIO
+        val circuitBreak = deletionCircuitBreak(
+            existsSize = exists.size,
+            fetchedSize = nameMap.size,
+            filterActive = filterActive,
+        )
         if (circuitBreak) {
             Logs.w(
                 "Subscription diff circuit breaker tripped: exists=${exists.size}, " +
