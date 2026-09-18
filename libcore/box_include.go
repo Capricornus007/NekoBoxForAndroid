@@ -40,6 +40,7 @@ import (
 	"github.com/sagernet/sing-box/protocol/vmess"
 	"github.com/sagernet/sing-box/protocol/wireguard"
 
+	"libcore/protocol/byedpi"
 	"libcore/protocol/juicity"
 	"libcore/protocol/loadbalance"
 	"libcore/protocol/shadowquic"
@@ -106,6 +107,11 @@ func nekoboxAndroidOutboundRegistry() *outbound.Registry {
 	juicity.RegisterOutbound(registry)
 	shadowquic.RegisterOutbound(registry)
 	trusttunnel.RegisterOutbound(registry)
+
+	// byedpi：深度包检测规避层（libcore/byedpi 的 patched C 源，经 socketpair
+	// 私有桥接，不监听任何 IP 端口）。仅 android 构建可用；其他平台由
+	// bridge_stub.go 在 Start() 时返回明确错误。必须是链路最后一跳，见 options.go。
+	byedpi.RegisterOutbound(registry)
 
 	// sing-box 1.14.x: WireGuard は endpoint 化された（RegisterOutbound 廃止）。
 	// outbound 登録は不要、nekoboxAndroidEndpointRegistry で endpoint 登録する。

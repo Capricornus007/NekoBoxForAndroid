@@ -48,6 +48,13 @@ func (w *boxPlatformInterfaceWrapper) UsePlatformAutoDetectInterfaceControl() bo
 }
 
 func (w *boxPlatformInterfaceWrapper) AutoDetectInterfaceControl(fd int) error {
+	return protectSocketFD(fd)
+}
+
+// protectSocketFD 是“protect 一个已建立的 socket”的实现本体，单独抽出来是因为
+// byeDPI 的出口 socket 是在 C 线程里自己 socket()/connect() 出来的，绕过了
+// sing-box 的 dialer，只能由 libcore/protocol/byedpi 直接回调这个函数。
+func protectSocketFD(fd int) error {
 	// call protect_path
 	if !isBgProcess {
 		err := sendFdToProtect(fd, "protect_path")

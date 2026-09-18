@@ -162,6 +162,10 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 		cancel()
 		return nil, fmt.Errorf("decode config: %v", err)
 	}
+	if err = validateByeDPIOptions(options); err != nil {
+		cancel()
+		return nil, fmt.Errorf("validate config: %v", err)
+	}
 
 	// 官方内核不支持 fork 私有的 "geoip:xxx"/"geosite:xxx" 伪路径 local rule-set，
 	// 这里预处理：从 geoip.db/geosite.db 生成 .srs 缓存并改写为真实路径。
