@@ -92,6 +92,28 @@ fun JSONObject.getBool(name: String): Boolean? {
     }
 }
 
+/**
+ * Read a tri-state boolean out of a link query parameter.
+ *
+ * A missing (or blank / "auto") parameter returns null so the caller can leave the option
+ * unwritten and keep the core's own default, which is not always false: sing-box runs
+ * Hysteria2 and TUIC with udp_fragment enabled by default.
+ */
+fun String?.toTriStateBoolean(): Boolean? = when (this?.trim()?.lowercase()) {
+    null, "", "auto", "default" -> null
+    "1", "true", "on", "yes" -> true
+    "0", "false", "off", "no" -> false
+    else -> null
+}
+
+/** Same as [toTriStateBoolean] but for a JSON member, which may be a bool, a string or 0 / 1. */
+fun JSONObject.getTriStateBool(name: String): Boolean? = when (val value = opt(name)) {
+    is Boolean -> value
+    is Number -> value.toInt() != 0
+    is String -> value.toTriStateBoolean()
+    else -> null
+}
+
 // name collision, nya
 fun JSONObject.getIntNya(name: String): Int? {
     return try {

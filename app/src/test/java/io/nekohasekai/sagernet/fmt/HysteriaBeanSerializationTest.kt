@@ -4,6 +4,7 @@ import com.esotericsoftware.kryo.io.ByteBufferOutput
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 
@@ -59,11 +60,43 @@ class HysteriaBeanSerializationTest {
         assertEquals("Legacy Hysteria 2", decoded.name)
     }
 
-    /** Writes the exact field order used by HysteriaBean schema version 8. */
-    private fun legacyVersion8Profile(): ByteArray {
+    @Test
+    fun udpFragment_roundTripsEveryState() {
+        listOf<Boolean?>(null, true, false).forEach { state ->
+            val bean = HysteriaBean().apply {
+                protocolVersion = 2
+                serverAddress = "example.com"
+                serverPort = 443
+                serverPorts = "443"
+                authPayload = "password"
+                udpFragment = state
+                initializeDefaultValues()
+            }
+
+            val encoded = KryoConverters.serialize(bean)
+            val decoded = KryoConverters.hysteriaDeserialize(encoded)!!
+
+            assertEquals(state, decoded.udpFragment)
+            assertArrayEquals(encoded, KryoConverters.serialize(decoded))
+        }
+    }
+
+    @Test
+    fun version9Profile_leavesUdpFragmentUnset() {
+        // Profiles stored before the udp_fragment field existed must keep the "not written"
+        // state so the core default (fragmentation on) still applies to them.
+        val decoded = KryoConverters.hysteriaDeserialize(legacyProfile(9))!!
+
+        assertNull(decoded.udpFragment)
+        assertEquals(false, decoded.enableECH)
+        assertEquals("legacy-password", decoded.authPayload)
+    }
+
+    /** Writes the exact field order used by HysteriaBean schema versions 8 and 9. */
+    private fun legacyProfile(version: Int): ByteArray {
         val bytes = ByteArrayOutputStream()
         ByteBufferOutput(bytes).use { output ->
-            output.writeInt(8)
+            output.writeInt(version)
 
             // AbstractBean fields.
             output.writeString("legacy.example.com")
@@ -89,6 +122,11 @@ class HysteriaBeanSerializationTest {
             output.writeInt(512)
             output.writeInt(1200)
 
+            if (version >= 9) {
+                output.writeBoolean(false)
+                output.writeString("")
+            }
+
             // AbstractBean trailing fields written by serializeToBuffer().
             output.writeInt(1)
             output.writeString("Legacy Hysteria 2")
@@ -98,4 +136,6 @@ class HysteriaBeanSerializationTest {
         }
         return bytes.toByteArray()
     }
+
+    private fun legacyVersion8Profile(): ByteArray = legacyProfile(8)
 }

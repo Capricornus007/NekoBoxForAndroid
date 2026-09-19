@@ -33,6 +33,9 @@ public class TuicBean extends AbstractBean {
     public Integer protocolVersion;
     public String uuid;
 
+    // sing-box DialerOptions.udp_fragment, null = leave it to the core (default: on).
+    public Boolean udpFragment;
+
     @Override
     public void initializeDefaultValues() {
         super.initializeDefaultValues();
@@ -54,7 +57,7 @@ public class TuicBean extends AbstractBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(2);
+        output.writeInt(3);
         super.serialize(output);
         output.writeString(token);
         output.writeString(caText);
@@ -70,6 +73,8 @@ public class TuicBean extends AbstractBean {
         output.writeString(customJSON);
         output.writeInt(protocolVersion);
         output.writeString(uuid);
+        // 0 = unset (core default), 1 = forced on, 2 = forced off.
+        output.writeInt(triStateToInt(udpFragment));
     }
 
     @Override
@@ -95,6 +100,11 @@ public class TuicBean extends AbstractBean {
             uuid = input.readString();
         } else {
             protocolVersion = 4;
+        }
+        if (version >= 3) {
+            udpFragment = readTriState(input.readInt());
+        } else {
+            udpFragment = null;
         }
     }
 

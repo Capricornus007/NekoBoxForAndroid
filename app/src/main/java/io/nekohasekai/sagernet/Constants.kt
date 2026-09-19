@@ -182,6 +182,11 @@ object Key {
     const val SERVER_HY2_ECH_ENABLED = "serverHy2EchEnabled"
     const val SERVER_HY2_ECH_CONFIG = "serverHy2EchConfig"
 
+    // Tri-state UDP fragmentation switch, shared by Hysteria2 and TUIC.
+    // "" = leave it to the sing-box core (both outbounds default to enabled),
+    // "true" / "false" = explicit value.
+    const val SERVER_UDP_FRAGMENT = "serverUdpFragment"
+
     // MasterDnsVPN
     const val MDV_DOMAINS = "mdvDomains"
     const val MDV_ENCRYPTION_METHOD = "mdvEncryptionMethod"

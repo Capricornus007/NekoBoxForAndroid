@@ -103,6 +103,26 @@ public abstract class AbstractBean extends Serializable {
         serverPort = input.readInt();
     }
 
+    // Some sing-box options are a nullable bool (*bool) whose core default is "on"
+    // (e.g. DialerOptions.udp_fragment on the Hysteria2 / TUIC outbounds). Storing them
+    // as a plain Boolean would lose the "not written at all" state, so the profile stream
+    // uses 0 = unset, 1 = on, 2 = off instead of a single boolean.
+    protected static int triStateToInt(Boolean value) {
+        if (value == null) return 0;
+        return value ? 1 : 2;
+    }
+
+    protected static Boolean readTriState(int mode) {
+        switch (mode) {
+            case 1:
+                return true;
+            case 2:
+                return false;
+            default:
+                return null;
+        }
+    }
+
     @NotNull
     @Override
     public abstract AbstractBean clone();

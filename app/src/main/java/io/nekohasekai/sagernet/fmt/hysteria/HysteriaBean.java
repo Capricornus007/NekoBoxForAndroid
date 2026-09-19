@@ -59,6 +59,10 @@ public class HysteriaBean extends AbstractBean {
     public Boolean enableECH;
     public String echConfig;
 
+    // sing-box DialerOptions.udp_fragment is a nullable bool, and the Hysteria2 outbound
+    // sets UDPFragmentDefault = true, so null must stay "not written" instead of false.
+    public Boolean udpFragment;
+
     @Override
     public boolean canMapping() {
         return protocol != PROTOCOL_FAKETCP;
@@ -103,7 +107,7 @@ public class HysteriaBean extends AbstractBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(9);
+        output.writeInt(10);
         super.serialize(output);
 
         output.writeInt(protocolVersion);
@@ -132,6 +136,9 @@ public class HysteriaBean extends AbstractBean {
 
         output.writeBoolean(Boolean.TRUE.equals(enableECH));
         output.writeString(echConfig);
+
+        // 0 = unset (core default), 1 = forced on, 2 = forced off.
+        output.writeInt(triStateToInt(udpFragment));
     }
 
     @Override
@@ -187,6 +194,11 @@ public class HysteriaBean extends AbstractBean {
         } else {
             enableECH = false;
             echConfig = "";
+        }
+        if (version >= 10) {
+            udpFragment = readTriState(input.readInt());
+        } else {
+            udpFragment = null;
         }
         // For version < 8, hysteria2ObfsType/gecko* stay null and are derived in
         // initializeDefaultValues() (Salamander when an obfuscation password exists).

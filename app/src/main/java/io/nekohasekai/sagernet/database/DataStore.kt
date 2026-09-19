@@ -405,6 +405,10 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var serverHy2EchEnabled by profileCacheStore.boolean(Key.SERVER_HY2_ECH_ENABLED)
     var serverHy2EchConfig by profileCacheStore.string(Key.SERVER_HY2_ECH_CONFIG)
 
+    // "" (core default) / "true" / "false". Also read by the TUIC editor: both
+    // protocols expose the same sing-box DialerOptions field.
+    var serverUdpFragment by profileCacheStore.string(Key.SERVER_UDP_FRAGMENT)
+
     // MasterDnsVPN
     var mdvDomains by profileCacheStore.string(Key.MDV_DOMAINS)
     var mdvEncryptionMethod by profileCacheStore.stringToInt(Key.MDV_ENCRYPTION_METHOD) { 0 }
