@@ -15,6 +15,7 @@ import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.canonicalHysteria2ECHConfig
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
+import io.nekohasekai.sagernet.ktx.toTriStateBoolean
 import moe.matsuri.nb4a.ui.SimpleMenuPreference
 
 class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
@@ -45,6 +46,7 @@ class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
         DataStore.serverConnectionReceiveWindow = connectionReceiveWindow
         DataStore.serverDisableMtuDiscovery = disableMtuDiscovery
         DataStore.serverHopInterval = hopInterval
+        DataStore.serverUdpFragment = udpFragment?.toString() ?: ""
     }
 
     override suspend fun saveAndExit() {
@@ -90,6 +92,7 @@ class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
         connectionReceiveWindow = DataStore.serverConnectionReceiveWindow
         disableMtuDiscovery = DataStore.serverDisableMtuDiscovery
         hopInterval = DataStore.serverHopInterval
+        udpFragment = DataStore.serverUdpFragment.toTriStateBoolean()
     }
 
     override fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -109,6 +112,10 @@ class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
         val echCategory = findPreference<PreferenceCategory>(Key.SERVER_HY2_ECH_CATEGORY)!!
         val enableECH = findPreference<SwitchPreference>(Key.SERVER_HY2_ECH_ENABLED)!!
         val echConfig = findPreference<EditTextPreference>(Key.SERVER_HY2_ECH_CONFIG)!!
+
+        // UDP fragmentation is a sing-box DialerOptions field carried by the Hysteria2
+        // outbound only, so the selector stays hidden for Hysteria1 profiles.
+        val udpFragment = findPreference<SimpleMenuPreference>(Key.SERVER_UDP_FRAGMENT)!!
 
         fun updateECH(enabled: Boolean, version: Int) {
             val isHy2 = version == 2
@@ -188,6 +195,7 @@ class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
             }
             updateObfs(DataStore.serverHy2ObfsType, v)
             updateECH(DataStore.serverHy2EchEnabled, v)
+            udpFragment.isVisible = v == 2
         }
         findPreference<SimpleMenuPreference>(Key.PROTOCOL_VERSION)!!.setOnPreferenceChangeListener { _, newValue ->
             updateVersion(newValue.toString().toIntOrNull() ?: 1)

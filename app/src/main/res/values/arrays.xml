@@ -569,6 +569,19 @@
         <item>2</item>
     </string-array>
 
+    <!-- sing-box DialerOptions.udp_fragment. The empty value leaves the option out of the
+         generated config, so the core default (enabled for Hysteria2 and TUIC) still applies. -->
+    <string-array name="udp_fragment_mode">
+        <item>@string/auto</item>
+        <item>@string/enable</item>
+        <item>@string/disable</item>
+    </string-array>
+    <string-array name="udp_fragment_mode_value" translatable="false">
+        <item></item>
+        <item>true</item>
+        <item>false</item>
+    </string-array>
+
     <string-array name="mdv_encryption_method">
         <item>None</item>
         <item>XOR</item>

@@ -3,6 +3,7 @@ package io.nekohasekai.sagernet.fmt.tuic
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ktx.linkBuilder
 import io.nekohasekai.sagernet.ktx.toLink
+import io.nekohasekai.sagernet.ktx.toTriStateBoolean
 import io.nekohasekai.sagernet.ktx.urlSafe
 import moe.matsuri.nb4a.SingBoxOptions
 import moe.matsuri.nb4a.utils.listByLineOrComma
@@ -50,6 +51,10 @@ fun parseTuic(url: String): TuicBean {
         link.queryParameter("disable_sni")?.let {
             if (it == "1") disableSNI = true
         }
+        // Absent keeps the core default (sing-box enables UDP fragmentation for TUIC).
+        link.queryParameter("udp_fragment")?.toTriStateBoolean()?.also {
+            udpFragment = it
+        }
     }
 }
 
@@ -63,6 +68,9 @@ fun TuicBean.toUri(): String {
     if (alpn.isNotBlank()) builder.addQueryParameter("alpn", alpn)
     if (allowInsecure) builder.addQueryParameter("allow_insecure", "1")
     if (disableSNI) builder.addQueryParameter("disable_sni", "1")
+    udpFragment?.let {
+        builder.addQueryParameter("udp_fragment", if (it) "1" else "0")
+    }
     if (name.isNotBlank()) builder.encodedFragment(name.urlSafe())
 
     return builder.toLink("tuic")
@@ -81,6 +89,11 @@ fun buildSingBoxOutboundTuicBean(bean: TuicBean): SingBoxOptions.Outbound_TUICOp
             "quic" -> udp_relay_mode = "quic"
         }
         zero_rtt_handshake = bean.reduceRTT
+        // Leave the field unwritten when the profile did not choose a value: the sing-box
+        // tuic outbound has UDPFragmentDefault = true.
+        if (bean.udpFragment != null) {
+            udp_fragment = bean.udpFragment
+        }
         tls = SingBoxOptions.OutboundTLSOptions().apply {
             if (bean.sni.isNotBlank()) {
                 server_name = bean.sni

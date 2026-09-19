@@ -244,4 +244,55 @@ class HysteriaFmtTest {
         val outbound = buildSingBoxOutboundHysteriaBean(bean) as SingBoxOptions.Outbound_HysteriaOptions
         assertNull(outbound.tls.ech)
     }
+
+    @Test
+    fun udpFragment_unset_keepsCoreDefaultAndStaysOutOfLink() {
+        // sing-box runs hysteria2 with UDPFragmentDefault = true, so an untouched profile
+        // must not emit the option at all.
+        val bean = hysteria2Bean()
+        assertNull(bean.udpFragment)
+        assertNull(buildHysteria2(bean).udp_fragment)
+        assertFalse(bean.toUri().contains("udp_fragment"))
+    }
+
+    @Test
+    fun udpFragment_off_isWrittenToTheOutboundAndSurvivesTheLinkRoundTrip() {
+        val bean = hysteria2Bean().apply { udpFragment = false }
+
+        assertEquals(false, buildHysteria2(bean).udp_fragment)
+
+        val exported = bean.toUri()
+        assertTrue(exported.contains("udp_fragment=0"))
+        assertEquals(false, parseHysteria2(exported).apply { initializeDefaultValues() }.udpFragment)
+    }
+
+    @Test
+    fun udpFragment_on_isWrittenToTheOutboundAndSurvivesTheLinkRoundTrip() {
+        val bean = hysteria2Bean().apply { udpFragment = true }
+
+        assertEquals(true, buildHysteria2(bean).udp_fragment)
+
+        val exported = bean.toUri()
+        assertTrue(exported.contains("udp_fragment=1"))
+        assertEquals(true, parseHysteria2(exported).apply { initializeDefaultValues() }.udpFragment)
+    }
+
+    @Test
+    fun parseHysteria2Uri_readsUdpFragmentSpellings() {
+        assertEquals(false, parseHysteria2("hy2://pw@example.com:443/?udp_fragment=false").udpFragment)
+        assertEquals(true, parseHysteria2("hy2://pw@example.com:443/?udp_fragment=true").udpFragment)
+        assertNull(parseHysteria2("hy2://pw@example.com:443/?udp_fragment=auto").udpFragment)
+        assertNull(parseHysteria2("hy2://pw@example.com:443/").udpFragment)
+    }
+
+    @Test
+    fun parseHysteria2Json_readsUdpFragment() {
+        val explicit = JSONObject(
+            """{ "server": "example.com:443", "udp_fragment": false }""",
+        ).parseHysteria2Json()
+        assertEquals(false, explicit.udpFragment)
+
+        val absent = JSONObject("""{ "server": "example.com:443" }""").parseHysteria2Json()
+        assertNull(absent.udpFragment)
+    }
 }

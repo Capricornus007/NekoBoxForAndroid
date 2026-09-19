@@ -223,6 +223,10 @@ fun parseHysteria2(url: String): HysteriaBean {
         link.queryParameter("insecure")?.also {
             allowInsecure = it == "1" || it == "true"
         }
+        // Absent keeps the core default (sing-box enables UDP fragmentation for HY2).
+        link.queryParameter("udp_fragment")?.toTriStateBoolean()?.also {
+            udpFragment = it
+        }
         link.queryParameterPreservingPlus("ech")?.also {
             echConfig = canonicalHysteria2ECHConfig(it)
             enableECH = true
@@ -310,6 +314,9 @@ fun HysteriaBean.toUri(): String {
     } else {
         if (sni.isNotBlank()) {
             builder.addQueryParameter("sni", sni)
+        }
+        udpFragment?.let {
+            builder.addQueryParameter("udp_fragment", if (it) "1" else "0")
         }
         if (enableECH == true) {
             builder.addQueryParameter("ech", canonicalHysteria2ECHConfig(echConfig))
@@ -401,6 +408,8 @@ fun JSONObject.parseHysteria2Json(): HysteriaBean {
             authPayloadType = HysteriaBean.TYPE_STRING
             authPayload = it
         }
+        // DialerOptions field of the sing-box outbound form; absent keeps the core default.
+        getTriStateBool("udp_fragment")?.also { udpFragment = it }
         // tls block (sni / insecure / Hysteria 2.10 ECH config list).
         optJSONObject("tls")?.also { tls ->
             tls.getStr("sni")?.also { sni = it }
@@ -606,6 +615,11 @@ fun buildSingBoxOutboundHysteriaBean(bean: HysteriaBean): SingBoxOptions.SingBox
             hop_interval = "${bean.hopInterval}s"
             up_mbps = bean.uploadMbps
             down_mbps = bean.downloadMbps
+            // Leave the field unwritten when the profile did not choose a value: the
+            // sing-box hysteria2 outbound has UDPFragmentDefault = true.
+            if (bean.udpFragment != null) {
+                udp_fragment = bean.udpFragment
+            }
             if (bean.obfuscation.isNotBlank() && bean.hysteria2ObfsType != HysteriaBean.OBFS_NONE) {
                 obfs = SingBoxOptions.Hysteria2Obfs().apply {
                     when (bean.hysteria2ObfsType) {

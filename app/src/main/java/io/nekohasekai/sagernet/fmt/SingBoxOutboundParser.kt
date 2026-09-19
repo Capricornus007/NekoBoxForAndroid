@@ -15,6 +15,7 @@ import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.fmt.wireguard.parseWireGuardEndpoint
 import io.nekohasekai.sagernet.ktx.getIntNya
 import io.nekohasekai.sagernet.ktx.getStr
+import io.nekohasekai.sagernet.ktx.getTriStateBool
 import io.nekohasekai.sagernet.ktx.isIpAddress
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSBean
 import org.json.JSONArray
@@ -115,6 +116,7 @@ fun parseSingBoxOutbound(json: JSONObject): AbstractBean? {
             authPayload = json.getStr("password") ?: ""
             uploadMbps = json.getIntNya("up_mbps")
             downloadMbps = json.getIntNya("down_mbps")
+            udpFragment = json.getTriStateBool("udp_fragment")
             json.optJSONObject("obfs")?.let {
                 obfuscation = it.getStr("password") ?: ""
             }
@@ -133,6 +135,7 @@ fun parseSingBoxOutbound(json: JSONObject): AbstractBean? {
             congestionController = json.getStr("congestion_control")
             udpRelayMode = json.getStr("udp_relay_mode")
             reduceRTT = json.optBoolean("zero_rtt_handshake", false)
+            udpFragment = json.getTriStateBool("udp_fragment")
             if (tls != null) {
                 sni = tls.sni
                 alpn = tls.alpn

@@ -71,6 +71,14 @@
             app:icon="@drawable/ic_notification_enhanced_encryption"
             app:key="serverAllowInsecure"
             app:title="@string/allow_insecure" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:defaultValue=""
+            app:entries="@array/udp_fragment_mode"
+            app:entryValues="@array/udp_fragment_mode_value"
+            app:icon="@drawable/ic_baseline_call_split_24"
+            app:key="serverUdpFragment"
+            app:title="@string/udp_fragment"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
 </PreferenceScreen>

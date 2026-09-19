@@ -9,6 +9,7 @@ import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.fmt.tuic.TuicBean
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
+import io.nekohasekai.sagernet.ktx.toTriStateBoolean
 
 class TuicSettingsActivity : ProfileSettingsActivity<TuicBean>() {
 
@@ -28,6 +29,7 @@ class TuicSettingsActivity : ProfileSettingsActivity<TuicBean>() {
         DataStore.serverSNI = sni
         DataStore.serverReduceRTT = reduceRTT
         DataStore.serverAllowInsecure = allowInsecure
+        DataStore.serverUdpFragment = udpFragment?.toString() ?: ""
     }
 
     override fun TuicBean.serialize() {
@@ -44,6 +46,7 @@ class TuicSettingsActivity : ProfileSettingsActivity<TuicBean>() {
         sni = DataStore.serverSNI
         reduceRTT = DataStore.serverReduceRTT
         allowInsecure = DataStore.serverAllowInsecure
+        udpFragment = DataStore.serverUdpFragment.toTriStateBoolean()
     }
 
     override fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {

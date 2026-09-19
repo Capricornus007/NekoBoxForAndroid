@@ -1113,4 +1113,5 @@ Continue?</string>
     <string name="action_byedpi" translatable="false">byeDPI</string>
     <string name="byedpi_cli_strategy">CLI strategy</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Flags for embedded byeDPI, e.g. --split 0 --disorder 1</string>
+    <string name="udp_fragment">UDP Fragmentation</string>
 </resources>
