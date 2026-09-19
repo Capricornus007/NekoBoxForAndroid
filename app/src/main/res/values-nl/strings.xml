@@ -924,4 +924,5 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="probe_tolerance">Balancer-schakeltolerantie (ms)</string>
     <string name="byedpi_cli_strategy">CLI-strategie</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Opties voor ingebed byeDPI, bv. --split 0 --disorder 1</string>
+    <string name="udp_fragment">UDP-fragmentatie</string>
 </resources>

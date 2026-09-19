@@ -958,4 +958,5 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="probe_tolerance">Tolleranza di cambio del bilanciatore (ms)</string>
     <string name="byedpi_cli_strategy">Strategia CLI</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Flag per byeDPI integrato, es. --split 0 --disorder 1</string>
+    <string name="udp_fragment">Frammentazione UDP</string>
 </resources>

@@ -937,4 +937,5 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="probe_tolerance">Toleransi alih penyeimbang (ms)</string>
     <string name="byedpi_cli_strategy">Strategi CLI</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Flag untuk byeDPI bawaan, mis. --split 0 --disorder 1</string>
+    <string name="udp_fragment">Fragmentasi UDP</string>
 </resources>

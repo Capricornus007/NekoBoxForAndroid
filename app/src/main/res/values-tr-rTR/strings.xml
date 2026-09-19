@@ -968,4 +968,5 @@ Devam edilsin mi?</string>
     <string name="probe_tolerance">Dengelerleyici geçiş toleransı (ms)</string>
     <string name="byedpi_cli_strategy">CLI stratejisi</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Gömülü byeDPI için bayraklar, örn. --split 0 --disorder 1</string>
+    <string name="udp_fragment">UDP Parçalama</string>
 </resources>

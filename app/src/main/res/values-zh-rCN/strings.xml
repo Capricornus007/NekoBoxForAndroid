@@ -974,4 +974,5 @@
     <string name="probe_tolerance">负载均衡切换容差（毫秒）</string>
     <string name="byedpi_cli_strategy">命令行策略</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">传给内置 byeDPI 的参数，例如 --split 0 --disorder 1</string>
+    <string name="udp_fragment">UDP 分片</string>
 </resources>
