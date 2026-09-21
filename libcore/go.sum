@@ -8,8 +8,8 @@ github.com/Capricornus007/sing v0.9.4-0.20260918084926-e48a87f46e06 h1:sZNOp/h+0
 github.com/Capricornus007/sing v0.9.4-0.20260918084926-e48a87f46e06/go.mod h1:K3Owt3xPhHugvlnlPPxZJ/exXdaJfEPOTNorGk4AXjo=
 github.com/Capricornus007/sing-snell v0.0.0-20260918085103-049f27400525 h1:9vGTS2MEhKaURoiGNx5nALRBzYzi4u0C5XWr+BPup5w=
 github.com/Capricornus007/sing-snell v0.0.0-20260918085103-049f27400525/go.mod h1:LBytgFmbtHFUAOVuBhBcGIOs0mCjuLwvgdNV02H+tpw=
-github.com/Capricornus007/sing-tun v0.0.0-20260919100025-1e533bf54dc3 h1:+rSZe/upesMVBqZTe1Rv2FRaDUK7vCnklqZghtLmLWI=
-github.com/Capricornus007/sing-tun v0.0.0-20260919100025-1e533bf54dc3/go.mod h1:liMb9HPIWcFWqF6VJ/ttIY8fTSRPdRltBeSeEcXt1Dk=
+github.com/Capricornus007/sing-tun v0.0.0-20260920040250-1e18024e6a08 h1:Jw4O4v+Ih1y7Pxc8Kh4kfComqXS4FcN2jClKnTDpBIY=
+github.com/Capricornus007/sing-tun v0.0.0-20260920040250-1e18024e6a08/go.mod h1:liMb9HPIWcFWqF6VJ/ttIY8fTSRPdRltBeSeEcXt1Dk=
 github.com/Capricornus007/sing-vmess v0.2.9-0.20260902104811-b3e975d5372a h1:7gYL/4QM1TKX8UjKfbaidez2wK703JceV5WEpVgeNt8=
 github.com/Capricornus007/sing-vmess v0.2.9-0.20260902104811-b3e975d5372a/go.mod h1:mZjljwCAsUOwEn1MRMEXtTJakcw4rbhEWfRmhbDRS1Q=
 github.com/Capricornus007/utls v0.0.0-20260918090442-912a23eb55ce h1:5VjnyO4Nk039csMZ0f73s9D3uwpJdtBgD6p0XEi/paU=
