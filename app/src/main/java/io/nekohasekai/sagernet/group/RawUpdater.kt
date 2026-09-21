@@ -752,7 +752,13 @@ object RawUpdater : GroupUpdater() {
                                                 if (opts["tls"]?.toString() == "true") add("tls")
                                                 add("host=" + (opts["host"]?.toString() ?: ""))
                                                 add("path=" + (opts["path"]?.toString() ?: ""))
-                                                if (opts["mux"]?.toString() == "true") add("mux=8")
+                                                val muxOpt = opts["mux"]
+                                                when {
+                                                    muxOpt == null -> {}
+                                                    muxOpt == true -> add("mux=1")
+                                                    muxOpt == false -> add("mux=0")
+                                                    else -> muxOpt.toString().trim().toIntOrNull()?.let { add("mux=$it") }
+                                                }
                                             }
                                         }
                                     }
