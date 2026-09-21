@@ -12,7 +12,7 @@ require (
 	github.com/miekg/dns v1.1.72
 	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/sagernet/quic-go v0.61.0-sing-box-mod.7
-	github.com/sagernet/sing v0.9.5-0.20260917164122-8fc5da509c10
+	github.com/sagernet/sing v0.9.5
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-snell v0.0.0-20260904135315-bc5a12ac736f
 	github.com/sagernet/sing-tun v0.9.4-0.20260917142847-fbc0c3dff312
@@ -185,4 +185,4 @@ replace github.com/exclavenetwork/sing-juicity => ../../sing-juicity
 
 replace github.com/xchacha20-poly1305/sing-trusttunnel => ../../sing-trusttunnel
 
-replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.4-0.20260918084926-e48a87f46e06
+replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.5-0.20260921052444-70199c7b2f36
