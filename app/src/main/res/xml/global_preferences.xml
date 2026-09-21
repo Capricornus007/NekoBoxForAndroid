@@ -264,23 +264,10 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 <PreferenceCategory app:title="@string/inbound_settings">
-        <EditTextPreference
-            app:icon="@drawable/ic_maps_directions_boat"
-            app:key="socksPort"
-            app:title="SOCKS5 Proxy Port"
-            app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
-            app:icon="@drawable/ic_maps_directions_boat"
-            app:key="httpPort"
-            app:title="@string/port_http"
-            app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
-            app:defaultValue="User"
-            app:key="mixedUsername"
-            app:title="Proxy Username" />
-        <EditTextPreference
-            app:key="mixedPassword"
-            app:title="Proxy Password" />
+        <Preference
+            app:icon="@drawable/ic_hardware_router"
+            app:key="localProxySettings"
+            app:title="@string/local_proxy_settings" />
         <EditTextPreference
             app:defaultValue=""
             app:dialogMessage="@string/http_proxy_bypass_dialog_message"
@@ -298,11 +285,6 @@
             app:defaultValue="true"
             app:key="strictRoute"
             app:title="@string/strict_route" />
-        <SwitchPreferenceCompat
-            app:icon="@drawable/ic_baseline_nat_24"
-            app:key="allowAccess"
-            app:summary="@string/allow_access_sum"
-            app:title="@string/allow_access" />
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/cag_misc">
         <moe.matsuri.nb4a.ui.UrlTestPreference

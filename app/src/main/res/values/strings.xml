@@ -1032,4 +1032,9 @@ Continue?</string>
     <string name="byedpi_cli_strategy">CLI strategy</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Flags for embedded byeDPI, e.g. --split 0 --disorder 1</string>
     <string name="udp_fragment">UDP Fragmentation</string>
+    <string name="local_proxy_settings">Local Proxy Settings</string>
+    <string name="port_out_of_range">Port should be in range 1–65535</string>
+    <string name="socks_port">SOCKS5 Proxy Port</string>
+    <string name="proxy_username">Proxy Username</string>
+    <string name="proxy_password">Proxy Password</string>
 </resources>

@@ -8,9 +8,11 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
@@ -36,6 +38,51 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     private val reloadListener = Preference.OnPreferenceChangeListener { _, _ ->
         needReload()
         true
+    }
+
+    private fun localProxySummary(): String {
+        val bind = if (DataStore.allowAccess) "0.0.0.0" else "127.0.0.1"
+        return "$bind  SOCKS:${DataStore.socksPort}  HTTP:${DataStore.httpPort}"
+    }
+
+    private fun showLocalProxyDialog(preference: Preference) {
+        val view = layoutInflater.inflate(R.layout.layout_local_proxy_dialog, null)
+        val socksField = view.findViewById<TextInputEditText>(R.id.socksPortField)
+        val httpField = view.findViewById<TextInputEditText>(R.id.httpPortField)
+        val userField = view.findViewById<TextInputEditText>(R.id.proxyUsernameField)
+        val passField = view.findViewById<TextInputEditText>(R.id.proxyPasswordField)
+        val allowSwitch = view.findViewById<SwitchCompat>(R.id.allowAccessSwitch)
+
+        socksField.setText(DataStore.socksPort.toString())
+        httpField.setText(DataStore.httpPort.toString())
+        userField.setText(DataStore.mixedUsername)
+        passField.setText(DataStore.mixedPassword)
+        allowSwitch.isChecked = DataStore.allowAccess
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.local_proxy_settings)
+            .setView(view)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val sp = socksField.text.toString().toIntOrNull()
+                val hp = httpField.text.toString().toIntOrNull()
+                if (sp == null || hp == null || sp !in 1..65535 || hp !in 1..65535) {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.port_out_of_range,
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                    return@setPositiveButton
+                }
+                DataStore.socksPort = sp
+                DataStore.httpPort = hp
+                DataStore.mixedUsername = userField.text.toString().trim()
+                DataStore.mixedPassword = passField.text.toString()
+                DataStore.allowAccess = allowSwitch.isChecked
+                preference.summary = localProxySummary()
+                needReload()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun sanitizeDnsPreferenceValue(value: String): String {
@@ -93,14 +140,10 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             AppLocale.apply(newValue as String)
             true
         }
-        val socksPort = findPreference<EditTextPreference>(Key.SOCKS_PORT)!!
-        val httpPort = findPreference<EditTextPreference>(Key.HTTP_PORT)!!
-        val mixedUsername = findPreference<EditTextPreference>(Key.MIXED_USERNAME)!!
-        val mixedPassword = findPreference<EditTextPreference>(Key.MIXED_PASSWORD)!!
+        val localProxySettings = findPreference<Preference>("localProxySettings")!!
         val httpProxyBypass = findPreference<EditTextPreference>(Key.HTTP_PROXY_BYPASS)!!
         val dnsHosts = findPreference<EditTextPreference>(Key.DNS_HOSTS)!!
         val serviceMode = findPreference<Preference>(Key.SERVICE_MODE)!!
-        val allowAccess = findPreference<SwitchPreferenceCompat>(Key.ALLOW_ACCESS)!!
         val appendHttpProxy = findPreference<SwitchPreferenceCompat>(Key.APPEND_HTTP_PROXY)!!
         val strictRoute = findPreference<SwitchPreferenceCompat>(Key.STRICT_ROUTE)!!
         val speedTestMode = findPreference<SimpleMenuPreference>(Key.SPEED_TEST_MODE)!!
@@ -150,12 +193,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 .setNegativeButton(android.R.string.cancel, null)
                 .show()
             true
-        }
-        socksPort.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
-        httpPort.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
-        mixedPassword.setOnBindEditTextListener { editText ->
-            editText.inputType =
-                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
         httpProxyBypass.setOnBindEditTextListener(EditTextPreferenceModifiers.Hosts)
         dnsHosts.setOnBindEditTextListener(EditTextPreferenceModifiers.Hosts)
@@ -258,10 +295,11 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             rulesGeoipUrl.isVisible = provider == 4
             true
         }
-        socksPort.onPreferenceChangeListener = reloadListener
-        httpPort.onPreferenceChangeListener = reloadListener
-        mixedUsername.onPreferenceChangeListener = reloadListener
-        mixedPassword.onPreferenceChangeListener = reloadListener
+        localProxySettings.summary = localProxySummary()
+        localProxySettings.setOnPreferenceClickListener {
+            showLocalProxyDialog(localProxySettings)
+            true
+        }
 
         appendHttpProxy.setOnPreferenceChangeListener { _, newValue ->
             if (newValue as Boolean) {
@@ -348,7 +386,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         enableDnsRouting.onPreferenceChangeListener = reloadListener
 
         ipv6Mode.onPreferenceChangeListener = reloadListener
-        allowAccess.onPreferenceChangeListener = reloadListener
 
         resolveDestination.onPreferenceChangeListener = reloadListener
         tunImplementation.onPreferenceChangeListener = reloadListener

@@ -933,4 +933,9 @@
     <string name="theme_dynamic">动态配色</string>
     <string name="theme_monokai">Monokai</string>
     <string name="theme_nord">Nord</string>
+    <string name="local_proxy_settings">本地代理设置</string>
+    <string name="port_out_of_range">端口范围应为 1–65535</string>
+    <string name="socks_port">SOCKS5 代理端口</string>
+    <string name="proxy_username">代理用户名</string>
+    <string name="proxy_password">代理密码</string>
 </resources>

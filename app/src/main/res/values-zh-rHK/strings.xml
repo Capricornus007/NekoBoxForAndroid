@@ -940,4 +940,9 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="theme_dynamic">動態配色</string>
     <string name="theme_monokai">Monokai</string>
     <string name="theme_nord">Nord</string>
+    <string name="local_proxy_settings">本機代理設定</string>
+    <string name="port_out_of_range">連接埠範圍應為 1–65535</string>
+    <string name="socks_port">SOCKS5 代理連接埠</string>
+    <string name="proxy_username">代理使用者名稱</string>
+    <string name="proxy_password">代理密碼</string>
 </resources>
