@@ -7,6 +7,7 @@ import android.net.NetworkRequest
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import androidx.annotation.RequiresApi
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
@@ -135,15 +136,46 @@ object DefaultNetworkListener {
     }
 
     private object Callback : ConnectivityManager.NetworkCallback() {
+        // 網路狀態風暴去抖：同一 Network 的 onCapabilitiesChanged 短時間內（信號抖動/速率協商）
+        // 會連續觸發，每次都會讓下游重列介面、燒 CPU。500ms 內合併成一次。
+        private var pendingUpdate: Runnable? = null
+        private var lastNetwork: Network? = null
+        private var lastUpdateAt = 0L
+
+        private fun cancelPending() {
+            pendingUpdate?.let { mainHandler.removeCallbacks(it) }
+            pendingUpdate = null
+        }
+
         override fun onAvailable(network: Network) {
+            cancelPending()
+            lastNetwork = network
+            lastUpdateAt = SystemClock.elapsedRealtime()
             offer(NetworkMessage.Put(network))
         }
 
         override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) { // it's a good idea to refresh capabilities
+            val now = SystemClock.elapsedRealtime()
+            if (lastNetwork == network && now - lastUpdateAt < 500L) {
+                cancelPending()
+                val runnable = Runnable {
+                    lastUpdateAt = SystemClock.elapsedRealtime()
+                    offer(NetworkMessage.Update(network))
+                }
+                pendingUpdate = runnable
+                mainHandler.postDelayed(runnable, 500L - (now - lastUpdateAt))
+                return
+            }
+            cancelPending()
+            lastNetwork = network
+            lastUpdateAt = now
             offer(NetworkMessage.Update(network))
         }
 
         override fun onLost(network: Network) {
+            cancelPending()
+            lastNetwork = null
+            lastUpdateAt = 0L
             offer(NetworkMessage.Lost(network))
         }
     }

@@ -6,6 +6,7 @@ import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Build.VERSION_CODES
+import android.os.SystemClock
 import android.system.OsConstants
 import androidx.annotation.RequiresApi
 import io.nekohasekai.sagernet.SagerNet
@@ -154,7 +155,17 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
     // 平台网络接口枚举（sing-box 官方内核拨号路径强制要求，否则报 no available network interface）。
     // 参考 husi AndroidPlatformInterface.getInterfaces。
 
+    // 列舉所有網路介面代價不斐，內核在 auto_detect_interface 下會高頻呼叫；短 TTL 快取避免風暴。
+    private var cachedInterfaces: List<LibcoreNetworkInterface>? = null
+    private var lastInterfaceFetchAt = 0L
+
     override fun getInterfaces(): NetworkInterfaceIterator {
+        val now = SystemClock.elapsedRealtime()
+        cachedInterfaces?.let { cached ->
+            if (now - lastInterfaceFetchAt < 1000L) {
+                return InterfaceArray(cached.iterator(), cached.size)
+            }
+        }
         @Suppress("DEPRECATION")
         val networks = SagerNet.connectivity.allNetworks
         val networkInterfaces = NetworkInterface.getNetworkInterfaces().toList()
@@ -194,6 +205,8 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
                 !networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
             interfaces.add(boxInterface)
         }
+        cachedInterfaces = interfaces
+        lastInterfaceFetchAt = now
         return InterfaceArray(interfaces.iterator(), interfaces.size)
     }
 
