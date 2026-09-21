@@ -19,7 +19,7 @@ import libcore.Libcore
 class VpnWatchdog(private val service: BaseService.Interface) {
 
     companion object {
-        private const val FAIL_THRESHOLD = 2 // 2 сбоя = рестарт (быстрая реакция)
+        private const val FAIL_THRESHOLD = 3 // 连续 3 次 urlTest 失败才断开（配合默认数秒间隔，避免网络抖动误断）
         private const val HTTP_TIMEOUT_MS = 3_000 // Ждем ответа всего 3 секунды
 
         @Volatile
@@ -28,27 +28,24 @@ class VpnWatchdog(private val service: BaseService.Interface) {
 
     private var job: Job? = null
     private var consecutiveFailures = 0
-    private var lastRestartAt = 0L
 
     fun start(scope: CoroutineScope) {
-        if (!DataStore.vpnWatchdogEnabled) return
+        // 斷開守護常駐生效（用戶要求：連續失敗即斷開、以後不再空轉），不再依賴 vpnWatchdogEnabled 開關。
         job?.cancel()
         consecutiveFailures = 0
         testModeRequested = false
 
-        // ЧИТАЕМ ИНТЕРВАЛ ИЗ НАСТРОЕК (по дефолту 7 сек)
         var intervalSec = DataStore.vpnWatchdogInterval
-        if (intervalSec < 3) intervalSec = 3 // Защита от дурака (не меньше 3 сек)
+        if (intervalSec < 3) intervalSec = 3 // 下限 3 秒
 
         val checkIntervalMs = intervalSec * 1000L
-        val minRestartIntervalMs = checkIntervalMs * 3 // Антипетля (3 интервала)
 
         job = scope.launch(Dispatchers.IO) {
-            Logs.d("VpnWatchdog: запущен (интервал ${intervalSec}с)")
+            Logs.d("VpnWatchdog: 已启动（每 ${intervalSec}s 检测；连续 $FAIL_THRESHOLD 次失败即断开）")
             delay(checkIntervalMs)
             while (isActive) {
                 try {
-                    check(minRestartIntervalMs)
+                    check()
                 } catch (error: CancellationException) {
                     throw error
                 } catch (error: Throwable) {
@@ -71,7 +68,7 @@ class VpnWatchdog(private val service: BaseService.Interface) {
         Logs.d("VpnWatchdog: остановлен")
     }
 
-    private suspend fun check(minRestartIntervalMs: Long) {
+    private suspend fun check() {
         if (service.data.state != BaseService.State.Connected) {
             consecutiveFailures = 0
             return
@@ -110,31 +107,20 @@ class VpnWatchdog(private val service: BaseService.Interface) {
             return
         }
 
-        // Если мы здесь - значит либо реальный лаг, либо мы его имитируем
+        // 这里说明：要么真的断了，要么是测试模式
         consecutiveFailures++
 
-        // Показываем пользователю, что счетчик тикает (чтобы ты видел работу)
-        showToast("Watchdog: обнаружен лаг ($consecutiveFailures/$FAIL_THRESHOLD)...")
-        Logs.w("Watchdog: Потеря связи или Тест (#$consecutiveFailures)")
+        // 只在计数的日志里体现，不再每次失败都弹 toast（避免抖动时刷屏）
+        Logs.w("Watchdog: 连接检测失败 ($consecutiveFailures/$FAIL_THRESHOLD)")
 
         if (consecutiveFailures >= FAIL_THRESHOLD) {
-            val now = System.currentTimeMillis()
-
-            // Проверка антипетли (в режиме теста игнорируем её, чтобы сработало сразу)
-            if (!testModeRequested && (now - lastRestartAt < minRestartIntervalMs)) {
-                return
-            }
-
-            lastRestartAt = now
             consecutiveFailures = 0
-
-            // Если это был тест, выключаем его после первого успешного срабатывания
             testModeRequested = false
 
-            Logs.w("Watchdog: ▶ ВЫПОЛНЯЮ АВТО-ВОССТАНОВЛЕНИЕ")
-            showToast("⚠️ Связь восстановлена автоматически!")
+            Logs.w("Watchdog: 連續 $FAIL_THRESHOLD 次連接失敗 → 斷開服務（不自動重連）")
+            showToast("⚠️ 偵測到出口連續連接失敗，已自動斷開，請手動重連")
 
-            Libcore.resetAllConnections(true)
+            service.stopRunner(false, "Watchdog: connection repeatedly failed")
         }
     }
 
