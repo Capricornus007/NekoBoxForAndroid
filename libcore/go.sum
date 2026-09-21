@@ -6,8 +6,8 @@ github.com/Capricornus007/amneziawg-go/v3 v3.1.20260828-mod.1 h1:XkWRxcFo6GAAngB
 github.com/Capricornus007/amneziawg-go/v3 v3.1.20260828-mod.1/go.mod h1:YoPc6qcOZqD7TXZ1xpedD8Sx3aSKsxN05ZqEFmXDNHk=
 github.com/Capricornus007/sing v0.9.5-0.20260921052444-70199c7b2f36 h1:nmvGglPxh6LKTfaxtJ7cPC5jMw9Mq21X2PTl4+slrLk=
 github.com/Capricornus007/sing v0.9.5-0.20260921052444-70199c7b2f36/go.mod h1:K3Owt3xPhHugvlnlPPxZJ/exXdaJfEPOTNorGk4AXjo=
-github.com/Capricornus007/sing-snell v0.0.0-20260918085103-049f27400525 h1:9vGTS2MEhKaURoiGNx5nALRBzYzi4u0C5XWr+BPup5w=
-github.com/Capricornus007/sing-snell v0.0.0-20260918085103-049f27400525/go.mod h1:LBytgFmbtHFUAOVuBhBcGIOs0mCjuLwvgdNV02H+tpw=
+github.com/Capricornus007/sing-snell v0.0.0-20260920030852-2c97c522fbc2 h1:Dz75XzC3K6nRn3PM/s3/7waaNtcLrxGVYFn9Od2wD3E=
+github.com/Capricornus007/sing-snell v0.0.0-20260920030852-2c97c522fbc2/go.mod h1:LBytgFmbtHFUAOVuBhBcGIOs0mCjuLwvgdNV02H+tpw=
 github.com/Capricornus007/sing-tun v0.0.0-20260920040250-1e18024e6a08 h1:Jw4O4v+Ih1y7Pxc8Kh4kfComqXS4FcN2jClKnTDpBIY=
 github.com/Capricornus007/sing-tun v0.0.0-20260920040250-1e18024e6a08/go.mod h1:liMb9HPIWcFWqF6VJ/ttIY8fTSRPdRltBeSeEcXt1Dk=
 github.com/Capricornus007/sing-vmess v0.2.9-0.20260902104811-b3e975d5372a h1:7gYL/4QM1TKX8UjKfbaidez2wK703JceV5WEpVgeNt8=
