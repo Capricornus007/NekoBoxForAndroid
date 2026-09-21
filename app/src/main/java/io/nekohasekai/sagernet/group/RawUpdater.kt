@@ -749,7 +749,7 @@ object RawUpdater : GroupUpdater() {
                                             ssPlugin.apply {
                                                 add("v2ray-plugin")
                                                 add("mode=" + (opts["mode"]?.toString() ?: ""))
-                                                if (opts["mode"]?.toString() == "true") add("tls")
+                                                if (opts["tls"]?.toString() == "true") add("tls")
                                                 add("host=" + (opts["host"]?.toString() ?: ""))
                                                 add("path=" + (opts["path"]?.toString() ?: ""))
                                                 if (opts["mux"]?.toString() == "true") add("mux=8")
@@ -1206,6 +1206,10 @@ object RawUpdater : GroupUpdater() {
                                             bean.allowInsecure =
                                                 opt.value.toString() == "true"
 
+                                        "udp-fragment" ->
+                                            bean.udpFragment =
+                                                opt.value?.toString()?.toTriStateBoolean()
+
                                         "up" ->
                                             bean.uploadMbps =
                                                 opt.value.toString().substringBefore(" ").toIntOrNull() ?: 0
@@ -1248,6 +1252,10 @@ object RawUpdater : GroupUpdater() {
                                         "disable-sni" ->
                                             bean.disableSNI =
                                                 opt.value.toString() == "true"
+
+                                        "udp-fragment" ->
+                                            bean.udpFragment =
+                                                opt.value?.toString()?.toTriStateBoolean()
 
                                         "reduce-rtt" ->
                                             bean.reduceRTT =
