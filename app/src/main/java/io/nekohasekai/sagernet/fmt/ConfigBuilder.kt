@@ -1455,28 +1455,6 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
         }
 
-        // 境內專用解析器：境內站點要的是「就近節點 + ECS」，這只有境內解析器給得了；
-        // 但它對境外域名會回 Facebook/Twitter 網段的假 IP（實測 223.5.5.5/1.12.12.12/120.53.53.53
-        // 三家無一例外），所以它必須被 geosite:cn 排他地圈住，绝不能當兜底——
-        // 兜底給 dns-remote（經隧道出海，解析必然誠實）。
-        dns.servers.add(
-            DNSServerOptions().apply {
-                address = "https://223.5.5.5/dns-query"
-                tag = "dns-cn"
-                detour = TAG_DIRECT
-                address_resolver = "dns-local"
-                strategy = autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct"))
-            },
-        )
-        dns.servers.add(
-            DNSServerOptions().apply {
-                address = "https://1.12.12.12/dns-query"
-                tag = "dns-cn-2"
-                detour = TAG_DIRECT
-                address_resolver = "dns-local"
-                strategy = autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct"))
-            },
-        )
         if (dnsHosts.isNotEmpty()) {
             dns.servers.add(
                 DNSServerOptions().apply {
@@ -1567,9 +1545,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     server = "dns-remote"
                 },
             )
-            // 境內域名排他地交給境內解析器（就近 CDN + ECS）。sing-box 的 DNS 規則是
-            // 「第一條命中即用」，這正是 AdGuardHome 那套 #域名 釘選做不到的排他性
-            // （load_balance 下所有適用上游並行賽跑、誰先回用誰）。
+            // 境內域名排他地交給「直連 DNS」（用戶自己設的那台，通常是本机 AdGuardHome：去廣告 +
+            // 境內就近 CDN + ECS 全留）。sing-box 的 DNS 規則是「第一條命中即用」，這才是排他；
+            // AdGuardHome 自己的 `#域名` 釘選不排他（v0.108.0-b.90 沒有 use_most_specific_servers，
+            // 且 load_balance 是所有適用上游並行賽跑、誰先回用誰），所以這一刀只能切在 sing-box 這層。
             if (java.io.File(io.nekohasekai.sagernet.SagerNet.application.filesDir, "geosite.db")
                     .exists()
             ) {
@@ -1580,14 +1559,14 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     0,
                     DNSRule_DefaultOptions().apply {
                         rule_set = mutableListOf("geosite:cn")
-                        server = "dns-cn"
+                        server = "dns-direct"
                     },
                 )
                 dns.rules.add(
                     0,
                     DNSRule_DefaultOptions().apply {
                         domain_suffix = mutableListOf("cn")
-                        server = "dns-cn-2"
+                        server = "dns-direct"
                     },
                 )
             }
