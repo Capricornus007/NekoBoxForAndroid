@@ -350,7 +350,9 @@ func (b *BoxInstance) SelectOutbound(tag string) bool {
 
 func (b *BoxInstance) GetBalancerNow() string {
 	if b.urlTest != nil {
-		return b.urlTest.Now()
+		if selected := b.urlTest.Selected(N.NetworkTCP); selected != nil {
+			return selected.Tag()
+		}
 	}
 	return ""
 }
