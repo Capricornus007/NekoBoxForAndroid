@@ -1533,16 +1533,14 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     },
                 )
             }
-            // 兜底：所有 dial-time（真正出海那一跳）的解析改走遠端。
-            // 這一條原本是 dns-direct，等於「境外域名也由直連側解析器回答」——在直連 DNS 指著
-            // 本機 AdGuardHome 的那種配置下，境內解析器會對 google/youtube 回假 IP，表現為
-            // TLS 憑證對不上（YouTube 首页空白、連環 net_error -202）。境內域名交給下面兩條
-            // 排他規則提前截走，其餘一律由經隧道出海的 dns-remote 解析，就不會被騙。
+            // 這一條只管「解析代理伺服器自己的域名」時用哪台：Outbound 欄位是在建立出口時塞進
+            // context 的（box.go:384），App 發起的查詢不帶它。用 dns-direct＝節點域名在隧道外解析，
+            // 改成 dns-remote 會變成「繞著自己的隧道去解析这台隧道要連的位址」＝啟動死循環隱患。
             dns.rules.add(
                 0,
                 DNSRule_DefaultOptions().apply {
                     outbound = mutableListOf("any")
-                    server = "dns-remote"
+                    server = "dns-direct"
                 },
             )
             // 境內域名排他地交給「直連 DNS」（用戶自己設的那台，通常是本机 AdGuardHome：去廣告 +
