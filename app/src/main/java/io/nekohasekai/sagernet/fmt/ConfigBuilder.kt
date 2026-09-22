@@ -1454,6 +1454,29 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 )
             }
         }
+
+        // 境內專用解析器：境內站點要的是「就近節點 + ECS」，這只有境內解析器給得了；
+        // 但它對境外域名會回 Facebook/Twitter 網段的假 IP（實測 223.5.5.5/1.12.12.12/120.53.53.53
+        // 三家無一例外），所以它必須被 geosite:cn 排他地圈住，绝不能當兜底——
+        // 兜底給 dns-remote（經隧道出海，解析必然誠實）。
+        dns.servers.add(
+            DNSServerOptions().apply {
+                address = "https://223.5.5.5/dns-query"
+                tag = "dns-cn"
+                detour = TAG_DIRECT
+                address_resolver = "dns-local"
+                strategy = autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct"))
+            },
+        )
+        dns.servers.add(
+            DNSServerOptions().apply {
+                address = "https://1.12.12.12/dns-query"
+                tag = "dns-cn-2"
+                detour = TAG_DIRECT
+                address_resolver = "dns-local"
+                strategy = autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct"))
+            },
+        )
         if (dnsHosts.isNotEmpty()) {
             dns.servers.add(
                 DNSServerOptions().apply {
@@ -1532,13 +1555,42 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     },
                 )
             }
+            // 兜底：所有 dial-time（真正出海那一跳）的解析改走遠端。
+            // 這一條原本是 dns-direct，等於「境外域名也由直連側解析器回答」——在直連 DNS 指著
+            // 本機 AdGuardHome 的那種配置下，境內解析器會對 google/youtube 回假 IP，表現為
+            // TLS 憑證對不上（YouTube 首页空白、連環 net_error -202）。境內域名交給下面兩條
+            // 排他規則提前截走，其餘一律由經隧道出海的 dns-remote 解析，就不會被騙。
             dns.rules.add(
                 0,
                 DNSRule_DefaultOptions().apply {
                     outbound = mutableListOf("any")
-                    server = "dns-direct"
+                    server = "dns-remote"
                 },
             )
+            // 境內域名排他地交給境內解析器（就近 CDN + ECS）。sing-box 的 DNS 規則是
+            // 「第一條命中即用」，這正是 AdGuardHome 那套 #域名 釘選做不到的排他性
+            // （load_balance 下所有適用上游並行賽跑、誰先回用誰）。
+            if (java.io.File(io.nekohasekai.sagernet.SagerNet.application.filesDir, "geosite.db")
+                    .exists()
+            ) {
+                val cnRuleSets = mutableListOf<RuleSet>()
+                generateRuleSet(listOf("geosite:cn"), cnRuleSets)
+                route.rule_set.addAll(cnRuleSets)
+                dns.rules.add(
+                    0,
+                    DNSRule_DefaultOptions().apply {
+                        rule_set = mutableListOf("geosite:cn")
+                        server = "dns-cn"
+                    },
+                )
+                dns.rules.add(
+                    0,
+                    DNSRule_DefaultOptions().apply {
+                        domain_suffix = mutableListOf("cn")
+                        server = "dns-cn-2"
+                    },
+                )
+            }
             if (domainListDNSDirectForce.isNotEmpty()) {
                 dns.rules.add(
                     0,
