@@ -177,7 +177,7 @@ replace github.com/sagernet/sing-quic => ../../sing-quic
 // sing-quic: SagerNet 版には sing-box 1.14.x が必要とする realm PortMapping が含まれる。
 // replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
 
-replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.0.0-20260920040250-1e18024e6a08
+replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20260922095141-5ad792bd1882
 
 replace github.com/metacubex/utls => github.com/Capricornus007/utls v0.0.0-20260918090442-912a23eb55ce
 
@@ -185,4 +185,7 @@ replace github.com/exclavenetwork/sing-juicity => ../../sing-juicity
 
 replace github.com/xchacha20-poly1305/sing-trusttunnel => ../../sing-trusttunnel
 
-replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.5-0.20260921052444-70199c7b2f36
+replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.5-0.20260922095057-ede6c68abc28
+
+// sing-shadowquic 復刻到自有 fork（與 sing 家族其他包一致），跟 Capricornus007/sing-shadowquic main。
+replace github.com/exclavenetwork/sing-shadowquic => github.com/Capricornus007/sing-shadowquic v0.0.0-20260904152941-03a261e772e4
