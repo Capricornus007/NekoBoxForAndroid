@@ -1262,28 +1262,43 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         }
                     }
 
-                    when (rule.outbound) {
-                        -1L -> {
-                            userDNSRuleList += makeDnsRuleObj().apply { server = "dns-direct" }
-                        }
-
-                        -2L -> {
-                            userDNSRuleList += makeDnsRuleObj().apply {
-                                server = "dns-block"
-                                disable_cache = true
+                    // 移植 hawkff #160 (0f4f63a5e)「Fix DNS routing criteria」的守衛概念，適配我方
+                    // makeDnsRuleObj 結構：DNS 看不到後續連線的 port/network/protocol/source，
+                    // custom JSON 也可能反轉或取代準則。若路由規則帶了這些「連線準則」，就
+                    // 不為其 domain 生成 DNS 規則，否則該 domain 的解析會被過度放寬路由。
+                    val dnsProbe = makeDnsRuleObj()
+                    val hasDomainCriteria = !dnsProbe.checkEmpty()
+                    val hasConnectionCriteria = rule.port.isNotBlank() || rule.sourcePort.isNotBlank() ||
+                        rule.network.isNotBlank() || rule.source.isNotBlank() ||
+                        rule.protocol.isNotBlank() || rule.config.isNotBlank()
+                    val isAppOnlyDns = uidList.isNotEmpty() &&
+                        rule.domains.isBlank() && rule.ip.isBlank() && rule.ruleset.isBlank()
+                    if ((hasDomainCriteria || isAppOnlyDns) && !hasConnectionCriteria &&
+                        (rule.packages.isEmpty() || uidList.isNotEmpty())
+                    ) {
+                        when (rule.outbound) {
+                            -1L -> {
+                                userDNSRuleList += makeDnsRuleObj().apply { server = "dns-direct" }
                             }
-                        }
 
-                        else -> {
-                            if (useFakeDns) {
+                            -2L -> {
                                 userDNSRuleList += makeDnsRuleObj().apply {
-                                    server = "dns-fake"
-                                    inbound = listOf(deviceInboundTag)
-                                    query_type = listOf("A", "AAAA")
+                                    server = "dns-block"
+                                    disable_cache = true
                                 }
-                            } else {
-                                userDNSRuleList += makeDnsRuleObj().apply {
-                                    server = "dns-remote"
+                            }
+
+                            else -> {
+                                if (useFakeDns) {
+                                    userDNSRuleList += makeDnsRuleObj().apply {
+                                        server = "dns-fake"
+                                        inbound = listOf(deviceInboundTag)
+                                        query_type = listOf("A", "AAAA")
+                                    }
+                                } else {
+                                    userDNSRuleList += makeDnsRuleObj().apply {
+                                        server = "dns-remote"
+                                    }
                                 }
                             }
                         }
