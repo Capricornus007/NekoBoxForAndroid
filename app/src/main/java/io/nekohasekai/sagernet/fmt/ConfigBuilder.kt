@@ -1549,16 +1549,24 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             // 境內就近 CDN + ECS 全留）。sing-box 的 DNS 規則是「第一條命中即用」，這才是排他；
             // AdGuardHome 自己的 `#域名` 釘選不排他（v0.108.0-b.90 沒有 use_most_specific_servers，
             // 且 load_balance 是所有適用上游並行賽跑、誰先回用誰），所以這一刀只能切在 sing-box 這層。
-            if (java.io.File(io.nekohasekai.sagernet.SagerNet.application.filesDir, "geosite.db")
+            // 複用已在的 route 規則集，絕不新增第二份：sing-box 對重複 rule-set tag 是直接
+            // 拒絕整份配置（route/router.go "duplicate rule-set tag"），訂閱那條 geosite:cn 路由
+            // 規則早就聲明過這個 tag，再加一條就整機沒網。
+            val cnRuleSetTag = "geosite:cn"
+            val cnDeclared = route.rule_set?.any { it.tag == cnRuleSetTag } == true
+            if (cnDeclared ||
+                java.io.File(io.nekohasekai.sagernet.SagerNet.application.externalAssets, "geosite.db")
                     .exists()
             ) {
-                val cnRuleSets = mutableListOf<RuleSet>()
-                generateRuleSet(listOf("geosite:cn"), cnRuleSets)
-                route.rule_set.addAll(cnRuleSets)
+                if (!cnDeclared) {
+                    val cnRuleSets = mutableListOf<RuleSet>()
+                    generateRuleSet(listOf(cnRuleSetTag), cnRuleSets)
+                    route.rule_set.addAll(cnRuleSets)
+                }
                 dns.rules.add(
                     0,
                     DNSRule_DefaultOptions().apply {
-                        rule_set = mutableListOf("geosite:cn")
+                        rule_set = mutableListOf(cnRuleSetTag)
                         server = "dns-direct"
                     },
                 )
