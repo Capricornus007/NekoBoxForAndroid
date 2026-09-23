@@ -1021,4 +1021,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="byedpi_cli_strategy">Стратегия CLI</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Флаги встроенного byeDPI, например --split 0 --disorder 1</string>
     <string name="udp_fragment">Фрагментация UDP</string>
+    <string name="card_style">Карточка</string>
+    <string name="card_style_classic">Классический</string>
+    <string name="card_style_stroke">Контур</string>
 </resources>

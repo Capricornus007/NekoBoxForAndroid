@@ -938,4 +938,7 @@
     <string name="socks_port">SOCKS5 代理端口</string>
     <string name="proxy_username">代理用户名</string>
     <string name="proxy_password">代理密码</string>
+    <string name="card_style">卡片</string>
+    <string name="card_style_classic">经典</string>
+    <string name="card_style_stroke">描边</string>
 </resources>

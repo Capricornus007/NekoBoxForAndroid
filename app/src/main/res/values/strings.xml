@@ -1037,4 +1037,7 @@ Continue?</string>
     <string name="socks_port">SOCKS5 Proxy Port</string>
     <string name="proxy_username">Proxy Username</string>
     <string name="proxy_password">Proxy Password</string>
+    <string name="card_style">Card</string>
+    <string name="card_style_classic">Classic</string>
+    <string name="card_style_stroke">Outline</string>
 </resources>

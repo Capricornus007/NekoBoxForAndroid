@@ -981,4 +981,7 @@ Continuare?</string>
     <string name="byedpi_cli_strategy">Strategia CLI</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Flag per byeDPI integrato, es. --split 0 --disorder 1</string>
     <string name="udp_fragment">Frammentazione UDP</string>
+    <string name="card_style">Scheda</string>
+    <string name="card_style_classic">Classico</string>
+    <string name="card_style_stroke">Contorno</string>
 </resources>

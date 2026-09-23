@@ -981,4 +981,7 @@ Lanjutkan?</string>
     <string name="byedpi_cli_strategy">Strategi CLI</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Flag untuk byeDPI bawaan, mis. --split 0 --disorder 1</string>
     <string name="udp_fragment">Fragmentasi UDP</string>
+    <string name="card_style">Kartu</string>
+    <string name="card_style_classic">Klasik</string>
+    <string name="card_style_stroke">Garis tepi</string>
 </resources>

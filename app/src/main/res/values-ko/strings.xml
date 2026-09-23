@@ -743,4 +743,7 @@
     <string name="byedpi_cli_strategy">CLI 전략</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">내장 byeDPI에 전달할 인수, 예: --split 0 --disorder 1</string>
     <string name="udp_fragment">UDP 단편화</string>
+    <string name="card_style">카드</string>
+    <string name="card_style_classic">클래식</string>
+    <string name="card_style_stroke">외곽선</string>
 </resources>

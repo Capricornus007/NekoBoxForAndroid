@@ -275,6 +275,35 @@ class ConfigurationGroupFragment : Fragment() {
             }
             true
         }
+
+        val cardClassic = menu.findItem(R.id.action_card_style_classic)
+        val cardStroke = menu.findItem(R.id.action_card_style_stroke)
+        when (DataStore.profileCardStyle) {
+            0 -> cardClassic.isChecked = true
+            1 -> cardStroke.isChecked = true
+        }
+        cardClassic.setOnMenuItemClickListener {
+            it.isChecked = true
+            if (DataStore.profileCardStyle != 0) {
+                DataStore.profileCardStyle = 0
+                (parentFragment as? ConfigurationFragment)?.switchAllGroupFragmentsCardStyle()
+            }
+            true
+        }
+        cardStroke.setOnMenuItemClickListener {
+            it.isChecked = true
+            if (DataStore.profileCardStyle != 1) {
+                DataStore.profileCardStyle = 1
+                (parentFragment as? ConfigurationFragment)?.switchAllGroupFragmentsCardStyle()
+            }
+            true
+        }
+    }
+
+    fun refreshCardStyle() {
+        if (::configurationListView.isInitialized) {
+            configurationListView.adapter?.notifyDataSetChanged()
+        }
     }
 
     private fun setupLayoutManager() {
@@ -1204,7 +1233,15 @@ class ConfigurationGroupFragment : Fragment() {
             val ctx = card.context
             val primary = ctx.getColorAttr(R.attr.colorPrimary)
             val surface = ctx.getColorAttr(R.attr.colorSurface)
-            card.strokeWidth = 0
+            if (DataStore.profileCardStyle == 1) {
+                card.strokeWidth = ctx.resources.getDimensionPixelSize(
+                    if (selected) R.dimen.card_stroke_width_selected else R.dimen.card_stroke_width,
+                )
+                card.strokeColor =
+                    if (selected) primary else ctx.getColour(R.color.card_stroke)
+            } else {
+                card.strokeWidth = 0
+            }
             card.setCardBackgroundColor(
                 if (selected) {
                     ColorUtils.compositeColors(

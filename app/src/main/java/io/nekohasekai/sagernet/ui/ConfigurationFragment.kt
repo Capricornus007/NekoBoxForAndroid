@@ -210,6 +210,14 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
     }
 
+    fun switchAllGroupFragmentsCardStyle() {
+        adapter.groupFragments.values.forEach { fragment ->
+            if (fragment.isAdded && fragment.view != null) {
+                fragment.refreshCardStyle()
+            }
+        }
+    }
+
     val updateSelectedCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
             if (adapter.groupList.size > position) {
