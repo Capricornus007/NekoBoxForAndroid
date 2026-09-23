@@ -2,6 +2,8 @@ package io.nekohasekai.sagernet.fmt.v2ray
 
 import android.text.TextUtils
 import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
@@ -57,6 +59,8 @@ data class VmessQRCode(
     var sni: String = "",
     var alpn: String = "",
     var fp: String = "",
+    var mode: String? = null,
+    var extra: JsonElement? = null,
 )
 
 fun StandardV2RayBean.isTLS(): Boolean {
@@ -502,7 +506,14 @@ fun parseV2RayN(link: String): VMessBean {
     bean.encryption = vmessQRCode.scy
     bean.uuid = vmessQRCode.id
     bean.alterId = vmessQRCode.aid.toIntOrNull()
-    bean.type = vmessQRCode.net
+    bean.type = if (vmessQRCode.net == "splithttp") "xhttp" else vmessQRCode.net
+    if (bean.type == "xhttp") {
+        bean.xhttpMode = normalizeXhttpMode(vmessQRCode.mode)
+        vmessQRCode.extra?.takeUnless { it.isJsonNull }?.let {
+            val extra = if (it.isJsonPrimitive && it.asJsonPrimitive.isString) it.asString else it.toString()
+            bean.xhttpExtra = runCatching { XhttpExtraConverter.xrayToSingBox(extra) }.getOrDefault(extra)
+        }
+    }
     bean.host = vmessQRCode.host
     bean.path = vmessQRCode.path
     val headerType = vmessQRCode.type
@@ -589,6 +600,15 @@ fun VMessBean.toV2rayN(): String {
         sni = bean.sni
         alpn = bean.alpn.replace("\n", ",")
         fp = bean.utlsFingerprint
+
+        if (bean.type == "xhttp") {
+            mode = bean.xhttpMode
+            bean.xhttpExtra?.takeIf { it.isNotBlank() }?.let {
+                extra = runCatching {
+                    JsonParser.parseString(XhttpExtraConverter.singBoxToXray(it))
+                }.getOrNull()
+            }
+        }
     }.let {
         NGUtil.encode(Gson().toJson(it))
     }

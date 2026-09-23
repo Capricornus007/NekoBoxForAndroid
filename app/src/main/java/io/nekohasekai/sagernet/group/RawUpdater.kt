@@ -223,6 +223,9 @@ object RawUpdater : GroupUpdater() {
             if (isDefaultGroupName(proxyGroup.name)) {
                 var remoteName = parseBodyProfileTitle(content)
                 if (remoteName.isBlank()) {
+                    remoteName = decodeProfileTitle(Util.getStringBox(response.getHeader("Profile-Title")))
+                }
+                if (remoteName.isBlank()) {
                     remoteName = Util.decodeFilename(Util.getStringBox(response.getHeader("content-disposition")))
                 }
                 if (remoteName.isNotBlank()) {
@@ -426,8 +429,11 @@ object RawUpdater : GroupUpdater() {
             .find(content)?.groupValues?.get(1)?.trim()
     }
 
-    fun parseBodyProfileTitle(content: String): String {
-        var title = findBodyHeader(content, "profile-title") ?: ""
+    fun parseBodyProfileTitle(content: String): String =
+        decodeProfileTitle(findBodyHeader(content, "profile-title") ?: "")
+
+    fun decodeProfileTitle(raw: String): String {
+        var title = raw.trim()
         if (title.startsWith("base64:")) {
             title = runCatching {
                 title.removePrefix("base64:").trim().decodeBase64UrlSafe()
