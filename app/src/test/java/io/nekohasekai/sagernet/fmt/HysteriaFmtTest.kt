@@ -12,6 +12,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -25,6 +26,13 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35], application = android.app.Application::class)
 class HysteriaFmtTest {
+
+    // DataStore 的 static 初始化會去讀 SagerNet.application，沒先裝好就整個 JVM 被毒掉
+    // （單獨跑這個類別時原本就會全紅），所以每個測試前都先把環境立起來。
+    @Before
+    fun setUpEnvironment() {
+        ConfigBuilderTestEnv.reset()
+    }
 
     // Structurally valid ECHConfigList using an X25519 public key and example.com public name.
     private val echConfig = "AEb+DQBCAAAgACAHo3y8FCCTyLdV3BsQ6Gy0JjdK0WqoU+0L38CyuG0cfAAMAAEAAQABAAIAAQADAAtleGFtcGxlLmNvbQAA"
@@ -230,6 +238,20 @@ class HysteriaFmtTest {
         assertThrows(IllegalArgumentException::class.java) {
             buildSingBoxOutboundHysteriaBean(malformedBase64)
         }
+    }
+
+    @Test
+    fun hysteria1_keepsStreamAndConnectionWindowsApart() {
+        val bean = hysteria2Bean().apply {
+            protocolVersion = 1
+            authPayloadType = HysteriaBean.TYPE_STRING
+            streamReceiveWindow = 65536
+            connectionReceiveWindow = 262144
+        }
+
+        val outbound = buildSingBoxOutboundHysteriaBean(bean) as SingBoxOptions.Outbound_HysteriaOptions
+        assertEquals(65536L, outbound.recv_window_conn)
+        assertEquals(262144L, outbound.recv_window)
     }
 
     @Test
