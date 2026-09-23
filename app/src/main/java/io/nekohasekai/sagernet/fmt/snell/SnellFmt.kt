@@ -65,7 +65,7 @@ fun parseClashSnell(proxy: Map<String, Any?>): SnellBean {
         psk = proxy["psk"] as? String ?: ""
 
         val clashVersion = ((proxy["version"] as? Number)?.toInt() ?: 4).coerceIn(1, 5)
-        version = if (clashVersion == 5) 4 else clashVersion
+        version = clashVersion
 
         reuse = proxy["reuse"] as? Boolean ?: false
 

@@ -153,6 +153,10 @@ fun SingBoxOptions.Rule_DefaultOptions.makeSingBoxRule(list: List<String>, isIP:
 }
 
 fun SingBoxOptions.Rule_DefaultOptions.checkEmpty(): Boolean {
+    if (ip_is_private == true) return false
+    if (network?.isNotEmpty() == true) return false
+    if (source_port?.isNotEmpty() == true) return false
+    if (source_port_range?.isNotEmpty() == true) return false
     if (ip_cidr?.isNotEmpty() == true) return false
     if (domain?.isNotEmpty() == true) return false
     if (rule_set?.isNotEmpty() == true) return false
