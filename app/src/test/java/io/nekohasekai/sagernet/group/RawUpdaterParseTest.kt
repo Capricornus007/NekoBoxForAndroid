@@ -151,6 +151,77 @@ class RawUpdaterParseTest {
     }
 
     @Test
+    fun singboxEndpoints_keepsEveryPeer() = runTest {
+        val config =
+            """{"endpoints":[{"type":"wireguard","tag":"wg-edge","address":"10.0.0.2/32","private_key":"private","peers":[{"address":"vpn.example.com","port":51820,"public_key":"public","allowed_ips":["10.0.0.0/24"]},{"address":"2001:db8::1","port":51821,"public_key":"public2","allowed_ips":["198.51.100.0/24"]}]}],"outbounds":[{"type":"direct","tag":"direct"}]}"""
+
+        val bean = RawUpdater.parseRaw(config)!!.single() as WireGuardBean
+
+        assertEquals("10.0.0.0/24", bean.peerAllowedIps)
+        assertTrue(bean.extraPeers.contains("Endpoint = [2001:db8::1]:51821"))
+        assertTrue(bean.extraPeers.contains("198.51.100.0/24"))
+    }
+
+    @Test
+    fun clashYaml_keepsPeerListAndAllowedIps() = runTest {
+        val input = buildString {
+            appendLine("proxies:")
+            appendLine("  - name: wg-split")
+            appendLine("    type: wireguard")
+            appendLine("    ip: 10.0.0.2/32")
+            appendLine("    private-key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
+            appendLine("    peers:")
+            appendLine("      - server: 192.0.2.10")
+            appendLine("        port: 51820")
+            appendLine("        public-key: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=")
+            appendLine("        allowed-ips:")
+            appendLine("          - 10.0.0.0/24")
+            appendLine("      - server: 192.0.2.11")
+            appendLine("        port: 51821")
+            appendLine("        public-key: CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=")
+            appendLine("        allowed-ips: 198.51.100.0/24")
+        }
+
+        val bean = RawUpdater.parseRaw(input)!!.single() as WireGuardBean
+
+        assertEquals("10.0.0.2/32", bean.localAddress)
+        assertEquals("192.0.2.10", bean.serverAddress)
+        assertEquals("10.0.0.0/24", bean.peerAllowedIps)
+        assertTrue(bean.extraPeers.contains("192.0.2.11:51821"))
+        assertTrue(bean.extraPeers.contains("198.51.100.0/24"))
+    }
+
+    @Test
+    fun amneziawgConfig_mergesRouteSplitPeersIntoSingleProfile() = runTest {
+        val input = """
+            [Interface]
+            Address = 10.0.0.2/32
+            PrivateKey = AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+            Jc = 6
+            Jmin = 10
+            Jmax = 50
+
+            [Peer]
+            PublicKey = BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=
+            Endpoint = 192.0.2.10:51820
+            AllowedIPs = 10.0.0.0/24
+
+            [Peer]
+            PublicKey = CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=
+            Endpoint = [2001:db8::1]:51821
+            AllowedIPs = 198.51.100.0/24
+        """.trimIndent()
+
+        val bean = RawUpdater.parseRaw(input, "split.conf")!!.single() as AmneziaWGBean
+
+        assertEquals("split", bean.name)
+        assertEquals(6, bean.jc)
+        assertEquals("192.0.2.10", bean.serverAddress)
+        assertEquals("10.0.0.0/24", bean.peerAllowedIps)
+        assertTrue(bean.extraPeers.contains("Endpoint = [2001:db8::1]:51821"))
+    }
+
+    @Test
     fun emptyInput_returnsNull() = runTest {
         assertNull(RawUpdater.parseRaw(""))
     }

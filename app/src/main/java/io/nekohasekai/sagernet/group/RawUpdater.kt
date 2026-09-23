@@ -32,6 +32,8 @@ import io.nekohasekai.sagernet.fmt.v2ray.normalizeXhttpMode
 import io.nekohasekai.sagernet.fmt.v2ray.setTLS
 import io.nekohasekai.sagernet.fmt.wireguard.AmneziaWireGuardImporter
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
+import io.nekohasekai.sagernet.fmt.wireguard.WireGuardPeerSpec
+import io.nekohasekai.sagernet.fmt.wireguard.formatWireGuardPeerBlocks
 import io.nekohasekai.sagernet.ktx.*
 import libcore.Libcore
 import moe.matsuri.nb4a.Protocols
@@ -1074,8 +1076,10 @@ object RawUpdater : GroupUpdater() {
                             }
 
                             "wireguard" -> {
-                                val peers = proxy["peers"] as? List<Map<String, Any?>>
-                                val configToUse = peers?.firstOrNull() ?: proxy
+                                val peerList = proxy["peers"] as? List<Map<String, Any?>>
+                                // mihomo 把介面層欄位（ip / private-key / mtu）放在 proxy 層、
+                                // peer 專屬欄位放進 peers[] 的每一筆；peer 層覆蓋同名鍵。
+                                val configToUse = proxy + (peerList?.firstOrNull().orEmpty())
 
                                 val bean = WireGuardBean().apply {
                                     name = proxy["name"].toString()
@@ -1085,6 +1089,7 @@ object RawUpdater : GroupUpdater() {
                                             "server" -> serverAddress = value.toString()
                                             "port" -> serverPort = value.toString().toIntOrNull() ?: 0
                                             "mtu" -> mtu = value.toString().toIntOrNull() ?: 0
+                                            "allowed-ips" -> peerAllowedIps = value.clashList()
                                             "ip" -> {
                                                 val ipValue = value.toString()
                                                 localAddress = if (!ipValue.contains("/")) {
@@ -1135,6 +1140,11 @@ object RawUpdater : GroupUpdater() {
                                         }
                                     }
                                 }
+                                // peers 列表第二筆起不能丟：只取 firstOrNull 會讓後面那些目的段
+                                // 在訂閱更新時靜默消失。
+                                bean.extraPeers = formatWireGuardPeerBlocks(
+                                    peerList.orEmpty().drop(1).mapNotNull(::clashWireGuardPeerSpec),
+                                )
                                 proxies.add(bean)
                             }
 
@@ -1396,6 +1406,43 @@ object RawUpdater : GroupUpdater() {
         return AmneziaWireGuardImporter.parseWireGuard(conf)
     }
 
+    /** clash YAML 的 `peers:` 列表第二筆起也要留得下來。 */
+    private fun clashWireGuardPeerSpec(entry: Map<String, Any?>): WireGuardPeerSpec? {
+        val fields = entry.mapKeys { (key, _) -> key.replace('_', '-').lowercase() }
+        val endpoint = fields["endpoint"].clashText()
+        val host = (fields["server"].clashText() ?: endpoint?.substringBeforeLast(':'))
+            ?.removeSurrounding("[", "]")
+            ?.takeIf(String::isNotEmpty) ?: return null
+        val port = (
+            fields["port"].clashText()?.toIntOrNull()
+                ?: endpoint?.substringAfterLast(':')?.toIntOrNull()
+            )
+            ?.takeIf { it in 1..65535 } ?: return null
+        val publicKey = fields["public-key"].clashText() ?: return null
+        return WireGuardPeerSpec(
+            host = host,
+            port = port,
+            publicKey = publicKey,
+            preSharedKey = (fields["pre-shared-key"] ?: fields["presharedkey"]).clashText().orEmpty(),
+            allowedIPs = (fields["allowed-ips"] ?: fields["allowedips"]).clashList(),
+            keepalive = (fields["persistent-keepalive"] ?: fields["persistent-keepalive-interval"])
+                .clashText()?.toIntOrNull() ?: 0,
+            reserved = fields["reserved"].clashList(),
+        )
+    }
+
+    private fun Any?.clashText(): String? = when (this) {
+        is String -> trim().takeIf(String::isNotEmpty)
+        is Number -> toString()
+        is Boolean -> toString()
+        else -> null
+    }
+
+    private fun Any?.clashList(): String = when (this) {
+        is List<*> -> joinToString(", ") { element -> element.toString().trim() }
+        else -> clashText().orEmpty()
+    }
+
     // AmneziaWG configs are WireGuard configs that also carry obfuscation keys in
     // the [Interface] section (Jc/Jmin/Jmax, S1-S4, H1-H4, I1-I5).
     private fun isAmneziaWGConf(conf: String): Boolean {
@@ -1412,51 +1459,10 @@ object RawUpdater : GroupUpdater() {
         }
     }
 
-    fun parseAmneziaWG(conf: String): List<AmneziaWGBean> {
-        val ini = IniConfig.parse(conf)
-        val iface = ini["Interface"] ?: error("Missing 'Interface' section")
-        val bean = AmneziaWGBean().applyDefaultValues()
-        val localAddresses = iface.getAll("Address")
-        if (localAddresses.isNullOrEmpty()) error("Empty address in 'Interface' section")
-        bean.localAddress = localAddresses.flatMap { it.split(",") }.joinToString("\n")
-        bean.privateKey = iface["PrivateKey"]
-        iface["MTU"]?.toIntOrNull()?.let { bean.mtu = it }
-        // AmneziaWG obfuscation parameters.
-        bean.jc = iface["Jc"]?.toIntOrNull() ?: 0
-        bean.jmin = iface["Jmin"]?.toIntOrNull() ?: 0
-        bean.jmax = iface["Jmax"]?.toIntOrNull() ?: 0
-        bean.s1 = iface["S1"]?.toIntOrNull() ?: 0
-        bean.s2 = iface["S2"]?.toIntOrNull() ?: 0
-        bean.s3 = iface["S3"]?.toIntOrNull() ?: 0
-        bean.s4 = iface["S4"]?.toIntOrNull() ?: 0
-        bean.h1 = iface["H1"] ?: ""
-        bean.h2 = iface["H2"] ?: ""
-        bean.h3 = iface["H3"] ?: ""
-        bean.h4 = iface["H4"] ?: ""
-        bean.i1 = iface["I1"] ?: ""
-        bean.i2 = iface["I2"] ?: ""
-        bean.i3 = iface["I3"] ?: ""
-        bean.i4 = iface["I4"] ?: ""
-        bean.i5 = iface["I5"] ?: ""
-        val peers = ini.getAll("Peer")
-        if (peers.isNullOrEmpty()) error("Missing 'Peer' sections")
-        val beans = mutableListOf<AmneziaWGBean>()
-        for (peer in peers) {
-            val endpoint = peer["Endpoint"]
-            if (endpoint.isNullOrBlank() || !endpoint.contains(":")) {
-                continue
-            }
-
-            val peerBean = bean.clone()
-            peerBean.serverAddress = endpoint.substringBeforeLast(":")
-            peerBean.serverPort = endpoint.substringAfterLast(":").toIntOrNull() ?: continue
-            peerBean.peerPublicKey = peer["PublicKey"] ?: continue
-            peerBean.peerPreSharedKey = peer["PresharedKey"]
-            beans.add(peerBean.applyDefaultValues())
-        }
-        if (beans.isEmpty()) error("Empty available peer list")
-        return beans
-    }
+    // 交由匯入器解析後再轉型：它本來是第二套實作，會漏掉 AllowedIPs、多 peer 的
+    // 分流合併、IPv6 方括號與本地位址補前綴，留著只會跟匯入路徑越走越不一致。
+    fun parseAmneziaWG(conf: String): List<AmneziaWGBean> =
+        AmneziaWireGuardImporter.parseWireGuard(conf).map { it.toAmneziaWGBean() }
 
     fun parseJSON(json: Any): List<AbstractBean> {
         val proxies = ArrayList<AbstractBean>()
