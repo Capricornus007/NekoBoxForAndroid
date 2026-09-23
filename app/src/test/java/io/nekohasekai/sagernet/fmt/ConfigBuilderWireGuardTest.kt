@@ -168,11 +168,25 @@ class ConfigBuilderWireGuardTest {
         referenced.forEach { assertTrue("被引用的出口 $it 不存在", available.contains(it)) }
     }
 
-    private fun options() = MyOptions().apply {
+    @Test
+    fun generatedEndpointKeepsEveryPeerAndItsAllowedIps() {
+        val options = options(multiPeerWireGuardEndpoint())
+        val config = gson.toJsonTree(finalizeRootConfig(options)).asJsonObject
+
+        val peers = config.getAsJsonArray("endpoints").single().asJsonObject
+            .getAsJsonArray("peers").map { it.asJsonObject }
+        assertEquals(2, peers.size)
+        assertEquals(listOf("10.0.0.0/24"), peers[0].getAsJsonArray("allowed_ips").map { it.asString })
+        assertEquals("2001:db8::1", peers[1].get("address").asString)
+        assertEquals(51821, peers[1].get("port").asInt)
+        assertEquals(listOf("198.51.100.0/24"), peers[1].getAsJsonArray("allowed_ips").map { it.asString })
+    }
+
+    private fun options(endpoint: Endpoint_WireGuardOptions = wireGuardEndpoint()) = MyOptions().apply {
         endpoints = mutableListOf()
         route = RouteOptions().apply { final_ = MAIN_TAG }
         outbounds = mutableListOf(
-            wireGuardEndpoint(),
+            endpoint,
             Outbound().apply {
                 type = "direct"
                 tag = TAG_DIRECT
@@ -189,6 +203,25 @@ class ConfigBuilderWireGuardTest {
             localAddress = "10.0.0.2/32"
             privateKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
             peerPublicKey = "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="
+        },
+    ).apply { tag = MAIN_TAG }
+
+    private fun multiPeerWireGuardEndpoint() = buildSingBoxEndpointWireGuardBean(
+        WireGuardBean().apply {
+            initializeDefaultValues()
+            serverAddress = "198.51.100.10"
+            serverPort = 51820
+            localAddress = "10.0.0.2/32"
+            privateKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+            peerPublicKey = "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="
+            peerAllowedIps = "10.0.0.0/24"
+            extraPeers = """
+                [Peer]
+                Endpoint = [2001:db8::1]:51821
+                PublicKey = CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=
+                AllowedIPs = 198.51.100.0/24
+                PersistentKeepalive = 25
+            """.trimIndent()
         },
     ).apply { tag = MAIN_TAG }
 
