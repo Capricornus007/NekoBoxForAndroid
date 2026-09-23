@@ -108,6 +108,18 @@ class ConfigurationGroupFragment : Fragment() {
 
     lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var itemTouchHelper: ItemTouchHelper
+    private var dragAbandonedOnPause = false
+
+    override fun onPause() {
+        super.onPause()
+        // 拖曳排序進行中被搶走觸控（HOME、通知欄、手勢列）時，ItemTouchHelper 可能永遠等不到
+        // 動作的結束事件：那張「被拿起來」的卡片會一直吞掉後續手勢，列表就此滑不動、只能重啟 App。
+        // 這個 recyclerview 版本沒有 stopDrag()，所以先結掉拖曳狀態，回來看時重建一個乾淨的 helper。
+        if (::itemTouchHelper.isInitialized && adapter?.isDragInProgress() == true) {
+            adapter?.commitMove()
+            dragAbandonedOnPause = true
+        }
+    }
 
     private fun setupItemTouchHelper() {
         if (select) return
@@ -195,6 +207,10 @@ class ConfigurationGroupFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
+        if (dragAbandonedOnPause) {
+            dragAbandonedOnPause = false
+            setupItemTouchHelper()
+        }
         if (::configurationListView.isInitialized && configurationListView.size == 0) {
             configurationListView.adapter = adapter
             runOnDefaultDispatcher {
@@ -592,6 +608,8 @@ class ConfigurationGroupFragment : Fragment() {
             !masterUpdatePending &&
             !displayPending &&
             configurationIdList == masterIds
+
+        fun isDragInProgress() = dragInProgress
 
         fun beginDrag() {
             if (!canDrag()) return
