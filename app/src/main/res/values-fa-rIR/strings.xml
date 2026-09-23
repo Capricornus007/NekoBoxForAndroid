@@ -912,6 +912,8 @@
 
     <string name="wireguard_listen_port">درگاه شنود</string>
     <string name="wireguard_persistent_keepalive">فاصلهٔ زنده‌نگه‌داشتن مداوم (ثانیه)</string>
+    <string name="wireguard_peer_allowed_ips">IPهای مجاز همتا</string>
+    <string name="wireguard_extra_peers">همتاهای اضافی</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">آزمون سرعت این گروه</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

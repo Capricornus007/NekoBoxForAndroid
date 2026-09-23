@@ -870,6 +870,8 @@
     <string name="stun_binding_test">ربط سريع (العنوان الخارجي فقط)</string>
     <string name="wireguard_listen_port">منفذ الاستماع</string>
     <string name="wireguard_persistent_keepalive">فاصلالإبقاء على الاتصال بالثواني</string>
+    <string name="wireguard_peer_allowed_ips">العناوين المسموح بها للقرين</string>
+    <string name="wireguard_extra_peers">القرائن الإضافية</string>
     <string name="trusttunnel_health_check">فحص السلامة</string>
     <string name="trusttunnel_congestion_control">التحكم في ازدحام QUIC</string>
     <string name="invalid_naive_link">رابط Naive غير صالح: %1$s</string>

@@ -87,21 +87,47 @@ object AmneziaWireGuardImporter {
             i5 = iface.get("I5").orEmpty()
         }
 
-        return peers.mapNotNull { peer ->
+        val parsedPeers = peers.mapNotNull { peer ->
             val endpoint = peer.get("Endpoint")?.let(::parseEndpoint) ?: return@mapNotNull null
             val publicKey = peer.get("PublicKey")?.takeIf(String::isNotBlank)
                 ?: return@mapNotNull null
-            template.clone().apply {
-                serverAddress = endpoint.host
-                serverPort = endpoint.port
-                peerPublicKey = publicKey
-                peerPreSharedKey = peer.get("PresharedKey").orEmpty()
-                persistentKeepaliveInterval = peer.intValue("PersistentKeepalive")
-                reserved = peer.get("Reserved").orEmpty()
-                initializeDefaultValues()
-            }
+            WireGuardPeerSpec(
+                host = endpoint.host,
+                port = endpoint.port,
+                publicKey = publicKey,
+                preSharedKey = peer.get("PresharedKey").orEmpty(),
+                allowedIPs = peer.get("AllowedIPs").orEmpty(),
+                keepalive = peer.intValue("PersistentKeepalive"),
+                reserved = peer.get("Reserved").orEmpty(),
+            )
         }.ifEmpty {
             error("No valid peers")
+        }
+
+        // 每個 peer 各自宣告了不同的 AllowedIPs，代表這是「按目的位址分流」的一份配置：
+        // 拆成 N 份 profile 會讓每份只帶自己那段路由、其餘全部漏走直連，所以併成一份多 peer。
+        // 其餘情況（沒寫 AllowedIPs、或重複）是漫遊／備援寫法，維持一比一拆成多份的舊行為。
+        val routed = parsedPeers.filter { it.allowedIPs.isNotBlank() }
+        val routeSplit = parsedPeers.size > 1 &&
+            routed.size == parsedPeers.size &&
+            routed.map(WireGuardPeerSpec::allowedIPs).distinct().size == parsedPeers.size
+
+        fun profileFor(primary: WireGuardPeerSpec, extra: List<WireGuardPeerSpec>) = template.clone().apply {
+            serverAddress = primary.host
+            serverPort = primary.port
+            peerPublicKey = primary.publicKey
+            peerPreSharedKey = primary.preSharedKey
+            persistentKeepaliveInterval = primary.keepalive
+            reserved = primary.reserved
+            peerAllowedIps = primary.allowedIPs
+            extraPeers = formatWireGuardPeerBlocks(extra)
+            initializeDefaultValues()
+        }
+
+        return if (routeSplit) {
+            listOf(profileFor(parsedPeers.first(), parsedPeers.drop(1)))
+        } else {
+            parsedPeers.map { profileFor(it, emptyList()) }
         }
     }
 

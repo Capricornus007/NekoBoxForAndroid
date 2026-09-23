@@ -903,6 +903,8 @@
     <string name="stun_binding_test">Liaison rapide (adresse externe uniquement)</string>
     <string name="wireguard_listen_port">Port d\'écoute</string>
     <string name="wireguard_persistent_keepalive">Intervalle de keepalive persistant (secondes)</string>
+    <string name="wireguard_peer_allowed_ips">IP autorisées du pair</string>
+    <string name="wireguard_extra_peers">Pairs supplémentaires</string>
     <string name="backup_not_throne_desktop">Ceci n\'est pas une sauvegarde Throne Desktop : .thrbackup attendu, mais %s trouvé</string>
     <string name="action_import_throne_desktop">Importer depuis Throne Desktop</string>
     <string name="backup_import_throne_desktop_summary">Importer profils, routes et réglages depuis un fichier .thrbackup de Throne Desktop</string>

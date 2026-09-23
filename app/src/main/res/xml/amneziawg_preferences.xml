@@ -38,6 +38,16 @@
             app:key="peerPreSharedKey"
             app:title="@string/wireguard_psk" />
         <EditTextPreference
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="peerAllowedIps"
+            app:title="@string/wireguard_peer_allowed_ips"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_hardware_router"
+            app:key="extraPeers"
+            app:title="@string/wireguard_extra_peers"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
             app:defaultValue="1420"
             app:icon="@drawable/baseline_public_24"
             app:key="mtu"

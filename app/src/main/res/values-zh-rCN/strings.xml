@@ -650,6 +650,8 @@
     <string name="snell_reuse_summary">仅适用于 v4-v6</string>
     <string name="wireguard_listen_port">监听端口</string>
     <string name="wireguard_persistent_keepalive">持久保活间隔</string>
+    <string name="wireguard_peer_allowed_ips">对端允许 IP</string>
+    <string name="wireguard_extra_peers">额外对端</string>
     <string name="connection_test_url_test">URL 测试本组</string>
     <string name="group_is_load_balance">负载均衡（轮询）</string>
     <string name="group_is_load_balance_sum">将连接轮询分发到本组所有节点</string>

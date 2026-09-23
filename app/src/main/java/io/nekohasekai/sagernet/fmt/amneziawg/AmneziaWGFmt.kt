@@ -3,7 +3,11 @@ package io.nekohasekai.sagernet.fmt.amneziawg
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
+import io.nekohasekai.sagernet.fmt.wireguard.formatWireGuardPeerBlocks
 import io.nekohasekai.sagernet.fmt.wireguard.genReservedBytes
+import io.nekohasekai.sagernet.fmt.wireguard.parseWireGuardAllowedIPs
+import io.nekohasekai.sagernet.fmt.wireguard.parseWireGuardPeerBlocks
+import io.nekohasekai.sagernet.fmt.wireguard.wireGuardPeerSpecFromJson
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
 import moe.matsuri.nb4a.SingBoxOptions
 import moe.matsuri.nb4a.utils.listByLineOrComma
@@ -15,17 +19,7 @@ fun buildSingBoxEndpointAmneziaWGBean(bean: AmneziaWGBean): SingBoxOptions.Endpo
         private_key = bean.privateKey
         mtu = bean.mtu
         listen_port = bean.listenPort?.takeIf { it > 0 }
-        peers = listOf(
-            SingBoxOptions.Endpoint_AwgPeer().apply {
-                address = bean.serverAddress
-                port = bean.serverPort
-                public_key = bean.peerPublicKey
-                preshared_key = bean.peerPreSharedKey
-                allowed_ips = listOf("0.0.0.0/0", "::/0")
-                persistent_keepalive_interval = bean.persistentKeepaliveInterval?.takeIf { it > 0 }
-                reserved = bean.reserved.takeIf { it.isNotBlank() }?.let(::genReservedBytes)
-            },
-        )
+        peers = buildAmneziaWGPeers(bean)
 
         // AmneziaWG obfuscation parameters; zero/blank values are omitted so the
         // tunnel behaves like plain WireGuard when unset.
@@ -48,13 +42,40 @@ fun buildSingBoxEndpointAmneziaWGBean(bean: AmneziaWGBean): SingBoxOptions.Endpo
     }
 }
 
+fun buildAmneziaWGPeers(bean: AmneziaWGBean): List<SingBoxOptions.Endpoint_AwgPeer> {
+    val peers = mutableListOf(
+        SingBoxOptions.Endpoint_AwgPeer().apply {
+            address = bean.serverAddress
+            port = bean.serverPort
+            public_key = bean.peerPublicKey
+            preshared_key = bean.peerPreSharedKey
+            allowed_ips = parseWireGuardAllowedIPs(bean.peerAllowedIps)
+            persistent_keepalive_interval = bean.persistentKeepaliveInterval?.takeIf { it > 0 }
+            reserved = bean.reserved.takeIf { it.isNotBlank() }?.let(::genReservedBytes)
+        },
+    )
+    parseWireGuardPeerBlocks(bean.extraPeers).forEach { spec ->
+        peers.add(
+            SingBoxOptions.Endpoint_AwgPeer().apply {
+                address = spec.host
+                port = spec.port
+                public_key = spec.publicKey
+                preshared_key = spec.preSharedKey.takeIf(String::isNotBlank)
+                allowed_ips = parseWireGuardAllowedIPs(spec.allowedIPs)
+                persistent_keepalive_interval = spec.keepalive.takeIf { it > 0 }
+                reserved = spec.reserved.takeIf { it.isNotBlank() }?.let(::genReservedBytes)
+            },
+        )
+    }
+    return peers
+}
+
 fun parseAmneziaWGEndpoint(json: JsonObject): AmneziaWGBean? {
     if (json.stringValue("type") != "awg") return null
-    val peer = json.getAsJsonArray("peers")
-        ?.firstOrNull()
-        ?.takeIf(JsonElement::isJsonObject)
-        ?.asJsonObject
-        ?: return null
+    val peerList = json.getAsJsonArray("peers")
+        ?.mapNotNull { element -> element.takeIf(JsonElement::isJsonObject)?.asJsonObject }
+        .orEmpty()
+    val peer = peerList.firstOrNull() ?: return null
     val localAddresses = json.listableStrings("address") ?: return null
     val privateKey = json.stringValue("private_key") ?: return null
     val serverAddress = peer.stringValue("address") ?: return null
@@ -73,6 +94,10 @@ fun parseAmneziaWGEndpoint(json: JsonObject): AmneziaWGBean? {
         peerPreSharedKey = peer.stringValue("preshared_key").orEmpty()
         persistentKeepaliveInterval = peer.intValue("persistent_keepalive_interval")?.takeIf { it > 0 } ?: 0
         reserved = peer.reservedValue().orEmpty()
+        peerAllowedIps = peer.listableStrings("allowed_ips").orEmpty().joinToString(", ")
+        extraPeers = formatWireGuardPeerBlocks(
+            peerList.drop(1).mapNotNull { wireGuardPeerSpecFromJson(it, "preshared_key") },
+        )
         jc = json.intValue("jc") ?: 0
         jmin = json.intValue("jmin") ?: 0
         jmax = json.intValue("jmax") ?: 0
@@ -150,6 +175,8 @@ fun WireGuardBean.toAmneziaWGBean() = AmneziaWGBean().apply {
     reserved = this@toAmneziaWGBean.reserved
     listenPort = this@toAmneziaWGBean.listenPort
     persistentKeepaliveInterval = this@toAmneziaWGBean.persistentKeepaliveInterval
+    peerAllowedIps = this@toAmneziaWGBean.peerAllowedIps
+    extraPeers = this@toAmneziaWGBean.extraPeers
     jc = this@toAmneziaWGBean.jc
     jmin = this@toAmneziaWGBean.jmin
     jmax = this@toAmneziaWGBean.jmax

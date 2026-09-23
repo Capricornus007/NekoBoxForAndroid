@@ -899,6 +899,8 @@ Devam edilsin mi?</string>
 
     <string name="wireguard_listen_port">Dinleme bağlantı noktası</string>
     <string name="wireguard_persistent_keepalive">Kalıcı bağlantı sürdürme aralığı (saniye)</string>
+    <string name="wireguard_peer_allowed_ips">Üyenin izin verilen IP\'leri</string>
+    <string name="wireguard_extra_peers">Ek üyeler</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Bu grubun hızını test et</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

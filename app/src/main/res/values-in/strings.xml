@@ -879,6 +879,8 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="stun_binding_test">Pengikatan cepat (hanya alamat eksternal)</string>
     <string name="wireguard_listen_port">Porta dengar</string>
     <string name="wireguard_persistent_keepalive">Interval keepalive persisten (detik)</string>
+    <string name="wireguard_peer_allowed_ips">IP Diizinkan Rekan</string>
+    <string name="wireguard_extra_peers">Rekan Tambahan</string>
     <string name="trusttunnel_health_check">Pemeriksaan kesehatan</string>
     <string name="trusttunnel_congestion_control">Kontrol kemacetan QUIC</string>
     <string name="invalid_naive_link">Tautan Naive tidak valid: %1$s</string>

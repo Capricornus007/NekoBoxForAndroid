@@ -22,6 +22,8 @@ class AmneziaWGSettingsActivity : ProfileSettingsActivity<AmneziaWGBean>() {
     private val privateKey = pbm.add(PreferenceBinding(Type.Text, "privateKey"))
     private val peerPublicKey = pbm.add(PreferenceBinding(Type.Text, "peerPublicKey"))
     private val peerPreSharedKey = pbm.add(PreferenceBinding(Type.Text, "peerPreSharedKey"))
+    private val peerAllowedIps = pbm.add(PreferenceBinding(Type.Text, "peerAllowedIps"))
+    private val extraPeers = pbm.add(PreferenceBinding(Type.Text, "extraPeers"))
     private val mtu = pbm.add(PreferenceBinding(Type.TextToInt, "mtu"))
     private val reserved = pbm.add(PreferenceBinding(Type.Text, "reserved"))
     private val listenPort = pbm.add(PreferenceBinding(Type.TextToInt, "listenPort"))
@@ -65,6 +67,8 @@ class AmneziaWGSettingsActivity : ProfileSettingsActivity<AmneziaWGBean>() {
             .setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
         (persistentKeepaliveInterval.preference as EditTextPreference)
             .setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+        (extraPeers.preference as EditTextPreference)
+            .setOnBindEditTextListener(EditTextPreferenceModifiers.Multiline)
         for (intPref in listOf(jc, jmin, jmax, s1, s2, s3, s4)) {
             (intPref.preference as EditTextPreference)
                 .setOnBindEditTextListener(EditTextPreferenceModifiers.Number)

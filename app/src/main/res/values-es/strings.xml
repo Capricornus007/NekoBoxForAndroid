@@ -857,6 +857,8 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
     <string name="route_need_vpn">La regla de enrutado %s depende de que la VPN esté activa, se ignora</string>
     <string name="wireguard_listen_port">Puerto de escucha</string>
     <string name="wireguard_persistent_keepalive">Intervalo de keepalive persistente (segundos)</string>
+    <string name="wireguard_peer_allowed_ips">IP permitidas del par</string>
+    <string name="wireguard_extra_peers">Pares adicionales</string>
     <string name="not_set">Sin establecer</string>
     <string name="hide_from_recent_apps">Ocultar de tareas recientes</string>
     <string name="hide_from_recent_apps_summary">Ocultar la aplicación de las tareas recientes cuando esté en segundo plano</string>

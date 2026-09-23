@@ -38,6 +38,52 @@ class WireGuardFmtTest {
     }
 
     @Test
+    fun extraPeersFromJsonSurviveRoundTrip() {
+        val parsed = parseWireGuardEndpoint(
+            JsonParser.parseString(
+                """{"type":"wireguard","tag":"wg","address":"10.0.0.2/32","private_key":"private","peers":[{"address":"vpn.example.com","port":51820,"public_key":"$PUBLIC_KEY","allowed_ips":["10.0.0.0/24"]},{"address":"[2001:db8::1]","port":51821,"public_key":"$SECOND_KEY","pre_shared_key":"$PRESHARED_KEY","allowed_ips":"198.51.100.7","persistent_keepalive_interval":25}]}""",
+            ).asJsonObject,
+        )!!
+
+        assertEquals("10.0.0.0/24", parsed.peerAllowedIps)
+        val peers = buildSingBoxEndpointWireGuardBean(parsed).peers
+        assertEquals(2, peers.size)
+        assertEquals(listOf("10.0.0.0/24"), peers[0].allowed_ips)
+        assertEquals("2001:db8::1", peers[1].address)
+        assertEquals(51821, peers[1].port)
+        assertEquals(SECOND_KEY, peers[1].public_key)
+        assertEquals(PRESHARED_KEY, peers[1].pre_shared_key)
+        assertEquals(listOf("198.51.100.7/32"), peers[1].allowed_ips)
+        assertEquals(25, peers[1].persistent_keepalive_interval)
+    }
+
+    @Test
+    fun peerBlocksRoundTripWithoutLoss() {
+        val blocks = formatWireGuardPeerBlocks(
+            listOf(
+                WireGuardPeerSpec(
+                    host = "203.0.113.9",
+                    port = 51820,
+                    publicKey = "public",
+                    allowedIPs = "192.0.2.0/24",
+                ),
+            ),
+        )
+
+        val parsed = parseWireGuardPeerBlocks(blocks).single()
+        assertEquals("203.0.113.9", parsed.host)
+        assertEquals(51820, parsed.port)
+        assertEquals("public", parsed.publicKey)
+        assertEquals("192.0.2.0/24", parsed.allowedIPs)
+    }
+
+    @Test
+    fun emptyAllowedIpsKeepsFullTunnelDefault() {
+        assertEquals(listOf("0.0.0.0/0", "::/0"), parseWireGuardAllowedIPs(""))
+        assertEquals(listOf("10.0.0.0/24", "fd00::/64"), parseWireGuardAllowedIPs("10.0.0.0/24, fd00::/64"))
+    }
+
+    @Test
     fun legacyVersion3SerializationDefaultsNewFields() {
         val legacy = ByteArrayOutputStream().use { bytes ->
             ByteBufferOutput(bytes).use { output ->
@@ -66,5 +112,13 @@ class WireGuardFmtTest {
         assertEquals("legacy", parsed.name)
         assertEquals(0, parsed.listenPort)
         assertEquals(0, parsed.persistentKeepaliveInterval)
+        assertEquals("", parsed.peerAllowedIps)
+        assertEquals("", parsed.extraPeers)
+    }
+
+    private companion object {
+        const val PUBLIC_KEY = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+        const val SECOND_KEY = "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="
+        const val PRESHARED_KEY = "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC="
     }
 }

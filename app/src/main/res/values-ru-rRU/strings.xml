@@ -970,6 +970,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
 
     <string name="wireguard_listen_port">Порт прослушивания</string>
     <string name="wireguard_persistent_keepalive">Интервал постоянного поддержания соединения (секунды)</string>
+    <string name="wireguard_peer_allowed_ips">Разрешённые IP пира</string>
+    <string name="wireguard_extra_peers">Дополнительные пиры</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Проверить скорость этой группы</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

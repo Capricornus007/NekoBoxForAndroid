@@ -918,6 +918,8 @@
 
     <string name="wireguard_listen_port">منفذ الاستماع</string>
     <string name="wireguard_persistent_keepalive">الفاصل الزمني للإبقاء المستمر على الاتصال (بالثواني)</string>
+    <string name="wireguard_peer_allowed_ips">العناوين المسموح بها للقرين</string>
+    <string name="wireguard_extra_peers">القرائن الإضافية</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">اختبار سرعة هذه المجموعة</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

@@ -198,6 +198,66 @@ class AmneziaWireGuardImporterTest {
         )
     }
 
+    @Test
+    fun routeSplitConfMergesIntoSingleMultiPeerProfile() {
+        val conf = """
+            [Interface]
+            Address = 10.0.0.2/32
+            PrivateKey = $PRIVATE_KEY
+
+            [Peer]
+            PublicKey = $PUBLIC_KEY
+            Endpoint = 192.0.2.10:51820
+            AllowedIPs = 10.0.0.0/24, fd00::/64
+
+            [Peer]
+            PublicKey = $PRESHARED_KEY
+            Endpoint = [2001:db8::1]:51821
+            AllowedIPs = 198.51.100.0/24
+            PersistentKeepalive = 25
+        """.trimIndent()
+
+        val profiles = AmneziaWireGuardImporter.parseWireGuard(conf)
+
+        assertEquals(1, profiles.size)
+        val profile = profiles.single()
+        assertEquals("192.0.2.10", profile.serverAddress)
+        assertEquals("10.0.0.0/24, fd00::/64", profile.peerAllowedIps)
+        val peers = buildSingBoxEndpointWireGuardBean(profile).peers
+        assertEquals(2, peers.size)
+        assertEquals(listOf("10.0.0.0/24", "fd00::/64"), peers[0].allowed_ips)
+        assertEquals("2001:db8::1", peers[1].address)
+        assertEquals(51821, peers[1].port)
+        assertEquals(listOf("198.51.100.0/24"), peers[1].allowed_ips)
+        assertEquals(25, peers[1].persistent_keepalive_interval)
+    }
+
+    @Test
+    fun duplicateAllowedIpsStillSplitIntoSeparateProfiles() {
+        val conf = """
+            [Interface]
+            Address = 10.0.0.2/32
+            PrivateKey = $PRIVATE_KEY
+
+            [Peer]
+            PublicKey = $PUBLIC_KEY
+            Endpoint = 192.0.2.10:51820
+            AllowedIPs = 0.0.0.0/0, ::/0
+
+            [Peer]
+            PublicKey = $PRESHARED_KEY
+            Endpoint = 192.0.2.11:51820
+            AllowedIPs = 0.0.0.0/0, ::/0
+        """.trimIndent()
+
+        val profiles = AmneziaWireGuardImporter.parseWireGuard(conf)
+
+        assertEquals(2, profiles.size)
+        assertEquals("192.0.2.10", profiles[0].serverAddress)
+        assertEquals("192.0.2.11", profiles[1].serverAddress)
+        assertEquals("", profiles[0].extraPeers)
+    }
+
     private fun assertReason(reason: AmneziaWireGuardImporter.ErrorReason, vpn: String) {
         val error = assertThrows(AmneziaWireGuardImporter.ImportException::class.java) {
             AmneziaWireGuardImporter.parseVpn(vpn)

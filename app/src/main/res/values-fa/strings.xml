@@ -885,6 +885,8 @@
     <string name="dialog_log_buffer_size">اندازه بافر لاگ (KB)</string>
     <string name="wireguard_listen_port">پورت شنیدن</string>
     <string name="wireguard_persistent_keepalive">فاصله keepalive پایدار (ثانیه)</string>
+    <string name="wireguard_peer_allowed_ips">IPهای مجاز همتا</string>
+    <string name="wireguard_extra_peers">همتاهای اضافی</string>
     <string name="trusttunnel_health_check">بررسی سلامت</string>
     <string name="trusttunnel_congestion_control">کنترل ازدحام QUIC</string>
     <string name="batch_update_summary" formatted="false">به‌روزرسانی دسته‌ای انجام شد: %1$d موفق، %2$d ناموفق</string>

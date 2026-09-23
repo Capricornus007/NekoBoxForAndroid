@@ -922,6 +922,8 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
 
     <string name="wireguard_listen_port">Puerto de escucha</string>
     <string name="wireguard_persistent_keepalive">Intervalo de mantenimiento persistente (segundos)</string>
+    <string name="wireguard_peer_allowed_ips">IP permitidas del par</string>
+    <string name="wireguard_extra_peers">Pares adicionales</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Probar velocidad de este grupo</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

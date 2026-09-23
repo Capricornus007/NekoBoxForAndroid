@@ -685,6 +685,8 @@
     <string name="stun_binding_test">빠른 바인딩(외부 주소만)</string>
     <string name="wireguard_listen_port">수신 포트</string>
     <string name="wireguard_persistent_keepalive">지속 Keepalive 간격(초)</string>
+    <string name="wireguard_peer_allowed_ips">피어 허용 IP</string>
+    <string name="wireguard_extra_peers">추가 피어</string>
     <string name="trusttunnel_health_check">헬스 체크</string>
     <string name="trusttunnel_congestion_control">QUIC 혼잡 제어</string>
     <string name="invalid_naive_link">잘못된 Naive 링크: %1$s</string>

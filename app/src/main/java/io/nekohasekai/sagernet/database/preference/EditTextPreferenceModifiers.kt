@@ -21,6 +21,17 @@ object EditTextPreferenceModifiers {
         }
     }
 
+    /** 多行純文字（如 `[Peer]` 區塊）：換行要留得下來，所以關閉單行與橫向捲動。 */
+    object Multiline : EditTextPreference.OnBindEditTextListener {
+
+        override fun onBindEditText(editText: EditText) {
+            editText.inputType = EditorInfo.TYPE_CLASS_TEXT or EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE
+            editText.typeface = Typeface.MONOSPACE
+            editText.setHorizontallyScrolling(false)
+            editText.minLines = 4
+        }
+    }
+
     object Port : EditTextPreference.OnBindEditTextListener {
         private val portLengthFilter = arrayOf(InputFilter.LengthFilter(5))
 

@@ -903,6 +903,8 @@ VPN адключыцца на 1–3 секунды, а затым падключ
 
     <string name="wireguard_listen_port">Порт праслухоўвання</string>
     <string name="wireguard_persistent_keepalive">Інтэрвал пастаяннага падтрымання злучэння (у секундах)</string>
+    <string name="wireguard_peer_allowed_ips">Дазволаныя IP аднавярблістага</string>
+    <string name="wireguard_extra_peers">Дадатковыя аднавярблістыя</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Тэст хуткасці гэтай групы</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

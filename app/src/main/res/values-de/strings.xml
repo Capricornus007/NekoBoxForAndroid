@@ -529,6 +529,8 @@
     <string name="wireguard_psk">Pre-Shared Key des Peers</string>
     <string name="wireguard_listen_port">Listen-Port</string>
     <string name="wireguard_persistent_keepalive">Persistentes Keepalive-Intervall (Sekunden)</string>
+    <string name="wireguard_peer_allowed_ips">Erlaubte IPs des Peers</string>
+    <string name="wireguard_extra_peers">Zusätzliche Peers</string>
     <string name="warp_license">CloudFlare Warp ist ein kostenloser WireGuard-VPN-Anbieter. Mit der Nutzung</string>
     <string name="warp_generate">Konfiguration erzeugen</string>
     <string name="generating">Wird erzeugt…</string>

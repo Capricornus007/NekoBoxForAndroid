@@ -914,6 +914,8 @@ Continuare?</string>
 
     <string name="wireguard_listen_port">Porta di ascolto</string>
     <string name="wireguard_persistent_keepalive">Intervallo keepalive persistente (secondi)</string>
+    <string name="wireguard_peer_allowed_ips">IP consentiti del peer</string>
+    <string name="wireguard_extra_peers">Peer aggiuntivi</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Test velocità di questo gruppo</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

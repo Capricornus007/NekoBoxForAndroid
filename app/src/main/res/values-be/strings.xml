@@ -589,6 +589,8 @@
     <string name="wireguard_public_key">Публічны ключ піра</string>
     <string name="wireguard_psk">Pre-shared key піра</string>
     <string name="wireguard_persistent_keepalive">Інтэрвал пастаяннага keepalive (секунды)</string>
+    <string name="wireguard_peer_allowed_ips">Дазволаныя IP аднавярблістага</string>
+    <string name="wireguard_extra_peers">Дадатковыя аднавярблістыя</string>
     <string name="cloudflare_wrap">Cloudflare Warp</string>
     <string name="warp_license">CloudFlare Warp — бясплатны правайдар WireGuard VPN. Выкарыстоўваючы яго, вы</string>
     <string name="warp_generate">Стварыць канфігурацыю</string>

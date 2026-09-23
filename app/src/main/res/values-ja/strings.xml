@@ -689,6 +689,8 @@
     <string name="stun_binding_test">クイックバインド（外部アドレスのみ）</string>
     <string name="wireguard_listen_port">リッスンポート</string>
     <string name="wireguard_persistent_keepalive">持続的キープアライブ間隔（秒）</string>
+    <string name="wireguard_peer_allowed_ips">ピアの許可 IP</string>
+    <string name="wireguard_extra_peers">追加のピア</string>
     <string name="trusttunnel_health_check">ヘルスチェック</string>
     <string name="trusttunnel_congestion_control">QUIC 輻輳制御</string>
     <string name="invalid_naive_link">無効な Naive リンク: %1$s</string>

@@ -765,6 +765,8 @@
     <string name="mixed_auth_enabled_sum">Ім\'я користувача: %1$s</string>
     <string name="wireguard_listen_port">Порт прослуховування</string>
     <string name="wireguard_persistent_keepalive">Інтервал постійного keepalive (секунди)</string>
+    <string name="wireguard_peer_allowed_ips">Дозволені IP піра</string>
+    <string name="wireguard_extra_peers">Додаткові піри</string>
     <string name="backup_not_throne_desktop">Це не резервна копія Throne Desktop: очікувався .thrbackup, але знайдено %s</string>
     <string name="action_import_throne_desktop">Імпортувати з Throne Desktop</string>
     <string name="backup_import_throne_desktop_summary">Імпортувати профілі, маршрути та налаштування з файлу .thrbackup Throne Desktop</string>

@@ -36,6 +36,8 @@ public class WireGuardBean extends AbstractBean {
     public String i3;
     public String i4;
     public String i5;
+    public String peerAllowedIps;
+    public String extraPeers;
 
     @Override
     public void initializeDefaultValues() {
@@ -64,11 +66,13 @@ public class WireGuardBean extends AbstractBean {
         if (i3 == null) i3 = "";
         if (i4 == null) i4 = "";
         if (i5 == null) i5 = "";
+        if (peerAllowedIps == null) peerAllowedIps = "";
+        if (extraPeers == null) extraPeers = "";
     }
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(4);
+        output.writeInt(5);
         super.serialize(output);
         output.writeString(localAddress);
         output.writeString(privateKey);
@@ -94,6 +98,8 @@ public class WireGuardBean extends AbstractBean {
         output.writeString(i5);
         output.writeInt(listenPort);
         output.writeInt(persistentKeepaliveInterval);
+        output.writeString(peerAllowedIps);
+        output.writeString(extraPeers);
     }
 
     @Override
@@ -129,6 +135,10 @@ public class WireGuardBean extends AbstractBean {
         if (version >= 4) {
             listenPort = input.readInt();
             persistentKeepaliveInterval = input.readInt();
+        }
+        if (version >= 5) {
+            peerAllowedIps = input.readString();
+            extraPeers = input.readString();
         }
         initializeDefaultValues();
     }

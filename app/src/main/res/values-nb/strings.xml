@@ -917,6 +917,8 @@ Fortsette?</string>
 
     <string name="wireguard_listen_port">Lytteport</string>
     <string name="wireguard_persistent_keepalive">Intervall for vedvarende keepalive (sekunder)</string>
+    <string name="wireguard_peer_allowed_ips">Tillatte IP-er for peer</string>
+    <string name="wireguard_extra_peers">Flere peers</string>
 
     <string name="speed_test_group">Test hastighet for denne gruppen</string>
     <string name="simple_download_url">Simple download URL</string>

@@ -900,6 +900,8 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="stun_binding_test">Binding rapido (solo indirizzo esterno)</string>
     <string name="wireguard_listen_port">Porta in ascolto</string>
     <string name="wireguard_persistent_keepalive">Intervallo keepalive persistente (secondi)</string>
+    <string name="wireguard_peer_allowed_ips">IP consentiti del peer</string>
+    <string name="wireguard_extra_peers">Peer aggiuntivi</string>
     <string name="trusttunnel_health_check">Controllo integrità</string>
     <string name="trusttunnel_congestion_control">Controllo congestione QUIC</string>
     <string name="invalid_naive_link">Link Naïve non valido: %1$s</string>

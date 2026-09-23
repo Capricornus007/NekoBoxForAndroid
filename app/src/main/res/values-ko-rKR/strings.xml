@@ -903,6 +903,8 @@
 
     <string name="wireguard_listen_port">수신 포트</string>
     <string name="wireguard_persistent_keepalive">지속적 연결 유지 간격(초)</string>
+    <string name="wireguard_peer_allowed_ips">피어 허용 IP</string>
+    <string name="wireguard_extra_peers">추가 피어</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">이 그룹 속도 테스트</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

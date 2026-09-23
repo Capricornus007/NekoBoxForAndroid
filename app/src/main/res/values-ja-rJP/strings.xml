@@ -912,6 +912,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
 
     <string name="wireguard_listen_port">リッスンポート</string>
     <string name="wireguard_persistent_keepalive">永続キープアライブ間隔（秒）</string>
+    <string name="wireguard_peer_allowed_ips">ピアの許可 IP</string>
+    <string name="wireguard_extra_peers">追加のピア</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">このグループの速度テスト</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>

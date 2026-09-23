@@ -559,6 +559,8 @@
     <string name="wireguard_psk">Peer Pre-Shared Key</string>
     <string name="wireguard_listen_port">Listen Port</string>
     <string name="wireguard_persistent_keepalive">Persistent Keepalive Interval (seconds)</string>
+    <string name="wireguard_peer_allowed_ips">Peer Allowed IPs</string>
+    <string name="wireguard_extra_peers">Extra Peers</string>
 
     <string name="cloudflare_wrap" translatable="false">Cloudflare Warp</string>
     <string name="warp_license">CloudFlare Warp is a free WireGuard VPN provider. By using it, you

@@ -53,6 +53,8 @@ public class AmneziaWGBean extends AbstractBean {
     public String i3;
     public String i4;
     public String i5;
+    public String peerAllowedIps;
+    public String extraPeers;
 
     @Override
     public void initializeDefaultValues() {
@@ -81,11 +83,13 @@ public class AmneziaWGBean extends AbstractBean {
         if (i3 == null) i3 = "";
         if (i4 == null) i4 = "";
         if (i5 == null) i5 = "";
+        if (peerAllowedIps == null) peerAllowedIps = "";
+        if (extraPeers == null) extraPeers = "";
     }
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(1);
+        output.writeInt(2);
         super.serialize(output);
         output.writeString(localAddress);
         output.writeString(privateKey);
@@ -111,6 +115,8 @@ public class AmneziaWGBean extends AbstractBean {
         output.writeString(i3);
         output.writeString(i4);
         output.writeString(i5);
+        output.writeString(peerAllowedIps);
+        output.writeString(extraPeers);
     }
 
     @Override
@@ -143,6 +149,10 @@ public class AmneziaWGBean extends AbstractBean {
         i3 = input.readString();
         i4 = input.readString();
         i5 = input.readString();
+        if (version >= 2) {
+            peerAllowedIps = input.readString();
+            extraPeers = input.readString();
+        }
     }
 
     @NotNull

@@ -915,6 +915,8 @@ Lanjutkan?</string>
 
     <string name="wireguard_listen_port">Port dengar</string>
     <string name="wireguard_persistent_keepalive">Interval keepalive persisten (detik)</string>
+    <string name="wireguard_peer_allowed_ips">IP Diizinkan Rekan</string>
+    <string name="wireguard_extra_peers">Rekan Tambahan</string>
     <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Uji kecepatan grup ini</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
