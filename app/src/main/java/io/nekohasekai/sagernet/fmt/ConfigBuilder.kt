@@ -1681,9 +1681,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
  * 啟動前體檢 sing-box 的 cache-file：損毀就隔離掉，讓核心重建。
  * 壞掉時 sing-box 會把整個啟動丟出來，使用者唯一能做的是「清除資料」，連同全部節點一起清掉。
  * 路徑實測於設備：../cache/cache.db 的基準是 filesDir，實際落在 /data/data/<包>/cache/cache.db。
+ * 這個檔是 bbolt 不是 SQLite，格式判斷由 quarantineIfNotDatabase 負責，別在這裡只認 SQLite。
  */
 private fun quarantineCorruptCacheDb() {
-    moe.matsuri.nb4a.utils.Util.quarantineIfNotSqlite(
+    moe.matsuri.nb4a.utils.Util.quarantineIfNotDatabase(
         java.io.File(io.nekohasekai.sagernet.SagerNet.application.cacheDir, "cache.db"),
     )
 }

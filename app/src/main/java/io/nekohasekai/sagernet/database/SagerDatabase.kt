@@ -187,7 +187,7 @@ abstract class SagerDatabase : RoomDatabase() {
             // 建 builder 前先做魔數體檢，壞了就隔離讓 Room 重建。刻意不用
             // fallbackToDestructiveMigration：那會在任何遷移失敗時無聲清空全部節點，
             // 我方就是為了這個才把它拿掉的（見 Migration16To17 的教訓）。
-            moe.matsuri.nb4a.utils.Util.quarantineIfNotSqlite(
+            moe.matsuri.nb4a.utils.Util.quarantineIfNotDatabase(
                 SagerNet.application.getDatabasePath(Key.DB_PROFILE),
             )
             Room.databaseBuilder(SagerNet.application, SagerDatabase::class.java, Key.DB_PROFILE)
