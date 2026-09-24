@@ -12,6 +12,10 @@
 
     <uses-permission android:name="${applicationId}.permission.SERVICE_ACCESS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- NativeInterface.wifiState() 讀 WifiManager.connectionInfo 拿 SSID/BSSID（給核心做
+         wifi_ssid / wifi_bssid 規則用）。沒宣告這個權限時該讀取只能拿到遮罩值，
+         在某些版本上直接拋 SecurityException。 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
