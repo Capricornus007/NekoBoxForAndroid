@@ -506,6 +506,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     return MyOptions().apply {
         if (!forTest) {
             experimental = ExperimentalOptions().apply {
+                // cache-file 壞掉時 sing-box 會直接把整個啟動丟出來，使用者唯一能做的是「清除
+                // 資料」——連同全部節點一起清掉。寫配置前先做個 16 字節魔數體檢：不是合法
+                // SQLite 頭就改名留證（改名失敗才直刪），讓核心自己重建一個。
+                // 刻意不去比對異常文字判損毀：關鍵字比對容易把別的故障誤判成這個。
+                quarantineCorruptCacheDb()
+
                 cache_file = CacheFile().apply {
                     enabled = true
                     path = "../cache/cache.db"
@@ -1651,5 +1657,28 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             if (buildSelector) group.id else -1L,
             localProxyCredentials,
         )
+    }
+}
+
+/**
+ * 啟動前體檢 sing-box 的 cache-file：損毀就隔離掉，讓核心重建。
+ * 判據只看 SQLite 的 16 字節文件頭魔數，不依賴任何異常訊息。
+ */
+private fun quarantineCorruptCacheDb() {
+    try {
+        val db = java.io.File(SagerNet.application.cacheDir, "cache.db")
+        if (!db.isFile) return
+        val magic = ByteArray(16)
+        if (db.length() >= 16) {
+            java.io.RandomAccessFile(db, "r").use { it.readFully(magic) }
+            if (String(magic, Charsets.ISO_8859_1) == "SQLite format 3\u0000") return
+        }
+        val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US)
+            .format(java.util.Date())
+        // 留一份樣本便於事後判斷是真損毀還是被截斷；留不下來就直接刪，別擋著啟動。
+        if (!db.renameTo(java.io.File(db.parentFile, "cache.db.corrupt-$stamp"))) {
+            db.delete()
+        }
+    } catch (ignored: Throwable) {
     }
 }
