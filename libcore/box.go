@@ -385,9 +385,13 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 	return
 }
 
+// urlTestUserAgent 是探測請求帶的瀏覽器 UA：不少測速檔的 CDN 會直接拒掉 Go 的預設 UA。
+const urlTestUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+
 // urlTest 替代 libneko/speedtest.UrlTest 与 fork 的 boxapi.CreateProxyHttpClient，
 // 对齐 husi libcore/ping.go 的"显式拨号 + 连接复用 + 双 HEAD 请求"模式：
 // 第一次 HEAD 预热（含握手，不计时），第二次 HEAD 复用同一连接计时。
+// HEAD 被目标拒掉时两阶段一起退化成带浏览器 UA 的 GET，避免好节点被误报为失败。
 // 收益：① 延迟为纯 RTT，跨协议可比、贴近实际使用时连接复用的体感；
 // ② 第二次请求验证连接持续性——"首包能通但随即断开"的节点不再假成功。
 // 超时由 ctx 全程控制（拨号 + 两次请求共用 timeout 预算）。
@@ -442,20 +446,36 @@ func urlTest(b *box.Box, tracker adapter.ConnectionTracker, link string, timeout
 	}
 	defer client.CloseIdleConnections()
 
-	doHead := func() error {
-		req, err := http.NewRequestWithContext(ctx, http.MethodHead, link, nil)
+	// 很多測速檔的 CDN 對 HEAD 回 405/403，或直接拒掉 Go 的預設 UA —— 節點明明是好的卻報失敗。
+	// 所以 HEAD 碰壁且還沒超時時改用帶瀏覽器 UA 的 GET 重試，並讓後續量測沿用同一方法。
+	probeMethod := http.MethodHead
+	doProbe := func() error {
+		req, err := http.NewRequestWithContext(ctx, probeMethod, link, nil)
 		if err != nil {
 			return err
+		}
+		if probeMethod == http.MethodGet {
+			req.Header.Set("User-Agent", urlTestUserAgent)
 		}
 		resp, err := client.Do(req)
 		if err != nil {
 			return err
 		}
+		// GET 要把 body 讀乾，否則 keep-alive 連線不會回池，第二階段就退化成冷啟動。
+		_, _ = io.Copy(io.Discard, resp.Body)
 		_ = resp.Body.Close()
 		if resp.StatusCode >= 400 {
 			return E.New("unexpected status: ", resp.Status)
 		}
 		return nil
+	}
+	doHead := func() error {
+		err := doProbe()
+		if err == nil || probeMethod == http.MethodGet || ctx.Err() != nil {
+			return err
+		}
+		probeMethod = http.MethodGet
+		return doProbe()
 	}
 
 	// 第一次：预热（建立 TLS 会话等），不计时
