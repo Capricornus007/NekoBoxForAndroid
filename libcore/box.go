@@ -223,6 +223,29 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 	return b, nil
 }
 
+// runOnFreshStack 把 fn 丟到一條全新的 goroutine 上執行，並等它結束（語意仍是同步）。
+//
+// 由 Java 執行緒經 gomobile 進來的呼叫，沿用宿主 pthread 的堆疊上限（Android 常見 8MB
+// 出頭），而 gvisor TUN 樹的建立與拆除遞迴很深，超過就會 `fatal error: stack growth
+// failed` 把整個 :bg 打死（golang/go#68760）。上游 sing-box 自己有
+// libbox SetupOptions.FixAndroidStack 做同一件事，但我方不走 libbox CommandServer
+// （用 gomobile-matsuri + box_include.go），那個開關對我們是死的，只能自己包。
+// 新起的 goroutine 由 Go runtime 管理堆疊，可以正常增長。
+//
+// panic 必須在這裡就轉成 error 傳出去：fn 已經不在呼叫端那些 defer 的覆蓋範圍內了。
+func runOnFreshStack(name string, fn func() error) error {
+	done := make(chan error, 1)
+	go func() {
+		var err error
+		// 先註冊傳送、後註冊 panic 轉換，這樣 LIFO 展開時轉換先跑、傳送後跑，
+		// panic 才會帶著錯誤一起送出去而不是讓呼叫端永久阻塞。
+		defer func() { done <- err }()
+		defer device.DeferPanicToError(name, func(err_ error) { err = err_ })
+		err = fn()
+	}()
+	return <-done
+}
+
 func (b *BoxInstance) Start() (err error) {
 	b.access.Lock()
 	defer b.access.Unlock()
@@ -242,13 +265,15 @@ func (b *BoxInstance) Start() (err error) {
 	}()
 	defer device.DeferPanicToError("box.Start", func(err_ error) { err = err_ })
 
-	if b.startBox != nil {
-		err = b.startBox()
-	} else if b.Box != nil {
-		err = b.Box.Start()
-	} else {
-		err = errors.New("box is nil")
-	}
+	err = runOnFreshStack("box.Start", func() error {
+		if b.startBox != nil {
+			return b.startBox()
+		}
+		if b.Box != nil {
+			return b.Box.Start()
+		}
+		return errors.New("box is nil")
+	})
 	return err
 }
 
@@ -280,15 +305,20 @@ func (b *BoxInstance) Close() (err error) {
 		goServeProtect(false)
 	}
 
-	// close box
+	// close box —— 只有真正拆 gvisor 樹的那幾行要換到新堆疊上，上面的 mainInstance /
+	// goServeProtect / cancel 狀態機留在原 goroutine，避免把同步語意搞亂。
 	if b.cancel != nil {
 		b.cancel()
 	}
-	if b.closeBox != nil {
-		err = b.closeBox()
-	} else if b.Box != nil {
-		err = b.Box.Close()
-	}
+	err = runOnFreshStack("box.Close", func() error {
+		if b.closeBox != nil {
+			return b.closeBox()
+		}
+		if b.Box != nil {
+			return b.Box.Close()
+		}
+		return nil
+	})
 
 	return err
 }
