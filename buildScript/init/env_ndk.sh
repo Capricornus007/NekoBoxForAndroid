@@ -16,11 +16,16 @@ _NDK="$ANDROID_HOME/ndk/25.0.8775105"
 [ -f "$_NDK/source.properties" ] || _NDK="${NDK:-}"
 [ -f "$_NDK/source.properties" ] || _NDK="$ANDROID_HOME/ndk-bundle"
 
-# 上面都没命中时，挑 $ANDROID_HOME/ndk/ 下版本号最大的一个。CI runner 和
-# 本机的 NDK 版本目录名不固定，写死单个版本号太脆。
+# 上面都没命中时，从 $ANDROID_HOME/ndk/ 下挑版本号最大、而且真正完整的那一个。半截下载
+# 没有 source.properties，选中它会让下面直接 "NDK not found" 退出，而不是退回次新的完整
+# 版本。CI runner 和本机的 NDK 版本目录名不固定，写死单个版本号太脆。
 if [ ! -f "$_NDK/source.properties" ]; then
-  _latest="$(ls -d "$ANDROID_HOME"/ndk/* 2>/dev/null | sort -V | tail -n1)"
-  [ -n "$_latest" ] && _NDK="$_latest"
+  for _candidate in $(find "$ANDROID_HOME"/ndk -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort -Vr); do
+    if [ -f "$_candidate/source.properties" ]; then
+      _NDK="$_candidate"
+      break
+    fi
+  done
 fi
 
 if [ ! -f "$_NDK/source.properties" ]; then
