@@ -179,6 +179,10 @@ replace github.com/sagernet/sing-quic => ../../sing-quic
 
 replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20260924053801-79dae2566f99
 
+replace github.com/sagernet/quic-go => github.com/Capricornus007/quic-go v0.61.0-sing-box-mod.9
+
+replace github.com/sagernet/sing-mux => github.com/Capricornus007/sing-mux v0.3.7-0.20260924041331-2cbd52d50a66
+
 replace github.com/metacubex/utls => github.com/Capricornus007/utls v0.0.0-20260918090442-912a23eb55ce
 
 replace github.com/exclavenetwork/sing-juicity => ../../sing-juicity
