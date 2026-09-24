@@ -118,6 +118,8 @@ object Key {
 
     const val TUN_IMPLEMENTATION = "tunImplementation"
     const val ENABLE_HEV_TUN = "enableHevTun"
+    const val SUBSCRIPTION_DIRECT_FALLBACK = "subscriptionDirectFallback"
+    const val ADAPTIVE_TRAFFIC_POLLING = "adaptiveTrafficPolling"
     const val PROFILE_TRAFFIC_STATISTICS = "profileTrafficStatistics"
 
     const val PROFILE_DIRTY = "profileDirty"

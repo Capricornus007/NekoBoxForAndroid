@@ -942,4 +942,8 @@
     <string name="card_style">卡片</string>
     <string name="card_style_classic">經典</string>
     <string name="card_style_stroke">描邊</string>
+    <string name="subscription_direct_fallback">訂閱改走直連重試</string>
+    <string name="subscription_direct_fallback_summary">當訂閱無法透過本地代理取得時，改用直連再試一次。預設關閉：訂閱網址內含 token，直連會把該網址從本機網路送出去。</string>
+    <string name="adaptive_traffic_polling">自適應流量輪詢</string>
+    <string name="adaptive_traffic_polling_summary">螢幕關閉或 App 在背景時，降低流量計數的輪詢頻率，不再一律使用上面的間隔。可省電；回到前台前速率更新會變慢。</string>
 </resources>

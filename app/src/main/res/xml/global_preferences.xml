@@ -60,6 +60,18 @@
             app:key="enableHevTun"
             app:summary="@string/enable_hev_tun_summary"
             app:title="@string/enable_hev_tun" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_download_24"
+            app:key="subscriptionDirectFallback"
+            app:summary="@string/subscription_direct_fallback_summary"
+            app:title="@string/subscription_direct_fallback" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_shutter_speed_24"
+            app:key="adaptiveTrafficPolling"
+            app:summary="@string/adaptive_traffic_polling_summary"
+            app:title="@string/adaptive_traffic_polling" />
         <moe.matsuri.nb4a.ui.MTUPreference
             app:defaultValue="1500"
             app:entries="@array/mtu_select"

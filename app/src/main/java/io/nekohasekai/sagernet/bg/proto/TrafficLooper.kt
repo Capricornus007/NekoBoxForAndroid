@@ -216,16 +216,27 @@ class TrafficLooper(
         }
     }
 
+    /**
+     * 開啟自適應輪詢且螢幕熄掉（通知欄已經不刷速率）時把輪詢放慢四倍：查核心的頻率直接
+     * 決定 :bg 被喚醒的次數與耗電。亮屏或開關關閉時完全維持你設的固定間隔，行為不變。
+     */
+    private fun pollDelayMs(baseMs: Long): Long {
+        if (!DataStore.adaptiveTrafficPolling) return baseMs
+        val screenOn = data.notification?.listenPostSpeed ?: true
+        return if (screenOn) baseMs else baseMs * 4L
+    }
+
     private suspend fun loop() {
-        val delayMs = DataStore.speedInterval.toLong()
+        val baseDelayMs = DataStore.speedInterval.toLong()
         val showDirectSpeed = DataStore.showDirectSpeed
         val profileTrafficStatistics = DataStore.profileTrafficStatistics
-        if (delayMs == 0L) return
+        if (baseDelayMs == 0L) return
 
         // for display
         val itemBypass = TrafficUpdater.TrafficLooperData(tag = TAG_BYPASS)
 
         while (currentCoroutineContext().isActive) {
+            val delayMs = pollDelayMs(baseDelayMs)
             val proxy = data.proxy
             if (proxy == null) {
                 delay(delayMs)

@@ -1021,6 +1021,11 @@ Continue?</string>
     <string name="dialog_log_buffer_size">Log buffer size (KB)</string>
         <string name="enable_hev_tun">Enable Hev TUN</string>
         <string name="enable_hev_tun_summary">Use hev-socks5-tunnel to create the TUN device</string>
+
+    <string name="subscription_direct_fallback">Fall back to direct connection for subscriptions</string>
+    <string name="subscription_direct_fallback_summary">When a subscription cannot be fetched through the local proxy, retry it once directly. Off by default: subscription URLs carry tokens, and a direct attempt sends that URL over the local network.</string>
+    <string name="adaptive_traffic_polling">Adaptive traffic polling</string>
+    <string name="adaptive_traffic_polling_summary">Poll traffic counters less often when the screen is off or the app is in the background, instead of always using the interval above. Saves battery; speed readouts update more slowly until you come back.</string>
     <string name="tun_implementation_hev_override">Managed by Hev TUN — turn it off to choose</string>
     <string name="url_test_finished_summary">URL test finished: %1$d succeeded / %2$d failed</string>
     <string name="hide_unavailable_profiles">Hide unavailable profiles</string>

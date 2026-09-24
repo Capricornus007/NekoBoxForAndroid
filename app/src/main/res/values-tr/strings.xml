@@ -917,4 +917,8 @@
     <string name="byedpi_cli_strategy">CLI stratejisi</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Gömülü byeDPI için bayraklar, örn. --split 0 --disorder 1</string>
     <string name="udp_fragment">UDP Parçalama</string>
+    <string name="subscription_direct_fallback">Abonelikler için doğrudan bağlantıya geri dönüş</string>
+    <string name="subscription_direct_fallback_summary">Bir abonelik yerel vekil sunucu üzerinden alınamadığında bir kez doğrudan denenir. Varsayılan olarak kapalı: abonelik URL\'leri belirteç içerir ve doğrudan deneme o URL\'yi yerel ağdan gönderir.</string>
+    <string name="adaptive_traffic_polling">Duyarlı trafik yoklaması</string>
+    <string name="adaptive_traffic_polling_summary">Ekran kapalıyken veya uygulama arka plandayken trafik sayaçlarını yukarıdaki aralığı her zaman kullanmak yerine daha seyrek yoklar. Pilden tasarruf eder; siz geri dönene kadar hız gösterimi daha yavaş güncellenir.</string>
 </resources>

@@ -183,33 +183,47 @@ object RawUpdater : GroupUpdater() {
             proxies = contentText?.let { parseRaw(contentText) }
                 ?: error(app.getString(R.string.no_proxies_found_in_subscription))
         } else {
-            val response = Libcore.newHttpClient().apply {
-                trySocks5(
-                    DataStore.mixedPort,
-                    DataStore.mixedInboundUser,
-                    DataStore.mixedInboundPass,
-                )
-                tryH3Direct()
-                when (DataStore.appTLSVersion) {
-                    "1.3" -> restrictedTLS()
-                }
-            }.newRequest().apply {
-                if (DataStore.allowInsecureOnRequest) {
-                    allowInsecure()
-                }
-                setURL(subscription.link)
-                setUserAgent(
-                    subscription.customUserAgent.takeIf { it.isNotBlank() }
-                        ?: DataStore.spoofUserAgent.takeIf { it.isNotBlank() }
-                        ?: USER_AGENT,
-                )
-                if (subscription.sendHwid == true) {
-                    val hwidHeaders = buildHwidHeaders(subscription.customHwidParams)
-                    for ((key, value) in hwidHeaders) {
-                        setHeader(key, value)
+            val fetch = { useProxy: Boolean ->
+                Libcore.newHttpClient().apply {
+                    if (useProxy) {
+                        trySocks5(
+                            DataStore.mixedPort,
+                            DataStore.mixedInboundUser,
+                            DataStore.mixedInboundPass,
+                        )
+                        tryH3Direct()
                     }
-                }
-            }.execute()
+                    when (DataStore.appTLSVersion) {
+                        "1.3" -> restrictedTLS()
+                    }
+                }.newRequest().apply {
+                    if (DataStore.allowInsecureOnRequest) {
+                        allowInsecure()
+                    }
+                    setURL(subscription.link)
+                    setUserAgent(
+                        subscription.customUserAgent.takeIf { it.isNotBlank() }
+                            ?: DataStore.spoofUserAgent.takeIf { it.isNotBlank() }
+                            ?: USER_AGENT,
+                    )
+                    if (subscription.sendHwid == true) {
+                        val hwidHeaders = buildHwidHeaders(subscription.customHwidParams)
+                        for ((key, value) in hwidHeaders) {
+                            setHeader(key, value)
+                        }
+                    }
+                }.execute()
+            }
+            // 訂閱流量走本地 mixed 入站，所以代理沒起來或壞掉時「更新訂閱」會整批失敗，
+            // 使用者看到的是「這個訂閱壞了」而不是「代理沒起來」。開關打開時，帶代理失敗
+            // 之後再直連試一次。預設關：訂閱網址自帶 token，直連會把它從本機網路發出去。
+            val response = try {
+                fetch(true)
+            } catch (e: Exception) {
+                if (!DataStore.subscriptionDirectFallback) throw e
+                Logs.w("subscription via local proxy failed, retrying direct", e)
+                fetch(false)
+            }
             val content = Util.getStringBox(response.getContentStringLimited(10L * 1024 * 1024))
             rawText = content
             proxies = parseRaw(content)

@@ -947,4 +947,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="socks_port">SOCKS5 代理連接埠</string>
     <string name="proxy_username">代理使用者名稱</string>
     <string name="proxy_password">代理密碼</string>
+    <string name="subscription_direct_fallback">訂閱改走直連重試</string>
+    <string name="subscription_direct_fallback_summary">當訂閱無法透過本地代理擷取時，改用直連再試一次。預設關閉：訂閱網址內含 token，直連會將該網址經本地網路送出。</string>
+    <string name="adaptive_traffic_polling">自適應流量輪詢</string>
+    <string name="adaptive_traffic_polling_summary">螢幕關閉或 App 於背景執行時，降低流量計數的輪詢頻率，不再一律使用上述間隔。可省電；返回前景前速率更新會變慢。</string>
 </resources>

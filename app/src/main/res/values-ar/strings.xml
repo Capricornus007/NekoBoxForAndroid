@@ -931,4 +931,8 @@
     <string name="byedpi_cli_strategy">استراتيجية CLI</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">أعلام لـ byeDPI المدمج، مثل --split 0 --disorder 1</string>
     <string name="udp_fragment">تجزئة UDP</string>
+    <string name="subscription_direct_fallback">الرجوع إلى الاتصال المباشر للاشتراكات</string>
+    <string name="subscription_direct_fallback_summary">إذا تعذّر جلب الاشتراك عبر الوكيل المحلي، تُعاد المحاولة مرة واحدة مباشرة. معطّل افتراضياً: عناوين الاشتراك تحتوي على رموز، والمحاولة المباشرة ترسل ذلك العنوان عبر الشبكة المحلية.</string>
+    <string name="adaptive_traffic_polling">استطلاع تكيفي للحركة</string>
+    <string name="adaptive_traffic_polling_summary">يستعلم عن عدّادات الحركة بوتيرة أقل عند انطفاء الشاشة أو بقاء التطبيق في الخلفية، بدلاً من استخدام الفاصل أعلاه دائماً. يوفّر البطارية؛ يتحدّث عرض السرعة ببطء حتى تعود.</string>
 </resources>

@@ -344,6 +344,12 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     var tunImplementation by configurationStore.stringToInt(Key.TUN_IMPLEMENTATION) { TunImplementation.GVISOR }
     var enableHevTun by configurationStore.boolean(Key.ENABLE_HEV_TUN)
+
+    // 訂閱走本地代理失敗時，是否再直連試一次（預設關：訂閱網址含 token）
+    var subscriptionDirectFallback by configurationStore.boolean(Key.SUBSCRIPTION_DIRECT_FALLBACK) { false }
+
+    // 滅屏／後台時降低流量計數輪詢頻率（預設關＝維持固定間隔）
+    var adaptiveTrafficPolling by configurationStore.boolean(Key.ADAPTIVE_TRAFFIC_POLLING) { false }
     var profileTrafficStatistics by configurationStore.boolean(Key.PROFILE_TRAFFIC_STATISTICS) { true }
 
     var yacdURL by configurationStore.string("yacdURL") { "http://127.0.0.1:9090/ui" }

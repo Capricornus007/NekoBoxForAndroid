@@ -926,4 +926,8 @@
     <string name="byedpi_cli_strategy">Стратегия CLI</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Флаги встроенного byeDPI, например --split 0 --disorder 1</string>
     <string name="udp_fragment">Фрагментация UDP</string>
+    <string name="subscription_direct_fallback">Резервный прямой доступ к подпискам</string>
+    <string name="subscription_direct_fallback_summary">Если подписку не удалось получить через локальный прокси, выполняется одна попытка напрямую. По умолчанию выключено: URL подписки содержит токены, и при прямом запросе он уходит в локальную сеть.</string>
+    <string name="adaptive_traffic_polling">Адаптивный опрос трафика</string>
+    <string name="adaptive_traffic_polling_summary">Опрашивать счётчики трафика реже, когда экран выключен или приложение в фоне, вместо постоянного интервала выше. Экономит батарею; скорость обновляется медленнее, пока вы не вернётесь.</string>
 </resources>
