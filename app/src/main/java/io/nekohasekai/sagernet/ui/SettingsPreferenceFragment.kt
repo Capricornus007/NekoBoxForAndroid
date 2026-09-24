@@ -402,9 +402,10 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 }
                 // 隧道沒在跑時不動作：此時沒有可分享的進程，設定留給下次連線由 lateInit 套用。
                 if (DataStore.serviceState.canStop) {
+                    // 不去判回傳值：startClientSharing 回 false 只代表「已在跑」（無害），
+                    // root 不可用時它回 true 並自己 Logs.w；stopClientSharing 未啟動時是安全空轉。
                     if (enabled) {
-                        val ok = RootLanSharing.startClientSharing(SagerNet.application)
-                        if (!ok) Logs.w("LAN sharing: startClientSharing refused (root unavailable?)")
+                        RootLanSharing.startClientSharing(SagerNet.application)
                     } else {
                         RootLanSharing.stopClientSharing(SagerNet.application)
                     }
