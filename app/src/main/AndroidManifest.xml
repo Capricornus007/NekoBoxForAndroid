@@ -12,6 +12,10 @@
 
     <uses-permission android:name="${applicationId}.permission.SERVICE_ACCESS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- NativeInterface.wifiState() 讀 WifiManager.connectionInfo 拿 SSID/BSSID（給核心做
+         wifi_ssid / wifi_bssid 規則用）。未宣告時只能拿到遮罩值，部分版本直接拋
+         SecurityException。normal 權限、安裝即授予、不會彈窗。 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
@@ -30,10 +34,13 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <uses-feature
-        android:name="android.software.leanback"
-        android:required="false" />
-    <uses-feature
         android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <!-- 宣告 ACCESS_WIFI_STATE 會讓系統隱含要求 android.hardware.wifi，進而在裝置相容性
+         上把沒有 Wi-Fi 硬體的裝置過濾掉；這條把它明確標成非必需（本應用走蜂窩網路或乙太
+         網路一樣能用）。 -->
+    <uses-feature
+        android:name="android.hardware.wifi"
         android:required="false" />
     <uses-feature
         android:name="android.hardware.camera"
@@ -51,7 +58,6 @@
     <application
         android:name="io.nekohasekai.sagernet.SagerNet"
         android:allowBackup="false"
-        android:banner="@mipmap/ic_launcher"
         android:dataExtractionRules="@xml/backup_rules"
         android:fullBackupContent="@xml/backup_descriptor"
         android:fullBackupOnly="true"
@@ -85,11 +91,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
-            </intent-filter>
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
             </intent-filter>
