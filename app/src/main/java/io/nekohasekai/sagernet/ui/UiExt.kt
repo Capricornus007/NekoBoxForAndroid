@@ -84,7 +84,7 @@ fun Fragment.startFilesForResult(launcher: ActivityResultLauncher<String>, input
     } catch (_: ActivityNotFoundException) {
     } catch (_: SecurityException) {
     }
-    (requireActivity() as ThemedActivity).snackbar(getString(R.string.file_manager_missing)).show()
+    snackbar(getString(R.string.file_manager_missing)).show()
 }
 
 fun Fragment.needReload() {

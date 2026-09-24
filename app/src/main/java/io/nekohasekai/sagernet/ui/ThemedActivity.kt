@@ -109,5 +109,10 @@ abstract class ThemedActivity : AppCompatActivity {
         }
     }
 
-    internal open fun snackbarInternal(text: CharSequence): Snackbar = throw NotImplementedError()
+    // 基類兜底：只有 MainActivity／AssetsActivity 覆寫了這個方法，其餘九個子類
+    // （AppList、AppManager、GroupSettings、RouteSettings、Scanner、Stun、
+    // WebDAVSettings、ConfigEdit、ProfileSettings）一旦走到 snackbar() 就是當機，
+    // 不是顯示問題。用 decorView 建，覆寫者仍走自己的實作。
+    internal open fun snackbarInternal(text: CharSequence): Snackbar =
+        Snackbar.make(window.decorView, text, Snackbar.LENGTH_LONG)
 }
