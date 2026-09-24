@@ -39,6 +39,12 @@
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
+    <!-- 有 LEANBACK_LAUNCHER 時，只要宣告了 Wi-Fi 權限就會被 lint 的 LeanbackUsesWifi
+         判定為「只支援乙太網路的 TV 裝置會被商店過濾掉」；該檢查看的是這條 uses-feature，
+         不是權限自己的 android:required。 -->
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
