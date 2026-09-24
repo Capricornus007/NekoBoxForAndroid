@@ -20,6 +20,7 @@ import io.nekohasekai.sagernet.SpeedTestSettings
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.ktx.*
+import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.utils.AppLocale
 import io.nekohasekai.sagernet.utils.Theme
 import moe.matsuri.nb4a.ui.*
@@ -386,6 +387,31 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         enableDnsRouting.onPreferenceChangeListener = reloadListener
 
         ipv6Mode.onPreferenceChangeListener = reloadListener
+
+        // LAN 分享是 root 改 iptables + ip rule，原本只在連線（BaseService.lateInit）時套用、
+        // 只在隧道關閉時拆除，而且這個開關完全沒掛 listener：開 ON 沒反應，關 OFF 後防火牆規則
+        // 還留著（熱點上的人繼續走隧道）。這裡直接對稱起／拆，避免用重啟服務把使用者的連線全部打掉。
+        findPreference<SwitchPreferenceCompat>(Key.LAN_SHARING)!!.setOnPreferenceChangeListener { _, newValue ->
+            val enabled = newValue as Boolean
+            runOnDefaultDispatcher {
+                try {
+                    // :bg 起會立刻回讀設定，先讓寫入落盤
+                    DataStore.configurationStore.awaitWrites()
+                } catch (e: Exception) {
+                    Logs.w(e)
+                }
+                // 隧道沒在跑時不動作：此時沒有可分享的進程，設定留給下次連線由 lateInit 套用。
+                if (DataStore.serviceState.canStop) {
+                    if (enabled) {
+                        val ok = RootLanSharing.startClientSharing(SagerNet.application)
+                        if (!ok) Logs.w("LAN sharing: startClientSharing refused (root unavailable?)")
+                    } else {
+                        RootLanSharing.stopClientSharing(SagerNet.application)
+                    }
+                }
+            }
+            true
+        }
 
         resolveDestination.onPreferenceChangeListener = reloadListener
         tunImplementation.onPreferenceChangeListener = reloadListener
