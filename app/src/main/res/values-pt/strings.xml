@@ -970,7 +970,7 @@ Continuar?</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Opções para o byeDPI integrado, p. ex. --split 0 --disorder 1</string>
     <string name="udp_fragment">Fragmentação de UDP</string>
     <string name="subscription_direct_fallback">Usar conexão direta como recurso para assinaturas</string>
-    <string name="subscription_direct_fallback_summary">Quando uma assinatura não puder ser obtida pelo proxy local, tenta-se uma vez de forma direta. Desativado por padrão: as URLs de assinatura contêm tokens e uma tentativa direta envia essa URL pela rede local.</string>
+    <string name="subscription_direct_fallback_summary">Tenta a assinatura em direto se o proxy local falhar. Evite se o URL contiver um token.</string>
     <string name="adaptive_traffic_polling">Sondagem adaptativa de tráfego</string>
-    <string name="adaptive_traffic_polling_summary">Consulta os contadores de tráfego com menos frequência quando a tela está apagada ou o app está em segundo plano, em vez de usar sempre o intervalo acima. Economiza bateria; a velocidade é atualizada mais devagar até você voltar.</string>
+    <string name="adaptive_traffic_polling_summary">Consulta menos vezes com o ecrã desligado ou a aplicação em segundo plano.</string>
 </resources>

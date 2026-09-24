@@ -867,7 +867,7 @@
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Сцягі для ўбудаванага byeDPI, напр. --split 0 --disorder 1</string>
     <string name="udp_fragment">Фрагментацыя UDP</string>
     <string name="subscription_direct_fallback">Рэзервовае прамое злучэнне для падпісак</string>
-    <string name="subscription_direct_fallback_summary">Калі падпіску не атрымалася дастаць праз лакальны проксі, выконваецца адна спроба напрамую. Па змаўчанні выключана: адрасы падпісак змяшчаюць токены, і прамая спроба адпраўляе гэты адрас лакальнай сеткай.</string>
+    <string name="subscription_direct_fallback_summary">Паўтарыць падпіску напрамую, калі лакальны проксі не змог. Не ўключаць, калі URL з token.</string>
     <string name="adaptive_traffic_polling">Адаптыўны апыт трафіку</string>
-    <string name="adaptive_traffic_polling_summary">Апытваць лічыльнікі трафіку радзей, калі экран выключаны або праграма ў фоне, замест заўсёднага выкарыстання інтэрвалу вышэй. Экранівае батарэю; хуткасць абнаўляецца павольней, пакуль вы не вернецеся.</string>
+    <string name="adaptive_traffic_polling_summary">Апытваць радзей пры выключаным экране або ў фонавым рэжыме.</string>
 </resources>

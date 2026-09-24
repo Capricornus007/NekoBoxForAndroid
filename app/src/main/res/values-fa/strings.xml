@@ -895,7 +895,7 @@
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">فلگ‌های byeDPI داخلی، مثلاً --split 0 --disorder 1</string>
     <string name="udp_fragment">تکه‌تکه‌سازی UDP</string>
     <string name="subscription_direct_fallback">بازگشت به اتصال مستقیم برای اشتراک‌ها</string>
-    <string name="subscription_direct_fallback_summary">اگر اشتراک از طریق پراکسی محلی دریافت نشد، یک بار به‌صورت مستقیم امتحان می‌شود. به‌طور پیش‌فرض خاموش: نشانی‌های اشتراک شامل توکن هستند و امتحان مستقیم آن نشانی را روی شبکه محلی می‌فرستد.</string>
+    <string name="subscription_direct_fallback_summary">اگر پروکسی محلی اشتراک را نگرفت، مستقیم امتحان کنید. اگر نشانی token دارد روشن نکنید.</string>
     <string name="adaptive_traffic_polling">نمونه‌برداری سازگار از ترافیک</string>
-    <string name="adaptive_traffic_polling_summary">وقتی صفحه خاموش است یا برنامه در پس‌زمینه قرار دارد، شمارنده‌های ترافیک را کمتر نمونه‌برداری می‌کند به‌جای همیشه استفاده از بازهٔ بالا. مصرف باتری را کم می‌کند؛ تا بازگشت شما به‌روزرسانی سرعت کندتر می‌شود.</string>
+    <string name="adaptive_traffic_polling_summary">هنگام خاموش بودن صفحه یا بودن برنامه در پس‌زمینه، کمتر پرس‌وجو می‌کند.</string>
 </resources>

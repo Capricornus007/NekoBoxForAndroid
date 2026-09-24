@@ -1126,7 +1126,7 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Banderas para byeDPI integrado, p. ej. --split 0 --disorder 1</string>
     <string name="udp_fragment">Fragmentación de UDP</string>
     <string name="subscription_direct_fallback">Reintentar suscripciones por conexión directa</string>
-    <string name="subscription_direct_fallback_summary">Cuando una suscripción no pueda obtenerse a través del proxy local, se reintenta una vez en modo directo. Desactivado de forma predeterminada: las URL de suscripción contienen tokens y un intento directo envía esa URL por la red local.</string>
+    <string name="subscription_direct_fallback_summary">Reintentar la suscripción en directo si el proxy local falla. No la actives si la URL lleva token.</string>
     <string name="adaptive_traffic_polling">Sondeo adaptativo de tráfico</string>
-    <string name="adaptive_traffic_polling_summary">Consulta los contadores de tráfico con menos frecuencia cuando la pantalla está apagada o la aplicación está en segundo plano, en lugar de usar siempre el intervalo anterior. Ahorra batería; la velocidad se actualiza más despacio hasta que vuelvas.</string>
+    <string name="adaptive_traffic_polling_summary">Consulta con menos frecuencia con la pantalla apagada o la app en segundo plano.</string>
 </resources>

@@ -944,7 +944,7 @@
     <string name="card_style_classic">经典</string>
     <string name="card_style_stroke">描边</string>
     <string name="subscription_direct_fallback">订阅改用直连重试</string>
-    <string name="subscription_direct_fallback_summary">无法通过本地代理获取订阅时，改用直连再试一次。默认关闭：订阅网址带有令牌，直连会把该网址从本机网络发出。</string>
+    <string name="subscription_direct_fallback_summary">订阅通过本地代理取不到时，改用直连再试一次。网址内含 token 时请勿开启。</string>
     <string name="adaptive_traffic_polling">自适应流量轮询</string>
-    <string name="adaptive_traffic_polling_summary">屏幕关闭或应用处于后台时降低流量计数的轮询频率，不再一律使用上面的间隔。可省电；回到前台前速率刷新会变慢。</string>
+    <string name="adaptive_traffic_polling_summary">屏幕关闭或 App 在后台时降低轮询频率以省电，回到前台立即恢复。</string>
 </resources>

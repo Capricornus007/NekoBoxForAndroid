@@ -750,7 +750,7 @@
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">内蔵byeDPIへの引数（例: --split 0 --disorder 1）</string>
     <string name="udp_fragment">UDP フラグメンテーション</string>
     <string name="subscription_direct_fallback">購読は直接接続にフォールバック</string>
-    <string name="subscription_direct_fallback_summary">ローカルプロキシで購読を取得できない場合、直接接続で一度再試行します。既定ではオフ：購読 URL にはトークンが含まれ、直接接続ではその URL がローカルネットワークを流れます。</string>
+    <string name="subscription_direct_fallback_summary">ローカルプロキシで購読を取得できないとき、直接接続で再試行します。URL に token が含まれる場合は有効にしないでください。</string>
     <string name="adaptive_traffic_polling">アダプティブなトラフィックポーリング</string>
-    <string name="adaptive_traffic_polling_summary">画面が消灯中またはアプリがバックグラウンドのとき、トラフィックカウンターの取得間隔を伸ばします（上の間隔を常に使うわけではありません）。省電力になりますが、前面に戻るまで速度表示の更新は遅くなります。</string>
+    <string name="adaptive_traffic_polling_summary">画面オフまたはアプリがバックグラウンドのとき、輪行頻度を下げて消費電力を抑えます。</string>
 </resources>

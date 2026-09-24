@@ -962,7 +962,7 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">Flag per byeDPI integrato, es. --split 0 --disorder 1</string>
     <string name="udp_fragment">Frammentazione UDP</string>
     <string name="subscription_direct_fallback">Ripiego su connessione diretta per gli abbonamenti</string>
-    <string name="subscription_direct_fallback_summary">Se un abbonamento non può essere recuperato tramite il proxy locale, viene riprovato una volta in modo diretto. Disattivato per impostazione predefinita: gli URL degli abbonamenti contengono token e un tentativo diretto invia quell\'URL sulla rete locale.</string>
+    <string name="subscription_direct_fallback_summary">Riprova l’abbonamento in diretto se il proxy locale fallisce. Evita se l’URL contiene un token.</string>
     <string name="adaptive_traffic_polling">Interrogazione adattiva del traffico</string>
-    <string name="adaptive_traffic_polling_summary">Interroga i contatori del traffico meno spesso quando lo schermo è spento o l\'app è in background, invece di usare sempre l\'intervallo sopra. Risparmia batteria; la velocità si aggiorna più lentamente finché non torni.</string>
+    <string name="adaptive_traffic_polling_summary">Interroga meno spesso con schermo spento o app in background.</string>
 </resources>
