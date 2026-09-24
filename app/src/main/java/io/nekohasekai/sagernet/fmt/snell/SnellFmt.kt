@@ -12,13 +12,16 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 // URI format: snell://base64(psk)@server:port?version=4&obfs-mode=http&obfs-host=bing.com&reuse=true&network=tcp#name
 fun parseSnell(url: String): SnellBean {
     val link = url.replace("snell://", "https://").toHttpUrlOrNull()
-    // 標準解析有兩個靜默陷阱：(1) psk 含 `/` 時（`snell://abc/def@host:1443`）會被切成
-    // host=abc、後面全丟；(2) 我們是把 scheme 換成 https 再解析，原文沒寫端口時 okhttp
-    // 會默默給 443 而不是報錯。兩種都比「整筆失敗」更壞，所以要連可疑結果一起交給回退解析。
-    val explicitPort = url.substringAfter('@', "").substringBefore('#').substringBefore('?').contains(':')
-    if (link == null || (link.port == 443 && !explicitPort)) {
+    // 換成 https 再解析有兩個靜默陷阱：psk 含 `/` 時 authority 會在中途截斷（host 變成 psk
+    // 前半、真正的位址全丟）；原文沒寫端口時 okhttp 默默補 443。兩種都不報錯，比整筆失敗更壞。
+    // 注意 `/` 那個陷阱不能用「@ 之後有沒有冒號」來判斷：截斷後 @ 仍然留在 path 裡，
+    // 冒號照樣看得到，所以必須直接看 authority 段本身。
+    val authority = url.substringAfter("snell://", "").substringBefore('#').substringBefore('?')
+    val malformedAuthority = authority.contains('/')
+    val explicitPort = authority.substringAfter('@', "").contains(':')
+    if (link == null || malformedAuthority || (link.port == 443 && !explicitPort)) {
         parseSnellLenient(url)?.let { return it }
-        if (link == null) error(app.getString(R.string.invalid_snell_url))
+        if (link == null || malformedAuthority) error(app.getString(R.string.invalid_snell_url))
     }
 
     return SnellBean().apply {
