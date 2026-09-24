@@ -10,10 +10,14 @@ import io.nekohasekai.sagernet.ktx.ImportTooLargeException
 import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
 import libcore.StringBox
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.RandomAccessFile
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.Date
+import java.util.Locale
 import java.util.zip.Deflater
 import java.util.zip.Inflater
 
@@ -27,6 +31,35 @@ object Util {
      * @param right text after
      * @return returns String
      */
+    /**
+     * 讀 16 字節的 SQLite 文件頭魔數判斷資料庫是否還完整；不對就改名留一份樣本便於事後判斷
+     * 是真損毀還是被截斷，留不下來就直接刪，別擋著啟動。附帶的 -wal / -shm 一起清掉，否則
+     * 殘留日誌會被拿去跟新建的庫對帳。
+     *
+     * 刻意只認魔數、不去比對異常訊息關鍵字：關鍵字比對會把別的故障誤判成資料庫損毀。
+     *
+     * @return true 表示做了隔離處理（呼叫端該知道原本的庫已不可用）
+     */
+    fun quarantineIfNotSqlite(db: File): Boolean {
+        try {
+            if (!db.isFile) return false
+            val magic = ByteArray(16)
+            if (db.length() >= 16) {
+                RandomAccessFile(db, "r").use { it.readFully(magic) }
+                if (String(magic, Charsets.ISO_8859_1) == "SQLite format 3\u0000") return false
+            }
+            val stamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
+            if (!db.renameTo(File(db.parentFile, "${db.name}.corrupt-$stamp"))) {
+                db.delete()
+            }
+            File(db.parentFile, "${db.name}-wal").delete()
+            File(db.parentFile, "${db.name}-shm").delete()
+            return true
+        } catch (ignored: Throwable) {
+            return false
+        }
+    }
+
     fun getSubString(text: String, left: String?, right: String?): String {
         var zLen: Int
         if (left.isNullOrEmpty()) {

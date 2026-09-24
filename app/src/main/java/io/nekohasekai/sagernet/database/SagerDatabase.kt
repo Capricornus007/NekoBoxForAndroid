@@ -182,6 +182,14 @@ abstract class SagerDatabase : RoomDatabase() {
     companion object {
         val instance by lazy {
             SagerNet.application.getDatabasePath(Key.DB_PROFILE).parentFile?.mkdirs()
+            // 主庫損毀時 Room 只會在第一次查詢拋 SQLiteException，而這個 instance 是 lazy 單例，
+            // 於是每次存取都再拋一次、形成啟動崩潰迴圈，使用者只能清資料、連節點一起清掉。
+            // 建 builder 前先做魔數體檢，壞了就隔離讓 Room 重建。刻意不用
+            // fallbackToDestructiveMigration：那會在任何遷移失敗時無聲清空全部節點，
+            // 我方就是為了這個才把它拿掉的（見 Migration16To17 的教訓）。
+            moe.matsuri.nb4a.utils.Util.quarantineIfNotSqlite(
+                SagerNet.application.getDatabasePath(Key.DB_PROFILE),
+            )
             Room.databaseBuilder(SagerNet.application, SagerDatabase::class.java, Key.DB_PROFILE)
                 .setJournalMode(JournalMode.TRUNCATE)
                 .addMigrations(Migration13To14, Migration14To15, Migration16To17, Migration17To18)
