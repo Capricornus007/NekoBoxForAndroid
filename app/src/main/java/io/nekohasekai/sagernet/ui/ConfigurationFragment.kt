@@ -1649,7 +1649,15 @@ class ConfigurationFragment @JvmOverloads constructor(
 
         val mainJob = runOnDefaultDispatcher {
             val group = DataStore.currentGroup()
-            val profilesList = SagerDatabase.proxyDao.getByGroup(group.id)
+            val allProfiles = SagerDatabase.proxyDao.getByGroup(group.id)
+            // 純 UDP/QUIC 節點（WireGuard、AmneziaWG、TUIC、Juicity、ShadowQUIC、HY2 與
+            // HY1 的 udp 模式）伺服器端沒有 TCP 監聽，TCP 握手探測必然一路等到 timeout，
+            // 於是被標成 status=3「失敗」——節點其實是好的。先過濾掉，讓進度與完成摘要
+            // 只反映「TCP Ping 有意義」的節點。
+            val profilesList = allProfiles.filter { TcpPing.isTcpReachable(it) }
+            if (profilesList.size < allProfiles.size) {
+                Logs.i("TcpPing: skipped ${allProfiles.size - profilesList.size} UDP-only profiles")
+            }
             test.proxyN = profilesList.size
             val profiles = ConcurrentLinkedQueue(profilesList)
             val tcpPing = TcpPing()
