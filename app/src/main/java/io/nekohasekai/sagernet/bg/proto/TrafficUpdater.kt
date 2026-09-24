@@ -1,5 +1,7 @@
 package io.nekohasekai.sagernet.bg.proto
 
+import android.os.SystemClock
+
 class TrafficUpdater(
     private val box: libcore.BoxInstance,
     val items: List<TrafficLooperData>, // contain "bypass"
@@ -26,7 +28,9 @@ class TrafficUpdater(
 
     private fun updateOne(item: TrafficLooperData): TrafficLooperData {
         // last update
-        val now = System.currentTimeMillis()
+        // 用單調時鐘：NTP 校正、時區/DST 跳動或使用者手動改系統時間都會讓牆鐘倒退或暴增，
+        // 那會讓 interval 變成負數或巨大值，速度顯示跟著歸零或跳出天文數字。
+        val now = SystemClock.elapsedRealtime()
         val interval = now - item.lastUpdate
         item.lastUpdate = now
         if (interval <= 0) {

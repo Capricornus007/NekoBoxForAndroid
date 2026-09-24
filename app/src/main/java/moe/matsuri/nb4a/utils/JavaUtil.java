@@ -15,6 +15,7 @@ import com.google.gson.ToNumberPolicy;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
+import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -112,8 +113,15 @@ public class JavaUtil {
 
     @androidx.annotation.RequiresApi(Build.VERSION_CODES.P)
     private static void tryLockOrRecreateFile(File file) {
+        // 探測性上鎖一定要把 channel 跟檔案關掉：只 close lock 的話每呼叫一次就漏一個 FD，
+        // 而這個函式在外層重試迴圈裡會被反覆呼叫，漏掉的 channel 還可能讓鎖一直被本行程
+        // 持有，於是「拿不到鎖就重建檔案」那條分支永遠走不到。
+        RandomAccessFile lockFile = null;
+        FileChannel channel = null;
         try {
-            FileLock tryLock = new RandomAccessFile(file, "rw").getChannel().tryLock();
+            lockFile = new RandomAccessFile(file, "rw");
+            channel = lockFile.getChannel();
+            FileLock tryLock = channel.tryLock();
             if (tryLock != null) {
                 tryLock.close();
             } else {
@@ -126,6 +134,16 @@ public class JavaUtil {
                 deleted = file.delete();
             }
             createFile(file, deleted);
+        } finally {
+            try {
+                if (channel != null) {
+                    channel.close();
+                }
+                if (lockFile != null) {
+                    lockFile.close();
+                }
+            } catch (Exception ignored) {
+            }
         }
     }
 

@@ -746,7 +746,13 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             val chainTag = "c-$chainId"
             var muxApplied = false
 
-            val defaultServerDomainStrategy = SingBoxOptionsUtil.domainStrategy("server")
+            // 節點域名也得跟著 IPv6 開關走：只讀使用者設定的 "auto" 時，選「僅 IPv6」會拿到
+            // prefer_ipv4、選「停用 IPv6」也可能解出 v6 位址，鏈上第一跳就在 tun 裡不可達。
+            val defaultServerDomainStrategy = when (ipv6Mode) {
+                IPv6Mode.DISABLE -> "ipv4_only"
+                IPv6Mode.ONLY -> "ipv6_only"
+                else -> SingBoxOptionsUtil.domainStrategy("server")
+            }
 
             profileList.forEachIndexed { index, proxyEntity ->
                 val bean = proxyEntity.requireBean()
