@@ -237,6 +237,8 @@ private fun parseV2RayHttpUrl(link: String): HttpUrl? {
                     if (info.contains(":")) encodedPassword(info.substringAfter(":", ""))
                 }
                 uri.rawQuery?.let { encodedQuery(it) }
+                // 節點備註就在 fragment 裡，漏掉的話走這條回退路徑解出來的名字會是空的。
+                uri.fragment?.let { fragment(it) }
             }
             .build()
     }.getOrNull()
