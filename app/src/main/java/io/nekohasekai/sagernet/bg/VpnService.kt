@@ -134,8 +134,16 @@ class VpnService :
 
         // address
         builder.addAddress(PRIVATE_VLAN4_CLIENT, 30)
-        if (ipv6Mode != IPv6Mode.DISABLE) {
+        // v6 位址與路由一律常駐，不再看 ipv6Mode：不給 TUN 任何 v6 路由的話，應用的
+        // IPv6 流量就不進 VPN，而是從實體網卡的 v6 直連出去（繞過代理，屬外洩）。
+        // 「停用 IPv6」改由核心用 ip_version=6 + reject 在 TUN 內拒掉（見 ConfigBuilder）。
+        // 少數裝置／ROM 拒絕下發 v6：那種情況退回舊行為並記日誌，別讓整個 VPN 起不來。
+        var v6Ready = false
+        try {
             builder.addAddress(PRIVATE_VLAN6_CLIENT, 126)
+            v6Ready = true
+        } catch (e: Exception) {
+            Logs.w("IPv6 address not configured on this device", e)
         }
         builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
 
@@ -153,12 +161,12 @@ class VpnService :
                 builder.addRoute(HEV_MAPDNS_VLAN4, 10)
             }
             // https://issuetracker.google.com/issues/149636790
-            if (ipv6Mode != IPv6Mode.DISABLE) {
+            if (v6Ready) {
                 builder.addRoute("2000::", 3)
             }
         } else {
             builder.addRoute("0.0.0.0", 0)
-            if (ipv6Mode != IPv6Mode.DISABLE) {
+            if (v6Ready) {
                 builder.addRoute("::", 0)
             }
         }

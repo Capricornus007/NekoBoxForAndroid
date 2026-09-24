@@ -623,6 +623,18 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             rules = mutableListOf()
             rule_set = mutableListOf()
 
+            // 「停用 IPv6」的語意是不要用 IPv6，不是讓 IPv6 裸奔出實體網卡。VpnService 現在
+            // 一律下發 v6 位址與路由（否則 v6 流量根本不進 VPN），所以改由這裡明確拒掉。
+            // 必須是第一條：路由規則為首匹配，排後面會被別的規則先接走。
+            if (ipv6Mode == IPv6Mode.DISABLE) {
+                rules.add(
+                    Rule_DefaultOptions().apply {
+                        ip_version = 6
+                        action = "reject"
+                    },
+                )
+            }
+
             // sing-box 1.14 removed route.concurrent_dial; the feature moved to
             // default_network_strategy. "fallback" = Happy Eyeballs 并发容灾拨号
             // （对多个地址/接口并发发起，先完成者胜出）——等价旧 concurrent_dial。
@@ -1523,7 +1535,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         _hack_config_map["type"] = "fakeip"
                         tag = "dns-fake"
                         _hack_config_map["inet4_range"] = "198.18.0.0/15"
-                        _hack_config_map["inet6_range"] = "fc00::/18"
+                        if (ipv6Mode != IPv6Mode.DISABLE) {
+                            _hack_config_map["inet6_range"] = "fc00::/18"
+                        }
                     },
                 )
                 dns.rules.add(
@@ -1531,7 +1545,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         inbound = listOf(deviceInboundTag)
                         server = "dns-fake"
                         disable_cache = true
-                        query_type = listOf("A", "AAAA")
+                        // 停用 IPv6 時不發假 v6 位址、也不代答 AAAA：讓應用自己走 IPv4，
+                        // 比給它一個必然被拒的 fake v6 更接近「沒有 IPv6」的實感。
+                        query_type = if (ipv6Mode == IPv6Mode.DISABLE) listOf("A") else listOf("A", "AAAA")
                     },
                 )
             }
