@@ -12,10 +12,6 @@
 
     <uses-permission android:name="${applicationId}.permission.SERVICE_ACCESS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- NativeInterface.wifiState() 讀 WifiManager.connectionInfo 拿 SSID/BSSID（給核心做
-         wifi_ssid / wifi_bssid 規則用）。沒宣告這個權限時該讀取只能拿到遮罩值，
-         在某些版本上直接拋 SecurityException。 -->
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
@@ -38,12 +34,6 @@
         android:required="false" />
     <uses-feature
         android:name="android.hardware.touchscreen"
-        android:required="false" />
-    <!-- 有 LEANBACK_LAUNCHER 時，只要宣告了 Wi-Fi 權限就會被 lint 的 LeanbackUsesWifi
-         判定為「只支援乙太網路的 TV 裝置會被商店過濾掉」；該檢查看的是這條 uses-feature，
-         不是權限自己的 android:required。 -->
-    <uses-feature
-        android:name="android.hardware.wifi"
         android:required="false" />
     <uses-feature
         android:name="android.hardware.camera"
