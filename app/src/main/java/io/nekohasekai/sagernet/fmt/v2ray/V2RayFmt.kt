@@ -426,7 +426,12 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
     }
 
     url.queryParameter("fp")?.let {
-        utlsFingerprint = it
+        // fp=none 是 xray/V2rayN 表示「不啟用 uTLS」的寫法，sing-box 的指紋表不認 none，
+        // 原樣帶進去會讓整個 outbound 建立不起來；指紋表全小寫，大寫同樣會被拒。
+        val fingerprint = it.trim().lowercase()
+        if (fingerprint.isNotEmpty() && fingerprint != "none") {
+            utlsFingerprint = fingerprint
+        }
     }
 }
 

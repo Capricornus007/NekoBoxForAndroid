@@ -25,7 +25,7 @@ fun parseSnell(url: String): SnellBean {
         link.queryParameter("userkey")?.let { userKey = it.unUrlSafe() }
         link.queryParameter("obfs-mode")?.let { obfsMode = it }
         link.queryParameter("obfs-host")?.let { obfsHost = it }
-        link.queryParameter("reuse")?.let { reuse = it.toBoolean() }
+        link.queryParameter("reuse")?.let { reuse = it == "1" || it.equals("true", ignoreCase = true) }
         link.queryParameter("network")?.let { network = it }
         link.queryParameter("mode")?.let { mode = it }
     }

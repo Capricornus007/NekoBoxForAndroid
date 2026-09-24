@@ -568,10 +568,12 @@ fun buildSingBoxOutboundHysteriaBean(bean: HysteriaBean): SingBoxOptions.SingBox
             type = "hysteria"
             server = bean.serverAddress
             val port = bean.serverPorts.toIntOrNull()
-            if (port != null) {
-                server_port = port
-            } else {
-                server_ports = hopPortsToSingboxList(bean.serverPorts)
+            val hops = if (port == null) hopPortsToSingboxList(bean.serverPorts) else emptyList()
+            when {
+                port != null -> server_port = port
+                hops.isNotEmpty() -> server_ports = hops
+                // 每個片段都非法時不能發 server_ports: []，sing-box 會帶著 port 0 去建連線直接失敗。
+                else -> server_port = getFirstPort(bean.serverPorts)
             }
             hop_interval = "${bean.hopInterval}s"
             up_mbps = bean.uploadMbps
@@ -607,10 +609,12 @@ fun buildSingBoxOutboundHysteriaBean(bean: HysteriaBean): SingBoxOptions.SingBox
             type = "hysteria2"
             server = bean.serverAddress
             val port = bean.serverPorts.toIntOrNull()
-            if (port != null) {
-                server_port = port
-            } else {
-                server_ports = hopPortsToSingboxList(bean.serverPorts)
+            val hops = if (port == null) hopPortsToSingboxList(bean.serverPorts) else emptyList()
+            when {
+                port != null -> server_port = port
+                hops.isNotEmpty() -> server_ports = hops
+                // 每個片段都非法時不能發 server_ports: []，sing-box 會帶著 port 0 去建連線直接失敗。
+                else -> server_port = getFirstPort(bean.serverPorts)
             }
             hop_interval = "${bean.hopInterval}s"
             up_mbps = bean.uploadMbps

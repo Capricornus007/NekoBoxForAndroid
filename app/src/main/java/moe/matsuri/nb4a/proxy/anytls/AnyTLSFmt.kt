@@ -97,7 +97,11 @@ fun parseAnytls(url: String): AnyTLSBean {
             allowInsecure = it == "1" || it == "true"
         }
         link.queryParameter("fp")?.let {
-            utlsFingerprint = it
+            // 同 VLESS/VMESS：fp=none 代表不啟用 uTLS，帶進 sing-box 的指紋表會整條 outbound 建立失敗。
+            val fingerprint = it.trim().lowercase()
+            if (fingerprint.isNotEmpty() && fingerprint != "none") {
+                utlsFingerprint = fingerprint
+            }
         }
         link.queryParameter("pbk")?.let {
             realityPubKey = it

@@ -635,7 +635,7 @@ object RawUpdater : GroupUpdater() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    suspend fun parseRaw(text: String, fileName: String = ""): List<AbstractBean>? {
+    suspend fun parseRaw(text: String, fileName: String = "", rawDepth: Int = 0): List<AbstractBean>? {
         val proxies = mutableListOf<AbstractBean>()
 
         try {
@@ -1378,9 +1378,15 @@ object RawUpdater : GroupUpdater() {
         }
 
         try {
-            return parseProxies(text.linesNoComments().joinToString("\n").decodeBase64UrlSafe())
-                .takeIf { it.isNotEmpty() }
-                ?: error("Not found")
+            val decoded = text.linesNoComments().joinToString("\n").decodeBase64UrlSafe()
+            val links = parseProxies(decoded)
+            if (links.isNotEmpty()) return links
+            // 有些面板會把整份 Clash/YAML 訂閱再 base64 一次：解開後不是連結清單，
+            // 必須讓它再走一次 parseRaw 才認得。深度上限防止自我循環。
+            if (rawDepth < 2) {
+                parseRaw(decoded, fileName, rawDepth + 1)?.takeIf { it.isNotEmpty() }?.let { return it }
+            }
+            error("Not found")
         } catch (e: Exception) {
             Logs.w(e)
         }

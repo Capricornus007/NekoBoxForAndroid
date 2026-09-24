@@ -19,8 +19,10 @@ fun parseUniversal(link: String): AbstractBean {
 }
 
 fun AbstractBean.toUniversalLink(): String {
+    val typeKey = TypeMap.reversed[ProxyEntity().putBean(this).type]
+        ?: error("No universal type for ${javaClass.simpleName}")
     var link = "sn://"
-    link += TypeMap.reversed[ProxyEntity().putBean(this).type]
+    link += typeKey
     link += "?"
     link += Util.b64EncodeUrlSafe(Util.zlibCompress(KryoConverters.serialize(this), 9))
     return link
