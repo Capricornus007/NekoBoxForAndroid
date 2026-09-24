@@ -579,7 +579,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         strict_route = DataStore.strictRoute
                         when (ipv6Mode) {
                             IPv6Mode.DISABLE -> {
-                                address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
+                                // 前綴以 VpnService 實際下發的 /30 為準（兩邊不一致時內核路由表說的是 VpnService 那個）
+                                address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/30")
                             }
 
                             IPv6Mode.ONLY -> {
@@ -588,7 +589,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
                             else -> {
                                 address = listOf(
-                                    VpnService.PRIVATE_VLAN4_CLIENT + "/28",
+                                    VpnService.PRIVATE_VLAN4_CLIENT + "/30",
                                     VpnService.PRIVATE_VLAN6_CLIENT + "/126",
                                 )
                             }
