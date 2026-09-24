@@ -15,6 +15,7 @@ import (
 	"runtime/debug"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -233,6 +234,31 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 // 新起的 goroutine 由 Go runtime 管理堆疊，可以正常增長。
 //
 // panic 必須在這裡就轉成 error 傳出去：fn 已經不在呼叫端那些 defer 的覆蓋範圍內了。
+// assetsReady 在 :bg 行程把 APK 內的 geoip / geosite / yacd 資產解壓結束後關閉。
+// InitCore 把解壓丟在一條分離的 goroutine 裡，而 BoxInstance.Start() 有可能先跑完，
+// 這時核心讀不到 geo 檔並不會報錯，只是讓 geo 規則靜默失效——使用者看到的是
+// 「規則沒作用」，而且重啟就好，極難歸因。
+var (
+	assetsReady               = make(chan struct{})
+	assetsExtractionScheduled atomic.Bool
+)
+
+// assetsWaitTimeout 是上機安全閥：資產真的卡住時最多延後這麼久，而不是永遠連不上。
+const assetsWaitTimeout = 15 * time.Second
+
+// awaitAssetsReady 只在「確實排定了資產解壓」時等待。已解完時 channel 早已關閉，
+// 這個 select 零開銷；非 :bg 行程根本不會排程解壓，直接返回，就不會被拖住。
+func awaitAssetsReady() {
+	if !assetsExtractionScheduled.Load() {
+		return
+	}
+	select {
+	case <-assetsReady:
+	case <-time.After(assetsWaitTimeout):
+		log.Println("box: assets still not ready after", assetsWaitTimeout, "- starting anyway")
+	}
+}
+
 func runOnFreshStack(name string, fn func() error) error {
 	done := make(chan error, 1)
 	go func() {
@@ -247,6 +273,9 @@ func runOnFreshStack(name string, fn func() error) error {
 }
 
 func (b *BoxInstance) Start() (err error) {
+	// 先等資產解壓，別拿著 b.access 等：Close() 用的是同一把鎖。
+	awaitAssetsReady()
+
 	b.access.Lock()
 	defer b.access.Unlock()
 

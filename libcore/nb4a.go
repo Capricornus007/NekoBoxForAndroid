@@ -85,8 +85,18 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 	setupLog(int(maxLogSizeKb)*1024, filepath.Join(cachePath, "neko.log"), isBgProcess, !logEnable)
 
 	// Set up some component
+	if isBgProcess {
+		// 同步登記「會有人去抽資產」，再啟動 goroutine：這樣 BoxInstance.Start() 一定
+		// 看得到這個旗標，不會因為競態而跳過等待。
+		assetsExtractionScheduled.Store(true)
+	}
 	go func() {
 		defer device.DeferPanicToError("InitCore-go", func(err error) { log.Println(err) })
+		if isBgProcess {
+			// 註冊在 goroutine 開頭而不是解壓那一段：就算 GoDebug / certs 那幾步 panic，
+			// channel 仍會被關閉，不會讓 Start() 白等 15 秒。
+			defer close(assetsReady)
+		}
 		device.GoDebug(process)
 
 		// certs: use the Java-provided system trust anchors when registered,
