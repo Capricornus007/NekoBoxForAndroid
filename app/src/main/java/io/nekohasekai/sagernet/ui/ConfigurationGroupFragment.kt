@@ -220,7 +220,11 @@ class ConfigurationGroupFragment : Fragment() {
             onViewCreated(requireView(), null)
         }
         checkOrderMenu()
-        configurationListView.requestFocus()
+        // 搜尋開著時不能把焦點搶到列表上：那會讓 SearchView 失焦，父 Fragment 的焦點監聽器
+        // 隨即 cancelSearch，於是「開節點編輯器再返回」「鎖屏解鎖」「從後臺切回」都會靜默關掉搜尋。
+        if ((parentFragment as? ConfigurationFragment)?.isSearchActive() != true) {
+            configurationListView.requestFocus()
+        }
     }
 
     fun checkOrderMenu() {

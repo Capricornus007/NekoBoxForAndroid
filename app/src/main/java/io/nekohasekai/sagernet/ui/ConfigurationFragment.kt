@@ -224,9 +224,23 @@ class ConfigurationFragment @JvmOverloads constructor(
                 DataStore.selectedGroup = adapter.groupList[position].id
             }
         }
+
+        // 翻分頁要重套目前的查詢：filter() 只作用在「當下那一個」分頁的 adapter，不補這一下
+        // 會出現「搜尋框還有字、新分頁卻列出全部節點」的矛盾狀態，使用者可能對不符合搜尋
+        // 條件的節點做刪除／設為選取。
+        override fun onPageSelected(position: Int) {
+            val query = currentSearchQuery
+            if (query.isEmpty()) return
+            // 新分頁的 ConfigurationGroupFragment 可能是這一輪才剛被 ViewPager2 建立，
+            // getCurrentGroupFragment() 靠 childFragmentManager 找 tag，延一幀最穩。
+            view?.post {
+                if (isAdded) getCurrentGroupFragment()?.adapter?.filter(query)
+            }
+        }
     }
 
     override fun onQueryTextChange(query: String): Boolean {
+        currentSearchQuery = query
         getCurrentGroupFragment()?.adapter?.filter(query)
         return false
     }
@@ -270,6 +284,7 @@ class ConfigurationFragment @JvmOverloads constructor(
         // findViewById (not ViewBinding): action_search is a menu action view inflated from the
         // toolbar menu, not a view in this fragment's layout binding.
         val searchView = toolbar.findViewById<SearchView>(R.id.action_search)
+        searchViewRef = searchView
         if (searchView != null) {
             searchView.setOnQueryTextListener(this)
             searchView.maxWidth = Int.MAX_VALUE
@@ -442,6 +457,9 @@ class ConfigurationFragment @JvmOverloads constructor(
     }
 
     override fun onKeyDown(ketCode: Int, event: KeyEvent): Boolean {
+        // 搜尋開著時別搶焦點：搶走會觸發焦點監聽器把搜尋關掉、查詢字清空
+        // （實體／藍牙鍵盤按方向鍵必現）。
+        if (isSearchActive()) return super.onKeyDown(ketCode, event)
         val fragment = getCurrentGroupFragment()
         fragment?.configurationListView?.apply {
             if (!hasFocus()) requestFocus()
@@ -951,6 +969,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                         // snackbar 只能在主執行緒建立：原本写在 Default 上，抛出的例外被下面
                         // 外層 catch 吞掉，「需重載＋套用」按鈕因此永不出現。
                         onMainDispatcher {
+                            if (!isAdded) return@onMainDispatcher
                             snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {
                                 runOnDefaultDispatcher {
                                     SagerNet.reloadService()
@@ -988,6 +1007,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                         // 同上：原本在 Default 上建 snackbar，抛例外後會被 catch 接去彈
                         // 「服務失敗」，於是切換全局模式永遠只會顯示錯誤訊息。
                         onMainDispatcher {
+                            if (!isAdded) return@onMainDispatcher
                             if (writeFailed) {
                                 snackbar(getString(R.string.service_failed)).show()
                             } else {
@@ -1589,6 +1609,28 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
             }
         }
+
+    private var searchViewRef: SearchView? = null
+    private var currentSearchQuery = ""
+
+    /**
+     * 搜尋框是否展開中（含已取得焦點）。RecyclerView.requestFocus() 會經
+     * FOCUS_AFTER_DESCENDANTS 把焦點轉給第一列節點（layout_profile 的卡片本身
+     * clickable+focusable），SearchView 因此失焦、被上面那個焦點監聽器自動
+     * cancelSearch，查詢字就被清空。所以任何「搶焦點」之前都必須先問這個。
+     */
+    fun isSearchActive(): Boolean {
+        val searchView = searchViewRef ?: return false
+        return !searchView.isIconified || searchView.hasFocus()
+    }
+
+    // 搜尋框展開時按返回應該收合搜尋，而不是像預設那樣把整個應用丟到後臺。
+    override fun onBackPressed(): Boolean {
+        val searchView = searchViewRef ?: return false
+        if (searchView.isIconified) return false
+        cancelSearch(searchView)
+        return true
+    }
 
     private fun cancelSearch(searchView: SearchView) {
         searchView.onActionViewCollapsed()
