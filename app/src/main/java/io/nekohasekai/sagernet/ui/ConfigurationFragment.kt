@@ -944,13 +944,18 @@ class ConfigurationFragment @JvmOverloads constructor(
                     runOnDefaultDispatcher {
                         try {
                             DataStore.configurationStore.awaitWrites()
+                        } catch (e: Exception) {
+                            Logs.w(e)
+                            return@runOnDefaultDispatcher
+                        }
+                        // snackbar 只能在主執行緒建立：原本写在 Default 上，抛出的例外被下面
+                        // 外層 catch 吞掉，「需重載＋套用」按鈕因此永不出現。
+                        onMainDispatcher {
                             snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {
                                 runOnDefaultDispatcher {
                                     SagerNet.reloadService()
                                 }
                             }.show()
-                        } catch (e: Exception) {
-                            Logs.w(e)
                         }
                     }
                 }
@@ -971,27 +976,34 @@ class ConfigurationFragment @JvmOverloads constructor(
                 DataStore.globalMode = item.isChecked
                 if (DataStore.serviceState.canStop) {
                     runOnDefaultDispatcher {
-                        try {
+                        val writeFailed = try {
                             // ensure the globalMode write-through has committed before offering
                             // reload (the :bg reload re-reads globalMode from the DB)
                             DataStore.configurationStore.awaitWrites()
-                            snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {
-                                runOnDefaultDispatcher {
-                                    try {
-                                        DataStore.configurationStore.awaitWrites()
-                                        SagerNet.reloadService()
-                                    } catch (e: Exception) {
-                                        Logs.w(e)
-                                        onMainDispatcher {
-                                            snackbar(getString(R.string.service_failed)).show()
-                                        }
-                                    }
-                                }
-                            }.show()
+                            false
                         } catch (e: Exception) {
                             Logs.w(e)
-                            onMainDispatcher {
+                            true
+                        }
+                        // 同上：原本在 Default 上建 snackbar，抛例外後會被 catch 接去彈
+                        // 「服務失敗」，於是切換全局模式永遠只會顯示錯誤訊息。
+                        onMainDispatcher {
+                            if (writeFailed) {
                                 snackbar(getString(R.string.service_failed)).show()
+                            } else {
+                                snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {
+                                    runOnDefaultDispatcher {
+                                        try {
+                                            DataStore.configurationStore.awaitWrites()
+                                            SagerNet.reloadService()
+                                        } catch (e: Exception) {
+                                            Logs.w(e)
+                                            onMainDispatcher {
+                                                snackbar(getString(R.string.service_failed)).show()
+                                            }
+                                        }
+                                    }
+                                }.show()
                             }
                         }
                     }
