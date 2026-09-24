@@ -102,6 +102,26 @@ class RawUpdaterParseTest {
     }
 
     @Test
+    fun base64WrappedClashYaml_isParsedThroughRecursion() = runTest {
+        // 有些面板會把整份 Clash YAML 再 base64 一次。解開之後不是連結清單，若只餵給
+        // parseProxies 會全部識別不出來，最後回 null，使用者只看到「找不到节点」。
+        val yaml = fixture("clash-basic.yaml")
+        val encoded = Base64.getUrlEncoder().withoutPadding().encodeToString(yaml.toByteArray())
+
+        val beans = RawUpdater.parseRaw(encoded)!!
+
+        assertEquals(2, beans.size)
+        assertEquals(
+            "alpha",
+            beans.filterIsInstance<ShadowsocksBean>().single().password,
+        )
+        assertEquals(
+            "example.com",
+            beans.filterIsInstance<VMessBean>().single().serverAddress,
+        )
+    }
+
+    @Test
     fun singboxOutbounds_parsesOutboundAsNativeBean() = runTest {
         val bean = RawUpdater.parseRaw(fixture("singbox-outbounds.json"))!!.single() as SOCKSBean
 
