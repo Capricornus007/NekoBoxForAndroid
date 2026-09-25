@@ -8,8 +8,6 @@
         <item name="colorPrimaryDark">@color/material_pink_700</item>
         <item name="colorAccent">@color/material_pink_accent_200</item>
 
-        <item name="colorMaterial100">@color/material_pink_100</item>
-
         <!-- Elevated card surface: Pink by default, each colour variant below overrides it -->
         <item name="cardElevatedSurfaceColor">@color/card_elevated_pink</item>
 
@@ -65,8 +63,6 @@
         <item name="colorPrimary">@color/material_pink_500</item>
         <item name="colorPrimaryDark">@color/material_pink_700</item>
         <item name="colorAccent">@color/material_pink_accent_200</item>
-
-        <item name="colorMaterial100">@color/material_pink_100</item>
 
         <!-- Elevated card surface: Pink by default, each colour variant below overrides it -->
         <item name="cardElevatedSurfaceColor">@color/card_elevated_pink</item>
@@ -295,7 +291,6 @@
         <item name="colorPrimary">@color/color_pink_ssr</item>
         <item name="colorPrimaryDark">@color/color_pink_ssr</item>
         <item name="colorAccent">@color/material_pink_accent_200</item>
-        <item name="colorMaterial100">@color/material_pink_accent_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_pink_ssr</item>
     </style>
 
@@ -303,7 +298,6 @@
         <item name="colorPrimary">@color/material_amber_500</item>
         <item name="colorPrimaryDark">@color/material_amber_700</item>
         <item name="colorAccent">@color/material_amber_accent_200</item>
-        <item name="colorMaterial100">@color/material_amber_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_amber</item>
     </style>
 
@@ -311,7 +305,6 @@
         <item name="colorPrimary">@color/material_blue_500</item>
         <item name="colorPrimaryDark">@color/material_blue_700</item>
         <item name="colorAccent">@color/material_blue_accent_200</item>
-        <item name="colorMaterial100">@color/material_blue_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_blue</item>
     </style>
 
@@ -319,7 +312,6 @@
         <item name="colorPrimary">@color/material_blue_grey_500</item>
         <item name="colorPrimaryDark">@color/material_blue_grey_700</item>
         <item name="colorAccent">@color/material_blue_grey_200</item>
-        <item name="colorMaterial100">@color/material_blue_grey_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_blue_grey</item>
         <item name="dialogButtonColor">@color/dialog_button_blue_grey</item>
     </style>
@@ -328,7 +320,6 @@
         <item name="colorPrimary">@color/material_brown_500</item>
         <item name="colorPrimaryDark">@color/material_brown_700</item>
         <item name="colorAccent">@color/material_brown_200</item>
-        <item name="colorMaterial100">@color/material_brown_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_brown</item>
         <item name="dialogButtonColor">@color/dialog_button_brown</item>
     </style>
@@ -337,7 +328,6 @@
         <item name="colorPrimary">@color/material_cyan_500</item>
         <item name="colorPrimaryDark">@color/material_cyan_700</item>
         <item name="colorAccent">@color/material_cyan_accent_200</item>
-        <item name="colorMaterial100">@color/material_cyan_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_cyan</item>
     </style>
 
@@ -345,7 +335,6 @@
         <item name="colorPrimary">@color/material_deep_orange_500</item>
         <item name="colorPrimaryDark">@color/material_deep_orange_700</item>
         <item name="colorAccent">@color/material_deep_orange_accent_200</item>
-        <item name="colorMaterial100">@color/material_deep_orange_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_deep_orange</item>
     </style>
 
@@ -353,7 +342,6 @@
         <item name="colorPrimary">@color/material_deep_purple_500</item>
         <item name="colorPrimaryDark">@color/material_deep_purple_700</item>
         <item name="colorAccent">@color/material_deep_purple_accent_200</item>
-        <item name="colorMaterial100">@color/material_deep_purple_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_deep_purple</item>
         <item name="dialogButtonColor">@color/dialog_button_deep_purple</item>
     </style>
@@ -362,7 +350,6 @@
         <item name="colorPrimary">@color/material_green_500</item>
         <item name="colorPrimaryDark">@color/material_green_700</item>
         <item name="colorAccent">@color/material_green_accent_200</item>
-        <item name="colorMaterial100">@color/material_green_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_green</item>
     </style>
 
@@ -370,7 +357,6 @@
         <item name="colorPrimary">@color/material_grey_500</item>
         <item name="colorPrimaryDark">@color/material_grey_700</item>
         <item name="colorAccent">@color/material_grey_200</item>
-        <item name="colorMaterial100">@color/material_grey_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_grey</item>
     </style>
 
@@ -378,7 +364,6 @@
         <item name="colorPrimary">@color/material_indigo_500</item>
         <item name="colorPrimaryDark">@color/material_indigo_700</item>
         <item name="colorAccent">@color/material_indigo_accent_200</item>
-        <item name="colorMaterial100">@color/material_indigo_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_indigo</item>
         <item name="dialogButtonColor">@color/dialog_button_indigo</item>
     </style>
@@ -387,7 +372,6 @@
         <item name="colorPrimary">@color/material_light_blue_500</item>
         <item name="colorPrimaryDark">@color/material_light_blue_700</item>
         <item name="colorAccent">@color/material_light_blue_accent_200</item>
-        <item name="colorMaterial100">@color/material_light_blue_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_light_blue</item>
     </style>
 
@@ -395,7 +379,6 @@
         <item name="colorPrimary">@color/material_light_green_500</item>
         <item name="colorPrimaryDark">@color/material_light_green_700</item>
         <item name="colorAccent">@color/material_light_green_accent_200</item>
-        <item name="colorMaterial100">@color/material_light_green_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_light_green</item>
     </style>
 
@@ -403,7 +386,6 @@
         <item name="colorPrimary">@color/material_lime_500</item>
         <item name="colorPrimaryDark">@color/material_lime_700</item>
         <item name="colorAccent">@color/material_lime_accent_200</item>
-        <item name="colorMaterial100">@color/material_lime_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_lime</item>
     </style>
 
@@ -411,7 +393,6 @@
         <item name="colorPrimary">@color/material_orange_500</item>
         <item name="colorPrimaryDark">@color/material_orange_700</item>
         <item name="colorAccent">@color/material_orange_accent_200</item>
-        <item name="colorMaterial100">@color/material_orange_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_orange</item>
     </style>
 
@@ -419,7 +400,6 @@
         <item name="colorPrimary">@color/material_purple_500</item>
         <item name="colorPrimaryDark">@color/material_purple_700</item>
         <item name="colorAccent">@color/material_purple_accent_200</item>
-        <item name="colorMaterial100">@color/material_purple_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_purple</item>
         <item name="dialogButtonColor">@color/dialog_button_purple</item>
     </style>
@@ -428,7 +408,6 @@
         <item name="colorPrimary">@color/material_red_500</item>
         <item name="colorPrimaryDark">@color/material_red_700</item>
         <item name="colorAccent">@color/material_red_accent_200</item>
-        <item name="colorMaterial100">@color/material_red_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_red</item>
     </style>
 
@@ -436,7 +415,6 @@
         <item name="colorPrimary">@color/material_teal_500</item>
         <item name="colorPrimaryDark">@color/material_teal_700</item>
         <item name="colorAccent">@color/material_teal_accent_200</item>
-        <item name="colorMaterial100">@color/material_teal_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_teal</item>
     </style>
 
@@ -444,7 +422,6 @@
         <item name="colorPrimary">@color/material_yellow_500</item>
         <item name="colorPrimaryDark">@color/material_yellow_700</item>
         <item name="colorAccent">@color/material_yellow_accent_200</item>
-        <item name="colorMaterial100">@color/material_yellow_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_yellow</item>
         <item name="colorOnPrimarySurface">@color/black</item>
     </style>
@@ -453,7 +430,6 @@
         <item name="colorPrimary">@color/material_amber_500</item>
         <item name="colorPrimaryDark">@color/material_amber_700</item>
         <item name="colorAccent">@color/material_amber_accent_200</item>
-        <item name="colorMaterial100">@color/material_amber_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_amber</item>
     </style>
 
@@ -461,7 +437,6 @@
         <item name="colorPrimary">@color/material_blue_500</item>
         <item name="colorPrimaryDark">@color/material_blue_700</item>
         <item name="colorAccent">@color/material_blue_accent_200</item>
-        <item name="colorMaterial100">@color/material_blue_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_blue</item>
     </style>
 
@@ -469,7 +444,6 @@
         <item name="colorPrimary">@color/material_blue_grey_500</item>
         <item name="colorPrimaryDark">@color/material_blue_grey_700</item>
         <item name="colorAccent">@color/material_blue_grey_200</item>
-        <item name="colorMaterial100">@color/material_blue_grey_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_blue_grey</item>
         <item name="dialogButtonColor">@color/dialog_button_blue_grey</item>
     </style>
@@ -478,7 +452,6 @@
         <item name="colorPrimary">@color/material_brown_500</item>
         <item name="colorPrimaryDark">@color/material_brown_700</item>
         <item name="colorAccent">@color/material_brown_200</item>
-        <item name="colorMaterial100">@color/material_brown_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_brown</item>
         <item name="dialogButtonColor">@color/dialog_button_brown</item>
     </style>
@@ -487,7 +460,6 @@
         <item name="colorPrimary">@color/material_cyan_500</item>
         <item name="colorPrimaryDark">@color/material_cyan_700</item>
         <item name="colorAccent">@color/material_cyan_accent_200</item>
-        <item name="colorMaterial100">@color/material_cyan_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_cyan</item>
     </style>
 
@@ -495,7 +467,6 @@
         <item name="colorPrimary">@color/material_deep_orange_500</item>
         <item name="colorPrimaryDark">@color/material_deep_orange_700</item>
         <item name="colorAccent">@color/material_deep_orange_accent_200</item>
-        <item name="colorMaterial100">@color/material_deep_orange_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_deep_orange</item>
     </style>
 
@@ -503,7 +474,6 @@
         <item name="colorPrimary">@color/material_deep_purple_500</item>
         <item name="colorPrimaryDark">@color/material_deep_purple_700</item>
         <item name="colorAccent">@color/material_deep_purple_accent_200</item>
-        <item name="colorMaterial100">@color/material_deep_purple_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_deep_purple</item>
         <item name="dialogButtonColor">@color/dialog_button_deep_purple</item>
     </style>
@@ -512,7 +482,6 @@
         <item name="colorPrimary">@color/material_green_500</item>
         <item name="colorPrimaryDark">@color/material_green_700</item>
         <item name="colorAccent">@color/material_green_accent_200</item>
-        <item name="colorMaterial100">@color/material_green_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_green</item>
     </style>
 
@@ -520,7 +489,6 @@
         <item name="colorPrimary">@color/material_grey_500</item>
         <item name="colorPrimaryDark">@color/material_grey_700</item>
         <item name="colorAccent">@color/material_grey_200</item>
-        <item name="colorMaterial100">@color/material_grey_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_grey</item>
     </style>
 
@@ -528,7 +496,6 @@
         <item name="colorPrimary">@color/material_indigo_500</item>
         <item name="colorPrimaryDark">@color/material_indigo_700</item>
         <item name="colorAccent">@color/material_indigo_accent_200</item>
-        <item name="colorMaterial100">@color/material_indigo_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_indigo</item>
         <item name="dialogButtonColor">@color/dialog_button_indigo</item>
     </style>
@@ -537,7 +504,6 @@
         <item name="colorPrimary">@color/material_light_blue_500</item>
         <item name="colorPrimaryDark">@color/material_light_blue_700</item>
         <item name="colorAccent">@color/material_light_blue_accent_200</item>
-        <item name="colorMaterial100">@color/material_light_blue_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_light_blue</item>
     </style>
 
@@ -545,7 +511,6 @@
         <item name="colorPrimary">@color/material_light_green_500</item>
         <item name="colorPrimaryDark">@color/material_light_green_700</item>
         <item name="colorAccent">@color/material_light_green_accent_200</item>
-        <item name="colorMaterial100">@color/material_light_green_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_light_green</item>
     </style>
 
@@ -553,7 +518,6 @@
         <item name="colorPrimary">@color/material_lime_500</item>
         <item name="colorPrimaryDark">@color/material_lime_700</item>
         <item name="colorAccent">@color/material_lime_accent_200</item>
-        <item name="colorMaterial100">@color/material_lime_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_lime</item>
     </style>
 
@@ -561,7 +525,6 @@
         <item name="colorPrimary">@color/material_orange_500</item>
         <item name="colorPrimaryDark">@color/material_orange_700</item>
         <item name="colorAccent">@color/material_orange_accent_200</item>
-        <item name="colorMaterial100">@color/material_orange_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_orange</item>
     </style>
 
@@ -569,7 +532,6 @@
         <item name="colorPrimary">@color/material_purple_500</item>
         <item name="colorPrimaryDark">@color/material_purple_700</item>
         <item name="colorAccent">@color/material_purple_accent_200</item>
-        <item name="colorMaterial100">@color/material_purple_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_purple</item>
         <item name="dialogButtonColor">@color/dialog_button_purple</item>
     </style>
@@ -578,7 +540,6 @@
         <item name="colorPrimary">@color/material_red_500</item>
         <item name="colorPrimaryDark">@color/material_red_700</item>
         <item name="colorAccent">@color/material_red_accent_200</item>
-        <item name="colorMaterial100">@color/material_red_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_red</item>
     </style>
 
@@ -586,7 +547,6 @@
         <item name="colorPrimary">@color/color_pink_ssr</item>
         <item name="colorPrimaryDark">@color/color_pink_ssr</item>
         <item name="colorAccent">@color/material_pink_accent_200</item>
-        <item name="colorMaterial100">@color/material_pink_accent_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_pink_ssr</item>
     </style>
 
@@ -594,7 +554,6 @@
         <item name="colorPrimary">@color/material_teal_500</item>
         <item name="colorPrimaryDark">@color/material_teal_700</item>
         <item name="colorAccent">@color/material_teal_accent_200</item>
-        <item name="colorMaterial100">@color/material_teal_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_teal</item>
     </style>
 
@@ -602,7 +561,6 @@
         <item name="colorPrimary">@color/material_yellow_500</item>
         <item name="colorPrimaryDark">@color/material_yellow_700</item>
         <item name="colorAccent">@color/material_yellow_accent_200</item>
-        <item name="colorMaterial100">@color/material_yellow_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_yellow</item>
         <item name="colorOnPrimarySurface">@color/black</item>
     </style>
@@ -611,7 +569,6 @@
         <item name="colorPrimary">@color/color_ng_black_primary</item>
         <item name="colorPrimaryDark">@color/color_ng_black_primary</item>
         <item name="colorAccent">@color/color_ng_black_accent</item>
-        <item name="colorMaterial100">@color/color_ng_black_primary</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_black</item>
 
         <item name="selectedColorPrimary">@color/color_ng_black_accent</item>
@@ -626,7 +583,6 @@
         <item name="colorPrimary">@color/color_verdant_mint</item>
         <item name="colorPrimaryDark">@color/color_verdant_mint_dark</item>
         <item name="colorAccent">@color/color_verdant_mint_accent</item>
-        <item name="colorMaterial100">@color/color_verdant_mint_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_verdant_mint</item>
     </style>
 
@@ -634,7 +590,6 @@
         <item name="colorPrimary">@color/color_ng_black_primary</item>
         <item name="colorPrimaryDark">@color/color_ng_black_primary</item>
         <item name="colorAccent">@color/color_ng_black_accent</item>
-        <item name="colorMaterial100">@color/color_ng_black_primary</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_black</item>
 
         <item name="selectedColorPrimary">@color/color_ng_black_accent</item>
@@ -649,7 +604,6 @@
         <item name="colorPrimary">@color/color_verdant_mint</item>
         <item name="colorPrimaryDark">@color/color_verdant_mint_dark</item>
         <item name="colorAccent">@color/color_verdant_mint_accent</item>
-        <item name="colorMaterial100">@color/color_verdant_mint_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_verdant_mint</item>
     </style>
 
@@ -664,7 +618,6 @@
         <item name="colorPrimary">@color/color_white_theme</item>
         <item name="colorPrimaryDark">@color/color_white_theme_dark</item>
         <item name="colorAccent">@color/color_white_theme_accent</item>
-        <item name="colorMaterial100">@color/color_white_theme_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_white</item>
 
         <!-- Dark text and icons on white -->
@@ -694,7 +647,6 @@
         <item name="colorPrimary">@color/color_white_theme</item>
         <item name="colorPrimaryDark">@color/color_white_theme_dark</item>
         <item name="colorAccent">@color/color_white_theme_accent</item>
-        <item name="colorMaterial100">@color/color_white_theme_100</item>
         <item name="cardElevatedSurfaceColor">@color/card_elevated_white</item>
         <item name="whiteOrTextPrimary">@color/black</item>
 
