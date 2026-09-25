@@ -120,6 +120,10 @@ object RootLanSharing {
                 appendLine("ip6tables -t mangle -A CORE6_PRE ! -i \$TUN -j MARK --set-xmark $MARK")
                 appendLine("ip6tables -t mangle -D PREROUTING -j CORE6_PRE 2>/dev/null || true")
                 appendLine("ip6tables -t mangle -A PREROUTING -j CORE6_PRE")
+                // The marks above are pointless without a rule that reads them: nothing else on
+                // Android matches 0xCAFE (netd's v6 rules are all `iif lo` or need 0xc0000 bits),
+                // so the REJECT below used to be the only thing client v6 ever hit.
+                appendLine("ip -6 rule add fwmark $FWMARK lookup \$TUN pref 5060 2>/dev/null || true")
                 appendLine("ip6tables -A CORE6_FWD -j REJECT --reject-with icmp6-no-route")
             } else {
                 appendLine("ip6tables -A CORE6_FWD -j REJECT --reject-with icmp6-no-route")
@@ -147,6 +151,7 @@ object RootLanSharing {
                 for (pref in listOf(5010, 5020, 5030, 5040, 5050)) {
                     appendLine("ip rule del pref $pref 2>/dev/null || true")
                 }
+                appendLine("ip -6 rule del pref 5060 2>/dev/null || true")
                 // Remove iptables chains
                 appendLine("iptables -D FORWARD -j CORE_FWD 2>/dev/null || true")
                 appendLine("iptables -F CORE_FWD 2>/dev/null || true")
