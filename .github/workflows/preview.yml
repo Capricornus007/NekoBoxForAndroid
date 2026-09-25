@@ -11,21 +11,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Golang Status
         run: find buildScript libcore/*.sh nb4a.properties | xargs cat | sha1sum > golang_status
       - name: Libcore Status
         run: git ls-files libcore | xargs cat | sha1sum > libcore_status
       - name: LibCore Cache
         id: cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             app/libs/libcore.aar
           key: ${{ hashFiles('.github/workflows/*', 'golang_status', 'libcore_status') }}
       - name: Install Golang
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version: '1.27.1'
       - name: Native Build
@@ -51,7 +51,7 @@ jobs:
       - libcore
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Download LibCore AAR
         uses: actions/download-artifact@v8
         with:
@@ -64,7 +64,7 @@ jobs:
           unzip -l /tmp/libcore-classes.jar | grep -q 'libcore/Libcore.class'
           unzip -l /tmp/libcore-classes.jar | grep -q 'go/Seq.class'
       - name: Gradle cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.gradle
           key: gradle-oss-${{ hashFiles('**/*.gradle.kts') }}
