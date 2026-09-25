@@ -48,7 +48,7 @@ func NewOutbound(ctx context.Context, _ adapter.Router, logger log.ContextLogger
 	if options.Detour != "" {
 		return nil, E.New("byedpi cannot be used with detour")
 	}
-	queryOptions, err := adapter.DNSQueryOptionsFrom(ctx, options.DomainResolver)
+	queryOptions, err := dnsQueryOptionsFrom(ctx, options.DomainResolver)
 	if err != nil {
 		return nil, err
 	}

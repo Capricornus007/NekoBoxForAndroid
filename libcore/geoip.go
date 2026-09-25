@@ -3,11 +3,13 @@ package libcore
 import (
 	"fmt"
 	"net"
+	"net/netip"
 	"strings"
 
 	"github.com/oschwald/maxminddb-golang"
 	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
+	"github.com/sagernet/sing/common/json/badoption"
 )
 
 type geoip struct {
@@ -43,9 +45,17 @@ func (g *geoip) Rules(countryCode string) ([]option.HeadlessRule, error) {
 	}
 
 	var headlessRule option.DefaultHeadlessRule
-	headlessRule.IPCIDR = make([]string, 0, len(ipNets))
+	headlessRule.IPCIDR = make([]*badoption.Prefixable, 0, len(ipNets))
 	for _, cidr := range ipNets {
-		headlessRule.IPCIDR = append(headlessRule.IPCIDR, cidr.String())
+		// sing-box 上游把 ip_cidr 的型別從字串改成 Prefixable（63f31c2b2），
+		// 這裡跟着轉。maxmind 偶爾會給出無法解析的網段，跳過比讓整個國家的
+		// 規則全部報錯合適。
+		prefix, prefixErr := netip.ParsePrefix(cidr.String())
+		if prefixErr != nil {
+			continue
+		}
+		p := badoption.Prefixable(prefix)
+		headlessRule.IPCIDR = append(headlessRule.IPCIDR, &p)
 	}
 
 	return []option.HeadlessRule{

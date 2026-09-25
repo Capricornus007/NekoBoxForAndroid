@@ -12,7 +12,7 @@ require (
 	github.com/miekg/dns v1.1.72
 	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/sagernet/quic-go v0.61.0-sing-box-mod.7
-	github.com/sagernet/sing v0.9.5
+	github.com/sagernet/sing v0.9.6-0.20260922013359-4ca3bebe0b8e
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-snell v0.0.0-20260904135315-bc5a12ac736f
 	github.com/sagernet/sing-tun v0.9.6-0.20260922105247-aff4131a9e9e
@@ -113,7 +113,7 @@ require (
 	github.com/sagernet/gvisor v0.0.0-20260727.0-sing-box-mod.1 // indirect
 	github.com/sagernet/netlink v0.0.0-20260814022025-64455d367bbf // indirect
 	github.com/sagernet/nftables v0.3.0-mod.4 // indirect
-	github.com/sagernet/sing-anytls v0.0.0-20260904135308-cec2d74334be // indirect
+	github.com/sagernet/sing-anytls v0.0.0-20260924021732-7ca72921ac6a // indirect
 	github.com/sagernet/sing-mux v0.3.7-0.20260905054442-91d1502591ce // indirect
 	github.com/sagernet/sing-quic v0.7.1-0.20260904135313-497364e8ee3e // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.8 // indirect
@@ -177,7 +177,7 @@ replace github.com/sagernet/sing-quic => ../../sing-quic
 // sing-quic: SagerNet 版には sing-box 1.14.x が必要とする realm PortMapping が含まれる。
 // replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
 
-replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20260924053801-79dae2566f99
+replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20260925011904-8c00669703c8
 
 replace github.com/sagernet/quic-go => github.com/Capricornus007/quic-go v0.61.0-sing-box-mod.9
 
@@ -189,7 +189,7 @@ replace github.com/exclavenetwork/sing-juicity => ../../sing-juicity
 
 replace github.com/xchacha20-poly1305/sing-trusttunnel => ../../sing-trusttunnel
 
-replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.5-0.20260924041329-d6cd7fde8449
+replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.5-0.20260925023042-72ce040d872e
 
 // sing-shadowquic 復刻到自有 fork（與 sing 家族其他包一致），跟 Capricornus007/sing-shadowquic main。
 replace github.com/exclavenetwork/sing-shadowquic => github.com/Capricornus007/sing-shadowquic v0.0.0-20260904152941-03a261e772e4
