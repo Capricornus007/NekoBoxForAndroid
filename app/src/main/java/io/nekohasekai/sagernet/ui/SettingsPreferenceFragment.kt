@@ -392,7 +392,9 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         // LAN 分享是 root 改 iptables + ip rule，原本只在連線（BaseService.lateInit）時套用、
         // 只在隧道關閉時拆除，而且這個開關完全沒掛 listener：開 ON 沒反應，關 OFF 後防火牆規則
         // 還留著（熱點上的人繼續走隧道）。這裡直接對稱起／拆，避免用重啟服務把使用者的連線全部打掉。
-        findPreference<SwitchPreferenceCompat>(Key.LAN_SHARING)!!.setOnPreferenceChangeListener { preference, newValue ->
+        findPreference<SwitchPreferenceCompat>(
+            Key.LAN_SHARING,
+        )!!.setOnPreferenceChangeListener { preference, newValue ->
             val enabled = newValue as Boolean
             runOnDefaultDispatcher {
                 try {
