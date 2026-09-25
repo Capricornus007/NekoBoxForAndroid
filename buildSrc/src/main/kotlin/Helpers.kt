@@ -151,6 +151,7 @@ fun Project.setupAppCommon() {
                     keyPassword = pwd
                     enableV1Signing = true
                     enableV2Signing = true
+                    enableV3Signing = true
                 }
             }
             if (debugKeystoreFile.isFile) {
@@ -159,6 +160,9 @@ fun Project.setupAppCommon() {
                     storePassword = "android"
                     keyAlias = "androiddebugkey"
                     keyPassword = "android"
+                    enableV1Signing = true
+                    enableV2Signing = true
+                    enableV3Signing = true
                 }
             }
         }
