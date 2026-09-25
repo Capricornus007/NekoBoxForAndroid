@@ -21,6 +21,7 @@ import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.RootLanSharing
+import io.nekohasekai.sagernet.root.RootManager
 import io.nekohasekai.sagernet.utils.AppLocale
 import io.nekohasekai.sagernet.utils.Theme
 import moe.matsuri.nb4a.ui.*
@@ -391,7 +392,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         // LAN 分享是 root 改 iptables + ip rule，原本只在連線（BaseService.lateInit）時套用、
         // 只在隧道關閉時拆除，而且這個開關完全沒掛 listener：開 ON 沒反應，關 OFF 後防火牆規則
         // 還留著（熱點上的人繼續走隧道）。這裡直接對稱起／拆，避免用重啟服務把使用者的連線全部打掉。
-        findPreference<SwitchPreferenceCompat>(Key.LAN_SHARING)!!.setOnPreferenceChangeListener { _, newValue ->
+        findPreference<SwitchPreferenceCompat>(Key.LAN_SHARING)!!.setOnPreferenceChangeListener { preference, newValue ->
             val enabled = newValue as Boolean
             runOnDefaultDispatcher {
                 try {
@@ -400,10 +401,27 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 } catch (e: Exception) {
                     Logs.w(e)
                 }
+                // root 不可用時原本的狀態是「開關打開、什麼都沒發生、只在日誌留一行 warning」，
+                // 使用者會以為已經生效。探測 root 要起 su 進程（最多等 10 秒）不能放主執行緒，
+                // 所以先讓它打開、探不到再退回並說明原因。
+                if (enabled && !RootManager.cachedRoot() && !RootManager.refresh()) {
+                    runOnMainDispatcher {
+                        (preference as SwitchPreferenceCompat).isChecked = false
+                        if (isAdded) {
+                            Toast.makeText(
+                                requireContext(),
+                                R.string.lan_sharing_requires_root,
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                        }
+                    }
+                    return@runOnDefaultDispatcher
+                }
                 // 隧道沒在跑時不動作：此時沒有可分享的進程，設定留給下次連線由 lateInit 套用。
                 if (DataStore.serviceState.canStop) {
-                    // 不去判回傳值：startClientSharing 回 false 只代表「已在跑」（無害），
-                    // root 不可用時它回 true 並自己 Logs.w；stopClientSharing 未啟動時是安全空轉。
+                    // 不去判回傳值：startClientSharing 回 false 只代表「已在跑」（無害）；
+                    // root 不可用已在上面擋掉了，這裡不會再走到那條 Logs.w 分支。
+                    // stopClientSharing 未啟動時是安全空轉。
                     if (enabled) {
                         RootLanSharing.startClientSharing(SagerNet.application)
                     } else {
