@@ -25,6 +25,7 @@ import (
 	"github.com/sagernet/sing/common/logger"
 	M "github.com/sagernet/sing/common/metadata"
 	"github.com/sagernet/sing/common/winpowrprof"
+	"github.com/sagernet/sing/common/x/list"
 	"github.com/sagernet/sing/service"
 	"github.com/sagernet/sing/service/pause"
 
@@ -34,28 +35,40 @@ import (
 var _ adapter.NetworkManager = (*NetworkManager)(nil)
 
 type NetworkManager struct {
-	logger            logger.ContextLogger
-	interfaceFinder   *control.DefaultInterfaceFinder
-	networkInterfaces common.TypedValue[[]adapter.NetworkInterface]
-
-	autoDetectInterface    bool
-	defaultOptions         adapter.NetworkOptions
-	autoRedirectOutputMark uint32
-	networkMonitor         tun.NetworkUpdateMonitor
-	interfaceMonitor       tun.DefaultInterfaceMonitor
-	packageManager         tun.PackageManager
-	powerListener          winpowrprof.EventListener
-	pauseManager           pause.Manager
-	platformInterface      adapter.PlatformInterface
-	connectionManager      adapter.ConnectionManager
-	endpoint               adapter.EndpointManager
-	inbound                adapter.InboundManager
-	outbound               adapter.OutboundManager
-	needWIFIState          bool
-	wifiMonitor            settings.WIFIMonitor
-	wifiState              adapter.WIFIState
-	wifiStateMutex         sync.RWMutex
-	started                bool
+	ctx                     context.Context
+	logger                  logger.ContextLogger
+	router                  adapter.Router
+	interfaceFinder         *control.DefaultInterfaceFinder
+	networkInterfaces       common.TypedValue[[]adapter.NetworkInterface]
+	autoDetectInterface     bool
+	defaultOptions          adapter.NetworkOptions
+	autoRedirectOutputMark  uint32
+	networkMonitor          tun.NetworkUpdateMonitor
+	interfaceMonitor        tun.DefaultInterfaceMonitor
+	packageManager          tun.PackageManager
+	powerListener           winpowrprof.EventListener
+	pauseManager            pause.Manager
+	platformInterface       adapter.PlatformInterface
+	connectionManager       adapter.ConnectionManager
+	endpoint                adapter.EndpointManager
+	inbound                 adapter.InboundManager
+	outbound                adapter.OutboundManager
+	needWIFIState           bool
+	wifiMonitor             settings.WIFIMonitor
+	wifiState               adapter.WIFIState
+	networkEnvironment      uint64
+	stateAccess             sync.RWMutex
+	environmentUpdateAccess sync.Mutex
+	environmentUpdateTimer  *time.Timer
+	startedCtx              context.Context
+	startedCancel           context.CancelFunc
+	interfaceUpdateElement  *list.Element[tun.DefaultInterfaceUpdateCallback]
+	interfaceUpdateAccess   sync.Mutex
+	interfaceUpdateCancel   context.CancelFunc
+	networkResetPending     bool
+	resetRunAccess          sync.Mutex
+	powerUpdateAccess       sync.Mutex
+	powerUpdateCancel       context.CancelFunc
 }
 
 func NewNetworkManager(ctx context.Context, logger logger.ContextLogger, options option.RouteOptions, dnsOptions option.DNSOptions) (*NetworkManager, error) {
@@ -70,6 +83,7 @@ func NewNetworkManager(ctx context.Context, logger logger.ContextLogger, options
 		return nil, E.New("`default_mark` is only supported on linux")
 	}
 	nm := &NetworkManager{
+		ctx:                 ctx,
 		logger:              logger,
 		interfaceFinder:     control.NewDefaultInterfaceFinder(),
 		autoDetectInterface: options.AutoDetectInterface,
@@ -78,10 +92,12 @@ func NewNetworkManager(ctx context.Context, logger logger.ContextLogger, options
 			RoutingMark:    uint32(options.DefaultMark),
 			DomainResolver: defaultDomainResolver.Server,
 			DomainResolveOptions: adapter.DNSQueryOptions{
-				Strategy:     C.DomainStrategy(defaultDomainResolver.Strategy),
-				DisableCache: defaultDomainResolver.DisableCache,
-				RewriteTTL:   defaultDomainResolver.RewriteTTL,
-				ClientSubnet: defaultDomainResolver.ClientSubnet.Build(netip.Prefix{}),
+				Strategy:               C.DomainStrategy(defaultDomainResolver.Strategy),
+				Timeout:                time.Duration(defaultDomainResolver.Timeout),
+				DisableCache:           defaultDomainResolver.DisableCache,
+				DisableOptimisticCache: defaultDomainResolver.DisableOptimisticCache,
+				RewriteTTL:             defaultDomainResolver.RewriteTTL,
+				ClientSubnet:           defaultDomainResolver.ClientSubnet.Build(netip.Prefix{}),
 			},
 			NetworkStrategy:     (*C.NetworkStrategy)(options.DefaultNetworkStrategy),
 			NetworkType:         common.Map(options.DefaultNetworkType, option.InterfaceType.Build),
@@ -104,7 +120,7 @@ func NewNetworkManager(ctx context.Context, logger logger.ContextLogger, options
 			return nil, E.New("`auto_detect_interface` is required by `default_network_strategy`")
 		}
 	}
-	usePlatformDefaultInterfaceMonitor := nm.platformInterface != nil
+	usePlatformDefaultInterfaceMonitor := nm.platformInterface != nil && nm.platformInterface.UsePlatformDefaultInterfaceMonitor()
 	enforceInterfaceMonitor := options.AutoDetectInterface
 	if !usePlatformDefaultInterfaceMonitor {
 		networkMonitor, err := tun.NewNetworkUpdateMonitor(logger)
@@ -113,6 +129,7 @@ func NewNetworkManager(ctx context.Context, logger logger.ContextLogger, options
 				return nil, E.Cause(err, "create network monitor")
 			}
 			nm.networkMonitor = networkMonitor
+			networkMonitor.RegisterCallback(nm.postUpdateNetworkEnvironment)
 			interfaceMonitor, err := tun.NewDefaultInterfaceMonitor(nm.networkMonitor, logger, tun.DefaultInterfaceMonitorOptions{
 				InterfaceFinder:       nm.interfaceFinder,
 				OverrideAndroidVPN:    options.OverrideAndroidVPN,
@@ -121,13 +138,10 @@ func NewNetworkManager(ctx context.Context, logger logger.ContextLogger, options
 			if err != nil {
 				return nil, E.New("auto_detect_interface unsupported on current platform")
 			}
-			interfaceMonitor.RegisterCallback(nm.notifyInterfaceUpdate)
 			nm.interfaceMonitor = interfaceMonitor
 		}
 	} else {
-		interfaceMonitor := nm.platformInterface.CreateDefaultInterfaceMonitor(logger)
-		interfaceMonitor.RegisterCallback(nm.notifyInterfaceUpdate)
-		nm.interfaceMonitor = interfaceMonitor
+		nm.interfaceMonitor = nm.platformInterface.CreateDefaultInterfaceMonitor(logger)
 	}
 	return nm, nil
 }
@@ -136,6 +150,7 @@ func (r *NetworkManager) Start(stage adapter.StartStage) error {
 	monitor := taskmonitor.New(r.logger, C.StartTimeout)
 	switch stage {
 	case adapter.StartStateInitialize:
+		r.router = service.FromContext[adapter.Router](r.ctx)
 		if r.networkMonitor != nil {
 			monitor.Start("initialize network monitor")
 			err := r.networkMonitor.Start()
@@ -151,24 +166,9 @@ func (r *NetworkManager) Start(stage adapter.StartStage) error {
 			if err != nil {
 				return err
 			}
+			r.interfaceUpdateElement = r.interfaceMonitor.RegisterCallback(r.notifyInterfaceUpdate)
 		}
 	case adapter.StartStateStart:
-		if runtime.GOOS == "windows" {
-			powerListener, err := winpowrprof.NewEventListener(r.notifyWindowsPowerEvent)
-			if err == nil {
-				r.powerListener = powerListener
-			} else {
-				r.logger.Warn("initialize power listener: ", err)
-			}
-		}
-		if r.powerListener != nil {
-			monitor.Start("start power listener")
-			err := r.powerListener.Start()
-			monitor.Finish()
-			if err != nil {
-				return E.Cause(err, "start power listener")
-			}
-		}
 		if C.IsAndroid && r.platformInterface == nil {
 			monitor.Start("initialize package manager")
 			packageManager, err := tun.NewPackageManager(tun.PackageManagerOptions{
@@ -203,7 +203,28 @@ func (r *NetworkManager) Start(stage adapter.StartStage) error {
 				}
 			}
 		}
-		r.started = true
+		r.interfaceUpdateAccess.Lock()
+		r.startedCtx, r.startedCancel = context.WithCancel(r.ctx)
+		if r.interfaceMonitor != nil {
+			r.dispatchInterfaceUpdateLocked()
+		}
+		r.interfaceUpdateAccess.Unlock()
+		if runtime.GOOS == "windows" {
+			powerListener, err := winpowrprof.NewEventListener(r.notifyWindowsPowerEvent)
+			if err == nil {
+				r.powerListener = powerListener
+			} else {
+				r.logger.Warn("initialize power listener: ", err)
+			}
+		}
+		if r.powerListener != nil {
+			monitor.Start("start power listener")
+			err := r.powerListener.Start()
+			monitor.Finish()
+			if err != nil {
+				return E.Cause(err, "start power listener")
+			}
+		}
 	}
 	return nil
 }
@@ -221,17 +242,28 @@ func (r *NetworkManager) Initialize(ruleSets []adapter.RuleSet) {
 func (r *NetworkManager) Close() error {
 	monitor := taskmonitor.New(r.logger, C.StopTimeout)
 	var err error
-	if r.packageManager != nil {
-		monitor.Start("close package manager")
-		err = E.Append(err, r.packageManager.Close(), func(err error) error {
-			return E.Cause(err, "close package manager")
-		})
-		monitor.Finish()
+	if r.interfaceUpdateElement != nil {
+		r.interfaceMonitor.UnregisterCallback(r.interfaceUpdateElement)
+		r.interfaceUpdateElement = nil
 	}
 	if r.powerListener != nil {
 		monitor.Start("close power listener")
 		err = E.Append(err, r.powerListener.Close(), func(err error) error {
 			return E.Cause(err, "close power listener")
+		})
+		monitor.Finish()
+	}
+	if r.startedCancel != nil {
+		r.startedCancel()
+		monitor.Start("wait network reset")
+		r.resetRunAccess.Lock()
+		monitor.Finish()
+		defer r.resetRunAccess.Unlock()
+	}
+	if r.packageManager != nil {
+		monitor.Start("close package manager")
+		err = E.Append(err, r.packageManager.Close(), func(err error) error {
+			return E.Cause(err, "close package manager")
 		})
 		monitor.Finish()
 	}
@@ -249,6 +281,11 @@ func (r *NetworkManager) Close() error {
 		})
 		monitor.Finish()
 	}
+	r.environmentUpdateAccess.Lock()
+	if r.environmentUpdateTimer != nil {
+		r.environmentUpdateTimer.Stop()
+	}
+	r.environmentUpdateAccess.Unlock()
 	if r.wifiMonitor != nil {
 		monitor.Start("close WIFI monitor")
 		err = E.Append(err, r.wifiMonitor.Close(), func(err error) error {
@@ -264,6 +301,7 @@ func (r *NetworkManager) InterfaceFinder() control.InterfaceFinder {
 }
 
 func (r *NetworkManager) UpdateInterfaces() error {
+	defer r.postUpdateNetworkEnvironment()
 	if r.platformInterface == nil || !r.platformInterface.UsePlatformNetworkInterfaces() {
 		return r.interfaceFinder.Update()
 	} else {
@@ -423,40 +461,41 @@ func (r *NetworkManager) NeedWIFIState() bool {
 }
 
 func (r *NetworkManager) WIFIState() adapter.WIFIState {
-	r.wifiStateMutex.RLock()
-	defer r.wifiStateMutex.RUnlock()
+	r.stateAccess.RLock()
+	defer r.stateAccess.RUnlock()
 	return r.wifiState
 }
 
 func (r *NetworkManager) onWIFIStateChanged(state adapter.WIFIState) {
 	state.BSSID = adapter.NormalizeWIFIBSSID(state.BSSID)
-	r.wifiStateMutex.Lock()
+	r.stateAccess.Lock()
 	if state != r.wifiState {
 		r.wifiState = state
-		r.wifiStateMutex.Unlock()
+		r.stateAccess.Unlock()
+		r.postUpdateNetworkEnvironment()
 		if state.SSID != "" {
 			r.logger.Info("WIFI state changed: SSID=", state.SSID, ", BSSID=", state.BSSID)
 		} else {
 			r.logger.Info("WIFI disconnected")
 		}
 	} else {
-		r.wifiStateMutex.Unlock()
+		r.stateAccess.Unlock()
 	}
 }
 
-func (r *NetworkManager) UpdateWIFIState() {
+func (r *NetworkManager) UpdateWIFIState(ctx context.Context) {
 	var state adapter.WIFIState
 	if r.wifiMonitor != nil {
-		state = r.wifiMonitor.ReadWIFIState()
+		state = r.wifiMonitor.ReadWIFIState(ctx)
 	} else if r.platformInterface != nil && r.platformInterface.UsePlatformWIFIMonitor() {
-		state = r.platformInterface.ReadWIFIState()
+		state = r.platformInterface.ReadWIFIState(ctx)
 	} else {
 		return
 	}
 	r.onWIFIStateChanged(state)
 }
 
-func (r *NetworkManager) ResetNetwork() {
+func (r *NetworkManager) ResetNetwork(ctx context.Context) {
 	if r.connectionManager != nil {
 		r.connectionManager.CloseAll()
 	}
@@ -464,33 +503,58 @@ func (r *NetworkManager) ResetNetwork() {
 	for _, endpoint := range r.endpoint.Endpoints() {
 		listener, isListener := endpoint.(adapter.InterfaceUpdateListener)
 		if isListener {
-			listener.InterfaceUpdated()
+			listener.InterfaceUpdated(ctx)
 		}
 	}
 
 	for _, inbound := range r.inbound.Inbounds() {
 		listener, isListener := inbound.(adapter.InterfaceUpdateListener)
 		if isListener {
-			listener.InterfaceUpdated()
+			listener.InterfaceUpdated(ctx)
 		}
 	}
 
 	for _, outbound := range r.outbound.Outbounds() {
 		listener, isListener := outbound.(adapter.InterfaceUpdateListener)
 		if isListener {
-			listener.InterfaceUpdated()
+			listener.InterfaceUpdated(ctx)
 		}
+	}
+
+	r.router.ResetNetwork()
+}
+
+func (r *NetworkManager) notifyInterfaceUpdate(_ *control.Interface, _ int) {
+	r.interfaceUpdateAccess.Lock()
+	defer r.interfaceUpdateAccess.Unlock()
+	r.networkResetPending = true
+	if r.startedCtx != nil {
+		r.dispatchInterfaceUpdateLocked()
 	}
 }
 
-func (r *NetworkManager) notifyInterfaceUpdate(defaultInterface *control.Interface, flags int) {
+func (r *NetworkManager) dispatchInterfaceUpdateLocked() {
+	defaultInterface := r.interfaceMonitor.DefaultInterface()
 	if defaultInterface == nil {
 		r.pauseManager.NetworkPause()
 		r.logger.Error("missing default interface")
 		return
 	}
-
 	r.pauseManager.NetworkWake()
+	if r.interfaceUpdateCancel != nil {
+		r.interfaceUpdateCancel()
+	}
+	updateContext, updateCancel := context.WithCancel(r.startedCtx)
+	r.interfaceUpdateCancel = updateCancel
+	go r.updateInterface(updateContext, defaultInterface)
+}
+
+func (r *NetworkManager) updateInterface(ctx context.Context, defaultInterface *control.Interface) {
+	r.resetRunAccess.Lock()
+	defer r.resetRunAccess.Unlock()
+	if ctx.Err() != nil {
+		return
+	}
 	var options []string
 	options = append(options, F.ToString("index ", defaultInterface.Index))
 	if C.IsAndroid && r.platformInterface == nil {
@@ -501,7 +565,7 @@ func (r *NetworkManager) notifyInterfaceUpdate(defaultInterface *control.Interfa
 			vpnStatus = "disabled"
 		}
 		options = append(options, "vpn "+vpnStatus)
-	} else if r.platformInterface != nil {
+	} else if r.platformInterface != nil && r.platformInterface.UsePlatformNetworkInterfaces() {
 		networkInterface := common.Find(r.networkInterfaces.Load(), func(it adapter.NetworkInterface) bool {
 			return it.Interface.Index == defaultInterface.Index
 		})
@@ -518,19 +582,28 @@ func (r *NetworkManager) notifyInterfaceUpdate(defaultInterface *control.Interfa
 		}
 	}
 	r.logger.Info("updated default interface ", defaultInterface.Name, ", ", strings.Join(options, ", "))
-	r.UpdateWIFIState()
-
-	if !r.started {
+	r.UpdateWIFIState(ctx)
+	if ctx.Err() != nil {
 		return
 	}
-	r.ResetNetwork()
+	r.updateNetworkEnvironment()
+	r.interfaceUpdateAccess.Lock()
+	resetNetwork := ctx.Err() == nil && r.networkResetPending
+	if resetNetwork {
+		r.networkResetPending = false
+	}
+	r.interfaceUpdateAccess.Unlock()
+	if resetNetwork {
+		r.ResetNetwork(ctx)
+	}
 }
 
 func (r *NetworkManager) notifyWindowsPowerEvent(event int) {
 	switch event {
 	case winpowrprof.EVENT_SUSPEND:
 		r.pauseManager.DevicePause()
-		r.ResetNetwork()
+		r.cancelPowerUpdate()
+		r.ResetNetwork(r.startedCtx)
 	case winpowrprof.EVENT_RESUME:
 		if !r.pauseManager.IsDevicePaused() {
 			return
@@ -538,7 +611,32 @@ func (r *NetworkManager) notifyWindowsPowerEvent(event int) {
 		fallthrough
 	case winpowrprof.EVENT_RESUME_AUTOMATIC:
 		r.pauseManager.DeviceWake()
-		r.ResetNetwork()
+		updateContext, updateCancel := context.WithCancel(r.startedCtx)
+		r.powerUpdateAccess.Lock()
+		previousCancel := r.powerUpdateCancel
+		r.powerUpdateCancel = updateCancel
+		r.powerUpdateAccess.Unlock()
+		if previousCancel != nil {
+			previousCancel()
+		}
+		go func() {
+			r.resetRunAccess.Lock()
+			defer r.resetRunAccess.Unlock()
+			if updateContext.Err() != nil {
+				return
+			}
+			r.ResetNetwork(updateContext)
+		}()
+	}
+}
+
+func (r *NetworkManager) cancelPowerUpdate() {
+	r.powerUpdateAccess.Lock()
+	previousCancel := r.powerUpdateCancel
+	r.powerUpdateCancel = nil
+	r.powerUpdateAccess.Unlock()
+	if previousCancel != nil {
+		previousCancel()
 	}
 }
 

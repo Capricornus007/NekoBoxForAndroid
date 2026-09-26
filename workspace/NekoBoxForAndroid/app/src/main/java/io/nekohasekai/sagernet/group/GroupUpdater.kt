@@ -13,15 +13,18 @@ import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.fmt.trojan_go.TrojanGoBean
 import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean
 import io.nekohasekai.sagernet.fmt.v2ray.isTLS
+import io.nekohasekai.sagernet.app.AppGraph
 import io.nekohasekai.sagernet.ktx.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.coroutineContext
 
-@Suppress("EXPERIMENTAL_API_USAGE")
 abstract class GroupUpdater {
 
     abstract suspend fun doUpdate(
@@ -41,8 +44,7 @@ abstract class GroupUpdater {
         profiles: List<AbstractBean>, groupId: Long?
     ) {
         val ipv6Mode = DataStore.ipv6Mode
-        val lookupPool = newFixedThreadPoolContext(5, "DNS Lookup")
-        val lookupJobs = mutableListOf<Job>()
+        val lookupPermits = Semaphore(5)
         val progress = Progress(profiles.size)
         if (groupId != null) {
             GroupUpdater.progress[groupId] = progress
@@ -50,44 +52,45 @@ abstract class GroupUpdater {
         }
         val ipv6First = ipv6Mode >= IPv6Mode.PREFER
 
-        for (profile in profiles) {
-            when (profile) {
-                // SNI rewrite unsupported
-                is NaiveBean -> continue
-            }
+        coroutineScope {
+            for (profile in profiles) {
+                when (profile) {
+                    // SNI rewrite unsupported
+                    is NaiveBean -> continue
+                }
 
-            if (profile.serverAddress.isIpAddress()) continue
+                if (profile.serverAddress.isIpAddress()) continue
 
-            lookupJobs.add(GlobalScope.launch(lookupPool) {
-                try {
-                    val results = if (
-                        SagerNet.underlyingNetwork != null &&
-                        DataStore.enableFakeDns &&
-                        DataStore.serviceState.started &&
-                        DataStore.serviceMode == Key.MODE_VPN
-                    ) {
-                        // FakeDNS
-                        SagerNet.underlyingNetwork!!
-                            .getAllByName(profile.serverAddress)
-                            .filterNotNull()
-                    } else {
-                        // System DNS is enough (when VPN connected, it uses v2ray-core)
-                        InetAddress.getAllByName(profile.serverAddress).filterNotNull()
+                launch(AppGraph.dispatchers.io) {
+                    lookupPermits.withPermit {
+                        try {
+                            val results = if (
+                                SagerNet.underlyingNetwork != null &&
+                                DataStore.enableFakeDns &&
+                                DataStore.serviceState.started &&
+                                DataStore.serviceMode == Key.MODE_VPN
+                            ) {
+                                // FakeDNS
+                                SagerNet.underlyingNetwork!!
+                                    .getAllByName(profile.serverAddress)
+                                    .filterNotNull()
+                            } else {
+                                // System DNS is enough (when VPN connected, it uses v2ray-core)
+                                InetAddress.getAllByName(profile.serverAddress).filterNotNull()
+                            }
+                            if (results.isEmpty()) error("empty response")
+                            rewriteAddress(profile, results, ipv6First)
+                        } catch (e: Exception) {
+                            Logs.d("Lookup ${profile.serverAddress} failed: ${e.readableMessage}", e)
+                        }
+                        if (groupId != null) {
+                            progress.progress++
+                            GroupManager.postReload(groupId)
+                        }
                     }
-                    if (results.isEmpty()) error("empty response")
-                    rewriteAddress(profile, results, ipv6First)
-                } catch (e: Exception) {
-                    Logs.d("Lookup ${profile.serverAddress} failed: ${e.readableMessage}", e)
                 }
-                if (groupId != null) {
-                    progress.progress++
-                    GroupManager.postReload(groupId)
-                }
-            })
+            }
         }
-
-        lookupJobs.joinAll()
-        lookupPool.close()
     }
 
     protected fun rewriteAddress(
@@ -124,6 +127,7 @@ abstract class GroupUpdater {
 
         val updating = Collections.synchronizedSet<Long>(mutableSetOf())
         val progress = Collections.synchronizedMap<Long, Progress>(mutableMapOf())
+        private val activeJobs = Collections.synchronizedMap<Long, Job>(mutableMapOf())
         const val SUBSCRIPTION_UPDATE_TIMEOUT_MILLIS = 2 * 60 * 1000L
 
         fun startUpdate(proxyGroup: ProxyGroup, byUser: Boolean) {
@@ -135,6 +139,8 @@ abstract class GroupUpdater {
         suspend fun executeUpdate(proxyGroup: ProxyGroup, byUser: Boolean): Boolean {
             return coroutineScope {
                 if (!updating.add(proxyGroup.id)) return@coroutineScope false
+                val updateJob = coroutineContext.job
+                activeJobs[proxyGroup.id] = updateJob
                 GroupManager.postReload(proxyGroup.id)
 
                 val subscription = proxyGroup.subscription!!
@@ -171,9 +177,24 @@ abstract class GroupUpdater {
                         false
                     }
                 } finally {
+                    synchronized(activeJobs) {
+                        if (activeJobs[proxyGroup.id] === updateJob) {
+                            activeJobs.remove(proxyGroup.id)
+                        }
+                    }
                     finishUpdate(proxyGroup)
                 }
             }
+        }
+
+        suspend fun cancelUpdate(groupId: Long) {
+            val job = activeJobs[groupId] ?: return
+            if (job === coroutineContext.job) return
+            job.cancelAndJoin()
+        }
+
+        suspend fun cancelUpdates(groupIds: Iterable<Long>) {
+            groupIds.forEach { cancelUpdate(it) }
         }
 
 

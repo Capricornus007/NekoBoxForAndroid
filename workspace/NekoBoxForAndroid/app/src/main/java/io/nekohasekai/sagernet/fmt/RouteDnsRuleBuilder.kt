@@ -18,8 +18,16 @@ internal fun shouldCreateBaseRouteDnsRule(
             !hasOtherRouteCriteria
 }
 
+internal fun hasGeoIpOrRsipMatcher(
+    ipList: List<String>?,
+    rulesetList: List<String>?,
+): Boolean =
+    ipList.orEmpty().any { it.startsWith("geoip:") } ||
+        rulesetList.orEmpty().any { it.startsWith("rsip:") }
+
 fun buildRouteDnsRules(
     createDnsRule: Boolean,
+    hasGeoIpOrRsipMatcher: Boolean = false,
     createBaseDnsRule: Boolean = true,
     outbound: Long,
     uidList: List<Int>,
@@ -28,10 +36,8 @@ fun buildRouteDnsRules(
     rulesetTags: List<Pair<String, Boolean>>,
     useFakeDns: Boolean,
     clashMode: String = "",
-    directDnsStrategy: String? = null,
-    remoteDnsStrategy: String? = null,
 ): List<DNSRule_DefaultOptions> {
-    if (!createDnsRule) return emptyList()
+    if (!createDnsRule || hasGeoIpOrRsipMatcher) return emptyList()
 
     val dnsRules = mutableListOf<DNSRule_DefaultOptions>()
 
@@ -61,11 +67,8 @@ fun buildRouteDnsRules(
         dnsRules += rule.apply(configure)
     }
 
-    fun DNSRule_DefaultOptions.routeTo(server: String, strategy: String? = null) {
+    fun DNSRule_DefaultOptions.routeTo(server: String) {
         this.server = server
-        if (!strategy.isNullOrBlank()) {
-            this.strategy = strategy
-        }
     }
 
     fun DNSRule_DefaultOptions.blockWithSuccessResponse() {
@@ -75,7 +78,6 @@ fun buildRouteDnsRules(
 
     fun addRuleSetDnsRules(
         server: String?,
-        strategy: String? = null,
         configure: DNSRule_DefaultOptions.() -> Unit = {},
     ) {
         val routeRuleSet = ruleSet ?: return
@@ -87,7 +89,7 @@ fun buildRouteDnsRules(
                 dnsRules += DNSRule_DefaultOptions().apply {
                     rule_set = mutableListOf(tag)
                     if (server != null) {
-                        routeTo(server, strategy)
+                        routeTo(server)
                     }
                     if (clashMode.isNotBlank()) clash_mode = clashMode
                     configure()
@@ -98,8 +100,8 @@ fun buildRouteDnsRules(
 
     when (outbound) {
         -1L -> {
-            addBaseDnsRule { routeTo("dns-direct", directDnsStrategy) }
-            addRuleSetDnsRules("dns-direct", directDnsStrategy)
+            addBaseDnsRule { routeTo("dns-direct") }
+            addRuleSetDnsRules("dns-direct")
         }
 
         0L -> {
@@ -115,9 +117,9 @@ fun buildRouteDnsRules(
                 }
             } else {
                 addBaseDnsRule {
-                    routeTo("dns-remote", remoteDnsStrategy)
+                    routeTo("dns-remote")
                 }
-                addRuleSetDnsRules("dns-remote", remoteDnsStrategy)
+                addRuleSetDnsRules("dns-remote")
             }
         }
 

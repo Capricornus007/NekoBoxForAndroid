@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.fmt.tailscale
 
+import io.nekohasekai.sagernet.fmt.applyConfiguredDialOptions
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -27,7 +28,9 @@ class TailscaleFmtTest {
             tcpKeepAlive = "30s"
         }
 
-        val endpoint = buildSingBoxEndpointTailscaleBean(bean, 42)
+        val endpoint = buildSingBoxEndpointTailscaleBean(bean, 42).apply {
+            applyConfiguredDialOptions(bean, false, false, "")
+        }
 
         assertEquals("tailscale", endpoint.type)
         assertEquals("tailscale/42", endpoint.state_directory)

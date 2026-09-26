@@ -8,6 +8,7 @@ import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.plugin.PluginManager
+import io.nekohasekai.sagernet.utils.ProfileCountryResolver
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
@@ -55,6 +56,8 @@ object ProfileUrlTestController {
                         error = e.readableMessage,
                         reloadDelayOrderedGroup = false
                     )
+                } finally {
+                    ProfileCountryResolver.resolveAndUpdateDomain(profile.id)
                 }
             }
         }

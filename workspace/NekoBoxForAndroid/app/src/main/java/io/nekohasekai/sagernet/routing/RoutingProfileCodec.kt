@@ -31,6 +31,7 @@ object RoutingProfileCodec {
         val root = gson.toJsonTree(profile).asJsonObject
         root.getAsJsonArray("Rules")?.forEach { element ->
             val rule = element.asJsonObject
+            legacyRuleFields.forEach(rule::remove)
             val isDnsRule = rule.get("Type")?.asString == "dns"
             val fieldsToRemove = if (isDnsRule) normalOnlyRuleFields else dnsOnlyRuleFields
             fieldsToRemove.forEach(rule::remove)
@@ -41,10 +42,10 @@ object RoutingProfileCodec {
     }
 
     private val normalOnlyRuleFields = setOf("Outbound", "OutboundHash", "CreateDnsRule")
+    private val legacyRuleFields = setOf("DnsStrategy")
     private val dnsOnlyRuleFields = setOf(
         "DnsAction",
         "DnsServer",
-        "DnsStrategy",
         "DnsDisableCache",
         "DnsRewriteTtl",
         "DnsClientSubnet",
@@ -120,6 +121,10 @@ object IncyRoutingLinkProcessor : RoutingLinkProcessor {
     override val format = RoutingProfileFormat.INCY
 }
 
+object V2RayTunRoutingLinkProcessor : RoutingLinkProcessor {
+    override val format = RoutingProfileFormat.V2RAY_TUN
+}
+
 object NekoBoxPlusRoutingLinkProcessor : RoutingLinkProcessor {
     override val format = RoutingProfileFormat.NEKOBOX_PLUS
 }
@@ -127,6 +132,7 @@ object NekoBoxPlusRoutingLinkProcessor : RoutingLinkProcessor {
 object RoutingLinkProcessors {
     private val processors = listOf(
         HappRoutingLinkProcessor,
+        V2RayTunRoutingLinkProcessor,
         IncyRoutingLinkProcessor,
         NekoBoxPlusRoutingLinkProcessor,
     )

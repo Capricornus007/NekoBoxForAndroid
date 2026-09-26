@@ -22,20 +22,32 @@ func (s *Service[T]) NewConnectionWithOptions(ctx context.Context, conn net.Conn
 	if err != nil {
 		return err
 	}
-	user, loaded := s.userMap[request.UUID]
+	user, userFlow, userRevision, loaded := s.lookupUser(request.UUID)
 	if !loaded {
 		return E.New("unknown UUID: ", uuid.FromBytesOrNil(request.UUID[:]))
 	}
 	ctx = auth.ContextWithUser(ctx, user)
-	userFlow := s.userFlow[user]
 	if request.Flow == FlowVision && request.Command == vmess.NetworkUDP {
 		return E.New(FlowVision, " flow does not support UDP")
 	} else if request.Flow != userFlow {
 		return E.New("flow mismatch: expected ", flowName(userFlow), ", but got ", flowName(request.Flow))
 	}
 
+	trackedConn, loaded := s.trackConnection(user, userRevision, conn)
+	if !loaded {
+		return E.New("user configuration changed during handshake")
+	}
+	handedOff := false
+	defer func() {
+		if !handedOff {
+			trackedConn.remove()
+		}
+	}()
+	conn = trackedConn
+
 	if request.Command == vmess.CommandUDP {
-		s.handler.NewPacketConnectionEx(ctx, &serverPacketConn{ExtendedConn: bufio.NewExtendedConn(conn), destination: request.Destination}, source, request.Destination, onClose)
+		s.handler.NewPacketConnectionEx(ctx, &serverPacketConn{ExtendedConn: bufio.NewExtendedConn(conn), destination: request.Destination}, source, request.Destination, trackedConn.onClose(onClose))
+		handedOff = true
 		return nil
 	}
 	responseConn := &serverConn{ExtendedConn: bufio.NewExtendedConn(conn)}
@@ -52,7 +64,8 @@ func (s *Service[T]) NewConnectionWithOptions(ctx context.Context, conn net.Conn
 	}
 	switch request.Command {
 	case vmess.CommandTCP:
-		s.handler.NewConnectionEx(ctx, conn, source, request.Destination, onClose)
+		s.handler.NewConnectionEx(ctx, conn, source, request.Destination, trackedConn.onClose(onClose))
+		handedOff = true
 		return nil
 	case vmess.CommandMux:
 		return vmess.HandleMuxConnection(ctx, conn, source, s.handler)

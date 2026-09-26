@@ -16,6 +16,22 @@ public struct LogEntry: Identifiable {
     }
 }
 
+public struct LogBuffer {
+    public var entries: [LogEntry]
+    /// Cumulative count of entries trimmed from the front since the last reset,
+    /// letting consumers compute incremental deltas after the buffer saturates.
+    public var droppedCount: Int
+
+    public init(entries: [LogEntry] = [], droppedCount: Int = 0) {
+        self.entries = entries
+        self.droppedCount = droppedCount
+    }
+
+    public var totalCount: Int {
+        droppedCount + entries.count
+    }
+}
+
 public enum LogLevel: Int, CaseIterable, Identifiable {
     public var id: Self {
         self
@@ -66,15 +82,32 @@ public class CommandClient: ObservableObject {
         case log
         case clashMode
         case connections
+        case outbounds
+    }
+
+    public struct ConnectionError: Equatable {
+        public enum Kind: Equatable {
+            /// A connect attempt failed; retrying is not expected to succeed.
+            case connectFailed
+            /// An established connection dropped (app suspension, network
+            /// change, server restart); reconnecting may recover.
+            case connectionLost
+        }
+
+        public let kind: Kind
+        public let message: String
     }
 
     private let connectionTypes: [ConnectionType]
     private let logMaxLines: Int
+    private let localOnly: Bool
     private var commandClient: LibboxCommandClient?
     private var connectTask: Task<Void, Never>?
     private var activeConnectionToken: UInt64 = 0
     private var isConnecting = false
     @Published public var isConnected: Bool
+    @Published public private(set) var startedAt: Date?
+    @Published public var lastError: ConnectionError?
     // Coalesce traffic updates so SwiftUI re-renders once per status tick.
     @Published private var trafficSnapshot = TrafficSnapshot()
     public var status: LibboxStatusMessage? {
@@ -87,8 +120,13 @@ public class CommandClient: ObservableObject {
             .eraseToAnyPublisher()
     }
 
-    @Published public var groups: [LibboxOutboundGroup]?
-    @Published public var logList: [LogEntry]
+    @Published public var groups: [OutboundGroup]?
+    @Published public var outbounds: [LibboxOutboundGroupItem]?
+    @Published public var logBuffer = LogBuffer()
+    /// The server always sends the saved log backlog as the first message after
+    /// subscribing (even when it is empty), so until it arrives an empty buffer
+    /// means "still loading", not "no logs".
+    @Published public private(set) var initialLogsReceived = false
     @Published public var defaultLogLevel = 0
     @Published public var selectedLogLevel: Int?
     @Published public var clashModeList: [String]
@@ -113,17 +151,17 @@ public class CommandClient: ObservableObject {
     private var logBatchTimer: DispatchWorkItem?
     private let logBatchInterval: TimeInterval = 0.1 // 100ms batch window
 
-    public init(_ connectionTypes: [ConnectionType], logMaxLines: Int = 3000) {
+    public init(_ connectionTypes: [ConnectionType], logMaxLines: Int = 3000, localOnly: Bool = false) {
         self.connectionTypes = connectionTypes
         self.logMaxLines = logMaxLines
-        logList = []
+        self.localOnly = localOnly
         clashModeList = []
         clashMode = ""
         isConnected = false
     }
 
-    public convenience init(_ connectionType: ConnectionType, logMaxLines: Int = 300) {
-        self.init([connectionType], logMaxLines: logMaxLines)
+    public convenience init(_ connectionType: ConnectionType, logMaxLines: Int = 300, localOnly: Bool = false) {
+        self.init([connectionType], logMaxLines: logMaxLines, localOnly: localOnly)
     }
 
     public func setupMockData() {
@@ -167,28 +205,46 @@ public class CommandClient: ObservableObject {
         if isConnected {
             isConnected = false
         }
+        startedAt = nil
+    }
+
+    public func loadStartedAt() {
+        guard isConnected, startedAt == nil else { return }
+        let token = activeConnectionToken
+        Task.detached { [weak self] in
+            guard let client = try? CommandTarget.standaloneClient() else { return }
+            var value: Int64 = 0
+            try? client.getStartedAt(&value)
+            guard value > 0 else { return }
+            let date = Date(timeIntervalSince1970: Double(value) / 1000)
+            await MainActor.run {
+                guard let self, self.activeConnectionToken == token, self.isConnected else { return }
+                self.startedAt = date
+            }
+        }
     }
 
     private func flushPendingLogs() {
         logBatchTimer = nil
         guard !pendingLogs.isEmpty else { return }
 
-        // Batch append all pending logs
-        logList.append(contentsOf: pendingLogs)
+        // Build the new buffer locally so subscribers see a single, consistent publish.
+        var buffer = logBuffer
+        buffer.entries.append(contentsOf: pendingLogs)
         pendingLogs.removeAll()
-
-        // Trim to max lines if needed
-        if logList.count > logMaxLines {
-            let removeCount = logList.count - logMaxLines
-            logList.removeFirst(removeCount)
+        if buffer.entries.count > logMaxLines {
+            let removeCount = buffer.entries.count - logMaxLines
+            buffer.entries.removeFirst(removeCount)
+            buffer.droppedCount += removeCount
         }
+        logBuffer = buffer
     }
 
     public func clearLogs() {
         logBatchTimer?.cancel()
         logBatchTimer = nil
         pendingLogs.removeAll()
-        logList.removeAll()
+        logBuffer = LogBuffer()
     }
 
     public func filterConnectionsNow() {
@@ -246,17 +302,39 @@ public class CommandClient: ObservableObject {
                 clientOptions.addCommand(LibboxCommandClashMode)
             case .connections:
                 clientOptions.addCommand(LibboxCommandConnections)
+            case .outbounds:
+                clientOptions.addCommand(LibboxCommandOutbounds)
             }
         }
         clientOptions.statusInterval = Int64(NSEC_PER_SEC)
-        let client = LibboxNewCommandClient(clientHandler(self, connectionToken: token), clientOptions)!
+        let client: LibboxCommandClient
+        if !localOnly, let server = CommandTarget.remoteServer {
+            var clientError: NSError?
+            let remoteClient = LibboxNewRemoteCommandClient(clientHandler(self, connectionToken: token), clientOptions, CommandTarget.libboxOptions(server), &clientError)
+            if let clientError {
+                await reportConnectError(token: token, error: clientError)
+                await finishConnectionAttempt(token: token, client: nil)
+                return
+            }
+            client = remoteClient!
+        } else {
+            client = LibboxNewCommandClient(clientHandler(self, connectionToken: token), clientOptions)!
+        }
         do {
             try client.connect()
         } catch {
+            await reportConnectError(token: token, error: error)
             await finishConnectionAttempt(token: token, client: nil)
             return
         }
         await finishConnectionAttempt(token: token, client: client)
+    }
+
+    private func reportConnectError(token: UInt64, error: Error) async {
+        await MainActor.run { [self] in
+            guard token == activeConnectionToken else { return }
+            lastError = ConnectionError(kind: .connectFailed, message: error.localizedDescription)
+        }
     }
 
     private func finishConnectionAttempt(token: UInt64, client: LibboxCommandClient?) async {
@@ -280,6 +358,7 @@ public class CommandClient: ObservableObject {
     private class clientHandler: NSObject, LibboxCommandClientHandlerProtocol {
         private let commandClient: CommandClient
         private let connectionToken: UInt64
+        private var lastGroups: [OutboundGroup]?
 
         init(_ commandClient: CommandClient, connectionToken: UInt64) {
             self.commandClient = commandClient
@@ -294,8 +373,10 @@ public class CommandClient: ObservableObject {
             DispatchQueue.main.async { [self] in
                 guard isActiveConnection() else { return }
                 if commandClient.connectionTypes.contains(.log) {
-                    commandClient.logList = []
+                    commandClient.initialLogsReceived = false
+                    commandClient.clearLogs()
                 }
+                commandClient.lastError = nil
                 commandClient.isConnected = true
             }
         }
@@ -303,7 +384,11 @@ public class CommandClient: ObservableObject {
         func disconnected(_ message: String?) {
             DispatchQueue.main.async { [self] in
                 guard isActiveConnection() else { return }
+                if let message {
+                    commandClient.lastError = ConnectionError(kind: .connectionLost, message: message)
+                }
                 commandClient.isConnected = false
+                commandClient.startedAt = nil
             }
             if let message {
                 logger.debug("client disconnected: \(message)")
@@ -337,18 +422,26 @@ public class CommandClient: ObservableObject {
                 newLogs.append(LogEntry(level: Int(logEntry.level), message: logEntry.message))
             }
 
-            guard !newLogs.isEmpty else { return }
-
             DispatchQueue.main.async { [self] in
                 guard isActiveConnection() else { return }
+                if !commandClient.initialLogsReceived {
+                    commandClient.initialLogsReceived = true
+                }
+                guard !newLogs.isEmpty else { return }
                 commandClient.pendingLogs.append(contentsOf: newLogs)
                 if commandClient.logBatchTimer == nil {
-                    let workItem = DispatchWorkItem { [weak commandClient] in
-                        guard let commandClient else { return }
+                    if commandClient.logBuffer.entries.isEmpty {
+                        // First batch after connect: paint the backlog immediately
+                        // instead of waiting out the batch window.
                         commandClient.flushPendingLogs()
+                    } else {
+                        let workItem = DispatchWorkItem { [weak commandClient] in
+                            guard let commandClient else { return }
+                            commandClient.flushPendingLogs()
+                        }
+                        commandClient.logBatchTimer = workItem
+                        DispatchQueue.main.asyncAfter(deadline: .now() + commandClient.logBatchInterval, execute: workItem)
                     }
-                    commandClient.logBatchTimer = workItem
-                    DispatchQueue.main.asyncAfter(deadline: .now() + commandClient.logBatchInterval, execute: workItem)
                 }
             }
         }
@@ -374,13 +467,30 @@ public class CommandClient: ObservableObject {
                 return
             }
             guard isActiveConnection() else { return }
-            var newGroups: [LibboxOutboundGroup] = []
+            var newGroups: [OutboundGroup] = []
             while groups.hasNext() {
-                newGroups.append(groups.next()!)
+                newGroups.append(OutboundGroup(groups.next()!))
             }
+            if newGroups == lastGroups {
+                return
+            }
+            lastGroups = newGroups
             DispatchQueue.main.async { [self] in
                 guard isActiveConnection() else { return }
                 commandClient.groups = newGroups
+            }
+        }
+
+        func writeOutbounds(_ message: (any LibboxOutboundGroupItemIteratorProtocol)?) {
+            guard let message else { return }
+            guard isActiveConnection() else { return }
+            var newOutbounds: [LibboxOutboundGroupItem] = []
+            while message.hasNext() {
+                newOutbounds.append(message.next()!)
+            }
+            DispatchQueue.main.async { [self] in
+                guard isActiveConnection() else { return }
+                commandClient.outbounds = newOutbounds
             }
         }
 

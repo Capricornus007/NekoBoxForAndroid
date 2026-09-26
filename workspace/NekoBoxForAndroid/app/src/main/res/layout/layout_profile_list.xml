@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Bottom padding includes extra scroll space to keep the last compact profile clear of the FAB. -->
-<com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<io.nekohasekai.sagernet.widget.ProfileListRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/configuration_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,9 +9,7 @@
     android:paddingLeft="4dp"
     android:paddingTop="4dp"
     android:paddingRight="4dp"
-    android:paddingBottom="114dp"
     android:scrollbarSize="0dp"
     app:fastScrollAutoHide="true"
     app:fastScrollThumbColor="?colorPrimary"
-    app:fastScrollThumbInactiveColor="?colorPrimary"
-    tools:listitem="@layout/layout_profile" />
+    app:fastScrollThumbInactiveColor="?colorPrimary" />

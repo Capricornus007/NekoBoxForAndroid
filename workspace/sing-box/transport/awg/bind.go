@@ -253,8 +253,11 @@ func (b *bind_adapter) connection(ipv6 bool) (net.PacketConn, error) {
 		return nil, net.ErrClosed
 	}
 
-	dialCtx, cancel := context.WithTimeout(bindCtx, bindOperationTimeout)
-	defer cancel()
+	dialCtx, cancelDial := context.WithCancelCause(bindCtx)
+	cancel := func() { cancelDial(context.Canceled) }
+	dialTimeout := time.AfterFunc(bindOperationTimeout, func() {
+		cancelDial(context.DeadlineExceeded)
+	})
 	address := netip.IPv4Unspecified()
 	if ipv6 {
 		address = netip.IPv6Unspecified()
@@ -264,7 +267,14 @@ func (b *bind_adapter) connection(ipv6 bool) (net.PacketConn, error) {
 	}
 	packetConn, err := b.connect(dialCtx, address, port)
 	if err != nil {
+		dialTimeout.Stop()
+		cancel()
 		return nil, err
+	}
+	dialCompleted := dialTimeout.Stop()
+	packetConn = &bindPacketConn{
+		PacketConn: packetConn,
+		cancel:     cancel,
 	}
 
 	b.mutex.Lock()
@@ -273,6 +283,11 @@ func (b *bind_adapter) connection(ipv6 bool) (net.PacketConn, error) {
 		_ = packetConn.Close()
 		return nil, net.ErrClosed
 	}
+	if !dialCompleted || dialCtx.Err() != nil {
+		b.mutex.Unlock()
+		_ = packetConn.Close()
+		return nil, context.Cause(dialCtx)
+	}
 	if ipv6 {
 		b.conn6 = packetConn
 	} else {
@@ -280,6 +295,16 @@ func (b *bind_adapter) connection(ipv6 bool) (net.PacketConn, error) {
 	}
 	b.mutex.Unlock()
 	return packetConn, nil
+}
+
+type bindPacketConn struct {
+	net.PacketConn
+	cancel context.CancelFunc
+}
+
+func (c *bindPacketConn) Close() error {
+	c.cancel()
+	return c.PacketConn.Close()
 }
 
 func (b *bind_adapter) invalidate(ipv6 bool, packetConn net.PacketConn) {

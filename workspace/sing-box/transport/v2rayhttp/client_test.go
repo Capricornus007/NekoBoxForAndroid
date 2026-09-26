@@ -41,16 +41,16 @@ func TestHTTP2NonOKResponseIsClosedWithoutDrain(t *testing.T) {
 		method:  http.MethodPut,
 		host:    []string{"example.com"},
 		headers: make(http.Header),
-		transport: testRoundTripper(func(request *http.Request) (*http.Response, error) {
-			return &http.Response{
-				Status:     "503 Service Unavailable",
-				StatusCode: http.StatusServiceUnavailable,
-				Body:       body,
-				Header:     make(http.Header),
-				Request:    request,
-			}, nil
-		}),
 	}
+	client.transport.Store(testRoundTripper(func(request *http.Request) (*http.Response, error) {
+		return &http.Response{
+			Status:     "503 Service Unavailable",
+			StatusCode: http.StatusServiceUnavailable,
+			Body:       body,
+			Header:     make(http.Header),
+			Request:    request,
+		}, nil
+	}))
 
 	conn, err := client.dialHTTP2(t.Context())
 	if err != nil {

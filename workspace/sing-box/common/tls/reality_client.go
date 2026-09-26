@@ -30,7 +30,6 @@ import (
 	"github.com/sagernet/sing-box/adapter"
 	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
-	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/debug"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
@@ -52,11 +51,18 @@ type RealityClientConfig struct {
 }
 
 func NewRealityClient(ctx context.Context, logger logger.ContextLogger, serverAddress string, options option.OutboundTLSOptions) (Config, error) {
+	return newRealityClient(ctx, logger, serverAddress, options, false)
+}
+
+func newRealityClient(ctx context.Context, logger logger.ContextLogger, serverAddress string, options option.OutboundTLSOptions, allowEmptyServerName bool) (Config, error) {
 	if options.UTLS == nil || !options.UTLS.Enabled {
 		return nil, E.New("uTLS is required by reality client")
 	}
+	if options.Spoof != "" || options.SpoofMethod != "" {
+		return nil, E.New("spoof is unsupported in reality")
+	}
 
-	uClient, err := NewUTLSClient(ctx, logger, serverAddress, options)
+	uClient, err := newUTLSClient(ctx, logger, serverAddress, options, allowEmptyServerName)
 	if err != nil {
 		return nil, err
 	}
@@ -108,6 +114,14 @@ func (e *RealityClientConfig) SetNextProtos(nextProto []string) {
 	e.uClient.SetNextProtos(nextProto)
 }
 
+func (e *RealityClientConfig) HandshakeTimeout() time.Duration {
+	return e.uClient.HandshakeTimeout()
+}
+
+func (e *RealityClientConfig) SetHandshakeTimeout(timeout time.Duration) {
+	e.uClient.SetHandshakeTimeout(timeout)
+}
+
 func (e *RealityClientConfig) STDConfig() (*STDConfig, error) {
 	return nil, E.New("unsupported usage for reality")
 }
@@ -127,22 +141,6 @@ func (e *RealityClientConfig) ClientHandshake(ctx context.Context, conn net.Conn
 	uConn := utls.UClient(conn, uConfig, e.uClient.id)
 	verifier.UConn = uConn
 	err := uConn.BuildHandshakeState()
-	if err != nil {
-		return nil, err
-	}
-	for _, extension := range uConn.Extensions {
-		if ce, ok := extension.(*utls.SupportedCurvesExtension); ok {
-			ce.Curves = common.Filter(ce.Curves, func(curveID utls.CurveID) bool {
-				return curveID != utls.X25519MLKEM768
-			})
-		}
-		if ks, ok := extension.(*utls.KeyShareExtension); ok {
-			ks.KeyShares = common.Filter(ks.KeyShares, func(share utls.KeyShare) bool {
-				return share.Group != utls.X25519MLKEM768
-			})
-		}
-	}
-	err = uConn.BuildHandshakeState()
 	if err != nil {
 		return nil, err
 	}
@@ -168,9 +166,9 @@ func (e *RealityClientConfig) ClientHandshake(ctx context.Context, conn net.Conn
 	}
 	binary.BigEndian.PutUint64(hello.SessionId, uint64(nowTime.Unix()))
 
-	hello.SessionId[0] = 1
-	hello.SessionId[1] = 8
-	hello.SessionId[2] = 1
+	hello.SessionId[0] = 26
+	hello.SessionId[1] = 3
+	hello.SessionId[2] = 27
 	binary.BigEndian.PutUint32(hello.SessionId[4:], uint32(time.Now().Unix()))
 	copy(hello.SessionId[8:], e.shortID[:])
 	if debug.Enabled {
@@ -184,9 +182,9 @@ func (e *RealityClientConfig) ClientHandshake(ctx context.Context, conn net.Conn
 	if keyShareKeys == nil {
 		return nil, E.New("nil KeyShareKeys")
 	}
-	ecdheKey := keyShareKeys.Ecdhe
+	ecdheKey := realityAuthPrivateKey(keyShareKeys)
 	if ecdheKey == nil {
-		return nil, E.New("nil ecdheKey")
+		return nil, E.New("fingerprint does not provide an X25519 key share")
 	}
 	authKey, err := ecdheKey.ECDH(publicKey)
 	if err != nil {
@@ -224,6 +222,19 @@ func (e *RealityClientConfig) ClientHandshake(ctx context.Context, conn net.Conn
 	}
 
 	return &realityClientConnWrapper{uConn}, nil
+}
+
+func realityAuthPrivateKey(keys *utls.KeySharePrivateKeys) *ecdh.PrivateKey {
+	if keys == nil {
+		return nil
+	}
+	if keys.Ecdhe != nil && keys.Ecdhe.Curve() == ecdh.X25519() {
+		return keys.Ecdhe
+	}
+	if keys.MlkemEcdhe != nil && keys.MlkemEcdhe.Curve() == ecdh.X25519() {
+		return keys.MlkemEcdhe
+	}
+	return nil
 }
 
 func realityClientFallback(ctx context.Context, uConn net.Conn, serverName string, fingerprint utls.ClientHelloID) {
@@ -328,5 +339,5 @@ func (c *realityClientConnWrapper) ReaderReplaceable() bool {
 }
 
 func (c *realityClientConnWrapper) WriterReplaceable() bool {
-	return true
+	return false
 }

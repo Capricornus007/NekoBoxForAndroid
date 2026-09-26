@@ -1,16 +1,14 @@
 package io.nekohasekai.sagernet.ui.profile
 
-import android.os.Bundle
-import androidx.preference.EditTextPreference
-import androidx.preference.PreferenceFragmentCompat
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
+import androidx.compose.runtime.Composable
 import io.nekohasekai.sagernet.fmt.wireguard.AmneziaWGBean
+import io.nekohasekai.sagernet.ui.compose.AmneziaWGProfileSettingsScreen
 import moe.matsuri.nb4a.proxy.PreferenceBinding
 import moe.matsuri.nb4a.proxy.PreferenceBindingManager
 import moe.matsuri.nb4a.proxy.Type
 
 class AmneziaWGSettingsActivity : ProfileSettingsActivity<AmneziaWGBean>() {
+    override val usesComposePreferences = true
 
     override fun createEntity() = AmneziaWGBean()
 
@@ -48,6 +46,8 @@ class AmneziaWGSettingsActivity : ProfileSettingsActivity<AmneziaWGBean>() {
     private val rejectAfterTime = pbm.add(PreferenceBinding(Type.Text, "rejectAfterTime"))
     private val keepaliveTimeout = pbm.add(PreferenceBinding(Type.Text, "keepaliveTimeout"))
     private val maxHandshakeAttempts = pbm.add(PreferenceBinding(Type.Text, "maxHandshakeAttempts"))
+    private val randomTrailers = pbm.add(PreferenceBinding(Type.Bool, "randomTrailers"))
+    private val disableCookies = pbm.add(PreferenceBinding(Type.Bool, "disableCookies"))
 
     override fun AmneziaWGBean.init() {
         pbm.writeToCacheAll(this)
@@ -57,38 +57,7 @@ class AmneziaWGSettingsActivity : ProfileSettingsActivity<AmneziaWGBean>() {
         pbm.fromCacheAll(this)
     }
 
-    override fun PreferenceFragmentCompat.createPreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-    ) {
-        addPreferencesFromResource(R.xml.amneziawg_preferences)
-        pbm.setPreferenceFragment(this)
-
-        (serverPort.preference as EditTextPreference)
-            .setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
-        (privateKey.preference as EditTextPreference).summaryProvider = PasswordSummaryProvider
-        (peerPersistentKeepalive.preference as EditTextPreference)
-            .setOnBindEditTextListener(EditTextPreferenceModifiers.UnsignedRange)
-        (mtu.preference as EditTextPreference).setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-        (jc.preference as EditTextPreference).setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-        (jmin.preference as EditTextPreference).setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-        (jmax.preference as EditTextPreference).setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-        (s1.preference as EditTextPreference).setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-        (s2.preference as EditTextPreference).setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-        (s3.preference as EditTextPreference).setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-        (s4.preference as EditTextPreference).setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-        (headerProtectionKey.preference as EditTextPreference).summaryProvider = PasswordSummaryProvider
-        listOf(
-            contentPaddingAddition,
-            rekeyAfterTime,
-            rekeyTimeout,
-            rejectAfterTime,
-            keepaliveTimeout,
-            maxHandshakeAttempts,
-        ).forEach {
-            (it.preference as EditTextPreference)
-                .setOnBindEditTextListener(EditTextPreferenceModifiers.UnsignedRange)
-        }
-    }
+    @Composable
+    override fun ComposePreferences() = AmneziaWGProfileSettingsScreen()
 
 }

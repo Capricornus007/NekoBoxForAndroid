@@ -37,6 +37,7 @@
         <item quantity="other">%d profiles moved.</item>
     </plurals>
     <string name="no_profiles_support_export">None of the selected profiles support this export format.</string>
+    <string name="amneziawg_json" translatable="false">AmneziaWG JSON</string>
     <string name="qr_code_data_too_large">The selected profile data is too large for a QR code.</string>
     <plurals name="profiles_skipped">
         <item quantity="one">Skipped %d profile.</item>
@@ -127,8 +128,6 @@
     <string name="duplicate">Duplicate</string>
     <string name="route_duplicated">Rule has been duplicated!</string>
     <string name="action_open">Open</string>
-    <string name="happ_crypt_unsupported_title">Unsupported Happ link</string>
-    <string name="happ_crypt_unsupported_message">This link uses a proprietary format from the Happ Android app; supporting it may be incompatible with the project\'s license. Use a public converter to obtain a standard subscription link, then import that link, enable “HWID Support”, and select Happ under “Spoof App”.</string>
     <!-- group -->
     <string name="group_name">Group name</string>
     <string name="group_update">Update</string>
@@ -145,6 +144,8 @@
     <string name="layout_double_column">Double column</string>
     <string name="profile_actions">Profile actions</string>
     <string name="layout_compact">Compact</string>
+    <string name="layout_alternate">Alternate</string>
+    <string name="profile_card_borders">Borders</string>
     <string name="sort_and_layout">Sort and Layout</string>
     <string name="group_status_empty">Empty group</string>
     <string name="group_status_empty_subscription">Not updated yet</string>
@@ -324,11 +325,18 @@
     <string name="mux_brutal_down_mbps">Download (Mbps)</string>
     <string name="tcp_keep_alive_interval">TCP keep active packet delivery interval</string>
     <string name="sing_box_dial_options">sing-box connection options</string>
+    <string name="tcp_fast_open">TCP Fast Open</string>
+    <string name="multipath_tcp">Multipath TCP</string>
+    <string name="udp_fragmentation">UDP Fragmentation</string>
+    <string name="connection_option_default">Default</string>
+    <string name="connection_option_enabled">Enabled</string>
+    <string name="connection_option_disabled">Disabled</string>
     <string name="disable_tcp_keep_alive">Disable TCP keep-alive</string>
     <string name="tcp_keep_alive">TCP keep-alive initial period</string>
-    <string name="sing_box_tls_13_options">sing-box TLS 1.13 options</string>
+    <string name="sing_box_tls_13_options">Common TLS options</string>
     <string name="tls_curve_preferences">TLS curve preferences</string>
     <string name="tls_certificate_public_key_sha256">Server public-key SHA-256 pins</string>
+    <string name="tls_xray_certificate_sha256">Xray server-certificate SHA-256 pins</string>
     <string name="tls_client_certificate">Client certificate (PEM)</string>
     <string name="tls_client_key">Client private key (PEM)</string>
     <string name="proxied_apps">Apps VPN mode</string>
@@ -356,14 +364,39 @@
     <string name="auto_connect_summary">Enable proxy on startup/app update if it was running before</string>
     <string name="use_toolbar">Use toolbar</string>
     <string name="use_toolbar_summary">Replaces the application title with the quick action toolbar</string>
+    <string name="toolbar_layout">Toolbar layout</string>
+    <string name="toolbar_actions_active">Active</string>
+    <string name="toolbar_actions_inactive">Inactive</string>
+    <string name="toolbar_action_enabled">Action enabled</string>
+    <string name="toolbar_action_checkbox_description">Enable %1$s in the toolbar</string>
+    <string name="toolbar_reorder_action">Reorder action</string>
+    <string name="toolbar_active_profile">Active profile</string>
+    <string name="toolbar_restart_app">Restart App</string>
+    <string name="toolbar_more_actions">More actions</string>
+    <string name="kill_background_process">Kill background process</string>
+    <string name="kill_background_process_summary">Stop the proxy service and terminate its background process without restarting it.</string>
+    <string name="kill_background_process_confirm">This stops the active connection and terminates the background process. Continue?</string>
+    <string name="background_process_killed">Background process stopped</string>
+    <string name="background_process_not_running">Background process is not running</string>
     <string name="show_profile_count_on_tabs">Show profile count on tabs</string>
     <string name="show_profile_count_on_tabs_summary">Shows a pill with profile count on each group tab</string>
+    <string name="profile_country_indicator">Profile country indicator</string>
+    <string name="profile_country_indicator_summary">Show country flag icons and remove matching country emoji from profile names.</string>
+    <string name="notification_country_indicator">Notification country indicator</string>
+    <string name="notification_country_indicator_summary">Show the active profile country flag in the connection notification.</string>
+    <string name="short_profile_protocol_info">Short profile protocol info</string>
+    <string name="short_profile_protocol_info_summary">Show only a shortened protocol type on profile cards.</string>
+    <string name="tab_double_tap_to_navigate">Tab double tap to navigate</string>
+    <string name="tab_double_tap_to_navigate_summary">Opens tab navigator on double-click on any tab</string>
+    <string name="go_to">Go to...</string>
     <string name="show_bottom_bar_in_settings">Show bottom bar in Settings</string>
     <string name="show_bottom_bar_in_settings_summary">Shows the connection controls and traffic status at the bottom of the main Settings screen.</string>
     <string name="dont_highlight_insecure_profiles">Don\'t highlight insecure profiles</string>
     <string name="dont_highlight_insecure_profiles_summary">Disables insecure profile highlighting without changing insecure profile selection and removal.</string>
     <string name="compact_stats_bar">Compact stats bar</string>
     <string name="compact_stats_bar_summary">Use a compact two-row layout for connection status and traffic speed.</string>
+    <string name="legacy_main_view">Legacy main view</string>
+    <string name="legacy_main_view_summary">Add navigation bar margins to the main screen to prevent overlap. Requires an app restart.</string>
     <string name="enable_group_update_dialog">Enable dialog after group update</string>
     <string name="enable_group_update_dialog_summary">Shows the detailed server diff dialog after manual group updates.</string>
     <string name="open_group_settings_on_long_press">Long press group tabs to open settings</string>
@@ -385,7 +418,6 @@
     <string name="stopping">Shutting down…</string>
     <string name="vpn_error">%s</string>
     <string name="vpn_permission_denied">Permission denied to create a VPN service</string>
-    <string name="battery_optimization_declined_hint">Battery restrictions remain enabled. You can allow unrestricted battery use later in About or in Android\'s app battery settings.</string>
     <string name="reboot_required">Failed to start VPN service. You might need to reboot your
         device.</string>
     <!-- alert category -->
@@ -396,6 +428,7 @@
     <string name="settings">Settings</string>
     <string name="edit">Edit</string>
     <string name="share">Share</string>
+    <string name="share_server">Share server</string>
     <string name="add_profile">Add Profile</string>
     <string name="select_profile">Select Profile</string>
     <string name="action_socks" translatable="false">SOCKS</string>
@@ -410,10 +443,17 @@
     <string name="mieru_handshake_mode">Handshake mode</string>
     <string name="mieru_port_range">Server port range</string>
     <string name="mieru_traffic_pattern">Traffic pattern</string>
+    <string name="mieru_low_entropy_mode">Low entropy mode</string>
+    <string name="mieru_low_entropy_mask_rotation">Low entropy mask rotation</string>
     <string name="action_naive" translatable="false">Naïve</string>
     <string name="action_anytls" translatable="false">AnyTLS</string>
+    <string name="anytls_client_metadata">Client metadata</string>
+    <string name="reality_public_key">Reality Public Key</string>
+    <string name="reality_short_id">Reality ShortId</string>
     <string name="action_masque" translatable="false">MASQUE</string>
     <string name="action_tailscale" translatable="false">Tailscale</string>
+    <string name="action_openvpn" translatable="false">OpenVPN</string>
+    <string name="action_openconnect" translatable="false">OpenConnect</string>
     <string name="action_hysteria" translatable="false">Hysteria</string>
     <string name="action_ssh" translatable="false">SSH</string>
     <string name="action_wireguard" translatable="false">WireGuard</string>
@@ -428,6 +468,7 @@
     <string name="proxy_set_mode_selector">Selector</string>
     <string name="proxy_set_mode_url_test">URL Test</string>
     <string name="proxy_set_default_outbound">Default outbound</string>
+    <string name="proxy_set_skip_insecure_profiles">Skip Insecure Profiles</string>
     <string name="proxy_chain">Proxy Chain</string>
     <string name="custom_config">Custom Config</string>
     <string name="preview_sing_box_config">Preview sing-box config</string>
@@ -448,8 +489,12 @@
     <string name="chain_settings">Chain Settings</string>
     <string name="proxy_set_settings">Proxy Set Settings</string>
     <string name="config_settings">Config Settings</string>
+    <string name="config_editor_insert_tab">Insert tab</string>
+    <string name="config_editor_redo">Redo</string>
+    <string name="config_editor_format">Format JSON</string>
     <string name="circular_reference">Circular reference</string>
     <string name="circular_reference_sum">The route cannot contain itself.</string>
+    <string name="profile_reference_cycle">Circular profile reference: %1$s</string>
     <string name="invalid_profile">Invalid profile</string>
     <string name="action_byedpi" translatable="false">ByeDPI</string>
     <string name="action_direct">Direct</string>
@@ -469,6 +514,8 @@
     <string name="action_export">Export</string>
     <string name="action_import">Import from Clipboard</string>
     <string name="action_import_file">Import from file</string>
+    <string name="scanner_turn_flashlight_on">Turn flashlight on</string>
+    <string name="scanner_turn_flashlight_off">Turn flashlight off</string>
     <string name="action_new">New</string>
     <string name="action_from_clipboard">From Clipboard</string>
     <string name="action_export_msg">Successfully export!</string>
@@ -509,6 +556,7 @@
     <!-- subscriptions -->
     <string name="subscriptions">Subscriptions</string>
     <string name="cleartext_http_warning">Cleartext HTTP traffic is insecure</string>
+    <string name="unexpected_new_line">Unexpected new line</string>
     <string name="error_title">Error</string>
     <string name="no_proxies_found">No proxies found in the link</string>
     <string name="no_proxies_found_in_subscription">No proxies found in the subscription</string>
@@ -565,6 +613,7 @@
     <string name="api_port">API Port</string>
     <string name="probe_interval">Balancer observation interval</string>
     <string name="standard">Standard</string>
+    <string name="sn_link">SN Link</string>
     <string name="v2rayn" translatable="false">V2RayN</string>
     <string name="available" translatable="false">%dms</string>
     <string name="unavailable">N/A</string>
@@ -602,6 +651,34 @@
     <string name="group_settings">Group Settings</string>
     <string name="subscription">Subscription</string>
     <string name="subscription_settings">Subscription Settings</string>
+    <string name="subscription_banner_layout">Banner Layout</string>
+    <string name="subscription_banner_announcements">Announcements</string>
+    <string name="subscription_banner_announcement_urls">Announcement URLs</string>
+    <string name="subscription_banner_traffic_text">Traffic counter text</string>
+    <string name="subscription_banner_traffic_bar">Traffic counter bar</string>
+    <string name="subscription_banner_expiration_time">Expiration time</string>
+    <string name="subscription_banner_clickable">Clickable</string>
+    <string name="subscription_provider_announcement">Provider announcement</string>
+    <string name="subscription_open_link_prompt">What link do you want to open?</string>
+    <string name="subscription_link_announcement">Announcement</string>
+    <string name="subscription_link_support">Support</string>
+    <string name="subscription_link_email_support">E-Mail Support</string>
+    <string name="subscription_link_page">Subscription Page</string>
+    <string name="subscription_traffic_total">%1$s / %2$s</string>
+    <plurals name="subscription_expiration_days_left">
+        <item quantity="one">%d day left</item>
+        <item quantity="other">%d days left</item>
+    </plurals>
+    <plurals name="subscription_expiration_hours_left">
+        <item quantity="one">%d hour left</item>
+        <item quantity="other">%d hours left</item>
+    </plurals>
+    <plurals name="subscription_expiration_minutes_left">
+        <item quantity="one">%d minute left</item>
+        <item quantity="other">%d minutes left</item>
+    </plurals>
+    <string name="subscription_expiration_less_than_minute">&lt; 1 minute</string>
+    <string name="subscription_expiration_expired">Expired</string>
     <string name="group_type">Group Type</string>
     <string name="subscription_type">Subscription Type</string>
     <string name="delete_group_prompt">Are you sure you want to remove this group?</string>
@@ -626,8 +703,10 @@
     <string name="hwid_support">HWID Support</string>
     <string name="hwid_support_sum">Sends this device\'s unique identifier during subscription update. Enable only when subscription provider doesn\'t allow subscriptions without HWID.</string>
     <string name="spoof_app">Spoof App</string>
-    <string name="spoof_app_sum">Mimics another app\'s HWID logic. Use only if subscription provider restricts usage with a predefined apps list.</string>
+    <string name="spoof_app_sum">Mimics another app\'s subscription update requests. These apps usually send HWID.</string>
     <string name="spoof_app_none">None</string>
+    <string name="spoof_app_without_hwid_title">Spoof App without HWID</string>
+    <string name="spoof_app_without_hwid_message">These apps usually send a device identifier with subscription update requests. Spoofing without HWID may be rejected by the subscription provider.</string>
     <string name="hwid_not_supported">This subscription requires HWID support</string>
     <string name="hwid_max_devices_reached">You\'ve reached maximum number of devices in this subscription</string>
     <string name="subscription_user_agent">UserAgent</string>
@@ -654,6 +733,10 @@
     <string name="group_filter">Filter</string>
     <string name="subscription_used">%s Used</string>
     <string name="subscription_traffic">%1$s Used / %2$s Remaining</string>
+    <string name="subscription_traffic_unit">Subscription traffic units</string>
+    <string name="subscription_traffic_unit_summary">Choose the unit system used to display subscription traffic</string>
+    <string name="subscription_traffic_unit_decimal">Decimal (MB, GB)</string>
+    <string name="subscription_traffic_unit_binary">Binary (MiB, GiB)</string>
     <string name="subscription_expire">Expire: %s</string>
     <string name="subscription_import">Import subscription</string>
     <string name="subscription_import_message">Confirm you want to import subscription %s? If you
@@ -742,6 +825,17 @@
     <string name="dns_server_name">Name</string>
     <string name="dns_server_type">Type</string>
     <string name="domain_resolver">Domain resolver</string>
+    <string name="custom_dns_path">Path</string>
+    <string name="custom_dns_http_method">HTTP method</string>
+    <string name="custom_dns_headers">Headers</string>
+    <string name="custom_dns_bind_interface">Bind interface</string>
+    <string name="custom_dns_ipv4_bind_address">IPv4 bind address</string>
+    <string name="custom_dns_ipv6_bind_address">IPv6 bind address</string>
+    <string name="custom_dns_connect_timeout">Connect timeout</string>
+    <string name="custom_dns_udp_fragment">UDP fragment (true/false)</string>
+    <string name="custom_dns_tls_server_name">TLS server name</string>
+    <string name="custom_dns_tls_alpn">TLS ALPN</string>
+    <string name="custom_dns_tls_certificates">TLS certificates</string>
 
     <string name="copy_success">Copy success!</string>
     <string name="copy_failed">Copy failed.</string>
@@ -772,6 +866,7 @@
     <string name="copy_all_logs">Copy all debug information</string>
     <string name="logs_copied">Debug information copied</string>
     <string name="scroll_to_bottom">Scroll to bottom</string>
+    <string name="log_line_position">Line %1$d of %2$d</string>
     <string name="log_level_panic">Panic</string>
     <string name="log_level_fatal">Fatal</string>
     <string name="log_level_error">Error</string>
@@ -789,6 +884,9 @@
     <string name="amneziawg_obfuscation_awg15">AmneziaWG 1.5 Obfuscation</string>
     <string name="amneziawg_obfuscation_awg20">AmneziaWG 2.0 Obfuscation</string>
     <string name="amneziawg_obfuscation_awg30">AmneziaWG 3.0</string>
+    <string name="amneziawg_obfuscation_awg31">AmneziaWG 3.1</string>
+    <string name="amneziawg_random_trailers">Randomize packet trailers</string>
+    <string name="amneziawg_disable_cookies">Disable cookie replies</string>
     <string name="amneziawg_header_protection_key">Header protection key</string>
     <string name="amneziawg_content_padding_addition">Content padding addition (value or range)</string>
     <string name="amneziawg_rekey_after_time">Rekey after time, seconds (value or range)</string>
@@ -956,6 +1054,17 @@
     <string name="hide_from_recent_apps_summary">Hide the app from recent tasks when running in background</string>
     <string name="action_switch">Switch</string>
     <string name="not_set">Not specified</string>
+    <string name="sing_box_server">sing-box server</string>
+    <string name="udp_over_tcp">UDP over TCP</string>
+    <string name="udp_nat_mapping">UDP NAT mapping</string>
+    <string name="udp_nat_mapping_summary">Controls whether a source address and port reuse the same NAT mapping across destinations.</string>
+    <string name="udp_nat_filtering">UDP NAT filtering</string>
+    <string name="udp_nat_filtering_summary">Controls which remote addresses and ports may send packets through an existing NAT session.</string>
+    <string name="udp_nat_max">Maximum UDP NAT sessions</string>
+    <string name="udp_nat_max_summary">Not specified. Maximum number of sessions before the least recently used session is closed; leave empty to use the sing-box default.</string>
+    <string name="udp_nat_endpoint_independent">Endpoint-independent</string>
+    <string name="udp_nat_address_dependent">Address-dependent</string>
+    <string name="udp_nat_address_and_port_dependent">Address-and-port-dependent</string>
     <string name="none">None</string>
     <string name="custom_rules_provider">Custom</string>
     <string name="route_protocol_custom">Custom</string>
@@ -984,6 +1093,7 @@
     <string name="domain_strategy_for_server">Domain strategy for Server address</string>
     <string name="show_bottom_bar">Show bottom bar like SagerNet</string>
     <string name="utls_fingerprint">uTLS fingerprint</string>
+    <string name="app_utls_fingerprint">uTLS for subscriptions</string>
     <string name="custom_outbound_json">Custom outbound JSON</string>
     <string name="custom_config_json">Custom config JSON</string>
     <string name="is_outbound_only">The JSON set is outbound</string>
@@ -995,6 +1105,8 @@
     <string name="no_active_connections">No active connections</string>
     <string name="enable_clash_api">Enable Clash API</string>
     <string name="log_level">Log Level</string>
+    <string name="logcat_retention_size">Logcat retention size</string>
+    <string name="logcat_retention_size_summary">Maximum log data retained in the backing file. Use kb or mb (10kb–1024mb).</string>
     <string name="enable_clash_api_summary">Provide Clash API and metacubexd dashboard</string>
     <string name="reset_clash_api_secret">Reset Clash API secret</string>
     <string name="reset_clash_api_secret_summary">Resets the secret used to access the Clash API; use this if the old secret was compromised</string>
@@ -1116,6 +1228,9 @@
     <string name="webdav_password">Password</string>
     <string name="webdav_path">Backup Path</string>
     <string name="webdav_test">Test Connection</string>
+    <string name="webdav_test_in_progress">Please wait before testing again</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
     <string name="webdav_test_success">Connection Successful</string>
     <string name="webdav_test_failed" formatted="false">Connection Failed: %s</string>
     <string name="backup_to_webdav">Backup to WebDAV</string>
@@ -1141,8 +1256,9 @@
     <string name="network_change_reconnect">Reconnect when network changes</string>
     <string name="network_change_reset_connections">Reset outbound connections when network changes</string>
     <string name="wake_reconnect">Reconnect when device wake from sleep</string>
-    <string name="wake_reset_connections">Reset outbound connections when device wake from sleep</string>
+    <string name="wake_reset_connections">Reset upstream connections after sleep</string>
     <string name="backup_in_progress">Backup is already in progress</string>
+    <string name="backup_creating">Creating backup…</string>
     <string name="restore_in_progress">Restore is already in progress</string>
     <string name="restore_cancelled">Restore operation cancelled</string>
     <string name="ruleset_update_interval">RuleSet Update Interval</string>
@@ -1180,6 +1296,8 @@
     <string name="xhttp_host">XHTTP Host</string>
     <string name="xhttp_path">XHTTP Path</string>
     <string name="xhttp_mode">XHTTP Mode</string>
+    <string name="xhttp_congestion_controller">Congestion controller</string>
+    <string name="xhttp_cwnd">Initial CWND (packets, default 32)</string>
     <string name="xhttp_headers">XHTTP Headers</string>
     <string name="xhttp_extra">XHTTP Extra</string>
     <string name="xhttp_settings">XHTTP Settings</string>
@@ -1333,14 +1451,14 @@
     <string name="masterdnsvpn_arq_terminal_ack_wait_timeout_seconds">ARQ terminal ACK wait timeout seconds</string>
     <string name="action_snell">Snell</string>
     <string name="snell_psk">PSK</string>
-    <string name="snell_userkey">User key</string>
     <string name="snell_version">Version</string>
     <string name="snell_network">Network</string>
     <string name="snell_obfs_mode">Obfs mode</string>
     <string name="snell_obfs_host">Obfs host</string>
-    <string name="snell_mode">Mode</string>
     <string name="snell_reuse">Reuse</string>
     <string name="snell_reuse_summary">v4–v6 only</string>
+    <string name="snell_quic_proxy">QUIC Proxy mode</string>
+    <string name="snell_quic_proxy_summary">v6 only: compatibility with legacy v5 QUIC Proxy</string>
     <string name="connection_group_test_timeout">Group Test Timeout (ms)</string>
     <string name="hide_clash_api">Hide Clash API</string>
     <string name="hide_clash_api_summary">Makes Clash API &amp; sing-box invisible to the other apps</string>
@@ -1370,6 +1488,9 @@
     <string name="libcore_crash_native_heap_corruption">CGo heap corruption</string>
     <string name="save_core_profiler_snapshot">Save profiler snapshot</string>
     <string name="delete_core_profiler_snapshot">Delete profiler snapshot</string>
+    <string name="core_profiler_mode">Profiler mode</string>
+    <string name="core_profiler_mode_cpu">CPU profile</string>
+    <string name="core_profiler_mode_trace">Execution trace (CPU fallback for AmneziaWG)</string>
     <string name="service_is_not_running">Service is not running</string>
     <string name="done">Done</string>
     <string name="fail_no_crash">Failed to crash libcore</string>
@@ -1456,7 +1577,7 @@
     <string name="settings_group_developers_description">Profiling, libcore maintenance, and developer-facing service controls.</string>
     <string name="settings_group_others">Others</string>
     <string name="settings_group_others_description">Security exceptions, app TLS behavior, reset, and cache cleanup.</string>
-    <string name="abc_search_hint">Search...</string>
+    <string name="abc_search_hint">Search…</string>
     <string name="abc_searchview_description_clear">Clear query</string>
     <string name="abc_searchview_description_search">Search</string>
     <string name="abc_searchview_description_submit">Submit query</string>
@@ -1539,8 +1660,185 @@
     <string name="naive_stream_receive_window">Stream receive window</string>
     <string name="naive_quic_session_receive_window">QUIC session receive window</string>
     <string name="proxy_protocol">PROXY protocol</string>
+    <string name="dns_timeout">DNS query timeout</string>
+    <string name="dns_timeout_summary">Maximum duration for a DNS query, for example 10s</string>
+    <string name="dns_optimistic_cache">Optimistic DNS cache</string>
+    <string name="dns_optimistic_cache_summary">Return expired cached results while refreshing them in the background</string>
+    <string name="dns_optimistic_timeout">Optimistic cache timeout</string>
+    <string name="dns_optimistic_timeout_summary">How long expired DNS results may be reused, for example 5s</string>
+    <string name="dns_store_cache">Persist DNS cache</string>
+    <string name="dns_store_cache_summary">Store DNS cache entries in the sing-box cache file</string>
+    <string name="tls_handshake_timeout">TLS handshake timeout</string>
+    <string name="sing_box_quic_options">sing-box QUIC options</string>
+    <string name="quic_idle_timeout">Idle timeout</string>
+    <string name="quic_keep_alive_period">Keep-alive period</string>
+    <string name="quic_stream_receive_window">Stream receive window</string>
+    <string name="quic_connection_receive_window">Connection receive window</string>
+    <string name="quic_max_concurrent_streams">Maximum concurrent streams</string>
+    <string name="quic_initial_packet_size">Initial packet size</string>
+    <string name="quic_disable_path_mtu_discovery">Disable path MTU discovery</string>
+    <string name="snell_user_key">User key</string>
+    <string name="snell_v6_mode">Snell v6 mode</string>
+    <string name="ssh_host_key_algorithms">Host key algorithms</string>
+    <string name="ssh_client_version">Client version</string>
+    <string name="ssh_ciphers">Ciphers</string>
+    <string name="ssh_mac_algorithms">MAC algorithms</string>
+    <string name="ssh_kex_algorithms">Key exchange algorithms</string>
+    <string name="hysteria2_advanced_options">Hysteria 2 advanced options</string>
+    <string name="hysteria2_hop_interval_max">Maximum hop interval</string>
+    <string name="hysteria2_bbr_profile">BBR profile</string>
+    <string name="hysteria2_brutal_debug">Brutal debug</string>
+    <string name="hysteria2_disable_chrome_parrot">Disable Chrome imitation for Hysteria 2</string>
+    <string name="hysteria2_disable_chrome_parrot_summary">Turn off Chrome-like QUIC behavior for all Hysteria 2 profiles</string>
+    <string name="hysteria2_obfs_type">Obfuscation type</string>
+    <string name="hysteria2_gecko_min_packet_size">Gecko minimum packet size</string>
+    <string name="hysteria2_gecko_max_packet_size">Gecko maximum packet size</string>
+    <string name="hysteria2_realm_server_url">Realm server URL</string>
+    <string name="hysteria2_realm_token">Realm token</string>
+    <string name="hysteria2_realm_id">Realm ID</string>
+    <string name="hysteria2_realm_stun_servers">Realm STUN servers</string>
+    <string name="hysteria2_realm_ip_version">Realm IP version</string>
+    <string name="hysteria2_realm_port_mapping">Realm port mapping</string>
+    <string name="hysteria2_realm_port_mapping_timeout">Port mapping timeout</string>
+    <string name="hysteria2_realm_port_mapping_lifetime">Port mapping lifetime</string>
+    <string name="openvpn_connection">OpenVPN connection</string>
+    <string name="openvpn_mode">Session mode</string>
+    <string name="openvpn_mode_summary">tls or static_key</string>
+    <string name="openvpn_addresses">Tunnel addresses</string>
+    <string name="openvpn_peer_address">IPv4 peer address</string>
+    <string name="openvpn_peer_address_ipv6">IPv6 peer address</string>
+    <string name="openvpn_topology">Tunnel topology</string>
+    <string name="openvpn_additional_remotes">Additional remotes</string>
+    <string name="openvpn_additional_remotes_summary">One udp://host:port or tcp://host:port per line</string>
+    <string name="openvpn_remote_random">Choose a remote randomly</string>
+    <string name="udp_timeout">UDP timeout</string>
+    <string name="openvpn_authentication">OpenVPN authentication</string>
+    <string name="openvpn_auth_retry">Authentication retry mode</string>
+    <string name="openvpn_static_challenge">Static challenge</string>
+    <string name="openvpn_static_challenge_echo">Echo static challenge response</string>
+    <string name="openvpn_static_key">Static key</string>
+    <string name="openvpn_static_key_direction">Static key direction</string>
+    <string name="server_name">Server name</string>
+    <string name="openvpn_server_name_type">Server name type</string>
+    <string name="openvpn_ca_certificates">CA certificates (PEM)</string>
+    <string name="client_certificate">Client certificate (PEM)</string>
+    <string name="client_key">Client private key (PEM)</string>
+    <string name="openvpn_peer_fingerprints">Peer fingerprints</string>
+    <string name="openvpn_remote_certificate_ku">Remote certificate key usage</string>
+    <string name="openvpn_remote_certificate_eku">Remote certificate extended key usage</string>
+    <string name="openvpn_remote_certificate_tls">Remote certificate purpose</string>
+    <string name="openvpn_certificate_profile">Certificate profile</string>
+    <string name="openvpn_ns_certificate_type">Netscape certificate type</string>
+    <string name="tls_version_min">Minimum TLS version</string>
+    <string name="tls_version_max">Maximum TLS version</string>
+    <string name="cipher">Cipher</string>
+    <string name="openvpn_tls_groups">TLS groups</string>
+    <string name="openvpn_control_wrap_type">Control channel protection</string>
+    <string name="openvpn_control_wrap_key">Control channel key</string>
+    <string name="openvpn_key_direction">Key direction</string>
+    <string name="openvpn_data_channel">OpenVPN data channel</string>
+    <string name="openvpn_data_ciphers">Data ciphers</string>
+    <string name="openvpn_data_cipher_fallback">Fallback data cipher</string>
+    <string name="openvpn_packet_auth">Packet authentication algorithm</string>
+    <string name="openvpn_static_cipher">Static-key cipher</string>
+    <string name="openvpn_mss_fix">MSS fix</string>
+    <string name="openvpn_mss_fix_disabled">Disable MSS clamping</string>
+    <string name="openvpn_mss_fix_mode">MSS calculation mode</string>
+    <string name="openvpn_replay_window">Replay window size</string>
+    <string name="openvpn_replay_window_time">Replay window duration</string>
+    <string name="openvpn_fragment">Fragment size</string>
+    <string name="openvpn_compression">Compression</string>
+    <string name="openvpn_compression_lzo">LZO compression</string>
+    <string name="openvpn_allow_compression">Allow compression</string>
+    <string name="openvpn_routes_timing">Routes and timing</string>
+    <string name="openvpn_route_no_pull">Do not pull routes</string>
+    <string name="openvpn_pull_filters">Pull filters (action and text per line)</string>
+    <string name="routes">Routes</string>
+    <string name="openvpn_route_gateway">Route gateway</string>
+    <string name="openvpn_route_metric">Route metric</string>
+    <string name="openvpn_redirect_gateway">Redirect the default gateway</string>
+    <string name="openvpn_redirect_gateway_flags">Redirect-gateway flags</string>
+    <string name="openvpn_redirect_private">Accept private-route redirect</string>
+    <string name="openvpn_block_ipv6">Block IPv6 through this endpoint</string>
+    <string name="openvpn_ping_interval">Ping interval</string>
+    <string name="openvpn_ping_restart">Ping restart timeout</string>
+    <string name="openvpn_ping_restart_disabled">Disable ping restart timeout</string>
+    <string name="openvpn_renegotiate_interval">Renegotiation interval</string>
+    <string name="openvpn_renegotiate_disabled">Disable timed renegotiation</string>
+    <string name="openvpn_renegotiate_bytes">Renegotiate after bytes</string>
+    <string name="openvpn_renegotiate_packets">Renegotiate after packets</string>
+    <string name="openvpn_tls_timeout">TLS retransmission timeout</string>
+    <string name="openvpn_handshake_window">TLS handshake window</string>
+    <string name="openvpn_explicit_exit_notify">Explicit exit notifications</string>
+    <string name="openconnect_connection">OpenConnect connection</string>
+    <string name="openconnect_server_url">Server URL</string>
+    <string name="openconnect_flavor">Protocol flavor</string>
+    <string name="openconnect_flavor_summary">anyconnect, gp, fortinet, f5, pulse, or nc</string>
+    <string name="openconnect_no_udp">Disable UDP/DTLS</string>
+    <string name="openconnect_allow_insecure_crypto">Allow insecure cryptography</string>
+    <string name="openconnect_authentication">OpenConnect authentication</string>
+    <string name="openconnect_auth_group">Authentication group</string>
+    <string name="openconnect_cookie">Existing session cookie</string>
+    <string name="openconnect_client_version">Reported client version</string>
+    <string name="openconnect_local_hostname">Reported local hostname</string>
+    <string name="pin">PIN</string>
+    <string name="tls_settings">TLS settings</string>
+    <string name="openconnect_tls_insecure">Disable server verification</string>
+    <string name="openconnect_tls_peer_fingerprints">Server certificate fingerprints</string>
+    <string name="openconnect_disable_system_trust">Disable system trust store</string>
+    <string name="openconnect_mobile_identity">AnyConnect mobile identity</string>
+    <string name="openconnect_mobile_platform_version">Platform version</string>
+    <string name="openconnect_mobile_device_type">Device type</string>
+    <string name="openconnect_mobile_device_id">Unique device ID</string>
+    <string name="openconnect_transport_controls">Transport and timing</string>
+    <string name="openconnect_dtls_local_port">DTLS local port</string>
+    <string name="openconnect_base_mtu">Base path MTU</string>
+    <string name="openconnect_disable_compression">Disable compression</string>
+    <string name="openconnect_compression_mode">Compression mode</string>
+    <string name="openconnect_disable_ipv6">Disable IPv6</string>
+    <string name="openconnect_disable_http_keepalive">Disable HTTP keep-alive</string>
+    <string name="openconnect_disable_xml_post">Disable XML POST authentication</string>
+    <string name="openconnect_disable_external_auth">Disable external authentication</string>
+    <string name="openconnect_disable_password_auth">Disable password authentication</string>
+    <string name="openconnect_tcp_keep_alive">Enable TCP keep alive</string>
+    <string name="openconnect_pfs">Require forward secrecy</string>
+    <string name="openconnect_dpd_interval">DPD interval</string>
+    <string name="openconnect_reconnect_timeout">Reconnect timeout</string>
+    <string name="openconnect_trojan_interval">Host-check report interval</string>
+    <string name="openconnect_queue_length">Packet queue length</string>
+    <string name="openconnect_fortinet_host_check">Fortinet host check</string>
+    <string name="openconnect_fortinet_hostcheck">Host-check result</string>
+    <string name="openconnect_fortinet_virtual_desktop">Virtual desktop result</string>
+    <string name="tncc">TNCC</string>
+    <string name="pushed_dns">Pushed DNS</string>
+    <string name="use_pushed_dns">Use pushed DNS</string>
+    <string name="accept_pushed_default_resolvers">Use pushed default resolvers</string>
+    <string name="expand_pushed_search_domains">Expand pushed search domains</string>
+    <string name="openconnect_reported_os">Reported operating system</string>
+    <string name="user_agent">User agent</string>
+    <string name="openconnect_form_entries">Authentication form overrides</string>
+    <string name="openconnect_form_entries_summary">JSON array of form_id, submission_key, name, value, and promote fields</string>
+    <string name="openconnect_token">Software token</string>
+    <string name="openconnect_token_mode">Token mode</string>
+    <string name="openconnect_token_secret">Token secret</string>
+    <string name="openconnect_token_password">Token password</string>
+    <string name="openconnect_token_device_id">Token device ID</string>
+    <string name="openconnect_token_counter">Token counter</string>
+    <string name="openconnect_client_key_password">Client key password</string>
+    <string name="openconnect_mca_certificate">MCA certificate (PEM)</string>
+    <string name="openconnect_mca_key">MCA private key (PEM)</string>
+    <string name="openconnect_mca_key_password">MCA key password</string>
+    <string name="openconnect_tncc_device_id">TNCC device ID</string>
+    <string name="openconnect_tncc_user_agent">TNCC user agent</string>
+    <string name="openconnect_tncc_machine_id">Enable TNCC machine identification</string>
+    <string name="openconnect_tncc_certificates">TNCC certificates (PEM)</string>
+    <string name="endpoint_authentication_required">%1$s requires interactive authentication, which is not supported. Update the stored credentials and try again.</string>
+    <string name="happ_crypt_unsupported_title">Unsupported Happ link</string>
+    <string name="happ_crypt_unsupported_message">This link uses a proprietary format from the Happ Android app; supporting it may be incompatible with the project\'s license. Use a public converter to obtain a standard subscription link, then import that link, enable “HWID Support”, and select Happ under “Spoof App”.</string>
+    <string name="battery_optimization_declined_hint">Battery restrictions remain enabled. You can allow unrestricted battery use later in About or in Android\'s app battery settings.</string>
     <string name="routing_import_preview">Routing import preview</string>
     <string name="routing_format_happ" translatable="false">Happ</string>
+    <string name="routing_format_v2ray_tun" translatable="false">v2RayTun</string>
     <string name="routing_format_incy" translatable="false">Incy</string>
     <string name="routing_format_nekobox_plus" translatable="false">NekoBox+</string>
     <string name="routing_export_default_name" translatable="false">NekoBox+ Routing</string>
@@ -1698,4 +1996,26 @@
     <string name="git_branch_name">New branch name</string>
     <string name="git_invalid_branch">Enter a valid Git branch name.</string>
     <string name="git_branch_save_failed">The branch could not be checked or created. Check write permissions and try again.</string>
+    <string name="subscription_routing_enabled">Use subscription routing</string>
+    <string name="subscription_routing_enabled_summary">Use routing supplied by this subscription only when one of its profiles is selected directly</string>
+    <string name="subscription_routing_interval">Routing update frequency</string>
+    <string name="subscription_routing_interval_12_hours">12 hours</string>
+    <string name="subscription_routing_interval_24_hours">24 hours</string>
+    <string name="subscription_routing_interval_3_days">3 days</string>
+    <string name="subscription_routing_interval_7_days">7 days</string>
+    <string name="subscription_import_routing">Import subscription routing</string>
+    <string name="subscription_import_routing_summary">Download the current routing from this subscription and import it once</string>
+    <string name="subscription_routing_unavailable">Update this subscription to use its routing</string>
+    <string name="subscription_routing_not_found">This subscription did not provide routing.</string>
+    <string name="subscription_routing_disabled_by_provider">The subscription provider disabled routing.</string>
+    <string name="subscription_routing_downloading">Downloading routing…</string>
+    <string name="subscription_routing_not_provided">This subscription doesn\'t provide routing data. Your current routing rules will apply.</string>
+    <string name="toolbar_restore_default">Restore default</string>
+    <string name="toolbar_restore_default_confirmation">Restore the default toolbar layout?</string>
+    <string name="profile_country">Profile country: %1$s</string>
+    <string name="ruleset">RuleSet (.srs)</string>
+    <string name="change_icon_android_tv_summary">Does not work on Android TV</string>
+    <string name="subscription_xray_balancers">Subscription Xray Balancers</string>
+    <string name="subscription_xray_balancers_convert">Convert to the Proxy Set</string>
+    <string name="subscription_xray_balancers_split">Split into separate profiles</string>
 </resources>

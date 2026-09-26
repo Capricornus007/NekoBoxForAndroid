@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.ColorStateList
 import android.graphics.Canvas
+import android.graphics.Rect
+import android.graphics.RectF
 import android.os.DeadObjectException
 import android.text.format.Formatter
 import android.util.AttributeSet
@@ -25,16 +27,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomappbar.BottomAppBarTopEdgeTreatment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
+import io.nekohasekai.sagernet.SagerNet
+import io.nekohasekai.sagernet.aidl.ISagerNetService
+import io.nekohasekai.sagernet.bg.AutomaticConnectionTestPolicy
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.proto.ProfileStatusUpdater
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.MainActivity
 import io.nekohasekai.sagernet.utils.ConnectionIpResolver
+import io.nekohasekai.sagernet.utils.ProfileCountryResolver
 import io.nekohasekai.sagernet.utils.Theme
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +77,7 @@ class StatsBar @JvmOverloads constructor(
     private lateinit var compactSectionDivider: View
     private lateinit var compactSpeedDivider: View
     private var regularShapeAppearance: ShapeAppearanceModel? = null
+    private var regularTopEdgeTreatment: BottomAppBarTopEdgeTreatment? = null
     private var compactShapeAppearance: ShapeAppearanceModel? = null
     private var compactTopEdgeTreatment: BottomAppBarTopEdgeTreatment? = null
     @Suppress("unused")
@@ -104,13 +112,21 @@ class StatsBar @JvmOverloads constructor(
             if (!value) cancelPendingTransition()
         }
     private var masterDnsVPNResolverChecking = false
-    private var connectedStateHandled = false
-    private var connectionSession = 0
+    private var connectedStateRendered = false
+    private var connectionCheckPolicy = StatsBarConnectionCheckPolicy()
     private val reconnectPolicy = StatsBarReconnectPolicy()
     private var transitionGeneration = 0
     private var transitionJob: Job? = null
     private var connectionTestJob: Job? = null
     private var connectionTestGeneration = 0
+
+    internal fun bindConnectionCheckService(service: ISagerNetService) {
+        connectionCheckPolicy.bindService(service)
+        connectionCheckPolicy.retainedPresentation()?.let { (status, ipInfo) ->
+            renderStatus(status)
+            renderIpInfo(ipInfo)
+        }
+    }
 
     override fun getBehavior(): YourBehavior {
         if (!this::behavior.isInitialized) behavior = YourBehavior()
@@ -167,6 +183,8 @@ class StatsBar @JvmOverloads constructor(
         compactSectionDivider = findViewById(R.id.compact_section_divider)
         compactSpeedDivider = findViewById(R.id.compact_speed_divider)
         regularShapeAppearance = (background as? MaterialShapeDrawable)?.shapeAppearanceModel
+        regularTopEdgeTreatment =
+            regularShapeAppearance?.topEdge as? BottomAppBarTopEdgeTreatment
         compactTopEdgeTreatment = BottomAppBarTopEdgeTreatment(
             fabCradleMargin,
             fabCradleRoundedCornerRadius,
@@ -223,6 +241,13 @@ class StatsBar @JvmOverloads constructor(
         }
     }
 
+    override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
+        if (!gainFocus && SagerNet.isTv && !DataStore.serviceState.connected) {
+            post(::hideStats)
+        }
+    }
+
     private fun applyThemeColors() {
         val usePrimary = Theme.isCustom() && DataStore.customThemeStatsBarPrimary
         val backgroundColor = context.getColorAttr(
@@ -271,6 +296,12 @@ class StatsBar @JvmOverloads constructor(
         updateSpeed(lastTxRate, lastRxRate)
         applyThemeColors()
         requestLayout()
+        (parent as? CoordinatorLayout)?.let { coordinator ->
+            coordinator.getDependents(this)
+                .filterIsInstance<FabCluster>()
+                .forEach { it.syncWithStatsBar(this) }
+            coordinator.requestLayout()
+        }
     }
 
     private fun applyBarMargins() {
@@ -303,8 +334,22 @@ class StatsBar @JvmOverloads constructor(
         }
     }
 
-    internal val fabRestingTranslationY: Float
+    internal val fabClusterTranslationY: Float
         get() = if (compactMode) -dp2pxf(12) else 0f
+
+    internal fun updateFabCradle(fab: FloatingActionButton) {
+        if (!this::regularContent.isInitialized || fab.measuredWidth <= 0) return
+        val contentRect = Rect()
+        fab.getMeasuredContentRect(contentRect)
+        if (contentRect.isEmpty) return
+
+        val topEdge = regularTopEdgeTreatment ?: return
+        val diameter = contentRect.height().toFloat()
+        val cornerSize = fab.shapeAppearanceModel.topLeftCornerSize.getCornerSize(RectF(contentRect))
+        if (topEdge.fabDiameter != diameter) topEdge.fabDiameter = diameter
+        if (topEdge.fabCornerRadius != cornerSize) topEdge.setFabCornerSize(cornerSize)
+        invalidate()
+    }
 
     private fun resizeCompactIcons() {
         val size = dp2px(18)
@@ -406,6 +451,10 @@ class StatsBar @JvmOverloads constructor(
         reconcileAnchoredViewsAfterTransition()
     }
 
+    internal fun revealForTvFocus() {
+        if (allowShow) showStats()
+    }
+
     private fun hideStats() {
         scrollHidden = true
         resetScrollDriverState()
@@ -464,13 +513,23 @@ class StatsBar @JvmOverloads constructor(
         }
     }
 
-    private fun setStatus(text: CharSequence) {
+    private fun setStatus(text: CharSequence, retain: Boolean = true) {
+        if (retain) connectionCheckPolicy.retainStatus(text)
+        renderStatus(text)
+    }
+
+    private fun renderStatus(text: CharSequence) {
         statusText.text = text
         compactStatusText.text = text
         TooltipCompat.setTooltipText(this, buildTooltipText(text))
     }
 
     private fun setIpInfo(text: CharSequence?) {
+        connectionCheckPolicy.retainIpInfo(text)
+        renderIpInfo(text)
+    }
+
+    private fun renderIpInfo(text: CharSequence?) {
         if (text.isNullOrBlank()) {
             ipText.text = " "
             compactIpText.text = " "
@@ -515,22 +574,25 @@ class StatsBar @JvmOverloads constructor(
             isEnabled = true
         }
         if (state != BaseService.State.Connected) {
-            connectedStateHandled = false
-            connectionSession++
+            connectedStateRendered = false
+            connectionCheckPolicy.onDisconnected()
             connectionTestGeneration++
             connectionTestJob?.cancel()
             connectionTestJob = null
         }
         if ((state == BaseService.State.Connected).also { hideOnScroll = it }) {
-            val firstConnectedState = !connectedStateHandled
-            val runAutomaticCheck = firstConnectedState && DataStore.automaticConnectionCheck
-            val currentConnectionSession = connectionSession
-            connectedStateHandled = true
+            val connectedEvent = connectionCheckPolicy.onConnected()
+            val firstConnectedRender = !connectedStateRendered
+            val hasRetainedPresentation =
+                connectionCheckPolicy.retainedPresentation() != null
+            val runAutomaticCheck =
+                connectedEvent.shouldRunAutomaticCheck && DataStore.automaticConnectionCheck
+            connectedStateRendered = true
             scheduleTransition(show = true) {
-                if (currentConnectionSession == connectionSession) {
+                if (connectionCheckPolicy.isCurrent(connectedEvent.session)) {
                     if (runAutomaticCheck && DataStore.serviceState.connected) {
-                        testConnection()
-                    } else if (firstConnectedState) {
+                        testConnection(automatic = true)
+                    } else if (firstConnectedRender && !hasRetainedPresentation) {
                         setStatus(app.getText(R.string.vpn_connected))
                     }
                 }
@@ -560,24 +622,30 @@ class StatsBar @JvmOverloads constructor(
             masterDnsVPNResolverChecking = false
             isEnabled = DataStore.serviceState.connected
             hideOnScroll = true
-            setIpInfo(null)
-            val runAutomaticCheck = !connectedStateHandled && DataStore.automaticConnectionCheck
-            val currentConnectionSession = connectionSession
-            connectedStateHandled = true
-            if (!runAutomaticCheck) setStatus(app.getText(R.string.vpn_connected))
+            val connectedEvent = connectionCheckPolicy.onConnected()
+            val hasRetainedPresentation =
+                connectionCheckPolicy.retainedPresentation() != null
+            val runAutomaticCheck =
+                connectedEvent.shouldRunAutomaticCheck && DataStore.automaticConnectionCheck
+            connectedStateRendered = true
+            if (runAutomaticCheck) {
+                setIpInfo(null)
+            } else if (!hasRetainedPresentation) {
+                setStatus(app.getText(R.string.vpn_connected))
+            }
             scheduleTransition(show = true) {
                 if (
                     runAutomaticCheck &&
-                    currentConnectionSession == connectionSession &&
+                    connectionCheckPolicy.isCurrent(connectedEvent.session) &&
                     DataStore.serviceState.connected
                 ) {
-                    testConnection()
+                    testConnection(automatic = true)
                 }
             }
             return
         }
-        connectedStateHandled = false
-        connectionSession++
+        connectedStateRendered = false
+        connectionCheckPolicy.onDisconnected()
         masterDnsVPNResolverChecking = true
         hideOnScroll = false
         isEnabled = false
@@ -630,23 +698,27 @@ class StatsBar @JvmOverloads constructor(
         compactSpeedDivider.isVisible = visible && !compactSpeedsStacked
     }
 
-    fun testConnection() {
+    fun testConnection(automatic: Boolean = false) {
         val activity = context.mainActivity() ?: return
         val profileId = DataStore.currentProfile
-        val testSession = connectionSession
+        val testSession = connectionCheckPolicy.currentSession
         val testGeneration = ++connectionTestGeneration
         connectionTestJob?.cancel()
         isEnabled = false
-        setStatus(app.getText(R.string.connection_test_testing))
+        setStatus(app.getText(R.string.connection_test_testing), retain = false)
         connectionTestJob = runOnDefaultDispatcher {
             fun isCurrentTest(): Boolean {
-                return testSession == connectionSession &&
+                return connectionCheckPolicy.isCurrent(testSession) &&
                     testGeneration == connectionTestGeneration &&
                     DataStore.serviceState.connected &&
                     DataStore.currentProfile == profileId
             }
             try {
-                val elapsed = activity.urlTest()
+                if (automatic) {
+                    delay(AutomaticConnectionTestPolicy.START_DELAY_MILLIS)
+                    if (!isCurrentTest()) return@runOnDefaultDispatcher
+                }
+                val elapsed = activity.urlTest(automatic)
                 if (!isCurrentTest()) return@runOnDefaultDispatcher
                 updateCurrentProfileStatus(profileId, status = 1, ping = elapsed, error = null)
                 val status = app.getString(
@@ -664,6 +736,24 @@ class StatsBar @JvmOverloads constructor(
                     setIpInfo(null)
                 }
                 val ipInfo = ipResult.await()
+                if (ipInfo != null && isCurrentTest()) {
+                    val countryUpdated = ipInfo.countryCode?.let { countryCode ->
+                        ProfileCountryResolver.updateFromCountryCode(
+                            profileId,
+                            countryCode,
+                            ProfileCountryResolver.SOURCE_OUTBOUND,
+                        )
+                    } ?: ProfileCountryResolver.updateFromAddress(
+                            profileId,
+                            ipInfo.ip,
+                            ProfileCountryResolver.SOURCE_OUTBOUND,
+                        )
+                    if (countryUpdated && isCurrentTest()) {
+                        SagerNet.updateNotificationCountryIndicator(
+                            DataStore.notificationCountryIndicator
+                        )
+                    }
+                }
                 onMainDispatcher {
                     if (!isCurrentTest()) return@onMainDispatcher
                     if (
@@ -673,7 +763,7 @@ class StatsBar @JvmOverloads constructor(
                     ) {
                         setIpInfo(null)
                     } else {
-                        setIpInfo(ipInfo ?: context.getString(R.string.failed_to_obtain_ip))
+                        setIpInfo(ipInfo?.displayText ?: context.getString(R.string.failed_to_obtain_ip))
                     }
                 }
             } catch (_: CancellationException) {

@@ -11,7 +11,11 @@ interface ISagerNetService {
   oneway void unregisterCallback(in ISagerNetServiceCallback cb);
   oneway void resetTraffic(in long[] profileIds);
 
-  int urlTest();
+  int urlTest(boolean automatic);
+  boolean claimAutomaticConnectionCheck();
+  String connectionTestStatus();
+  String connectionTestIpInfo();
+  void setConnectionTestPresentation(String status, String ipInfo);
   oneway void startSpeedTest(long runId, int durationMillis, int connections, int serverMode, String serverValue, int finalResult);
   oneway void stopSpeedTest(long runId);
   SpeedTestData speedTestStatus();
@@ -36,7 +40,7 @@ interface ISagerNetService {
   boolean hasCoreProfilerSnapshot();
   void performLibcoreGcSweep();
   void triggerLibcoreCrash(String crashType);
-  void startCoreProfiling();
+  void startCoreProfiling(int mode);
   void stopCoreProfiling();
   void writeCoreProfilerSnapshot(String outputDir);
   void deleteCoreProfilerSnapshot();

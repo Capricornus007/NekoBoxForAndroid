@@ -132,7 +132,7 @@ class CustomDnsConfigBuilderTest {
         val map = buildStandaloneDnsRule(rule, setOf("dns-custom"))!!.asMap()
 
         assertEquals("dns-custom", map["server"])
-        assertEquals("prefer_ipv6", map["strategy"])
+        assertFalse(map.containsKey("strategy"))
         assertEquals(listOf("example.com"), map["domain_suffix"])
         assertEquals(true, map["disable_cache"])
     }

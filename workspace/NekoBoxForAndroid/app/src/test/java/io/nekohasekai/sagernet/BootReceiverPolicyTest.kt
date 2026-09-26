@@ -46,6 +46,19 @@ class BootReceiverPolicyTest {
     }
 
     @Test
+    fun androidMarshmallowDoesNotRequireDirectBootUnlockState() {
+        assertTrue(
+            BootReceiverPolicy.shouldStartService(
+                action = "android.intent.action.BOOT_COMPLETED",
+                persistAcrossReboot = true,
+                selectedProxy = 1L,
+                sdkInt = 23,
+                userUnlocked = false,
+            )
+        )
+    }
+
+    @Test
     fun bootDoesNotReconnectWithoutSelectedProxy() {
         assertFalse(
             BootReceiverPolicy.shouldStartService(

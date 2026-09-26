@@ -108,6 +108,9 @@ internal object AppIconStatePolicy {
         }
     }
 
+    fun selectionForDevice(selected: AppIcon, isTelevision: Boolean): AppIcon =
+        if (isTelevision) AppIcon.NEKOBOX_PLUS else selected
+
     fun previewUiMode(appUiMode: Int, systemUiMode: Int): Int {
         return (appUiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or
                 (systemUiMode and Configuration.UI_MODE_NIGHT_MASK)
@@ -124,10 +127,15 @@ object AppIconManager {
     }
 
     fun set(context: Context, selected: AppIcon) {
-        if (current(context) == selected) return
+        val effectiveSelection = AppIconStatePolicy.selectionForDevice(
+            selected,
+            context.resources.configuration.uiMode and Configuration.UI_MODE_TYPE_MASK ==
+                Configuration.UI_MODE_TYPE_TELEVISION,
+        )
+        if (current(context) == effectiveSelection) return
 
         val packageManager = context.packageManager
-        val desiredStates = AppIconStatePolicy.desired(selected)
+        val desiredStates = AppIconStatePolicy.desired(effectiveSelection)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             packageManager.setComponentEnabledSettings(
                 desiredStates.map { (icon, state) ->
@@ -142,12 +150,12 @@ object AppIconManager {
         }
 
         packageManager.setComponentEnabledSetting(
-            selected.componentName(context),
+            effectiveSelection.componentName(context),
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
             PackageManager.DONT_KILL_APP,
         )
         desiredStates.forEach { (icon, state) ->
-            if (icon == selected) return@forEach
+            if (icon == effectiveSelection) return@forEach
             packageManager.setComponentEnabledSetting(
                 icon.componentName(context),
                 state,

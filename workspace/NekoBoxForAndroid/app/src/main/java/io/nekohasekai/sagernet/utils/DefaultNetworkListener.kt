@@ -9,10 +9,9 @@ import android.os.Handler
 import android.os.Looper
 import androidx.annotation.RequiresApi
 import io.nekohasekai.sagernet.SagerNet
+import io.nekohasekai.sagernet.app.AppGraph
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.runBlocking
 import java.net.UnknownHostException
@@ -46,7 +45,7 @@ object DefaultNetworkListener {
     }
 
     private val networkActor =
-        GlobalScope.actor<NetworkMessage>(Dispatchers.Default) {
+        AppGraph.applicationScope.actor<NetworkMessage>(AppGraph.dispatchers.default) {
             val listeners = mutableMapOf<Any, (Network?) -> Unit>()
             val selector = PhysicalNetworkSelector<Network>()
             val pendingRequests = arrayListOf<NetworkMessage.Get>()

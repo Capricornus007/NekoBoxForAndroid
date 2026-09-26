@@ -5,13 +5,13 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"libcore/device"
 	"net"
 	"net/http"
 	"net/netip"
 	"net/url"
 	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -45,7 +45,12 @@ type GroupURLTester struct {
 }
 
 func NewGroupURLTester(link string, timeout int32, attempts int32, pause int32, hardened bool, localTransport LocalDNSTransport) (tester *GroupURLTester, err error) {
-	defer device.DeferPanicToError("NewGroupURLTester", func(panicErr error) { err = panicErr })
+	return runWithPanicError("NewGroupURLTester", func() (*GroupURLTester, error) {
+		return newGroupURLTester(link, timeout, attempts, pause, hardened, localTransport)
+	})
+}
+
+func newGroupURLTester(link string, timeout int32, attempts int32, pause int32, hardened bool, localTransport LocalDNSTransport) (*GroupURLTester, error) {
 	if localTransport == nil {
 		return nil, errors.New("group URLTest local DNS transport is unavailable")
 	}
@@ -85,17 +90,26 @@ func NewGroupURLTester(link string, timeout int32, attempts int32, pause int32, 
 }
 
 func (t *GroupURLTester) Test(config, tag string) (latency int32, err error) {
-	defer device.DeferPanicToError("GroupURLTester.Test", func(panicErr error) { err = panicErr })
-	if t == nil || !t.destination.IsValid() {
-		return -1, errors.New("group URLTester is not initialized")
-	}
-	return runGroupURLTestStartRetry(func() (int32, error) {
-		return t.testProfile(config, tag)
+	return runWithPanicError("GroupURLTester.Test", func() (int32, error) {
+		return t.test(config, tag)
 	})
 }
 
-func (t *GroupURLTester) testProfile(config, tag string) (latency int32, err error) {
-	instance, err := newSingBoxInstanceWithProtect(config, t.localTransport, true, true)
+func (t *GroupURLTester) test(config, tag string) (int32, error) {
+	if t == nil || !t.destination.IsValid() {
+		return -1, errors.New("group URLTester is not initialized")
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	return runGroupURLTestOperation(ctx, func() (int32, error) {
+		return runGroupURLTestStartRetry(ctx, func() (int32, error) {
+			return t.testProfile(ctx, config, tag)
+		})
+	})
+}
+
+func (t *GroupURLTester) testProfile(ctx context.Context, config, tag string) (latency int32, err error) {
+	instance, err := newSingBoxInstanceWithProtectContext(ctx, config, t.localTransport, true, true)
 	if err != nil {
 		return -1, fmt.Errorf("create group URLTest service: %w", err)
 	}
@@ -115,7 +129,7 @@ func (t *GroupURLTester) testProfile(config, tag string) (latency int32, err err
 	if err != nil {
 		return -1, err
 	}
-	latency, err = t.testWithRetry(instance, detour)
+	latency, err = t.testWithRetry(ctx, instance, detour)
 	if errors.Is(err, context.DeadlineExceeded) {
 		closeSynchronously = false
 		instance.closeURLTestAsync()
@@ -123,13 +137,25 @@ func (t *GroupURLTester) testProfile(config, tag string) (latency int32, err err
 	return latency, err
 }
 
-func runGroupURLTestStartRetry(test func() (int32, error)) (int32, error) {
+func runGroupURLTestOperation(ctx context.Context, test func() (int32, error)) (int32, error) {
+	latency, err := runURLTestAsync(ctx, "group URLTest profile", test)
+	if err != nil {
+		return -1, err
+	}
+	return latency, nil
+}
+
+func runGroupURLTestStartRetry(ctx context.Context, test func() (int32, error)) (int32, error) {
 	for attempt := range 2 {
 		latency, err := test()
 		if err == nil || !errors.Is(err, errGroupURLTestStart) || attempt == 1 {
 			return latency, err
 		}
-		time.Sleep(probeRetryDelay)
+		select {
+		case <-ctx.Done():
+			return -1, context.Cause(ctx)
+		case <-time.After(probeRetryDelay):
+		}
 	}
 	panic("unreachable")
 }
@@ -149,8 +175,8 @@ func (b *BoxInstance) urlTestOutbound(tag string) (adapter.Outbound, error) {
 	return detour, nil
 }
 
-func (t *GroupURLTester) testWithRetry(instance *BoxInstance, detour N.Dialer) (int32, error) {
-	return runURLTestAttempts(instance.ctx, int32(t.timeout/time.Millisecond), t.attempts, t.pauseMillis, func(ctx context.Context) (int32, error) {
+func (t *GroupURLTester) testWithRetry(ctx context.Context, instance *BoxInstance, detour adapter.Outbound) (int32, error) {
+	return runURLTestAfterOutboundReady(ctx, instance.Outbound(), detour, int32(t.timeout/time.Millisecond), t.attempts, t.pauseMillis, func(ctx context.Context) (int32, error) {
 		return t.testOnce(ctx, instance, detour)
 	})
 }
@@ -242,17 +268,30 @@ func shouldRetryProbe(err error, elapsed, timeout time.Duration) bool {
 }
 
 func TcpPing(host, port string, timeout int32, hardened bool, localTransport LocalDNSTransport) (latency int32, err error) {
-	defer device.DeferPanicToError("TCPPing", func(panicErr error) { err = panicErr })
+	result, err := TcpPingWithAddress(host, port, timeout, hardened, localTransport)
+	if err != nil {
+		return -1, err
+	}
+	return result.latency, nil
+}
+
+func TcpPingWithAddress(host, port string, timeout int32, hardened bool, localTransport LocalDNSTransport) (result *PingResult, err error) {
+	return runWithPanicError("TCPPing", func() (*PingResult, error) {
+		return tcpPingWithAddress(host, port, timeout, hardened, localTransport)
+	})
+}
+
+func tcpPingWithAddress(host, port string, timeout int32, hardened bool, localTransport LocalDNSTransport) (*PingResult, error) {
 	if host == "" {
-		return -1, errors.New("TCP ping host is empty")
+		return nil, errors.New("TCP ping host is empty")
 	}
 	portNumber, parseErr := strconv.ParseUint(port, 10, 16)
 	if parseErr != nil || portNumber == 0 {
-		return -1, fmt.Errorf("invalid TCP ping port %q", port)
+		return nil, fmt.Errorf("invalid TCP ping port %q", port)
 	}
 	probeTimeout := time.Duration(timeout) * time.Millisecond
 	if probeTimeout <= 0 {
-		return -1, errors.New("TCP ping timeout must be positive")
+		return nil, errors.New("TCP ping timeout must be positive")
 	}
 	address := net.JoinHostPort(host, port)
 	dialer := &net.Dialer{Control: protectSocketControl}
@@ -264,20 +303,20 @@ func TcpPing(host, port string, timeout int32, hardened bool, localTransport Loc
 		defer cancel()
 		addresses, lookupErr := resolveHardenedTCPPingHost(ctx, host, localTransport)
 		if lookupErr != nil {
-			return -1, fmt.Errorf("resolve TCP ping host: %w", lookupErr)
+			return nil, fmt.Errorf("resolve TCP ping host: %w", lookupErr)
 		}
 		return runHardenedTCPPing(ctx, addresses, port, dialer.DialContext)
 	}
 	for attempt := range 2 {
 		ctx, cancel := context.WithTimeout(context.Background(), probeTimeout)
 		started := time.Now()
-		latency, err = speedtest.TCPPing(ctx, dialer.DialContext, address)
+		latency, pingErr := speedtest.TCPPing(ctx, dialer.DialContext, address)
 		cancel()
-		if err == nil {
-			return latency, nil
+		if pingErr == nil {
+			return &PingResult{latency: latency, address: strings.Trim(host, "[]")}, nil
 		}
-		if attempt == 1 || !shouldRetryProbe(err, time.Since(started), probeTimeout) {
-			return -1, err
+		if attempt == 1 || !shouldRetryProbe(pingErr, time.Since(started), probeTimeout) {
+			return nil, pingErr
 		}
 		time.Sleep(probeRetryDelay)
 	}
@@ -289,23 +328,23 @@ func runHardenedTCPPing(
 	addresses []netip.Addr,
 	port string,
 	dial func(context.Context, string, string) (net.Conn, error),
-) (int32, error) {
+) (*PingResult, error) {
 	var lastErr error
 	for {
 		for _, resolvedAddress := range addresses {
 			dialAddress := net.JoinHostPort(resolvedAddress.String(), port)
 			latency, err := speedtest.TCPPing(ctx, dial, dialAddress)
 			if err == nil {
-				return latency, nil
+				return &PingResult{latency: latency, address: resolvedAddress.String()}, nil
 			}
 			lastErr = err
 			if ctx.Err() != nil {
-				return -1, errors.Join(context.Cause(ctx), lastErr)
+				return nil, errors.Join(context.Cause(ctx), lastErr)
 			}
 		}
 		select {
 		case <-ctx.Done():
-			return -1, errors.Join(context.Cause(ctx), lastErr)
+			return nil, errors.Join(context.Cause(ctx), lastErr)
 		case <-time.After(probeRetryDelay):
 		}
 	}

@@ -57,12 +57,13 @@ type Service struct {
 	httpServers  *TypedPool[*http.Server]
 	http2Servers *TypedPool[*http.Server]
 
-	requestCache *freelru.ShardedLRU[adblockCheckCacheKey, adblockRequestCacheValue]
+	requestCache *freelru.Cache[adblockCheckCacheKey, adblockRequestCacheValue]
 
 	stats *serviceStats
 
 	cosmeticSessionsAccess sync.Mutex
 	cosmeticSessions       map[string]cosmeticSession
+	tlsExclusions          sync.Map
 
 	utls   consts.UTLSFingerprintID
 	cronet bool
@@ -207,6 +208,9 @@ func (s *Service) Start(stage adapter.StartStage) error {
 			s.loopUpdate()
 		})
 		s.workers.Go(s.loopReload)
+		if s.tlsCA != nil {
+			s.workers.Go(s.loopTLSExclusionCleanup)
+		}
 	}
 	return nil
 }

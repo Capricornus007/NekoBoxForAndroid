@@ -13,33 +13,48 @@ import SwiftUI
 public class LogDataModel: ObservableObject {
     @Published public var filteredLogs: [LogEntry] = []
     @Published public private(set) var visibleLogs: [LogEntry] = []
+    @Published public private(set) var initialLogsReceived = false
     @Published public var showFileExporter = false
     @Published public var logFileURL: URL?
 
     private let commandClient: CommandClient
     private weak var viewModel: LogViewModel?
-    private var pausedLogSnapshot: [LogEntry]?
+    private var pausedLogSnapshot: LogBuffer?
     private var lastPaused = false
-    private var lastProcessedLogCount = 0
+    private var hasProcessed = false
+    private var lastProcessedTotal = 0
     private var lastEffectiveLevel: Int?
     private var lastSearchText = ""
     private var cancellables = Set<AnyCancellable>()
+    private var isPreparingLogFile = false
 
     private static let maxVisibleLogs = 1000
+    private static let maxFilteredLogs = 3000
+    /// Trimming the head of visibleLogs makes the text view delete from the front of
+    /// its storage, which invalidates layout for the whole document. Letting the
+    /// window overgrow and trimming in chunks keeps steady-state batches append-only.
+    private static let visibleLogsTrimThreshold = 1250
 
     public var isEmpty: Bool {
-        commandClient.logList.isEmpty
+        commandClient.logBuffer.entries.isEmpty
     }
 
     public var isConnected: Bool {
         commandClient.isConnected
     }
 
-    private func updateVisibleLogs() {
+    private func rebuildVisibleLogs() {
         if filteredLogs.count <= Self.maxVisibleLogs {
             visibleLogs = filteredLogs
         } else {
             visibleLogs = Array(filteredLogs.suffix(Self.maxVisibleLogs))
+        }
+    }
+
+    private func appendVisibleLogs(_ newLogs: [LogEntry]) {
+        visibleLogs.append(contentsOf: newLogs)
+        if visibleLogs.count > Self.visibleLogsTrimThreshold {
+            visibleLogs.removeFirst(visibleLogs.count - Self.maxVisibleLogs)
         }
     }
 
@@ -50,59 +65,64 @@ public class LogDataModel: ObservableObject {
         let debouncedSearchText = viewModel.$searchText
             .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
 
-        Publishers.CombineLatest(
+        Publishers.CombineLatest3(
             Publishers.CombineLatest4(
-                commandClient.$logList,
+                commandClient.$logBuffer,
                 commandClient.$defaultLogLevel,
                 viewModel.$selectedLogLevel,
                 debouncedSearchText
             ),
-            viewModel.$isPaused
+            viewModel.$isPaused,
+            commandClient.$initialLogsReceived
         )
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] combined, isPaused in
+        .sink { [weak self] combined, isPaused, initialLogsReceived in
             guard let self else { return }
-            let (logList, defaultLogLevel, selectedLogLevel, searchText) = combined
+            if self.initialLogsReceived != initialLogsReceived {
+                self.initialLogsReceived = initialLogsReceived
+            }
+            let (logBuffer, defaultLogLevel, selectedLogLevel, searchText) = combined
             let effectiveLevel = selectedLogLevel ?? defaultLogLevel
 
             if isPaused, !self.lastPaused {
-                self.pausedLogSnapshot = logList
-                self.lastProcessedLogCount = 0
+                self.pausedLogSnapshot = logBuffer
             } else if !isPaused, self.lastPaused {
                 self.pausedLogSnapshot = nil
-                self.lastProcessedLogCount = 0
             }
             self.lastPaused = isPaused
 
-            let sourceList = self.pausedLogSnapshot ?? logList
-
-            if isPaused, effectiveLevel == self.lastEffectiveLevel, searchText == self.lastSearchText,
-               self.lastProcessedLogCount > 0
-            {
-                return
+            let sourceBuffer = self.pausedLogSnapshot ?? logBuffer
+            let filter: (LogEntry) -> Bool = { log in
+                log.level <= effectiveLevel &&
+                    (searchText.isEmpty || log.message.contains(searchText))
             }
 
-            let canIncrement = self.lastProcessedLogCount > 0 &&
-                sourceList.count > self.lastProcessedLogCount &&
-                effectiveLevel == self.lastEffectiveLevel &&
-                searchText == self.lastSearchText
-
-            if canIncrement {
-                let newLogs = sourceList[self.lastProcessedLogCount...]
-                let newFilteredLogs = newLogs.filter { log in
-                    log.level <= effectiveLevel &&
-                        (searchText.isEmpty || log.message.contains(searchText))
+            if self.hasProcessed, effectiveLevel == self.lastEffectiveLevel, searchText == self.lastSearchText {
+                let newCount = sourceBuffer.totalCount - self.lastProcessedTotal
+                if newCount == 0 {
+                    return
                 }
-                self.filteredLogs.append(contentsOf: newFilteredLogs)
-            } else {
-                self.filteredLogs = sourceList.filter { log in
-                    log.level <= effectiveLevel &&
-                        (searchText.isEmpty || log.message.contains(searchText))
+                // Tracking the cumulative total keeps appends incremental even after
+                // the buffer saturates and starts dropping entries from the front.
+                if newCount > 0, newCount <= sourceBuffer.entries.count {
+                    self.lastProcessedTotal = sourceBuffer.totalCount
+                    let newFilteredLogs = sourceBuffer.entries.suffix(newCount).filter(filter)
+                    guard !newFilteredLogs.isEmpty else {
+                        return
+                    }
+                    self.filteredLogs.append(contentsOf: newFilteredLogs)
+                    if self.filteredLogs.count > Self.maxFilteredLogs {
+                        self.filteredLogs.removeFirst(self.filteredLogs.count - Self.maxFilteredLogs)
+                    }
+                    self.appendVisibleLogs(newFilteredLogs)
+                    return
                 }
             }
 
-            self.updateVisibleLogs()
-            self.lastProcessedLogCount = sourceList.count
+            self.filteredLogs = sourceBuffer.entries.filter(filter)
+            self.rebuildVisibleLogs()
+            self.hasProcessed = true
+            self.lastProcessedTotal = sourceBuffer.totalCount
             self.lastEffectiveLevel = effectiveLevel
             self.lastSearchText = searchText
         }
@@ -113,14 +133,15 @@ public class LogDataModel: ObservableObject {
         viewModel?.isPaused = false
         pausedLogSnapshot = nil
         lastPaused = false
-        lastProcessedLogCount = 0
+        hasProcessed = false
+        lastProcessedTotal = 0
         lastEffectiveLevel = nil
         lastSearchText = ""
         filteredLogs = []
         visibleLogs = []
         commandClient.clearLogs()
         Task.detached {
-            try? LibboxNewStandaloneCommandClient()!.clearLogs()
+            try? CommandTarget.standaloneClient().clearLogs()
         }
     }
 
@@ -145,22 +166,37 @@ public class LogDataModel: ObservableObject {
             #endif
         }
 
-        public func cleanupLogFile() {
-            guard let url = logFileURL else { return }
-            try? FileManager.default.removeItem(at: url)
+        public func cleanupLogFile(_ url: URL?) async {
+            guard let url else { return }
+            if logFileURL == url {
+                logFileURL = nil
+            }
+            await BlockingIO.run {
+                try? FileManager.default.removeItem(at: url)
+            }
         }
 
-        public func prepareLogFile() {
-            cleanupLogFile()
+        public func prepareLogFile(export: Bool = false) async {
+            guard !isPreparingLogFile else { return }
+            isPreparingLogFile = true
+            defer { isPreparingLogFile = false }
+            let text = getLogsText()
+            await cleanupLogFile(logFileURL)
+            let dateString = Self.dateFormatter.string(from: Date())
+            let fileURL = FilePath.cacheDirectory.appendingPathComponent("logs-\(dateString)-\(UUID().uuidString).txt")
             do {
-                let text = getLogsText()
-                let dateString = Self.dateFormatter.string(from: Date())
-                let tempDirectory = FileManager.default.temporaryDirectory
-                let fileURL = tempDirectory.appendingPathComponent("logs-\(dateString).txt")
-                try text.write(to: fileURL, atomically: true, encoding: .utf8)
+                try Task.checkCancellation()
+                try await BlockingIO.run {
+                    try text.write(to: fileURL, atomically: true, encoding: .utf8)
+                }
+                try Task.checkCancellation()
+                showFileExporter = export
                 logFileURL = fileURL
             } catch {
-                viewModel?.alert = AlertState(action: "prepare log file", error: error)
+                await cleanupLogFile(fileURL)
+                if !Task.isCancelled {
+                    viewModel?.alert = AlertState(action: "prepare log file", error: error)
+                }
             }
         }
     #endif

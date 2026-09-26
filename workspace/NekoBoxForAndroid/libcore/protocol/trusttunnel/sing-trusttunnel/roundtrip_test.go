@@ -69,6 +69,75 @@ func (s *testServerTLSConfig) Server(conn net.Conn) (tls.Conn, error) {
 	return stdtls.Server(conn, s.config), nil
 }
 
+type fakeTLSConfig struct {
+	serverName string
+	nextProtos []string
+}
+
+func (c *fakeTLSConfig) Start() error {
+	return nil
+}
+
+func (c *fakeTLSConfig) Close() error {
+	return nil
+}
+
+func (c *fakeTLSConfig) ServerName() string {
+	return c.serverName
+}
+
+func (c *fakeTLSConfig) SetServerName(serverName string) {
+	c.serverName = serverName
+}
+
+func (c *fakeTLSConfig) NextProtos() []string {
+	return c.nextProtos
+}
+
+func (c *fakeTLSConfig) SetNextProtos(nextProtos []string) {
+	c.nextProtos = nextProtos
+}
+
+func (c *fakeTLSConfig) HandshakeTimeout() time.Duration {
+	return 0
+}
+
+func (c *fakeTLSConfig) SetHandshakeTimeout(time.Duration) {
+}
+
+func (c *fakeTLSConfig) STDConfig() (*stdtls.Config, error) {
+	return nil, nil
+}
+
+func (c *fakeTLSConfig) Client(conn net.Conn) (tls.Conn, error) {
+	return &fakeTLSConn{Conn: conn}, nil
+}
+
+func (c *fakeTLSConfig) Clone() tls.Config {
+	return &fakeTLSConfig{
+		serverName: c.serverName,
+		nextProtos: append([]string(nil), c.nextProtos...),
+	}
+}
+
+func (c *fakeTLSConfig) Server(conn net.Conn) (tls.Conn, error) {
+	return &fakeTLSConn{Conn: conn}, nil
+}
+
+var _ duckTLSConn = (*fakeTLSConn)(nil)
+
+type fakeTLSConn struct {
+	net.Conn
+}
+
+func (c *fakeTLSConn) NetConn() net.Conn                      { return c.Conn }
+func (c *fakeTLSConn) HandshakeContext(context.Context) error { return nil }
+func (c *fakeTLSConn) ConnectionState() stdtls.ConnectionState {
+	return stdtls.ConnectionState{
+		NegotiatedProtocol: http2.NextProtoTLS,
+	}
+}
+
 // echoHandler echoes all TCP streams and UDP packets back to the sender.
 type echoHandler struct{}
 
@@ -76,7 +145,7 @@ func (h *echoHandler) NewConnectionEx(ctx context.Context, conn net.Conn, _, _ M
 	go func() {
 		defer onClose(nil)
 		defer conn.Close()
-		_ = bufio.CopyConn(ctx, conn, conn)
+		_, _ = bufio.Copy(conn, conn)
 	}()
 }
 
@@ -84,7 +153,18 @@ func (h *echoHandler) NewPacketConnectionEx(ctx context.Context, conn N.PacketCo
 	go func() {
 		defer onClose(nil)
 		defer conn.Close()
-		_ = bufio.CopyPacketConn(ctx, conn, conn)
+		for {
+			buffer := buf.NewPacket()
+			destination, err := conn.ReadPacket(buffer)
+			if err != nil {
+				buffer.Release()
+				return
+			}
+			err = conn.WritePacket(buffer, destination)
+			if err != nil {
+				return
+			}
+		}
 	}()
 }
 
@@ -130,25 +210,35 @@ func newTestSetup(t *testing.T) *testSetup {
 	t.Helper()
 
 	serverStd, clientStd := generateTestTLSPair(t)
+	return newTestSetupWith(t, &testServerTLSConfig{config: serverStd}, &testClientTLSConfig{config: clientStd}, new(N.DefaultDialer))
+}
+
+func newTestSetupWithTLS(t *testing.T, serverTLS tls.ServerConfig, clientTLS tls.Config) *testSetup {
+	t.Helper()
+	return newTestSetupWith(t, serverTLS, clientTLS, new(N.DefaultDialer))
+}
+
+func newTestSetupWith(t *testing.T, serverTLS tls.ServerConfig, clientTLS tls.Config, detour N.Dialer) *testSetup {
+	t.Helper()
 
 	listener, err := net.Listen(N.NetworkTCP, "127.0.0.1:0")
 	require.NoError(t, err)
 
 	service := NewService(ServiceOptions{
-		Ctx:     context.Background(),
+		Ctx:     t.Context(),
 		Logger:  logger.NOP(),
 		Handler: &echoHandler{},
 	})
 	service.UpdateUsers([]auth.User{{Username: "test", Password: "test"}})
-	require.NoError(t, service.Start(listener, nil, &testServerTLSConfig{config: serverStd}))
+	require.NoError(t, service.Start(listener, nil, serverTLS))
 
 	addr := listener.Addr().String()
 	client, err := NewClient(ClientOptions{
-		Ctx:       context.Background(),
-		Detour:    new(N.DefaultDialer),
+		Ctx:       t.Context(),
+		Detour:    detour,
 		Server:    M.ParseSocksaddr(addr),
 		Auth:      auth.User{Username: "test", Password: "test"},
-		TLSConfig: &testClientTLSConfig{config: clientStd},
+		TLSConfig: clientTLS,
 	})
 	require.NoError(t, err)
 	require.NoError(t, client.Start())
@@ -165,16 +255,49 @@ func TestRoundtripHealthCheck(t *testing.T) {
 	t.Parallel()
 	s := newTestSetup(t)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
 	require.NoError(t, s.client.HealthCheck(ctx))
+}
+
+func TestRoundtripFakeTLS(t *testing.T) {
+	t.Parallel()
+
+	s := newTestSetupWithTLS(t, &fakeTLSConfig{}, &fakeTLSConfig{})
+
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+	defer cancel()
+	require.NoError(t, s.client.HealthCheck(ctx))
+
+	tcpConn, err := s.client.Dial(ctx, M.ParseSocksaddr("example.com:80"))
+	require.NoError(t, err)
+	defer tcpConn.Close()
+	tcpPayload := []byte("hello fake tls tcp")
+	_, err = tcpConn.Write(tcpPayload)
+	require.NoError(t, err)
+	tcpResponse := make([]byte, len(tcpPayload))
+	_, err = io.ReadFull(tcpConn, tcpResponse)
+	require.NoError(t, err)
+	require.Equal(t, tcpPayload, tcpResponse)
+
+	udpConn, err := s.client.ListenPacket(ctx)
+	require.NoError(t, err)
+	defer udpConn.Close()
+	udpPayload := []byte("hello fake tls udp")
+	_, err = udpConn.WriteTo(udpPayload, &net.UDPAddr{IP: net.ParseIP("1.2.3.4"), Port: 53})
+	require.NoError(t, err)
+	udpResponse := make([]byte, len(udpPayload))
+	n, source, err := udpConn.ReadFrom(udpResponse)
+	require.NoError(t, err)
+	require.Equal(t, udpPayload, udpResponse[:n])
+	require.Equal(t, "1.2.3.4:53", source.String())
 }
 
 func TestRoundtripTCP(t *testing.T) {
 	t.Parallel()
 	s := newTestSetup(t)
 
-	conn, err := s.client.Dial(context.Background(), M.ParseSocksaddr("example.com:80"))
+	conn, err := s.client.Dial(t.Context(), M.ParseSocksaddr("example.com:80"))
 	require.NoError(t, err)
 	defer conn.Close()
 
@@ -192,7 +315,7 @@ func TestRoundtripUDP(t *testing.T) {
 	t.Parallel()
 	s := newTestSetup(t)
 
-	conn, err := s.client.ListenPacket(context.Background())
+	conn, err := s.client.ListenPacket(t.Context())
 	require.NoError(t, err)
 	defer conn.Close()
 
@@ -218,11 +341,9 @@ func TestRoundtripTCPConcurrent(t *testing.T) {
 
 	const numStreams = 20
 	var waitGroup sync.WaitGroup
-	waitGroup.Add(numStreams)
 	for range numStreams {
-		go func() {
-			defer waitGroup.Done()
-			conn, err := s.client.Dial(context.Background(), M.ParseSocksaddr("example.com:80"))
+		waitGroup.Go(func() {
+			conn, err := s.client.Dial(t.Context(), M.ParseSocksaddr("example.com:80"))
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -238,7 +359,7 @@ func TestRoundtripTCPConcurrent(t *testing.T) {
 				return
 			}
 			assert.Equal(t, msg, got)
-		}()
+		})
 	}
 	waitGroup.Wait()
 }
@@ -254,11 +375,9 @@ func TestRoundtripUDPConcurrent(t *testing.T) {
 	payload := []byte("concurrent udp echo")
 
 	var waitGroup sync.WaitGroup
-	waitGroup.Add(numConns)
 	for range numConns {
-		go func() {
-			defer waitGroup.Done()
-			pktConn, err := s.client.ListenPacket(context.Background())
+		waitGroup.Go(func() {
+			pktConn, err := s.client.ListenPacket(t.Context())
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -274,7 +393,7 @@ func TestRoundtripUDPConcurrent(t *testing.T) {
 				return
 			}
 			assert.Equal(t, payload, got[:n])
-		}()
+		})
 	}
 	waitGroup.Wait()
 }

@@ -92,24 +92,20 @@ func TestMapConcurrentClose(t *testing.T) {
 	cache := New[int, int](time.Second)
 	var group sync.WaitGroup
 	for worker := range 16 {
-		group.Add(1)
-		go func(worker int) {
-			defer group.Done()
+		group.Go(func() {
 			for index := range 256 {
 				key := worker*256 + index
 				cache.Store(key, key)
 				cache.Load(key)
 			}
-		}(worker)
+		})
 	}
 	group.Wait()
 	var closeGroup sync.WaitGroup
 	for range 8 {
-		closeGroup.Add(1)
-		go func() {
-			defer closeGroup.Done()
+		closeGroup.Go(func() {
 			cache.Close()
-		}()
+		})
 	}
 	closeGroup.Wait()
 	require.Zero(t, cache.Len())

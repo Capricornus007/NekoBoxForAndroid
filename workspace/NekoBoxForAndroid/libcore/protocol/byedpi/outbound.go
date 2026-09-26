@@ -45,7 +45,7 @@ func NewOutbound(ctx context.Context, _ adapter.Router, logger log.ContextLogger
 	if options.Detour != "" {
 		return nil, E.New("byedpi cannot be used with detour")
 	}
-	queryOptions, err := adapter.DNSQueryOptionsFrom(ctx, options.DomainResolver)
+	queryOptions, err := dialer.NewDNSQueryOptions(ctx, options.DomainResolver, false)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func NewOutbound(ctx context.Context, _ adapter.Router, logger log.ContextLogger
 		ctx:       ctx,
 		logger:    logger,
 		cli:       options.CLI,
-		queryOpts: *queryOptions,
+		queryOpts: queryOptions,
 	}, nil
 }
 
@@ -177,11 +177,14 @@ func privateHandshake(
 		_ = conn.SetDeadline(deadline)
 	}
 	_, err := socks.ClientHandshake5(conn, command, destination, "", "")
-	if !stopCancellation() && err == nil {
-		err = ctx.Err()
+	if !stopCancellation() {
+		if contextErr := ctx.Err(); contextErr != nil {
+			err = contextErr
+		}
 	}
 	if err == nil {
 		_ = conn.SetDeadline(time.Time{})
+		return nil
 	}
-	return err
+	return fmt.Errorf("ByeDPI SOCKS handshake: %w", err)
 }

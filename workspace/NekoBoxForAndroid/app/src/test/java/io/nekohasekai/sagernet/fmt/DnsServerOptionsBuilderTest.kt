@@ -422,7 +422,7 @@ class DnsServerOptionsBuilderTest {
     }
 
     @Test
-    fun `route dns rule carries resolver strategy on the rule`() {
+    fun `route dns rule does not carry legacy resolver strategy`() {
         val rules = buildRouteDnsRules(
             createDnsRule = true,
             outbound = 0L,
@@ -431,12 +431,11 @@ class DnsServerOptionsBuilderTest {
             ruleSet = null,
             rulesetTags = emptyList(),
             useFakeDns = false,
-            remoteDnsStrategy = "prefer_ipv6",
         )
 
         val map = rules.single().asMap()
         assertEquals("dns-remote", map["server"])
-        assertEquals("prefer_ipv6", map["strategy"])
+        assertFalse(map.containsKey("strategy"))
         assertNull(map["action"])
     }
 }

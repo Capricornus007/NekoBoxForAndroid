@@ -7,6 +7,7 @@ import android.system.Os
 import android.system.OsConstants
 import androidx.annotation.MainThread
 import io.nekohasekai.sagernet.SagerNet
+import io.nekohasekai.sagernet.app.AppGraph
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.utils.Commandline
 import kotlinx.coroutines.*
@@ -75,7 +76,7 @@ class GuardedProcessPool(private val onFatal: suspend (IOException) -> Unit) : C
                 }
             } catch (e: IOException) {
                 Logs.w("error occurred. stop guard: ${Commandline.toString(cmd)}")
-                GlobalScope.launch(Dispatchers.Main) { onFatal(e) }
+                withContext(AppGraph.dispatchers.main) { onFatal(e) }
             } finally {
                 if (running) withContext(NonCancellable) {  // clean-up cannot be cancelled
                     if (Build.VERSION.SDK_INT < 24) {

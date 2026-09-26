@@ -1,17 +1,15 @@
 package io.nekohasekai.sagernet.ui.profile
 
-import android.os.Bundle
-import androidx.preference.EditTextPreference
-import androidx.preference.PreferenceFragmentCompat
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
+import androidx.compose.runtime.Composable
 import io.nekohasekai.sagernet.fmt.tailscale.TailscaleBean
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
+import io.nekohasekai.sagernet.ui.compose.TailscaleProfileSettingsScreen
 import moe.matsuri.nb4a.proxy.PreferenceBinding
 import moe.matsuri.nb4a.proxy.PreferenceBindingManager
 import moe.matsuri.nb4a.proxy.Type
 
 class TailscaleSettingsActivity : ProfileSettingsActivity<TailscaleBean>() {
+    override val usesComposePreferences = true
 
     override fun createEntity() = TailscaleBean().applyDefaultValues()
 
@@ -37,12 +35,6 @@ class TailscaleSettingsActivity : ProfileSettingsActivity<TailscaleBean>() {
 
     override fun TailscaleBean.serialize() = binding.fromCacheAll(this)
 
-    override fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.tailscale_preferences)
-        binding.setPreferenceFragment(this)
-        findPreference<EditTextPreference>("authKey")!!.summaryProvider = PasswordSummaryProvider
-        findPreference<EditTextPreference>("relayServerPort")!!.setOnBindEditTextListener(
-            EditTextPreferenceModifiers.Port,
-        )
-    }
+    @Composable
+    override fun ComposePreferences() = TailscaleProfileSettingsScreen()
 }

@@ -8,24 +8,25 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.InputType
-import android.view.MenuItem
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
-import android.widget.EditText
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.ViewCompat
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import android.widget.FrameLayout
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.databinding.LayoutWebviewBinding
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
-import io.nekohasekai.sagernet.widget.ListListener
+import io.nekohasekai.sagernet.ui.compose.DashboardScreen
+import io.nekohasekai.sagernet.ui.compose.NekoComposeTheme
 import libcore.Libcore
 import moe.matsuri.nb4a.utils.WebViewUtil
 import okhttp3.Dns
@@ -52,7 +53,7 @@ import javax.net.SocketFactory
 
 // Fragment必须有一个无参public的构造函数，否则在数据恢复的时候，会报crash
 
-class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenuItemClickListener {
+class WebviewFragment : ToolbarFragment() {
 
     private val dashboardClient = OkHttpClient()
     private val dashboardUnixClient by lazy {
@@ -77,7 +78,8 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
     }
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    private var binding: LayoutWebviewBinding? = null
+    private var webviewContainer: FrameLayout? = null
+    private var showNoActiveConnections by mutableStateOf(true)
     private var mWebView: WebView? = null
     private var dashboardClosed = false
     private var dashboardEndpointSeeded = false
@@ -85,20 +87,49 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
     private var dashboardLoadAttempts = 0
     private var pendingDashboardLoad: Runnable? = null
     private var pendingDashboardLoadUrl: String? = null
+    private var showSetUrlDialog by mutableStateOf(false)
+    private var panelUrlDraft by mutableStateOf("")
+    private var showCleanupConfirmation by mutableStateOf(false)
+
+    @SuppressLint("SetJavaScriptEnabled")
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View = ComposeView(requireContext()).apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent {
+            NekoComposeTheme {
+                DashboardScreen(
+                    showNoActiveConnections = showNoActiveConnections,
+                    showSetUrl = !DataStore.hideClashApi,
+                    showSetUrlDialog = showSetUrlDialog,
+                    panelUrlDraft = panelUrlDraft,
+                    showCleanupConfirmation = showCleanupConfirmation,
+                    onOpenDrawer = { (requireActivity() as MainActivity).openDrawer() },
+                    onSetUrl = ::showSetUrlDialog,
+                    onPanelUrlChanged = { panelUrlDraft = it },
+                    onDismissSetUrl = { showSetUrlDialog = false },
+                    onConfirmSetUrl = ::applyPanelUrl,
+                    onCleanup = ::confirmDashboardCleanup,
+                    onDismissCleanup = { showCleanupConfirmation = false },
+                    onConfirmCleanup = {
+                        showCleanupConfirmation = false
+                        destroyDashboardAndNavigate(cleanStorage = true, cleanupPanelFiles = true)
+                    },
+                    onClose = { destroyDashboardAndNavigate(cleanStorage = false) },
+                    onContainerReady = { view ->
+                        webviewContainer = view
+                        if (DataStore.serviceState.started && mWebView == null) showDashboard()
+                    },
+                )
+            }
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // layout
-        toolbar.setTitle(R.string.menu_dashboard)
-        toolbar.inflateMenu(R.menu.yacd_menu)
-        toolbar.menu.findItem(R.id.action_set_url)?.isVisible = !DataStore.hideClashApi
-        toolbar.setOnMenuItemClickListener(this)
-
-        binding = LayoutWebviewBinding.bind(view)
-        val binding = binding!!
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root, ListListener)
         dashboardSignature = DashboardSignature.current()
 
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
@@ -147,7 +178,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                binding?.noActiveConnections?.visibility = View.GONE
+                showNoActiveConnections = false
                 view?.visibility = View.VISIBLE
             }
         } else object : WebViewClient() {
@@ -163,7 +194,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 dashboardLoadAttempts = 0
-                binding?.noActiveConnections?.visibility = View.GONE
+                showNoActiveConnections = false
                 view?.visibility = View.VISIBLE
                 seedDashboardEndpoint(url)
             }
@@ -203,14 +234,14 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
     }
 
     private fun showDashboard() {
-        val binding = binding ?: return
-        binding.noActiveConnections.visibility = View.GONE
+        webviewContainer ?: return
+        showNoActiveConnections = false
         ensureDashboardWebView()
         loadPanel(DataStore.resolvedYacdURL(), resetAttempts = true)
     }
 
     private fun ensureDashboardWebView(): WebView {
-        val binding = checkNotNull(binding)
+        val container = checkNotNull(webviewContainer)
         val currentSignature = DashboardSignature.current()
         val currentWebView = mWebView
         if (currentWebView != null && dashboardSignature == currentSignature) {
@@ -220,7 +251,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
         }
 
         dashboardSignature = currentSignature
-        mWebView = obtainDashboardWebView(binding.webviewContainer, dashboardSignature)
+        mWebView = obtainDashboardWebView(container, dashboardSignature)
         val webView = checkNotNull(mWebView)
         webView.resumeTimers()
         webView.onResume()
@@ -236,38 +267,22 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
         dashboardLoadAttempts = 0
         destroyRetainedDashboardWebView(cleanStorage = false)
         mWebView = null
-        binding?.noActiveConnections?.visibility = View.VISIBLE
+        showNoActiveConnections = true
     }
 
-    @SuppressLint("CheckResult")
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_set_url -> {
-                val view = EditText(context).apply {
-                    inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
-                    setText(DataStore.resolvedYacdURL())
-                }
-                MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.set_panel_url)
-                    .setView(view)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        DataStore.yacdURL = view.text.toString()
-                        retainedDashboardLoaded = false
-                        if (DataStore.serviceState.started) {
-                            ensureDashboardWebView()
-                            loadPanel(DataStore.resolvedYacdURL(), resetAttempts = true)
-                        }
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
-            }
-            R.id.close -> {
-                destroyDashboardAndNavigate(cleanStorage = false)
-            }
-            R.id.action_cleanup -> {
-                confirmDashboardCleanup()
-            }
+    private fun showSetUrlDialog() {
+        panelUrlDraft = DataStore.resolvedYacdURL()
+        showSetUrlDialog = true
+    }
+
+    private fun applyPanelUrl() {
+        showSetUrlDialog = false
+        DataStore.yacdURL = panelUrlDraft
+        retainedDashboardLoaded = false
+        if (DataStore.serviceState.started) {
+            ensureDashboardWebView()
+            loadPanel(DataStore.resolvedYacdURL(), resetAttempts = true)
         }
-        return true
     }
 
     override fun onDestroyView() {
@@ -275,7 +290,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
             suspendDashboard()
         }
         cancelDashboardLoadRetry()
-        binding = null
+        webviewContainer = null
         super.onDestroyView()
     }
 
@@ -293,13 +308,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
     }
 
     private fun confirmDashboardCleanup() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setMessage(R.string.webview_cleanup_confirmation)
-            .setPositiveButton(R.string.yes) { _, _ ->
-                destroyDashboardAndNavigate(cleanStorage = true, cleanupPanelFiles = true)
-            }
-            .setNegativeButton(R.string.no, null)
-            .show()
+        showCleanupConfirmation = true
     }
 
     private fun destroyDashboardAndNavigate(cleanStorage: Boolean, cleanupPanelFiles: Boolean = false) {
@@ -444,7 +453,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
         cancelDashboardLoadRetry()
         val retry = Runnable {
             pendingDashboardLoad = null
-            if (!dashboardClosed && DataStore.serviceState.started && binding != null) {
+            if (!dashboardClosed && DataStore.serviceState.started && webviewContainer != null) {
                 ensureDashboardWebView()
                 loadPanel(url)
             }

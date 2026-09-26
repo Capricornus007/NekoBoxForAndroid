@@ -46,8 +46,13 @@ var outboundErrorPatterns = []*regexp.Regexp{
 }
 
 func normalizeConfig(configContent string) (string, []string, bool) {
+	migratedContent, migrationViolations, migrated := migrateConfig114(configContent)
+	if !migrated {
+		return "", nil, false
+	}
+	configContent = migratedContent
 	if checkConfigForNormalization(configContent) == nil {
-		return configContent, nil, true
+		return configContent, migrationViolations, true
 	}
 
 	root, outbounds, err := parseRawConfig(configContent)
@@ -58,7 +63,7 @@ func normalizeConfig(configContent string) (string, []string, bool) {
 		return "", nil, false
 	}
 
-	var violations []string
+	violations := migrationViolations
 	for len(outbounds) > 0 {
 		candidate, marshalErr := marshalRawConfig(root, outbounds)
 		if marshalErr != nil {

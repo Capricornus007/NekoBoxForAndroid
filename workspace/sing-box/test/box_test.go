@@ -26,7 +26,10 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	goleak.VerifyTestMain(m)
+	goleak.VerifyTestMain(m,
+		// mihomo's package-level logger owns a process-lifetime observable goroutine.
+		goleak.IgnoreTopFunction("github.com/metacubex/mihomo/common/observable.(*Observable[...]).process"),
+	)
 }
 
 var globalCtx context.Context

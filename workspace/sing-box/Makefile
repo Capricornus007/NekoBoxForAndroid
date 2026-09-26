@@ -19,7 +19,7 @@ ifneq ($(findstring with_awg,$(TAGS)),)
 BUILD_MOD = -mod=vendor
 endif
 
-.PHONY: test release docs build
+.PHONY: test release docs build schema
 
 build:
 	$(if $(findstring with_awg,$(TAGS)),@echo "Preparing patched AWG dependency..." && $(MAKE) patch-deps,)
@@ -37,6 +37,9 @@ ci_build:
 
 generate_completions:
 	go run -v --tags "$(TAGS),generate,generate_completions" $(MAIN)
+
+schema:
+	go run -ldflags "$(LDFLAGS_SHARED)" --tags "$(TAGS)" $(MAIN) schema -o docs/schema.json
 
 install:
 	$(if $(findstring with_awg,$(TAGS)),@echo "Preparing patched AWG dependency..." && $(MAKE) patch-deps,)
@@ -60,8 +63,7 @@ lint_install:
 
 proto:
 	@go run ./cmd/internal/protogen
-	@gofumpt -l -w .
-	@gofumpt -l -w .
+	@golangci-lint fmt
 
 proto_install:
 	go install -v google.golang.org/protobuf/cmd/protoc-gen-go@latest
@@ -92,6 +94,9 @@ release_install:
 update_android_version:
 	go run ./cmd/internal/update_android_version
 
+update_desktop_version:
+	go run ./cmd/internal/update_desktop_version
+
 build_android:
 	cd ../sing-box-for-android && ./gradlew :app:clean :app:assembleOtherRelease :app:assembleOtherLegacyRelease && ./gradlew --stop
 
@@ -115,29 +120,27 @@ publish_android:
 build_ios:
 	cd ../sing-box-for-apple && \
 	rm -rf build/SFI.xcarchive && \
-	xcodebuild clean -scheme SFI && \
-	xcodebuild archive -scheme SFI -configuration Release -destination 'generic/platform=iOS' -archivePath build/SFI.xcarchive -allowProvisioningUpdates | xcbeautify | grep -A 10 -e "Archive Succeeded" -e "ARCHIVE FAILED" -e "❌"
+	xcodebuild clean -scheme SFI -derivedDataPath build/SFI.dd && \
+	xcodebuild archive -scheme SFI -configuration Release -destination 'generic/platform=iOS' -archivePath build/SFI.xcarchive -derivedDataPath build/SFI.dd -allowProvisioningUpdates | xcbeautify | grep -A 10 -e "Archive Succeeded" -e "ARCHIVE FAILED" -e "❌"
 
 upload_ios_app_store:
 	cd ../sing-box-for-apple && \
 	xcodebuild -exportArchive -archivePath build/SFI.xcarchive -exportOptionsPlist SFI/Upload.plist -allowProvisioningUpdates
 
-export_ios_ipa:
-	cd ../sing-box-for-apple && \
-	xcodebuild -exportArchive -archivePath build/SFI.xcarchive -exportOptionsPlist SFI/Export.plist -allowProvisioningUpdates -exportPath build/SFI && \
-	cp build/SFI/sing-box.ipa dist/SFI.ipa
+build_ios_deb:
+	$(MAKE) -C ../sing-box-for-apple build_ios_deb
 
-upload_ios_ipa:
-	cd dist && \
-	cp SFI.ipa "SFI-${VERSION}.ipa" && \
-	ghr --replace --draft --prerelease "v${VERSION}" "SFI-${VERSION}.ipa"
+upload_ios_deb:
+	ghr --replace --draft --prerelease "v${VERSION}" ../sing-box-for-apple/build/jailbreak/"SFI-${VERSION}-iphoneos-arm64.deb"
 
 release_ios: build_ios upload_ios_app_store
+
+release_ios_deb: build_ios_deb upload_ios_deb
 
 build_macos:
 	cd ../sing-box-for-apple && \
 	rm -rf build/SFM.xcarchive && \
-	xcodebuild archive -scheme SFM -configuration Release -archivePath build/SFM.xcarchive -allowProvisioningUpdates | xcbeautify | grep -A 10 -e "Archive Succeeded" -e "ARCHIVE FAILED" -e "❌"
+	xcodebuild archive -scheme SFM -configuration Release -archivePath build/SFM.xcarchive -derivedDataPath build/SFM.dd -allowProvisioningUpdates | xcbeautify | grep -A 10 -e "Archive Succeeded" -e "ARCHIVE FAILED" -e "❌"
 
 upload_macos_app_store:
 	cd ../sing-box-for-apple && \
@@ -206,7 +209,7 @@ replace_macos_standalone: build_macos_pkg notarize_macos_pkg upload_macos_pkg up
 build_tvos:
 	cd ../sing-box-for-apple && \
 	rm -rf build/SFT.xcarchive && \
-	xcodebuild archive -scheme SFT -configuration Release -archivePath build/SFT.xcarchive -allowProvisioningUpdates | xcbeautify | grep -A 10 -e "Archive Succeeded" -e "ARCHIVE FAILED" -e "❌"
+	xcodebuild archive -scheme SFT -configuration Release -archivePath build/SFT.xcarchive -derivedDataPath build/SFT.dd -allowProvisioningUpdates | xcbeautify | grep -A 10 -e "Archive Succeeded" -e "ARCHIVE FAILED" -e "❌"
 
 upload_tvos_app_store:
 	cd ../sing-box-for-apple && \
@@ -228,7 +231,7 @@ update_apple_version:
 	go run ./cmd/internal/update_apple_version
 
 update_macos_version:
-	MACOS_PROJECT_VERSION=$(shell go run -v ./cmd/internal/app_store_connect next_macos_project_version) go run ./cmd/internal/update_apple_version
+	MACOS_PROJECT_VERSION=$(shell go run ./cmd/internal/app_store_connect next_project_version macos) go run ./cmd/internal/update_apple_version
 
 release_apple: lib_apple update_apple_version release_ios release_macos release_tvos release_macos_standalone
 
@@ -237,11 +240,13 @@ release_apple_beta: update_apple_version release_ios release_macos release_tvos
 publish_testflight:
 	go run -v ./cmd/internal/app_store_connect publish_testflight $(filter-out $@,$(MAKECMDGOALS))
 
-prepare_app_store:
-	go run -v ./cmd/internal/app_store_connect prepare_app_store
+submit_app_store:
+	go run -v ./cmd/internal/app_store_connect submit_app_store $(filter-out $@,$(MAKECMDGOALS))
+
+release_app_store: release_ios release_tvos submit_app_store
 
 publish_app_store:
-	go run -v ./cmd/internal/app_store_connect publish_app_store
+	go run -v ./cmd/internal/app_store_connect publish_app_store $(filter-out $@,$(MAKECMDGOALS))
 
 test:
 	@go test -v ./... && \
@@ -271,8 +276,8 @@ lib_apple_new:
 	$(SING_FFI) generate --config $(LIBBOX_FFI_CONFIG) --platform-type apple
 
 lib_install:
-	go install -v github.com/sagernet/gomobile/cmd/gomobile@v0.1.12
-	go install -v github.com/sagernet/gomobile/cmd/gobind@v0.1.12
+	go install -v github.com/sagernet/gomobile/cmd/gomobile@v0.1.13
+	go install -v github.com/sagernet/gomobile/cmd/gobind@v0.1.13
 
 docs:
 	venv/bin/mkdocs serve

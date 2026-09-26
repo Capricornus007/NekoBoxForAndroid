@@ -17,6 +17,7 @@ class SnellFmtTest {
             userKey = "user secret"
             version = 6
             mode = "unshaped"
+            quicProxyMode = true
             name = "Snell v6"
         }
 
@@ -28,6 +29,7 @@ class SnellFmtTest {
         assertEquals(6, restored.version)
         assertEquals("user secret", restored.userKey)
         assertEquals("unshaped", restored.mode)
+        assertEquals(true, restored.quicProxyMode)
     }
 
     @Test
@@ -40,6 +42,7 @@ class SnellFmtTest {
                 userKey = "user"
                 version = 6
                 mode = "unsafe-raw"
+                quicProxyMode = true
                 obfsMode = "http"
                 obfsHost = "legacy.example"
             }
@@ -47,14 +50,15 @@ class SnellFmtTest {
 
         assertEquals("user", outbound.userkey)
         assertEquals("unsafe-raw", outbound.mode)
+        assertEquals(true, outbound.quic_proxy_mode)
         assertNull(outbound.obfs_mode)
         assertNull(outbound.obfs_host)
     }
 
     @Test
-    fun clashVersionFiveMapsToSupportedVersionFour() {
+    fun clashVersionFiveIsPreserved() {
         assertEquals(
-            4,
+            5,
             parseClashSnell(
                 mapOf(
                     "server" to "example.com",

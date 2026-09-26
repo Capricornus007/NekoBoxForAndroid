@@ -5,7 +5,7 @@ import android.os.Bundle
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.ProxyEntity
 
-class ProfileSelectActivity : ThemedActivity(R.layout.layout_empty),
+class ProfileSelectActivity : ThemedActivity(),
     ConfigurationFragment.SelectCallback {
 
     companion object {
@@ -15,6 +15,7 @@ class ProfileSelectActivity : ThemedActivity(R.layout.layout_empty),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installFragmentHost()
 
         val selected = intent.getParcelableExtra<ProxyEntity>(EXTRA_SELECTED)
 

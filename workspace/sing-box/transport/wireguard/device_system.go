@@ -93,6 +93,7 @@ func (w *systemDevice) Start() error {
 		MTU:            w.options.MTU,
 		GSO:            true,
 		InterfaceScope: true,
+		DNSMode:        tun.DNSModeDisabled,
 		Inet4RouteAddress: common.Filter(w.options.AllowedAddress, func(it netip.Prefix) bool {
 			return it.Addr().Is4()
 		}),
@@ -120,7 +121,7 @@ func (w *systemDevice) Start() error {
 	if isBatchTUN && batchTUN.BatchSize() > 1 {
 		w.batchDevice = batchTUN
 	}
-	w.events <- wgTun.EventUp
+	// The endpoint lifecycle controller owns Up/Down, including initial startup.
 	return nil
 }
 

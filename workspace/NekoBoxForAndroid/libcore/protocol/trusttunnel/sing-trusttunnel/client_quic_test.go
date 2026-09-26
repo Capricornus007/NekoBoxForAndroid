@@ -7,6 +7,7 @@ import (
 	"errors"
 	"net"
 	"testing"
+	"time"
 
 	"github.com/sagernet/quic-go/http3"
 	"github.com/sagernet/sing/common/tls"
@@ -15,14 +16,19 @@ import (
 )
 
 type stdConfigErrorTLSConfig struct {
-	config *stdtls.Config
-	err    error
+	config           *stdtls.Config
+	err              error
+	handshakeTimeout time.Duration
 }
 
 func (c *stdConfigErrorTLSConfig) ServerName() string              { return c.config.ServerName }
 func (c *stdConfigErrorTLSConfig) SetServerName(serverName string) { c.config.ServerName = serverName }
 func (c *stdConfigErrorTLSConfig) NextProtos() []string            { return c.config.NextProtos }
 func (c *stdConfigErrorTLSConfig) SetNextProtos(p []string)        { c.config.NextProtos = p }
+func (c *stdConfigErrorTLSConfig) HandshakeTimeout() time.Duration { return c.handshakeTimeout }
+func (c *stdConfigErrorTLSConfig) SetHandshakeTimeout(timeout time.Duration) {
+	c.handshakeTimeout = timeout
+}
 func (c *stdConfigErrorTLSConfig) STDConfig() (*stdtls.Config, error) {
 	return nil, c.err
 }
@@ -31,8 +37,9 @@ func (c *stdConfigErrorTLSConfig) Client(conn net.Conn) (tls.Conn, error) {
 }
 func (c *stdConfigErrorTLSConfig) Clone() tls.Config {
 	return &stdConfigErrorTLSConfig{
-		config: c.config.Clone(),
-		err:    c.err,
+		config:           c.config.Clone(),
+		err:              c.err,
+		handshakeTimeout: c.handshakeTimeout,
 	}
 }
 

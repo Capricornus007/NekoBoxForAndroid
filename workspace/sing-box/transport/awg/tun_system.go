@@ -34,7 +34,9 @@ func newSystemTun(ctx context.Context, address []netip.Prefix, allowedIps []neti
 	events := make(chan awgTun.Event)
 
 	dial, err := dialer.NewDefault(ctx, option.DialerOptions{
-		BindInterface: name,
+		AbstractDialerOptions: option.AbstractDialerOptions{
+			BindInterface: name,
+		},
 	})
 	if err != nil {
 		return nil, exceptions.Cause(err, "get in-tunnel dialer")
@@ -84,7 +86,7 @@ func (t *systemTun) Start() error {
 		return exceptions.Cause(err, "start tunnel")
 	}
 
-	t.events <- awgTun.EventUp
+	// The endpoint lifecycle controller owns Up/Down, including initial startup.
 	return nil
 }
 

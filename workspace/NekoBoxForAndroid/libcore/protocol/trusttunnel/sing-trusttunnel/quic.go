@@ -275,10 +275,9 @@ func setCongestionControl(timeFunc func() time.Time, conn *quic.Conn, name strin
 	case "", "bbr":
 		fallthrough
 	default:
-		congestionControl = congestion_meta2.NewBbrSender(
-			congestion_meta2.DefaultClock{TimeFunc: timeFunc},
+		congestionControl = congestion_meta2.NewBbrSenderWithProfile(
 			congestion.ByteCount(conn.Config().InitialPacketSize),
-			congestion.ByteCount(congestion_meta1.InitialCongestionWindow),
+			congestion_meta2.ProfileStandard,
 		)
 	}
 	conn.SetCongestionControl(congestionControl)

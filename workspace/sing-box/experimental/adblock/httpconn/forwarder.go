@@ -40,8 +40,9 @@ func NewHTTPForwarder(ctx context.Context, c *ctx.Conn) ClosableRoundTripper {
 
 func newStandardHTTPForwarder(ctx context.Context, c *ctx.Conn) ClosableRoundTripper {
 	tlsConfig := &tls.Config{
-		Time:    ntp.TimeFuncFromContext(ctx),
-		RootCAs: adapter.RootPoolFromContext(ctx),
+		Time:               ntp.TimeFuncFromContext(ctx),
+		RootCAs:            adapter.RootPoolFromContext(ctx),
+		InsecureSkipVerify: c.InsecureSkipVerify,
 	}
 	if c.UseTLS && SupportsUTLS && c.UTLS != consts.Invalid {
 		return newUTLSForwarder(c, tlsConfig)

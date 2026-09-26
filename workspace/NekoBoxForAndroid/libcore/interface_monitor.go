@@ -1,6 +1,7 @@
 package libcore
 
 import (
+	"context"
 	"encoding/json"
 	"net"
 	"net/netip"
@@ -14,10 +15,11 @@ import (
 const netFlagUp = 1
 
 type platformDefaultInterface struct {
-	Name        string `json:"name"`
-	Index       int    `json:"index"`
-	Expensive   bool   `json:"expensive"`
-	Constrained bool   `json:"constrained"`
+	Name          string `json:"name"`
+	Index         int    `json:"index"`
+	NetworkHandle int64  `json:"network_handle"`
+	Expensive     bool   `json:"expensive"`
+	Constrained   bool   `json:"constrained"`
 }
 
 type platformNetworkInterface struct {
@@ -36,6 +38,7 @@ type interfaceMonitor struct {
 	access           sync.Mutex
 	callbacks        list.List[tun.DefaultInterfaceUpdateCallback]
 	defaultInterface *control.Interface
+	defaultState     platformDefaultInterface
 	myInterfaces     []string
 }
 
@@ -59,8 +62,9 @@ func (m *interfaceMonitor) Start() error {
 	currentPlatformNetworkState.access.Lock()
 	currentPlatformNetworkState.monitors[m] = struct{}{}
 	current := buildDefaultControlInterface(currentPlatformNetworkState.defaultInterface)
+	state := currentPlatformNetworkState.defaultInterface
 	currentPlatformNetworkState.access.Unlock()
-	m.setDefaultInterface(current, true)
+	m.setDefaultInterface(current, state, true)
 	return nil
 }
 
@@ -109,16 +113,17 @@ func (m *interfaceMonitor) MyInterfaces() []string {
 	return m.myInterfaces
 }
 
-func (m *interfaceMonitor) setDefaultInterface(current *control.Interface, notify bool) {
+func (m *interfaceMonitor) setDefaultInterface(current *control.Interface, state platformDefaultInterface, notify bool) {
 	m.access.Lock()
-	old := m.defaultInterface
+	oldState := m.defaultState
 	m.defaultInterface = current
+	m.defaultState = state
 	callbacks := m.callbacks.Array()
 	m.access.Unlock()
 	if !notify {
 		return
 	}
-	if sameControlInterface(old, current) {
+	if oldState == state {
 		return
 	}
 	for _, callback := range callbacks {
@@ -168,7 +173,7 @@ func UpdatePlatformNetworkState(defaultInterfaceJSON string, interfacesJSON stri
 		_ = platformNetworkManager.UpdateInterfaces()
 	}
 	for _, monitor := range monitors {
-		monitor.setDefaultInterface(current, true)
+		monitor.setDefaultInterface(current, state, true)
 	}
 }
 
@@ -180,7 +185,7 @@ func ReplayPlatformNetworkState() {
 
 func UpdatePlatformWIFIState() {
 	if platformNetworkManager != nil {
-		platformNetworkManager.UpdateWIFIState()
+		platformNetworkManager.UpdateWIFIState(context.Background())
 	}
 }
 

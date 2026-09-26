@@ -6,6 +6,9 @@ import io.nekohasekai.sagernet.fmt.Serializable
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.wireguard.AmneziaWGBean
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
+import io.nekohasekai.sagernet.fmt.wireguard.applyAmneziaWG3Options
+import io.nekohasekai.sagernet.fmt.wireguard.parseAmneziaWGUri
+import io.nekohasekai.sagernet.fmt.wireguard.parseThroneWireGuardUri
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
 import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.fmt.http.parseHttp
@@ -13,12 +16,13 @@ import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria1
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria2
 import io.nekohasekai.sagernet.fmt.mieru.parseMieru
 import io.nekohasekai.sagernet.fmt.naive.parseNaive
+import io.nekohasekai.sagernet.fmt.openvpn.parseOpenVPNConfig
 import io.nekohasekai.sagernet.fmt.parseUniversal
 import io.nekohasekai.sagernet.fmt.shadowsocks.parseShadowsocks
 import io.nekohasekai.sagernet.fmt.shadowsocksr.parseShadowsocksR
 import io.nekohasekai.sagernet.fmt.snell.parseSnell
-import io.nekohasekai.sagernet.fmt.socks.parseSOCKS
 import io.nekohasekai.sagernet.fmt.ssh.parseSSH
+import io.nekohasekai.sagernet.fmt.socks.parseSOCKS
 import io.nekohasekai.sagernet.fmt.trojan.parseTrojan
 import io.nekohasekai.sagernet.fmt.trusttunnel.parseTrustTunnel
 import io.nekohasekai.sagernet.fmt.tuic.parseTuic
@@ -29,11 +33,15 @@ import moe.matsuri.nb4a.proxy.anytls.parseAnytls
 import moe.matsuri.nb4a.proxy.anytls.parseStormDns
 import moe.matsuri.nb4a.utils.JavaUtil.gson
 import moe.matsuri.nb4a.utils.Util
+import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.group.GroupUpdater
+import libcore.Libcore
 import okhttp3.HttpUrl
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.net.URLDecoder
 import java.util.zip.InflaterOutputStream
 
 // JSON & Base64
@@ -119,6 +127,27 @@ class SubscriptionFoundException(val link: String) : RuntimeException()
 class AmneziaApiKeyUnsupportedException : RuntimeException("Amnezia API VPN keys are not supported")
 
 suspend fun parseProxies(text: String): List<AbstractBean> {
+    if (text.startsWith("openvpn://import-profile/", ignoreCase = true)) {
+        val nested = text.substringAfter("openvpn://import-profile/")
+        val decoded = if (nested.startsWith("https://", ignoreCase = true)) nested
+            else URLDecoder.decode(nested.replace("+", "%2B"), Charsets.UTF_8.name())
+        require(decoded.startsWith("https://", ignoreCase = true)) { "OpenVPN import profile URL must use HTTPS" }
+        val client = Libcore.newHttpClient().apply {
+            setTimeoutMillis(GroupUpdater.SUBSCRIPTION_UPDATE_TIMEOUT_MILLIS)
+            tryH3Direct()
+        }
+        try {
+            val response = client.newRequest().apply {
+                setURL(decoded)
+                setUserAgent(USER_AGENT)
+            }.execute()
+            val content = Util.getStringBox(response.contentString)
+            require(content.toByteArray().size <= 4 * 1024 * 1024) { "OpenVPN profile is too large" }
+            return listOf(parseOpenVPNConfig(content))
+        } finally {
+            client.close()
+        }
+    }
     val linksByLine = text.split('\n').map { it.trim() }
     fun String.looksLikeLink(): Boolean {
         val schemeEnd = indexOf("://")
@@ -312,6 +341,24 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
             }.onFailure {
                 Logs.w(it)
             }
+        } else if (startsWith("wg://", ignoreCase = true) ||
+            startsWith("wireguard://", ignoreCase = true)
+        ) {
+            Logs.d("Try parse WireGuard link")
+            runCatching {
+                entities.add(parseThroneWireGuardUri(this))
+            }.onFailure {
+                Logs.w(it)
+            }
+        } else if (startsWith("amneziawg://", ignoreCase = true) ||
+            startsWith("awg://", ignoreCase = true)
+        ) {
+            Logs.d("Try parse AmneziaWG link")
+            runCatching {
+                entities.addAll(parseAmneziaWGUri(this))
+            }.onFailure {
+                Logs.w(it)
+            }
         } else if (startsWith("vpn://")) {
             Logs.d("Try parse AmneziaVPN vpn:// link: $this")
             runCatching {
@@ -347,7 +394,11 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
             }
         }
     }
-    return if (entities.size > entitiesByLine.size) entities else entitiesByLine
+    val parsed = if (entities.size > entitiesByLine.size) entities else entitiesByLine
+    val seenAmnezia = mutableSetOf<String>()
+    return parsed.filter { bean ->
+        bean !is AmneziaWGBean || seenAmnezia.add(bean.hash)
+    }
 }
 
 /**
@@ -456,9 +507,11 @@ private fun parseAmneziaWireGuardContainer(wgConfig: JSONObject): List<WireGuard
 }
 
 private fun parseAmneziaAwgLastConfig(lastConfig: String): List<AmneziaWGBean> {
-    val config = runCatching {
-        val lc = JSONObject(lastConfig)
-        val interfaceIni = lc.optString("config").takeIf { it.isNotBlank() } ?: return emptyList()
+    val lastConfigJson = runCatching { JSONObject(lastConfig) }.getOrNull()
+    val config = lastConfigJson?.let { lc ->
+        val nativeConfig = lc.optString("config").takeIf { it.isNotBlank() } ?: return emptyList()
+        val peerSection = Regex("(?im)^\\s*\\[Peer]\\s*$").find(nativeConfig)
+        val interfaceIni = peerSection?.let { nativeConfig.substring(0, it.range.first) } ?: nativeConfig
         val hostName = lc.optString("hostName").takeIf { it.isNotBlank() } ?: return emptyList()
         val port = lc.optString("port").takeIf { it.isNotBlank() } ?: return emptyList()
         val serverPubKey = lc.optString("server_pub_key").takeIf { it.isNotBlank() } ?: return emptyList()
@@ -480,11 +533,17 @@ private fun parseAmneziaAwgLastConfig(lastConfig: String): List<AmneziaWGBean> {
             append("AllowedIPs = $allowedIps\n")
             if (keepAlive.isNotBlank()) append("PersistentKeepalive = $keepAlive\n")
         }
-    }.getOrDefault(lastConfig)
+    } ?: lastConfig
 
     return runCatching { RawUpdater.parseAmneziaWG(config) }.getOrElse {
         Logs.w(it)
         emptyList()
+    }.onEach { bean ->
+        lastConfigJson?.let { json ->
+            bean.applyAmneziaWG3Options { key ->
+                json.optString(key).takeIf(String::isNotBlank)
+            }
+        }
     }
 }
 

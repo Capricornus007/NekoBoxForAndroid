@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/sagernet/sing-box/adapter"
+	"github.com/sagernet/sing-box/adapter/certificate"
 	"github.com/sagernet/sing-box/adapter/endpoint"
 	"github.com/sagernet/sing-box/adapter/inbound"
 	"github.com/sagernet/sing-box/adapter/outbound"
@@ -13,6 +14,7 @@ import (
 	"github.com/sagernet/sing-box/dns/transport/fakeip"
 	"github.com/sagernet/sing-box/dns/transport/hosts"
 	"github.com/sagernet/sing-box/dns/transport/local"
+	"github.com/sagernet/sing-box/dns/transport/mdns"
 	"github.com/sagernet/sing-box/dns/transport/quic"
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
@@ -27,6 +29,8 @@ import (
 	"github.com/sagernet/sing-box/protocol/hysteria2"
 	"github.com/sagernet/sing-box/protocol/mieru"
 	"github.com/sagernet/sing-box/protocol/mixed"
+	"github.com/sagernet/sing-box/protocol/openconnect"
+	"github.com/sagernet/sing-box/protocol/openvpn"
 	"github.com/sagernet/sing-box/protocol/redirect"
 	"github.com/sagernet/sing-box/protocol/shadowsocks"
 	"github.com/sagernet/sing-box/protocol/shadowsocksr"
@@ -114,6 +118,8 @@ func nekoboxAndroidEndpointRegistry() *endpoint.Registry {
 	wireguard.RegisterEndpoint(registry)
 	awg.RegisterEndpoint(registry)
 	tailscale.RegisterEndpoint(registry)
+	openvpn.RegisterEndpoint(registry)
+	openconnect.RegisterEndpoint(registry)
 
 	return registry
 }
@@ -132,7 +138,10 @@ func nekoboxAndroidDNSTransportRegistry(localTransport LocalDNSTransport) *dns.T
 
 	quic.RegisterTransport(registry)
 	quic.RegisterHTTP3Transport(registry)
+	mdns.RegisterTransport(registry)
 	tailscale.RegistryTransport(registry)
+	openvpn.RegisterDNSTransport(registry)
+	openconnect.RegisterDNSTransport(registry)
 
 	if localTransport == nil {
 		local.RegisterTransport(registry)
@@ -149,4 +158,8 @@ func nekoboxAndroidServiceRegistry() *service.Registry {
 	registry := service.NewRegistry()
 
 	return registry
+}
+
+func nekoboxAndroidCertificateProviderRegistry() *certificate.Registry {
+	return certificate.NewRegistry()
 }

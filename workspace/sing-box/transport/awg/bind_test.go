@@ -36,6 +36,20 @@ type reconnectDialer struct {
 	dialCount int
 }
 
+type contextDialer struct {
+	conn    net.Conn
+	dialCtx context.Context
+}
+
+func (d *contextDialer) DialContext(ctx context.Context, _ string, _ M.Socksaddr) (net.Conn, error) {
+	d.dialCtx = ctx
+	return d.conn, nil
+}
+
+func (d *contextDialer) ListenPacket(context.Context, M.Socksaddr) (net.PacketConn, error) {
+	return nil, errors.New("unexpected packet listener")
+}
+
 func (d *reconnectDialer) DialContext(context.Context, string, M.Socksaddr) (net.Conn, error) {
 	d.dialCount++
 	var writeErr error
@@ -249,6 +263,34 @@ func TestConnectedBindUsesPeerEndpointForReceivedPacket(t *testing.T) {
 	}
 	if sourceEndpoint := M.SocksaddrFromNet(source).AddrPort(); sourceEndpoint != peerEndpoint {
 		t.Fatalf("received source mismatch: got %v, want %v", sourceEndpoint, peerEndpoint)
+	}
+}
+
+func TestConnectedBindKeepsSuccessfulDialContextAlive(t *testing.T) {
+	peerEndpoint := netip.MustParseAddrPort("192.0.2.1:51820")
+	dialer := &contextDialer{conn: &fakeConn{
+		remoteAddr: &net.UDPAddr{
+			IP:   peerEndpoint.Addr().AsSlice(),
+			Port: int(peerEndpoint.Port()),
+		},
+	}}
+	bind := newBind(t.Context(), logger.NOP(), dialer, false, peerEndpoint, [3]uint8{}, nil)
+	if _, _, err := bind.Open(0); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-dialer.dialCtx.Done():
+		t.Fatalf("successful dial context was canceled: %v", context.Cause(dialer.dialCtx))
+	default:
+	}
+
+	if err := bind.Close(); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-dialer.dialCtx.Done():
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("dial context was not canceled after the bind closed")
 	}
 }
 

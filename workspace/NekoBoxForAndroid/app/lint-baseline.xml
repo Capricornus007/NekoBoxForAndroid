@@ -112,50 +112,6 @@
     </issue>
 
     <issue
-        id="NewApi"
-        message="Call requires API level 24 (current min is 23): `android.os.UserManager#isUserUnlocked`"
-        errorLine1="                userUnlocked = SagerNet.user.isUserUnlocked,"
-        errorLine2="                                             ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/nekohasekai/sagernet/BootReceiver.kt"
-            line="40"
-            column="46"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 26 (current min is 23): `java.util.Base64#getUrlEncoder`"
-        errorLine1="        certChainHash.length == 64 -> Base64.getUrlEncoder()"
-        errorLine2="                                             ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/nekohasekai/sagernet/fmt/juicity/JuicityFmt.kt"
-            line="89"
-            column="46"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 26 (current min is 23): `java.util.Base64.Encoder#encodeToString`"
-        errorLine1="            .encodeToString(certChainHash.chunked(2).map { chunk -> chunk.toInt(16).toByte() }.toByteArray())"
-        errorLine2="             ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/io/nekohasekai/sagernet/fmt/juicity/JuicityFmt.kt"
-            line="90"
-            column="14"/>
-    </issue>
-
-    <issue
-        id="NewApi"
-        message="Call requires API level 29 (current min is 23): `android.net.LinkProperties#getMtu`"
-        errorLine1="            put(&quot;mtu&quot;, networkInterface?.mtu ?: linkProperties.mtu)"
-        errorLine2="                                                               ~~~">
-        <location
-            file="src/main/java/moe/matsuri/nb4a/NativeInterface.kt"
-            line="339"
-            column="64"/>
-    </issue>
-
-    <issue
         id="DefaultUncaughtExceptionDelegation"
         message="Must call `getDefaultUncaughtExceptionHandler()` to get the existing handler, and call `existingHandler.uncaughtException(thread, throwable)` from your new handler"
         errorLine1="        Thread.setDefaultUncaughtExceptionHandler(CrashHandler)"
@@ -432,8 +388,8 @@
 
     <issue
         id="NewerVersionAvailable"
-        message="A newer version of com.blacksquircle.ui:editorkit than 2.6.0 is available: 2.9.0"
-        errorLine1="    implementation(&quot;com.blacksquircle.ui:editorkit:2.6.0&quot;)"
+        message="A newer version of com.blacksquircle.ui:editorkit than 2.2.0 is available: 2.9.0"
+        errorLine1="    implementation(&quot;com.blacksquircle.ui:editorkit:2.2.0&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle.kts"
@@ -443,8 +399,8 @@
 
     <issue
         id="NewerVersionAvailable"
-        message="A newer version of com.blacksquircle.ui:language-base than 2.6.0 is available: 2.9.0"
-        errorLine1="    implementation(&quot;com.blacksquircle.ui:language-base:2.6.0&quot;)"
+        message="A newer version of com.blacksquircle.ui:language-base than 2.2.0 is available: 2.9.0"
+        errorLine1="    implementation(&quot;com.blacksquircle.ui:language-base:2.2.0&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle.kts"
@@ -454,8 +410,8 @@
 
     <issue
         id="NewerVersionAvailable"
-        message="A newer version of com.blacksquircle.ui:language-json than 2.6.0 is available: 2.9.0"
-        errorLine1="    implementation(&quot;com.blacksquircle.ui:language-json:2.6.0&quot;)"
+        message="A newer version of com.blacksquircle.ui:language-json than 2.2.0 is available: 2.9.0"
+        errorLine1="    implementation(&quot;com.blacksquircle.ui:language-json:2.2.0&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="build.gradle.kts"

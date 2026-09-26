@@ -15,11 +15,16 @@ class AndroidTunPayloadTest {
         autoRoute: Boolean = true,
         v4: String? = "172.19.0.1/30",
         v6: String? = "fdfe:dcba:9876::1/126",
-        v4Dns: String? = if (v4 != null) "172.19.0.2" else null,
-        v6Dns: String? = if (v6 != null) "fdfe:dcba:9876::2" else null,
+        dnsMode: String = "hijack",
+        dnsServers: List<String> =
+            listOfNotNull(
+                if (v4 != null) "172.19.0.2" else null,
+                if (v6 != null) "fdfe:dcba:9876::2" else null,
+            ),
         v4Routes: List<String> = if (v4 != null) listOf("0.0.0.0/0") else emptyList(),
         v6Routes: List<String> = if (v6 != null) listOf("::/0") else emptyList(),
-    ): AndroidTunPayload = AndroidTunPayload(version, mtu, autoRoute, v4, v6, v4Dns, v6Dns, v4Routes, v6Routes)
+    ): AndroidTunPayload =
+        AndroidTunPayload(version, mtu, autoRoute, v4, v6, dnsMode, dnsServers, v4Routes, v6Routes)
 
     private fun assertInvalid(block: () -> Unit) {
         try {
@@ -37,8 +42,8 @@ class AndroidTunPayloadTest {
         assertTrue(plan.autoRoute)
         assertEquals(Cidr("172.19.0.1", 30), plan.inet4Address)
         assertEquals(Cidr("fdfe:dcba:9876::1", 126), plan.inet6Address)
-        assertEquals("172.19.0.2", plan.inet4DnsServer)
-        assertEquals("fdfe:dcba:9876::2", plan.inet6DnsServer)
+        assertEquals("hijack", plan.dnsMode)
+        assertEquals(listOf("172.19.0.2", "fdfe:dcba:9876::2"), plan.dnsServers)
         assertEquals(listOf(Cidr("0.0.0.0", 0)), plan.inet4Routes)
         assertEquals(listOf(Cidr("::", 0)), plan.inet6Routes)
     }
@@ -48,7 +53,7 @@ class AndroidTunPayloadTest {
         val plan = payload(v6 = null).validate()
         assertEquals(Cidr("172.19.0.1", 30), plan.inet4Address)
         assertNull(plan.inet6Address)
-        assertNull(plan.inet6DnsServer)
+        assertEquals(listOf("172.19.0.2"), plan.dnsServers)
         assertEquals(listOf(Cidr("0.0.0.0", 0)), plan.inet4Routes)
         assertTrue(plan.inet6Routes.isEmpty())
     }
@@ -58,7 +63,7 @@ class AndroidTunPayloadTest {
         val plan = payload(v4 = null).validate()
         assertEquals(Cidr("fdfe:dcba:9876::1", 126), plan.inet6Address)
         assertNull(plan.inet4Address)
-        assertNull(plan.inet4DnsServer)
+        assertEquals(listOf("fdfe:dcba:9876::2"), plan.dnsServers)
         assertEquals(listOf(Cidr("::", 0)), plan.inet6Routes)
         assertTrue(plan.inet4Routes.isEmpty())
     }
@@ -121,18 +126,31 @@ class AndroidTunPayloadTest {
     }
 
     @Test
-    fun dnsMustMatchDeclaredFamily() {
-        // address declared without DNS server
-        assertInvalid { payload(v4Dns = null).validate() }
-        // DNS server declared without address family
-        assertInvalid { payload(v4 = null, v4Dns = "172.19.0.2").validate() }
-        // DNS server of wrong family
-        assertInvalid { payload(v4Dns = "fdfe:dcba:9876::2").validate() }
+    fun dnsModeAndServersMustAgree() {
+        assertInvalid { payload(dnsServers = emptyList()).validate() }
+        assertInvalid { payload(dnsMode = "disabled").validate() }
+        assertInvalid { payload(dnsMode = "invalid").validate() }
+        assertInvalid { payload(v4 = null, dnsServers = listOf("172.19.0.2")).validate() }
+        assertInvalid { payload(v6 = null, dnsServers = listOf("fdfe:dcba:9876::2")).validate() }
+        assertInvalid { payload(dnsServers = listOf("not-an-ip")).validate() }
+    }
+
+    @Test
+    fun disabledDnsAllowsNoServers() {
+        val plan = payload(dnsMode = "disabled", dnsServers = emptyList()).validate()
+        assertEquals("disabled", plan.dnsMode)
+        assertTrue(plan.dnsServers.isEmpty())
+    }
+
+    @Test
+    fun multipleDnsServersArePreserved() {
+        val servers = listOf("172.19.0.2", "172.19.0.3", "fdfe:dcba:9876::2")
+        assertEquals(servers, payload(dnsServers = servers).validate().dnsServers)
     }
 
     @Test
     fun unsupportedVersionIsRejected() {
-        assertInvalid { payload(version = 2).validate() }
+        assertInvalid { payload(version = 1).validate() }
         assertInvalid { payload(version = 0).validate() }
     }
 
@@ -142,20 +160,20 @@ class AndroidTunPayloadTest {
         val json =
             """
             {
-              "version": 1,
+              "version": 2,
               "mtu": 9000,
               "auto_route": true,
               "inet4_address": "172.19.0.1/30",
               "inet6_address": "fdfe:dcba:9876::1/126",
-              "inet4_dns_server": "172.19.0.2",
-              "inet6_dns_server": "fdfe:dcba:9876::2",
+              "dns_mode": "hijack",
+              "dns_servers": ["172.19.0.2", "fdfe:dcba:9876::2"],
               "inet4_routes": ["0.0.0.0/0"],
               "inet6_routes": ["::/0"]
             }
             """.trimIndent()
         val plan: Plan = AndroidTunPayload.parse(json)
         assertEquals(Cidr("172.19.0.1", 30), plan.inet4Address)
-        assertEquals("172.19.0.2", plan.inet4DnsServer)
+        assertEquals(listOf("172.19.0.2", "fdfe:dcba:9876::2"), plan.dnsServers)
     }
 
     @Test

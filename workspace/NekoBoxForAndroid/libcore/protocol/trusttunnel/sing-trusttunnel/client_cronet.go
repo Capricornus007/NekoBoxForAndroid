@@ -18,12 +18,13 @@ import (
 
 	"github.com/sagernet/cronet-go"
 	_ "github.com/sagernet/cronet-go/all"
-	"github.com/sagernet/sing-box/common/cronetbidistream"
 	"github.com/sagernet/sing/common/bufio"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
+
+	"libcore/protocol/trusttunnel/sing-trusttunnel/internal/cronetbidistream"
 )
 
 const cronetCloseTimeout = 5 * time.Second
@@ -291,7 +292,7 @@ func (c *Client) newCronetRoundTripper(options ClientOptions, quic bool) (RoundT
 	}
 
 	params := cronet.NewEngineParams()
-	params.SetUserAgent(TCPUserAgent)
+	params.SetUserAgent(c.userAgents.TCPUserAgent)
 
 	if quic && options.ForceQUIC {
 		params.SetEnableHTTP2(false)
@@ -310,7 +311,7 @@ func (c *Client) newCronetRoundTripper(options ClientOptions, quic bool) (RoundT
 		}
 	}
 	if quic {
-		if err := params.SetQUICOptions(cronetCongestionControl(options.QUICCongestionControl), DefaultQuicMaxStreamWindow, DefaultQuicConnectionWindow); err != nil {
+		if err := params.SetQUICOptions("", cronetCongestionControl(options.QUICCongestionControl), DefaultQuicMaxStreamWindow, DefaultQuicConnectionWindow); err != nil {
 			params.Destroy()
 			cancel()
 			engine.Destroy()
@@ -401,11 +402,11 @@ func (t *cronetRoundTripper) tcpDialer(ctx context.Context, c *Client) cronet.Di
 }
 
 func (t *cronetRoundTripper) udpDialer(ctx context.Context, c *Client) cronet.UDPDialer {
-	return func(address string, port uint16) (int, string, uint16) {
+	return func(address string, port uint16) (int, string, uint16, func()) {
 		destination := M.ParseSocksaddrHostPort(address, port)
 		conn, err := c.detour.DialContext(ctx, N.NetworkUDP, destination)
 		if err != nil {
-			return cronetNetError(err).Code(), "", 0
+			return cronetNetError(err).Code(), "", 0, nil
 		}
 		localAddr := M.SocksaddrFromNet(conn.LocalAddr())
 		var localAddress string
@@ -418,13 +419,13 @@ func (t *cronetRoundTripper) udpDialer(ctx context.Context, c *Client) cronet.UD
 			fd, duplicateErr := dupSocketFD(udpConn)
 			if duplicateErr == nil {
 				conn.Close()
-				return fd, localAddress, localPort
+				return fd, localAddress, localPort, nil
 			}
 		}
 		fd, pipeConn, err := createPacketSocketPair(false)
 		if err != nil {
 			conn.Close()
-			return cronet.NetErrorConnectionFailed.Code(), "", 0
+			return cronet.NetErrorConnectionFailed.Code(), "", 0, nil
 		}
 		remoteAddress := M.SocksaddrFromNet(conn.RemoteAddr())
 		packetConn := bufio.NewUnbindPacketConn(conn)
@@ -432,15 +433,17 @@ func (t *cronetRoundTripper) udpDialer(ctx context.Context, c *Client) cronet.UD
 		releaseConn := t.tracker.addCloser(conn)
 		releasePipeConn := t.tracker.addCloser(pipeConn)
 		doneWaiter := t.tracker.addWaiter()
+		relayContext, relayCancel := context.WithCancel(ctx)
 		go func() {
 			defer doneWaiter()
 			defer releaseConn()
 			defer releasePipeConn()
-			if err := bufio.CopyPacketConn(ctx, packetConn, pipePacketConn); shouldRecoverCronetBridgeRoundTripper(err) && !t.closedForRecovery() {
+			defer relayCancel()
+			if err := bufio.CopyPacketConn(relayContext, packetConn, pipePacketConn); shouldRecoverCronetBridgeRoundTripper(err) && !t.closedForRecovery() {
 				c.scheduleRoundTripperRecoveryNow(t)
 			}
 		}()
-		return fd, localAddress, localPort
+		return fd, localAddress, localPort, relayCancel
 	}
 }
 

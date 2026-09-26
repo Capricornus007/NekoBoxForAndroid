@@ -61,6 +61,14 @@ type routingRuleCachePlan struct {
 // inline SRS-decoded rules. The returned bool reports whether a source geo
 // resource was opened, which lets the caller promptly release transient heap.
 func prepareRoutingRuleSets(options *option.Options) (bool, error) {
+	return prepareRoutingRuleSetsWithPaths(
+		options,
+		externalAssetsPath,
+		filepath.Join(tempPath, routingRulesCacheFileName),
+	)
+}
+
+func prepareRoutingRuleSetsWithPaths(options *option.Options, assetsPath string, cachePath string) (bool, error) {
 	referencedTags := make(map[string]struct{})
 	if options.Route != nil {
 		collectRouteRuleSetReferences(options.Route.Rules, referencedTags)
@@ -73,10 +81,12 @@ func prepareRoutingRuleSets(options *option.Options) (bool, error) {
 	if options.Route != nil {
 		definitions = make(map[string]option.RuleSet, len(options.Route.RuleSet))
 		for _, definition := range options.Route.RuleSet {
-			if _, exists := definitions[definition.Tag]; exists {
-				return false, fmt.Errorf("duplicate rule-set tag: %s", definition.Tag)
+			for _, tag := range definition.Tag {
+				if _, exists := definitions[tag]; exists {
+					return false, fmt.Errorf("duplicate rule-set tag: %s", tag)
+				}
+				definitions[tag] = definition
 			}
-			definitions[definition.Tag] = definition
 		}
 	}
 
@@ -96,7 +106,7 @@ func prepareRoutingRuleSets(options *option.Options) (bool, error) {
 			}
 			definition = option.RuleSet{
 				Type:         C.RuleSetTypeLocal,
-				Tag:          tag,
+				Tag:          []string{tag},
 				Format:       C.RuleSetFormatBinary,
 				LocalOptions: option.LocalRuleSet{Path: tag},
 			}
@@ -106,7 +116,8 @@ func prepareRoutingRuleSets(options *option.Options) (bool, error) {
 		if definition.Type != C.RuleSetTypeLocal {
 			continue
 		}
-		kind, key, loaded := parseRoutingRuleKey(definition.LocalOptions.Path)
+		path := strings.ReplaceAll(definition.LocalOptions.Path, C.RuleSetTagPlaceholder, tag)
+		kind, key, loaded := parseRoutingRuleKey(path)
 		if loaded {
 			requests[kind][key] = struct{}{}
 		}
@@ -115,30 +126,45 @@ func prepareRoutingRuleSets(options *option.Options) (bool, error) {
 		return false, nil
 	}
 
-	prepared, loadedFromResource, err := loadPreparedRoutingRules(requests)
+	prepared, loadedFromResource, err := loadPreparedRoutingRules(requests, assetsPath, cachePath)
 	if err != nil {
 		return loadedFromResource, err
 	}
 
 	ruleSets := make([]option.RuleSet, 0, len(options.Route.RuleSet))
 	for _, definition := range options.Route.RuleSet {
-		kind, key, pseudo := parseRoutingRuleKey(definition.LocalOptions.Path)
-		if definition.Type != C.RuleSetTypeLocal || !pseudo {
+		if definition.Type != C.RuleSetTypeLocal {
 			ruleSets = append(ruleSets, definition)
 			continue
 		}
-		if _, referenced := referencedTags[definition.Tag]; !referenced {
-			continue
+
+		var retainedTags []string
+		for _, tag := range definition.Tag {
+			path := strings.ReplaceAll(definition.LocalOptions.Path, C.RuleSetTagPlaceholder, tag)
+			kind, key, pseudo := parseRoutingRuleKey(path)
+			if !pseudo {
+				retainedTags = append(retainedTags, tag)
+				continue
+			}
+			if _, referenced := referencedTags[tag]; !referenced {
+				continue
+			}
+			rules, loaded := prepared[kind][key]
+			if !loaded {
+				return loadedFromResource, fmt.Errorf("routing rule %s was not prepared", key)
+			}
+			inlineDefinition := definition
+			inlineDefinition.Type = C.RuleSetTypeInline
+			inlineDefinition.Tag = []string{tag}
+			inlineDefinition.Format = ""
+			inlineDefinition.LocalOptions = option.LocalRuleSet{}
+			inlineDefinition.InlineOptions = option.PlainRuleSet{Rules: rules}
+			ruleSets = append(ruleSets, inlineDefinition)
 		}
-		rules, loaded := prepared[kind][key]
-		if !loaded {
-			return loadedFromResource, fmt.Errorf("routing rule %s was not prepared", key)
+		if len(retainedTags) > 0 {
+			definition.Tag = retainedTags
+			ruleSets = append(ruleSets, definition)
 		}
-		definition.Type = C.RuleSetTypeInline
-		definition.Format = ""
-		definition.LocalOptions = option.LocalRuleSet{}
-		definition.InlineOptions = option.PlainRuleSet{Rules: rules}
-		ruleSets = append(ruleSets, definition)
 	}
 	options.Route.RuleSet = ruleSets
 	return loadedFromResource, nil
@@ -182,7 +208,11 @@ func parseRoutingRuleKey(path string) (routingRuleKind, string, bool) {
 	return 0, "", false
 }
 
-func loadPreparedRoutingRules(requests routingRuleRequests) (map[routingRuleKind]map[string][]option.HeadlessRule, bool, error) {
+func loadPreparedRoutingRules(
+	requests routingRuleRequests,
+	assetsPath string,
+	cachePath string,
+) (map[routingRuleKind]map[string][]option.HeadlessRule, bool, error) {
 	routingRulesCacheAccess.Lock()
 	defer routingRulesCacheAccess.Unlock()
 
@@ -191,13 +221,15 @@ func loadPreparedRoutingRules(requests routingRuleRequests) (map[routingRuleKind
 		routingRuleGeosite: make(map[string][]option.HeadlessRule),
 	}
 	versions := map[routingRuleKind]string{
-		routingRuleGeoIP:   readRoutingRuleVersion(geoipVersion),
-		routingRuleGeosite: readRoutingRuleVersion(geositeVersion),
+		routingRuleGeoIP:   readRoutingRuleVersion(assetsPath, geoipVersion),
+		routingRuleGeosite: readRoutingRuleVersion(assetsPath, geositeVersion),
 	}
 	lookups := map[routingRuleKind]routingRuleCacheLookup{}
-	cachePath := filepath.Join(tempPath, routingRulesCacheFileName)
 	cacheEnabled := isBgProcess
 	if cacheEnabled {
+		if err := os.MkdirAll(filepath.Dir(cachePath), 0o755); err != nil {
+			return nil, false, err
+		}
 		_ = os.Remove(filepath.Join(tempPath, routingRulesCompactFileName))
 		var err error
 		lookups, err = readRoutingRulesCache(cachePath, versions, requests)
@@ -237,7 +269,7 @@ func loadPreparedRoutingRules(requests routingRuleRequests) (map[routingRuleKind
 			plans[kind] = plan
 			continue
 		}
-		rules, err := loadRoutingRulesFromResource(kind, requested)
+		rules, err := loadRoutingRulesFromResource(kind, requested, assetsPath)
 		if err != nil {
 			return nil, loadedFromResource, err
 		}
@@ -263,8 +295,8 @@ func loadPreparedRoutingRules(requests routingRuleRequests) (map[routingRuleKind
 	return prepared, loadedFromResource, nil
 }
 
-func readRoutingRuleVersion(name string) string {
-	content, err := os.ReadFile(filepath.Join(externalAssetsPath, name))
+func readRoutingRuleVersion(assetsPath string, name string) string {
+	content, err := os.ReadFile(filepath.Join(assetsPath, name))
 	if err != nil {
 		return ""
 	}
@@ -327,7 +359,11 @@ func readRoutingRulesCache(path string, versions map[routingRuleKind]string, req
 	return lookups, errors.Join(err, database.Close())
 }
 
-func loadRoutingRulesFromResource(kind routingRuleKind, requested map[string]struct{}) (map[string][]option.HeadlessRule, error) {
+func loadRoutingRulesFromResource(
+	kind routingRuleKind,
+	requested map[string]struct{},
+	assetsPath string,
+) (map[string][]option.HeadlessRule, error) {
 	keys := slices.Sorted(maps.Keys(requested))
 	codes := make([]string, 0, len(keys))
 	for _, key := range keys {
@@ -341,9 +377,9 @@ func loadRoutingRulesFromResource(kind routingRuleKind, requested map[string]str
 	)
 	switch kind {
 	case routingRuleGeoIP:
-		loaded, err = loadGeoIPRules(filepath.Join(externalAssetsPath, geoipDat), codes)
+		loaded, err = loadGeoIPRules(filepath.Join(assetsPath, geoipDat), codes)
 	case routingRuleGeosite:
-		loaded, err = loadGeositeRules(filepath.Join(externalAssetsPath, geositeDat), codes)
+		loaded, err = loadGeositeRules(filepath.Join(assetsPath, geositeDat), codes)
 	default:
 		return nil, fmt.Errorf("unknown routing rule kind: %d", kind)
 	}

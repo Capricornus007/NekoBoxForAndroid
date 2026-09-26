@@ -1,21 +1,24 @@
 package io.nekohasekai.sagernet.ui.profile
 
-import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.preference.EditTextPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.fmt.masterdns.MasterDnsVPNBean
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
+import io.nekohasekai.sagernet.ui.compose.MasterDnsVPNProfileSettingsScreen
+import io.nekohasekai.sagernet.ui.compose.showComposeItemDialog
 import moe.matsuri.nb4a.proxy.PreferenceBinding
 import moe.matsuri.nb4a.proxy.PreferenceBindingManager
 import moe.matsuri.nb4a.proxy.Type
 
 class MasterDnsVPNSettingsActivity : ProfileSettingsActivity<MasterDnsVPNBean>() {
+    override val usesComposePreferences = true
+
+    private var stateRevision by mutableIntStateOf(0)
 
     private val pbm = PreferenceBindingManager()
     private val additionalBindings = mutableListOf<PreferenceBinding>()
@@ -100,7 +103,7 @@ class MasterDnsVPNSettingsActivity : ProfileSettingsActivity<MasterDnsVPNBean>()
         if (uri != null) {
             val text = contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() } ?: return@registerForActivityResult
             DataStore.profileCacheStore.putString("resolvers", text)
-            (resolvers.preference as? EditTextPreference)?.text = text
+            stateRevision++
         }
     }
 
@@ -116,32 +119,16 @@ class MasterDnsVPNSettingsActivity : ProfileSettingsActivity<MasterDnsVPNBean>()
         initializeDefaultValues()
     }
 
-    override fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.masterdnsvpn_preferences)
-        pbm.setPreferenceFragment(this)
-        findPreference<Preference>("preset")!!.setOnPreferenceClickListener {
-            showPresetDialog()
-            true
-        }
-        findPreference<Preference>("importResolvers")!!.setOnPreferenceClickListener {
+    @Composable
+    override fun ComposePreferences() = MasterDnsVPNProfileSettingsScreen(
+        stateRevision = stateRevision,
+        onPreset = ::showPresetDialog,
+        onImportResolvers = {
             importResolvers.launch(arrayOf("text/*", "application/octet-stream", "*/*"))
-            true
-        }
-        resolvers.preference.summary = getString(R.string.masterdnsvpn_dns_resolvers_summary)
-        additionalBindings.forEach { binding ->
-            (binding.preference as? EditTextPreference)?.setOnBindEditTextListener(
-                if (binding.type == Type.TextToDouble) {
-                    EditTextPreferenceModifiers.Decimal
-                } else if (binding.type == Type.TextToInt) {
-                    EditTextPreferenceModifiers.Number
-                } else {
-                    EditTextPreferenceModifiers.Multiline
-                }
-            )
-        }
-    }
+        },
+    )
 
-    private fun PreferenceFragmentCompat.showPresetDialog() {
+    private fun showPresetDialog() {
         val values = arrayOf("stable", "mobile", "censored", "throughput")
         val labels = arrayOf(
             getString(R.string.masterdnsvpn_preset_default),
@@ -149,17 +136,18 @@ class MasterDnsVPNSettingsActivity : ProfileSettingsActivity<MasterDnsVPNBean>()
             getString(R.string.masterdnsvpn_preset_censored),
             getString(R.string.masterdnsvpn_preset_speed),
         )
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.masterdnsvpn_preset)
-            .setItems(labels) { _, which ->
+        showComposeItemDialog(
+            title = getText(R.string.masterdnsvpn_preset),
+            items = labels.toList(),
+            onItemSelected = { which ->
                 val bean = MasterDnsVPNBean().applyDefaultValues()
                 bean.applyPreset(values[which])
                 additionalBindings.forEach {
                     it.bean = bean
                     it.writeToCache()
-                    it.writeToPreference()
                 }
-            }
-            .show()
+                stateRevision++
+            },
+        )
     }
 }

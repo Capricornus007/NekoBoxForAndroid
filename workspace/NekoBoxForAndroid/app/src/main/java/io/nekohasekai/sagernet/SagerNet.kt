@@ -65,7 +65,12 @@ class SagerNet : Application(),
 
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler)
 
+        if (isMainProcess && isTv) {
+            AppIconManager.set(this, AppIcon.NEKOBOX_PLUS)
+        }
+
         if (isMainProcess || isBgProcess) {
+            clearCacheAfterAppUpdate()
             externalAssets.mkdirs()
             Seq.setContext(this)
             val logLevel = AppLogLevelController.initialize(DataStore.logLevel)
@@ -132,6 +137,24 @@ class SagerNet : Application(),
                     .penaltyLog()
                     .build()
             )
+        }
+    }
+
+    private fun clearCacheAfterAppUpdate() {
+        runCatching {
+            val currentVersionCode = BuildConfig.VERSION_CODE
+            if (!AppVersionCachePolicy.shouldClearCache(
+                    DataStore.lastStartedVersionCode,
+                    currentVersionCode,
+                )
+            ) {
+                return
+            }
+
+            DataStore.lastStartedVersionCode = currentVersionCode
+            AppCache.clear(cacheDir)
+        }.onFailure {
+            Logs.w("Unable to clear app cache after version change: ${it.message}")
         }
     }
 
@@ -297,6 +320,15 @@ class SagerNet : Application(),
                 Intent(Action.CLOSE)
                     .setPackage(application.packageName)
                     .putExtra(Action.EXTRA_REQUEST_ID, SystemClock.elapsedRealtimeNanos())
+            )
+        }
+
+        fun updateNotificationCountryIndicator(enabled: Boolean) {
+            application.sendBroadcast(
+                Intent(Action.UPDATE_NOTIFICATION_COUNTRY_INDICATOR)
+                    .setPackage(application.packageName)
+                    .putExtra(Action.EXTRA_REQUEST_ID, SystemClock.elapsedRealtimeNanos())
+                    .putExtra(Action.EXTRA_NOTIFICATION_COUNTRY_INDICATOR_ENABLED, enabled)
             )
         }
 

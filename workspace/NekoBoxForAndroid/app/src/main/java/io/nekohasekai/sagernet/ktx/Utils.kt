@@ -20,6 +20,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
@@ -32,14 +33,13 @@ import com.jakewharton.processphoenix.ProcessPhoenix
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
+import io.nekohasekai.sagernet.app.AppGraph
 import io.nekohasekai.sagernet.aidl.ISagerNetService
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.SagerConnection
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ui.MainActivity
 import io.nekohasekai.sagernet.ui.ThemedActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -90,9 +90,13 @@ val FileDescriptor.int get() = getInt.invoke(this) as Int
 suspend fun <T> HttpURLConnection.useCancellable(block: suspend HttpURLConnection.() -> T): T {
     return suspendCancellableCoroutine { cont ->
         cont.invokeOnCancellation {
-            if (Build.VERSION.SDK_INT >= 26) disconnect() else GlobalScope.launch(Dispatchers.IO) { disconnect() }
+            if (Build.VERSION.SDK_INT >= 26) {
+                disconnect()
+            } else {
+                AppGraph.applicationScope.launch(AppGraph.dispatchers.io) { disconnect() }
+            }
         }
-        GlobalScope.launch(Dispatchers.IO) {
+        AppGraph.applicationScope.launch(AppGraph.dispatchers.io) {
             try {
                 cont.resume(block())
             } catch (e: Throwable) {
@@ -175,10 +179,13 @@ fun String.unUrlSafe(): String {
 }
 
 fun RecyclerView.scrollTo(index: Int, force: Boolean = false) {
-    if (force) post {
-        scrollToPosition(index)
+    fun isTargetFullyVisible(): Boolean {
+        val manager = layoutManager ?: return false
+        val target = manager.findViewByPosition(index) ?: return false
+        return manager.isViewPartiallyVisible(target, true, true)
     }
-    postDelayed({
+
+    fun smoothScrollToTarget() {
         try {
             layoutManager?.startSmoothScroll(object : LinearSmoothScroller(context) {
                 init {
@@ -191,7 +198,20 @@ fun RecyclerView.scrollTo(index: Int, force: Boolean = false) {
             })
         } catch (ignored: IllegalArgumentException) {
         }
-    }, 300L)
+    }
+
+    doOnLayout {
+        if (isTargetFullyVisible()) return@doOnLayout
+
+        if (force) {
+            scrollToPosition(index)
+            postDelayed(::smoothScrollToTarget, 300L)
+        } else {
+            postDelayed({
+                if (!isTargetFullyVisible()) smoothScrollToTarget()
+            }, 300L)
+        }
+    }
 }
 
 val app get() = SagerNet.application

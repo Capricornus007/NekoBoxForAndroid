@@ -85,6 +85,7 @@ fun SingBoxOptions.DNSRule_DefaultOptions.checkEmpty(): Boolean {
     if (package_name?.isNotEmpty() == true) return false
     if (package_name_regex?.isNotEmpty() == true) return false
     if (outbound?.isNotEmpty() == true) return false
+    if (preferred_by?.isNotEmpty() == true) return false
     if (user_id?.isNotEmpty() == true) return false
     if (!clash_mode.isNullOrBlank()) return false
     if (!action.isNullOrBlank()) return false
@@ -228,7 +229,7 @@ fun generateRemoteRuleSet(url: String, ruleSets: MutableList<RuleSet>, updateInt
         this.tag = tag
         this.format = format
         this.url = url
-        download_detour = mainProxyTag
+        http_client = "ruleset-download"
         update_interval = updateInterval
     })
     

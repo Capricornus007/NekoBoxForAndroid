@@ -40,7 +40,7 @@ func RegisterOutbound(registry *outbound.Registry) {
 	outbound.Register[option.MASQUEOutboundOptions](registry, C.TypeMASQUE, NewOutbound)
 }
 
-var _ adapter.DirectRouteOutbound = (*Outbound)(nil)
+var _ adapter.FlowOutbound = (*Outbound)(nil)
 
 type Outbound struct {
 	outbound.Adapter
@@ -173,17 +173,23 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
 			fail(err)
 			return
 		}
+		addresses, err := parseMASQUEAddresses(appConfig)
+		if err != nil {
+			fail(err)
+			return
+		}
 		tunnel, err := masque.NewTunnel(ctx, logger, masque.TunnelOptions{
 			System: options.System,
 			Name:   options.Name,
 			CreateDialer: func(interfaceName string) N.Dialer {
-				return common.Must1(dialer.NewDefault(ctx, option.DialerOptions{BindInterface: interfaceName}))
+				return common.Must1(dialer.NewDefault(ctx, option.DialerOptions{
+					AbstractDialerOptions: option.AbstractDialerOptions{
+						BindInterface: interfaceName,
+					},
+				}))
 			},
-			Dialer: outboundDialer,
-			Address: []netip.Prefix{
-				netip.MustParsePrefix(appConfig.IPv4 + "/32"),
-				netip.MustParsePrefix(appConfig.IPv6 + "/128"),
-			},
+			Dialer:                  outboundDialer,
+			Address:                 addresses,
 			AllowedAddress:          options.AllowedIPs,
 			H3Endpoint:              h3Endpoint,
 			H2Endpoint:              h2Endpoint,
@@ -211,6 +217,25 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
 		}
 	}
 	return outbound, nil
+}
+
+func parseMASQUEAddresses(config *option.MASQUEConfig) ([]netip.Prefix, error) {
+	ipv4, err := netip.ParseAddr(config.IPv4)
+	if err != nil {
+		return nil, E.New("invalid MASQUE IPv4 address: ", err)
+	} else if !ipv4.Is4() {
+		return nil, E.New("invalid MASQUE IPv4 address: ", ipv4)
+	}
+	ipv6, err := netip.ParseAddr(config.IPv6)
+	if err != nil {
+		return nil, E.New("invalid MASQUE IPv6 address: ", err)
+	} else if !ipv6.Is6() || ipv6.Is4In6() {
+		return nil, E.New("invalid MASQUE IPv6 address: ", ipv6)
+	}
+	return []netip.Prefix{
+		netip.PrefixFrom(ipv4, 32),
+		netip.PrefixFrom(ipv6, 128),
+	}, nil
 }
 
 func resolveTransportOptions(options option.MASQUEOutboundOptions) (string, uint32, time.Duration, error) {
@@ -317,11 +342,35 @@ func (w *Outbound) ListenPacket(ctx context.Context, destination M.Socksaddr) (n
 	return packetConn, nil
 }
 
-func (w *Outbound) NewDirectRouteConnection(metadata adapter.InboundContext, routeContext tun.DirectRouteContext, timeout time.Duration) (tun.DirectRouteDestination, error) {
-	if err := w.isTunnelInitialized(w.ctx); err != nil {
-		return nil, err
+func (w *Outbound) PreMatchFlow(network string, destination netip.Addr) adapter.PreMatchAction {
+	select {
+	case <-w.await:
+		if w.tunnel != nil && destination.IsValid() {
+			return adapter.PreMatchFlow
+		}
+	default:
 	}
-	return w.tunnel.NewDirectRouteConnection(metadata, routeContext, timeout)
+	return adapter.PreMatchContinue
+}
+
+func (w *Outbound) PortAddresses() (netip.Addr, netip.Addr) {
+	return w.tunnel.PortAddresses()
+}
+
+func (w *Outbound) PortMTU() uint32 {
+	return w.tunnel.PortMTU()
+}
+
+func (w *Outbound) AttachReturn(returnPath tun.Return) error {
+	return w.tunnel.AttachReturn(returnPath)
+}
+
+func (w *Outbound) DetachReturn(returnPath tun.Return) error {
+	return w.tunnel.DetachReturn(returnPath)
+}
+
+func (w *Outbound) WritePackets(packets [][]byte) error {
+	return w.tunnel.WritePackets(packets)
 }
 
 func (w *Outbound) isTunnelInitialized(ctx context.Context) error {

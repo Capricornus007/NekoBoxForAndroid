@@ -25,10 +25,17 @@ object Key {
     const val APP_LANGUAGE = "appLanguage"
     const val CHANGE_ICON = "changeIcon"
     const val USE_TOOLBAR = "useToolbar"
+    const val TOOLBAR_LAYOUT = "toolbarLayout"
+    const val CONFIGURE_TOOLBAR_LAYOUT = "configureToolbarLayout"
     const val SHOW_PROFILE_COUNT_ON_TABS = "showProfileCountOnTabs"
+    const val PROFILE_COUNTRY_INDICATOR = "profileCountryIndicator"
+    const val NOTIFICATION_COUNTRY_INDICATOR = "notificationCountryIndicator"
+    const val TAB_DOUBLE_TAP_TO_NAVIGATE = "tabDoubleTapToNavigate"
+    const val SHORT_PROFILE_PROTOCOL_INFO = "shortProfileProtocolInfo"
     const val DONT_HIGHLIGHT_INSECURE_PROFILES = "dontHighlightInsecureProfiles"
     const val SHOW_BOTTOM_BAR_IN_SETTINGS = "showBottomBarInSettings"
     const val COMPACT_STATS_BAR = "compactStatsBar"
+    const val LEGACY_MAIN_VIEW = "legacyMainView"
     const val AUTOMATIC_CONNECTION_CHECK = "automaticConnectionCheck"
     const val ENABLE_GROUP_UPDATE_DIALOG = "enableGroupUpdateDialog"
     const val OPEN_GROUP_SETTINGS_ON_LONG_PRESS = "openGroupSettingsOnLongPress"
@@ -39,6 +46,7 @@ object Key {
     const val CERT_PROVIDER = "certProvider"
     const val GLOBAL_CUSTOM_CONFIG = "globalCustomConfig"
     const val PREVIEW_SING_BOX_CONFIG = "previewSingBoxConfig"
+    const val KILL_BACKGROUND_PROCESS = "killBackgroundProcess"
 
     const val REMOTE_DNS = "remoteDns"
     const val REMOTE_DNS_DEADLINE = "remoteDnsDeadline"
@@ -49,6 +57,10 @@ object Key {
     const val DNS_DISABLE_CACHE = "dnsDisableCache"
     const val DNS_DISABLE_EXPIRE = "dnsDisableExpire"
     const val DNS_CACHE_CAPACITY = "dnsCacheCapacity"
+    const val DNS_TIMEOUT = "dnsTimeout"
+    const val DNS_OPTIMISTIC_CACHE = "dnsOptimisticCache"
+    const val DNS_OPTIMISTIC_TIMEOUT = "dnsOptimisticTimeout"
+    const val DNS_STORE_CACHE = "dnsStoreCache"
     const val DNS_REVERSE_MAPPING = "dnsReverseMapping"
     const val DNS_DOMAIN_OVERRIDES = "dnsDomainOverrides"
     const val CUSTOM_DNS_SERVERS = "customDnsServers"
@@ -98,6 +110,8 @@ object Key {
     const val ALLOW_ACCESS = "allowAccess"
     const val SPEED_INTERVAL = "speedInterval"
     const val PROFILE_TRAFFIC_UPDATE_INTERVAL = "profileTrafficUpdateInterval"
+    const val SUBSCRIPTION_XRAY_BALANCERS = "subscriptionXrayBalancers"
+    const val SUBSCRIPTION_TRAFFIC_UNIT = "subscriptionTrafficUnit"
     const val SHOW_DIRECT_SPEED = "showDirectSpeed"
     const val PERSISTENT_STATUS_NOTIFICATION = "persistentStatusNotification"
 
@@ -130,10 +144,14 @@ object Key {
     const val NETWORK_CHANGE_RESET_CONNECTIONS = "networkChangeResetConnections"
     const val WAKE_RECONNECT = "wakeReconnect"
     const val WAKE_RESET_CONNECTIONS = "wakeResetConnections"
+    const val GLOBAL_TCP_FAST_OPEN = "globalTcpFastOpen"
+    const val GLOBAL_TCP_MULTI_PATH = "globalTcpMultiPath"
+    const val GLOBAL_UDP_FRAGMENT = "globalUdpFragment"
     const val RULES_PROVIDER = "rulesProvider"
     const val LOG_LEVEL = "logLevel"
     const val LOG_BUF_SIZE = "logBufSize"
     const val ENABLE_CORE_PROFILING = "enableCoreProfiling"
+    const val CORE_PROFILER_MODE = "coreProfilerMode"
     const val CONNECTION_GUARD = "connectionGuard"
     const val CORE_RECOVERY_EXPECTED_STOP = "coreRecoveryExpectedStop"
     const val OVERLOAD_WATCHDOG = "overloadWatchdog"
@@ -151,11 +169,13 @@ object Key {
 
     // Protocol Settings
     const val GLOBAL_ALLOW_INSECURE = "globalAllowInsecure"
+    const val HYSTERIA2_DISABLE_CHROME_PARROT = "hysteria2DisableChromeParrot"
 
     const val ACQUIRE_WAKE_LOCK = "acquireWakeLock"
     const val HIDE_FROM_RECENT_APPS = "hideFromRecentApps"
     const val CONFIRM_PROFILE_DELETE = "confirmProfileDelete"
     const val GROUP_LAYOUT_MODE = "groupLayoutMode"
+    const val PROFILE_CARD_BORDERS = "profileCardBorders"
     const val GROUP_ORDER_MODE_ALWAYS = "groupOrderModeAlways"
     const val GROUP_ORDER_MODE_URL_TEST = "groupOrderModeUrlTest"
     const val GROUP_ORDER_MODE_UPDATE = "groupOrderModeUpdate"
@@ -163,6 +183,9 @@ object Key {
     const val ALLOW_INSECURE_ON_REQUEST = "allowInsecureOnRequest"
 
     const val TUN_IMPLEMENTATION = "tunImplementation"
+    const val UDP_NAT_MAPPING = "udpNatMapping"
+    const val UDP_NAT_FILTERING = "udpNatFiltering"
+    const val UDP_NAT_MAX = "udpNatMax"
     const val PROFILE_TRAFFIC_STATISTICS = "profileTrafficStatistics"
 
     const val PROFILE_DIRTY = "profileDirty"
@@ -227,6 +250,8 @@ object Key {
     const val SERVER_MIERU_MUX_LEVEL = "serverMieruMuxLevel"
     const val SERVER_MIERU_HANDSHAKE_MODE = "serverMieruHandshakeMode"
     const val SERVER_MIERU_TRAFFIC_PATTERN = "serverMieruTrafficPattern"
+    const val SERVER_MIERU_LOW_ENTROPY_MODE = "serverMieruLowEntropyMode"
+    const val SERVER_MIERU_LOW_ENTROPY_MASK_ROTATION = "serverMieruLowEntropyMaskRotation"
 
     const val SERVER_USER_ID = "serverUserId"
     const val SERVER_PINNED_CERT_CHAIN_SHA256 = "serverPinnedCertChainSha256"
@@ -247,7 +272,6 @@ object Key {
     const val ROUTE_CREATE_DNS_RULE = "routeCreateDnsRule"
     const val ROUTE_DNS_ACTION = "routeDnsAction"
     const val ROUTE_DNS_SERVER = "routeDnsServer"
-    const val ROUTE_DNS_STRATEGY = "routeDnsStrategy"
     const val ROUTE_DNS_DISABLE_CACHE = "routeDnsDisableCache"
     const val ROUTE_DNS_REWRITE_TTL = "routeDnsRewriteTtl"
     const val ROUTE_DNS_CLIENT_SUBNET = "routeDnsClientSubnet"
@@ -291,10 +315,15 @@ object Key {
     const val SUBSCRIPTION_HWID_ENABLED = "subscriptionHwidEnabled"
     const val SUBSCRIPTION_SPOOF_APP = "subscriptionSpoofApp"
     const val SUBSCRIPTION_SERVER_DNS = "subscriptionServerDns"
+    const val SUBSCRIPTION_BANNER_LAYOUT = "subscriptionBannerLayout"
+    const val SUBSCRIPTION_ROUTING_ENABLED = "subscriptionRoutingEnabled"
+    const val SUBSCRIPTION_ROUTING_INTERVAL = "subscriptionRoutingInterval"
+    const val SUBSCRIPTION_IMPORT_ROUTING = "subscriptionImportRouting"
 
     //
 
     const val APP_TLS_VERSION = "appTLSVersion"
+    const val APP_UTLS_FINGERPRINT = "appUTLSFingerprint"
     const val ENABLE_CLASH_API = "enableClashAPI"
     const val HIDE_CLASH_API = "hideClashAPI"
     const val CLASH_API_SECRET = "clashApiSecret"
@@ -314,6 +343,11 @@ object Key {
     const val WEBDAV_PATH = "webdavPath"
 
     const val GLOBAL_MODE = "globalMode"
+}
+
+object CoreProfilerMode {
+    const val CPU = 0
+    const val TRACE = 1
 }
 
 object TunImplementation {
@@ -371,6 +405,7 @@ object SpoofApp {
     const val NONE = 0
     const val HAPP = 1
     const val V2RAY_TUN = 2
+    const val INCY = 3
 }
 
 object Action {
@@ -379,10 +414,14 @@ object Action {
     const val RELOAD = "io.nekohasekai.sagernet.RELOAD"
     const val EXTRA_PROFILE_ID = "io.nekohasekai.sagernet.extra.PROFILE_ID"
     const val EXTRA_REQUEST_ID = "io.nekohasekai.sagernet.extra.REQUEST_ID"
+    const val EXTRA_NOTIFICATION_COUNTRY_INDICATOR_ENABLED =
+        "io.nekohasekai.sagernet.extra.NOTIFICATION_COUNTRY_INDICATOR_ENABLED"
     const val RECOVER_CORE = "${BuildConfig.APPLICATION_ID}.RECOVER_CORE"
 
     // const val SWITCH_WAKE_LOCK = "io.nekohasekai.sagernet.SWITCH_WAKELOCK"
     const val RESET_UPSTREAM_CONNECTIONS = "${BuildConfig.APPLICATION_ID}.RESET_UPSTREAM_CONNECTIONS"
+    const val UPDATE_NOTIFICATION_COUNTRY_INDICATOR =
+        "${BuildConfig.APPLICATION_ID}.UPDATE_NOTIFICATION_COUNTRY_INDICATOR"
 }
 
 object Param {

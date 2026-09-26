@@ -1,6 +1,5 @@
 package io.nekohasekai.sagernet.fmt.tailscale
 
-import io.nekohasekai.sagernet.fmt.applySharedDialOptions
 import io.nekohasekai.sagernet.SagerNet
 import moe.matsuri.nb4a.SingBoxOptions
 import moe.matsuri.nb4a.utils.listByLineOrComma
@@ -24,7 +23,6 @@ fun buildSingBoxEndpointTailscaleBean(
     relay_server_port = bean.relayServerPort.takeIf { it > 0 }
     relay_server_static_endpoints = bean.relayServerStaticEndpoints.listByLineOrComma().takeIf { it.isNotEmpty() }
     udp_timeout = bean.udpTimeout.takeIf { it.isNotBlank() }
-    applySharedDialOptions(bean)
 }
 
 fun deleteTailscaleProfileState(profileId: Long) {

@@ -98,9 +98,10 @@ func (s *Service) forwardHTTP3RequestURL(requestContext *adblockRequestContext) 
 	outRequest.Close = true
 	transport := &http3.Transport{
 		TLSClientConfig: &tls.Config{
-			ServerName: requestContext.requestURL.Hostname(),
-			Time:       ntp.TimeFuncFromContext(s.ctx),
-			RootCAs:    adapter.RootPoolFromContext(s.ctx),
+			ServerName:         requestContext.requestURL.Hostname(),
+			Time:               ntp.TimeFuncFromContext(s.ctx),
+			RootCAs:            adapter.RootPoolFromContext(s.ctx),
+			InsecureSkipVerify: s.tlsExclusionActive(requestContext.requestURL.Hostname()),
 		},
 		QUICConfig: &quic.Config{
 			DisablePathMTUDiscovery: true,

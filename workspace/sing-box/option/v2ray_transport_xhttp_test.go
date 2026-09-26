@@ -39,6 +39,30 @@ func TestV2RayXHTTPOptionsDefaults(t *testing.T) {
 	}
 }
 
+func TestV2RayXHTTPCongestionOptions(t *testing.T) {
+	for _, controller := range []string{"", "bbr", "cubic", "reno"} {
+		content := []byte(`{"congestion_controller":"` + controller + `","cwnd":64,"download":{"congestion_controller":"` + controller + `","cwnd":48}}`)
+		var options V2RayXHTTPOptions
+		if err := json.Unmarshal(content, &options); err != nil {
+			t.Fatalf("controller %q: %v", controller, err)
+		}
+		if options.CWND != 64 || options.Download == nil || options.Download.CWND != 48 {
+			t.Fatalf("controller %q did not preserve cwnd", controller)
+		}
+	}
+	for _, content := range []string{
+		`{"congestion_controller":"invalid"}`,
+		`{"cwnd":-1}`,
+		`{"download":{"congestion_controller":"invalid"}}`,
+		`{"download":{"cwnd":-1}}`,
+	} {
+		var options V2RayXHTTPOptions
+		if err := json.Unmarshal([]byte(content), &options); err == nil {
+			t.Fatalf("expected error for %s", content)
+		}
+	}
+}
+
 func TestV2RayXHTTPNormalizedPath(t *testing.T) {
 	tests := []struct {
 		name               string
@@ -117,7 +141,6 @@ func TestV2RayXHTTPOptionsRejectsInvalidCombinations(t *testing.T) {
 		`{"mode":"packet-up","headers":{"Host":"example.com"}}`,
 		`{"mode":"stream-up","uplink_data_placement":"header"}`,
 		`{"mode":"stream-one","uplink_http_method":"GET"}`,
-		`{"mode":"packet-up","session_id_placement":"path","seq_placement":"header"}`,
 		`{"mode":"packet-up","xmux":{"max_connections":1,"max_concurrency":1}}`,
 	}
 	for _, content := range tests {
@@ -127,6 +150,22 @@ func TestV2RayXHTTPOptionsRejectsInvalidCombinations(t *testing.T) {
 				t.Fatal("expected error")
 			}
 		})
+	}
+}
+
+func TestV2RayXHTTPOptionsAllowsIndependentSessionAndSequencePlacements(t *testing.T) {
+	var options V2RayXHTTPOptions
+	if err := json.Unmarshal([]byte(`{"mode":"packet-up","session_id_placement":"path","seq_placement":"cookie"}`), &options); err != nil {
+		t.Fatal(err)
+	}
+	if options.SessionIDPlacement != PlacementPath {
+		t.Fatalf("session_id_placement = %q", options.SessionIDPlacement)
+	}
+	if options.SeqPlacement != PlacementCookie {
+		t.Fatalf("seq_placement = %q", options.SeqPlacement)
+	}
+	if options.SeqKey != "x_seq" {
+		t.Fatalf("seq_key = %q", options.SeqKey)
 	}
 }
 
@@ -230,7 +269,7 @@ func TestV2RayXHTTPOptionsXmuxDefaults(t *testing.T) {
 	if options.Xmux.MaxConcurrency != (Xbadoption.Range{}) {
 		t.Fatalf("xmux max concurrency = %+v", options.Xmux.MaxConcurrency)
 	}
-	if options.Xmux.MaxConnections != (Xbadoption.Range{From: 6, To: 6}) {
+	if options.Xmux.MaxConnections != (Xbadoption.Range{From: 3, To: 3}) {
 		t.Fatalf("xmux max connections = %+v", options.Xmux.MaxConnections)
 	}
 	if options.Xmux.HMaxRequestTimes != (Xbadoption.Range{From: 600, To: 900}) {
@@ -246,7 +285,7 @@ func TestV2RayXHTTPXmuxZeroValueDefaults(t *testing.T) {
 	if options.GetNormalizedMaxConcurrency() != (Xbadoption.Range{}) {
 		t.Fatalf("xmux max concurrency = %+v", options.GetNormalizedMaxConcurrency())
 	}
-	if options.GetNormalizedMaxConnections() != (Xbadoption.Range{From: 6, To: 6}) {
+	if options.GetNormalizedMaxConnections() != (Xbadoption.Range{From: 3, To: 3}) {
 		t.Fatalf("xmux max connections = %+v", options.GetNormalizedMaxConnections())
 	}
 	if options.GetNormalizedHMaxRequestTimes() != (Xbadoption.Range{From: 600, To: 900}) {

@@ -338,3 +338,7 @@ func (h3TestCertificateStore) Close() error {
 func (s h3TestCertificateStore) Pool() *x509.CertPool {
 	return s.pool
 }
+
+func (h3TestCertificateStore) ExclusiveAnchors() bool {
+	return false
+}

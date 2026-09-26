@@ -1,9 +1,11 @@
 package io.nekohasekai.sagernet.database
 
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
+import io.nekohasekai.sagernet.fmt.internal.ProxySetBean
 import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean
 import io.nekohasekai.sagernet.fmt.v2ray.isTLS
+import io.nekohasekai.sagernet.fmt.wireguard.hasAmneziaWG31Options
 import io.nekohasekai.sagernet.fmt.wireguard.hasAmneziaWG3Options
 
 private val insecureShadowsocksMethods = setOf(
@@ -43,7 +45,22 @@ private fun StandardV2RayBean.transportEncryption(): String = when {
 private fun StandardV2RayBean.v2RayCardType(protocol: String): String =
     "$protocol ${type.shortNetwork()} ${transportEncryption()}"
 
-fun ProxyEntity.profileCardType(): String = when (type) {
+private fun StandardV2RayBean.shortV2RayCardType(): String = buildString {
+    append(if (isVLESS) "VL" else "VM")
+    append('.')
+    append(type.shortNetwork())
+
+    when (transportEncryption()) {
+        "TLS" -> append(".TLS")
+        "Reality" -> append(".R")
+    }
+
+    if (isVLESS && vlessEncryption.isEnabledEncryption()) append('*')
+}
+
+fun ProxyEntity.profileCardType(short: Boolean = false): String = if (short) {
+    shortProfileCardType()
+} else when (type) {
     ProxyEntity.TYPE_SS -> "Shadowsocks ${ssBean?.method.orEmpty()}".trimEnd()
     ProxyEntity.TYPE_SSR -> "ShadowsocksR ${ssrBean?.method.orEmpty()}".trimEnd()
     ProxyEntity.TYPE_VMESS -> vmessBean?.let { bean ->
@@ -114,10 +131,49 @@ fun ProxyEntity.profileCardType(): String = when (type) {
         "MASQUE $network"
     }
     ProxyEntity.TYPE_AWG -> {
-        val version = if (awgBean?.hasAmneziaWG3Options() == true) "3.0" else "2.0"
+        val version = when {
+            awgBean?.hasAmneziaWG31Options() == true -> "3.1"
+            awgBean?.hasAmneziaWG3Options() == true -> "3.0"
+            else -> "2.0"
+        }
         "AmneziaWG $version"
     }
     else -> displayType()
+}
+
+private fun ProxyEntity.shortProfileCardType(): String = when (type) {
+    ProxyEntity.TYPE_SOCKS -> when (socksBean?.protocolName()) {
+        "SOCKS4" -> "S4"
+        "SOCKS4A" -> "S4A"
+        else -> "S5"
+    }
+    ProxyEntity.TYPE_HTTP -> if (httpBean?.isTLS() == true) "HTTPS" else "HTTP"
+    ProxyEntity.TYPE_SS -> "Sh.S"
+    ProxyEntity.TYPE_SSR -> "SSR"
+    ProxyEntity.TYPE_VMESS -> vmessBean?.shortV2RayCardType() ?: "VMess"
+    ProxyEntity.TYPE_TROJAN -> "Trjn"
+    ProxyEntity.TYPE_TROJAN_GO -> "TrGo"
+    ProxyEntity.TYPE_MIERU -> "Mieru"
+    ProxyEntity.TYPE_NAIVE -> "Naïve"
+    ProxyEntity.TYPE_HYSTERIA -> if (hysteriaBean?.protocolVersion == 1) "Hy1" else "Hy2"
+    ProxyEntity.TYPE_SSH -> "SSH"
+    ProxyEntity.TYPE_WG -> "WG"
+    ProxyEntity.TYPE_AWG -> "AWG"
+    ProxyEntity.TYPE_TUIC -> "TUIC"
+    ProxyEntity.TYPE_JUICITY -> "Juic"
+    ProxyEntity.TYPE_SNELL -> "Snell"
+    ProxyEntity.TYPE_MASTERDNSVPN -> "MDVPN"
+    ProxyEntity.TYPE_BYEDPI -> "ByDPI"
+    ProxyEntity.TYPE_SHADOWTLS -> "ShTLS"
+    ProxyEntity.TYPE_ANYTLS -> "AnTLS"
+    ProxyEntity.TYPE_TRUST_TUNNEL -> "TrTun"
+    ProxyEntity.TYPE_MASQUE -> "MASQ"
+    ProxyEntity.TYPE_DIRECT -> "Dir"
+    ProxyEntity.TYPE_TAILSCALE -> "Tail"
+    ProxyEntity.TYPE_PROXY_SET ->
+        if (proxySetBean?.mode == ProxySetBean.MODE_URL_TEST) "URLT" else "Sel"
+    ProxyEntity.TYPE_CHAIN -> "Chain"
+    else -> displayType().take(5)
 }
 
 private fun StandardV2RayBean.hasInsecureTls(globalAllowInsecure: Boolean): Boolean =

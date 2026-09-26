@@ -8,29 +8,29 @@ public struct UploadTrafficCard: View {
     public init() {}
 
     public var body: some View {
-        DashboardCardView(title: "", isHalfWidth: true) {
+        DashboardCardView(title: "") {
             VStack(alignment: .leading, spacing: 8) {
                 DashboardCardHeader(icon: "arrow.up.circle.fill", title: "Upload")
 
                 if Variant.screenshotMode {
-                    Text("38 B/s")
+                    Text(verbatim: "38 B/s")
                         .font(.title2)
                         .fontWeight(.medium)
-                    Text("52 MB")
+                    Text(verbatim: "52 MB")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } else if let message = commandClient.status, message.trafficAvailable {
-                    Text("\(LibboxFormatBytes(message.uplink))/s")
+                    Text(verbatim: "\(LibboxFormatBytes(message.uplink))/s")
                         .font(.title2)
                         .fontWeight(.medium)
                     Text(LibboxFormatBytes(message.uplinkTotal))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("...")
+                    Text(verbatim: "...")
                         .font(.title2)
                         .fontWeight(.medium)
-                    Text("...")
+                    Text(verbatim: "...")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }

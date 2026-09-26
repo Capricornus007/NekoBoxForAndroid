@@ -1,6 +1,7 @@
 package libbox
 
 import (
+	"context"
 	"time"
 
 	C "github.com/sagernet/sing-box/constant"
@@ -32,5 +33,5 @@ func (s *BoxService) ResetNetwork() {
 }
 
 func (s *BoxService) UpdateWIFIState() {
-	s.instance.Network().UpdateWIFIState()
+	s.instance.Network().UpdateWIFIState(context.Background())
 }

@@ -132,7 +132,7 @@ func TestGroupURLTesterPassesDomainToOutboundAndPreservesHost(t *testing.T) {
 
 func TestRunGroupURLTestStartRetrySucceedsWithFreshAttempt(t *testing.T) {
 	var events []string
-	latency, err := runGroupURLTestStartRetry(func() (_ int32, err error) {
+	latency, err := runGroupURLTestStartRetry(t.Context(), func() (_ int32, err error) {
 		events = append(events, "start")
 		defer func() { events = append(events, "cleanup") }()
 		if len(events) == 1 {
@@ -158,7 +158,7 @@ func TestRunGroupURLTestStartRetryReturnsFinalStartError(t *testing.T) {
 		fmt.Errorf("%w: final failure", errGroupURLTestStart),
 	}
 	var calls int
-	latency, err := runGroupURLTestStartRetry(func() (int32, error) {
+	latency, err := runGroupURLTestStartRetry(t.Context(), func() (int32, error) {
 		result := errorsByAttempt[calls]
 		calls++
 		return -1, result
@@ -171,11 +171,51 @@ func TestRunGroupURLTestStartRetryReturnsFinalStartError(t *testing.T) {
 func TestRunGroupURLTestStartRetryDoesNotRetryOtherFailures(t *testing.T) {
 	wantErr := errors.New("create or probe failed")
 	var calls int
-	latency, err := runGroupURLTestStartRetry(func() (int32, error) {
+	latency, err := runGroupURLTestStartRetry(t.Context(), func() (int32, error) {
 		calls++
 		return -1, wantErr
 	})
 	if latency != -1 || !errors.Is(err, wantErr) || calls != 1 {
+		t.Fatalf("latency = %d, error = %v, calls = %d", latency, err, calls)
+	}
+}
+
+func TestRunGroupURLTestOperationHonorsDeadlineWhenWorkerBlocks(t *testing.T) {
+	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Millisecond)
+	defer cancel()
+	release := make(chan struct{})
+	workerDone := make(chan struct{})
+
+	started := time.Now()
+	latency, err := runGroupURLTestOperation(ctx, func() (int32, error) {
+		defer close(workerDone)
+		<-release
+		return 42, nil
+	})
+	if latency != -1 || !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("latency = %d, error = %v", latency, err)
+	}
+	if elapsed := time.Since(started); elapsed > time.Second {
+		t.Fatalf("blocking operation returned too late: %v", elapsed)
+	}
+
+	close(release)
+	select {
+	case <-workerDone:
+	case <-time.After(time.Second):
+		t.Fatal("late group URLTest worker did not finish")
+	}
+}
+
+func TestRunGroupURLTestStartRetryHonorsCancellationDuringPause(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	var calls int
+	latency, err := runGroupURLTestStartRetry(ctx, func() (int32, error) {
+		calls++
+		cancel()
+		return -1, fmt.Errorf("%w: temporary failure", errGroupURLTestStart)
+	})
+	if latency != -1 || !errors.Is(err, context.Canceled) || calls != 1 {
 		t.Fatalf("latency = %d, error = %v, calls = %d", latency, err, calls)
 	}
 }
@@ -264,7 +304,7 @@ func TestRunHardenedTCPPingRetriesConnections(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if latency < 0 || calls.Load() != 3 {
-		t.Fatalf("latency = %d, dials = %d", latency, calls.Load())
+	if latency.latency < 0 || latency.address != "192.0.2.40" || calls.Load() != 3 {
+		t.Fatalf("result = %+v, dials = %d", latency, calls.Load())
 	}
 }

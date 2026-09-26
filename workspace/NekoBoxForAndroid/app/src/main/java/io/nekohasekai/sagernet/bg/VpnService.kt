@@ -11,6 +11,7 @@ import android.os.PowerManager
 import android.os.SystemClock
 import io.nekohasekai.sagernet.*
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.LOCALHOST
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
@@ -19,6 +20,20 @@ import io.nekohasekai.sagernet.ui.VpnRequestActivity
 import kotlinx.coroutines.delay
 import moe.matsuri.nb4a.utils.NGUtil.isPureIpAddress
 import android.net.VpnService as BaseVpnService
+
+internal data class VpnTunPlan(
+    val core: AndroidTunPayload.Plan,
+    val metered: Boolean,
+    val bypassApplications: Boolean?,
+    val applications: List<String>,
+    val httpProxy: VpnHttpProxyPlan?,
+)
+
+internal data class VpnHttpProxyPlan(
+    val host: String,
+    val port: Int,
+    val exclusions: List<String>,
+)
 
 class VpnService :
     BaseVpnService(),
@@ -31,6 +46,8 @@ class VpnService :
     var conn: ParcelFileDescriptor? = null
 
     private var metered = false
+    private var activeTunPlan: VpnTunPlan? = null
+    private var reuseTunOnNextOpen = false
 
     override var upstreamInterfaceName: String? = null
 
@@ -49,25 +66,17 @@ class VpnService :
                 .apply { acquire() }
     }
 
-    @Suppress("EXPERIMENTAL_API_USAGE")
-    override fun killProcesses() {
-        try {
-            super.killProcesses()
-        } finally {
-            conn?.let {
-                Logs.d("Closing Android VPN file descriptor")
-                runCatching {
-                    it.close()
-                }.onFailure { error ->
-                    Logs.w(error)
-                }
-                Logs.d("Android VPN file descriptor closed")
-            }
-            conn = null
+    override fun finalizeProcessCleanup(retainTun: Boolean) {
+        if (retainTun && conn != null) {
+            reuseTunOnNextOpen = true
+            Logs.d("Retaining Android VPN file descriptor for in-process restart")
+        } else {
+            closeTunConnection()
         }
     }
 
-    override suspend fun beforeRestartAfterStop() {
+    override suspend fun beforeRestartAfterStop(tunRetained: Boolean) {
+        if (tunRetained && conn != null) return
         val deadline = SystemClock.elapsedRealtime() + VPN_NETWORK_TEARDOWN_TIMEOUT_MS
         while (SystemClock.elapsedRealtime() < deadline && isVpnNetwork(SagerNet.connectivity.activeNetwork)) {
             delay(VPN_NETWORK_TEARDOWN_POLL_MS)
@@ -86,7 +95,14 @@ class VpnService :
     override val data = BaseService.Data(this)
     override val tag = "SagerNetVpnService"
 
-    override fun createNotification(profileName: String) = ServiceNotification(this, profileName, "service-vpn")
+    override fun createNotification(profile: ProxyEntity?) = ServiceNotification(
+        this,
+        profile?.let {
+            ServiceNotification.genNotificationTitle(it, DataStore.notificationCountryIndicator)
+        }.orEmpty(),
+        "service-vpn",
+        profile = profile,
+    )
 
     override fun onStartCommand(
         intent: Intent?,
@@ -138,9 +154,9 @@ class VpnService :
         plan.inet4Address?.let { builder.addAddress(it.address, it.prefixLength) }
         plan.inet6Address?.let { builder.addAddress(it.address, it.prefixLength) }
 
-        // in-TUN DNS servers (next address of each declared family's prefix)
-        plan.inet4DnsServer?.let { builder.addDnsServer(it) }
-        plan.inet6DnsServer?.let { builder.addDnsServer(it) }
+        // Effective in-TUN DNS servers computed by sing-tun 1.14 from
+        // dns_mode/dns_address and the configured address families.
+        plan.dnsServers.forEach(builder::addDnsServer)
 
         // route ranges flattened by sing-box BuildAutoRouteRanges(true)
         plan.inet4Routes.forEach { builder.addRoute(it.address, it.prefixLength) }
@@ -185,6 +201,8 @@ class VpnService :
                 .distinct()
                 .toList()
 
+        var effectiveBypass: Boolean? = null
+        var effectiveApplications = emptyList<String>()
         if (proxyApps || adblockSystemWideFilter || needBypassRootUid) {
             val individual = mutableSetOf<String>()
             val allApps by lazy {
@@ -249,8 +267,11 @@ class VpnService :
             } else {
                 Logs.d("Add allow: ${added.joinToString(", ")}")
             }
+            effectiveBypass = bypass
+            effectiveApplications = added.sorted()
         }
 
+        var httpProxyPlan: VpnHttpProxyPlan? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && DataStore.appendHttpProxy && DataStore.requireProxyInVPN) {
             val proxyHost =
                 when {
@@ -267,11 +288,34 @@ class VpnService :
                     exclusions,
                 ),
             )
+            httpProxyPlan = VpnHttpProxyPlan(proxyHost, DataStore.mixedPort, exclusions)
         }
 
+        val requestedTunPlan = VpnTunPlan(
+            core = plan,
+            metered = metered,
+            bypassApplications = effectiveBypass,
+            applications = effectiveApplications,
+            httpProxy = httpProxyPlan,
+        )
+        if (reuseTunOnNextOpen &&
+            ServiceLifecyclePolicy.isTunReuseEligible(data.activeRestartCause) &&
+            activeTunPlan == requestedTunPlan
+        ) {
+            val retained = conn
+            if (retained != null) {
+                reuseTunOnNextOpen = false
+                Logs.d("Reusing retained Android VPN file descriptor")
+                updateUnderlyingNetwork()
+                return retained.fd
+            }
+        }
+
+        reuseTunOnNextOpen = false
         val previousConnection = conn
         val newConnection = builder.establish() ?: throw NullConnectionException()
         conn = newConnection
+        activeTunPlan = requestedTunPlan
         previousConnection?.let { previous ->
             runCatching { previous.close() }.onFailure { error -> Logs.w(error) }
         }
@@ -281,18 +325,30 @@ class VpnService :
 
     fun updateUnderlyingNetwork(builder: Builder? = null) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            SagerNet.underlyingNetwork?.let {
-                builder?.setUnderlyingNetworks(arrayOf(SagerNet.underlyingNetwork))
-                    ?: setUnderlyingNetworks(arrayOf(SagerNet.underlyingNetwork))
-            }
+            val networks = SagerNet.underlyingNetwork?.let { arrayOf(it) } ?: emptyArray()
+            if (builder != null) builder.setUnderlyingNetworks(networks)
+            else setUnderlyingNetworks(networks)
         }
     }
 
     override fun onRevoke() = stopRunner()
 
     override fun onDestroy() {
+        closeTunConnection()
         DataStore.vpnService = null
         super.onDestroy()
         data.binder.close()
+    }
+
+    private fun closeTunConnection() {
+        val connection = conn
+        conn = null
+        activeTunPlan = null
+        reuseTunOnNextOpen = false
+        connection?.let {
+            Logs.d("Closing Android VPN file descriptor")
+            runCatching { it.close() }.onFailure { error -> Logs.w(error) }
+            Logs.d("Android VPN file descriptor closed")
+        }
     }
 }

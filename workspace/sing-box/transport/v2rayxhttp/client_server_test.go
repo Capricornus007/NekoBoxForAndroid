@@ -21,6 +21,7 @@ import (
 
 	"github.com/sagernet/quic-go/http3"
 	boxTLS "github.com/sagernet/sing-box/common/tls"
+	"github.com/sagernet/sing-box/common/vision"
 	xbuf "github.com/sagernet/sing-box/common/xray/buf"
 	Xbadoption "github.com/sagernet/sing-box/common/xray/json/badoption"
 	C "github.com/sagernet/sing-box/constant"
@@ -41,9 +42,10 @@ type stubDialerClient struct {
 type stubXmuxConn struct{}
 
 type fakeTLSConfig struct {
-	serverName   string
-	nextProtos   []string
-	stdConfigErr error
+	serverName       string
+	nextProtos       []string
+	handshakeTimeout time.Duration
+	stdConfigErr     error
 }
 
 func (f *fakeTLSConfig) ServerName() string {
@@ -62,6 +64,14 @@ func (f *fakeTLSConfig) SetNextProtos(nextProto []string) {
 	f.nextProtos = nextProto
 }
 
+func (f *fakeTLSConfig) HandshakeTimeout() time.Duration {
+	return f.handshakeTimeout
+}
+
+func (f *fakeTLSConfig) SetHandshakeTimeout(timeout time.Duration) {
+	f.handshakeTimeout = timeout
+}
+
 func (f *fakeTLSConfig) STDConfig() (*boxTLS.STDConfig, error) {
 	return nil, f.stdConfigErr
 }
@@ -72,9 +82,10 @@ func (f *fakeTLSConfig) Client(net.Conn) (boxTLS.Conn, error) {
 
 func (f *fakeTLSConfig) Clone() boxTLS.Config {
 	return &fakeTLSConfig{
-		serverName:   f.serverName,
-		nextProtos:   slices.Clone(f.nextProtos),
-		stdConfigErr: f.stdConfigErr,
+		serverName:       f.serverName,
+		nextProtos:       slices.Clone(f.nextProtos),
+		handshakeTimeout: f.handshakeTimeout,
+		stdConfigErr:     f.stdConfigErr,
 	}
 }
 
@@ -479,7 +490,7 @@ func testClientProfile(name string, options *option.V2RayXHTTPOptions, dialerCli
 
 func TestClientDialContextFallsBackToLegacyProfile(t *testing.T) {
 	var output bytes.Buffer
-	factory := newBufferLogger(t.Context(), &output)
+	factory := newBufferLogger(t, &output)
 	primaryOptions := &option.V2RayXHTTPOptions{
 		V2RayXHTTPBaseOptions: option.V2RayXHTTPBaseOptions{
 			Path:               "/xhttp",
@@ -540,7 +551,7 @@ func TestClientDialContextFallsBackToLegacyProfile(t *testing.T) {
 
 func TestClientDialContextReturnsFailureWhenFallbackProbesFail(t *testing.T) {
 	var output bytes.Buffer
-	factory := newBufferLogger(t.Context(), &output)
+	factory := newBufferLogger(t, &output)
 	primaryErr := errors.New("primary failed")
 	fallbackErr := errors.New("fallback failed")
 	primaryOptions := &option.V2RayXHTTPOptions{
@@ -598,7 +609,7 @@ func TestClientDialContextReturnsFailureWhenFallbackProbesFail(t *testing.T) {
 
 func TestClientDialContextConcurrentFallbackProbesOnce(t *testing.T) {
 	var output synchronizedBuffer
-	factory := newBufferLogger(t.Context(), &output)
+	factory := newBufferLogger(t, &output)
 	primaryOptions := &option.V2RayXHTTPOptions{
 		V2RayXHTTPBaseOptions: option.V2RayXHTTPBaseOptions{
 			Path:               "/xhttp",
@@ -1062,9 +1073,10 @@ func newClientDialLoggingTestClient(logger logger.ContextLogger) *Client {
 	}
 }
 
-func newBufferLogger(ctx context.Context, output io.Writer) log.ObservableFactory {
+func newBufferLogger(t *testing.T, output io.Writer) log.ObservableFactory {
+	t.Helper()
 	factory := log.NewDefaultFactory(
-		ctx,
+		t.Context(),
 		log.Formatter{DisableColors: true, DisableTimestamp: true},
 		output,
 		"",
@@ -1072,6 +1084,10 @@ func newBufferLogger(ctx context.Context, output io.Writer) log.ObservableFactor
 		false,
 	)
 	factory.SetLevel(log.LevelDebug)
+	if err := factory.Start(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = factory.Close() })
 	return factory
 }
 
@@ -1092,11 +1108,11 @@ func TestPrepareXHTTPTLSConfigPreservesSupportedHTTP3(t *testing.T) {
 	}
 }
 
-func TestPrepareXHTTPTLSConfigFallsBackFromHTTP3ForUTLS(t *testing.T) {
-	unsupportedUTLS := errors.New("unsupported usage for uTLS")
+func TestPrepareXHTTPTLSConfigFallsBackFromHTTP3ForUnsupportedTLSEngine(t *testing.T) {
+	unsupportedTLSEngine := errors.New("standard TLS config is unsupported")
 	original := &fakeTLSConfig{
 		nextProtos:   []string{http3.NextProtoH3, http2.NextProtoTLS, "http/1.1"},
-		stdConfigErr: unsupportedUTLS,
+		stdConfigErr: unsupportedTLSEngine,
 	}
 	prepared, adjustment, err := prepareXHTTPTLSConfig(original)
 	if err != nil {
@@ -1114,10 +1130,10 @@ func TestPrepareXHTTPTLSConfigFallsBackFromHTTP3ForUTLS(t *testing.T) {
 	}
 }
 
-func TestPrepareXHTTPTLSConfigRejectsHTTP3OnlyUTLS(t *testing.T) {
+func TestPrepareXHTTPTLSConfigRejectsHTTP3OnlyUnsupportedTLSEngine(t *testing.T) {
 	original := &fakeTLSConfig{
 		nextProtos:   []string{http3.NextProtoH3},
-		stdConfigErr: errors.New("unsupported usage for uTLS"),
+		stdConfigErr: errors.New("standard TLS config is unsupported"),
 	}
 	_, _, err := prepareXHTTPTLSConfig(original)
 	if err == nil || !strings.Contains(err.Error(), "no TCP ALPN fallback") {
@@ -1142,7 +1158,7 @@ func TestPrepareXHTTPTLSConfigDoesNotAdvertiseHTTP3OverTCP(t *testing.T) {
 
 func TestClientDialContextUsesConfiguredLogger(t *testing.T) {
 	var output bytes.Buffer
-	factory := newBufferLogger(t.Context(), &output)
+	factory := newBufferLogger(t, &output)
 	client := newClientDialLoggingTestClient(factory.Logger())
 
 	conn, err := client.DialContext(t.Context())
@@ -1160,7 +1176,7 @@ func TestClientDialContextUsesConfiguredLogger(t *testing.T) {
 
 func TestClientDialContextDoesNotUseStdLoggerFallback(t *testing.T) {
 	var output bytes.Buffer
-	factory := newBufferLogger(t.Context(), &output)
+	factory := newBufferLogger(t, &output)
 	oldLogger := log.StdLogger()
 	log.SetStdLogger(factory.Logger())
 	defer log.SetStdLogger(oldLogger)
@@ -1181,6 +1197,7 @@ func TestClientDialContextDoesNotUseStdLoggerFallback(t *testing.T) {
 
 func TestCreateHTTPClientInheritsDefaultHTTP2FrameSizeForPacketUp(t *testing.T) {
 	client := createHTTPClient(
+		t.Context(),
 		M.Socksaddr{Fqdn: "example.com", Port: 443},
 		nil,
 		&option.V2RayXHTTPBaseOptions{Mode: "packet-up"},
@@ -2244,6 +2261,103 @@ func TestDefaultDialerClientOpenStreamCloseWithoutRequestBody(t *testing.T) {
 	}
 }
 
+func TestDefaultDialerClientOpenStreamIgnoresLateGotConn(t *testing.T) {
+	requestErr := errors.New("request failed before connection was reported")
+	releaseGotConn := make(chan struct{})
+	gotConnDone := make(chan struct{})
+	transport := roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		trace := httptrace.ContextClientTrace(req.Context())
+		if trace == nil || trace.GotConn == nil {
+			return nil, errors.New("missing GotConn trace")
+		}
+		go func() {
+			defer close(gotConnDone)
+			<-releaseGotConn
+			clientConn, serverConn := net.Pipe()
+			trace.GotConn(httptrace.GotConnInfo{Conn: clientConn})
+			closeSilently(clientConn)
+			closeSilently(serverConn)
+		}()
+		return nil, requestErr
+	})
+	client := &DefaultDialerClient{
+		options:     &option.V2RayXHTTPBaseOptions{},
+		client:      &http.Client{Transport: transport},
+		httpVersion: "2",
+	}
+	var hookCalls atomic.Int32
+	ctx := vision.WithHook(t.Context(), func(net.Conn) {
+		hookCalls.Add(1)
+	})
+
+	readCloser, remoteAddr, localAddr, err := client.OpenStream(ctx, "https://example.com/download", "session", nil, false)
+	if !errors.Is(err, requestErr) {
+		t.Fatalf("expected request error, got %v", err)
+	}
+	if remoteAddr != nil || localAddr != nil {
+		t.Fatalf("unexpected connection addresses after request failure: remote=%v local=%v", remoteAddr, localAddr)
+	}
+	if readCloser != nil {
+		closeSilently(readCloser)
+	}
+	close(releaseGotConn)
+	<-gotConnDone
+	if hookCalls.Load() != 0 {
+		t.Fatalf("Vision hook called %d times for a late connection", hookCalls.Load())
+	}
+}
+
+func TestDefaultDialerClientOpenStreamPublishesFirstConnection(t *testing.T) {
+	var firstConn net.Conn
+	transport := roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		trace := httptrace.ContextClientTrace(req.Context())
+		if trace == nil || trace.GotConn == nil {
+			return nil, errors.New("missing GotConn trace")
+		}
+		clientConn1, serverConn1 := net.Pipe()
+		clientConn2, serverConn2 := net.Pipe()
+		firstConn = clientConn1
+		trace.GotConn(httptrace.GotConnInfo{Conn: clientConn1})
+		trace.GotConn(httptrace.GotConnInfo{Conn: clientConn2})
+		closeSilently(serverConn1)
+		closeSilently(clientConn2)
+		closeSilently(serverConn2)
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Body:       io.NopCloser(strings.NewReader("payload")),
+			Header:     make(http.Header),
+			Request:    req,
+		}, nil
+	})
+	client := &DefaultDialerClient{
+		options:     &option.V2RayXHTTPBaseOptions{},
+		client:      &http.Client{Transport: transport},
+		httpVersion: "2",
+	}
+	var hookCalls atomic.Int32
+	var hookedConn net.Conn
+	ctx := vision.WithHook(t.Context(), func(conn net.Conn) {
+		hookedConn = conn
+		hookCalls.Add(1)
+	})
+
+	readCloser, remoteAddr, localAddr, err := client.OpenStream(ctx, "https://example.com/download", "session", nil, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer closeSilently(readCloser)
+	if remoteAddr == nil || localAddr == nil {
+		t.Fatalf("missing connection addresses: remote=%v local=%v", remoteAddr, localAddr)
+	}
+	if hookCalls.Load() != 1 {
+		t.Fatalf("Vision hook called %d times, want 1", hookCalls.Load())
+	}
+	if hookedConn != firstConn {
+		t.Fatal("Vision hook did not receive the first published connection")
+	}
+	closeSilently(firstConn)
+}
+
 func TestDefaultDialerClientOpenStreamWrapsNestedHTTP2StreamError(t *testing.T) {
 	streamError := http2.StreamError{
 		StreamID: 1,
@@ -2651,6 +2765,7 @@ func TestCreateHTTPClientTracksRawConnBeforeTLSHandshake(t *testing.T) {
 	}}
 	tlsConfig := &recordingTLSConfig{fakeTLSConfig: fakeTLSConfig{nextProtos: []string{http2.NextProtoTLS}}}
 	client := createHTTPClient(
+		t.Context(),
 		M.Socksaddr{Fqdn: "example.com", Port: 443},
 		dialer,
 		&option.V2RayXHTTPBaseOptions{Mode: "packet-up"},
@@ -2692,6 +2807,7 @@ func TestCreateHTTPClientReleasesRawConnAfterTLSHandshakeFailure(t *testing.T) {
 		handshakeErr:  handshakeErr,
 	}
 	client := createHTTPClient(
+		t.Context(),
 		M.Socksaddr{Fqdn: "example.com", Port: 443},
 		dialer,
 		&option.V2RayXHTTPBaseOptions{Mode: "packet-up"},

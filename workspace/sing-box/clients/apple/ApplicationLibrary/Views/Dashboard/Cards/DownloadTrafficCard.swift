@@ -8,29 +8,29 @@ public struct DownloadTrafficCard: View {
     public init() {}
 
     public var body: some View {
-        DashboardCardView(title: "", isHalfWidth: true) {
+        DashboardCardView(title: "") {
             VStack(alignment: .leading, spacing: 8) {
                 DashboardCardHeader(icon: "arrow.down.circle.fill", title: "Download")
 
                 if Variant.screenshotMode {
-                    Text("249 MB/s")
+                    Text(verbatim: "249 MB/s")
                         .font(.title2)
                         .fontWeight(.medium)
-                    Text("5.6 GB")
+                    Text(verbatim: "5.6 GB")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } else if let message = commandClient.status, message.trafficAvailable {
-                    Text("\(LibboxFormatBytes(message.downlink))/s")
+                    Text(verbatim: "\(LibboxFormatBytes(message.downlink))/s")
                         .font(.title2)
                         .fontWeight(.medium)
                     Text(LibboxFormatBytes(message.downlinkTotal))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("...")
+                    Text(verbatim: "...")
                         .font(.title2)
                         .fontWeight(.medium)
-                    Text("...")
+                    Text(verbatim: "...")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }

@@ -37,7 +37,8 @@ class BootReceiver : BroadcastReceiver() {
                 persistAcrossReboot = DataStore.persistAcrossReboot,
                 selectedProxy = DataStore.selectedProxy,
                 sdkInt = Build.VERSION.SDK_INT,
-                userUnlocked = SagerNet.user.isUserUnlocked,
+                userUnlocked = Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
+                    SagerNet.user.isUserUnlocked,
             )
         ) {
             SagerNet.startService()

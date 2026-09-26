@@ -22,11 +22,17 @@ var coreProfiler = &profilerState{}
 // profile to preserve recent data even if profiling is not stopped cleanly.
 const allocationProfileInterval = 10 * time.Second
 
+const (
+	CoreProfilerModeCPU int32 = iota
+	CoreProfilerModeTrace
+)
+
 type profilerState struct {
 	access sync.Mutex
 
 	running         bool
 	shutdownPending bool
+	mode            int32
 	started         time.Time
 	stopped         time.Time
 
@@ -55,10 +61,13 @@ func HasCoreProfilerSnapshot() bool {
 		profilerFileExists(coreProfiler.dir, "allocs.pprof")
 }
 
-func StartCoreProfiling() (err error) {
+func StartCoreProfiling(mode int32) (err error) {
 	coreProfiler.access.Lock()
 	defer coreProfiler.access.Unlock()
 
+	if !validCoreProfilerMode(mode) {
+		return fmt.Errorf("unknown core profiler mode: %d", mode)
+	}
 	if coreProfiler.running {
 		return nil
 	}
@@ -71,6 +80,7 @@ func StartCoreProfiling() (err error) {
 	if tempPath == "" {
 		return errors.New("core is not initialized")
 	}
+	mode = compatibleCoreProfilerMode(mode, mainInstance.hasAmneziaWG)
 
 	dir := filepath.Join(tempPath, "core-profiler")
 	err = os.RemoveAll(dir)
@@ -86,33 +96,32 @@ func StartCoreProfiling() (err error) {
 		return err
 	}
 
-	cpuFile, err := os.Create(filepath.Join(dir, "cpu.pprof"))
-	if err != nil {
-		return err
-	}
-	defer func() {
+	var cpuFile, traceFile *os.File
+	switch mode {
+	case CoreProfilerModeCPU:
+		cpuFile, err = os.Create(filepath.Join(dir, "cpu.pprof"))
 		if err != nil {
-			err = errors.Join(err, cpuFile.Close())
+			return err
 		}
-	}()
-	err = pprof.StartCPUProfile(cpuFile)
-	if err != nil {
-		return err
-	}
-
-	traceFile, err := os.Create(filepath.Join(dir, "trace.out"))
-	if err != nil {
-		pprof.StopCPUProfile()
-		return err
-	}
-	defer func() {
+		defer func() {
+			if err != nil {
+				err = errors.Join(err, cpuFile.Close())
+			}
+		}()
+		err = pprof.StartCPUProfile(cpuFile)
+	case CoreProfilerModeTrace:
+		traceFile, err = os.Create(filepath.Join(dir, "trace.out"))
 		if err != nil {
-			err = errors.Join(err, traceFile.Close())
+			return err
 		}
-	}()
-	err = trace.Start(traceFile)
+		defer func() {
+			if err != nil {
+				err = errors.Join(err, traceFile.Close())
+			}
+		}()
+		err = trace.Start(traceFile)
+	}
 	if err != nil {
-		pprof.StopCPUProfile()
 		return err
 	}
 
@@ -121,6 +130,7 @@ func StartCoreProfiling() (err error) {
 
 	coreProfiler.running = true
 	coreProfiler.shutdownPending = false
+	coreProfiler.mode = mode
 	coreProfiler.started = time.Now()
 	coreProfiler.stopped = time.Time{}
 	coreProfiler.cpuFile = cpuFile
@@ -146,7 +156,7 @@ func PrepareCoreProfilerShutdown() (err error) {
 	err = coreProfiler.stopCollectorsLocked()
 	coreProfiler.shutdownPending = true
 	err = errors.Join(err, captureRuntimeSnapshot(coreProfiler.dir, "before-close"))
-	err = errors.Join(err, writeProfilerMetadata(coreProfiler.dir, coreProfiler.started, coreProfiler.stopped, "pending"))
+	err = errors.Join(err, writeProfilerMetadata(coreProfiler.dir, coreProfiler.mode, coreProfiler.started, coreProfiler.stopped, "pending"))
 	return err
 }
 
@@ -164,7 +174,7 @@ func FinishCoreProfilerShutdown(closeCompleted bool) (err error) {
 		err = captureRuntimeSnapshot(coreProfiler.dir, "after-close")
 		shutdownStatus = "completed"
 	}
-	err = errors.Join(err, writeProfilerMetadata(coreProfiler.dir, coreProfiler.started, coreProfiler.stopped, shutdownStatus))
+	err = errors.Join(err, writeProfilerMetadata(coreProfiler.dir, coreProfiler.mode, coreProfiler.started, coreProfiler.stopped, shutdownStatus))
 	return err
 }
 
@@ -221,7 +231,7 @@ func (p *profilerState) stopAndCaptureLocked() error {
 	}
 	err := p.stopCollectorsLocked()
 	err = errors.Join(err, captureRuntimeSnapshot(p.dir, ""))
-	err = errors.Join(err, writeProfilerMetadata(p.dir, p.started, p.stopped, "not-requested"))
+	err = errors.Join(err, writeProfilerMetadata(p.dir, p.mode, p.started, p.stopped, "not-requested"))
 	return err
 }
 
@@ -230,8 +240,12 @@ func (p *profilerState) stopCollectorsLocked() error {
 		return nil
 	}
 
-	trace.Stop()
-	pprof.StopCPUProfile()
+	if p.traceFile != nil {
+		trace.Stop()
+	}
+	if p.cpuFile != nil {
+		pprof.StopCPUProfile()
+	}
 	runtime.SetBlockProfileRate(0)
 	runtime.SetMutexProfileFraction(0)
 	p.stopAllocationProfilerLocked()
@@ -363,7 +377,7 @@ func writeRuntimeProfile(outputDir string, profileName string, fileName string) 
 	return nil
 }
 
-func writeProfilerMetadata(outputDir string, started time.Time, stopped time.Time, shutdownStatus string) error {
+func writeProfilerMetadata(outputDir string, mode int32, started time.Time, stopped time.Time, shutdownStatus string) error {
 	buildInfo, loaded := debug.ReadBuildInfo()
 	buildText := "build info unavailable\n"
 	if loaded {
@@ -375,7 +389,8 @@ func writeProfilerMetadata(outputDir string, started time.Time, stopped time.Tim
 	}
 
 	metadata := fmt.Sprintf(
-		"started: %s\nstopped: %s\nduration: %s\nshutdown: %s\ngo: %s\nplatform: %s/%s\ngoroutines: %d\n",
+		"mode: %s\nstarted: %s\nstopped: %s\nduration: %s\nshutdown: %s\ngo: %s\nplatform: %s/%s\ngoroutines: %d\n",
+		coreProfilerModeName(mode),
 		started.Format(time.RFC3339Nano),
 		stopped.Format(time.RFC3339Nano),
 		stopped.Sub(started),
@@ -386,6 +401,31 @@ func writeProfilerMetadata(outputDir string, started time.Time, stopped time.Tim
 		runtime.NumGoroutine(),
 	)
 	return os.WriteFile(filepath.Join(outputDir, "metadata.txt"), []byte(metadata), 0600)
+}
+
+func validCoreProfilerMode(mode int32) bool {
+	return mode == CoreProfilerModeCPU || mode == CoreProfilerModeTrace
+}
+
+// Go execution tracing currently crashes the Android runtime while an
+// AmneziaWG endpoint is active. Keep profiler collection available by falling
+// back to CPU profiling for that configuration.
+func compatibleCoreProfilerMode(mode int32, hasAmneziaWG bool) int32 {
+	if mode == CoreProfilerModeTrace && hasAmneziaWG {
+		return CoreProfilerModeCPU
+	}
+	return mode
+}
+
+func coreProfilerModeName(mode int32) string {
+	switch mode {
+	case CoreProfilerModeCPU:
+		return "cpu"
+	case CoreProfilerModeTrace:
+		return "trace"
+	default:
+		return "unknown"
+	}
 }
 
 func writeJSONFile(path string, value any) error {

@@ -19,11 +19,22 @@ class BootReceiver : BroadcastReceiver() {
 
             else -> return
         }
+        val pendingResult = goAsync()
         GlobalScope.launch(Dispatchers.IO) {
-            if (Settings.startedByUser) {
-                withContext(Dispatchers.Main) {
-                    BoxService.start()
+            try {
+                if (Settings.startedByUser) {
+                    CrashReportManager.refresh()
+                    if (CrashReportManager.unreadCount.value > 0) {
+                        Settings.startedByUser = false
+                        return@launch
+                    }
+                    withContext(Dispatchers.Main) {
+                        BoxService.start().join()
+                    }
                 }
+            } finally {
+                Settings.dataStore.flush()
+                pendingResult.finish()
             }
         }
     }

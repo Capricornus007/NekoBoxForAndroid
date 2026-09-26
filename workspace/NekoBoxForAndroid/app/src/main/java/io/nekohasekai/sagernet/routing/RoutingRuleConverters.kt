@@ -127,7 +127,9 @@ object StableRoutingRuleMapper {
                 } else {
                     StableDnsServerReference.tag("")
                 },
-                dnsStrategy = if (isDnsRule) rule.dnsStrategy else "",
+                // Kept in StableRoutingRule for compatibility with existing links, but sing-box
+                // 1.14 no longer exposes a per-rule DNS strategy.
+                dnsStrategy = "",
                 dnsDisableCache = isDnsRule && rule.dnsDisableCache,
                 dnsRewriteTtl = if (isDnsRule) rule.dnsRewriteTtl else 0,
                 dnsClientSubnet = if (isDnsRule) rule.dnsClientSubnet else "",
@@ -169,7 +171,8 @@ object StableRoutingRuleMapper {
             createDnsRule = if (isDnsRule) true else rule.createDnsRule,
             dnsAction = if (isDnsRule) rule.dnsAction else "route",
             dnsServer = if (isDnsRule) resolvedDnsServer.orEmpty() else "",
-            dnsStrategy = if (isDnsRule) rule.dnsStrategy else "",
+            // Ignore the legacy wire value instead of restoring a setting removed in 1.14.
+            dnsStrategy = "",
             dnsDisableCache = isDnsRule && rule.dnsDisableCache,
             dnsRewriteTtl = if (isDnsRule) rule.dnsRewriteTtl else 0,
             dnsClientSubnet = if (isDnsRule) rule.dnsClientSubnet else "",

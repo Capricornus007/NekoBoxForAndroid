@@ -16,7 +16,7 @@ public struct ClashModeCard: View {
 
     public var body: some View {
         if shouldShowPicker {
-            DashboardCardView(title: "", isHalfWidth: false) {
+            DashboardCardView(title: "") {
                 VStack(alignment: .leading, spacing: 12) {
                     DashboardCardHeader(icon: "circle.grid.2x2.fill", title: "Mode")
                     #if os(tvOS)
@@ -142,15 +142,9 @@ public struct ClashModeCard: View {
             }
         }
 
-        @ViewBuilder
         private var selectorCapsule: some View {
-            if #available(iOS 26.0, macOS 26.0, *) {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(.ultraThinMaterial)
-            } else {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.primary.opacity(0.1))
-            }
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.primary.opacity(0.1))
         }
     #endif
 
@@ -192,7 +186,7 @@ public struct ClashModeCard: View {
 
     private nonisolated func setClashMode(_ newMode: String) async {
         do {
-            try LibboxNewStandaloneCommandClient()!.setClashMode(newMode)
+            try CommandTarget.standaloneClient().setClashMode(newMode)
         } catch {
             await MainActor.run {
                 alert = AlertState(action: "set clash mode", error: error)

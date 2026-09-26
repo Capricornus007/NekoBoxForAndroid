@@ -13,21 +13,27 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.RemoteException
 import android.view.KeyEvent
-import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
+import android.view.ViewConfiguration
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.ComponentDialog
 import androidx.annotation.IdRes
-import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceDataStore
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.materialswitch.MaterialSwitch
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import io.nekohasekai.sagernet.AppLogLevel
 import io.nekohasekai.sagernet.BuildConfig
@@ -47,7 +53,6 @@ import io.nekohasekai.sagernet.database.ProxyGroup
 import io.nekohasekai.sagernet.database.SubscriptionBean
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
 import io.nekohasekai.sagernet.databinding.LayoutMainBinding
-import io.nekohasekai.sagernet.databinding.LayoutProgressBinding
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.fmt.PluginEntry
@@ -70,6 +75,14 @@ import io.nekohasekai.sagernet.routing.RoutingImportManager
 import io.nekohasekai.sagernet.routing.RoutingPreviewPayloadStore
 import io.nekohasekai.sagernet.routing.RoutingProfileFormat
 import io.nekohasekai.sagernet.ui.MessageStore
+import io.nekohasekai.sagernet.ui.compose.MainComposeDrawer
+import io.nekohasekai.sagernet.ui.compose.MainShellState
+import io.nekohasekai.sagernet.ui.compose.NekoComposeTheme
+import io.nekohasekai.sagernet.ui.compose.DrawerOverlayComposeView
+import io.nekohasekai.sagernet.ui.compose.showBlockingProgressDialog
+import io.nekohasekai.sagernet.ui.compose.showComposeItemDialog
+import io.nekohasekai.sagernet.ui.compose.showComposeMessageDialog
+import io.nekohasekai.sagernet.ui.compose.showComposeDynamicMessageDialog
 import io.nekohasekai.sagernet.utils.PackageCache
 import io.nekohasekai.sagernet.utils.RoutingRulesService
 import io.nekohasekai.sagernet.utils.CustomTheme
@@ -85,10 +98,10 @@ import java.util.Locale
 class MainActivity :
     ThemedActivity(),
     SagerConnection.Callback,
-    OnPreferenceDataStoreChangeListener,
-    NavigationView.OnNavigationItemSelectedListener {
+    OnPreferenceDataStoreChangeListener {
     companion object {
         const val ACTION_SHOW_CONNECTION_TEST = "io.nekohasekai.sagernet.action.SHOW_CONNECTION_TEST"
+        private const val INITIAL_PROFILE_DRAW_TIMEOUT_MILLIS = 3_000L
         private var openSettingsOnCreate = false
 
         fun openSettingsOnNextCreate() {
@@ -103,9 +116,7 @@ class MainActivity :
     }
 
     lateinit var binding: LayoutMainBinding
-    lateinit var navigation: NavigationView
-    private var proxyAppsDrawerSwitch: MaterialSwitch? = null
-    private var syncingProxyAppsDrawerSwitch = false
+    private val shellState = MainShellState()
     private var bottomControlsVisibleForCurrentFragment = false
     private var activityStarted = false
     private var renderedServiceState = BaseService.State.Idle
@@ -113,8 +124,59 @@ class MainActivity :
     private var masterDnsVPNConnectedToastShown = false
     private var restoreConnectionTestLifecycleCallback: FragmentManager.FragmentLifecycleCallbacks? =
         null
-    private var customThemePreviewDialog: AlertDialog? = null
+    private var customThemePreviewDialog: ComponentDialog? = null
     private var customThemePreviewTimer: CountDownTimer? = null
+    private var initialProfileListReady = true
+    private var initialDrawListener: ViewTreeObserver.OnPreDrawListener? = null
+    private val initialDrawTimeout = Runnable { releaseInitialProfileDraw() }
+    private val tvDpadDoublePress by lazy {
+        DpadDoublePressTracker(ViewConfiguration.getDoubleTapTimeout().toLong())
+    }
+    private var tvDpadShortcutFocus: View? = null
+    private var consumeTvSearchBackUp = false
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (SagerNet.isTv && event.keyCode == KeyEvent.KEYCODE_BACK) {
+            if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+                val fragment = supportFragmentManager.findFragmentById(R.id.fragment_holder)
+                    as? ConfigurationFragment
+                if (fragment?.closeTvSearchIfExpanded() == true) {
+                    consumeTvSearchBackUp = true
+                    return true
+                }
+            } else if (event.action == KeyEvent.ACTION_UP && consumeTvSearchBackUp) {
+                consumeTvSearchBackUp = false
+                return true
+            }
+        }
+        if (SagerNet.isTv && event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
+            val fragment = supportFragmentManager.findFragmentById(R.id.fragment_holder)
+                as? ConfigurationFragment
+            val shortcutKey = event.keyCode == KeyEvent.KEYCODE_DPAD_LEFT ||
+                event.keyCode == KeyEvent.KEYCODE_DPAD_UP
+            if (shortcutKey && fragment?.canHandleTvDpadShortcut() == true &&
+                !shellState.drawerIsOpen
+            ) {
+                if (event.keyCode == KeyEvent.KEYCODE_DPAD_LEFT &&
+                    tvDpadShortcutFocus !== currentFocus
+                ) {
+                    tvDpadDoublePress.reset()
+                    tvDpadShortcutFocus = currentFocus
+                }
+                if (tvDpadDoublePress.record(event.keyCode, event.eventTime)) {
+                    when (event.keyCode) {
+                        KeyEvent.KEYCODE_DPAD_LEFT -> openDrawer()
+                        KeyEvent.KEYCODE_DPAD_UP -> fragment.focusSelectedGroupTab()
+                    }
+                    return true
+                }
+            } else {
+                tvDpadDoublePress.reset()
+                tvDpadShortcutFocus = null
+            }
+        }
+        return super.dispatchKeyEvent(event)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,9 +185,27 @@ class MainActivity :
 
         binding = LayoutMainBinding.inflate(layoutInflater)
         binding.fab.initProgress(binding.fabProgress)
-        navigation = binding.navView
-        navigation.setNavigationItemSelectedListener(this)
-        setupProxyAppsDrawerItem()
+        syncProxyAppsDrawerItem()
+        // Keep the fragment host synchronously attached; Compose owns the drawer overlay.
+        setContentView(binding.root)
+        val drawerOverlay = DrawerOverlayComposeView(this).apply {
+            drawerActive = { shellState.drawerRequestedOpen || shellState.drawerIsOpen }
+            setContent {
+            NekoComposeTheme {
+                MainComposeDrawer(
+                    state = shellState,
+                    onNavigate = ::displayFragmentWithId,
+                    onOpenApps = ::openAppManager,
+                    onToggleProxyApps = ::requestProxyAppsToggle,
+                    onDrawerActiveChanged = ::setDrawerActive,
+                )
+            }
+        }
+        }
+        addContentView(
+            drawerOverlay,
+            ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT),
+        )
 
         binding.fab.setOnClickListener {
             if (DataStore.serviceState.canStop) {
@@ -138,27 +218,40 @@ class MainActivity :
 
                 if (!geoip.exists() || !geosite.exists()) {
                     // Баз нет! Показываем красивое окно и отправляем качать
-                    MaterialAlertDialogBuilder(this)
-                        .setTitle(R.string.geodb_update_needed)
-                        .setMessage(R.string.geodb_update_needed_message)
-                        .setPositiveButton(R.string.download) { _, _ ->
+                    showComposeMessageDialog(
+                        title = getText(R.string.geodb_update_needed),
+                        message = getText(R.string.geodb_update_needed_message),
+                        positiveButton = getText(R.string.download),
+                        negativeButton = getText(android.R.string.cancel),
+                        onPositive = {
                             startActivity(Intent(this, AssetsActivity::class.java))
-                        }.setNegativeButton(android.R.string.cancel, null)
-                        .show()
+                        },
+                    )
                 } else {
                     // Базы есть, запускаем VPN
                     connect.launch(null)
                 }
             }
         }
+        if (SagerNet.isTv) {
+            binding.fab.installTvFocusOutline()
+            binding.stats.installTvFocusOutline()
+            binding.fab.nextFocusUpId = R.id.configuration_list
+            binding.fab.nextFocusDownId = R.id.stats
+        }
         binding.stats.setOnClickListener {
             if (binding.stats.isEnabled && DataStore.serviceState.connected) binding.stats.testConnection()
         }
 
         if (savedInstanceState == null && !openSettingsOnCreate) {
+            holdInitialDrawForProfiles()
             displayFragmentWithId(R.id.nav_configuration)
         }
         onBackPressedDispatcher.addCallback {
+            if (shellState.drawerIsOpen) {
+                closeDrawer()
+                return@addCallback
+            }
             val fragment = supportFragmentManager.findFragmentById(R.id.fragment_holder)
             if ((fragment as? ToolbarFragment)?.onBackPressed() == true) {
                 return@addCallback
@@ -170,7 +263,9 @@ class MainActivity :
             }
         }
 
-        setContentView(binding.root)
+        if (DataStore.legacyMainView) {
+            setupLegacyNavigationBarInsets()
+        }
         if (openSettingsOnCreate) {
             displayFragmentWithId(R.id.nav_settings)
             supportFragmentManager.executePendingTransactions()
@@ -208,11 +303,10 @@ class MainActivity :
         }
 
         if (isPreview) {
-            MaterialAlertDialogBuilder(this)
-                .setTitle(BuildConfig.PRE_VERSION_NAME)
-                .setMessage(R.string.preview_version_hint)
-                .setPositiveButton(android.R.string.ok, null)
-                .show()
+            showComposeMessageDialog(
+                title = BuildConfig.PRE_VERSION_NAME,
+                message = getText(R.string.preview_version_hint),
+            )
         }
 
         if (!DataStore.proxyAppsFirstSetup) {
@@ -221,6 +315,51 @@ class MainActivity :
                 performProxyAppsFirstSetup()
             }
         }
+    }
+
+    private fun setupLegacyNavigationBarInsets() {
+        val coordinatorInitialLeft = binding.coordinator.paddingLeft
+        val coordinatorInitialRight = binding.coordinator.paddingRight
+        val coordinatorInitialBottom = binding.coordinator.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.coordinator) { _, insets ->
+            val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            binding.coordinator.updatePadding(
+                left = coordinatorInitialLeft + navigationBars.left,
+                right = coordinatorInitialRight + navigationBars.right,
+                bottom = coordinatorInitialBottom + navigationBars.bottom,
+            )
+            WindowInsetsCompat.Builder(insets)
+                .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.NONE)
+                .build()
+        }
+        ViewCompat.requestApplyInsets(binding.coordinator)
+    }
+
+    private fun holdInitialDrawForProfiles() {
+        initialProfileListReady = false
+        val listener = ViewTreeObserver.OnPreDrawListener {
+            if (!initialProfileListReady) {
+                false
+            } else {
+                initialDrawListener?.let { activeListener ->
+                    binding.root.viewTreeObserver.takeIf { it.isAlive }
+                        ?.removeOnPreDrawListener(activeListener)
+                }
+                initialDrawListener = null
+                true
+            }
+        }
+        initialDrawListener = listener
+        binding.root.viewTreeObserver.addOnPreDrawListener(listener)
+        binding.root.postDelayed(initialDrawTimeout, INITIAL_PROFILE_DRAW_TIMEOUT_MILLIS)
+    }
+
+    internal fun releaseInitialProfileDraw() {
+        if (initialProfileListReady) return
+        initialProfileListReady = true
+        binding.root.removeCallbacks(initialDrawTimeout)
+        binding.root.postInvalidateOnAnimation()
     }
 
     private suspend fun performProxyAppsFirstSetup() {
@@ -260,53 +399,47 @@ class MainActivity :
                 getString(R.string.routing_region_other),
             )
         val dirs = arrayOf("ru", "cn", "ir", "other")
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.routing_select_region)
-            .setItems(labels) { _, i -> applyFirstRunSelection(dirs[i]) }
-            .setCancelable(false)
-            .show()
+        showComposeItemDialog(
+            title = getText(R.string.routing_select_region),
+            items = labels.toList(),
+            cancelable = false,
+            onItemSelected = { i -> applyFirstRunSelection(dirs[i]) },
+        )
     }
 
-    private fun setupProxyAppsDrawerItem() {
-        val item = navigation.menu.findItem(R.id.nav_route_apps) ?: return
-        item.isCheckable = false
-        item.setActionView(R.layout.layout_main_drawer_switch)
-
-        val switchView = item.actionView?.findViewById<MaterialSwitch>(R.id.drawer_switch) ?: return
-        proxyAppsDrawerSwitch = switchView
-        switchView.setOnCheckedChangeListener { _, isChecked ->
-            if (syncingProxyAppsDrawerSwitch || DataStore.proxyApps == isChecked) return@setOnCheckedChangeListener
-            if (isChecked) {
-                DataStore.proxyApps = true
-                DataStore.dirty = true
-                return@setOnCheckedChangeListener
-            }
-
-            MaterialAlertDialogBuilder(this)
-                .setMessage(R.string.disable_per_app_routing_warning)
-                .setPositiveButton(R.string.yes) { _, _ ->
-                    DataStore.proxyApps = false
-                    syncProxyAppsDrawerItem()
-                }.setNegativeButton(R.string.no) { _, _ ->
-                    syncProxyAppsDrawerItem()
-                }.setOnCancelListener {
-                    syncProxyAppsDrawerItem()
-                }.show()
+    private fun requestProxyAppsToggle(enabled: Boolean) {
+        if (enabled) {
+            DataStore.proxyApps = true
+            DataStore.dirty = true
+            syncProxyAppsDrawerItem()
+            return
         }
-        syncProxyAppsDrawerItem()
+        showComposeMessageDialog(
+            title = null,
+            message = getText(R.string.disable_per_app_routing_warning),
+            positiveButton = getText(R.string.yes),
+            negativeButton = getText(R.string.no),
+            onPositive = {
+                DataStore.proxyApps = false
+                syncProxyAppsDrawerItem()
+            },
+            onNegative = ::syncProxyAppsDrawerItem,
+            onCancel = ::syncProxyAppsDrawerItem,
+        )
     }
 
     private fun syncProxyAppsDrawerItem() {
-        val switchView = proxyAppsDrawerSwitch ?: return
-        syncingProxyAppsDrawerSwitch = true
-        switchView.isChecked = DataStore.proxyApps
-        syncingProxyAppsDrawerSwitch = false
+        shellState.proxyAppsEnabled = DataStore.proxyApps
     }
 
     private fun openAppManager() {
         startActivity(Intent(this, AppManagerActivity::class.java))
-        binding.drawerLayout.closeDrawers()
+        closeDrawer()
     }
+
+    fun openDrawer() = shellState.openDrawer()
+
+    fun closeDrawer() = shellState.closeDrawer()
 
     override fun onResume() {
         super.onResume()
@@ -332,9 +465,7 @@ class MainActivity :
     }
 
     fun refreshNavMenu(clashApi: Boolean) {
-        if (::navigation.isInitialized) {
-            navigation.menu.findItem(R.id.nav_traffic)?.isVisible = clashApi
-        }
+        shellState.trafficVisible = clashApi
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -379,11 +510,10 @@ class MainActivity :
     fun requestRoutingImport(link: String) {
         val processor = RoutingLinkProcessors.forLink(link)
         if (processor == null) {
-            MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.error_title)
-                .setMessage(R.string.routing_import_unsupported)
-                .setPositiveButton(android.R.string.ok, null)
-                .show()
+            showComposeMessageDialog(
+                title = getText(R.string.error_title),
+                message = getText(R.string.routing_import_unsupported),
+            )
             return
         }
         requestRoutingImport(link, processor)
@@ -394,12 +524,7 @@ class MainActivity :
         processor: io.nekohasekai.sagernet.routing.RoutingLinkProcessor,
     ) {
         if (processor.format == RoutingProfileFormat.NEKOBOX_PLUS) {
-            val progress = LayoutProgressBinding.inflate(layoutInflater)
-            progress.content.setText(R.string.routing_import_preparing)
-            val dialog = MaterialAlertDialogBuilder(this)
-                .setView(progress.root)
-                .setCancelable(false)
-                .show()
+            val dialog = showBlockingProgressDialog(R.string.routing_import_preparing)
             lifecycleScope.launch {
                 val result = runCatching {
                     withContext(Dispatchers.Default) {
@@ -427,11 +552,10 @@ class MainActivity :
     }
 
     private fun showRoutingImportError(error: Throwable) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.error_title)
-            .setMessage(getString(R.string.routing_import_invalid, error.readableMessage))
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
+        showComposeMessageDialog(
+            title = getText(R.string.error_title),
+            message = getString(R.string.routing_import_invalid, error.readableMessage),
+        )
     }
 
     fun requestCustomThemeImport(link: String, returnToInterface: Boolean) {
@@ -447,23 +571,24 @@ class MainActivity :
             Toast.makeText(this, R.string.invalid_custom_theme_link, Toast.LENGTH_LONG).show()
             return
         }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.import_custom_theme)
-            .setMessage(R.string.import_custom_theme_warning)
-            .setNegativeButton(R.string.no, null)
-            .setPositiveButton(R.string.yes) { _, _ ->
+        showComposeMessageDialog(
+            title = getText(R.string.import_custom_theme),
+            message = getText(R.string.import_custom_theme_warning),
+            positiveButton = getText(R.string.yes),
+            negativeButton = getText(R.string.no),
+            onPositive = {
                 if (CustomThemePreview.pending() != null) {
                     Toast.makeText(this, R.string.custom_theme_preview_active, Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
+                } else {
+                    CustomThemePreview.begin(this, candidate)
+                    if (returnToInterface) {
+                        openSettingsOnNextCreate()
+                        SettingsFragment.restoreInterfaceOnNextCreate()
+                    }
+                    ActivityCompat.recreate(this)
                 }
-                CustomThemePreview.begin(this, candidate)
-                if (returnToInterface) {
-                    openSettingsOnNextCreate()
-                    SettingsFragment.restoreInterfaceOnNextCreate()
-                }
-                ActivityCompat.recreate(this)
-            }
-            .show()
+            },
+        )
     }
 
     private fun showPendingCustomThemePreview() {
@@ -482,22 +607,25 @@ class MainActivity :
             if (CustomThemePreview.rollback(pending.id)) ActivityCompat.recreate(this)
         }
 
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setMessage(
-                getString(
-                    R.string.custom_theme_applied_save_changes,
-                    CustomThemePreview.remainingSeconds(pending),
-                ),
-            )
-            .setNegativeButton(R.string.no) { _, _ -> rollback() }
-            .setPositiveButton(R.string.yes) { _, _ ->
-                if (resolved) return@setPositiveButton
+        var previewMessage by mutableStateOf(
+            getString(
+                R.string.custom_theme_applied_save_changes,
+                CustomThemePreview.remainingSeconds(pending),
+            ),
+        )
+        val dialog = showComposeDynamicMessageDialog(
+            message = { previewMessage },
+            negativeButton = getText(R.string.no),
+            positiveButton = getText(R.string.yes),
+            onNegative = ::rollback,
+            onPositive = positive@{
+                if (resolved) return@positive
                 resolved = true
                 customThemePreviewTimer?.cancel()
                 CustomThemePreview.confirm(pending.id)
-            }
-            .setOnCancelListener { rollback() }
-            .show()
+            },
+            onCancel = ::rollback,
+        )
         customThemePreviewDialog = dialog
 
         var displayedSeconds = CustomThemePreview.remainingSeconds(pending)
@@ -506,9 +634,7 @@ class MainActivity :
                 val seconds = CustomThemePreview.remainingSeconds(pending)
                 if (seconds != displayedSeconds) {
                     displayedSeconds = seconds
-                    dialog.setMessage(
-                        getString(R.string.custom_theme_applied_save_changes, seconds),
-                    )
+                    previewMessage = getString(R.string.custom_theme_applied_save_changes, seconds)
                 }
             }
 
@@ -576,11 +702,11 @@ class MainActivity :
         }
     }
 
-    fun urlTest(): Int {
+    fun urlTest(automatic: Boolean = false): Int {
         if (!DataStore.serviceState.connected || connection.service == null) {
             error("not started")
         }
-        return connection.service!!.urlTest()
+        return connection.service!!.urlTest(automatic)
     }
 
     suspend fun importSubscription(uri: Uri) {
@@ -625,15 +751,17 @@ class MainActivity :
         onMainDispatcher {
             displayFragmentWithId(R.id.nav_group)
 
-            MaterialAlertDialogBuilder(this@MainActivity)
-                .setTitle(R.string.subscription_import)
-                .setMessage(getString(R.string.subscription_import_message, name))
-                .setPositiveButton(R.string.yes) { _, _ ->
+            showComposeMessageDialog(
+                title = getText(R.string.subscription_import),
+                message = getString(R.string.subscription_import_message, name),
+                positiveButton = getText(R.string.yes),
+                negativeButton = getText(android.R.string.cancel),
+                onPositive = {
                     runOnDefaultDispatcher {
                         finishImportSubscription(group)
                     }
-                }.setNegativeButton(android.R.string.cancel, null)
-                .show()
+                },
+            )
         }
     }
 
@@ -672,24 +800,24 @@ class MainActivity :
                     }
                 }
 
-            MaterialAlertDialogBuilder(this@MainActivity)
-                .setTitle(R.string.profile_import)
-                .setMessage(message)
-                .setPositiveButton(R.string.yes) { _, _ ->
+            showComposeMessageDialog(
+                title = getText(R.string.profile_import),
+                message = message,
+                positiveButton = getText(R.string.yes),
+                negativeButton = getText(android.R.string.cancel),
+                onPositive = {
                     runOnDefaultDispatcher {
                         finishImportProfiles(profiles)
                     }
-                }.setNegativeButton(android.R.string.cancel, null)
-                .show()
+                },
+            )
         }
     }
 
     private suspend fun finishImportProfiles(profiles: List<AbstractBean>) {
         val targetId = DataStore.selectedGroupForImport()
 
-        for (profile in profiles) {
-            ProfileManager.createProfile(targetId, profile)
-        }
+        ProfileManager.createProfiles(targetId, profiles)
 
         onMainDispatcher {
             displayFragmentWithId(R.id.nav_configuration)
@@ -712,20 +840,21 @@ class MainActivity :
 
         // official exe
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.missing_plugin)
-            .setMessage(
+        showComposeMessageDialog(
+            title = getText(R.string.missing_plugin),
+            message =
                 getString(
                     R.string.profile_requiring_plugin,
                     profileName,
                     pluginEntity.displayName,
                 ),
-            ).setPositiveButton(R.string.action_download) { _, _ ->
-                showDownloadDialog(pluginEntity)
-            }.setNeutralButton(android.R.string.cancel, null)
-            .setNeutralButton(R.string.action_learn_more) { _, _ ->
+            positiveButton = getText(R.string.action_download),
+            neutralButton = getText(R.string.action_learn_more),
+            onPositive = { showDownloadDialog(pluginEntity) },
+            onNeutral = {
                 launchCustomTab("https://matsuridayo.github.io/nb4a-plugin/")
-            }.show()
+            },
+        )
     }
 
     private fun showDownloadDialog(pluginEntry: PluginEntry) {
@@ -746,24 +875,17 @@ class MainActivity :
         items.add(getString(R.string.download))
         val downloadIndex = index
 
-        MaterialAlertDialogBuilder(this)
-            .setTitle(pluginEntry.name)
-            .setItems(items.toTypedArray()) { _, which ->
+        showComposeItemDialog(
+            title = pluginEntry.name,
+            items = items,
+            onItemSelected = { which ->
                 when (which) {
                     playIndex -> launchCustomTab("https://play.google.com/store/apps/details?id=${pluginEntry.packageName}")
                     fdroidIndex -> launchCustomTab("https://f-droid.org/packages/${pluginEntry.packageName}/")
                     downloadIndex -> launchCustomTab(pluginEntry.downloadSource.downloadLink)
                 }
-            }.show()
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        if (item.isChecked) {
-            binding.drawerLayout.closeDrawers()
-        } else {
-            return displayFragmentWithId(item.itemId)
-        }
-        return true
+            },
+        )
     }
 
     @SuppressLint("CommitTransaction")
@@ -773,7 +895,19 @@ class MainActivity :
             .beginTransaction()
             .replace(R.id.fragment_holder, fragment)
             .commitAllowingStateLoss()
-        binding.drawerLayout.closeDrawers()
+        closeDrawer()
+    }
+
+    fun displaySettingsGroup(groupId: String) {
+        val fragment = SettingsFragment()
+        displayFragment(fragment)
+        supportFragmentManager.executePendingTransactions()
+        fragment.openGroup(groupId, animate = false)
+    }
+
+    fun displayToolsFragment(fragment: ToolsFragment = ToolsFragment()) {
+        displayFragment(fragment)
+        shellState.selectedItemId = R.id.nav_tools
     }
 
     private fun updateBottomControlsVisibility(
@@ -785,12 +919,13 @@ class MainActivity :
         bottomControlsVisibleForCurrentFragment =
             fragment is ConfigurationFragment ||
             (fragment is SettingsFragment && DataStore.showBottomBarInSettings)
-        binding.stats.useExternalScrollDriver = fragment is ConfigurationFragment
+        binding.stats.useExternalScrollDriver =
+            fragment is ConfigurationFragment || fragment is SettingsFragment
         if (bottomControlsVisibleForCurrentFragment) {
             binding.stats.allowShow = true
             binding.stats.visibility = View.VISIBLE
+            binding.fabCluster.visibility = View.VISIBLE
             binding.fabProgress.visibility = View.INVISIBLE
-            binding.fab.show()
             if (syncState) {
                 binding.fab.changeState(DataStore.serviceState, DataStore.serviceState, false)
                 binding.stats.changeState(DataStore.serviceState, DataStore.serviceState)
@@ -809,14 +944,10 @@ class MainActivity :
         if (animate) {
             binding.stats.performHide()
         }
-        // Do not call fab.hide()/show() here: it runs the BottomAppBar custom motion spec that
-        // translates the FAB, and pairing it with the immediate visibility = GONE below left the
-        // FAB's internal show/hide state and translationY corrupted, so the next show() could
-        // strand the button at the bottom. The FAB now rides the bar via FabAnchorBehavior, so
-        // plain visibility is enough to remove the cluster.
+        // Keep the FAB's own visibility state untouched. The parent cluster is the only anchored
+        // unit, so hiding a fragment cannot leave Material's FAB animation state half-finished.
         binding.stats.visibility = View.GONE
-        binding.fab.visibility = View.GONE
-        binding.fabProgress.visibility = View.GONE
+        binding.fabCluster.visibility = View.GONE
     }
 
     fun driveBottomBar(scrollDy: Int) {
@@ -846,9 +977,7 @@ class MainActivity :
             }
 
             R.id.nav_adblock -> {
-                startActivity(Intent(this, AdblockSettingsActivity::class.java))
-                binding.drawerLayout.closeDrawers()
-                return false
+                displayFragment(AdblockSettingsFragment())
             }
 
             R.id.nav_settings -> {
@@ -860,7 +989,8 @@ class MainActivity :
             }
 
             R.id.nav_tools -> {
-                displayFragment(ToolsFragment())
+                displayToolsFragment()
+                return true
             }
 
             R.id.nav_logcat -> {
@@ -875,7 +1005,7 @@ class MainActivity :
                 return false
             }
         }
-        navigation.menu.findItem(id).isChecked = true
+        shellState.selectedItemId = id
         return true
     }
 
@@ -983,6 +1113,7 @@ class MainActivity :
     val connection = SagerConnection(SagerConnection.CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND, true)
 
     override fun onServiceConnected(service: ISagerNetService) {
+        binding.stats.bindConnectionCheckService(service)
         val logLevel = AppLogLevel.fromPreferenceValue(DataStore.logLevel)
         runOnDefaultDispatcher {
             runCatching { service.setLogLevel(logLevel.singBoxName, logLevel.outputEnabled) }
@@ -1049,6 +1180,14 @@ class MainActivity :
                     ?.refreshVisibleTraffic()
             }
 
+            Key.SUBSCRIPTION_TRAFFIC_UNIT -> {
+                when (val fragment =
+                    supportFragmentManager.findFragmentById(R.id.fragment_holder)) {
+                    is ConfigurationFragment -> fragment.refreshSubscriptionTrafficUnits()
+                    is GroupFragment -> fragment.refreshSubscriptionTrafficUnits()
+                }
+            }
+
             Key.SHOW_BOTTOM_BAR_IN_SETTINGS -> {
                 updateBottomControlsVisibility(animate = true)
             }
@@ -1088,6 +1227,12 @@ class MainActivity :
     }
 
     override fun onDestroy() {
+        binding.root.removeCallbacks(initialDrawTimeout)
+        initialDrawListener?.let { listener ->
+            binding.root.viewTreeObserver.takeIf { it.isAlive }
+                ?.removeOnPreDrawListener(listener)
+        }
+        initialDrawListener = null
         customThemePreviewTimer?.cancel()
         customThemePreviewTimer = null
         customThemePreviewDialog?.setOnCancelListener(null)
@@ -1112,21 +1257,22 @@ class MainActivity :
     ): Boolean {
         when (keyCode) {
             KeyEvent.KEYCODE_DPAD_LEFT -> {
-                if (super.onKeyDown(keyCode, event)) return true
-                binding.drawerLayout.open()
-                navigation.requestFocus()
+                if (!SagerNet.isTv) {
+                    if (super.onKeyDown(keyCode, event)) return true
+                    openDrawer()
+                }
             }
 
             KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                if (binding.drawerLayout.isOpen) {
-                    binding.drawerLayout.close()
+                if (shellState.drawerIsOpen) {
+                    closeDrawer()
                     return true
                 }
             }
         }
 
         if (super.onKeyDown(keyCode, event)) return true
-        if (binding.drawerLayout.isOpen) return false
+        if (shellState.drawerIsOpen) return false
 
         val fragment =
             supportFragmentManager.findFragmentById(R.id.fragment_holder) as? ToolbarFragment

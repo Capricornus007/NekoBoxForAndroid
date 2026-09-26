@@ -14,10 +14,6 @@ type Engine interface {
 	CSPDirectives(url string, sourceURL string, requestType string, method RequestMethod) (string, error)
 	URLCosmeticResources(url string) (CosmeticResources, error)
 	HiddenClassIDSelectors(classes []string, ids []string, exceptions []string) ([]string, error)
-	UseTags(tags []string) error
-	EnableTags(tags []string) error
-	DisableTags(tags []string) error
-	TagExists(tag string) (bool, error)
 	Close() error
 }
 

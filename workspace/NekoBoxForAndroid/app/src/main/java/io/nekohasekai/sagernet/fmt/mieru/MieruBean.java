@@ -53,6 +53,8 @@ public class MieruBean extends AbstractBean {
     public Integer handshakeMode;
     public String portRange;
     public String trafficPattern;
+    public String lowEntropyMode;
+    public String lowEntropyMaskRotation;
 
     @Override
     public void initializeDefaultValues() {
@@ -65,12 +67,14 @@ public class MieruBean extends AbstractBean {
         if (handshakeMode == null) handshakeMode = HANDSHAKE_DEFAULT;
         if (portRange == null) portRange = "";
         if (trafficPattern == null) trafficPattern = "";
+        if (lowEntropyMode == null) lowEntropyMode = "";
+        if (lowEntropyMaskRotation == null) lowEntropyMaskRotation = "";
     }
 
     @Override
     public void serialize(ByteBufferOutput output) {
         initializeDefaultValues();
-        output.writeInt(4);
+        output.writeInt(5);
         super.serialize(output);
         output.writeInt(protocol);
         output.writeString(username);
@@ -82,6 +86,8 @@ public class MieruBean extends AbstractBean {
         output.writeInt(handshakeMode);
         output.writeString(portRange);
         output.writeString(trafficPattern);
+        output.writeString(lowEntropyMode);
+        output.writeString(lowEntropyMaskRotation);
     }
 
     @Override
@@ -116,6 +122,10 @@ public class MieruBean extends AbstractBean {
         if (version >= 4) {
             trafficPattern = input.readString();
         }
+        if (version >= 5) {
+            lowEntropyMode = input.readString();
+            lowEntropyMaskRotation = input.readString();
+        }
     }
 
     public void applyFeatureSettings(AbstractBean other) {
@@ -125,6 +135,8 @@ public class MieruBean extends AbstractBean {
         bean.handshakeMode = handshakeMode;
         bean.mtu = mtu;
         bean.trafficPattern = trafficPattern;
+        bean.lowEntropyMode = lowEntropyMode;
+        bean.lowEntropyMaskRotation = lowEntropyMaskRotation;
     }
 
     @Override

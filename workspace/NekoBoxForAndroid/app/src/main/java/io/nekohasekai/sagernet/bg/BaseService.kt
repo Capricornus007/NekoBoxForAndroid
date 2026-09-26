@@ -22,9 +22,10 @@ import io.nekohasekai.sagernet.aidl.ISagerNetService
 import io.nekohasekai.sagernet.aidl.ISagerNetServiceCallback
 import io.nekohasekai.sagernet.aidl.SpeedTestData
 import io.nekohasekai.sagernet.bg.proto.ProxyInstance
+import io.nekohasekai.sagernet.database.AppData
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.RuleEntity
-import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.plugin.PluginManager
 import io.nekohasekai.sagernet.utils.DefaultNetworkListener
@@ -39,11 +40,11 @@ import moe.matsuri.nb4a.utils.JavaUtil
 import moe.matsuri.nb4a.utils.Util
 import java.net.UnknownHostException
 
-private const val NETWORK_RECOVERY_DEBOUNCE_MS = 1_000L
 private const val SING_BOX_CLOSE_TIMEOUT = "sing-box did not close in time"
 private const val SERVICE_CLOSE_TIMEOUT_MS = 5_000L
 private const val CONNECTING_CANCEL_TIMEOUT_MS = 5_000L
 private const val EXTRA_RESTART_ORIGIN = "io.nekohasekai.sagernet.extra.RESTART_ORIGIN"
+private const val EXTRA_RESTART_CAUSE = "io.nekohasekai.sagernet.extra.RESTART_CAUSE"
 private const val EXTRA_RETRY_ATTEMPT = "io.nekohasekai.sagernet.extra.RETRY_ATTEMPT"
 
 internal suspend fun Job.cancelAndJoinWithin(timeoutMillis: Long): Boolean =
@@ -90,14 +91,17 @@ class BaseService {
         var state = State.Stopped
         var proxy: ProxyInstance? = null
         var notification: ServiceNotification? = null
-        var networkRecoveryJob: Job? = null
+        @Volatile
+        internal var connectionRecovery: ConnectionRecoveryQueue? = null
         internal var overloadWatchdog: CoreOverloadWatchdog? = null
         var coreRecoveryConnection: ServiceConnection? = null
         var pendingRestart = false
         var pendingRestartOrigin = ServiceRestartOrigin.Manual
+        var pendingRestartCause = ServiceRestartCause.Default
         var pendingRetryAttempt = 0
         var restartJob: Job? = null
         var restartGeneration = 0L
+        var activeRestartCause = ServiceRestartCause.Default
         var lastStartId = 0
         var desiredProfileId = 0L
         var latestRequestId = Long.MIN_VALUE
@@ -121,17 +125,23 @@ class BaseService {
                 // Action.SWITCH_WAKE_LOCK -> runOnDefaultDispatcher { service.switchWakeLock() }
                 PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (SagerNet.power.isDeviceIdleMode) {
-                            proxy?.box?.sleep()
-                        } else {
-                            proxy?.box?.wake()
-                            service.handleConnectionRecovery(
-                                reconnect = DataStore.wakeReconnect,
-                                reset = DataStore.wakeResetConnections
-                            )
-                        }
+                        connectionRecovery?.idle(
+                            SagerNet.power.isDeviceIdleMode,
+                            DataStore.wakeReconnect,
+                            DataStore.wakeResetConnections,
+                        )
                     }
                 }
+                Intent.ACTION_SCREEN_OFF -> connectionRecovery?.screen(
+                    on = false,
+                    reconnect = DataStore.wakeReconnect,
+                    reset = DataStore.wakeResetConnections,
+                )
+                Intent.ACTION_SCREEN_ON -> connectionRecovery?.screen(
+                    on = true,
+                    reconnect = DataStore.wakeReconnect,
+                    reset = DataStore.wakeResetConnections,
+                )
 
                 Action.RESET_UPSTREAM_CONNECTIONS -> runOnDefaultDispatcher {
                     service.resetCoreNetwork()
@@ -140,6 +150,14 @@ class BaseService {
                         Toast.makeText(ctx, R.string.reset_connections_notification, Toast.LENGTH_SHORT)
                             .show()
                     }
+                }
+                Action.UPDATE_NOTIFICATION_COUNTRY_INDICATOR -> runOnDefaultDispatcher {
+                    notification?.postNotificationCountryIndicator(
+                        intent.getBooleanExtra(
+                            Action.EXTRA_NOTIFICATION_COUNTRY_INDICATOR_ENABLED,
+                            DataStore.notificationCountryIndicator,
+                        )
+                    )
                 }
 
                 else -> service.stopRunner()
@@ -155,7 +173,12 @@ class BaseService {
             if (state == s && msg == null) return
             state = s
             DataStore.serviceState = s
+            if (s != State.Connected) binder.resetConnectionTestState()
             binder.stateChanged(s, msg)
+        }
+
+        fun restartService() {
+            service.stopRunner(restart = true)
         }
     }
 
@@ -190,6 +213,7 @@ class BaseService {
         private var speedTestSession: SpeedTestSession? = null
         @Volatile
         private var latestSpeedTestStatus = SpeedTestData()
+        private val connectionTestSession = ConnectionTestSessionState()
 
         suspend fun broadcast(work: (ISagerNetServiceCallback) -> Unit) {
             broadcastMutex.withLock {
@@ -219,9 +243,14 @@ class BaseService {
             }
         }
 
-        override fun urlTest(): Int {
+        override fun urlTest(automatic: Boolean): Int {
             val data = data ?: error("core not started")
             val box = data.proxy?.box ?: error("core not started")
+            val retryPlan = AutomaticConnectionTestPolicy.retryPlan(
+                automatic,
+                DataStore.connectionTestAttempts,
+                DataStore.connectionTestPause,
+            )
             try {
                 return data.urlTestTracker.track {
                     Libcore.urlTest(
@@ -229,14 +258,32 @@ class BaseService {
                         DataStore.connectionTestURL,
                         DataStore.connectionTestTimeout,
                         DataStore.profileTestType,
-                        DataStore.connectionTestAttempts,
-                        DataStore.connectionTestPause,
+                        retryPlan.attempts,
+                        retryPlan.pauseMillis,
                         DataStore.connectionTestHardened,
                     )
                 }
             } catch (e: Exception) {
                 error(e.readableMessage)
+            } finally {
+                data.connectionRecovery?.urlTestFinished()
             }
+        }
+
+        override fun claimAutomaticConnectionCheck(): Boolean {
+            return connectionTestSession.claim(data?.state == State.Connected)
+        }
+
+        override fun connectionTestStatus(): String? = connectionTestSession.presentation()?.status
+
+        override fun connectionTestIpInfo(): String? = connectionTestSession.presentation()?.ipInfo
+
+        override fun setConnectionTestPresentation(status: String?, ipInfo: String?) {
+            connectionTestSession.setPresentation(data?.state == State.Connected, status, ipInfo)
+        }
+
+        fun resetConnectionTestState() {
+            connectionTestSession.reset()
         }
 
         override fun startSpeedTest(
@@ -358,8 +405,14 @@ class BaseService {
         }
 
         override fun setClashMode(mode: String) {
-            val box = data?.proxy?.box ?: return
+            val data = data ?: return
+            val box = data.proxy?.box ?: return
+            val oldMode = Libcore.currentClashMode(box)
             Libcore.setClashMode(box, mode)
+            val newMode = Libcore.currentClashMode(box)
+            if (!oldMode.equals(newMode, ignoreCase = true)) {
+                data.restartService()
+            }
         }
 
         override fun setLogLevel(level: String, enabled: Boolean) {
@@ -496,11 +549,11 @@ class BaseService {
             }
         }
 
-        override fun startCoreProfiling() {
+        override fun startCoreProfiling(mode: Int) {
             if (data?.proxy?.isInitialized() != true) {
                 error("Core is not started yet")
             }
-            Libcore.startCoreProfiling()
+            Libcore.startCoreProfiling(mode)
         }
 
         override fun stopCoreProfiling() {
@@ -542,12 +595,16 @@ class BaseService {
     interface Interface {
         val data: Data
         val tag: String
-        fun createNotification(profileName: String): ServiceNotification
+        fun createNotification(profile: ProxyEntity?): ServiceNotification
 
         fun onBind(intent: Intent): IBinder? =
             if (intent.action == Action.SERVICE) data.binder else null
 
         fun reload(selectedProxy: Long = DataStore.selectedProxy) {
+            val restartCause = ServiceLifecyclePolicy.profileReloadCause(
+                runningProfileId = data.proxy?.profile?.id,
+                selectedProfileId = selectedProxy,
+            )
             data.desiredProfileId = selectedProxy
             val s = data.state
             val action = ServiceLifecyclePolicy.reloadAction(
@@ -564,7 +621,7 @@ class BaseService {
                     stopRunner(false, (this as Context).getString(R.string.profile_empty))
                 }
                 ServiceLifecyclePolicy.ReloadAction.SelectorReload -> {
-                    val ent = SagerDatabase.proxyDao.getById(selectedProxy)
+                    val ent = AppData.profiles.getById(selectedProxy)
                     val tag = data.proxy!!.config.profileTagMap[ent?.id] ?: ""
                     if (tag.isNotBlank() && ent != null) {
                         // select from GUI
@@ -583,10 +640,14 @@ class BaseService {
                     }
                 }
                 ServiceLifecyclePolicy.ReloadAction.Start -> startRunner()
-                ServiceLifecyclePolicy.ReloadAction.StopRestart -> stopRunner(true)
+                ServiceLifecyclePolicy.ReloadAction.StopRestart -> stopRunner(
+                    restart = true,
+                    restartCause = restartCause,
+                )
                 ServiceLifecyclePolicy.ReloadAction.MarkPendingRestart -> {
                     data.pendingRestart = true
                     data.pendingRestartOrigin = ServiceRestartOrigin.Manual
+                    data.pendingRestartCause = restartCause
                 }
                 ServiceLifecyclePolicy.ReloadAction.Ignore -> Logs.w("Illegal state $s when invoking use")
             }
@@ -594,7 +655,7 @@ class BaseService {
 
         fun canReloadSelector(selectedProxy: Long = DataStore.selectedProxy): Boolean {
             if ((data.proxy?.config?.selectorGroupId ?: -1L) < 0) return false
-            val ent = SagerDatabase.proxyDao.getById(selectedProxy) ?: return false
+            val ent = AppData.profiles.getById(selectedProxy) ?: return false
             val tmpBox = ProxyInstance(ent)
             tmpBox.buildConfigTmp()
             if (tmpBox.lastSelectorGroupId == data.proxy?.lastSelectorGroupId) {
@@ -608,11 +669,12 @@ class BaseService {
         }
 
         fun hasActiveWifiRules(): Boolean {
-            return SagerDatabase.rulesDao.enabledRules().any { RuleEntity.hasActiveWifiIdentity(it) }
+            return AppData.rules.enabledRules().any { RuleEntity.hasActiveWifiIdentity(it) }
         }
 
         fun startRunner(
             origin: ServiceRestartOrigin = ServiceRestartOrigin.Manual,
+            cause: ServiceRestartCause = ServiceRestartCause.Default,
             retryAttempt: Int = 0,
             delayMillis: Long = 0L,
         ) {
@@ -626,6 +688,7 @@ class BaseService {
                 }
                 val restartIntent = Intent(this@Interface, serviceClass)
                     .putExtra(EXTRA_RESTART_ORIGIN, origin.name)
+                    .putExtra(EXTRA_RESTART_CAUSE, cause.name)
                     .putExtra(EXTRA_RETRY_ATTEMPT, retryAttempt)
                     .putExtra(Action.EXTRA_PROFILE_ID, data.desiredProfileId)
                     .putExtra(Action.EXTRA_REQUEST_ID, data.latestRequestId)
@@ -697,9 +760,11 @@ class BaseService {
             )
         }
 
-        suspend fun beforeRestartAfterStop() {
+        suspend fun beforeRestartAfterStop(tunRetained: Boolean) {
             delay(300)
         }
+
+        fun finalizeProcessCleanup(retainTun: Boolean) = Unit
 
         private suspend fun stopCoreRecoveryForCleanupTimeout() {
             data.overloadWatchdog?.close()
@@ -753,8 +818,8 @@ class BaseService {
         fun killProcesses() {
             Logs.d("Service cleanup started")
             stopCoreRecovery()
-            data.networkRecoveryJob?.cancel()
-            data.networkRecoveryJob = null
+            data.connectionRecovery?.close()
+            data.connectionRecovery = null
             SagerNet.application.nativeInterface.unregisterWifiStateListener()
             SagerNet.application.nativeInterface.setWifiRuleMonitoringEnabled(false)
             var closeError: Throwable? = null
@@ -775,6 +840,7 @@ class BaseService {
             restart: Boolean = false,
             msg: String? = null,
             restartOrigin: ServiceRestartOrigin = ServiceRestartOrigin.Manual,
+            restartCause: ServiceRestartCause = ServiceRestartCause.Default,
             retryAttempt: Int = 0,
         ) {
             if (!restart) {
@@ -783,10 +849,12 @@ class BaseService {
                 data.restartJob = null
                 data.pendingRestart = false
                 data.pendingRestartOrigin = ServiceRestartOrigin.Manual
+                data.pendingRestartCause = ServiceRestartCause.Default
                 data.pendingRetryAttempt = 0
             }
             if (ServiceLifecyclePolicy.shouldPreserveRestartOnDuplicateStop(data.state == State.Stopping, restart)) {
                 data.pendingRestart = true
+                data.pendingRestartCause = restartCause
                 if (restartOrigin == ServiceRestartOrigin.Automatic) {
                     data.pendingRestartOrigin = restartOrigin
                     data.pendingRetryAttempt = maxOf(data.pendingRetryAttempt, retryAttempt)
@@ -824,6 +892,8 @@ class BaseService {
                 var cleanupSucceeded = true
                 var shouldRestart = restart
                 var effectiveRetryAttempt = retryAttempt
+                var effectiveRestartOrigin = restartOrigin
+                var effectiveRestartCause = restartCause
                 var cleanupTimedOut = false
                 var cleanupError: Throwable? = null
                 data.lifecycleMutex.withLock {
@@ -864,15 +934,19 @@ class BaseService {
                         DataStore.baseService = null
                         DataStore.vpnService = null
                     }
-                    val effectiveRestartOrigin =
+                    effectiveRestartOrigin =
                         if (data.pendingRestartOrigin == ServiceRestartOrigin.Automatic) {
                             ServiceRestartOrigin.Automatic
                         } else {
                             restartOrigin
                         }
+                    if (data.pendingRestart) {
+                        effectiveRestartCause = data.pendingRestartCause
+                    }
                     effectiveRetryAttempt = maxOf(effectiveRetryAttempt, data.pendingRetryAttempt)
                     data.pendingRestart = false
                     data.pendingRestartOrigin = ServiceRestartOrigin.Manual
+                    data.pendingRestartCause = ServiceRestartCause.Default
                     data.pendingRetryAttempt = 0
 
                     if (cleanupTimedOut) {
@@ -881,9 +955,6 @@ class BaseService {
 
                     // change the state
                     data.changeState(State.Stopped, msg ?: cleanupError?.readableMessage)
-                    if (shouldRestart) {
-                        data.pendingRestartOrigin = effectiveRestartOrigin
-                    }
                 }
 
                 val cleanupAction = ServiceLifecyclePolicy.stopCleanupAction(
@@ -895,24 +966,33 @@ class BaseService {
                     "Service stop cleanup action: action=$cleanupAction restart=$shouldRestart " +
                         "cleanupSucceeded=$cleanupSucceeded cleanupTimedOut=$cleanupTimedOut"
                 )
+                val retainTun = ServiceLifecyclePolicy.shouldRetainTun(
+                    restartCause = effectiveRestartCause,
+                    cleanupAction = cleanupAction,
+                    cleanupSucceeded = cleanupSucceeded,
+                )
+                finalizeProcessCleanup(retainTun)
                 when (cleanupAction) {
                     ServiceLifecyclePolicy.StopCleanupAction.Restart -> {
-                        val effectiveOrigin = data.pendingRestartOrigin
-                        data.pendingRestartOrigin = ServiceRestartOrigin.Manual
                         val expectedRestartGeneration = data.restartGeneration
-                        beforeRestartAfterStop()
+                        beforeRestartAfterStop(retainTun)
                         if (data.restartGeneration != expectedRestartGeneration) {
                             return@runOnMainDispatcher
                         }
                         val delayMillis =
-                            if (effectiveOrigin == ServiceRestartOrigin.Automatic &&
+                            if (effectiveRestartOrigin == ServiceRestartOrigin.Automatic &&
                                 effectiveRetryAttempt > 0
                             ) {
                                 ServiceLifecyclePolicy.automaticRetryDelayMillis(effectiveRetryAttempt)
                             } else {
                                 0L
                             }
-                        startRunner(effectiveOrigin, effectiveRetryAttempt, delayMillis)
+                        startRunner(
+                            origin = effectiveRestartOrigin,
+                            cause = effectiveRestartCause,
+                            retryAttempt = effectiveRetryAttempt,
+                            delayMillis = delayMillis,
+                        )
                     }
                     ServiceLifecyclePolicy.StopCleanupAction.RecoverProcess -> {
                         requestBgProcessRecovery(
@@ -1025,24 +1105,6 @@ class BaseService {
             // TODO NEW save app stats?
         }
 
-        fun handleConnectionRecovery(reconnect: Boolean, reset: Boolean) {
-            val effectiveReset = shouldResetConnections(reset, data.urlTestTracker.isRunning)
-            if (reset && !effectiveReset) {
-                Logs.d("Skip automatic connection reset while URL Test is running")
-            }
-            if (reconnect && data.state.canStop) {
-                DataStore.pendingResetConnectionsAfterReconnect = effectiveReset
-                stopRunner(
-                    restart = true,
-                    restartOrigin = ServiceRestartOrigin.Automatic,
-                )
-                return
-            }
-            if (effectiveReset) {
-                resetCoreNetwork()
-            }
-        }
-
         fun isVpnNetwork(network: Network?): Boolean {
             if (network == null) return false
             val capabilities = SagerNet.connectivity.getNetworkCapabilities(network)
@@ -1057,36 +1119,46 @@ class BaseService {
 
         suspend fun preInit() {
             val networkChangeRecoveryPolicy = NetworkChangeRecoveryPolicy()
+            val recovery = data.connectionRecovery
 
             fun handleNetworkUpdate(network: Network?) {
+                recovery?.network(network != null)
                 SagerNet.underlyingNetwork = network
                 SagerNet.application.nativeInterface.syncNetworkState(network)
                 DataStore.vpnService?.updateUnderlyingNetwork()
                 val link = network?.let { current -> SagerNet.connectivity.getLinkProperties(current) }
+                val capabilities = network?.let { current ->
+                    SagerNet.connectivity.getNetworkCapabilities(current)
+                }
                 val currentName = link?.interfaceName
                 upstreamInterfaceName = currentName
                 val decision = networkChangeRecoveryPolicy.onNetworkChanged(
                     interfaceName = currentName,
+                    networkHandle = network?.networkHandle,
                     isVpnNetwork = isVpnNetwork(network),
                     reconnectEnabled = DataStore.networkChangeReconnect,
                     resetEnabled = DataStore.networkChangeResetConnections,
+                    validated = capabilities?.hasCapability(
+                        NetworkCapabilities.NET_CAPABILITY_VALIDATED,
+                    ),
                 )
                 if (decision.reconnect || decision.reset) {
-                    Logs.d("Network changed: ${decision.oldInterfaceName} -> ${decision.newInterfaceName}")
-                    data.networkRecoveryJob?.cancel()
-                    data.networkRecoveryJob = runOnDefaultDispatcher {
-                        delay(NETWORK_RECOVERY_DEBOUNCE_MS)
-                        if (!data.state.started) return@runOnDefaultDispatcher
-                        handleConnectionRecovery(
-                            reconnect = decision.reconnect,
-                            reset = decision.reset
-                        )
-                    }
+                    Logs.d(
+                        "Network changed: ${decision.oldInterfaceName}/${decision.oldNetworkHandle} -> " +
+                            "${decision.newInterfaceName}/${decision.newNetworkHandle}; " +
+                            "validated=${decision.oldValidated}->${decision.newValidated}"
+                    )
+                    recovery?.request(
+                        decision.reconnect,
+                        decision.reset,
+                        ServiceRestartCause.NetworkChange,
+                    )
                 }
                 if (decision.ignoredReconnectForVpn) {
                     Logs.d(
                         "Ignore VPN network change for reconnect: " +
-                            "${decision.oldInterfaceName} -> ${decision.newInterfaceName}"
+                            "${decision.oldInterfaceName}/${decision.oldNetworkHandle} -> " +
+                            "${decision.newInterfaceName}/${decision.newNetworkHandle}"
                     )
                 }
             }
@@ -1130,6 +1202,9 @@ class BaseService {
             val restartOrigin = intent?.getStringExtra(EXTRA_RESTART_ORIGIN)
                 ?.let { runCatching { ServiceRestartOrigin.valueOf(it) }.getOrNull() }
                 ?: ServiceRestartOrigin.Manual
+            val restartCause = intent?.getStringExtra(EXTRA_RESTART_CAUSE)
+                ?.let { runCatching { ServiceRestartCause.valueOf(it) }.getOrNull() }
+                ?: ServiceRestartCause.Default
             val retryAttempt = intent?.getIntExtra(EXTRA_RETRY_ATTEMPT, 0) ?: 0
             val requestedProfileId = intent?.getLongExtra(
                 Action.EXTRA_PROFILE_ID,
@@ -1164,17 +1239,46 @@ class BaseService {
                 )
                 return Service.START_NOT_STICKY
             }
+            data.activeRestartCause = restartCause
             data.desiredProfileId = requestedProfileId
-            val profile = SagerDatabase.proxyDao.getById(requestedProfileId)
+            val profile = AppData.profiles.getById(requestedProfileId)
             this as Context
             if (profile == null) { // gracefully shutdown: https://stackoverflow.com/q/47337857/2245107
-                data.notification = createNotification("")
+                data.notification = createNotification(null)
                 stopRunner(false, getString(R.string.profile_empty))
                 return Service.START_NOT_STICKY
             }
 
             val proxy = ProxyInstance(profile, this)
             data.proxy = proxy
+            data.connectionRecovery?.close()
+            data.connectionRecovery = ConnectionRecoveryQueue(
+                urlTestRunning = { data.urlTestTracker.isRunning },
+                pause = { idle ->
+                    if (data.proxy === proxy && data.state.started) {
+                        if (idle) proxy.box.sleep() else proxy.box.wake()
+                    }
+                },
+                recover = { reconnect, reset, cause ->
+                    if (data.proxy === proxy && data.state.started) {
+                        if (reconnect) {
+                            DataStore.pendingResetConnectionsAfterReconnect = reset
+                            stopRunner(
+                                restart = true,
+                                restartOrigin = ServiceRestartOrigin.Automatic,
+                                restartCause = cause,
+                            )
+                        } else if (reset) {
+                            resetCoreNetwork()
+                        }
+                    }
+                },
+            )
+            data.connectionRecovery?.idle(
+                SagerNet.power.isDeviceIdleMode,
+                DataStore.wakeReconnect,
+                DataStore.wakeResetConnections,
+            )
             runOnDefaultDispatcher {
                 SubscriptionUpdater.syncBootReceiverEnabled()
             }
@@ -1187,7 +1291,10 @@ class BaseService {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
                     }
+                    addAction(Intent.ACTION_SCREEN_OFF)
+                    addAction(Intent.ACTION_SCREEN_ON)
                     addAction(Action.RESET_UPSTREAM_CONNECTIONS)
+                    addAction(Action.UPDATE_NOTIFICATION_COUNTRY_INDICATOR)
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     registerReceiver(
@@ -1213,7 +1320,7 @@ class BaseService {
                 data.lifecycleMutex.withLock {
                     try {
                         withContext(Dispatchers.Main.immediate) {
-                            data.notification = createNotification(ServiceNotification.genTitle(profile))
+                            data.notification = createNotification(profile)
                         }
 
                         Executable.killAll()    // clean up old processes
@@ -1228,7 +1335,13 @@ class BaseService {
                                 desiredProfileId = data.desiredProfileId,
                             )
                         ) {
-                            stopRunner(restart = data.desiredProfileId != 0L)
+                            stopRunner(
+                                restart = data.desiredProfileId != 0L,
+                                restartCause = ServiceLifecyclePolicy.profileReloadCause(
+                                    runningProfileId = profile.id,
+                                    selectedProfileId = data.desiredProfileId,
+                                ),
+                            )
                             return@withLock
                         }
                         proxy.configNormalizationViolations
@@ -1255,14 +1368,21 @@ class BaseService {
                                 "Profile changed during startup: started=${profile.id} " +
                                     "desired=${data.desiredProfileId}"
                             )
-                            stopRunner(restart = data.desiredProfileId != 0L)
+                            stopRunner(
+                                restart = data.desiredProfileId != 0L,
+                                restartCause = ServiceLifecyclePolicy.profileReloadCause(
+                                    runningProfileId = profile.id,
+                                    selectedProfileId = data.desiredProfileId,
+                                ),
+                            )
                             return@withLock
                         }
                         DataStore.currentProfile = profile.id
                         if (DataStore.enableCoreProfiling) {
-                            Libcore.startCoreProfiling()
+                            Libcore.startCoreProfiling(DataStore.coreProfilerMode)
                         }
                         data.changeState(State.Connected)
+                        data.connectionRecovery?.ready()
                         data.pendingRestartOrigin = ServiceRestartOrigin.Manual
                         CoreRecoveryService.updateStopWatchdog(
                             context = this@Interface as Context,
@@ -1281,6 +1401,7 @@ class BaseService {
                     } catch (_: UnknownHostException) {
                         stopAfterStartFailure(
                             restartOrigin,
+                            restartCause,
                             retryAttempt,
                             getString(R.string.invalid_server),
                         )
@@ -1290,7 +1411,7 @@ class BaseService {
                         }
                         Logs.w(e)
                         data.binder.missingPlugin(e.plugin)
-                        stopAfterStartFailure(restartOrigin, retryAttempt, null)
+                        stopAfterStartFailure(restartOrigin, restartCause, retryAttempt, null)
                     } catch (exc: Throwable) {
                         if (exc.readableMessage.contains("no working DNS resolvers found", ignoreCase = true)) {
                             withContext(Dispatchers.Main.immediate) {
@@ -1300,7 +1421,7 @@ class BaseService {
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
-                            stopAfterStartFailure(restartOrigin, retryAttempt, null)
+                            stopAfterStartFailure(restartOrigin, restartCause, retryAttempt, null)
                             return@withLock
                         }
                         if (exc.javaClass.name.endsWith("proxyerror")) {
@@ -1311,6 +1432,7 @@ class BaseService {
                         }
                         stopAfterStartFailure(
                             restartOrigin,
+                            restartCause,
                             retryAttempt,
                             "${getString(R.string.service_failed)}: ${exc.readableMessage}",
                         )
@@ -1324,6 +1446,7 @@ class BaseService {
 
         private fun stopAfterStartFailure(
             restartOrigin: ServiceRestartOrigin,
+            restartCause: ServiceRestartCause,
             retryAttempt: Int,
             message: String?,
         ) {
@@ -1332,6 +1455,7 @@ class BaseService {
                     restart = true,
                     msg = message,
                     restartOrigin = restartOrigin,
+                    restartCause = restartCause,
                     retryAttempt = retryAttempt + 1,
                 )
             } else {

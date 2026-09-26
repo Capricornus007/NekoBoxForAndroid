@@ -13,10 +13,17 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.net.InetSocketAddress
 import java.net.Proxy
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 object ConnectionIpResolver {
-    fun resolve(): String? {
+    data class Result(
+        val displayText: String,
+        val ip: String,
+        val countryCode: String?,
+    )
+
+    fun resolve(): Result? {
         val url = DataStore.connectionIPResolveURL.takeIf { it.isNotBlank() } ?: CONNECTION_IP_RESOLVE_URL
         return if (DataStore.serviceMode == Key.MODE_PROXY) {
             resolveViaHttpProxy(url)
@@ -25,9 +32,10 @@ object ConnectionIpResolver {
         }
     }
 
-    private fun resolveViaSocks(url: String): String? {
+    private fun resolveViaSocks(url: String): Result? {
         val client =
             Libcore.newHttpClient().apply {
+                withUTLS(DataStore.appUTLSFingerprint)
                 modernTLS()
                 keepAlive()
                 trySocks5(
@@ -55,7 +63,7 @@ object ConnectionIpResolver {
         }
     }
 
-    private fun resolveViaHttpProxy(url: String): String? {
+    private fun resolveViaHttpProxy(url: String): Result? {
         val proxyCredentials = Credentials.basic(DataStore.mixedUsername, DataStore.mixedPassword)
         val client =
             OkHttpClient
@@ -82,7 +90,7 @@ object ConnectionIpResolver {
         }
     }
 
-    private fun format(ipInfo: IPAPIInfo?): String? {
+    internal fun format(ipInfo: IPAPIInfo?): Result? {
         if (ipInfo == null) return null
 
         val ip =
@@ -93,16 +101,15 @@ object ConnectionIpResolver {
                 ipInfo.query,
             ) ?: return null
 
-        val countryCode =
-            firstNotBlank(
-                ipInfo.country_code,
-                ipInfo.countryCode,
-                ipInfo.location?.country_code,
-                ipInfo.country_info?.country_code,
-                ipInfo.countryInfo?.country_code,
-                ipInfo.country_info?.code,
-                ipInfo.countryInfo?.code,
-            )
+        val countryCode = firstCountryCode(
+            ipInfo.country_code,
+            ipInfo.countryCode,
+            ipInfo.location?.country_code,
+            ipInfo.country_info?.country_code,
+            ipInfo.countryInfo?.country_code,
+            ipInfo.country_info?.code,
+            ipInfo.countryInfo?.code,
+        )
         val country =
             firstNotBlank(
                 countryCode,
@@ -134,19 +141,27 @@ object ConnectionIpResolver {
             )
 
         val flag = countryCode?.let(::flagEmoji)
-        return buildString {
+        val displayText = buildString {
             if (!flag.isNullOrBlank()) append(flag).append(' ')
             append(ip)
             if (!country.isNullOrBlank()) append(' ').append(country)
             if (!region.isNullOrBlank()) append(", ").append(region)
         }
+        return Result(displayText, ip, countryCode)
     }
 
     private fun firstNotBlank(vararg values: String?): String? = values.firstOrNull { !it.isNullOrBlank() }
 
+    private fun firstCountryCode(vararg values: String?): String? =
+        values.firstNotNullOfOrNull(::normalizeCountryCode)
+
+    internal fun normalizeCountryCode(countryCode: String?): String? {
+        val code = countryCode?.trim()?.uppercase(Locale.ROOT) ?: return null
+        return code.takeIf { it.length == 2 && it.all { character -> character in 'A'..'Z' } }
+    }
+
     private fun flagEmoji(countryCode: String): String? {
-        val code = countryCode.trim().uppercase()
-        if (code.length != 2 || !code.all { it in 'A'..'Z' }) return null
+        val code = normalizeCountryCode(countryCode) ?: return null
         val first = code[0].code - 'A'.code + 0x1F1E6
         val second = code[1].code - 'A'.code + 0x1F1E6
         return String(Character.toChars(first)) + String(Character.toChars(second))

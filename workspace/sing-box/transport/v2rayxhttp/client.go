@@ -21,8 +21,8 @@ import (
 	"github.com/sagernet/quic-go"
 	"github.com/sagernet/quic-go/http3"
 	"github.com/sagernet/sing-box/adapter"
+	commonCongestion "github.com/sagernet/sing-box/common/congestion"
 	"github.com/sagernet/sing-box/common/tls"
-	"github.com/sagernet/sing-box/common/vision"
 	"github.com/sagernet/sing-box/common/xray/buf"
 	xrcrypto "github.com/sagernet/sing-box/common/xray/crypto"
 	xrnet "github.com/sagernet/sing-box/common/xray/net"
@@ -33,11 +33,11 @@ import (
 	"github.com/sagernet/sing-box/option"
 	qtls "github.com/sagernet/sing-quic"
 	"github.com/sagernet/sing/common"
-	"github.com/sagernet/sing/common/bufio"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
+	"github.com/sagernet/sing/common/ntp"
 	sHTTP "github.com/sagernet/sing/protocol/http"
 	"github.com/sagernet/sing/service"
 	"golang.org/x/net/http2"
@@ -323,6 +323,14 @@ func xhttpSessionProfileSignature(blocks []*option.V2RayXHTTPBaseOptions, kind x
 }
 
 func NewClient(ctx context.Context, logger logger.ContextLogger, dialer N.Dialer, serverAddr M.Socksaddr, options option.V2RayXHTTPOptions, tlsConfig tls.Config) (adapter.V2RayClientTransport, error) {
+	if _, err := commonCongestion.New(options.CongestionController, options.CWND, nil); err != nil {
+		return nil, err
+	}
+	if options.Download != nil {
+		if _, err := commonCongestion.New(options.Download.CongestionController, options.Download.CWND, nil); err != nil {
+			return nil, E.Cause(err, "invalid XHTTP download congestion control")
+		}
+	}
 	configMode, err := option.NormalizeXHTTPMode(options.Mode)
 	if err != nil {
 		return nil, err
@@ -373,7 +381,7 @@ func NewClient(ctx context.Context, logger logger.ContextLogger, dialer N.Dialer
 		}
 	}
 	xmuxManager := NewXmuxManager(xmuxOptions, func() XmuxConn {
-		return createHTTPClient(dest, dialer, &options.V2RayXHTTPBaseOptions, tlsConfig)
+		return createHTTPClient(ctx, dest, dialer, &options.V2RayXHTTPBaseOptions, tlsConfig)
 	})
 	getHTTPClient := func() (DialerClient, *XmuxClient, error) {
 		xmuxClient := xmuxManager.GetXmuxClient(ctx)
@@ -424,7 +432,7 @@ func NewClient(ctx context.Context, logger logger.ContextLogger, dialer N.Dialer
 			}
 		}
 		xmuxManager2 = NewXmuxManager(xmuxOptions2, func() XmuxConn {
-			return createHTTPClient(dest2, dialer2, &options2.V2RayXHTTPBaseOptions, tlsConfig2)
+			return createHTTPClient(ctx, dest2, dialer2, &options2.V2RayXHTTPBaseOptions, tlsConfig2)
 		})
 		getHTTPClient2 = func() (DialerClient, *XmuxClient, error) {
 			xmuxClient2 := xmuxManager2.GetXmuxClient(ctx)
@@ -440,7 +448,7 @@ func NewClient(ctx context.Context, logger logger.ContextLogger, dialer N.Dialer
 		}
 		profileXmuxOptions := xmuxOptions
 		profileXmuxManager := NewXmuxManager(profileXmuxOptions, func() XmuxConn {
-			return createHTTPClient(dest, dialer, &profileOptions.V2RayXHTTPBaseOptions, tlsConfig)
+			return createHTTPClient(ctx, dest, dialer, &profileOptions.V2RayXHTTPBaseOptions, tlsConfig)
 		})
 		profileGetHTTPClient := func() (DialerClient, *XmuxClient, error) {
 			xmuxClient := profileXmuxManager.GetXmuxClient(ctx)
@@ -464,7 +472,7 @@ func NewClient(ctx context.Context, logger logger.ContextLogger, dialer N.Dialer
 			}
 			profileOptions2 := profileOptions.Download
 			profileXmuxManager2 = NewXmuxManager(profileXmuxOptions2, func() XmuxConn {
-				return createHTTPClient(*downloadDest, downloadDialer, &profileOptions2.V2RayXHTTPBaseOptions, downloadTLSConfig)
+				return createHTTPClient(ctx, *downloadDest, downloadDialer, &profileOptions2.V2RayXHTTPBaseOptions, downloadTLSConfig)
 			})
 			profileGetHTTPClient2 = func() (DialerClient, *XmuxClient, error) {
 				xmuxClient2 := profileXmuxManager2.GetXmuxClient(ctx)
@@ -1050,7 +1058,7 @@ func prepareXHTTPTLSConfig(tlsConfig tls.Config) (tls.Config, xhttpTLSAdjustment
 			preparedConfig.SetNextProtos(tcpNextProtos)
 			return preparedConfig, xhttpTLSFallbackToTCP, nil
 		}
-		return nil, xhttpTLSUnchanged, E.Cause(stdConfigErr, "XHTTP HTTP/3 is incompatible with uTLS and no TCP ALPN fallback is configured")
+		return nil, xhttpTLSUnchanged, E.Cause(stdConfigErr, "XHTTP HTTP/3 is incompatible with the configured TLS engine and no TCP ALPN fallback is configured")
 	}
 	if slices.Contains(nextProtos, http3.NextProtoH3) {
 		preparedConfig.SetNextProtos(xhttpTCPNextProtos(nextProtos))
@@ -1061,7 +1069,7 @@ func prepareXHTTPTLSConfig(tlsConfig tls.Config) (tls.Config, xhttpTLSAdjustment
 func logXHTTPTLSAdjustment(logger logger.ContextLogger, transportName string, adjustment xhttpTLSAdjustment) {
 	switch adjustment {
 	case xhttpTLSFallbackToTCP:
-		logger.Warn("uTLS is not supported over ", transportName, " HTTP/3; falling back to a configured TCP ALPN")
+		logger.Warn("the configured TLS engine is not supported over ", transportName, " HTTP/3; falling back to a configured TCP ALPN")
 	}
 }
 
@@ -1144,8 +1152,9 @@ func formatDestWithNetwork(client DialerClient, dest M.Socksaddr) string {
 	return network + ":" + dest.String()
 }
 
-func createHTTPClient(dest M.Socksaddr, dialer N.Dialer, options *option.V2RayXHTTPBaseOptions, tlsConfig tls.Config) DialerClient {
+func createHTTPClient(ctx context.Context, dest M.Socksaddr, dialer N.Dialer, options *option.V2RayXHTTPBaseOptions, tlsConfig tls.Config) DialerClient {
 	httpVersion := decideHTTPVersion(tlsConfig)
+	congestionControlFactory, _ := commonCongestion.New(options.CongestionController, options.CWND, ntp.TimeFuncFromContext(ctx))
 	rawConns := newRawConnTracker()
 	dialContext := func(ctxInner context.Context) (net.Conn, error) {
 		conn, err := dialer.DialContext(ctxInner, N.NetworkTCP, dest)
@@ -1157,15 +1166,11 @@ func createHTTPClient(dest M.Socksaddr, dialer N.Dialer, options *option.V2RayXH
 			return nil, err
 		}
 		trackedConn := conn
-		hook, hasHook := vision.HookFromContext(ctxInner)
 		needTLS := tlsConfig != nil && httpVersion != "3"
 		if needTLS {
 			conn, err = tls.ClientHandshake(ctxInner, conn, tlsConfig)
 			if err != nil {
 				return nil, errors.Join(err, trackedConn.Close())
-			}
-			if hasHook {
-				hook(conn)
 			}
 		}
 		return conn, nil
@@ -1197,7 +1202,19 @@ func createHTTPClient(dest M.Socksaddr, dialer N.Dialer, options *option.V2RayXH
 				if dErr != nil {
 					return nil, dErr
 				}
-				return qtls.DialEarly(ctx, bufio.NewUnbindPacketConn(udpConn), udpConn.RemoteAddr(), tlsConfig, cfg)
+				quicConn, dErr := qtls.DialEarly(ctx, udpConn, tlsConfig, cfg)
+				if dErr != nil {
+					_ = udpConn.Close()
+					return nil, dErr
+				}
+				if congestionControlFactory != nil {
+					quicConn.SetCongestionControl(congestionControlFactory(quicConn))
+				}
+				go func() {
+					<-quicConn.Context().Done()
+					_ = udpConn.Close()
+				}()
+				return quicConn, nil
 			},
 		}
 	case "2":

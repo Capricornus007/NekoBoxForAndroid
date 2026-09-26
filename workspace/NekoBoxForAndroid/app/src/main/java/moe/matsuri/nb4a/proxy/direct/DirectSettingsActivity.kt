@@ -1,17 +1,13 @@
 package moe.matsuri.nb4a.proxy.direct
 
-import android.os.Bundle
-import androidx.preference.PreferenceDataStore
-import androidx.preference.PreferenceFragmentCompat
-import io.nekohasekai.sagernet.Key
-import io.nekohasekai.sagernet.R
+import androidx.compose.runtime.Composable
 import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
 import io.nekohasekai.sagernet.ui.profile.ProfileSettingsActivity
+import io.nekohasekai.sagernet.ui.compose.DirectProfileSettingsScreen
 
 class DirectSettingsActivity :
-    ProfileSettingsActivity<DirectBean>(),
-    OnPreferenceDataStoreChangeListener {
+    ProfileSettingsActivity<DirectBean>() {
+    override val usesComposePreferences = true
 
     override fun createEntity() = DirectBean()
 
@@ -23,16 +19,6 @@ class DirectSettingsActivity :
         name = DataStore.profileName
     }
 
-    override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {
-        if (key != Key.PROFILE_DIRTY) {
-            DataStore.dirty = true
-        }
-    }
-
-    override fun PreferenceFragmentCompat.createPreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-    ) {
-        addPreferencesFromResource(R.xml.direct_preferences)
-    }
+    @Composable
+    override fun ComposePreferences() = DirectProfileSettingsScreen()
 }

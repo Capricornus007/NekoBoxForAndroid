@@ -17,6 +17,8 @@ import io.nekohasekai.sagernet.fmt.masque.MasqueBean
 import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.mieru.toUri
 import io.nekohasekai.sagernet.fmt.naive.NaiveBean
+import io.nekohasekai.sagernet.fmt.openconnect.OpenConnectBean
+import io.nekohasekai.sagernet.fmt.openvpn.OpenVPNBean
 import io.nekohasekai.sagernet.fmt.naive.buildNaiveConfig
 import io.nekohasekai.sagernet.fmt.naive.toUri
 import io.nekohasekai.sagernet.fmt.shadowsocks.*
@@ -44,6 +46,8 @@ import io.nekohasekai.sagernet.fmt.juicity.toUri
 import io.nekohasekai.sagernet.fmt.v2ray.*
 import io.nekohasekai.sagernet.fmt.wireguard.AmneziaWGBean
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
+import io.nekohasekai.sagernet.fmt.wireguard.toAmneziaWGUri
+import io.nekohasekai.sagernet.fmt.wireguard.toWireGuardUri
 import io.nekohasekai.sagernet.fmt.wireguard.buildAmneziaWGConfig
 import io.nekohasekai.sagernet.fmt.wireguard.buildWireGuardConfig
 import io.nekohasekai.sagernet.ktx.app
@@ -76,6 +80,8 @@ data class ProxyEntity(
     var ping: Int = 0,
     var uuid: String = "",
     var error: String? = null,
+    var countryCode: String = "",
+    var countrySource: Int = 0,
     var socksBean: SOCKSBean? = null,
     var httpBean: HttpBean? = null,
     var ssBean: ShadowsocksBean? = null,
@@ -100,6 +106,8 @@ data class ProxyEntity(
     var masqueBean: MasqueBean? = null,
     var directBean: DirectBean? = null,
     var tailscaleBean: TailscaleBean? = null,
+    var openVPNBean: OpenVPNBean? = null,
+    var openConnectBean: OpenConnectBean? = null,
     var proxySetBean: ProxySetBean? = null,
     var chainBean: ChainBean? = null,
     var nekoBean: NekoBean? = null,
@@ -134,6 +142,8 @@ data class ProxyEntity(
         const val TYPE_MASQUE = 30
         const val TYPE_DIRECT = 31
         const val TYPE_TAILSCALE = 32
+        const val TYPE_OPENVPN = 33
+        const val TYPE_OPENCONNECT = 34
 
         const val TYPE_CONFIG = 998
         const val TYPE_NEKO = 999
@@ -163,7 +173,7 @@ data class ProxyEntity(
     }
 
     override fun serializeToBuffer(output: ByteBufferOutput) {
-        output.writeInt(0)
+        output.writeInt(1)
 
         output.writeLong(id)
         output.writeLong(groupId)
@@ -181,6 +191,8 @@ data class ProxyEntity(
         output.writeBytes(data)
 
         output.writeBoolean(dirty)
+        output.writeString(countryCode)
+        output.writeInt(countrySource)
     }
 
     override fun deserializeFromBuffer(input: ByteBufferInput) {
@@ -199,6 +211,10 @@ data class ProxyEntity(
         putByteArray(input.readBytes(input.readVarInt(true)))
 
         dirty = input.readBoolean()
+        if (version >= 1) {
+            countryCode = input.readString()
+            countrySource = input.readInt()
+        }
     }
 
 
@@ -228,6 +244,8 @@ data class ProxyEntity(
             TYPE_MASQUE -> masqueBean = KryoConverters.masqueDeserialize(byteArray)
             TYPE_DIRECT -> directBean = KryoConverters.directDeserialize(byteArray)
             TYPE_TAILSCALE -> tailscaleBean = KryoConverters.tailscaleDeserialize(byteArray)
+            TYPE_OPENVPN -> openVPNBean = KryoConverters.openVPNDeserialize(byteArray)
+            TYPE_OPENCONNECT -> openConnectBean = KryoConverters.openConnectDeserialize(byteArray)
             TYPE_PROXY_SET -> proxySetBean = KryoConverters.proxySetDeserialize(byteArray)
             TYPE_CHAIN -> chainBean = KryoConverters.chainDeserialize(byteArray)
             TYPE_NEKO -> nekoBean = KryoConverters.nekoDeserialize(byteArray)
@@ -260,6 +278,8 @@ data class ProxyEntity(
         TYPE_MASQUE -> "MASQUE"
         TYPE_DIRECT -> "Direct"
         TYPE_TAILSCALE -> "Tailscale"
+        TYPE_OPENVPN -> "OpenVPN"
+        TYPE_OPENCONNECT -> "OpenConnect"
         TYPE_PROXY_SET -> proxySetBean!!.displayType()
         TYPE_CHAIN -> chainName
         TYPE_NEKO -> nekoBean!!.displayType()
@@ -296,6 +316,8 @@ data class ProxyEntity(
             TYPE_MASQUE -> masqueBean
             TYPE_DIRECT -> directBean
             TYPE_TAILSCALE -> tailscaleBean
+            TYPE_OPENVPN -> openVPNBean
+            TYPE_OPENCONNECT -> openConnectBean
             TYPE_PROXY_SET -> proxySetBean
             TYPE_CHAIN -> chainBean
             TYPE_NEKO -> nekoBean
@@ -318,13 +340,13 @@ data class ProxyEntity(
 
     fun haveStandardLink(): Boolean {
         return when (requireBean()) {
-            is WireGuardBean -> false
-            is AmneziaWGBean -> false
             is ShadowTLSBean -> false
             is NekoBean -> false
             is ConfigBean -> false
             is DirectBean -> false
             is TailscaleBean -> false
+            is OpenVPNBean -> false
+            is OpenConnectBean -> false
             is ProxySetBean -> false
             is ChainBean -> false
             is ByeDPIBean -> false
@@ -353,6 +375,8 @@ data class ProxyEntity(
             is ByeDPIBean -> ""
             is AnyTLSBean -> toUri()
             is MasqueBean -> toUniversalLink()
+            is WireGuardBean -> toWireGuardUri()
+            is AmneziaWGBean -> toAmneziaWGUri()
             is ProxySetBean -> error("Proxy sets can only be exported as configuration")
             is NekoBean -> ""
             is DirectBean -> ""
@@ -361,7 +385,7 @@ data class ProxyEntity(
     }
 
     fun usesUniversalLinkForGroupExport(): Boolean = when (requireBean()) {
-        is WireGuardBean, is AmneziaWGBean, is TailscaleBean -> true
+        is TailscaleBean, is OpenVPNBean, is OpenConnectBean -> true
         else -> false
     }
 
@@ -424,56 +448,14 @@ data class ProxyEntity(
 
     fun isByeDPI(): Boolean = type == TYPE_BYEDPI
 
-    fun containsByeDPI(): Boolean {
-        if (isByeDPI()) return true
-        return when (val bean = requireBean()) {
-            is ChainBean -> {
-                val profiles = SagerDatabase.proxyDao.getEntities(bean.proxies).associateBy { it.id }
-                bean.proxies.any { proxyId -> profiles[proxyId]?.containsByeDPI() == true }
-            }
+    fun containsByeDPI(): Boolean =
+        ProfileChainResolver(AppData.profiles, false, null, null).containsByeDpi(this)
 
-            is ProxySetBean -> {
-                val profiles = when (bean.type) {
-                    ProxySetBean.TYPE_LIST -> SagerDatabase.proxyDao.getEntities(bean.proxies)
-                    ProxySetBean.TYPE_GROUP -> SagerDatabase.proxyDao.getByGroup(bean.groupId)
-                    else -> emptyList()
-                }
-                profiles.any { it.id != id && it.containsByeDPI() }
-            }
+    fun containsMasterDnsVPN(): Boolean =
+        ProfileChainResolver(AppData.profiles, false, null, null).containsMasterDnsVPN(this)
 
-            else -> false
-        }
-    }
-
-    fun containsMasterDnsVPN(): Boolean {
-        if (type == TYPE_MASTERDNSVPN) return true
-        return when (val bean = requireBean()) {
-            is ChainBean -> {
-                val profiles = SagerDatabase.proxyDao.getEntities(bean.proxies).associateBy { it.id }
-                bean.proxies.any { proxyId -> profiles[proxyId]?.containsMasterDnsVPN() == true }
-            }
-
-            is ProxySetBean -> {
-                val profiles = when (bean.type) {
-                    ProxySetBean.TYPE_LIST -> SagerDatabase.proxyDao.getEntities(bean.proxies)
-                    ProxySetBean.TYPE_GROUP -> SagerDatabase.proxyDao.getByGroup(bean.groupId)
-                    else -> emptyList()
-                }
-                profiles.any { it.id != id && it.containsMasterDnsVPN() }
-            }
-
-            else -> false
-        }
-    }
-
-    fun startsWithByeDPI(): Boolean {
-        if (isByeDPI()) return true
-        val bean = requireBean()
-        if (bean !is ChainBean) return false
-        val firstProfileId = bean.proxies.firstOrNull() ?: return false
-        val firstProfile = SagerDatabase.proxyDao.getById(firstProfileId) ?: return false
-        return firstProfile.startsWithByeDPI()
-    }
+    fun startsWithByeDPI(): Boolean =
+        ProfileChainResolver(AppData.profiles, false, null, null).startsWithByeDpi(this)
 
     fun singMux(): MultiplexOptions? {
         return when (type) {
@@ -581,6 +563,8 @@ data class ProxyEntity(
         masqueBean = null
         directBean = null
         tailscaleBean = null
+        openVPNBean = null
+        openConnectBean = null
         proxySetBean = null
         chainBean = null
         configBean = null
@@ -707,6 +691,16 @@ data class ProxyEntity(
                 tailscaleBean = bean
             }
 
+            is OpenVPNBean -> {
+                type = TYPE_OPENVPN
+                openVPNBean = bean
+            }
+
+            is OpenConnectBean -> {
+                type = TYPE_OPENCONNECT
+                openConnectBean = bean
+            }
+
             is ProxySetBean -> {
                 type = TYPE_PROXY_SET
                 proxySetBean = bean
@@ -759,6 +753,8 @@ data class ProxyEntity(
                 TYPE_MASQUE -> MasqueSettingsActivity::class.java
                 TYPE_DIRECT -> DirectSettingsActivity::class.java
                 TYPE_TAILSCALE -> TailscaleSettingsActivity::class.java
+                TYPE_OPENVPN -> OpenVPNSettingsActivity::class.java
+                TYPE_OPENCONNECT -> OpenConnectSettingsActivity::class.java
                 TYPE_PROXY_SET -> ProxySetSettingsActivity::class.java
                 TYPE_CHAIN -> ChainSettingsActivity::class.java
                 TYPE_CONFIG -> ConfigSettingActivity::class.java

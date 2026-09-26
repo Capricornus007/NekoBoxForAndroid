@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/adapter/outbound"
@@ -50,7 +51,13 @@ type Outbound struct {
 	xudp            bool
 	encryption      *encryption.ClientInstance
 	vision          bool
+	retryReality    bool
 }
+
+const (
+	realityDialAttempts = 5
+	realityRetryDelay   = 200 * time.Millisecond
+)
 
 func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.VLESSOutboundOptions) (adapter.Outbound, error) {
 	outboundDialer, err := dialer.New(ctx, options.DialerOptions, options.ServerIsDomain())
@@ -65,6 +72,7 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
 		vision:     strings.HasPrefix(options.Flow, "xtls-rprx-vision"),
 	}
 	if options.TLS != nil {
+		outbound.retryReality = options.TLS.Reality != nil && options.TLS.Reality.Enabled && options.Transport == nil
 		outbound.tlsConfig, err = tls.NewClientWithOptions(tls.ClientOptions{
 			Context:       ctx,
 			Logger:        logger,
@@ -160,7 +168,7 @@ func (h *Outbound) MultiplexEnabled() bool {
 	return h.multiplexDialer != nil
 }
 
-func (h *Outbound) InterfaceUpdated() {
+func (h *Outbound) InterfaceUpdated(ctx context.Context) {
 	if h.transport != nil {
 		if err := adapter.ResetV2RayClientTransport(h.transport); err != nil {
 			h.logger.Warn(err)
@@ -208,7 +216,7 @@ func (h *vlessDialer) DialContext(ctx context.Context, network string, destinati
 			}
 		}
 	} else if h.tlsDialer != nil {
-		conn, err = h.tlsDialer.DialTLSContext(ctx, h.serverAddr)
+		conn, err = h.dialTLSContext(ctx)
 		if err == nil && enhancedVision && isVisionTLSConn(conn) {
 			baseConn = conn
 		}
@@ -270,22 +278,23 @@ func (h *vlessDialer) DialContext(ctx context.Context, network string, destinati
 }
 
 func (h *vlessDialer) prepareEnhancedVisionConn(conn net.Conn, baseConn net.Conn) (net.Conn, net.Conn, bool, error) {
-	fullRandomEncryption := h.encryption != nil && h.encryption.IsFullRandomXorMode()
-	canSplice := canSpliceEnhancedVision(fullRandomEncryption, h.transport != nil)
+	encrypted := h.encryption != nil
+	fullRandomEncryption := encrypted && h.encryption.IsFullRandomXorMode()
+	canDirect := canDirectEnhancedVision(encrypted, fullRandomEncryption, h.transport != nil)
+	if encrypted {
+		encryptionConn := findEncryptionLayer(conn)
+		if encryptionConn == nil {
+			return conn, nil, false, E.New("Vision: failed to find encryption layer")
+		}
+		return newVisionConnWrapper(conn, encryptionConn), encryptionConn, canDirect, nil
+	}
 	if baseConn != nil && !isVisionTLSConn(baseConn) {
 		baseConn = nil
 	}
 	if baseConn != nil {
-		return newVisionConnWrapper(conn, baseConn), baseConn, canSplice, nil
+		return newVisionConnWrapper(conn, baseConn), baseConn, canDirect, nil
 	}
-	if h.encryption == nil {
-		return conn, nil, false, E.New("Vision requires either TLS/Reality or Encryption")
-	}
-	encryptionConn := findEncryptionLayer(conn)
-	if encryptionConn == nil {
-		return conn, nil, false, E.New("Vision: failed to find encryption layer")
-	}
-	return newVisionConnWrapper(conn, encryptionConn), encryptionConn, canSplice, nil
+	return conn, nil, false, E.New("Vision requires either TLS/Reality or Encryption")
 }
 
 func (h *vlessDialer) ListenPacket(ctx context.Context, destination M.Socksaddr) (net.PacketConn, error) {
@@ -314,7 +323,7 @@ func (h *vlessDialer) ListenPacket(ctx context.Context, destination M.Socksaddr)
 			baseConn = conn
 		}
 	} else if h.tlsDialer != nil {
-		conn, err = h.tlsDialer.DialTLSContext(ctx, h.serverAddr)
+		conn, err = h.dialTLSContext(ctx)
 		if err == nil && enhancedVision && isVisionTLSConn(conn) {
 			baseConn = conn
 		}
@@ -359,6 +368,49 @@ func (h *vlessDialer) ListenPacket(ctx context.Context, destination M.Socksaddr)
 	} else {
 		return h.client.DialEarlyPacketConn(conn, destination)
 	}
+}
+
+func (h *vlessDialer) dialTLSContext(ctx context.Context) (tls.Conn, error) {
+	if !h.retryReality {
+		return h.tlsDialer.DialTLSContext(ctx, h.serverAddr)
+	}
+	return retryRealityDial(ctx, realityDialAttempts, realityRetryDelay, func() (tls.Conn, error) {
+		return h.tlsDialer.DialTLSContext(ctx, h.serverAddr)
+	}, func(attempt int, err error) {
+		h.logger.DebugContext(ctx, "Reality connection attempt ", attempt, "/", realityDialAttempts, " failed, retrying: ", err)
+	})
+}
+
+func retryRealityDial[T any](ctx context.Context, attempts int, retryDelay time.Duration, dial func() (T, error), onRetry func(int, error)) (T, error) {
+	var result T
+	for attempt := range attempts {
+		if cause := context.Cause(ctx); cause != nil {
+			return result, cause
+		}
+		var err error
+		result, err = dial()
+		if err == nil {
+			return result, nil
+		}
+		if attempt == attempts-1 {
+			return result, E.Cause(err, "all Reality connection attempts failed")
+		}
+		if onRetry != nil {
+			onRetry(attempt+1, err)
+		}
+		delay := time.Duration(attempt) * retryDelay
+		if delay == 0 {
+			continue
+		}
+		timer := time.NewTimer(delay)
+		select {
+		case <-timer.C:
+		case <-ctx.Done():
+			timer.Stop()
+			return result, context.Cause(ctx)
+		}
+	}
+	return result, E.New("invalid Reality connection attempt count")
 }
 
 type visionConnWrapper struct {

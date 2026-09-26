@@ -5,6 +5,7 @@ package adblock
 import (
 	"mime"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -16,7 +17,8 @@ import (
 )
 
 func (s *Service) forwardHTTPRequestURL(requestContext *adblockRequestContext) error {
-	if requestContext.useTLS && requestContext.request.ProtoMajor == 3 && !s.cronet {
+	tlsExcluded := requestContext.useTLS && s.tlsExclusionActive(requestContext.requestURL.Hostname())
+	if requestContext.useTLS && requestContext.request.ProtoMajor == 3 && (!s.cronet || tlsExcluded) {
 		s.debugContext(requestContext.ctx, "forwarding HTTP/3 request")
 		return s.forwardHTTP3RequestURL(requestContext)
 	}
@@ -44,6 +46,17 @@ func (s *Service) roundTripForwardedHTTPRequest(requestContext *adblockRequestCo
 	if err := http.NewResponseController(requestContext.writer).EnableFullDuplex(); err != nil && !httpFeatureNotSupported(err) {
 		return nil, err
 	}
+	if requestContext.useTLS && s.tlsExclusionActive(requestContext.requestURL.Hostname()) {
+		connContext := &ctx.Conn{
+			Outbound:           requestContext.outbound,
+			UseTLS:             true,
+			UTLS:               s.utls,
+			InsecureSkipVerify: true,
+		}
+		forwarder := httpconn.NewHTTPForwarder(s.ctx, connContext)
+		defer forwarder.Close()
+		return forwarder.RoundTrip(outRequest)
+	}
 	if requestContext.forwarder == nil {
 		connContext := &ctx.Conn{Outbound: requestContext.outbound, UseTLS: requestContext.useTLS, UTLS: s.utls, Cronet: s.cronet}
 		requestContext.forwarder = httpconn.NewHTTPForwarder(s.ctx, connContext)
@@ -66,12 +79,13 @@ func (s *Service) writeForwardRoundTripError(requestContext *adblockRequestConte
 		_ = response.Body.Close()
 	}
 	desc := textsForRoundTripError(err)
+	tlsExclusionURL, tlsExclusionAbsoluteURL := s.tlsExclusionURLs(requestContext, desc)
 	rawError := ""
 	if err != nil {
 		rawError = err.Error()
 	}
 	if !requestAcceptsErrorHTML(requestContext) {
-		writeForwardRoundTripErrorText(requestContext.writer, desc, rawError, requestContext.requestURLValue())
+		writeForwardRoundTripErrorText(requestContext.writer, desc, rawError, requestContext.requestURLValue(), tlsExclusionAbsoluteURL)
 		return err
 	}
 	errPage, pageBuildErr := assets.GetErrorPage(assets.ErrorContext{
@@ -81,16 +95,37 @@ func (s *Service) writeForwardRoundTripError(requestContext *adblockRequestConte
 		RawError:           rawError,
 		URL:                requestContext.requestURLValue(),
 		Timestamp:          time.Now().Format(time.RFC3339),
+		TLSExclusionURL:    tlsExclusionURL,
 	})
 	if pageBuildErr != nil {
 		s.debug("failed to serve proper error page, falling back to text:", pageBuildErr)
-		writeForwardRoundTripErrorText(requestContext.writer, desc, rawError, requestContext.requestURLValue())
+		writeForwardRoundTripErrorText(requestContext.writer, desc, rawError, requestContext.requestURLValue(), tlsExclusionAbsoluteURL)
 		return err
 	}
 	requestContext.writer.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	requestContext.writer.WriteHeader(http.StatusServiceUnavailable)
 	requestContext.writer.Write(errPage)
 	return err
+}
+
+func (s *Service) tlsExclusionURLs(requestContext *adblockRequestContext, desc roundTripErrorTexts) (string, string) {
+	if !desc.TLSExclusionAllowed || requestContext == nil || !requestContext.useTLS || requestContext.requestURL == nil {
+		return "", ""
+	}
+	domain := normalizeTLSExclusionDomain(requestContext.requestURL.Hostname())
+	token, err := newTLSExclusionToken(domain)
+	if err != nil {
+		s.debugContext(requestContext.ctx, "create TLS exclusion token: ", err)
+		return "", ""
+	}
+	relativeURL := tlsExclusionEndpoint + "?token=" + url.QueryEscape(token)
+	absoluteURL := &url.URL{
+		Scheme:   "https",
+		Host:     requestContext.requestURL.Host,
+		Path:     tlsExclusionEndpoint,
+		RawQuery: "token=" + url.QueryEscape(token),
+	}
+	return relativeURL, absoluteURL.String()
 }
 
 func requestAcceptsErrorHTML(requestContext *adblockRequestContext) bool {
@@ -117,7 +152,7 @@ func requestAcceptsErrorHTML(requestContext *adblockRequestContext) bool {
 	return false
 }
 
-func writeForwardRoundTripErrorText(writer http.ResponseWriter, desc roundTripErrorTexts, rawError string, requestURL string) {
+func writeForwardRoundTripErrorText(writer http.ResponseWriter, desc roundTripErrorTexts, rawError string, requestURL string, tlsExclusionURL string) {
 	var body strings.Builder
 	body.WriteString(desc.TitleHumanReadable)
 	body.WriteString("\n\n")
@@ -129,6 +164,10 @@ func writeForwardRoundTripErrorText(writer http.ResponseWriter, desc roundTripEr
 	if rawError != "" {
 		body.WriteString("\n\nError: ")
 		body.WriteString(rawError)
+	}
+	if tlsExclusionURL != "" {
+		body.WriteString("\n\nTo bypass TLS certificate verification for this site for 6 hours, open this URL, then reload the site: ")
+		body.WriteString(tlsExclusionURL)
 	}
 	body.WriteByte('\n')
 

@@ -2,11 +2,14 @@ package io.nekohasekai.sagernet.database
 
 import io.nekohasekai.sagernet.fmt.TypeMap
 import io.nekohasekai.sagernet.fmt.internal.ProxySetBean
+import io.nekohasekai.sagernet.fmt.openconnect.OpenConnectBean
+import io.nekohasekai.sagernet.fmt.openvpn.OpenVPNBean
 import io.nekohasekai.sagernet.fmt.masque.MasqueBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.wireguard.AmneziaWGBean
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -24,23 +27,35 @@ class ProxyEntityGroupExportTest {
     }
 
     @Test
-    fun wireGuardUsesUniversalGroupExport() {
+    fun wireGuardUsesStandardGroupExport() {
         val entity = ProxyEntity().putBean(WireGuardBean().apply {
             initializeDefaultValues()
         })
 
-        assertFalse(entity.haveStandardLink())
-        assertTrue(entity.usesUniversalLinkForGroupExport())
+        assertTrue(entity.haveStandardLink())
+        assertFalse(entity.usesUniversalLinkForGroupExport())
     }
 
     @Test
-    fun amneziaWGUsesUniversalGroupExport() {
+    fun amneziaWGUsesStandardGroupExport() {
         val entity = ProxyEntity().putBean(AmneziaWGBean().apply {
             initializeDefaultValues()
         })
 
-        assertFalse(entity.haveStandardLink())
-        assertTrue(entity.usesUniversalLinkForGroupExport())
+        assertTrue(entity.haveStandardLink())
+        assertFalse(entity.usesUniversalLinkForGroupExport())
+    }
+
+    @Test
+    fun openVPNAndOpenConnectUseUniversalGroupExport() {
+        for (bean in listOf(OpenVPNBean(), OpenConnectBean())) {
+            bean.initializeDefaultValues()
+            val entity = ProxyEntity().putBean(bean)
+            assertFalse(entity.haveStandardLink())
+            assertTrue(entity.usesUniversalLinkForGroupExport())
+        }
+        assertEquals(ProxyEntity.TYPE_OPENVPN, TypeMap["openvpn"])
+        assertEquals(ProxyEntity.TYPE_OPENCONNECT, TypeMap["openconnect"])
     }
 
     @Test

@@ -16,8 +16,8 @@ import (
 	"github.com/matsuridayo/libneko/neko_log"
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/boxapi"
+	"github.com/sagernet/sing-box/common/trafficcontrol"
 	adblockRegexpr "github.com/sagernet/sing-box/experimental/adblock/regexpr"
-	"github.com/sagernet/sing-box/experimental/clashapi/trafficontrol"
 	sblog "github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/protocol/group"
 
@@ -33,7 +33,7 @@ var mainInstance *BoxInstance
 
 func VersionBox() string {
 	version := []string{
-		"sing-box: " + constant.Version,
+		"sing-box-plus: " + constant.Version,
 		runtime.Version() + "@" + runtime.GOOS + "/" + runtime.GOARCH,
 	}
 
@@ -81,19 +81,16 @@ func ResetAllConnections(system bool) {
 	}
 }
 
-type clashTrafficManagerProvider interface {
-	TrafficManager() *trafficontrol.Manager
-}
-
 type BoxInstance struct {
 	access sync.Mutex
 
 	*box.Box
-	ctx       context.Context
-	cancel    context.CancelFunc
-	state     int
-	closeDone chan struct{}
-	closeErr  error
+	ctx          context.Context
+	cancel       context.CancelFunc
+	state        int
+	closeDone    chan struct{}
+	closeErr     error
+	hasAmneziaWG bool
 
 	v2api        *boxapi.SbV2rayServer
 	selector     *group.Selector
@@ -115,6 +112,22 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 	return newSingBoxInstance(config, localTransport, false)
 }
 
+func NewSingBoxInstanceWithPaths(
+	config string,
+	localTransport LocalDNSTransport,
+	routingAssetsPath string,
+	routingCachePath string,
+) (b *BoxInstance, err error) {
+	return newSingBoxInstanceWithRoutingPaths(
+		config,
+		localTransport,
+		false,
+		false,
+		routingAssetsPath,
+		routingCachePath,
+	)
+}
+
 func newSingBoxInstance(config string, localTransport LocalDNSTransport, forTest bool) (b *BoxInstance, err error) {
 	return newSingBoxInstanceWithProtect(config, localTransport, forTest, false)
 }
@@ -125,13 +138,69 @@ func newSingBoxInstanceWithProtect(
 	forTest bool,
 	strictProtect bool,
 ) (b *BoxInstance, err error) {
+	return newSingBoxInstanceWithProtectContext(
+		context.Background(),
+		config,
+		localTransport,
+		forTest,
+		strictProtect,
+	)
+}
+
+func newSingBoxInstanceWithProtectContext(
+	parentCtx context.Context,
+	config string,
+	localTransport LocalDNSTransport,
+	forTest bool,
+	strictProtect bool,
+) (b *BoxInstance, err error) {
+	return newSingBoxInstanceWithRoutingPathsContext(
+		parentCtx,
+		config,
+		localTransport,
+		forTest,
+		strictProtect,
+		"",
+		"",
+	)
+}
+
+func newSingBoxInstanceWithRoutingPaths(
+	config string,
+	localTransport LocalDNSTransport,
+	forTest bool,
+	strictProtect bool,
+	routingAssetsPath string,
+	routingCachePath string,
+) (b *BoxInstance, err error) {
+	return newSingBoxInstanceWithRoutingPathsContext(
+		context.Background(),
+		config,
+		localTransport,
+		forTest,
+		strictProtect,
+		routingAssetsPath,
+		routingCachePath,
+	)
+}
+
+func newSingBoxInstanceWithRoutingPathsContext(
+	parentCtx context.Context,
+	config string,
+	localTransport LocalDNSTransport,
+	forTest bool,
+	strictProtect bool,
+	routingAssetsPath string,
+	routingCachePath string,
+) (b *BoxInstance, err error) {
 	defer device.DeferPanicToError("NewSingBoxInstance", func(err_ error) { err = err_ })
 
 	// create box context
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(parentCtx)
 	ctx = box.Context(ctx,
 		nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(),
 		nekoboxAndroidDNSTransportRegistry(localTransport), nekoboxAndroidServiceRegistry(),
+		nekoboxAndroidCertificateProviderRegistry(),
 	)
 	ctx = service.ContextWithDefaultRegistry(ctx)
 	ctx = filemanager.WithDefault(ctx, workingPath, tempPath, os.Getuid(), os.Getgid())
@@ -147,13 +216,26 @@ func newSingBoxInstanceWithProtect(
 		cancel()
 		return nil, fmt.Errorf("decode config: %w", err)
 	}
+	options.Certificate = currentCertificateOptions()
 	err = validateByeDPIOptions(options)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("validate config: %w", err)
 	}
+	hasAmneziaWG := false
+	for _, endpoint := range options.Endpoints {
+		if endpoint.Type == constant.TypeAwg {
+			hasAmneziaWG = true
+			break
+		}
+	}
 	waitForAssetExtraction()
-	loadedRoutingResources, err := prepareRoutingRuleSets(&options)
+	var loadedRoutingResources bool
+	if routingAssetsPath != "" && routingCachePath != "" {
+		loadedRoutingResources, err = prepareRoutingRuleSetsWithPaths(&options, routingAssetsPath, routingCachePath)
+	} else {
+		loadedRoutingResources, err = prepareRoutingRuleSets(&options)
+	}
 	if loadedRoutingResources {
 		debug.FreeOSMemory()
 	}
@@ -212,6 +294,7 @@ func newSingBoxInstanceWithProtect(
 		logWriter:    platformLogWriter,
 		forTest:      forTest,
 		localDNS:     localTransport,
+		hasAmneziaWG: hasAmneziaWG,
 	}
 
 	// selector
@@ -247,12 +330,93 @@ func (b *BoxInstance) Start() (err error) {
 	if b.state == boxStateNew {
 		b.state = boxStateStarted
 		err = b.Box.Start()
+		if err == nil {
+			b.watchEndpointAuthentication()
+		}
 		if err == nil && !b.forTest {
 			debug.FreeOSMemory()
 		}
 		return err
 	}
 	return errors.New("already started")
+}
+
+func (b *BoxInstance) watchEndpointAuthentication() {
+	for _, currentEndpoint := range b.Endpoint().Endpoints() {
+		switch endpoint := currentEndpoint.(type) {
+		case adapter.OpenVPNEndpoint:
+			go b.watchOpenVPNAuthentication(endpoint)
+		case adapter.OpenConnectEndpoint:
+			go b.watchOpenConnectAuthentication(endpoint)
+		}
+	}
+}
+
+func (b *BoxInstance) watchOpenVPNAuthentication(endpoint adapter.OpenVPNEndpoint) {
+	for {
+		status := endpoint.OpenVPNStatus()
+		if detail, required := openVPNAuthenticationDetail(status); required {
+			if intfNB4A != nil {
+				intfNB4A.EndpointAuthenticationRequired("OpenVPN", detail)
+			}
+			return
+		}
+		select {
+		case <-b.ctx.Done():
+			return
+		case <-endpoint.StatusUpdated():
+		}
+	}
+}
+
+func (b *BoxInstance) watchOpenConnectAuthentication(endpoint adapter.OpenConnectEndpoint) {
+	for {
+		status := endpoint.OpenConnectStatus()
+		if detail, required := openConnectAuthenticationDetail(status); required {
+			if intfNB4A != nil {
+				intfNB4A.EndpointAuthenticationRequired("OpenConnect", detail)
+			}
+			return
+		}
+		select {
+		case <-b.ctx.Done():
+			return
+		case <-endpoint.StatusUpdated():
+		}
+	}
+}
+
+func openVPNAuthenticationDetail(status adapter.OpenVPNStatus) (string, bool) {
+	if status.State != adapter.OpenVPNStateAuthPending {
+		return "", false
+	}
+	if status.Challenge == nil {
+		return "", true
+	}
+	if status.Challenge.Message != "" {
+		return status.Challenge.Message, true
+	}
+	return status.Challenge.URL, true
+}
+
+func openConnectAuthenticationDetail(status adapter.OpenConnectStatus) (string, bool) {
+	if status.State != adapter.OpenConnectStateAuthPending {
+		return "", false
+	}
+	challenge := status.AuthChallenge
+	if challenge == nil {
+		return "", true
+	}
+	if challenge.Message != "" {
+		return challenge.Message, true
+	}
+	if challenge.Browser != nil {
+		return challenge.Browser.URL, true
+	}
+	if challenge.Error != "" {
+		return challenge.Error, true
+	}
+	return challenge.Banner, true
 }
 
 func (b *BoxInstance) Close() (err error) {
@@ -360,28 +524,25 @@ func (b *BoxInstance) resetConnectionsLocked() error {
 		return nil
 	}
 	b.urlTestReady.invalidate()
-	clashServer := clashServerFromInstance(b)
-	if trafficManagerProvider, ok := clashServer.(clashTrafficManagerProvider); ok {
-		if trafficManager := trafficManagerProvider.TrafficManager(); trafficManager != nil {
-			snapshot := trafficManager.Snapshot()
-			for _, connection := range snapshot.Connections {
-				_ = connection.Close()
-			}
-		}
+	if trafficManager := service.PtrFromContext[trafficcontrol.Manager](b.ctx); trafficManager != nil {
+		trafficManager.CloseAllConnections()
 	}
-	b.Box.Router().ResetNetwork()
+	b.Box.Network().ResetNetwork(b.ctx)
 	log.Println("Reset network done")
 	return nil
 }
 
 func (b *BoxInstance) Sleep() {
+	b.access.Lock()
+	defer b.access.Unlock()
 	if b.pauseManager != nil {
 		b.pauseManager.DevicePause()
 	}
-	// _ = b.Box.Router().ResetNetwork()
 }
 
 func (b *BoxInstance) Wake() {
+	b.access.Lock()
+	defer b.access.Unlock()
 	if b.pauseManager != nil {
 		b.pauseManager.DeviceWake()
 	}

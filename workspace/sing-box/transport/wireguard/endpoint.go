@@ -4,24 +4,22 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"net"
 	"net/netip"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
-	"time"
-	"unsafe"
 
-	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/common/dialer"
+	"github.com/sagernet/sing-box/common/pausecontrol"
+	"github.com/sagernet/sing-box/service/powerreport"
 	"github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
 	F "github.com/sagernet/sing/common/format"
 	M "github.com/sagernet/sing/common/metadata"
-	"github.com/sagernet/sing/common/x/list"
 	"github.com/sagernet/sing/service"
 	"github.com/sagernet/sing/service/pause"
 	"github.com/sagernet/wireguard-go/conn"
@@ -36,11 +34,11 @@ type Endpoint struct {
 	ipcConf        string
 	allowedAddress []netip.Prefix
 	tunDevice      Device
-	natDevice      NatDevice
+	returnDevice   *returnDeviceWrapper
 	device         *device.Device
 	allowedIPs     *device.AllowedIPs
-	pause          pause.Manager
-	pauseCallback  *list.Element[pause.Callback]
+	egressPool     *tun.UDPEgressPool
+	lifecycle      *pausecontrol.Controller
 }
 
 func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
@@ -105,25 +103,25 @@ func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
 		options.MTU = 1408
 	}
 	deviceOptions := DeviceOptions{
-		Context:        options.Context,
-		Logger:         options.Logger,
-		System:         options.System,
-		Handler:        options.Handler,
-		UDPTimeout:     options.UDPTimeout,
-		ICMPTimeout:    options.ICMPTimeout,
-		CreateDialer:   options.CreateDialer,
-		Name:           options.Name,
-		MTU:            options.MTU,
-		Address:        options.Address,
-		AllowedAddress: allowedAddresses,
+		Context:         options.Context,
+		Logger:          options.Logger,
+		System:          options.System,
+		Handler:         options.Handler,
+		UDPTimeout:      options.UDPTimeout,
+		ICMPTimeout:     options.ICMPTimeout,
+		UDPMapping:      options.UDPMapping,
+		UDPFiltering:    options.UDPFiltering,
+		UDPNATMax:       options.UDPNATMax,
+		InterfaceFinder: options.InterfaceFinder,
+		CreateDialer:    options.CreateDialer,
+		Name:            options.Name,
+		MTU:             options.MTU,
+		Address:         options.Address,
+		AllowedAddress:  allowedAddresses,
 	}
 	tunDevice, err := NewDevice(deviceOptions)
 	if err != nil {
 		return nil, E.Cause(err, "create WireGuard device")
-	}
-	natDevice, isNatDevice := tunDevice.(NatDevice)
-	if !isNatDevice {
-		natDevice = NewNATDevice(options.Context, options.Logger, tunDevice)
 	}
 	return &Endpoint{
 		options:        options,
@@ -131,50 +129,62 @@ func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
 		ipcConf:        ipcConf,
 		allowedAddress: allowedAddresses,
 		tunDevice:      tunDevice,
-		natDevice:      natDevice,
+		returnDevice:   &returnDeviceWrapper{Device: tunDevice},
 	}, nil
 }
 
-func (e *Endpoint) Start(resolve bool) error {
-	if common.Any(e.peers, func(peer peerConfig) bool {
-		return !peer.endpoint.IsValid() && peer.destination.IsDomain()
-	}) {
-		if !resolve {
-			return nil
-		}
-		for peerIndex, peer := range e.peers {
-			if peer.endpoint.IsValid() || !peer.destination.IsDomain() {
-				continue
-			}
-			destinationAddress, err := e.options.ResolvePeer(peer.destination.Fqdn)
-			if err != nil {
-				return E.Cause(err, "resolve endpoint domain for peer[", peerIndex, "]: ", peer.destination)
-			}
-			e.peers[peerIndex].endpoint = netip.AddrPortFrom(destinationAddress, peer.destination.Port)
-		}
-	} else if resolve {
+func (e *Endpoint) Start(postStart bool) error {
+	hasDomainPeer := common.Any(e.peers, func(peer peerConfig) bool {
+		return peer.destination.IsDomain()
+	})
+	if postStart != hasDomainPeer {
 		return nil
 	}
 	var bind conn.Bind
-	wgListener, isWgListener := common.Cast[dialer.WireGuardListener](e.options.Dialer)
-	if isWgListener {
-		bind = conn.NewStdNetBind(wgListener.WireGuardControl())
+	udpListener, isUDPListener := common.Cast[dialer.UDPListener](e.options.Dialer)
+	if isUDPListener {
+		listenerControl, egressEnabled := udpListener.UDPListenerControl()
+		standardBind := conn.NewStdNetBind(listenerControl).(*conn.StdNetBind)
+		if e.options.ListenPort == 0 && len(e.peers) == 1 && e.peers[0].endpoint.IsValid() {
+			standardBind.SetSinglePeerMode()
+		}
+		if egressEnabled {
+			egressPoolOptions := e.options.EgressPoolOptions
+			egressPoolOptions.Control = listenerControl
+			e.egressPool = tun.NewUDPEgressPool(egressPoolOptions)
+			standardBind.SetEgressProvider(e.egressPool)
+		}
+		powerManager := service.FromContext[*powerreport.Manager](e.options.Context)
+		if powerManager != nil {
+			recorder := powerManager.Recorder()
+			if recorder != nil {
+				attribution := &powerreport.Attribution{Endpoint: e.options.Tag}
+				standardBind.SetIOActivityFuncs(func(size int) {
+					recorder.Touch(powerreport.DirectionInbound, size, attribution)
+				}, func(size int) {
+					recorder.Touch(powerreport.DirectionOutbound, size, attribution)
+				})
+			}
+		}
+		bind = standardBind
 	} else {
 		var (
 			isConnect   bool
 			connectAddr netip.AddrPort
 			reserved    [3]uint8
 		)
-		if len(e.peers) == 1 && e.peers[0].endpoint.IsValid() {
-			isConnect = true
-			connectAddr = e.peers[0].endpoint
+		if len(e.peers) == 1 {
 			reserved = e.peers[0].reserved
+			if e.peers[0].endpoint.IsValid() {
+				isConnect = true
+				connectAddr = e.peers[0].endpoint
+			}
 		}
 		bind = NewClientBind(e.options.Context, e.options.Logger, e.options.Dialer, isConnect, connectAddr, reserved)
 	}
-	if isWgListener || len(e.peers) > 1 {
+	if isUDPListener || len(e.peers) > 1 {
 		for _, peer := range e.peers {
-			if peer.reserved != [3]uint8{} {
+			if peer.endpoint.IsValid() && peer.reserved != [3]uint8{} {
 				bind.SetReservedForEndpoint(peer.endpoint, peer.reserved)
 			}
 		}
@@ -191,14 +201,46 @@ func (e *Endpoint) Start(resolve bool) error {
 			e.options.Logger.Error(fmt.Sprintf(strings.ToLower(format), args...))
 		},
 	}
-	var deviceInput Device
-	if e.natDevice != nil {
-		deviceInput = e.natDevice
-	} else {
-		deviceInput = e.tunDevice
-	}
-	wgDevice := device.NewDevice(wireGuardDeviceContext(e.options.Context), deviceInput, bind, logger, e.options.Workers)
+	wgDevice := device.NewDevice(wireGuardDeviceContext(e.options.Context), e.returnDevice, bind, logger, e.options.Workers)
 	e.tunDevice.SetDevice(wgDevice)
+	domainPeers := make(map[device.NoisePublicKey]*peerConfig)
+	for peerIndex, peer := range e.peers {
+		if !peer.destination.IsDomain() {
+			continue
+		}
+		var publicKey device.NoisePublicKey
+		err = publicKey.FromHex(peer.publicKeyHex)
+		if err != nil {
+			wgDevice.Close()
+			return E.Cause(err, "decode public key for peer ", peerIndex)
+		}
+		domainPeers[publicKey] = &e.peers[peerIndex]
+	}
+	if len(domainPeers) > 0 {
+		wgDevice.SetEndpointResolverFunc(func(publicKey device.NoisePublicKey) ([]conn.Endpoint, error) {
+			peer, found := domainPeers[publicKey]
+			if !found {
+				return nil, nil
+			}
+			addresses, lookupErr := e.options.ResolvePeer(peer.destination.Fqdn)
+			if lookupErr != nil {
+				return nil, lookupErr
+			}
+			endpoints := make([]conn.Endpoint, 0, len(addresses))
+			for _, address := range addresses {
+				destination := netip.AddrPortFrom(address, peer.destination.Port)
+				if peer.reserved != ([3]uint8{}) {
+					bind.SetReservedForEndpoint(destination, peer.reserved)
+				}
+				endpoint, parseErr := bind.ParseEndpoint(destination.String())
+				if parseErr != nil {
+					return nil, parseErr
+				}
+				endpoints = append(endpoints, endpoint)
+			}
+			return endpoints, nil
+		})
+	}
 	var ipcConf strings.Builder
 	ipcConf.WriteString(e.ipcConf)
 	for _, peer := range e.peers {
@@ -210,11 +252,10 @@ func (e *Endpoint) Start(resolve bool) error {
 		return E.Cause(err, "setup wireguard: \n", ipcConf.String())
 	}
 	e.device = wgDevice
-	e.pause = service.FromContext[pause.Manager](e.options.Context)
-	if e.pause != nil {
-		e.pauseCallback = e.pause.RegisterCallback(e.onPauseUpdated)
-	}
-	e.allowedIPs = (*device.AllowedIPs)(unsafe.Pointer(reflect.Indirect(reflect.ValueOf(wgDevice)).FieldByName("allowedips").UnsafeAddr()))
+	e.lifecycle = pausecontrol.New(service.FromContext[pause.Manager](e.options.Context), wgDevice, nil, func(err error) {
+		e.options.Logger.Error(E.Cause(err, "reconcile WireGuard transport"))
+	})
+	e.allowedIPs = wgDevice.AllowedIPs()
 	return nil
 }
 
@@ -233,30 +274,48 @@ func (e *Endpoint) ListenPacket(ctx context.Context, destination M.Socksaddr) (n
 }
 
 func (e *Endpoint) Close() error {
-	if e.pauseCallback != nil {
-		e.pause.UnregisterCallback(e.pauseCallback)
-		e.pauseCallback = nil
+	if e.lifecycle != nil {
+		e.lifecycle.Close()
+	}
+	if e.egressPool != nil {
+		e.egressPool.Close()
+		e.egressPool = nil
 	}
 	if e.device != nil {
-		e.device.Down()
-		e.device.Close()
+		if e.lifecycle == nil {
+			e.device.Close()
+		}
 		e.device = nil
+		return nil
 	}
-	return nil
+	return e.tunDevice.Close()
+}
+
+func (e *Endpoint) InterfaceUpdated() {
+	if e.lifecycle != nil {
+		e.lifecycle.Rebind()
+	}
 }
 
 func (e *Endpoint) Lookup(address netip.Addr) *device.Peer {
 	if e.allowedIPs == nil {
 		return nil
 	}
-	return e.allowedIPs.Lookup(address.AsSlice())
+	return e.allowedIPs.LookupFromPacket(netip.Addr{}, address, nil)
 }
 
-func (e *Endpoint) NewDirectRouteConnection(metadata adapter.InboundContext, routeContext tun.DirectRouteContext, timeout time.Duration) (tun.DirectRouteDestination, error) {
-	if e.natDevice == nil {
-		return nil, os.ErrInvalid
+func (e *Endpoint) BindUpdate() error {
+	if e.lifecycle != nil {
+		e.lifecycle.Rebind()
 	}
-	return e.natDevice.CreateDestination(metadata, routeContext, timeout)
+	return nil
+}
+
+func (e *Endpoint) WaitReady(ctx context.Context) error {
+	if e.lifecycle == nil {
+		return errors.New("WireGuard device is not started")
+	}
+	return e.lifecycle.WaitReady(ctx)
 }
 
 func wireGuardDeviceContext(ctx context.Context) context.Context {
@@ -264,15 +323,6 @@ func wireGuardDeviceContext(ctx context.Context) context.Context {
 	// The endpoint owns pause transitions. Letting wireguard-go observe the same
 	// manager can deadlock DevicePause when Down waits for a paused timer callback.
 	return service.ContextWith[pause.Manager](deviceContext, nil)
-}
-
-func (e *Endpoint) onPauseUpdated(event int) {
-	switch event {
-	case pause.EventDevicePaused, pause.EventNetworkPause:
-		e.device.Down()
-	case pause.EventDeviceWake, pause.EventNetworkWake:
-		e.device.Up()
-	}
 }
 
 type peerConfig struct {

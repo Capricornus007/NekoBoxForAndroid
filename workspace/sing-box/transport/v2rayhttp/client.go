@@ -7,12 +7,16 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/common/tls"
+	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
+	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
@@ -27,20 +31,27 @@ type Client struct {
 	ctx        context.Context
 	dialer     N.Dialer
 	serverAddr M.Socksaddr
-	transport  http.RoundTripper
+	transport  common.TypedValue[http.RoundTripper]
 	http2      bool
 	requestURL url.URL
 	host       []string
 	method     string
 	headers    http.Header
+
+	connTracker *ConnTracker
 }
 
 func NewClient(ctx context.Context, dialer N.Dialer, serverAddr M.Socksaddr, options option.V2RayHTTPOptions, tlsConfig tls.Config) (adapter.V2RayClientTransport, error) {
 	var transport http.RoundTripper
+	connTracker := NewConnTracker()
 	if tlsConfig == nil {
 		transport = &http.Transport{
 			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-				return dialer.DialContext(ctx, network, M.ParseSocksaddr(addr))
+				conn, err := dialer.DialContext(ctx, network, M.ParseSocksaddr(addr))
+				if err != nil {
+					return nil, err
+				}
+				return connTracker.Track(conn), nil
 			},
 		}
 	} else {
@@ -52,7 +63,11 @@ func NewClient(ctx context.Context, dialer N.Dialer, serverAddr M.Socksaddr, opt
 			ReadIdleTimeout: time.Duration(options.IdleTimeout),
 			PingTimeout:     time.Duration(options.PingTimeout),
 			DialTLSContext: func(ctx context.Context, network, addr string, cfg *tls.STDConfig) (net.Conn, error) {
-				return tlsDialer.DialTLSContext(ctx, M.ParseSocksaddr(addr))
+				conn, err := tlsDialer.DialTLSContext(ctx, M.ParseSocksaddr(addr))
+				if err != nil {
+					return nil, err
+				}
+				return connTracker.Track(conn), nil
 			},
 		}
 	}
@@ -74,17 +89,19 @@ func NewClient(ctx context.Context, dialer N.Dialer, serverAddr M.Socksaddr, opt
 	if !strings.HasPrefix(requestURL.Path, "/") {
 		requestURL.Path = "/" + requestURL.Path
 	}
-	return &Client{
-		ctx:        ctx,
-		dialer:     dialer,
-		serverAddr: serverAddr,
-		requestURL: requestURL,
-		host:       options.Host,
-		method:     options.Method,
-		headers:    options.Headers.Build(),
-		transport:  transport,
-		http2:      tlsConfig != nil,
-	}, nil
+	client := &Client{
+		ctx:         ctx,
+		dialer:      dialer,
+		serverAddr:  serverAddr,
+		requestURL:  requestURL,
+		host:        options.Host,
+		method:      options.Method,
+		headers:     options.Headers.Build(),
+		http2:       tlsConfig != nil,
+		connTracker: connTracker,
+	}
+	client.transport.Store(transport)
+	return client, nil
 }
 
 func (c *Client) DialContext(ctx context.Context) (net.Conn, error) {
@@ -120,13 +137,14 @@ func (c *Client) dialHTTP(ctx context.Context) (net.Conn, error) {
 
 func (c *Client) dialHTTP2(ctx context.Context) (net.Conn, error) {
 	pipeInReader, pipeInWriter := io.Pipe()
+	requestCtx, cancel := context.WithCancel(context.WithoutCancel(ctx))
 	request := &http.Request{
 		Method: c.method,
 		Body:   pipeInReader,
 		URL:    &c.requestURL,
 		Header: c.headers.Clone(),
 	}
-	request = request.WithContext(ctx)
+	request = request.WithContext(requestCtx)
 	switch hostLen := len(c.host); hostLen {
 	case 0:
 		// https://github.com/v2fly/v2ray-core/blob/master/transport/internet/http/config.go#L13
@@ -136,11 +154,24 @@ func (c *Client) dialHTTP2(ctx context.Context) (net.Conn, error) {
 	default:
 		request.Host = c.host[rand.Intn(hostLen)]
 	}
-	conn := NewLateHTTPConn(pipeInWriter)
+	conn := NewLateHTTPConn(pipeInWriter, cancel)
+	handshakeTimeout := C.TCPTimeout
+	if deadline, hasDeadline := ctx.Deadline(); hasDeadline {
+		handshakeTimeout = time.Until(deadline)
+	}
+	var handshakeTimedOut atomic.Bool
+	handshakeTimer := time.AfterFunc(handshakeTimeout, func() {
+		handshakeTimedOut.Store(true)
+		cancel()
+	})
 	go func() {
 		//nolint:bodyclose // successful response bodies are used as the returned stream.
-		response, err := c.transport.RoundTrip(request)
+		response, err := c.transport.Load().RoundTrip(request)
+		handshakeTimer.Stop()
 		if err != nil {
+			if handshakeTimedOut.Load() {
+				err = os.ErrDeadlineExceeded
+			}
 			conn.Setup(nil, err)
 		} else if response.StatusCode != 200 {
 			response.Body.Close()
@@ -153,6 +184,6 @@ func (c *Client) dialHTTP2(ctx context.Context) (net.Conn, error) {
 }
 
 func (c *Client) Close() error {
-	c.transport = ResetTransport(c.transport)
+	c.transport.Store(ResetTransport(c.transport.Load(), c.connTracker))
 	return nil
 }

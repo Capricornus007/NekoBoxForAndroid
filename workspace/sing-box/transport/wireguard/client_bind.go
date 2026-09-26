@@ -24,6 +24,7 @@ type ClientBind struct {
 	bindCtx             context.Context
 	bindDone            context.CancelFunc
 	dialer              N.Dialer
+	reservedAccess      sync.RWMutex
 	reservedForEndpoint map[netip.AddrPort][3]uint8
 	connAccess          sync.Mutex
 	conn                *wireConn
@@ -69,34 +70,51 @@ func (c *ClientBind) connect() (*wireConn, error) {
 	bindCtx := c.bindCtx
 	c.connAccess.Unlock()
 
-	dialCtx, cancel := context.WithTimeout(bindCtx, clientBindOperationTimeout)
-	defer cancel()
+	dialCtx, cancelDial := context.WithCancelCause(bindCtx)
+	cancel := func() { cancelDial(context.Canceled) }
+	dialTimeout := time.AfterFunc(clientBindOperationTimeout, func() {
+		cancelDial(context.DeadlineExceeded)
+	})
 	var packetConn net.PacketConn
 	if c.isConnect {
 		udpConn, err := c.dialer.DialContext(dialCtx, N.NetworkUDP, M.SocksaddrFromNetIP(c.connectAddr))
 		if err != nil {
+			dialTimeout.Stop()
+			cancel()
 			return nil, err
 		}
 		packetConn = bufio.NewUnbindPacketConnWithAddr(udpConn, M.SocksaddrFromNetIP(c.connectAddr))
 	} else {
 		udpConn, err := c.dialer.ListenPacket(dialCtx, M.Socksaddr{Addr: netip.IPv4Unspecified()})
 		if err != nil {
+			dialTimeout.Stop()
+			cancel()
 			return nil, err
 		}
 		packetConn = bufio.NewPacketConn(udpConn)
 	}
+	dialCompleted := dialTimeout.Stop()
 	newConn := &wireConn{
 		PacketConn: packetConn,
+		cancel:     cancel,
 		done:       make(chan struct{}),
 	}
 
 	c.connAccess.Lock()
 	defer c.connAccess.Unlock()
+	if c.bindCtx != bindCtx {
+		_ = newConn.Close()
+		return nil, net.ErrClosed
+	}
 	select {
 	case <-c.done:
 		_ = newConn.Close()
 		return nil, net.ErrClosed
 	default:
+	}
+	if !dialCompleted || dialCtx.Err() != nil {
+		_ = newConn.Close()
+		return nil, context.Cause(dialCtx)
 	}
 	if c.conn != nil {
 		select {
@@ -204,7 +222,9 @@ func (c *ClientBind) Send(bufs [][]byte, ep conn.Endpoint, offset int) error {
 			buf = buf[offset:]
 		}
 		if len(buf) > 3 {
+			c.reservedAccess.RLock()
 			reserved, loaded := c.reservedForEndpoint[destination]
+			c.reservedAccess.RUnlock()
 			if !loaded {
 				reserved = c.reserved
 			}
@@ -235,12 +255,15 @@ func (c *ClientBind) BatchSize() int {
 }
 
 func (c *ClientBind) SetReservedForEndpoint(destination netip.AddrPort, reserved [3]byte) {
+	c.reservedAccess.Lock()
 	c.reservedForEndpoint[destination] = reserved
+	c.reservedAccess.Unlock()
 }
 
 type wireConn struct {
 	net.PacketConn
 	conn   net.Conn
+	cancel context.CancelFunc
 	access sync.Mutex
 	done   chan struct{}
 }
@@ -260,7 +283,8 @@ func (w *wireConn) Close() error {
 		return net.ErrClosed
 	default:
 	}
-	w.PacketConn.Close()
+	w.cancel()
+	_ = w.PacketConn.Close()
 	close(w.done)
 	return nil
 }
@@ -277,16 +301,16 @@ func (e remoteEndpoint) SrcToString() string {
 }
 
 func (e remoteEndpoint) DstToString() string {
-	return (netip.AddrPort)(e).String()
+	return netip.AddrPort(e).String()
 }
 
 func (e remoteEndpoint) DstToBytes() []byte {
-	b, _ := (netip.AddrPort)(e).MarshalBinary()
+	b, _ := netip.AddrPort(e).MarshalBinary()
 	return b
 }
 
 func (e remoteEndpoint) DstIP() netip.Addr {
-	return (netip.AddrPort)(e).Addr()
+	return netip.AddrPort(e).Addr()
 }
 
 func (e remoteEndpoint) SrcIP() netip.Addr {

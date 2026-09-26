@@ -1,16 +1,13 @@
 package io.nekohasekai.sagernet.ui.profile
 
-import android.os.Bundle
-import androidx.preference.EditTextPreference
-import androidx.preference.PreferenceFragmentCompat
-import moe.matsuri.nb4a.ui.MaterialSwitchPreference
-import io.nekohasekai.sagernet.Key
-import io.nekohasekai.sagernet.R
+import androidx.compose.runtime.Composable
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
+import io.nekohasekai.sagernet.ui.compose.JuicityProfileSettingsScreen
 
 class JuicitySettingsActivity : ProfileSettingsActivity<JuicityBean>() {
+    override val usesComposePreferences = true
 
     override fun createEntity() = JuicityBean().applyDefaultValues()
 
@@ -36,14 +33,6 @@ class JuicitySettingsActivity : ProfileSettingsActivity<JuicityBean>() {
         allowInsecure = DataStore.serverAllowInsecure
     }
 
-    override fun PreferenceFragmentCompat.createPreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-    ) {
-        addPreferencesFromResource(R.xml.juicity_preferences)
-
-        findPreference<EditTextPreference>(Key.SERVER_PASSWORD)!!.apply {
-            summaryProvider = PasswordSummaryProvider
-        }
-    }
+    @Composable
+    override fun ComposePreferences() = JuicityProfileSettingsScreen()
 }

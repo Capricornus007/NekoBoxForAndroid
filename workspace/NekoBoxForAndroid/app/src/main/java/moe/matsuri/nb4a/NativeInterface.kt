@@ -232,6 +232,12 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         }
     }
 
+    override fun cancelNotification(identifier: String, typeID: Int) {
+        runCatching {
+            NotificationManagerCompat.from(app).cancel(identifier.hashCode())
+        }.onFailure(Logs::w)
+    }
+
     fun syncNetworkState(network: Network?) {
         val defaultInterface = if (network == null) "" else buildDefaultInterface(network)?.toString() ?: ""
         val interfaces = networkInterfaces()
@@ -305,6 +311,15 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         }
     }
 
+    override fun endpointAuthenticationRequired(protocol: String?, detail: String?) {
+        Handler(Looper.getMainLooper()).post {
+            val message = app.getString(R.string.endpoint_authentication_required, protocol ?: "VPN")
+            Logs.w(listOfNotNull(message, detail?.takeIf { it.isNotBlank() }).joinToString(" "))
+            Toast.makeText(app, message, Toast.LENGTH_LONG).show()
+            SagerNet.stopService()
+        }
+    }
+
     private fun buildDefaultInterface(network: Network): JSONObject? {
         val linkProperties = SagerNet.connectivity.getLinkProperties(network) ?: return null
         val capabilities = SagerNet.connectivity.getNetworkCapabilities(network) ?: return null
@@ -314,6 +329,7 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         return JSONObject().apply {
             put("name", interfaceName)
             put("index", index)
+            put("network_handle", network.networkHandle)
             put("expensive", isExpensive(capabilities))
             put("constrained", false)
         }
@@ -336,7 +352,11 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         val flags = buildFlags(networkInterface)
         return JSONObject().apply {
             put("index", networkInterface?.index ?: 0)
-            put("mtu", networkInterface?.mtu ?: linkProperties.mtu)
+            put(
+                "mtu",
+                networkInterface?.mtu
+                    ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) linkProperties.mtu else 0,
+            )
             put("name", interfaceName)
             put("flags", flags)
             put("addresses", JSONArray().apply {

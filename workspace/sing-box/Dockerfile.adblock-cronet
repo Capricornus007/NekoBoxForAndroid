@@ -23,7 +23,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         lld \
         nodejs \
         npm \
-        pkg-config; \
+        pkg-config \
+        tcpdump; \
     rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \

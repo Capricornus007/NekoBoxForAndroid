@@ -1,6 +1,7 @@
 package libcore
 
 import (
+	"context"
 	"fmt"
 	"libcore/procfs"
 	"log"
@@ -28,7 +29,7 @@ type boxPlatformInterfaceWrapper struct {
 	strictProtect bool
 }
 
-func (w *boxPlatformInterfaceWrapper) ReadWIFIState() adapter.WIFIState {
+func (w *boxPlatformInterfaceWrapper) ReadWIFIState(context.Context) adapter.WIFIState {
 	state := strings.Split(intfBox.WIFIState(), ",")
 	if len(state) < 2 {
 		state = append(state, "")
@@ -95,6 +96,10 @@ func (w *boxPlatformInterfaceWrapper) OpenInterface(options *tun.Options, platfo
 	return tun.New(*options)
 }
 
+func (w *boxPlatformInterfaceWrapper) ProcessPlatformOptions(option.TunPlatformOptions) error {
+	return nil
+}
+
 func myInterfaceAddress(options *tun.Options) []netip.Addr {
 	addresses := make([]netip.Addr, 0, len(options.Inet4Address)+len(options.Inet6Address))
 	for _, prefix := range options.Inet4Address {
@@ -150,12 +155,12 @@ func (w *boxPlatformInterfaceWrapper) SendNotification(notification *adapter.Not
 	)
 }
 
-func (w *boxPlatformInterfaceWrapper) MyInterfaceAddress() []netip.Addr {
-	return w.myTunAddress
+func (w *boxPlatformInterfaceWrapper) CancelNotification(identifier string, typeID int32) error {
+	return intfBox.CancelNotification(identifier, typeID)
 }
 
-func (s *boxPlatformInterfaceWrapper) SystemCertificates() []string {
-	return nil
+func (w *boxPlatformInterfaceWrapper) MyInterfaceAddress() []netip.Addr {
+	return w.myTunAddress
 }
 
 // Android not using
@@ -173,6 +178,54 @@ func (w *boxPlatformInterfaceWrapper) RequestPermissionForWIFIState() error {
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformWIFIMonitor() bool {
 	return true
+}
+
+func (w *boxPlatformInterfaceWrapper) UsePlatformNeighborResolver() bool {
+	return false
+}
+
+func (w *boxPlatformInterfaceWrapper) StartNeighborMonitor(adapter.NeighborUpdateListener) error {
+	return E.New("android: platform neighbor monitor is unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) CloseNeighborMonitor(adapter.NeighborUpdateListener) error {
+	return E.New("android: platform neighbor monitor is unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) UsePlatformShell() bool {
+	return false
+}
+
+func (w *boxPlatformInterfaceWrapper) CheckPlatformShell() error {
+	return E.New("android: platform shell is unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) OpenShellSession(*adapter.PlatformUser, string, []string, string, int32, int32) (adapter.ShellSession, error) {
+	return nil, E.New("android: platform shell is unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) LookupUser(string) (*adapter.PlatformUser, error) {
+	return nil, E.New("android: platform user lookup is unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) LookupSFTPServer() (string, error) {
+	return "", E.New("android: platform SFTP server is unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) ReadSystemSSHHostKey() ([]byte, error) {
+	return nil, E.New("android: platform SSH host key is unsupported")
+}
+
+func (w *boxPlatformInterfaceWrapper) TailscaleHostname() string {
+	return ""
+}
+
+func (w *boxPlatformInterfaceWrapper) UsePlatformBridge() bool {
+	return false
+}
+
+func (w *boxPlatformInterfaceWrapper) CreateBridge(adapter.BridgeOptions) (adapter.BridgeSession, error) {
+	return nil, E.New("android: platform bridge is unsupported")
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformConnectionOwnerFinder() bool {

@@ -3,7 +3,6 @@ package adapter
 import (
 	"context"
 	"net/netip"
-	"time"
 
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
@@ -21,10 +20,17 @@ type Outbound interface {
 	N.Dialer
 }
 
+// OutboundWithReadiness reports when an asynchronously started outbound can
+// accept traffic. Callers should bound WaitReady with their own context.
+type OutboundWithReadiness interface {
+	Outbound
+	WaitReady(ctx context.Context) error
+}
+
 type OutboundWithPreferredRoutes interface {
 	Outbound
-	PreferredDomain(domain string) bool
-	PreferredAddress(address netip.Addr) bool
+	PreferredDomain(metadata *InboundContext, domain string) bool
+	PreferredAddress(metadata *InboundContext, address netip.Addr) bool
 }
 
 type OutboundWithMultiplex interface {
@@ -32,9 +38,10 @@ type OutboundWithMultiplex interface {
 	MultiplexEnabled() bool
 }
 
-type DirectRouteOutbound interface {
+type FlowOutbound interface {
 	Outbound
-	NewDirectRouteConnection(metadata InboundContext, routeContext tun.DirectRouteContext, timeout time.Duration) (tun.DirectRouteDestination, error)
+	tun.Port
+	PreMatchFlow(network string, destination netip.Addr) PreMatchAction
 }
 
 type OutboundRegistry interface {

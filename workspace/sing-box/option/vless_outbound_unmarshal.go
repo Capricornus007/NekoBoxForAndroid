@@ -22,6 +22,7 @@ func (c *VLESSOutboundOptions) UnmarshalJSON(bytes []byte) error {
 		c.TLS == nil ||
 		c.TLS.UTLS == nil ||
 		!c.TLS.UTLS.Enabled ||
+		c.TLS.Reality != nil && c.TLS.Reality.Enabled ||
 		len(c.TLS.ALPN) > 1 {
 		return nil
 	}

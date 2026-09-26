@@ -156,6 +156,7 @@ object RoutingImportManager {
     private fun RoutingProfileFormat.label(context: Context) = context.getString(
         when (this) {
             RoutingProfileFormat.HAPP -> R.string.routing_format_happ
+            RoutingProfileFormat.V2RAY_TUN -> R.string.routing_format_v2ray_tun
             RoutingProfileFormat.INCY -> R.string.routing_format_incy
             RoutingProfileFormat.NEKOBOX_PLUS -> R.string.routing_format_nekobox_plus
         },
@@ -166,6 +167,7 @@ object RoutingImportManager {
         val target = File(directory, fileName)
         val temporary = File(directory, "$fileName.routing-import.tmp")
         val client = Libcore.newHttpClient().apply {
+            withUTLS(DataStore.appUTLSFingerprint)
             modernTLS()
             keepAlive()
             trySocks5(DataStore.mixedListener, DataStore.mixedPort, DataStore.mixedUsername, DataStore.mixedPassword)

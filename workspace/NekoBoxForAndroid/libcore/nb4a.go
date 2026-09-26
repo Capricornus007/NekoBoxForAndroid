@@ -123,9 +123,7 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 	internalAssetsPath = internalAssets
 
 	// Set up log
-	if maxLogSizeKb < 50 {
-		maxLogSizeKb = 50
-	}
+	maxLogSizeKb = max(maxLogSizeKb, 10)
 	neko_log.SetLogEnabled(logEnable)
 	neko_log.TruncateOnStart = isBgProcess
 	neko_log.SetupLog(int(maxLogSizeKb)*1024, filepath.Join(cachePath, "neko.log"))

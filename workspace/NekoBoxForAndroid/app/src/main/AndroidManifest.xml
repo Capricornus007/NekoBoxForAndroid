@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="internalOnly">
 
-    <uses-sdk tools:overrideLibrary="com.google.zxing.client.android, com.blacksquircle.ui.editorkit" />
-
     <permission
         android:name="${applicationId}.SERVICE"
         android:protectionLevel="signature" />
@@ -57,7 +55,7 @@
         android:name="io.nekohasekai.sagernet.SagerNet"
         android:allowBackup="true"
         android:autoRevokePermissions="allowed"
-        android:banner="@mipmap/ic_launcher"
+        android:banner="@drawable/tv_banner"
         android:dataExtractionRules="@xml/backup_rules"
         android:fullBackupContent="@xml/backup_descriptor"
         android:fullBackupOnly="true"
@@ -84,6 +82,10 @@
             android:exported="false"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <activity
+            android:name="io.nekohasekai.sagernet.ui.ToolbarLayoutActivity"
+            android:exported="false" />
 
         <activity
             android:name="io.nekohasekai.sagernet.ui.MainActivity"
@@ -219,6 +221,7 @@
                 <data android:scheme="anytls" />
                 <data android:scheme="stormdns" />
                 <data android:scheme="vpn" />
+                <data android:scheme="openvpn" />
 
             </intent-filter>
 
@@ -498,6 +501,12 @@
             android:name="io.nekohasekai.sagernet.ui.profile.TailscaleSettingsActivity"
             android:configChanges="uiMode" />
         <activity
+            android:name="io.nekohasekai.sagernet.ui.profile.OpenVPNSettingsActivity"
+            android:configChanges="uiMode" />
+        <activity
+            android:name="io.nekohasekai.sagernet.ui.profile.OpenConnectSettingsActivity"
+            android:configChanges="uiMode" />
+        <activity
             android:name="io.nekohasekai.sagernet.ui.profile.HttpSettingsActivity"
             android:configChanges="uiMode" />
         <activity
@@ -599,23 +608,17 @@
             android:name="io.nekohasekai.sagernet.ui.AppListActivity"
             android:configChanges="uiMode" />
         <activity
-            android:name="io.nekohasekai.sagernet.ui.AdblockSettingsActivity"
-            android:configChanges="uiMode"
-            android:label="@string/adblock"
-            android:launchMode="singleTask"
-            android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
-        <activity
             android:name="io.nekohasekai.sagernet.ui.AdblockBundledFiltersActivity"
             android:configChanges="uiMode"
             android:label="@string/adblock_bundled_filters"
             android:launchMode="singleTask"
-            android:parentActivityName="io.nekohasekai.sagernet.ui.AdblockSettingsActivity" />
+            android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
         <activity
             android:name="io.nekohasekai.sagernet.ui.AdblockCustomFiltersActivity"
             android:configChanges="uiMode"
             android:label="@string/adblock_custom_filters"
             android:launchMode="singleTask"
-            android:parentActivityName="io.nekohasekai.sagernet.ui.AdblockSettingsActivity" />
+            android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
         <activity
             android:name="io.nekohasekai.sagernet.ui.AdblockCustomFilterActivity"
             android:configChanges="uiMode"
@@ -627,7 +630,7 @@
             android:configChanges="uiMode"
             android:label="@string/adblock_custom_rules"
             android:launchMode="singleTask"
-            android:parentActivityName="io.nekohasekai.sagernet.ui.AdblockSettingsActivity" />
+            android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
         <activity
             android:name=".QuickToggleShortcut"
             android:excludeFromRecents="true"
@@ -670,6 +673,7 @@
             android:name="io.nekohasekai.sagernet.ui.ScannerActivity"
             android:configChanges="uiMode"
             android:excludeFromRecents="true"
+            android:exported="true"
             android:label="@string/add_profile_methods_scan_qr_code"
             android:launchMode="singleTask"
             android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />

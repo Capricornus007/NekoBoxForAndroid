@@ -8,7 +8,6 @@ import (
 	"net/netip"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/sagernet/gvisor/pkg/buffer"
 	"github.com/sagernet/gvisor/pkg/tcpip"
@@ -17,12 +16,9 @@ import (
 	"github.com/sagernet/gvisor/pkg/tcpip/network/ipv4"
 	"github.com/sagernet/gvisor/pkg/tcpip/network/ipv6"
 	"github.com/sagernet/gvisor/pkg/tcpip/stack"
-	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/transport/wireguard"
 	"github.com/sagernet/sing-tun"
-	"github.com/sagernet/sing-tun/ping"
-	"github.com/sagernet/sing/common/buf"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
@@ -30,29 +26,29 @@ import (
 )
 
 type stackDevice struct {
-	ctx            context.Context
-	logger         log.ContextLogger
-	stack          *stack.Stack
-	mtu            uint32
-	events         chan wgTun.Event
-	outbound       chan *stack.PacketBuffer
-	packetOutbound chan *buf.Buffer
-	done           chan struct{}
-	closeOnce      sync.Once
-	dispatcher     stack.NetworkDispatcher
-	inet4Address   netip.Addr
-	inet6Address   netip.Addr
+	*flowPort
+	ctx          context.Context
+	logger       log.ContextLogger
+	stack        *stack.Stack
+	mtu          uint32
+	events       chan wgTun.Event
+	outbound     chan *stack.PacketBuffer
+	done         chan struct{}
+	closeOnce    sync.Once
+	dispatcher   stack.NetworkDispatcher
+	inet4Address netip.Addr
+	inet6Address netip.Addr
 }
 
 func newStackDevice(options DeviceOptions) (*stackDevice, error) {
 	tunDevice := &stackDevice{
-		ctx:            options.Context,
-		logger:         options.Logger,
-		mtu:            options.MTU,
-		events:         make(chan wgTun.Event, 1),
-		outbound:       make(chan *stack.PacketBuffer, 256),
-		packetOutbound: make(chan *buf.Buffer, 256),
-		done:           make(chan struct{}),
+		flowPort: newFlowPort(options),
+		ctx:      options.Context,
+		logger:   options.Logger,
+		mtu:      options.MTU,
+		events:   make(chan wgTun.Event, 1),
+		outbound: make(chan *stack.PacketBuffer, 256),
+		done:     make(chan struct{}),
 	}
 	ipStack, err := tun.NewGVisorStackWithOptions((*wireEndpoint)(tunDevice), stack.NICOptions{}, true)
 	if err != nil {
@@ -179,7 +175,7 @@ func (w *stackDevice) Read(bufs [][]byte, sizes []int, offset int) (count int, e
 		}
 		sizes[0] = copyN
 		return 1, nil
-	case packet := <-w.packetOutbound:
+	case packet := <-w.flowPort.packetOutbound:
 		defer packet.Release()
 		sizes[0] = copy(bufs[0][offset:], packet.Bytes())
 		return 1, nil
@@ -189,6 +185,7 @@ func (w *stackDevice) Read(bufs [][]byte, sizes []int, offset int) (count int, e
 }
 
 func (w *stackDevice) Write(bufs [][]byte, offset int) (count int, err error) {
+	bufs = w.flowPort.returnPackets(bufs, offset)
 	for _, b := range bufs {
 		b = b[offset:]
 		if len(b) == 0 {
@@ -242,23 +239,6 @@ func (w *stackDevice) Close() error {
 
 func (w *stackDevice) BatchSize() int {
 	return 1
-}
-
-func (w *stackDevice) NewDirectRouteConnection(metadata adapter.InboundContext, routeContext tun.DirectRouteContext, timeout time.Duration) (tun.DirectRouteDestination, error) {
-	ctx := log.ContextWithNewID(w.ctx)
-	destination, err := ping.ConnectGVisor(
-		ctx, w.logger,
-		metadata.Source.Addr, metadata.Destination.Addr,
-		routeContext,
-		w.stack,
-		w.inet4Address, w.inet6Address,
-		timeout,
-	)
-	if err != nil {
-		return nil, err
-	}
-	w.logger.InfoContext(ctx, "linked ", metadata.Network, " connection from ", metadata.Source.AddrString(), " to ", metadata.Destination.AddrString())
-	return destination, nil
 }
 
 var _ stack.LinkEndpoint = (*wireEndpoint)(nil)

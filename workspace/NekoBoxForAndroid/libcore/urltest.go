@@ -22,8 +22,12 @@ import (
 )
 
 func NewInstanceURLTest(config, tag, link string, timeout int32, standard int32, attempts int32, pause int32, hardened bool, localTransport LocalDNSTransport) (latency int32, err error) {
-	defer device.DeferPanicToError("NewInstanceURLTest", func(err_ error) { err = err_ })
+	return runWithPanicError("NewInstanceURLTest", func() (int32, error) {
+		return newInstanceURLTest(config, tag, link, timeout, standard, attempts, pause, hardened, localTransport)
+	})
+}
 
+func newInstanceURLTest(config, tag, link string, timeout int32, standard int32, attempts int32, pause int32, hardened bool, localTransport LocalDNSTransport) (latency int32, err error) {
 	instance, err := newSingBoxInstance(config, localTransport, true)
 	if err != nil {
 		return -1, fmt.Errorf("create service: %w", err)
@@ -70,7 +74,7 @@ func (b *BoxInstance) urlTest(tag, link string, timeout int32, attempts int32, p
 	if err != nil {
 		return -1, err
 	}
-	return runURLTestAttempts(b.ctx, timeout, attempts, pause, func(ctx context.Context) (int32, error) {
+	return runURLTestAfterOutboundReady(b.ctx, b.Outbound(), detour, timeout, attempts, pause, func(ctx context.Context) (int32, error) {
 		testDialer := N.Dialer(&fallbackURLTestDialer{
 			Dialer:         detour,
 			localTransport: b.localDNS,
@@ -94,8 +98,9 @@ func (b *BoxInstance) urlTest(tag, link string, timeout int32, attempts int32, p
 }
 
 func UrlTest(i *BoxInstance, link string, timeout int32, standard int32, attempts int32, pause int32, hardened bool) (latency int32, err error) {
-	defer device.DeferPanicToError("box.UrlTest", func(err_ error) { err = err_ })
-	return urlTest(i, link, timeout, standard, attempts, pause, hardened, true)
+	return runWithPanicError("box.UrlTest", func() (int32, error) {
+		return urlTest(i, link, timeout, standard, attempts, pause, hardened, true)
+	})
 }
 
 func urlTest(i *BoxInstance, link string, timeout int32, standard int32, attempts int32, pause int32, hardened bool, enforceInstanceMinTimeout bool) (latency int32, err error) {
@@ -111,10 +116,16 @@ func urlTest(i *BoxInstance, link string, timeout int32, standard int32, attempt
 	}
 
 	parentCtx := context.Background()
+	var (
+		outboundManager adapter.OutboundManager
+		detour          adapter.Outbound
+	)
 	if instance != nil {
 		parentCtx = instance.ctx
+		outboundManager = instance.Outbound()
+		detour = outboundManager.Default()
 	}
-	return runURLTestAttempts(parentCtx, timeout, attempts, pause, func(ctx context.Context) (int32, error) {
+	return runURLTestAfterOutboundReady(parentCtx, outboundManager, detour, timeout, attempts, pause, func(ctx context.Context) (int32, error) {
 		connections := newURLTestConnectionSet()
 		result, err := runURLTestAsync(ctx, "HTTP URLTest", func() (int32, error) {
 			return runHTTPURLTest(ctx, instance, connections, link, time.Duration(timeout)*time.Millisecond, urlTestStandard(standard), hardened)
@@ -132,21 +143,24 @@ func runURLTestAttempts(ctx context.Context, timeoutMillis int32, attempts int32
 	attempts = min(max(attempts, 1), 5)
 	timeout := time.Duration(timeoutMillis) * time.Millisecond
 	pause := time.Duration(max(pauseMillis, 0)) * time.Millisecond
+	operationCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
 	var lastErr error
 	for attempt := range attempts {
-		attemptCtx, cancel := context.WithTimeout(ctx, timeout)
-		latency, err := test(attemptCtx)
-		cancel()
+		latency, err := test(operationCtx)
 		if err == nil {
 			return latency, nil
 		}
 		lastErr = err
+		if cause := context.Cause(operationCtx); cause != nil {
+			return -1, cause
+		}
 		if attempt == attempts-1 {
 			break
 		}
 		select {
-		case <-ctx.Done():
-			return -1, context.Cause(ctx)
+		case <-operationCtx.Done():
+			return -1, context.Cause(operationCtx)
 		case <-time.After(pause):
 		}
 	}
@@ -295,10 +309,7 @@ func runURLTestAsync[T any](ctx context.Context, name string, run func() (T, err
 	var zero T
 	resultChan := make(chan asyncURLTestResult[T], 1)
 	go func() {
-		defer device.DeferPanicToError(name, func(panicErr error) {
-			resultChan <- asyncURLTestResult[T]{err: panicErr}
-		})
-		value, runErr := run()
+		value, runErr := runWithPanicError(name, run)
 		resultChan <- asyncURLTestResult[T]{value: value, err: runErr}
 	}()
 
@@ -531,13 +542,10 @@ type urlTestDialResult struct {
 func runURLTestDialAsync(ctx context.Context, name string, dial func(context.Context) (net.Conn, error)) (net.Conn, error) {
 	resultChan := make(chan urlTestDialResult)
 	go func() {
-		var result urlTestDialResult
-		func() {
-			defer device.DeferPanicToError(name, func(panicErr error) {
-				result.err = panicErr
-			})
-			result.conn, result.err = dial(ctx)
-		}()
+		conn, err := runWithPanicError(name, func() (net.Conn, error) {
+			return dial(ctx)
+		})
+		result := urlTestDialResult{conn: conn, err: err}
 		select {
 		case resultChan <- result:
 		case <-ctx.Done():

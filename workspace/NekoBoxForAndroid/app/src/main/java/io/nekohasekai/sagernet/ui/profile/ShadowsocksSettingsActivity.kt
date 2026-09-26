@@ -1,20 +1,16 @@
 package io.nekohasekai.sagernet.ui.profile
 
-import android.os.Bundle
-import androidx.preference.EditTextPreference
-import androidx.preference.PreferenceFragmentCompat
-import moe.matsuri.nb4a.ui.MaterialSwitchPreference
-import io.nekohasekai.sagernet.R
+import androidx.compose.runtime.Composable
 import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
+import io.nekohasekai.sagernet.ui.compose.ShadowsocksProfileSettingsScreen
 import moe.matsuri.nb4a.proxy.PreferenceBinding
 import moe.matsuri.nb4a.proxy.PreferenceBindingManager
 import moe.matsuri.nb4a.proxy.Type
 
-import moe.matsuri.nb4a.ui.SimpleMenuPreference
-
 class ShadowsocksSettingsActivity : ProfileSettingsActivity<ShadowsocksBean>() {
+
+    override val usesComposePreferences = true
 
     override fun createEntity() = ShadowsocksBean()
 
@@ -55,54 +51,7 @@ class ShadowsocksSettingsActivity : ProfileSettingsActivity<ShadowsocksBean>() {
         plugin = if (pn.isNotBlank()) "$pn;$pc" else ""
     }
 
-    override fun PreferenceFragmentCompat.createPreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-    ) {
-        addPreferencesFromResource(R.xml.shadowsocks_preferences)
-        pbm.setPreferenceFragment(this)
-
-        serverPort.preference.apply {
-            this as EditTextPreference
-            setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
-        }
-        password.preference.apply {
-            this as EditTextPreference
-            summaryProvider = PasswordSummaryProvider
-        }
-
-        // Mux mode visibility control
-        muxMode.preference.apply {
-            updateMuxMode(muxMode.readIntFromCache())
-            this as SimpleMenuPreference
-            setOnPreferenceChangeListener { _, newValue ->
-                updateMuxMode((newValue as String).toInt())
-                true
-            }
-        }
-
-        muxBrutal.preference.apply {
-            updateMuxBrutal(muxBrutal.readBoolFromCache())
-            this as MaterialSwitchPreference
-            setOnPreferenceChangeListener { _, newValue ->
-                updateMuxBrutal(newValue as Boolean)
-                true
-            }
-        }
-    }
-
-    private fun updateMuxBrutal(enabled: Boolean) {
-        muxBrutalUpMbps.preference.isVisible = enabled
-        muxBrutalDownMbps.preference.isVisible = enabled
-    }
-
-    private fun updateMuxMode(mode: Int) {
-        // mode 0: max_streams mode - show muxConcurrency, hide muxMaxConnections/muxMinStreams
-        // mode 1: connections mode - hide muxConcurrency, show muxMaxConnections/muxMinStreams
-        val isMaxStreamsMode = mode == 0
-        muxConcurrency.preference.isVisible = isMaxStreamsMode
-        muxMaxConnections.preference.isVisible = !isMaxStreamsMode
-        muxMinStreams.preference.isVisible = !isMaxStreamsMode
-    }
+    @Composable
+    override fun ComposePreferences() = ShadowsocksProfileSettingsScreen()
 
 }

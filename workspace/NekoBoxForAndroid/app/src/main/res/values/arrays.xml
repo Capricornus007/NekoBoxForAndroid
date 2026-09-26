@@ -27,10 +27,45 @@
         <item>1</item>
     </string-array>
 
+    <string-array name="connection_option_entries">
+        <item>@string/connection_option_default</item>
+        <item>@string/connection_option_enabled</item>
+        <item>@string/connection_option_disabled</item>
+    </string-array>
+    <string-array name="connection_option_values">
+        <item></item>
+        <item>true</item>
+        <item>false</item>
+    </string-array>
+
+    <string-array name="subscription_traffic_unit_entries">
+        <item>@string/subscription_traffic_unit_binary</item>
+        <item>@string/subscription_traffic_unit_decimal</item>
+    </string-array>
+
+    <string-array name="core_profiler_mode_entries">
+        <item>@string/core_profiler_mode_cpu</item>
+        <item>@string/core_profiler_mode_trace</item>
+    </string-array>
+
     <string-array name="int_array_3">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+    </string-array>
+
+    <string-array name="udp_nat_behavior_entries">
+        <item>@string/not_set</item>
+        <item>@string/udp_nat_endpoint_independent</item>
+        <item>@string/udp_nat_address_dependent</item>
+        <item>@string/udp_nat_address_and_port_dependent</item>
+    </string-array>
+
+    <string-array name="udp_nat_behavior_values" translatable="false">
+        <item></item>
+        <item>endpoint_independent</item>
+        <item>address_dependent</item>
+        <item>address_and_port_dependent</item>
     </string-array>
 
     <string-array name="vless_packet_encoding_value">
@@ -591,6 +626,19 @@
         <item>stream-one</item>
     </string-array>
 
+    <string-array name="xhttp_congestion_controller_entry">
+        <item>Default (BBR)</item>
+        <item>BBR</item>
+        <item>CUBIC</item>
+        <item>Reno</item>
+    </string-array>
+    <string-array name="xhttp_congestion_controller_value" translatable="false">
+        <item></item>
+        <item>bbr</item>
+        <item>cubic</item>
+        <item>reno</item>
+    </string-array>
+
     <string-array name="xhttp_uplink_data_placement_entry">
         <item>Default (body)</item>
         <item>Header</item>
@@ -787,6 +835,50 @@
         <item>1</item>
     </string-array>
 
+    <string-array name="mieru_low_entropy_mode" translatable="false">
+        <item></item>
+        <item>LOW_ENTROPY_MODE_OFF</item>
+        <item>LOW_ENTROPY_MODE_32</item>
+        <item>LOW_ENTROPY_MODE_40</item>
+        <item>LOW_ENTROPY_MODE_48</item>
+        <item>LOW_ENTROPY_MODE_56</item>
+    </string-array>
+
+    <string-array name="mieru_low_entropy_mask_rotation" translatable="false">
+        <item></item>
+        <item>LOW_ENTROPY_MASK_NO_ROTATION</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_1</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_2</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_3</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_4</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_5</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_6</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_7</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_8</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_9</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_10</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_11</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_12</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_13</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_14</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_RIGHT_15</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_1</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_2</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_3</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_4</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_5</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_6</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_7</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_8</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_9</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_10</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_11</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_12</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_13</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_14</item>
+        <item>LOW_ENTROPY_MASK_ROTATE_LEFT_15</item>
+    </string-array>
+
     <string-array name="naive_proto_entry">
         <item>HTTPS</item>
         <item>QUIC</item>
@@ -907,6 +999,7 @@
         <item>@string/spoof_app_none</item>
         <item>Happ</item>
         <item>v2RayTun</item>
+        <item>Incy</item>
     </string-array>
 
     <string-array name="ssh_auth_type">
@@ -1453,6 +1546,32 @@
         <item>6</item>
     </string-array>
 
+    <string-array name="snell_v6_modes_entry">
+        <item>Default</item>
+        <item>Unshaped</item>
+        <item>Unsafe raw</item>
+    </string-array>
+    <string-array name="snell_v6_modes_value">
+        <item>default</item>
+        <item>unshaped</item>
+        <item>unsafe-raw</item>
+    </string-array>
+
+    <string-array name="hysteria2_obfs_types">
+        <item>salamander</item>
+        <item>gecko</item>
+    </string-array>
+    <string-array name="hysteria2_ip_versions_entry">
+        <item>Auto</item>
+        <item>IPv4</item>
+        <item>IPv6</item>
+    </string-array>
+    <string-array name="hysteria2_ip_versions_value">
+        <item>0</item>
+        <item>4</item>
+        <item>6</item>
+    </string-array>
+
     <string-array name="snell_obfs_modes_entry">
         <item>None</item>
         <item>HTTP</item>
@@ -1477,18 +1596,6 @@
         <item>udp</item>
     </string-array>
 
-    <string-array name="snell_v6_modes_entry">
-        <item>Default</item>
-        <item>Unshaped</item>
-        <item>Unsafe raw</item>
-    </string-array>
-
-    <string-array name="snell_v6_modes_value">
-        <item>default</item>
-        <item>unshaped</item>
-        <item>unsafe-raw</item>
-    </string-array>
-
     <string-array name="proxy_protocol_entry">
         <item>Disabled</item>
         <item>PROXY protocol v1</item>
@@ -1498,5 +1605,38 @@
         <item>0</item>
         <item>1</item>
         <item>2</item>
+    </string-array>
+
+    <string-array name="subscription_banner_layout_entry">
+        <item>@string/subscription_banner_announcements</item>
+        <item>@string/subscription_banner_announcement_urls</item>
+        <item>@string/subscription_banner_traffic_text</item>
+        <item>@string/subscription_banner_traffic_bar</item>
+        <item>@string/subscription_banner_expiration_time</item>
+        <item>@string/subscription_banner_clickable</item>
+    </string-array>
+    <string-array name="subscription_banner_layout_value" translatable="false">
+        <item>announcements</item>
+        <item>announcement_urls</item>
+        <item>traffic_text</item>
+        <item>traffic_bar</item>
+        <item>expiration_time</item>
+        <item>clickable</item>
+    </string-array>
+    <string-array name="subscription_routing_interval_entries">
+        <item>@string/subscription_routing_interval_12_hours</item>
+        <item>@string/subscription_routing_interval_24_hours</item>
+        <item>@string/subscription_routing_interval_3_days</item>
+        <item>@string/subscription_routing_interval_7_days</item>
+    </string-array>
+    <string-array name="subscription_routing_interval_values" translatable="false">
+        <item>43200</item>
+        <item>86400</item>
+        <item>259200</item>
+        <item>604800</item>
+    </string-array>
+    <string-array name="subscription_xray_balancers_entries">
+        <item>@string/subscription_xray_balancers_convert</item>
+        <item>@string/subscription_xray_balancers_split</item>
     </string-array>
 </resources>
