@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.group
 
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
+import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
@@ -57,6 +58,24 @@ class RawUpdaterParseTest {
 
         assertEquals(2, beans.size)
         assertEquals(listOf("ss-first", "vm-last"), beans.map { it.displayName() })
+    }
+
+    @Test
+    fun clashYaml_keepsJuicityAndItsOwnTlsFlagName() = runTest {
+        val nodes = RawUpdater.parseRaw(fixture("clash-juicity.yaml"))!!
+            .filterIsInstance<JuicityBean>()
+
+        assertEquals(2, nodes.size)
+        val insecure = nodes.first { it.displayName() == "jq-one" }
+        assertEquals("jq.example.com", insecure.serverAddress)
+        assertEquals(443, insecure.serverPort)
+        assertEquals("00000000-0000-4000-8000-00000000000a", insecure.uuid)
+        assertEquals("alpha", insecure.password)
+        assertEquals("jq.example.com", insecure.sni)
+        assertEquals(true, insecure.allowInsecure)
+        val quotedPort = nodes.first { it.displayName() == "jq-two" }
+        assertEquals(80, quotedPort.serverPort)
+        assertTrue(quotedPort.sni.isNullOrEmpty())
     }
 
     @Test

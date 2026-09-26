@@ -13,6 +13,7 @@ import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria1Json
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria2Json
+import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.parseSingBoxEndpoint
 import io.nekohasekai.sagernet.fmt.parseSingBoxOutbound
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
@@ -1083,6 +1084,33 @@ object RawUpdater : GroupUpdater() {
                                                 opt.value.toString()
                                         "reality-short-id", "short-id" ->
                                             bean.realityShortId =
+                                                opt.value.toString()
+                                    }
+                                }
+                                proxies.add(bean)
+                            }
+
+                            "juicity" -> {
+                                val bean = JuicityBean()
+                                for (opt in proxy) {
+                                    if (opt.value == null) continue
+                                    when (opt.key.replace("_", "-")) {
+                                        "name" -> bean.name = opt.value.toString()
+                                        "server" -> bean.serverAddress = opt.value as String
+                                        "port" -> bean.serverPort = opt.value.toString().toIntOrNull() ?: 0
+                                        "uuid" -> bean.uuid = opt.value.toString()
+                                        "password" -> bean.password = opt.value.toString()
+                                        "sni" -> bean.sni = opt.value.toString()
+
+                                        // mihomo spells juicity's TLS bypass as allow-insecure, not
+                                        // skip-cert-verify like every other type here; accepting only
+                                        // the latter would silently re-enable certificate validation.
+                                        "allow-insecure", "skip-cert-verify" ->
+                                            bean.allowInsecure =
+                                                opt.value.toString() == "true"
+
+                                        "pinned-certchain-sha256", "pinned_chain_sha256" ->
+                                            bean.pinnedCertchainSha256 =
                                                 opt.value.toString()
                                     }
                                 }

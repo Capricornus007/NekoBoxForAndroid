@@ -1,0 +1,17 @@
+proxies:
+  - name: jq-one
+    type: juicity
+    server: jq.example.com
+    port: 443
+    uuid: 00000000-0000-4000-8000-00000000000a
+    password: alpha
+    sni: jq.example.com
+    allow-insecure: true
+    concurrency: 4
+  - name: jq-two
+    type: juicity
+    server: jq2.example.com
+    port: '80'
+    uuid: 00000000-0000-4000-8000-00000000000b
+    password: beta
+    skip-cert-verify: false
