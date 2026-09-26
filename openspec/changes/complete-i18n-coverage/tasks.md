@@ -5,7 +5,7 @@
 - [x] 1.1 创建 `tools/diagnostics/i18n_coverage.py`：解析基准 `values/strings.xml`、`values/arrays.xml` 与各 `values-*` 目录，输出缺失/多余条目、占位符多重集不匹配、`plurals` quantity 分类缺失（按 CLDR 语言规则），存在任一问题时退出码非 0；验证方式为从仓库根目录 `uv run tools/diagnostics/i18n_coverage.py` 能正常运行并列出当前已知缺口（如 it 缺约 1480 条），脚本自身无语法/运行错误
 - [x] 1.2 验证脚本只读与门禁语义：对当前仓库运行退出码非 0 且输出包含各语言缺失统计；用临时副本制造一个占位符不匹配样例确认能被检出后丢弃副本（不修改仓库文件）
 - [x] 1.3 提交脚本（仅 `tools/diagnostics/i18n_coverage.py`），确认 diff 不含任何 `app/` 资源改动
-- [ ] 1.4 CI/真机验证：本批次不适用真机验证，原因为未改动任何 Android 资源或代码；CI 侧确认推送后 `preview.yml` 预览构建仍成功（预期：构建通过，与基线无差异），回传证据为该 workflow 运行链接与成功状态
+- [x] 1.4 CI/真机验证：本批次不适用真机验证，原因为未改动任何 Android 资源或代码；CI 侧确认推送后 `preview.yml` 预览构建仍成功（预期：构建通过，与基线无差异），回传证据为该 workflow 运行链接与成功状态
 
 ## 2. 批次 2：中文三地补齐（zh-rCN / zh-rTW / zh-rHK）
 
