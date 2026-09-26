@@ -138,7 +138,8 @@ def check_locale(
     base_string_names: set[str],
     base_plural_names: set[str],
     base_array_names: set[str],
-    nontranslatable: set[str],
+    nontranslatable_strings: set[str],
+    nontranslatable_arrays: set[str],
 ) -> list[str]:
     issues: list[str] = []
     lang = locale_language(locale_dir.name)
@@ -153,10 +154,15 @@ def check_locale(
     _, _, loc_arrays = collect_entries(arrays_root)
     present = set(loc_strings) | set(loc_plurals)
 
-    for name in sorted(set(loc_strings) | set(loc_plurals) | set(loc_arrays)):
-        if name in nontranslatable:
+    for name in sorted(set(loc_strings) | set(loc_plurals)):
+        if name in nontranslatable_strings:
             issues.append(f"{locale_dir.name}: non-translatable leak: {name}")
-        elif name not in base_string_names | base_plural_names | base_array_names:
+        elif name not in base_string_names | base_plural_names:
+            issues.append(f"{locale_dir.name}: extra entry not in base: {name}")
+    for name in sorted(set(loc_arrays)):
+        if name in nontranslatable_arrays:
+            issues.append(f"{locale_dir.name}: non-translatable leak: {name}")
+        elif name not in base_array_names:
             issues.append(f"{locale_dir.name}: extra entry not in base: {name}")
 
     for name in sorted(base_string_names - present):
@@ -237,10 +243,11 @@ def main() -> int:
     base_string_names = {n for n, el in b_strings.items() if is_translatable(el)}
     base_plural_names = {n for n, el in b_plurals.items() if is_translatable(el)}
     base_array_names = {n for n, el in b_arrays.items() if is_translatable(el)}
-    nontranslatable = {
-        n for n, el in list(b_strings.items()) + list(b_plurals.items()) + list(b_arrays.items())
+    nontranslatable_strings = {
+        n for n, el in list(b_strings.items()) + list(b_plurals.items())
         if not is_translatable(el)
     }
+    nontranslatable_arrays = {n for n, el in b_arrays.items() if not is_translatable(el)}
 
     locale_dirs = sorted(
         d for d in res_dir.glob("values-*")
@@ -258,7 +265,7 @@ def main() -> int:
             res_dir, locale_dir,
             b_strings, b_plurals, b_arrays,
             base_string_names, base_plural_names, base_array_names,
-            nontranslatable,
+            nontranslatable_strings, nontranslatable_arrays,
         )
         total_issues += len(issues)
         counts = Counter(

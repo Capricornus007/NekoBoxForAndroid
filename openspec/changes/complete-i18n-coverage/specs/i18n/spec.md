@@ -7,15 +7,15 @@
 ## ADDED Requirements
 
 ### Requirement: 基准资源作为翻译唯一来源
-基准资源 `app/src/main/res/values/strings.xml` 与 `app/src/main/res/values/arrays.xml` MUST 作为全部翻译的唯一来源；标记 `translatable="false"` 的条目（当前为 24 条 `<string>` 与 51 个 `<string-array>`）MUST NOT 出现在任何语言目录中。本变更 MUST NOT 修改基准资源的文案内容，也 MUST NOT 新增或删除任何现有语言目录（`values-*`）。
+基准资源 `app/src/main/res/values/strings.xml` 与 `app/src/main/res/values/arrays.xml` MUST 作为全部翻译的唯一来源；标记 `translatable="false"` 的条目（当前为 24 条 `<string>` 与 51 个 `<string-array>`）MUST NOT 出现在任何语言目录中。判定 MUST 按条目类型分别对照：语言目录 `strings.xml` 中的 `<string>`/`<plurals>` 仅与基准 `strings.xml` 的同类型条目比对，语言目录 `arrays.xml` 中的 `<string-array>` 仅与基准 `arrays.xml` 的同类型条目比对（基准中存在 `<string>` 与 `<string-array>` 同名但可翻译性不同的条目，如 `log_level`）。本变更 MUST NOT 修改基准资源的文案内容，也 MUST NOT 新增或删除任何现有语言目录（`values-*`）。
 
 #### Scenario: 基准与语言集合保持稳定
 - **WHEN** 本变更完成后比对基准 `values/strings.xml`、`values/arrays.xml` 的内容与变更前一致，且 `values-*` 语言目录集合与变更前一致
 - **THEN** 基准文案与语言集合未被改动，符合要求
 
 #### Scenario: 不可翻译条目不泄漏到语言目录
-- **WHEN** 检查任一 `values-*/strings.xml` 或 `values-*/arrays.xml`
-- **THEN** 其中不包含任何在基准中标记 `translatable="false"` 的条目名
+- **WHEN** 检查任一 `values-*/strings.xml` 或 `values-*/arrays.xml` 中的条目，按其类型与基准 `strings.xml`（`<string>`/`<plurals>`）或基准 `arrays.xml`（`<string-array>`）中的同类型条目比对
+- **THEN** 语言目录的 `<string>`/`<plurals>` 不包含基准 `strings.xml` 中标记 `translatable="false"` 的名字，语言目录的 `<string-array>` 不包含基准 `arrays.xml` 中标记 `translatable="false"` 的名字
 
 ### Requirement: 语言目录条目完整覆盖基准
 每个含 `strings.xml` 的现有语言目录 MUST 包含基准中全部可翻译 `<string>` 与 `<plurals>` 条目，且 MUST 为基准中全部可翻译 `<string-array>` 提供同名数组（存放于该语言目录的 `arrays.xml`）。语言目录 MUST NOT 包含基准中不存在的条目名，也 MUST NOT 出现同名重复条目。
