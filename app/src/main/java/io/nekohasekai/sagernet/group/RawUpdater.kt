@@ -706,6 +706,11 @@ object RawUpdater : GroupUpdater() {
 
                 val globalClientFingerprint = yaml["global-client-fingerprint"]?.toString() ?: ""
 
+                // The dispatch below has no fall-through: a protocol we do not implement used to
+                // vanish with zero trace, so a subscription looked complete while nodes were
+                // missing. Count every drop and report it once at the end.
+                val skippedTypes = LinkedHashMap<String, Int>()
+
                 for (rawProxy in (
                     yaml["proxies"] as? List<*> ?: error(
                         app.getString(R.string.no_proxies_found_in_file),
@@ -1353,12 +1358,20 @@ object RawUpdater : GroupUpdater() {
                                 val bean = parseClashSnell(proxy)
                                 proxies.add(bean)
                             }
+
+                            else -> skippedTypes[type] = (skippedTypes[type] ?: 0) + 1
                         }
                     } catch (e: Exception) {
                         // Malformed node (e.g. a type-confused field): skip it and keep the
                         // rest of the subscription instead of failing the whole update.
                         Logs.w("skipping malformed Clash node: ${e.readableMessage}", e)
                     }
+                }
+
+                if (skippedTypes.isNotEmpty()) {
+                    val skipped = skippedTypes.values.sum()
+                    val detail = skippedTypes.entries.joinToString(", ") { "${it.key}×${it.value}" }
+                    Logs.w("Clash import: skipped $skipped unsupported node(s): $detail")
                 }
 
                 // Fix ent

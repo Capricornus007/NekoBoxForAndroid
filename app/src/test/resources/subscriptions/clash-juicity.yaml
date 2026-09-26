@@ -15,3 +15,7 @@ proxies:
     uuid: 00000000-0000-4000-8000-00000000000b
     password: beta
     skip-cert-verify: false
+  - name: hidme
+    type: haproxy
+    server: hap.example.com
+    port: 443

@@ -62,6 +62,8 @@ class RawUpdaterParseTest {
 
     @Test
     fun clashYaml_keepsJuicityAndItsOwnTlsFlagName() = runTest {
+        val warnings = mutableListOf<String>()
+        Logs.sink = { warnings.add(it) }
         val nodes = RawUpdater.parseRaw(fixture("clash-juicity.yaml"))!!
             .filterIsInstance<JuicityBean>()
 
@@ -76,6 +78,11 @@ class RawUpdaterParseTest {
         val quotedPort = nodes.first { it.displayName() == "jq-two" }
         assertEquals(80, quotedPort.serverPort)
         assertTrue(quotedPort.sni.isNullOrEmpty())
+        // An unlisted protocol must be visible in the log, not just absent from the list.
+        assertTrue(
+            "expected skip summary, got $warnings",
+            warnings.any { it.contains("skipped 1 unsupported node(s)") && it.contains("haproxy×1") },
+        )
     }
 
     @Test
