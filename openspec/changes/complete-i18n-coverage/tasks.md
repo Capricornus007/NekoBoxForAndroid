@@ -16,8 +16,8 @@
 
 ## 3. 批次 3：日韩俄乌补齐（ja / ko / ru / uk）
 
-- [ ] 3.1 补齐 `values-ja`、`values-ko`、`values-ru`、`values-uk` 的全部缺失 `<string>`、`<plurals>`（ru/uk 复数须覆盖 one/few/many/other 分类）并新建四地 `arrays.xml`；验证方式为诊断脚本中四地全部指标为 0
-- [ ] 3.2 本地静态校验：诊断脚本确认 XML 良构、占位符一致、无不可翻译条目泄漏
+- [x] 3.1 补齐 `values-ja`、`values-ko`、`values-ru`、`values-uk` 的全部缺失 `<string>`、`<plurals>`（ru/uk 复数须覆盖 one/few/many/other 分类）并新建四地 `arrays.xml`；验证方式为诊断脚本中四地全部指标为 0
+- [x] 3.2 本地静态校验：诊断脚本确认 XML 良构、占位符一致、无不可翻译条目泄漏
 - [ ] 3.3 提交本批次（8 个文件），确认 diff 范围仅限四地资源
 - [ ] 3.4 CI/真机验证：推送触发 `preview.yml` 预览构建成功；真机场景为切换日语、韩语、俄语、乌克兰语抽查主界面与订阅页，俄语复数（如「已删除 N 个配置」）显示正确分类；回传证据为 workflow 链接 + 截图
 
