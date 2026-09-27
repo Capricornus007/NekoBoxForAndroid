@@ -296,6 +296,8 @@
     <string name="unavailable">利用不可</string>
     <string name="always_show_address">常にアドレスを表示</string>
     <string name="always_show_address_sum">設定カードに常にサーバーアドレスを表示</string>
+    <string name="mask_address">ノードアドレスをマスク</string>
+    <string name="mask_address_sum">ノード一覧でサーバーアドレスを非表示にします。表示のみで、共有と編集は実際の値のままです。</string>
     <string name="clear_traffic_statistics">トラフィック統計をクリア</string>
     <string name="connection_test">接続テスト</string>
     <string name="connection_test_clear_results">テスト結果をクリア</string>

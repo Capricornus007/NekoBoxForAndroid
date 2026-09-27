@@ -703,6 +703,8 @@
     <string name="connection_test">اختبار الاتصال</string>
     <string name="clear_traffic_statistics">مسح إحصائيات حركة المرور</string>
     <string name="always_show_address_sum">اعرض دائمًا عنوان الخادم على بطاقة التكوين</string>
+    <string name="mask_address">إخفاء عنوان العقدة</string>
+    <string name="mask_address_sum">إخفاء عنوان الخادم في قائمة العقد. العرض فقط - المشاركة والتحرير يبقيان القيمة الحقيقية.</string>
     <string name="always_show_address">اعرض العنوان دائمًا</string>
     <string name="unavailable">غير متوفره</string>
     <string name="standard">معيار</string>

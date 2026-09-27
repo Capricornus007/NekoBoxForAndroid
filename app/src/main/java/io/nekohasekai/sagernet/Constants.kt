@@ -93,6 +93,7 @@ object Key {
     const val LOG_BUF_SIZE = "logBufSize"
     const val MTU = "mtu"
     const val ALWAYS_SHOW_ADDRESS = "alwaysShowAddress"
+    const val MASK_ADDRESS = "maskAddress"
 
     const val RULES_GEOSITE_URL = "rulesGeositeUrl"
     const val RULES_GEOIP_URL = "rulesGeoipUrl"

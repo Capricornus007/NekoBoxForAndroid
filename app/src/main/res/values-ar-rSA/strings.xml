@@ -311,6 +311,8 @@
     <string name="always_show_address">عرض العنوان دائمًا</string>
     <string name="always_show_address_sum">عرض عنوان الخادم دائمًا على بطاقة
         التكوين</string>
+    <string name="mask_address">إخفاء عنوان العقدة</string>
+    <string name="mask_address_sum">إخفاء عنوان الخادم في قائمة العقد. العرض فقط - المشاركة والتحرير يبقيان القيمة الحقيقية.</string>
     <string name="clear_traffic_statistics">مسح إحصائيات المرور</string>
     <string name="connection_test">اختبار الاتصال</string>
     <string name="connection_test_clear_results">مسح نتائج الاختبار</string>

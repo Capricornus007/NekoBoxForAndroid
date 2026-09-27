@@ -313,6 +313,8 @@
     <string name="always_show_address">Завжди показувати адресу</string>
     <string name="always_show_address_sum">Завжди відображати адресу сервера на картці
         конфігурації</string>
+    <string name="mask_address">Маскувати адресу вузла</string>
+    <string name="mask_address_sum">Ховати адресу сервера у списку вузлів. Лише відображення: експорт і редагування зберігають справжнє значення.</string>
     <string name="clear_traffic_statistics">Очистити статистику трафіку</string>
     <string name="connection_test">Тест з\'єднання</string>
     <string name="connection_test_clear_results">Очистити результати тесту</string>

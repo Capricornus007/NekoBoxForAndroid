@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.ui
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -1334,7 +1335,7 @@ class ConfigurationGroupFragment : Fragment() {
                 address = ""
             }
 
-            profileAddress.text = address
+            profileAddress.text = if (address.isNotBlank() && pf.maskAddress) maskHostPort(address) else address
             profileAddress.visibility = when {
                 address.isNotBlank() -> View.VISIBLE
                 reserveMiddleRow -> View.INVISIBLE
@@ -1384,6 +1385,25 @@ class ConfigurationGroupFragment : Fragment() {
 
             val selected = pf.isSelectedProfile(proxyEntity.id)
             applySelected(selected)
+
+            // 名稱與地址只在「這一列就是正在使用的節點」時跑馬燈。全列表常駐滾動會讓清單
+            // 每個畫面都持續重繪，直接對到你一直盯的發熱；其他列現在已經拿回整條寬度
+            // （狀態搬到協定那行了），只有真正超長才需要滾。
+            val marquee = if (selected) TextUtils.TruncateAt.MARQUEE else TextUtils.TruncateAt.END
+            profileName.ellipsize = marquee
+            profileName.isSelected = selected
+            profileAddress.ellipsize = marquee
+            profileAddress.isSelected = selected
+        }
+
+        // 只遮顯示，不動資料本身：分享／編輯／匯出都還是原值。留首 2 與末 1 字元加端口，
+        // 這樣「哪一台」還能認得出，但別人從你螢幕上抄不走完整地址。
+        private fun maskHostPort(address: String): String {
+            val portAt = address.lastIndexOf(':')
+            val host = if (portAt > 0) address.substring(0, portAt) else address
+            val port = if (portAt > 0) address.substring(portAt) else ""
+            if (host.length < 5) return "*".repeat(host.length) + port
+            return host.take(2) + "*".repeat(host.length - 3) + host.takeLast(1) + port
         }
 
         private fun speedTestResultText(proxyEntity: ProxyEntity): String? {

@@ -296,6 +296,8 @@
     <string name="unavailable">不可用</string>
     <string name="always_show_address">始終顯示地址</string>
     <string name="always_show_address_sum">始終在配置卡上顯示伺服器地址</string>
+    <string name="mask_address">遮罩節點地址</string>
+    <string name="mask_address_sum">在節點清單中隱藏伺服器地址。只影響顯示，分享與編輯仍是原值。</string>
     <string name="clear_traffic_statistics">清除流量統計</string>
     <string name="connection_test">連線測試</string>
     <string name="connection_test_clear_results">清除測試結果</string>

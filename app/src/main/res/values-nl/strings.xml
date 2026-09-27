@@ -349,6 +349,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="always_show_address">Altijd adres tonen</string>
     <string name="always_show_address_sum">Altijd het serveradres weergeven op de
         configuratiekaart</string>
+    <string name="mask_address">Maskeer knooppuntadres</string>
+    <string name="mask_address_sum">Verberg het serveradres in de lijst met knooppunten. Alleen weergave: delen en bewerken houden de echte waarde.</string>
     <string name="clear_traffic_statistics">Verkeersstatistieken wissen</string>
     <string name="connection_test">Verbindingstest</string>
     <string name="connection_test_clear_results">Testresultaten wissen</string>

@@ -345,6 +345,8 @@
     <string name="unavailable">Utilgjengelig</string>
     <string name="always_show_address">Vis alltid adresse</string>
     <string name="always_show_address_sum">Vis alltid serveradressen på konfigurasjonskortet</string>
+    <string name="mask_address">Masker nodeadresse</string>
+    <string name="mask_address_sum">Skjul serveradressen i nodelisten. Bare visning - deling og redigering beholder den virkelige verdien.</string>
     <string name="clear_traffic_statistics">Nullstill trafikkstatistikk</string>
     <string name="connection_test">Tilkoblingstest</string>
     <string name="connection_test_clear_results">Nullstill testresultater</string>

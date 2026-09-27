@@ -305,6 +305,8 @@
     <string name="unavailable">غیرقابل دسترس</string>
     <string name="always_show_address">همیشه نمایش آدرس</string>
     <string name="always_show_address_sum">همیشه آدرس سرور را روی کارت پیکربندی نمایش بده</string>
+    <string name="mask_address">پوشاندن نشانی گره</string>
+    <string name="mask_address_sum">نشانی سرور را در فهرست گره‌ها پنهان کنید. فقط نمایش - اشتراک و ویرایش مقدار واقعی را حفظ می‌کنند.</string>
     <string name="clear_traffic_statistics">پاک کردن آمار ترافیک</string>
     <string name="connection_test">تست اتصال</string>
     <string name="connection_test_clear_results">پاک کردن نتایج تست</string>

@@ -318,6 +318,8 @@
     <string name="unavailable">Kullanılamıyor</string>
     <string name="always_show_address">Adresi Her Zaman Göster</string>
     <string name="always_show_address_sum">Yapılandırma kartında sunucu adresini her zaman göster</string>
+    <string name="mask_address">Düğüm adresini maskele</string>
+    <string name="mask_address_sum">Sunucu adresini düğüm listesinde gizler. Yalnızca görüntüleme - paylaşma ve düzenleme gerçek değeri korur.</string>
     <string name="clear_traffic_statistics">Trafik istatistiklerini temizle</string>
     <string name="connection_test">Bağlantı testi</string>
     <string name="connection_test_clear_results">Test sonuçlarını temizle</string>

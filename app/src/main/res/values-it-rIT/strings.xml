@@ -308,6 +308,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="unavailable">Non disponibile</string>
     <string name="always_show_address">Mostra sempre indirizzo</string>
     <string name="always_show_address_sum">Mostra sempre l\'indirizzo del server sulla scheda di configurazione</string>
+    <string name="mask_address">Maschera l\'indirizzo del nodo</string>
+    <string name="mask_address_sum">Nascondi l\'indirizzo del server nell\'elenco dei nodi. Solo visualizzazione: condivisione e modifica mantengono il valore reale.</string>
     <string name="clear_traffic_statistics">Cancella statistiche traffico</string>
     <string name="connection_test">Test connessione</string>
     <string name="connection_test_clear_results">Cancella risultati test</string>

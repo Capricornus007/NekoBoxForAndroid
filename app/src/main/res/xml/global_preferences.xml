@@ -112,6 +112,10 @@
             app:summary="@string/always_show_address_sum"
             app:title="@string/always_show_address" />
         <SwitchPreferenceCompat
+            app:key="maskAddress"
+            app:summary="@string/mask_address_sum"
+            app:title="@string/mask_address" />
+        <SwitchPreferenceCompat
             app:icon="@drawable/ic_device_data_usage"
             app:key="meteredNetwork"
             app:summary="@string/metered_summary"

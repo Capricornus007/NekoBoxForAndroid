@@ -306,6 +306,8 @@
     <string name="unavailable">No disponible</string>
     <string name="always_show_address">Mostrar dirección siempre</string>
     <string name="always_show_address_sum">Mostrar siempre la dirección del servidor en la tarjeta de configuración</string>
+    <string name="mask_address">Enmascarar dirección del nodo</string>
+    <string name="mask_address_sum">Oculta la dirección del servidor en la lista de nodos. Solo la visualización: compartir y editar conservan el valor real.</string>
     <string name="clear_traffic_statistics">Borrar estadísticas de tráfico</string>
     <string name="connection_test">Prueba de conexión</string>
     <string name="connection_test_clear_results">Borrar resultados de prueba</string>

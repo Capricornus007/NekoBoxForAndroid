@@ -310,6 +310,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="always_show_address">Всегда показывать адрес</string>
     <string name="always_show_address_sum">Всегда отображать адрес сервера на карточке
         конфигурации</string>
+    <string name="mask_address">Маскировать адрес узла</string>
+    <string name="mask_address_sum">Скрывать адрес сервера в списке узлов. Только отображение: экспорт и изменение сохраняют реальное значение.</string>
     <string name="clear_traffic_statistics">Очистить статистику трафика</string>
     <string name="connection_test">Тест подключения</string>
     <string name="connection_test_clear_results">Очистить результаты теста</string>

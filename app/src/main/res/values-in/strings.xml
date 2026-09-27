@@ -325,6 +325,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="unavailable">Tidak tersedia</string>
     <string name="always_show_address">Selalu Tampilkan Alamat</string>
     <string name="always_show_address_sum">Selalu tampilkan alamat server pada kartu konfigurasi</string>
+    <string name="mask_address">Sembunyikan alamat node</string>
+    <string name="mask_address_sum">Sembunyikan alamat server di daftar node. Hanya tampilan - berbagi dan mengedit tetap memakai nilai asli.</string>
     <string name="clear_traffic_statistics">Hapus statistik lalu lintas</string>
     <string name="connection_test">Tes koneksi</string>
     <string name="connection_test_clear_results">Hapus hasil tes</string>

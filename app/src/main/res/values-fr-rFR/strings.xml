@@ -311,6 +311,8 @@
     <string name="always_show_address">Toujours afficher l\'adresse</string>
     <string name="always_show_address_sum">Toujours afficher l\'adresse du serveur sur la carte
         de configuration</string>
+    <string name="mask_address">Masquer l\'adresse du nœud</string>
+    <string name="mask_address_sum">Masquer l\'adresse du serveur dans la liste des nœuds. Affichage uniquement : le partage et la modification conservent la vraie valeur.</string>
     <string name="clear_traffic_statistics">Effacer les statistiques de trafic</string>
     <string name="connection_test">Test de connexion</string>
     <string name="connection_test_clear_results">Effacer les résultats du test</string>

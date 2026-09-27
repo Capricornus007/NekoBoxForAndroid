@@ -347,6 +347,8 @@
     <string name="always_show_address">Sempre mostrar endereço</string>
     <string name="always_show_address_sum">Sempre exibir o endereço do servidor no
         cartão de configuração</string>
+    <string name="mask_address">Mascarar endereço do nó</string>
+    <string name="mask_address_sum">Oculta o endereço do servidor na lista de nós. Apenas exibição: compartilhar e editar mantêm o valor real.</string>
     <string name="clear_traffic_statistics">Limpar estatísticas de tráfego</string>
     <string name="connection_test">Teste de conexão</string>
     <string name="connection_test_clear_results">Limpar resultados do teste</string>

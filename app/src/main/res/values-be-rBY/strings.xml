@@ -304,6 +304,8 @@
     <string name="unavailable">Недаступны</string>
     <string name="always_show_address">Заўсёды паказваць адрас</string>
     <string name="always_show_address_sum">Заўсёды паказваць адрас сервера на картцы канфігурацыі</string>
+    <string name="mask_address">Маскіраваць адрас вузла</string>
+    <string name="mask_address_sum">Схаваць адрас сервера ў спісе вузлоў. Толькі адлюстраванне: экспарт і рэдагаванне захоўваюць сапраўднае значэнне.</string>
     <string name="clear_traffic_statistics">Ачысціць статыстыку трафіку</string>
     <string name="connection_test">Тэст злучэння</string>
     <string name="connection_test_clear_results">Ачысціць вынікі тэсту</string>

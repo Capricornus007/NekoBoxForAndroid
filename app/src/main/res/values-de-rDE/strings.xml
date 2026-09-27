@@ -303,6 +303,8 @@
     <string name="always_show_address">Adresse immer anzeigen</string>
     <string name="always_show_address_sum">Serveradresse immer auf der Konfigurationskarte
         anzeigen</string>
+    <string name="mask_address">Knotenadresse maskieren</string>
+    <string name="mask_address_sum">Serveradresse in der Knotenliste ausblenden. Nur Anzeige - Teilen und Bearbeiten behalten den echten Wert.</string>
     <string name="clear_traffic_statistics">Datenverkehrsstatistiken löschen</string>
     <string name="connection_test">Verbindungstest</string>
     <string name="connection_test_clear_results">Testergebnisse löschen</string>

@@ -130,6 +130,7 @@ class ConfigurationFragment @JvmOverloads constructor(
     private var tabLayoutMediator: TabLayoutMediator? = null
 
     val alwaysShowAddress by lazy { DataStore.alwaysShowAddress }
+    val maskAddress by lazy { DataStore.maskAddress }
 
     private var selectedProfileSnapshot = 0L
     private var currentProfileSnapshot = 0L

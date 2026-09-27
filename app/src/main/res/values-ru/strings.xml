@@ -36,6 +36,8 @@
     <string name="alter_id">Изменить ID</string>
     <string name="always_show_address">Всегда показывать адрес</string>
     <string name="always_show_address_sum">Всегда отображать адрес сервера на карте конфигурации</string>
+    <string name="mask_address">Маскировать адрес узла</string>
+    <string name="mask_address_sum">Скрывать адрес сервера в списке узлов. Только отображение: экспорт и изменение сохраняют реальное значение.</string>
     <string name="app_desc">Универсальный набор инструментов прокси для Android, написанный на Kotlin.</string>
     <string name="app_name">Throne</string>
     <string name="app_name_long">Throne для Android</string>

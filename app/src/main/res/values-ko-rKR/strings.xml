@@ -300,6 +300,8 @@
     <string name="unavailable">사용 불가</string>
     <string name="always_show_address">항상 주소 표시</string>
     <string name="always_show_address_sum">구성 카드에 항상 서버 주소 표시</string>
+    <string name="mask_address">노드 주소 마스킹</string>
+    <string name="mask_address_sum">노드 목록에서 서버 주소를 숨깁니다. 표시에만 영향하며 공유 및 편집은 실제 값입니다.</string>
     <string name="clear_traffic_statistics">트래픽 통계 초기화</string>
     <string name="connection_test">연결 테스트</string>
     <string name="connection_test_clear_results">테스트 결과 지우기</string>

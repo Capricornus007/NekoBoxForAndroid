@@ -338,6 +338,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         SagerNet.application.getString(R.string.default_speed_test_fallback_server_list_url)
     }
     var alwaysShowAddress by configurationStore.boolean(Key.ALWAYS_SHOW_ADDRESS)
+    var maskAddress by configurationStore.boolean(Key.MASK_ADDRESS)
 
     var tunImplementation by configurationStore.stringToInt(Key.TUN_IMPLEMENTATION) { TunImplementation.GVISOR }
     var enableHevTun by configurationStore.boolean(Key.ENABLE_HEV_TUN)
