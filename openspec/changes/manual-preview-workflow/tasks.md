@@ -4,7 +4,7 @@
 
 - [x] 1.1 修改 `buildScript/release_assets.py`：`throne-update.json` 仅在 `channel == "stable"` 时生成，`preview` 通道 dist 只含各 ABI APK 与 `SHA256SUMS`；其余校验（签名、ABI、版本、包名一致性）保持不变，验证方式：通读 diff 确认 stable 分支行为零变化、preview 分支跳过清单写入
 - [x] 1.2 本地静态校验：按 governance 规范走 uv 文件工作流——将语法检查逻辑写入 `tools/diagnostics/` 脚本，从仓库根目录 `uv run tools/diagnostics/<script>.py buildScript/release_assets.py` 执行，验证语法无误（禁止 `python`/`python3` 直跑）
-- [ ] 1.3 提交该批次（`buildScript/release_assets.py` + 配套 `tools/diagnostics/py_syntax_check.py`），验证方式：`git show --stat` 确认只含这两个文件
+- [x] 1.3 提交该批次（`buildScript/release_assets.py` + 配套 `tools/diagnostics/py_syntax_check.py`），验证方式：`git show --stat` 确认只含这两个文件
 
 ## 2. Preview 工作流改造（触发、产物、包名）
 
