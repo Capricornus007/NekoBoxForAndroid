@@ -138,7 +138,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
      * Empty means nothing staged. Startup only deletes the APK when the installed
      * version has caught up to this name (cancel install keeps the cache).
      */
-    var pendingUpdateVersion by configurationStore.string(Key.PENDING_UPDATE_VERSION) { "" }
 
     var allowInsecureOnRequest by configurationStore.boolean(Key.ALLOW_INSECURE_ON_REQUEST)
     var networkChangeResetConnections by configurationStore.boolean(Key.NETWORK_CHANGE_RESET_CONNECTIONS) { true }

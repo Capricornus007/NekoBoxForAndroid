@@ -15,7 +15,6 @@ object Key {
      * Kept while the downloaded APK is still newer than the installed app;
      * cleared after startup cleans cache once the install has caught up.
      */
-    const val PENDING_UPDATE_VERSION = "pendingUpdateVersion"
 
     const val APP_EXPERT = "isExpert"
     const val APP_THEME = "appTheme"
