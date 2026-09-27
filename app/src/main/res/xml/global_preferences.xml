@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <PreferenceCategory app:title="@string/interface_settings">
+    <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/interface_settings">
         <SwitchPreferenceCompat
             app:defaultValue="false"
             app:icon="@drawable/ic_baseline_color_lens_24"
@@ -24,8 +24,8 @@
             app:key="appLanguage"
             app:title="@string/language"
             app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
-    <PreferenceCategory app:title="@string/general_settings">
+    </io.nekohasekai.sagernet.widget.CollapsibleCategory>
+    <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/general_settings">
         <SwitchPreferenceCompat
             app:defaultValue="false"
             app:icon="@drawable/ic_communication_phonelink_ring"
@@ -142,9 +142,9 @@
             app:key="globalCustomConfig"
             app:title="@string/custom_config"
             app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
+    </io.nekohasekai.sagernet.widget.CollapsibleCategory>
 
-    <PreferenceCategory app:title="@string/cag_route">
+    <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/cag_route">
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_navigation_apps"
             app:key="proxyApps"
@@ -207,9 +207,9 @@
             app:icon="@drawable/ic_baseline_shutter_speed_24"
             app:title="@string/ruleset_update_interval"
             app:summary="@string/ruleset_update_interval_summary" />
-    </PreferenceCategory>
+    </io.nekohasekai.sagernet.widget.CollapsibleCategory>
 
-    <PreferenceCategory app:title="@string/fragment_settings">
+    <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/fragment_settings">
         <SwitchPreferenceCompat
             app:key="enableTLSFragment"
             app:title="@string/enable_tls_fragment" />
@@ -223,9 +223,9 @@
             app:key="fragmentInterval"
             app:title="@string/fragment_interval"
             app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
+    </io.nekohasekai.sagernet.widget.CollapsibleCategory>
 
-    <PreferenceCategory app:title="@string/cag_dns">
+    <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/cag_dns">
         <EditTextPreference
             app:defaultValue="https://dns.google/dns-query"
             app:icon="@drawable/ic_action_dns"
@@ -278,8 +278,8 @@
             app:key="dnsHosts"
             app:title="@string/dns_hosts"
             app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
-<PreferenceCategory app:title="@string/inbound_settings">
+    </io.nekohasekai.sagernet.widget.CollapsibleCategory>
+<io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/inbound_settings">
         <Preference
             app:icon="@drawable/ic_hardware_router"
             app:key="localProxySettings"
@@ -301,8 +301,8 @@
             app:defaultValue="true"
             app:key="strictRoute"
             app:title="@string/strict_route" />
-    </PreferenceCategory>
-    <PreferenceCategory app:title="@string/cag_misc">
+    </io.nekohasekai.sagernet.widget.CollapsibleCategory>
+    <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/cag_misc">
         <moe.matsuri.nb4a.ui.UrlTestPreference
             app:defaultValue="@string/default_connection_test_url"
             app:icon="@drawable/ic_baseline_cast_connected_24"
@@ -435,6 +435,6 @@
             app:key="createClearCacheShortcut"
             app:title="@string/create_shortcut"
             app:summary="@string/create_clear_cache_shortcut_summary" />
-    </PreferenceCategory>
+    </io.nekohasekai.sagernet.widget.CollapsibleCategory>
 
 </PreferenceScreen>
