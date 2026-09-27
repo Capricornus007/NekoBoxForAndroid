@@ -220,7 +220,7 @@
 
     <PreferenceScreen
         app:key="cat_fragment_settings"
-        app:icon="@drawable/ic_baseline_shuffle_24"
+        app:icon="@drawable/ic_baseline_call_split_24"
         app:title="@string/fragment_settings">
             <SwitchPreferenceCompat
                 app:key="enableTLSFragment"
@@ -378,6 +378,26 @@
                 app:title="@string/wake_reset_connections"
                 app:useSimpleSummaryProvider="true" />
             <SwitchPreferenceCompat
+        app:defaultValue="false"
+        app:icon="@drawable/ic_baseline_flip_camera_android_24"
+        app:key="vpnWatchdogEnabled"
+        app:title="@string/vpn_watchdog"
+        app:summary="@string/vpn_watchdog_summary" />
+            <EditTextPreference
+        app:defaultValue="7"
+        app:dependency="vpnWatchdogEnabled"
+        app:icon="@drawable/ic_baseline_shutter_speed_24"
+        app:key="vpnWatchdogInterval"
+        app:title="@string/vpn_watchdog_interval"
+        app:useSimpleSummaryProvider="true" />
+            <Preference
+        app:dependency="vpnWatchdogEnabled"
+        app:icon="@drawable/ic_baseline_bug_report_24"
+        app:key="vpnWatchdogTest"
+        app:title="@string/vpn_watchdog_test"
+        app:summary="@string/vpn_watchdog_test_summary" />
+
+            <SwitchPreferenceCompat
                 app:icon="@drawable/ic_action_lock_open"
                 app:key="globalAllowInsecure"
                 app:title="@string/global_allow_insecure" />
@@ -436,30 +456,4 @@
                 app:summary="@string/create_clear_cache_shortcut_summary" />
     </PreferenceScreen>
 
-    <PreferenceScreen
-        app:key="cat_vpn_watchdog"
-        app:icon="@drawable/ic_baseline_security_24"
-        app:title="@string/vpn_watchdog">
-            <SwitchPreferenceCompat
-                app:defaultValue="false"
-                app:icon="@drawable/ic_baseline_flip_camera_android_24"
-                app:key="vpnWatchdogEnabled"
-                app:title="@string/vpn_watchdog"
-                app:summary="@string/vpn_watchdog_summary" />
-
-            <EditTextPreference
-                app:defaultValue="7"
-                app:dependency="vpnWatchdogEnabled"
-                app:icon="@drawable/ic_baseline_shutter_speed_24"
-                app:key="vpnWatchdogInterval"
-                app:title="@string/vpn_watchdog_interval"
-                app:useSimpleSummaryProvider="true" />
-
-            <Preference
-                app:dependency="vpnWatchdogEnabled"
-                app:icon="@drawable/ic_baseline_bug_report_24"
-                app:key="vpnWatchdogTest"
-                app:title="@string/vpn_watchdog_test"
-                app:summary="@string/vpn_watchdog_test_summary" />
-    </PreferenceScreen>
 </PreferenceScreen>
