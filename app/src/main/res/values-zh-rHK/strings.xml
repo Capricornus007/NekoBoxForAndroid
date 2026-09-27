@@ -527,7 +527,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="backup_importing">正在匯入…</string>
     <string name="packet_encoding">封包編碼</string>
     <string name="acquire_wake_lock">獲取喚醒鎖</string>
-    <string name="release_wake_lock">釋放喚醒鎖</string>
     <string name="acquire_wake_lock_summary">保持 CPU 喚醒</string>
     <string name="hide_from_recent_apps">從最近任務中隱藏</string>
     <string name="hide_from_recent_apps_summary">在背景運行時從最近任務中隱藏應用</string>
@@ -540,8 +539,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="tuic_disable_sni">停用 SNI</string>
     <string name="tuic_reduce_rtt">啓用 0-RTT QUIC 握手</string>
     <string name="pinned_certchain_sha256">固定憑證 SHA256</string>
-    <string name="please_update">您的 APP (%s) 太舊了喵，%s 再不更新就沒的用了喵～</string>
-    <string name="please_update_force">您的 APP (%s) 版本過舊，已於 %s 停止工作，請立即升級。</string>
     <string name="connection_test_delete_unavailable">清除不可用的</string>
     <string name="move">移動</string>
     <string name="exe_prefer_provider">外掛程式偏好提供者</string>
@@ -660,15 +657,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dual_network_acceleration_summary">同時透過 Wi-Fi 與行動數據連線。需在系統設定中保持 Wi-Fi 與行動數據皆開啟，並會增加耗電。</string>
     <string name="connection_test_timeout">測試逾時（毫秒）</string>
     <string name="preview_version_hint">此應用程式為預覽版本，可能包含許多問題。如果您不想測試，請前往 GitHub 下載正式版本！</string>
-    <string name="check_update_preview">檢查預覽版本更新</string>
-    <string name="check_update_release">檢查正式版本更新</string>
-    <string name="release_not_available">Throne 目前尚未發佈正式版</string>
-    <string name="update_dialog_title">發現新版本</string>
-    <string name="update_dialog_message">目前版本：%1$s\n可用版本：%2$s\n您要下載嗎？</string>
-    <string name="update_downloading">正在下載更新…</string>
-    <string name="update_open_page">開啟發佈頁</string>
-    <string name="update_no_apk_for_abi">找不到適用於此裝置（%1$s）的安裝包，您要改為開啟發佈頁嗎？</string>
-    <string name="check_update_no">檢查成功，但無更新。</string>
     <string name="reset_settings">還原預設設定</string>
     <string name="reset_settings_message">還原預設設定，但節點和分組等資料將保留。若要完全清除資料，請直接在系統設定中清除應用程式資料。</string>
     <string name="minimize">最小化</string>

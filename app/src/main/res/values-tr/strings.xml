@@ -651,7 +651,6 @@
     <string name="backup_importing">İçe aktarılıyor…</string>
     <string name="packet_encoding">Paket kodlaması</string>
     <string name="acquire_wake_lock">Wake lock al</string>
-    <string name="release_wake_lock">Wake lock bırak</string>
     <string name="acquire_wake_lock_summary">CPU\'yu açık tut</string>
     <string name="hide_from_recent_apps">Son kullanılanlardan gizle</string>
     <string name="hide_from_recent_apps_summary">Arka planda çalışırken uygulamayı son kullanılanlardan gizle</string>
@@ -796,15 +795,6 @@
     <string name="dual_network_acceleration_summary">Wi-Fi ve mobil veriyle eşzamanlı bağlan. Her iki ağın da etkin olması gerekir</string>
     <string name="connection_test_timeout">Test zaman aşımı (ms)</string>
     <string name="preview_version_hint">Bu uygulama bir önizleme sürümüdür ve birçok sorun içerebilir.</string>
-    <string name="check_update_preview">Önizleme sürümü güncellemelerini denetle</string>
-    <string name="check_update_release">Kararlı sürüm güncellemelerini denetle</string>
-    <string name="release_not_available">NekoBox henüz kararlı bir sürüm yayınlamadı</string>
-    <string name="update_dialog_title">Yeni sürüm mevcut</string>
-    <string name="update_dialog_message">Mevcut sürüm: %1$s\nMevcut olan: %2$s\nİndirilsin ve kurulsun mu?</string>
-    <string name="update_downloading">Güncelleme indiriliyor…</string>
-    <string name="update_open_page">Sürüm sayfasını aç</string>
-    <string name="update_no_apk_for_abi">Bu cihaz için eşleşen APK yok (%1$s). Sürüm sayfası açılsın mı?</string>
-    <string name="check_update_no">Denetim başarılı, güncelleme yok.</string>
     <string name="reset_settings">Varsayılan ayarlara dön</string>
     <string name="reset_settings_message">Varsayılan ayarlara dönülür; düğüm ve gruplar gibi veriler korunur</string>
     <string name="minimize">Küçült</string>

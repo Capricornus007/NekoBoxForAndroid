@@ -1,7 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="scanner_toggle_flashlight">Alihkan senter</string>
-    <string name="scanner_select_image">Pilih gambar</string>
     <string name="quick_toggle">Beralih</string>
     <string name="quick_enable">Aktifkan</string>
     <string name="quick_disable">Nonaktifkan</string>
@@ -577,7 +575,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="backup_importing">Mengimpor…</string>
     <string name="packet_encoding">Pengkodean Paket</string>
     <string name="acquire_wake_lock">Ambil WakeLock</string>
-    <string name="release_wake_lock">Lepaskan WakeLock</string>
     <string name="acquire_wake_lock_summary">Jaga CPU tetap aktif</string>
     <string name="hide_from_recent_apps">Sembunyikan dari tugas terkini</string>
     <string name="hide_from_recent_apps_summary">Sembunyikan aplikasi dari tugas terkini saat berjalan di latar belakang</string>
@@ -718,14 +715,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="concurrent_dial_summary">Aktifkan koneksi concurrent untuk pembentukan jaringan yang lebih cepat, dapat meningkatkan penggunaan baterai</string>
     <string name="connection_test_timeout">Batas Waktu Tes (ms)</string>
     <string name="preview_version_hint">Aplikasi ini adalah versi pratinjau dan mungkin mengandung banyak masalah. Jika Anda tidak ingin mengujinya, silakan kunjungi GitHub untuk mengunduh versi Rilis!</string>
-    <string name="check_update_preview">Periksa pembaruan versi pratinjau</string>
-    <string name="check_update_release">Periksa pembaruan versi rilis</string>
-    <string name="update_dialog_title">Versi baru tersedia</string>
-    <string name="update_dialog_message">Versi saat ini: %1$s\nVersi tersedia: %2$s\nApakah Anda ingin mengunduhnya?</string>
-    <string name="update_downloading">Mengunduh pembaruan…</string>
-    <string name="update_open_page">Buka halaman rilis</string>
-    <string name="update_no_apk_for_abi">Tidak ada APK yang cocok untuk perangkat ini (%1$s). Buka halaman rilis saja?</string>
-    <string name="check_update_no">Pemeriksaan berhasil, tetapi tidak ada pembaruan.</string>
     <string name="reset_settings">Kembalikan pengaturan default</string>
     <string name="reset_settings_message">Kembalikan pengaturan default, tetapi data seperti node dan grup akan dipertahankan. Untuk menghapus data sepenuhnya, hapus data aplikasi langsung di pengaturan sistem.</string>
     <string name="minimize">Minimalkan</string>
@@ -887,7 +876,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="masterdns_no_key">Kunci enkripsi untuk metode %1$s hilang dari tautan MasterDNS</string>
     <string name="webdav_auth_failed">Autentikasi gagal</string>
     <string name="webdav_check_dir_failed">Gagal memeriksa direktori (%1$s): %2$s</string>
-    <string name="release_not_available">NekoBox belum merilis versi stabil</string>
     <string name="mal_close">Tutup</string>
     <string name="proxy_fastest_regex">Tercepat (regex)</string>
     <string name="fastest_candidate_mode">Sumber kandidat</string>

@@ -479,7 +479,6 @@
     <string name="backup_importing">Importieren…</string>
     <string name="packet_encoding">Paketcodierung</string>
     <string name="acquire_wake_lock">WakeLock erwerben</string>
-    <string name="release_wake_lock">WakeLock freigeben</string>
     <string name="acquire_wake_lock_summary">CPU eingeschaltet lassen</string>
     <string name="hide_from_recent_apps">Aus letzten Aufgaben ausblenden</string>
     <string name="hide_from_recent_apps_summary">App aus letzten Aufgaben ausblenden, wenn sie im Hintergrund läuft</string>
@@ -609,15 +608,6 @@
     <string name="connection_test_timeout">Test-Timeout (ms)</string>
     <string name="preview_version_hint">Diese Anwendung ist eine Vorschauversion und kann viele Probleme enthalten. Wenn Sie sie nicht testen möchten, gehen Sie bitte zu GitHub, um die Release-Version herunterzuladen!</string>
     <string name="preview_hint_dont_show_again">Nicht mehr anzeigen</string>
-    <string name="check_update_preview">Nach Vorschauversions-Updates suchen</string>
-    <string name="check_update_release">Nach Releaseversions-Updates suchen</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
-    <string name="update_dialog_title">Neue Version verfügbar</string>
-    <string name="update_dialog_message">Aktuelle Version: %1$s\nVerfügbare Version: %2$s\nMöchten Sie sie herunterladen?</string>
-    <string name="update_downloading">Update wird heruntergeladen…</string>
-    <string name="update_open_page">Freigabeseite öffnen</string>
-    <string name="update_no_apk_for_abi">Kein passendes APK für dieses Gerät (%1$s). Freigabeseite stattdessen öffnen?</string>
-    <string name="check_update_no">Suche erfolgreich, aber keine Updates.</string>
     <string name="reset_settings">Standardeinstellungen wiederherstellen</string>
     <string name="reset_settings_message">Standardeinstellungen wiederherstellen, aber Daten wie Knoten und Gruppen bleiben erhalten. Um Daten vollständig zu löschen, löschen Sie die Anwendungsdaten direkt in den Systemeinstellungen.</string>
     <string name="minimize">Minimieren</string>
@@ -930,8 +920,6 @@ Fortfahren?</string>
     <string name="speed_test_stage_cancelled">Abgebrochen</string>
     <string name="speed_test_stage_error">Fehler</string>
     <string name="speed_test_url_invalid">Gib eine gültige HTTP- oder HTTPS-URL ein</string>
-    <string name="please_update">Deine App ist zu alt (%s) und wird ab %s nicht mehr funktionieren. Bitte aktualisiere sie!</string>
-    <string name="please_update_force">Deine App ist zu alt (%s) und funktioniert seit %s nicht mehr. Bitte aktualisiere sie!</string>
     <string name="profile_requiring_plugin">Für Profil %s ist das Plugin %s erforderlich, aber es wurde nicht gefunden.</string>
     <string name="mixed_auth_username_hint">Benutzername (beide leer lassen = keine Authentifizierung)</string>
     <string name="mixed_auth_no_auth">Nicht festgelegt (keine Authentifizierung)</string>

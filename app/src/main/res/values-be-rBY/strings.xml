@@ -475,7 +475,6 @@
     <string name="backup_importing">Імпартаванне…</string>
     <string name="packet_encoding">Кадаванне пакетаў</string>
     <string name="acquire_wake_lock">Атрымаць WakeLock</string>
-    <string name="release_wake_lock">Вызваліць WakeLock</string>
     <string name="acquire_wake_lock_summary">Трымаць працэсар уключаным</string>
     <string name="hide_from_recent_apps">Схаваць з апошніх задач</string>
     <string name="hide_from_recent_apps_summary">Схаваць праграму з апошніх задач пры працы ў фоне</string>
@@ -605,15 +604,6 @@
     <string name="connection_test_timeout">Тайм-аўт тэсту (мс)</string>
     <string name="preview_version_hint">Гэта дадатак з\'яўляецца папярэдняй версіяй і можа ўтрымліваць шмат праблем. Калі вы не жадаеце тэставаць яго, калі ласка, перайдзіце на GitHub, каб спампаваць Release версію!</string>
     <string name="preview_hint_dont_show_again">Не паказваць зноў</string>
-    <string name="check_update_preview">Праверыць абнаўленні папярэдняй версіі</string>
-    <string name="check_update_release">Праверыць абнаўленні Release версіі</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
-    <string name="update_dialog_title">Даступная новая версія</string>
-    <string name="update_dialog_message">Бягучая версія: %1$s\nДаступная версія: %2$s\nЦі жадаеце спампаваць яе?</string>
-    <string name="update_downloading">Спампоўка абнаўлення…</string>
-    <string name="update_open_page">Адкрыць старонку рэлізаў</string>
-    <string name="update_no_apk_for_abi">Няма сумяшчальнага APK для гэтай прылады (%1$s). Адкрыць старонку рэлізаў?</string>
-    <string name="check_update_no">Праверка паспяховая, але абнаўленняў няма.</string>
     <string name="reset_settings">Аднавіць стандартныя налады</string>
     <string name="reset_settings_message">Аднавіць стандартныя налады, але дадзеныя, такія як nodes і groups, будуць захаваны. Каб цалкам ачысціць дадзеныя, ачысціце дадзеныя дадатку непасрэдна ў сістэмных наладах.</string>
     <string name="minimize">Згарнуць</string>
@@ -923,8 +913,6 @@ VPN адключыцца на 1–3 секунды, а затым падключ
     <string name="speed_test_stage_cancelled">Скасавана</string>
     <string name="speed_test_stage_error">Памылка</string>
     <string name="speed_test_url_invalid">Увядзіце карэктны HTTP- ці HTTPS-URL</string>
-    <string name="please_update">Ваша праграма занадта старая (%s) і перастане працаваць %s. Абнавіце яе!</string>
-    <string name="please_update_force">Ваша праграма занадта старая (%s) і перастала працаваць %s. Абнавіце яе!</string>
     <string name="profile_requiring_plugin">Профіль %s патрабуе ўсталёўкі плагіна %s, але ён не знойдзен.</string>
     <string name="mixed_auth_username_hint">Імя карыстальніка (пакіньце абодва поля пустымі, каб без аўтэнтыфікацыі)</string>
     <string name="mixed_auth_no_auth">Не зададзена (без аўтэнтыфікацыі)</string>

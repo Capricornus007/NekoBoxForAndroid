@@ -607,7 +607,6 @@
     <string name="backup_importing">Імпортування…</string>
     <string name="packet_encoding">Кодування пакетів</string>
     <string name="acquire_wake_lock">Отримати WakeLock</string>
-    <string name="release_wake_lock">Звільнити WakeLock</string>
     <string name="acquire_wake_lock_summary">Тримати процесор увімкненим</string>
     <string name="hide_from_recent_apps">Приховати з недавніх завдань</string>
     <string name="hide_from_recent_apps_summary">Приховати додаток з недавніх завдань при роботі у фоні</string>
@@ -821,15 +820,6 @@
     <string name="dual_network_acceleration_summary">Використовувати обидві мережі одночасно</string>
     <string name="connection_test_timeout">Таймаут тесту з\'єднання</string>
     <string name="preview_version_hint">попередня версія</string>
-    <string name="check_update_preview">Перевіряти попередні версії</string>
-    <string name="check_update_release">Перевіряти стабільні версії</string>
-    <string name="release_not_available">NekoBox ще не опублікував стабільну версію</string>
-    <string name="update_dialog_title">Доступне оновлення</string>
-    <string name="update_dialog_message">Оновлення %s доступне. Завантажити?</string>
-    <string name="update_downloading">Завантаження…</string>
-    <string name="update_open_page">Відкрити сторінку</string>
-    <string name="update_no_apk_for_abi">Немає APK для цієї архітектури</string>
-    <string name="check_update_no">Оновлень немає</string>
     <string name="reset_settings">Скинути налаштування</string>
     <string name="reset_settings_message">Скинути всі налаштування до типових?</string>
     <string name="minimize">Згорнути</string>

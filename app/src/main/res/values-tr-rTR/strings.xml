@@ -470,7 +470,6 @@
     <string name="backup_importing">İçe aktarılıyor…</string>
     <string name="packet_encoding">Paket Kodlaması</string>
     <string name="acquire_wake_lock">WakeLock Al</string>
-    <string name="release_wake_lock">WakeLock Serbest Bırak</string>
     <string name="acquire_wake_lock_summary">CPU\'yu açık tut</string>
     <string name="hide_from_recent_apps">Son görevlerden gizle</string>
     <string name="hide_from_recent_apps_summary">Arka planda çalışırken uygulamayı son görevlerden gizle</string>
@@ -600,15 +599,6 @@
     <string name="connection_test_timeout">Test Zaman Aşımı (ms)</string>
     <string name="preview_version_hint">Bu uygulama bir önizleme sürümüdür ve birçok sorun içerebilir. Test etmek istemiyorsanız, lütfen GitHub\'a giderek Sürüm sürümünü indirin!</string>
     <string name="preview_hint_dont_show_again">Tekrar gösterme</string>
-    <string name="check_update_preview">Önizleme sürümü güncellemelerini kontrol et</string>
-    <string name="check_update_release">Sürüm güncellemelerini kontrol et</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
-    <string name="update_dialog_title">Yeni sürüm mevcut</string>
-    <string name="update_dialog_message">Mevcut sürüm: %1$s\nKullanılabilir sürüm: %2$s\nİndirmek istiyor musunuz?</string>
-    <string name="update_downloading">Güncelleme indiriliyor…</string>
-    <string name="update_open_page">Sürüm sayfasını aç</string>
-    <string name="update_no_apk_for_abi">Bu cihaz (%1$s) için uygun APK yok. Sürüm sayfasını açmak ister misiniz?</string>
-    <string name="check_update_no">Kontrol başarılı, ancak güncelleme yok.</string>
     <string name="reset_settings">Varsayılan ayarları geri yükle</string>
     <string name="reset_settings_message">Varsayılan ayarları geri yükleyin, ancak düğümler ve gruplar gibi veriler korunacaktır. Verileri tamamen temizlemek için sistem ayarlarından uygulama verilerini temizleyin.</string>
     <string name="minimize">Küçült</string>
@@ -921,8 +911,6 @@ Devam edilsin mi?</string>
     <string name="speed_test_url_invalid">Geçerli bir HTTP veya HTTPS URL\'si girin</string>
     <string name="reboot_required">VPN hizmeti başlatılamadı. Cihazı yeniden başlatmanız gerekebilir.</string>
     <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirekt： %3$s↑ %4$s↓</string>
-    <string name="please_update">Uygulamanız çok eski (%s) ve %s tarihinde çalışmayı durduracak. Lütfen güncelleyin!</string>
-    <string name="please_update_force">Uygulamanız çok eski (%s) ve %s tarihinden itibaren çalışmıyor. Lütfen güncelleyin!</string>
     <string name="profile_requiring_plugin">%s profili, %s eklentisinin yüklü olmasını gerektiriyor, ancak bulunamadı.</string>
     <string name="mixed_auth_username_hint">Kullanıcı adı (kimlik doğrulaması yoksa ikisini de boş bırakın)</string>
     <string name="mixed_auth_no_auth">Ayarlanmadı (kimlik doğrulaması yok)</string>

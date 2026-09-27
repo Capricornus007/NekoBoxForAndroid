@@ -484,7 +484,6 @@
     <string name="backup_importing">جارٍ الاستيراد…</string>
     <string name="packet_encoding">ترميز الحزم</string>
     <string name="acquire_wake_lock">اكتساب WakeLock</string>
-    <string name="release_wake_lock">تحرير WakeLock</string>
     <string name="acquire_wake_lock_summary">إبقاء وحدة المعالجة المركزية قيد التشغيل</string>
     <string name="hide_from_recent_apps">إخفاء من المهام الأخيرة</string>
     <string name="hide_from_recent_apps_summary">إخفاء التطبيق من المهام الأخيرة عند التشغيل في الخلفية</string>
@@ -615,15 +614,6 @@
     <string name="connection_test_timeout">مهلة الاختبار (مللي ثانية)</string>
     <string name="preview_version_hint">هذا التطبيق هو إصدار تجريبي وقد يحتوي على العديد من المشاكل. إذا كنت لا ترغب في اختباره، فيرجى زيارة GitHub لتنزيل إصدار الإصدار!</string>
     <string name="preview_hint_dont_show_again">لا تظهر مرة أخرى</string>
-    <string name="check_update_preview">التحقق من تحديثات الإصدار التجريبي</string>
-    <string name="check_update_release">التحقق من تحديثات إصدار الإصدار</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
-    <string name="update_dialog_title">إصدار جديد متاح</string>
-    <string name="update_dialog_message">الإصدار الحالي: %1$s\nالإصدار المتاح: %2$s\nهل تريد تنزيله؟</string>
-    <string name="update_downloading">جارٍ تنزيل التحديث…</string>
-    <string name="update_open_page">فتح صفحة الإصدارات</string>
-    <string name="update_no_apk_for_abi">لا يوجد ملف APK متوافق مع هذا الجهاز (%1$s). فتح صفحة الإصدارات بدلاً من ذلك؟</string>
-    <string name="check_update_no">تم التحقق بنجاح، ولكن لا توجد تحديثات.</string>
     <string name="reset_settings">استعادة الإعدادات الافتراضية</string>
     <string name="reset_settings_message">استعادة الإعدادات الافتراضية، ولكن سيتم الاحتفاظ بالبيانات مثل العقد والمجموعات. لمسح البيانات بالكامل، امسح بيانات التطبيق مباشرة في إعدادات النظام.</string>
     <string name="minimize">تصغير</string>
@@ -938,8 +928,6 @@
     <string name="speed_test_stage_cancelled">أُلغيت</string>
     <string name="speed_test_stage_error">خطأ</string>
     <string name="speed_test_url_invalid">أدخل رابط HTTP أو HTTPS صالحًا</string>
-    <string name="please_update">تطبيقك قديم جدًا (%s) وسيتوقف عن العمل في %s. يرجى التحديث!</string>
-    <string name="please_update_force">تطبيقك قديم جدًا (%s) وقد توقف عن العمل في %s. يرجى التحديث!</string>
     <string name="profile_requiring_plugin">الملف التعريفي %s يتطلب تثبيت الإضافة %s، ولكنها غير موجودة.</string>
     <string name="extra_subscription_links">روابط اشتراك إضافية</string>
     <string name="extra_subscription_links_hint">أدخل روابط الاشتراك، رابط لكل سطر</string>

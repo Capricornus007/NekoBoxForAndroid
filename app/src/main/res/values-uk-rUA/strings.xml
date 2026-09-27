@@ -485,7 +485,6 @@
     <string name="backup_importing">Імпортування…</string>
     <string name="packet_encoding">Кодування пакетів</string>
     <string name="acquire_wake_lock">Отримати WakeLock</string>
-    <string name="release_wake_lock">Звільнити WakeLock</string>
     <string name="acquire_wake_lock_summary">Тримати процесор увімкненим</string>
     <string name="hide_from_recent_apps">Приховати з недавніх завдань</string>
     <string name="hide_from_recent_apps_summary">Приховати додаток з недавніх завдань при роботі у фоні</string>
@@ -619,15 +618,6 @@
     <string name="connection_test_timeout">Тайм-аут тесту (мс)</string>
     <string name="preview_version_hint">Ця програма є попередньою версією і може містити багато проблем. Якщо ви не бажаєте тестувати її, перейдіть на GitHub, щоб завантажити стабільну версію!</string>
     <string name="preview_hint_dont_show_again">Не показувати знову</string>
-    <string name="check_update_preview">Перевірити оновлення попередньої версії</string>
-    <string name="check_update_release">Перевірити оновлення стабільної версії</string>
-    <string name="release_not_available">NekoBox ще не опублікував стабільний реліз</string>
-    <string name="update_dialog_title">Доступна нова версія</string>
-    <string name="update_dialog_message">Поточна версія: %1$s\nДоступна версія: %2$s\nБажаєте завантажити?</string>
-    <string name="update_downloading">Завантаження оновлення…</string>
-    <string name="update_open_page">Відкрити сторінку релізів</string>
-    <string name="update_no_apk_for_abi">Немає сумісного APK для цього пристрою (%1$s). Відкрити сторінку релізів?</string>
-    <string name="check_update_no">Перевірка успішна, але оновлень немає.</string>
     <string name="reset_settings">Відновити налаштування за замовчуванням</string>
     <string name="reset_settings_message">Відновити налаштування за замовчуванням, але дані, такі як вузли та групи, будуть збережені. Щоб повністю очистити дані, очистіть дані програми безпосередньо в системних налаштуваннях.</string>
     <string name="minimize">Згорнути</string>

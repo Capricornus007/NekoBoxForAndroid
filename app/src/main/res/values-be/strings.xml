@@ -437,7 +437,6 @@
     <string name="plugin_disabled">Адключана</string>
     <string name="plugin_unknown">Невядомы плагін</string>
     <string name="plugin_untrusted">Недавераны плагін</string>
-    <string name="plugin_auto_connect_payload"></string>
     <string name="proxy_cat">Проксі</string>
     <string name="ss_cat">Shadowsocks</string>
     <string name="unsaved_changes_prompt">Ёсць незахаваныя змены. Пакінуць?</string>
@@ -630,7 +629,6 @@
     <string name="backup_importing">Імпарт…</string>
     <string name="packet_encoding">Кадаванне пакетаў</string>
     <string name="acquire_wake_lock">Захапіць WakeLock</string>
-    <string name="release_wake_lock">Вызваліць WakeLock</string>
     <string name="acquire_wake_lock_summary">Трымаць CPU актыўным</string>
     <string name="hide_from_recent_apps">Хаваць з апошніх задач</string>
     <string name="hide_from_recent_apps_summary">Хаваць прыкладанне з апошніх задач у фоне</string>
@@ -642,8 +640,6 @@
     <string name="tuic_congestion_controller">Кантролер перагрузкі</string>
     <string name="tuic_disable_sni">Адключыць SNI</string>
     <string name="tuic_reduce_rtt">Уключыць 0-RTT QUIC handshake</string>
-    <string name="please_update">Ваша праграма занадта старая (%s) і перастане працаваць %s. Абнавіце!</string>
-    <string name="please_update_force">Ваша праграма занадта старая (%s) і перастала працаваць %s. Абнавіце!</string>
     <string name="connection_test_delete_unavailable">Выдаліць недаступныя</string>
     <string name="move">Перамясціць</string>
     <string name="exe_prefer_provider">Прэферэнцыйны правайдар плагіна</string>
@@ -761,14 +757,6 @@
     <string name="dual_network_acceleration_summary">Адначасова праз Wi-Fi і мабільныя дадзеныя. Патрабуюцца абедзве</string>
     <string name="connection_test_timeout">Таймаут тэсту (мс)</string>
     <string name="preview_version_hint">Гэта папярэдняя версія і можа змяшчаць праблемы.</string>
-    <string name="check_update_preview">Правяраць папярэднія версіі</string>
-    <string name="check_update_release">Правяраць стабільныя версіі</string>
-    <string name="update_dialog_title">Даступная новая версія</string>
-    <string name="update_dialog_message">Бягучая: %1$s\nДаступная: %2$s\nСпампаваць і ўсталяваць?</string>
-    <string name="update_downloading">Спампоўка абнаўлення…</string>
-    <string name="update_open_page">Адкрыць старонку версіі</string>
-    <string name="update_no_apk_for_abi">Няма APK для гэтай прылады (%1$s). Адкрыць старонку версій?</string>
-    <string name="check_update_no">Праверка паспяховая, абнаўленняў няма</string>
     <string name="reset_settings">Скінуць налады</string>
     <string name="reset_settings_message">Скінуць налады; вузлы і групы застануцца</string>
     <string name="minimize">Згарнуць</string>
@@ -818,7 +806,6 @@
     <string name="logcat">Экспарт logcat</string>
     <string name="encryption">Шыфраванне</string>
     <string name="not_set">Не зададзена</string>
-    <string name="release_not_available">NekoBox яшчэ не выпусціў стабільнай версіі</string>
     <string name="extra_subscription_links">Дадатковыя спасылкі на падпіскі</string>
     <string name="hysteria2_gecko_max_packet">Макс. пакет Gecko</string>
     <string name="lifetime_traffic">Усяго: %1$s↑ %2$s↓</string>

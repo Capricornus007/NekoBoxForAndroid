@@ -476,7 +476,6 @@
     <string name="backup_importing">در حال وارد کردن…</string>
     <string name="packet_encoding">رمزگذاری بسته</string>
     <string name="acquire_wake_lock">دریافت WakeLock</string>
-    <string name="release_wake_lock">رها کردن WakeLock</string>
     <string name="acquire_wake_lock_summary">روشن نگه داشتن CPU</string>
     <string name="hide_from_recent_apps">پنهان کردن از وظایف اخیر</string>
     <string name="hide_from_recent_apps_summary">پنهان کردن برنامه از وظایف اخیر هنگام اجرا در پس‌زمینه</string>
@@ -608,15 +607,6 @@
     <string name="connection_test_timeout">مهلت تست (میلی‌ثانیه)</string>
     <string name="preview_version_hint">این برنامه یک نسخه پیش‌نمایش است و ممکن است مشکلات زیادی داشته باشد. اگر نمی‌خواهید آن را آزمایش کنید، لطفاً به GitHub رفته و نسخه Release را دانلود کنید!</string>
     <string name="preview_hint_dont_show_again">دیگر نشان نده</string>
-    <string name="check_update_preview">بررسی به‌روزرسانی نسخه پیش‌نمایش</string>
-    <string name="check_update_release">بررسی به‌روزرسانی نسخه انتشار</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
-    <string name="update_dialog_title">نسخه جدید موجود است</string>
-    <string name="update_dialog_message">نسخه فعلی: %1$s\nنسخه موجود: %2$s\nآیا می‌خواهید آن را دانلود کنید؟</string>
-    <string name="update_downloading">در حال دانلود به‌روزرسانی…</string>
-    <string name="update_open_page">باز کردن صفحه انتشار</string>
-    <string name="update_no_apk_for_abi">هیچ APK سازگاری با این دستگاه (%1$s) یافت نشد. صفحه انتشار باز شود؟</string>
-    <string name="check_update_no">بررسی موفقیت‌آمیز بود، اما به‌روزرسانی وجود ندارد.</string>
     <string name="reset_settings">بازنشانی تنظیمات پیش‌فرض</string>
     <string name="reset_settings_message">بازنشانی تنظیمات پیش‌فرض، اما داده‌هایی مانند نودها و گروه‌ها حفظ می‌شوند. برای پاکسازی کامل داده‌ها، داده‌های برنامه را مستقیماً در تنظیمات سیستم پاک کنید.</string>
     <string name="minimize">کوچک‌سازی</string>

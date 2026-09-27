@@ -568,7 +568,6 @@
     <string name="backup_importing">Wird importiert…</string>
     <string name="packet_encoding">Paketkodierung</string>
     <string name="acquire_wake_lock">WakeLock anfordern</string>
-    <string name="release_wake_lock">WakeLock freigeben</string>
     <string name="acquire_wake_lock_summary">CPU wachhalten</string>
     <string name="hide_from_recent_apps">Aus recent tasks ausblenden</string>
     <string name="hide_from_recent_apps_summary">App im Hintergrund aus den recent tasks ausblenden</string>
@@ -585,8 +584,6 @@
     <string name="trusttunnel_congestion_control">QUIC-Congestion-Control</string>
     <string name="tuic_disable_sni">SNI deaktivieren</string>
     <string name="tuic_reduce_rtt">0-RTT-QUIC-Handshake aktivieren</string>
-    <string name="please_update">Deine App ist zu alt (%s) und wird ab %s nicht mehr funktionieren. Bitte aktualisieren!</string>
-    <string name="please_update_force">Deine App ist zu alt (%s) und funktioniert seit %s nicht mehr. Bitte aktualisieren!</string>
     <string name="connection_test_delete_unavailable">Nicht erreichbare löschen</string>
     <string name="move">Verschieben</string>
     <string name="exe_prefer_provider">Bevorzugter Plugin-Anbieter</string>
@@ -715,15 +712,6 @@
     <string name="dual_network_acceleration_summary">Gleichzeitig über WLAN und Mobilfunk verbinden. Beide Netze müssen aktiv sein</string>
     <string name="connection_test_timeout">Test-Timeout (ms)</string>
     <string name="preview_version_hint">Diese Anwendung ist eine Vorschauversion und kann viele Probleme enthalten.</string>
-    <string name="check_update_preview">Nach Vorschauversionen suchen</string>
-    <string name="check_update_release">Nach stabilen Versionen suchen</string>
-    <string name="release_not_available">NekoBox hat noch keine stabile Version veröffentlicht</string>
-    <string name="update_dialog_title">Neue Version verfügbar</string>
-    <string name="update_dialog_message">Aktuelle Version: %1$s\nVerfügbare Version: %2$s\nHerunterladen und installieren?</string>
-    <string name="update_downloading">Update wird heruntergeladen…</string>
-    <string name="update_open_page">Release-Seite öffnen</string>
-    <string name="update_no_apk_for_abi">Keine passende APK für dieses Gerät (%1$s). Release-Seite öffnen?</string>
-    <string name="check_update_no">Prüfung erfolgreich, keine Updates.</string>
     <string name="reset_settings">Standardeinstellungen wiederherstellen</string>
     <string name="reset_settings_message">Standardeinstellungen wiederherstellen; Daten wie Knoten und Gruppen bleiben erhalten</string>
     <string name="minimize">Minimieren</string>

@@ -19,6 +19,8 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <!-- 四邊都要有外邊距：原本只寫了 top/left/right，bottom 缺漏讓這顆卡與下面
+                 項目卡之間的間距實際是 0（看到的細縫只是卡描邊），兩顆圓角卡會看著貼在一起。 -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/title_card"
                 android:layout_width="match_parent"
@@ -26,6 +28,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
                 android:clickable="true"
                 android:focusable="true"
                 app:cardElevation="?attr/uiCardElevation">

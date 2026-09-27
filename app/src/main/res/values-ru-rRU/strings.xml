@@ -484,7 +484,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="backup_importing">Импорт…</string>
     <string name="packet_encoding">Кодирование пакетов</string>
     <string name="acquire_wake_lock">Получить WakeLock</string>
-    <string name="release_wake_lock">Освободить WakeLock</string>
     <string name="acquire_wake_lock_summary">Держать процессор включенным</string>
     <string name="hide_from_recent_apps">Скрывать из последних задач</string>
     <string name="hide_from_recent_apps_summary">Скрывать приложение из списка последних задач при работе в фоновом режиме</string>
@@ -616,15 +615,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="connection_test_timeout">Таймаут теста (мс)</string>
     <string name="preview_version_hint">Это приложение является предварительной версией и может содержать множество проблем. Если вы не хотите тестировать его, пожалуйста, перейдите на GitHub, чтобы скачать релизную версию!</string>
     <string name="preview_hint_dont_show_again">Больше не показывать</string>
-    <string name="check_update_preview">Проверить обновления предварительной версии</string>
-    <string name="check_update_release">Проверить обновления релизной версии</string>
-    <string name="release_not_available">NekoBox ещё не выпустил стабильную версию</string>
-    <string name="update_dialog_title">Доступна новая версия</string>
-    <string name="update_dialog_message">Текущая версия: %1$s\nДоступная версия: %2$s\nХотите скачать её?</string>
-    <string name="update_downloading">Загрузка обновления…</string>
-    <string name="update_open_page">Открыть страницу релизов</string>
-    <string name="update_no_apk_for_abi">Нет подходящего APK для этого устройства (%1$s). Открыть страницу релизов?</string>
-    <string name="check_update_no">Проверка прошла успешно, но обновлений нет.</string>
     <string name="reset_settings">Восстановить настройки по умолчанию</string>
     <string name="reset_settings_message">Восстановить настройки по умолчанию, но данные, такие как узлы и группы, будут сохранены. Чтобы полностью очистить данные, удалите данные приложения напрямую в системных настройках.</string>
     <string name="minimize">Свернуть</string>

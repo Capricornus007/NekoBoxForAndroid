@@ -486,7 +486,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="backup_importing">Importazione in corso…</string>
     <string name="packet_encoding">Codifica dei pacchetti</string>
     <string name="acquire_wake_lock">Acquisisci WakeLock</string>
-    <string name="release_wake_lock">Rilascia WakeLock</string>
     <string name="acquire_wake_lock_summary">Mantieni la CPU accesa</string>
     <string name="hide_from_recent_apps">Nascondi dalle app recenti</string>
     <string name="hide_from_recent_apps_summary">Nascondi l\'app dalle app recenti quando è in esecuzione in background</string>
@@ -616,15 +615,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="connection_test_timeout">Timeout test (ms)</string>
     <string name="preview_version_hint">Questa applicazione è una versione di anteprima e potrebbe contenere molti problemi. Se non vuoi testarla, vai su GitHub per scaricare la versione Release!</string>
     <string name="preview_hint_dont_show_again">Non mostrare più</string>
-    <string name="check_update_preview">Controlla aggiornamenti versione di anteprima</string>
-    <string name="check_update_release">Controlla aggiornamenti versione stabile</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
-    <string name="update_dialog_title">Nuova versione disponibile</string>
-    <string name="update_dialog_message">Versione attuale: %1$s\nVersione disponibile: %2$s\nVuoi scaricarla?</string>
-    <string name="update_downloading">Download dell\'aggiornamento…</string>
-    <string name="update_open_page">Apri la pagina release</string>
-    <string name="update_no_apk_for_abi">Nessun APK compatibile con questo dispositivo (%1$s). Aprire la pagina release?</string>
-    <string name="check_update_no">Controllo riuscito, ma nessun aggiornamento.</string>
     <string name="reset_settings">Ripristina impostazioni predefinite</string>
     <string name="reset_settings_message">Ripristina le impostazioni predefinite, ma i dati come nodi e gruppi verranno conservati. Per cancellare completamente i dati, cancella i dati dell\'app direttamente nelle impostazioni di sistema.</string>
     <string name="minimize">Riduci a icona</string>
@@ -943,10 +933,6 @@ Continuare?</string>
     <string name="plugin_exists_but_on_shit_system">Il profilo %1$s richiede il plugin %2$s, ma il tuo
         fornitore di apparecchiature proprietarie (di solito giganti del capitale di sorveglianza e produttori di malware)
         ha manomesso il tuo Android, rendendo il plugin inutilizzabile.</string>
-    <string name="please_update">La tua app è troppo vecchia (%1$s). Smetterà di funzionare il %2$s. Per favore,
-        aggiornala!</string>
-    <string name="please_update_force">La tua app è troppo vecchia (%1$s). Ha smesso di funzionare il %2$s.
-        Per favore, aggiornala!</string>
     <string name="lan_sharing">Condivisione LAN</string>
     <string name="lan_sharing_requires_root">La condivisione LAN richiede i permessi di root</string>
     <string name="lan_sharing_summary">Consenti ai dispositivi LAN di connettersi</string>

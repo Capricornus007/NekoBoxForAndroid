@@ -502,7 +502,6 @@
     <string name="traffic_downlink_total">%s ↓</string>
     <string name="action_shadowtls">ShadowTLS</string>
     <string name="ech_query_server_name">ECH Query Server Name</string>
-    <string name="release_not_available">Throne has not published a stable release yet</string>
     <string name="action_amneziawg">AmneziaWG</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="mal_close">Close</string>
@@ -685,7 +684,6 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
  
     <string name="packet_encoding">Codificación de paquetes</string>
     <string name="acquire_wake_lock">Adquirir WakeLock</string>
-    <string name="release_wake_lock">Liberar WakeLock</string>
  
     <string name="acquire_wake_lock_summary">Mantener la CPU encendida</string>
  
@@ -858,8 +856,6 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
     <string name="tuic_congestion_controller">Controlador de congestión</string>
     <string name="tuic_disable_sni">Desactivar SNI</string>
     <string name="tuic_reduce_rtt">Activar handshake QUIC 0-RTT</string>
-    <string name="please_update">Tu app es demasiado antigua (%s) y dejará de funcionar el %s. ¡Actualízala!</string>
-    <string name="please_update_force">Tu app es demasiado antigua (%s) y ha dejado de funcionar el %s. ¡Actualízala!</string>
     <string name="move">Mover</string>
     <string name="exe_prefer_provider">Proveedor preferido del plugin</string>
     <string name="create_shortcut">Crear acceso directo</string>
@@ -975,14 +971,6 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
     <string name="dual_network_acceleration_summary">Conectar en paralelo por Wi-Fi y datos móviles. Requiere ambos activos</string>
     <string name="connection_test_timeout">Tiempo de espera de prueba (ms)</string>
     <string name="preview_version_hint">Esta aplicación es una versión preliminar y puede contener problemas.</string>
-    <string name="check_update_preview">Buscar actualizaciones preliminares</string>
-    <string name="check_update_release">Buscar actualizaciones estables</string>
-    <string name="update_dialog_title">Nueva versión disponible</string>
-    <string name="update_dialog_message">Versión actual: %1$s\nVersión disponible: %2$s\n¿Descargar e instalar?</string>
-    <string name="update_downloading">Descargando actualización…</string>
-    <string name="update_open_page">Abrir página de la versión</string>
-    <string name="update_no_apk_for_abi">Sin APK para este dispositivo (%1$s). ¿Abrir la página de versiones?</string>
-    <string name="check_update_no">Comprobación correcta, no hay actualizaciones.</string>
     <string name="reset_settings">Restaurar ajustes predeterminados</string>
     <string name="reset_settings_message">Restaurar los ajustes predeterminados; los nodos y grupos se conservarán</string>
     <string name="minimize">Minimizar</string>

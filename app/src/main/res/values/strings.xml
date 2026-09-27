@@ -620,7 +620,6 @@
 
     <string name="packet_encoding">Packet Encoding</string>
     <string name="acquire_wake_lock">Acquire WakeLock</string>
-    <string name="release_wake_lock">Release WakeLock</string>
     <string name="acquire_wake_lock_summary">Keep the CPU on</string>
     <string name="hide_from_recent_apps">Hide from recent tasks</string>
     <string name="hide_from_recent_apps_summary">Hide the app from recent tasks when running in background</string>
@@ -783,15 +782,6 @@
     <string name="connection_test_timeout">Test Timeout (ms)</string>
     <string name="preview_version_hint">This application is a preview version and may contain many problems. If you do not want to test it, please go to GitHub to download the Release version!</string>
     <string name="preview_hint_dont_show_again">Don\'t show again</string>
-    <string name="check_update_preview">Check for preview version updates</string>
-    <string name="check_update_release">Check for release version updates</string>
-    <string name="release_not_available">NekoBox has not published a stable release yet</string>
-    <string name="update_dialog_title">New version available</string>
-    <string name="update_dialog_message">Current version: %1$s\nAvailable version: %2$s\nDownload and install the matching APK for this device?</string>
-    <string name="update_downloading">Downloading update…</string>
-    <string name="update_open_page">Open release page</string>
-    <string name="update_no_apk_for_abi">No matching APK for this device (%1$s). Open the release page instead?</string>
-    <string name="check_update_no">Check successful, but no updates.</string>
     <string name="reset_settings">Restore default settings</string>
     <string name="reset_settings_message">Restore default settings, but data such as nodes and groups will be retained. To completely clear data, clear application data directly in the system settings.</string>
     <string name="minimize">Minimize</string>

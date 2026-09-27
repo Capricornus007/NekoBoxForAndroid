@@ -477,7 +477,6 @@
 
     <string name="packet_encoding">رمزگذاری بسته</string>
     <string name="acquire_wake_lock">به دست آوردن WakeLock</string>
-    <string name="release_wake_lock">رها کردن WakeLock</string>
     <string name="acquire_wake_lock_summary">پردازنده را روشن نگه‌می‌دارد.</string>
     <string name="action_switch">سوییچ</string>
 
@@ -636,15 +635,6 @@
     <string name="connection_test_timeout">مهلت آزمایش (ms)</string>
     <string name="preview_version_hint">این برنامه نسخهٔ پیش‌نمایش است و ممکن است مشکلات زیادی داشته باشد. اگر نمی‌خواهید آن را آزمایش کنید، لطفاً برای دانلود نسخهٔ Release به GitHub بروید!</string>
     <string name="preview_hint_dont_show_again">دوباره نشان نده</string>
-    <string name="check_update_preview">بررسی به‌روزرسانی نسخهٔ پیش‌نمایش</string>
-    <string name="check_update_release">بررسی به‌روزرسانی نسخهٔ Release</string>
-    <string name="release_not_available">NekoBox هنوز نسخهٔ پایدار منتشر نکرده است</string>
-    <string name="update_dialog_title">نسخهٔ جدید در دسترس است</string>
-    <string name="update_dialog_message">نسخهٔ فعلی: %1$s\nنسخهٔ موجود: %2$s\nآیا می‌خواهید آن را دانلود کنید؟</string>
-    <string name="update_downloading">در حال دانلود به‌روزرسانی…</string>
-    <string name="update_open_page">باز کردن صفحه انتشار</string>
-    <string name="update_no_apk_for_abi">هیچ APK سازگاری با این دستگاه (%1$s) یافت نشد. صفحه انتشار باز شود؟</string>
-    <string name="check_update_no">بررسی موفق بود، اما به‌روزرسانی‌ای نیست.</string>
     <string name="reset_settings">بازگردانی تنظیمات پیش‌فرض</string>
     <string name="reset_settings_message">بازگردانی تنظیمات پیش‌فرض؛ اما داده‌هایی مانند گره‌ها و گروه‌ها حفظ می‌شوند. برای پاک‌سازی کامل داده‌ها، داده‌های برنامه را مستقیماً در تنظیمات سیستم پاک کنید.</string>
     <string name="minimize">کوچک کردن</string>

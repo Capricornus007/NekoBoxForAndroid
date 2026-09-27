@@ -478,7 +478,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="backup_importing">Importando…</string>
     <string name="packet_encoding">Codificação de pacotes</string>
     <string name="acquire_wake_lock">Adquirir WakeLock</string>
-    <string name="release_wake_lock">Liberar WakeLock</string>
     <string name="acquire_wake_lock_summary">Manter a CPU ligada</string>
     <string name="hide_from_recent_apps">Ocultar das tarefas recentes</string>
     <string name="hide_from_recent_apps_summary">Ocultar o aplicativo das tarefas recentes quando executando em segundo plano</string>
@@ -660,10 +659,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="plugin_exists_but_on_shit_system">O perfil %1$s requer o plugin %2$s, mas o seu
         fabricante de equipamento proprietário (geralmente gigantes do capital de vigilância e criadores de malware)
         adulterou seu Android, tornando o plugin inutilizável.</string>
-    <string name="please_update">Seu APP é muito antigo (%1$s). E deixará de funcionar em %2$s. Por favor,
-        atualize!</string>
-    <string name="please_update_force">Seu APP é muito antigo (%1$s). E parou de funcionar em %2$s.
-        Por favor, atualize!</string>
     <string name="speed_test_finished_summary">Concluídos: %1$d, falharam: %2$d, cancelados: %3$d</string>
     <string name="spoof_user_agent">User-Agent predefinido</string>
     <string name="spoof_user_agent_summary">Usado nas atualizações de subscrição quando a subscrição não tem User-Agent próprio</string>
@@ -706,15 +701,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="webdav_auth_failed">Falha na autenticação</string>
     <string name="webdav_check_dir_failed">Falha ao verificar o diretório (%1$s): %2$s</string>
     <string name="ech_query_server_name">Nome do servidor de consulta ECH</string>
-    <string name="check_update_preview">Verificar atualizações da versão de pré-visualização</string>
-    <string name="check_update_release">Verificar atualizações da versão de lançamento</string>
-    <string name="release_not_available">O Throne ainda não publicou uma versão estável</string>
-    <string name="update_dialog_title">Nova versão disponível</string>
-    <string name="update_dialog_message">Versão atual: %1$s\nVersão disponível: %2$s\nDeseja baixá-la?</string>
-    <string name="update_downloading">Baixando atualização…</string>
-    <string name="update_open_page">Abrir página de versões</string>
-    <string name="update_no_apk_for_abi">Nenhum APK compatível com este dispositivo (%1$s). Abrir a página de versões?</string>
-    <string name="check_update_no">Verificação bem-sucedida, mas sem atualizações.</string>
     <string name="reset_settings">Restaurar configurações padrão</string>
     <string name="reset_settings_message">Restaurar configurações padrão, mas dados como nós e grupos serão mantidos. Para limpar completamente os dados, limpe os dados do aplicativo diretamente nas configurações do sistema.</string>
     <string name="minimize">Minimizar</string>
