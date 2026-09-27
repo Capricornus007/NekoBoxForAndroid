@@ -719,6 +719,26 @@ class ConfigurationGroupFragment : Fragment() {
             if (changed) submitMasterList()
         }
 
+        // The URL test mutates ProxyEntity instances it loaded itself, so re-deriving the stamp
+        // from masterProfiles (what refreshProfileState does, and what selection changes need)
+        // would keep rendering the stale numbers. Copy the measured fields into the adapter's own
+        // entities so the stamp actually moves and only that one row rebinds.
+        fun applyProfileState(profiles: Collection<ProxyEntity>) {
+            if (disposed) return
+            var changed = false
+            profiles.forEach { fresh ->
+                val master = masterProfiles[fresh.id] ?: return@forEach
+                val before = masterStamps[fresh.id]
+                master.status = fresh.status
+                master.ping = fresh.ping
+                master.error = fresh.error
+                val after = profileStateStamp(master)
+                masterStamps[fresh.id] = after
+                if (before != after) changed = true
+            }
+            if (changed) submitMasterList()
+        }
+
         fun clearTrafficStatistics() {
             // Cleared by ProfileManager; UI refresh via adapter notification
             notifyDataSetChanged()

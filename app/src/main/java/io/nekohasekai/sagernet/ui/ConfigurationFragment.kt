@@ -1225,8 +1225,8 @@ class ConfigurationFragment @JvmOverloads constructor(
         val results = mutableListOf<ProxyEntity>()
         val group = DataStore.currentGroup()
 
-        fun refreshRows(ids: Set<Long>) {
-            adapter.groupFragments[group.id]?.adapter?.refreshProfileState(ids)
+        fun refreshRows(profiles: Collection<ProxyEntity>) {
+            adapter.groupFragments[group.id]?.adapter?.applyProfileState(profiles)
         }
 
         urlTestJob = runOnDefaultDispatcher {
@@ -1238,7 +1238,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                     it.error = null
                 }
                 onMainDispatcher {
-                    refreshRows(profilesList.mapTo(mutableSetOf()) { it.id })
+                    refreshRows(profilesList)
                     showToast(getString(R.string.connection_test_testing))
                 }
 
@@ -1271,7 +1271,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 if (!isActive) break
                                 synchronized(results) { results.add(profile) }
                                 // 只刷這一列：結果立刻落在節點列的狀態位上
-                                onMainDispatcher { refreshRows(setOf(profile.id)) }
+                                onMainDispatcher { refreshRows(listOf(profile)) }
                             }
                         },
                     )

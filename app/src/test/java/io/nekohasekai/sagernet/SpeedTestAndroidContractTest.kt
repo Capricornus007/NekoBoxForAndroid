@@ -213,9 +213,9 @@ class SpeedTestAndroidContractTest {
         assertTrue(urlTest.contains("DataStore.runningTest = false"))
         // 測速改為「無彈窗＋逐列即時」：開頭清全部列、每列測完立刻單列刷新、
         // 收尾用 toast 報成功/失敗數，且取消也要落庫（finally）。
-        assertTrue(urlTest.contains("refreshRows(profilesList.mapTo(mutableSetOf()) { it.id })"))
-        assertTrue(urlTest.contains("refreshRows(setOf(profile.id))"))
-        assertTrue(urlTest.contains("adapter?.refreshProfileState(ids)"))
+        assertTrue(urlTest.contains("refreshRows(profilesList)"))
+        assertTrue(urlTest.contains("refreshRows(listOf(profile))"))
+        assertTrue(urlTest.contains("adapter?.applyProfileState(profiles)"))
         assertTrue(urlTest.contains("showToast(getString(R.string.connection_test_testing))"))
         assertTrue(urlTest.contains("showToast(getString(R.string.url_test_finished_summary, ok, bad))"))
         assertTrue(urlTest.contains("} finally {"))
