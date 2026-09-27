@@ -1356,9 +1356,9 @@ class ConfigurationGroupFragment : Fragment() {
             }
 
             val selectOrChain = select || proxyEntity.type == ProxyEntity.TYPE_CHAIN
-            # 動作一律收進三點菜單（double_column_item_menu 裡本來就有編輯／分享／刪除三項），
-            # 這三個圖標在節點清單恆隱藏，把寬度還給名稱與地址；選取／鏈模式沒有可做的動作，
-            # 連三點按鈕也不顯示（與原本行為一致）。
+            // 動作一律收進三點菜單（double_column_item_menu 裡本來就有編輯／分享／刪除三項），
+            // 這三個圖標在節點清單恆隱藏，把寬度還給名稱與地址；選取／鏈模式沒有可做的動作，
+            // 連三點按鈕也不顯示（與原本行為一致）。
             binding.edit.isGone = true
             binding.shareIcon.isGone = true
             binding.remove.isGone = true
