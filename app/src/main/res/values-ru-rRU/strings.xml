@@ -409,16 +409,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="copy_success">Скопировано успешно!</string>
 
     <string name="copy">Копировать</string>
-    <string name="done">Готово</string>
-    <string name="retest">Повторить тест</string>
-    <string name="unknown">Неизвестно</string>
-    <string name="landing_ip_details_title">Сведения о выходном IP</string>
-    <string name="landing_ip_address">Исходящий IP</string>
-    <string name="landing_ip_isp">Провайдер</string>
-    <string name="landing_ip_asn">ASN</string>
-    <string name="landing_ip_query_time">Задержка</string>
-    <string name="landing_ip_querying">Запрос выходного IP…</string>
-    <string name="landing_ip_failed">Ошибка запроса: узел недоступен</string>
     <string name="copy_failed">Ошибка копирования.</string>
     <string name="app_no_launcher">У приложения нет интерфейса.</string>
     <string name="route_for">Правило для %s</string>
