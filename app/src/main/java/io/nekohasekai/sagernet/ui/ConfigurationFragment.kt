@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import android.text.format.Formatter
 import android.view.KeyEvent
-import android.widget.Toast
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
@@ -1206,7 +1206,6 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
     }
 
-
     @OptIn(DelicateCoroutinesApi::class)
     private fun showToast(text: String) {
         if (!isAdded) return
@@ -1513,7 +1512,6 @@ class ConfigurationFragment @JvmOverloads constructor(
         searchView.onActionViewCollapsed()
         searchView.clearFocus()
     }
-
 }
 
 /**

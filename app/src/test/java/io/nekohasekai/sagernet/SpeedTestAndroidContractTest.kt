@@ -10,7 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 class SpeedTestAndroidContractTest {
 
     @Test
-    fun nativeSessionReceivesAllFourModeSettingsAndIsPolled() {
+    fun nativeSessionReceivesAllModeSettingsAndIsPolled() {
         val source = source("main/java/io/nekohasekai/sagernet/bg/proto/SpeedTestRunner.kt")
         val settings = source("main/java/io/nekohasekai/sagernet/TestSettings.kt")
         assertTrue(source.contains("Libcore.newSpeedTestSession("))
@@ -18,12 +18,16 @@ class SpeedTestAndroidContractTest {
         assertTrue(source.contains("DataStore.speedTestTimeoutMs"))
         assertTrue(source.contains("DataStore.speedTestServerListURL"))
         assertTrue(source.contains("DataStore.speedTestFallbackServerListURL"))
-        assertTrue(source.contains("DataStore.simpleDownloadURL"))
+        // 「簡單下載」已移除，但舊備檔/舊設定可能還存著那個模式值：
+        // runner 必須在邊界處先驗證再退回預設，而不是把髒值直接丟給 native 層。
+        assertTrue(source.contains("SpeedTestSettings::isValidMode"))
+        assertFalse(source.contains("simpleDownloadURL"))
         assertTrue(source.contains("session.result.toSnapshot()"))
         assertTrue(source.contains("delay(SAMPLE_INTERVAL_MS)"))
-        listOf("download_upload", "download", "upload", "simple_download").forEach { mode ->
+        listOf("download_upload", "download", "upload").forEach { mode ->
             assertTrue("missing speed-test mode $mode", settings.contains("\"$mode\""))
         }
+        assertFalse("removed speed-test mode leaked back in", settings.contains("\"simple_download\""))
     }
 
     @Test
@@ -37,7 +41,7 @@ class SpeedTestAndroidContractTest {
             .substringBefore("private fun formatSpeedTestSnapshot")
         val formatter = source
             .substringAfter("private fun formatSpeedTestSnapshot")
-            .substringBefore("inner class TestDialog")
+            .substringBefore("private fun showToast")
         assertTrue(source.contains("confirmSpeedTest()"))
         assertTrue(source.contains("sessionFactory = ::AndroidSpeedTestSession"))
         assertTrue(lifecycle.contains("speedTestRunner?.cancel()"))
@@ -115,10 +119,8 @@ class SpeedTestAndroidContractTest {
             "speed_test_mode_download_upload",
             "speed_test_mode_download",
             "speed_test_mode_upload",
-            "speed_test_mode_simple_download",
             "speed_test_timeout_ms",
             "speed_test_timeout_invalid",
-            "simple_download_url",
             "speed_test_url_invalid",
             "speed_test_group",
             "speed_test_confirm_title",
@@ -162,6 +164,12 @@ class SpeedTestAndroidContractTest {
                     (requiredKeys - names.toSet()).sorted(),
                 names.containsAll(requiredKeys),
             )
+            val retired = setOf("speed_test_mode_simple_download", "simple_download_url")
+            val leftovers = retired.filter(names::contains)
+            assertTrue(
+                "retired strings still present in ${stringsFile.parentFile.name}: $leftovers",
+                leftovers.isEmpty(),
+            )
             resources.filter { it.getNamedItem("name").nodeValue in requiredKeys }.forEach { attributes ->
                 assertFalse(
                     "connection/speed-test string is not translatable in ${stringsFile.parentFile.name}: " +
@@ -202,9 +210,18 @@ class SpeedTestAndroidContractTest {
         assertTrue(urlTest.contains("repeat(DataStore.connectionTestConcurrent)"))
         assertTrue(urlTest.contains("val urlTest = UrlTest()"))
         assertTrue(urlTest.contains("profile.ping = result"))
-        assertTrue(urlTest.contains("ProfileManager.updateProfile(it)"))
-        assertTrue(urlTest.contains("GroupManager.postReload(DataStore.currentGroupId())"))
         assertTrue(urlTest.contains("DataStore.runningTest = false"))
+        // 測速改為「無彈窗＋逐列即時」：開頭清全部列、每列測完立刻單列刷新、
+        // 收尾用 toast 報成功/失敗數，且取消也要落庫（finally）。
+        assertTrue(urlTest.contains("refreshRows(profilesList.mapTo(mutableSetOf()) { it.id })"))
+        assertTrue(urlTest.contains("refreshRows(setOf(profile.id))"))
+        assertTrue(urlTest.contains("adapter?.refreshProfileState(ids)"))
+        assertTrue(urlTest.contains("showToast(getString(R.string.connection_test_testing))"))
+        assertTrue(urlTest.contains("showToast(getString(R.string.url_test_finished_summary, ok, bad))"))
+        assertTrue(urlTest.contains("} finally {"))
+        assertTrue(urlTest.contains("ProfileManager.updateProfileQuietly("))
+        assertTrue(urlTest.contains("GroupManager.postReload(group.id)"))
+        assertFalse("彈窗 TestDialog 已移除，不得回魂", urlTest.contains("TestDialog"))
 
         assertTrue(actions.contains("SagerDatabase.proxyDao.clearTestResults(DataStore.currentGroupId())"))
         assertTrue(actions.contains("getCurrentGroupFragment()?.adapter?.clearTestResults()"))

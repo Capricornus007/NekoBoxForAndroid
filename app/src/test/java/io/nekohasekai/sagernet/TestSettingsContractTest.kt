@@ -26,10 +26,6 @@ class TestSettingsContractTest {
             "https://www.speedtest.net/speedtest-servers-static.php",
             defaults["default_speed_test_fallback_server_list_url"],
         )
-        assertEquals(
-            "http://cachefly.cachefly.net/1mb.test",
-            defaults["default_simple_download_url"],
-        )
     }
 
     @Test
@@ -61,7 +57,6 @@ class TestSettingsContractTest {
             "connectionTestURL" to "default_connection_test_url",
             "speedTestMode" to "default_speed_test_mode",
             "speedTestTimeoutMs" to "default_speed_test_timeout_ms",
-            "simpleDownloadURL" to "default_simple_download_url",
         ).forEach { (key, resource) ->
             val preference = preferenceXml.substringAfter("app:key=\"$key\"")
             assertTrue("preference $key must exist", preference != preferenceXml)
@@ -74,6 +69,7 @@ class TestSettingsContractTest {
 
         assertFalse(preferenceXml.contains("speedTestServerListURL"))
         assertFalse(preferenceXml.contains("speedTestFallbackServerListURL"))
+        assertFalse(preferenceXml.contains("simpleDownloadURL"))
     }
 
     @Test
@@ -81,7 +77,6 @@ class TestSettingsContractTest {
         val existing = mapOf(
             Key.SPEED_TEST_MODE to SpeedTestSettings.MODE_UPLOAD,
             Key.SPEED_TEST_TIMEOUT_MS to "9000",
-            Key.SIMPLE_DOWNLOAD_URL to "https://example.com/existing.bin",
         )
 
         assertEquals(existing, existing + SpeedTestSettings.desktopBackupUpdates(emptyMap()))
@@ -96,16 +91,25 @@ class TestSettingsContractTest {
             ),
         )
 
-        val imported = existing + SpeedTestSettings.desktopBackupUpdates(
-            mapOf(
-                "speed_test_mode" to SpeedTestSettings.MODE_SIMPLE_DOWNLOAD,
-                "speed_test_timeout_ms" to "5000",
-                "simple_dl_url" to " https://example.com/imported.bin ",
+        // 「簡單下載」已整個移除：舊備檔就算帶著它的模式與 URL，也不准把任何一項寫回來。
+        assertEquals(
+            existing,
+            existing + SpeedTestSettings.desktopBackupUpdates(
+                mapOf(
+                    "speed_test_mode" to "simple_download",
+                    "simple_dl_url" to "https://example.com/legacy.bin",
+                ),
             ),
         )
-        assertEquals(SpeedTestSettings.MODE_SIMPLE_DOWNLOAD, imported[Key.SPEED_TEST_MODE])
+
+        val imported = existing + SpeedTestSettings.desktopBackupUpdates(
+            mapOf(
+                "speed_test_mode" to SpeedTestSettings.MODE_DOWNLOAD,
+                "speed_test_timeout_ms" to "5000",
+            ),
+        )
+        assertEquals(SpeedTestSettings.MODE_DOWNLOAD, imported[Key.SPEED_TEST_MODE])
         assertEquals("5000", imported[Key.SPEED_TEST_TIMEOUT_MS])
-        assertEquals("https://example.com/imported.bin", imported[Key.SIMPLE_DOWNLOAD_URL])
     }
 
     @Test

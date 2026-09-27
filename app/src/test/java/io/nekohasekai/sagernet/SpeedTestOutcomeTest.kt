@@ -21,10 +21,6 @@ class SpeedTestOutcomeTest {
             listOf(SpeedTestDirection.UPLOAD),
             outcome(SpeedTestSettings.MODE_UPLOAD).rates().map { it.direction },
         )
-        assertEquals(
-            listOf(SpeedTestDirection.DOWNLOAD),
-            outcome(SpeedTestSettings.MODE_SIMPLE_DOWNLOAD).rates().map { it.direction },
-        )
     }
 
     @Test
