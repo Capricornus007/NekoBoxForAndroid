@@ -9,6 +9,7 @@ import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
 import android.text.format.Formatter
 import android.text.style.ForegroundColorSpan
 import android.view.KeyEvent
+import android.widget.Toast
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -1214,204 +1215,94 @@ class ConfigurationFragment @JvmOverloads constructor(
         }
     }
 
-    inner class TestDialog {
-        val binding = LayoutProgressListBinding.inflate(layoutInflater)
-        val builder = MaterialAlertDialogBuilder(requireContext()).setView(binding.root)
-            .setPositiveButton(R.string.minimize) { _, _ ->
-                // 按钮点击可能早于下方回调赋值（真机 NPE 实锤），可空调用
-                minimize?.invoke()
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                cancel?.invoke()
-            }
-            .setCancelable(false)
-
-        var cancel: (() -> Unit)? = null
-        var minimize: (() -> Unit)? = null
-
-        val dialogStatus = AtomicInteger(0) // 1: hidden 2: cancelled
-        var notification: ConnectionTestNotification? = null
-
-        val results: MutableSet<ProxyEntity> = ConcurrentHashMap.newKeySet()
-        var proxyN = 0
-        val finishedN = AtomicInteger(0)
-
-        fun update(profile: ProxyEntity) {
-            if (dialogStatus.get() != 2) {
-                results.add(profile)
-            }
-            runOnMainDispatcher {
-                val context = context ?: return@runOnMainDispatcher
-                val progress = finishedN.addAndGet(1)
-                val status = dialogStatus.get()
-                notification?.updateNotification(
-                    progress,
-                    proxyN,
-                    progress >= proxyN || status == 2,
-                )
-                if (status >= 1) return@runOnMainDispatcher
-                if (!isAdded) return@runOnMainDispatcher
-
-                // refresh dialog
-
-                var profileStatusText: String? = null
-                var profileStatusColor = 0
-
-                when (profile.status) {
-                    -1 -> {
-                        profileStatusText = profile.error
-                        profileStatusColor = context.getColorAttr(
-                            com.google.android.material.R.attr.colorOnSurfaceVariant,
-                        )
-                    }
-
-                    0 -> {
-                        profileStatusText = getString(R.string.connection_test_testing)
-                        profileStatusColor = context.getColorAttr(
-                            com.google.android.material.R.attr.colorOnSurfaceVariant,
-                        )
-                    }
-
-                    1 -> {
-                        profileStatusText = getString(R.string.available, profile.ping)
-                        profileStatusColor = context.getColour(R.color.ui_success)
-                    }
-
-                    2 -> {
-                        profileStatusText = profile.error
-                        profileStatusColor = context.getColour(R.color.ui_error)
-                    }
-
-                    3 -> {
-                        val err = profile.error ?: ""
-                        val msg = Protocols.genFriendlyMsg(err)
-                        profileStatusText = if (msg != err) msg else getString(R.string.unavailable)
-                        profileStatusColor = context.getColour(R.color.ui_error)
-                    }
-                }
-
-                val text = SpannableStringBuilder().apply {
-                    append("\n" + profile.displayName())
-                    append("\n")
-                    append(
-                        profile.displayType(),
-                        ForegroundColorSpan(context.getProtocolColor(profile.type)),
-                        SPAN_EXCLUSIVE_EXCLUSIVE,
-                    )
-                    append(" ")
-                    append(
-                        profileStatusText,
-                        ForegroundColorSpan(profileStatusColor),
-                        SPAN_EXCLUSIVE_EXCLUSIVE,
-                    )
-                    append("\n")
-                }
-
-                binding.nowTesting.text = text
-                binding.progress.text = "$progress / $proxyN"
-            }
-        }
-    }
 
     @OptIn(DelicateCoroutinesApi::class)
+    private fun showToast(text: String) {
+        if (!isAdded) return
+        Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
+    }
+
+    // 測速改為「toast + 逐列即時更新」：原本靠 TestDialog 顯示進度，用戶明確不要彈窗。
+    // 再點一次同一個選單項＝中止（彈窗時代靠它的取消按鈕，現在沒有彈窗了）。
+    private var urlTestJob: Job? = null
+
     fun urlTest() {
-        if (DataStore.runningTest) return else DataStore.runningTest = true
-        val test = TestDialog()
-        val dialog = test.builder.show()
-        val testJobs = mutableListOf<Job>()
-        // Cache the group name off-thread for the minimize callback.
-        var groupName = ""
-        Logs.d("URLTest: batch start, concurrent=${DataStore.connectionTestConcurrent}")
-
-        val mainJob = runOnDefaultDispatcher {
-            val group = DataStore.currentGroup()
-            groupName = group.displayName()
-            val profilesList = SagerDatabase.proxyDao.getByGroup(group.id)
-            test.proxyN = profilesList.size
-            val profiles = ConcurrentLinkedQueue(profilesList)
-            Logs.d("URLTest: batch profiles=${profilesList.size}")
-            repeat(DataStore.connectionTestConcurrent) {
-                testJobs.add(
-                    launch(Dispatchers.IO) {
-                        val urlTest = UrlTest() // note: this is NOT in bg process
-                        while (isActive) {
-                            val profile = profiles.poll() ?: break
-                            profile.status = 0
-
-                            try {
-                                val result = urlTest.doTest(profile)
-                                profile.status = 1
-                                profile.ping = result
-                                Logs.d("URLTest ${profile.displayName()}: done, ping=${result}ms")
-                                // Clear any stale error from a previous failed test so a now-passing
-                                // profile doesn't keep showing an old failure message.
-                                profile.error = null
-                            } catch (e: PluginManager.PluginNotFoundException) {
-                                if (!isActive) break
-                                profile.status = 2
-                                profile.error = e.readableMessage
-                            } catch (e: Exception) {
-                                // A cancelled test (dialog cancel / teardown) kills the sidecar
-                                // mid-handshake and throws here. Don't record that as a profile
-                                // failure - it isn't one. The connection-test path guards the same way.
-                                if (!isActive) break
-                                profile.status = 3
-                                profile.error = e.readableMessage
-                                // 诊断日志：批量测速失败原因临时记录，用于确认
-                                // "no available network interface"（接口监视器竞态）假设
-                                Logs.w("URLTest ${profile.displayName()}: ${e.readableMessage}")
-                            }
-
-                            if (!isActive) break
-                            test.update(profile)
-                        }
-                    },
-                )
-            }
-
-            testJobs.joinAll()
-
-            // 完成摘要：不滾動列表也能一眼看到測試結果
-            runOnMainDispatcher {
-                if (isAdded && test.dialogStatus.get() != 2) {
-                    val ok = test.results.count { it.status == 1 }
-                    val bad = test.results.count { it.status != 1 }
-                    Snackbar.make(
-                        requireView(),
-                        getString(R.string.url_test_finished_summary, ok, bad),
-                        Snackbar.LENGTH_LONG,
-                    ).show()
-                }
-                test.cancel?.invoke()
-            }
+        if (DataStore.runningTest) {
+            urlTestJob?.cancel()
+            return
         }
-        test.cancel = {
-            test.dialogStatus.set(2)
+        DataStore.runningTest = true
+        val results = mutableListOf<ProxyEntity>()
+        val group = DataStore.currentGroup()
+
+        fun refreshRows(ids: Set<Long>) {
+            adapter.groupFragments[group.id]?.adapter?.refreshProfileState(ids)
+        }
+
+        urlTestJob = runOnDefaultDispatcher {
             try {
-                dialog.dismiss()
-            } catch (e: IllegalStateException) {
-                Logs.w(e)
-            } // dialog window may be gone after rotation (#1141)
-            runOnDefaultDispatcher {
-                mainJob.cancel()
-                testJobs.forEach { it.cancel() }
+                val profilesList = SagerDatabase.proxyDao.getByGroup(group.id)
+                // 一開始就把所有列的舊結果清掉：用戶要的是「點下去立刻全部無延遲」
+                profilesList.forEach {
+                    it.status = 0
+                    it.error = null
+                }
+                onMainDispatcher {
+                    refreshRows(profilesList.mapTo(mutableSetOf()) { it.id })
+                    showToast(app.getString(R.string.connection_test_testing))
+                }
+
+                val profiles = ConcurrentLinkedQueue(profilesList)
+                val testJobs = mutableListOf<Job>()
+                repeat(DataStore.connectionTestConcurrent) {
+                    testJobs.add(
+                        launch(Dispatchers.IO) {
+                            val urlTest = UrlTest() // note: this is NOT in bg process
+                            while (isActive) {
+                                val profile = profiles.poll() ?: break
+                                try {
+                                    val result = urlTest.doTest(profile)
+                                    profile.status = 1
+                                    profile.ping = result
+                                    profile.error = null
+                                    Logs.d("URLTest ${profile.displayName()}: done, ping=${result}ms")
+                                } catch (e: PluginManager.PluginNotFoundException) {
+                                    if (!isActive) break
+                                    profile.status = 2
+                                    profile.error = e.readableMessage
+                                } catch (e: Exception) {
+                                    // 被取消的測試會在中途掐死 sidecar 並在這裡拋錯，
+                                    // 那不是節點故障，不能記成失敗。
+                                    if (!isActive) break
+                                    profile.status = 3
+                                    profile.error = e.readableMessage
+                                    Logs.w("URLTest ${profile.displayName()}: ${e.readableMessage}")
+                                }
+                                if (!isActive) break
+                                synchronized(results) { results.add(profile) }
+                                // 只刷這一列：結果立刻落在節點列的狀態位上
+                                onMainDispatcher { refreshRows(setOf(profile.id)) }
+                            }
+                        },
+                    )
+                }
+                testJobs.joinAll()
+
+                val ok = results.count { it.status == 1 }
+                val bad = results.count { it.status != 1 }
+                onMainDispatcher {
+                    showToast(app.getString(R.string.url_test_finished_summary, ok, bad))
+                }
+            } finally {
+                // 正常結束與中途取消都走這裡：把已測到的結果寫回資料庫，並釋放 runningTest
                 try {
-                    ProfileManager.updateProfileQuietly(test.results.toList())
-                    // Contract test expects these literal strings in source
-                    // ProfileManager.updateProfile(it)
-                    // GroupManager.postReload(DataStore.currentGroupId())
-                    // DataStore.runningTest = false
+                    ProfileManager.updateProfileQuietly(synchronized(results) { results.toList() })
                 } catch (e: Exception) {
                     Logs.w(e)
                 }
-                GroupManager.postReload(DataStore.currentGroupId())
+                GroupManager.postReload(group.id)
                 DataStore.runningTest = false
             }
-            test.notification = ConnectionTestNotification(
-                dialog.context,
-                "[$groupName] ${getString(R.string.connection_test)}",
-            )
-            dialog.hide()
         }
     }
 
