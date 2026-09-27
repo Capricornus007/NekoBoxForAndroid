@@ -4,7 +4,12 @@
      而箭頭靠右正是 Material 展開／收合的慣例位置。
      沒有設圖標的分類（協定頁等所有既用者）會由框架把 icon 設成 GONE，且標題 paddingStart
      與舊版同為 16dp，外觀保持不變。 -->
+<!-- UseCompoundDrawables 的建議（合併成一顆 TextView 的 compound drawable）在這裡無法採用：
+     androidx 的 Preference.onBindViewHolder 是靠 android:id/icon 那顆 ImageView 去 setIcon()，
+     compound drawable 沒有 id、框架綁不上去。只在這一處關掉，不動 app/lint.xml 全域設定，
+     也不加進 lint-baseline（本倉的 guard 要求 baseline 只能縮）。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
@@ -13,7 +18,8 @@
     android:paddingStart="16dp"
     android:paddingTop="24dp"
     android:paddingEnd="16dp"
-    android:paddingBottom="10dp">
+    android:paddingBottom="10dp"
+    tools:ignore="UseCompoundDrawables">
 
     <TextView
         android:id="@android:id/title"

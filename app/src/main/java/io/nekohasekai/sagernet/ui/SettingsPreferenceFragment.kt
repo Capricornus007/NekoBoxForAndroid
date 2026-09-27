@@ -517,7 +517,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         // 放在最後：上面那一大批 findPreference(...)!! 要在整棵樹都還完整時綁定，
         // 折疊只改 isVisible，不影響查找，但綁定先跑完才不會有「藏在收合群組裡的項沒接上」。
-        enableCollapsibleCategories("global")
+        preferenceScreen?.enableCollapsibleCategories("global")
         // ────────────────────────────────────────────────────────────
     }
 

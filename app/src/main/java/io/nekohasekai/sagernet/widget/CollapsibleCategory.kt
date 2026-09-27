@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.widget
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceGroup
@@ -39,7 +40,7 @@ fun PreferenceGroup.enableCollapsibleCategories(storeKey: String) {
                 }
             }
             expanded = !expanded
-            prefs.edit().putBoolean(key, expanded).apply()
+            prefs.edit { putBoolean(key, expanded) }
             applyExpanded(category, expanded, natural)
             true
         }
@@ -47,16 +48,12 @@ fun PreferenceGroup.enableCollapsibleCategories(storeKey: String) {
     }
 }
 
-private fun applyExpanded(
-    category: PreferenceCategory,
-    expanded: Boolean,
-    natural: Map<Preference, Boolean>,
-) {
+private fun applyExpanded(category: PreferenceCategory, expanded: Boolean, natural: Map<Preference, Boolean>) {
     for (i in 0 until category.preferenceCount) {
         val child = category.getPreference(i)
         child.isVisible = expanded && (natural[child] ?: true)
     }
     category.setIcon(
-        if (expanded) R.drawable.ic_expand_less_24 else R.drawable.ic_expand_more_24
+        if (expanded) R.drawable.ic_expand_less_24 else R.drawable.ic_expand_more_24,
     )
 }
