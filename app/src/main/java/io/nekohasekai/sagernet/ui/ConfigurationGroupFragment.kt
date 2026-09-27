@@ -1307,20 +1307,23 @@ class ConfigurationGroupFragment : Fragment() {
                 TooltipCompat.setTooltipText(trafficText, null)
             }
 
+            // 地址與流量現在是兩行，各自決定可見度（以前共用一行，所以地址要被截到 27 字元
+            // 才塞得下流量，現在不需要）。
             var address = proxyEntity.displayAddress()
-            if (showTraffic && address.length >= 30) {
-                address = address.substring(0, 27) + "..."
-            }
-
             if (proxyEntity.requireBean().name.isBlank() || !pf.alwaysShowAddress) {
                 address = ""
             }
 
             profileAddress.text = address
-            val trafficRowEmpty =
-                (!showTraffic || proxyEntity.status <= 0) && address.isBlank()
-            (trafficText.parent as View).visibility = when {
-                !trafficRowEmpty -> View.VISIBLE
+            profileAddress.visibility = when {
+                address.isNotBlank() -> View.VISIBLE
+                reserveMiddleRow -> View.INVISIBLE
+                else -> View.GONE
+            }
+
+            val trafficEmpty = !showTraffic || proxyEntity.status <= 0
+            trafficText.visibility = when {
+                !trafficEmpty -> View.VISIBLE
                 reserveMiddleRow -> View.INVISIBLE
                 else -> View.GONE
             }
@@ -1330,15 +1333,10 @@ class ConfigurationGroupFragment : Fragment() {
             if (speedTestText != null) {
                 profileStatus.text = speedTestText
                 profileStatus.setTextColor(requireContext().getColorAttr(android.R.attr.textColorSecondary))
-                trafficText.text = ""
             } else if (proxyEntity.status <= 0) {
-                if (showTraffic) {
-                    profileStatus.text = trafficText.text
-                    profileStatus.setTextColor(requireContext().getColorAttr(android.R.attr.textColorSecondary))
-                    trafficText.text = ""
-                } else {
-                    profileStatus.text = ""
-                }
+                // 沒有測試結果時狀態留空。舊行為是把流量搬進狀態欄（因為當時只有一行可顯示），
+                // 現在流量有自己那一行，不能再佔用狀態位。
+                profileStatus.text = ""
             } else if (proxyEntity.status == 1) {
                 profileStatus.text = getString(R.string.available, proxyEntity.ping)
                 profileStatus.setTextColor(requireContext().getColour(R.color.material_green_500))
