@@ -1523,8 +1523,7 @@ class ConfigurationFragment @JvmOverloads constructor(
         searchView.clearFocus()
     }
 
-    // TCP Ping 批量測試：直連節點伺服器的 TCP 握手延遲（不經代理、不發 HTTP）。
-    // 移植自 OwnBoxForAndroid 48cc1e43a，與 urlTest() 同構（同一 worker pool 模式）。
+}
 
 /**
  * Closes this resource, ignoring any exception. Replacement for OkHttp's internal
