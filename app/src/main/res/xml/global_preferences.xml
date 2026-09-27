@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceScreen
         app:key="cat_interface_settings"
-        app:icon="@drawable/ic_baseline_grid_3x3_24"
+        app:icon="@drawable/ic_baseline_color_lens_24"
         app:title="@string/interface_settings">
             <SwitchPreferenceCompat
                 app:defaultValue="false"
@@ -220,7 +220,7 @@
 
     <PreferenceScreen
         app:key="cat_fragment_settings"
-        app:icon="@drawable/ic_baseline_layers_24"
+        app:icon="@drawable/ic_baseline_shuffle_24"
         app:title="@string/fragment_settings">
             <SwitchPreferenceCompat
                 app:key="enableTLSFragment"
@@ -438,7 +438,7 @@
 
     <PreferenceScreen
         app:key="cat_vpn_watchdog"
-        app:icon="@drawable/ic_baseline_refresh_24"
+        app:icon="@drawable/ic_baseline_security_24"
         app:title="@string/vpn_watchdog">
             <SwitchPreferenceCompat
                 app:defaultValue="false"
