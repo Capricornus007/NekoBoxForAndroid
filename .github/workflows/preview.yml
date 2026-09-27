@@ -1,22 +1,12 @@
 name: Preview
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
-    inputs:
-      publish:
-        description: Publish a GitHub pre-release (otherwise the APKs are only uploaded as a workflow artifact)
-        type: boolean
-        default: true
 concurrency:
   group: preview-${{ github.ref }}
   cancel-in-progress: true
-permissions:
-  contents: write
 jobs:
   preview:
-    name: Build and publish a preview
+    name: Build a preview
     runs-on: ubuntu-latest
     env:
       SIGNING_KEYSTORE_B64: ${{ secrets.SIGNING_KEYSTORE_B64 }}
@@ -50,6 +40,9 @@ jobs:
             echo "build=$BUILD"
             echo "tag=v${VERSION_NAME}-pre.${BUILD}"
           } >> "$GITHUB_OUTPUT"
+      - name: Use .debug package name
+        if: steps.version.outputs.skip != 'true'
+        run: sed -i 's/^PACKAGE_NAME=.*/PACKAGE_NAME=com.nb4a.throne.debug/' nb4a.properties
       - name: Build
         if: steps.version.outputs.skip != 'true'
         uses: ./.github/actions/android-build
@@ -62,19 +55,10 @@ jobs:
         if: steps.version.outputs.skip != 'true'
         run: python3 buildScript/release_assets.py app/build/outputs/apk/oss/release dist preview
       - name: Upload artifact
-        if: steps.version.outputs.skip != 'true' && github.event_name == 'workflow_dispatch' && !inputs.publish
+        if: steps.version.outputs.skip != 'true'
         uses: actions/upload-artifact@v7
         with:
           name: Throne-${{ steps.version.outputs.tag }}
           path: dist/
           if-no-files-found: error
           retention-days: 14
-      - name: Publish pre-release
-        if: steps.version.outputs.skip != 'true' && (github.event_name == 'push' || inputs.publish)
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          TAG: ${{ steps.version.outputs.tag }}
-        run: |
-          set -euo pipefail
-          gh release create "$TAG" dist/* --prerelease --target "$GITHUB_SHA" --title "$TAG" --generate-notes

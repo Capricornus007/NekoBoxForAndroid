@@ -8,9 +8,9 @@
 
 ## 2. Preview 工作流改造（触发、产物、包名）
 
-- [ ] 2.1 修改 `.github/workflows/preview.yml`：`on` 仅保留 `workflow_dispatch`（删除 `push` 触发与 `publish` 输入），删除 `permissions: contents: write` 与 `Publish pre-release` 步骤，`Upload artifact` 条件简化为 `steps.version.outputs.skip != 'true'`，保留 `Build number` 版本计算、`concurrency` 与 14 天 artifact 留存；验证方式：diff 确认无 `push`/`gh release create`/`publish` 残留
-- [ ] 2.2 在 `Build` 步骤前新增一步 `sed -i 's/^PACKAGE_NAME=.*/PACKAGE_NAME=com.nb4a.throne.debug/' nb4a.properties`（与 v1.x 一致，仅作用于工作流检出），验证方式：diff 确认 sed 位于 Gradle 构建之前且只改 `PACKAGE_NAME` 行
-- [ ] 2.3 同步规范：将 `openspec/changes/manual-preview-workflow/specs/repository-governance/spec.md` 的 delta 与实现对照复核（触发方式、artifact-only、`.debug` 包名、无 `throne-update.json` 四点均有对应实现），验证方式：`openspec validate --change manual-preview-workflow` 通过
+- [x] 2.1 修改 `.github/workflows/preview.yml`：`on` 仅保留 `workflow_dispatch`（删除 `push` 触发与 `publish` 输入），删除 `permissions: contents: write` 与 `Publish pre-release` 步骤，`Upload artifact` 条件简化为 `steps.version.outputs.skip != 'true'`，保留 `Build number` 版本计算、`concurrency` 与 14 天 artifact 留存；验证方式：diff 确认无 `push`/`gh release create`/`publish` 残留
+- [x] 2.2 在 `Build` 步骤前新增一步 `sed -i 's/^PACKAGE_NAME=.*/PACKAGE_NAME=com.nb4a.throne.debug/' nb4a.properties`（与 v1.x 一致，仅作用于工作流检出），验证方式：diff 确认 sed 位于 Gradle 构建之前且只改 `PACKAGE_NAME` 行
+- [x] 2.3 同步规范：将 `openspec/changes/manual-preview-workflow/specs/repository-governance/spec.md` 的 delta 与实现对照复核（触发方式、artifact-only、`.debug` 包名、无 `throne-update.json` 四点均有对应实现），验证方式：`openspec validate manual-preview-workflow` 通过
 - [ ] 2.4 提交该批次（`preview.yml` + 规范同步），验证方式：`git show --stat` 确认改动范围
 
 ## 3. CI 验证（手动触发 Preview 工作流）
