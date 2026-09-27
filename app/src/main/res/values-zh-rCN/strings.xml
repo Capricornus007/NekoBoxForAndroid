@@ -768,7 +768,7 @@
     <string name="grp_send_hwid">发送 HWID</string>
     <string name="grp_send_hwid_tip">随此订阅的请求发送 HWID、操作系统、系统版本与设备型号请求头。「保持默认」遵循「设置 › 订阅」。</string>
     <string name="grp_settings_subscription">订阅</string>
-    <string name="grp_settings_user_agent">User agent</string>
+    <string name="grp_settings_user_agent">UserAgent</string>
     <string name="grp_share_subscription">分享订阅链接</string>
     <string name="grp_skip_auto_update">跳过自动更新</string>
     <string name="grp_sort_by_latency">按延迟排序</string>
@@ -796,8 +796,8 @@
     <string name="grp_url_test">运行 URL 测试</string>
     <string name="grp_url_test_only">仅在开启「运行 URL 测试」时</string>
     <string name="grp_url_test_tip">更新完成后测试分组的配置，排在已在运行的测试之后。</string>
-    <string name="grp_user_agent">User agent</string>
-    <string name="grp_user_agent_tip">留空则使用「设置 › 订阅」中的 User agent。</string>
+    <string name="grp_user_agent">UserAgent</string>
+    <string name="grp_user_agent_tip">留空则使用「设置 › 订阅」中的 UserAgent。</string>
     <string name="grpc_authority">Authority</string>
     <string name="grpc_multi_mode">Multi mode</string>
     <string name="grpc_settings">gRPC 设置</string>
@@ -1196,11 +1196,11 @@
     <string name="settings_presets_sum">多路复用、TLS 分片、uTLS、HTTP/2 与 QUIC 默认值</string>
     <string name="settings_routing">路由</string>
     <string name="settings_routing_sum">域名策略、规则集镜像、AdBlock、配置更新</string>
-    <string name="settings_subscriptions_sum">自动更新、HWID、User agent、应用自身请求</string>
+    <string name="settings_subscriptions_sum">自动更新、HWID、UserAgent、应用请求</string>
     <string name="settings_testing">测试</string>
     <string name="settings_testing_sum">延迟与速度测试</string>
     <string name="settings_tun">TUN / VPN</string>
-    <string name="settings_tun_sum">协议栈、MTU、IPv6、私有网段、按应用代理</string>
+    <string name="settings_tun_sum">协议栈、MTU、IPv6、私有网段、分应用代理</string>
     <string name="share_target_missing">没有应用可以接收此文件</string>
     <string name="skip_cert_sum">默认跳过 TLS 证书验证（allowInsecure）</string>
     <string name="skip_delete_confirmation">跳过删除确认</string>
