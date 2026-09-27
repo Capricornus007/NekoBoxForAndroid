@@ -23,6 +23,7 @@ import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.root.RootManager
 import io.nekohasekai.sagernet.utils.AppLocale
 import io.nekohasekai.sagernet.utils.Theme
+import io.nekohasekai.sagernet.widget.enableCollapsibleCategories
 import moe.matsuri.nb4a.ui.*
 import java.io.File
 
@@ -513,6 +514,10 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val vpnWatchdogInterval = findPreference<EditTextPreference>(Key.VPN_WATCHDOG_INTERVAL)
         vpnWatchdogInterval?.setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
         vpnWatchdogInterval?.onPreferenceChangeListener = reloadListener
+
+        // 放在最後：上面那一大批 findPreference(...)!! 要在整棵樹都還完整時綁定，
+        // 折疊只改 isVisible，不影響查找，但綁定先跑完才不會有「藏在收合群組裡的項沒接上」。
+        enableCollapsibleCategories("global")
         // ────────────────────────────────────────────────────────────
     }
 

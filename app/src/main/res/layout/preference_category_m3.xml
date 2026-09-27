@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/title"
+<!-- 原本這是一顆裸 TextView，沒有任何圖標位置，所以「分類可折疊」要的箭頭無處可畫。
+     改成標題 weight=1、箭頭放右邊：androidx 只按 @android:id/icon 綁圖標、不在乎它在左右，
+     而箭頭靠右正是 Material 展開／收合的慣例位置。
+     沒有設圖標的分類（協定頁等所有既用者）會由框架把 icon 設成 GONE，且標題 paddingStart
+     與舊版同為 16dp，外觀保持不變。 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center_vertical"
     android:minHeight="56dp"
-    android:gravity="bottom"
+    android:orientation="horizontal"
     android:paddingStart="16dp"
-    android:paddingEnd="16dp"
     android:paddingTop="24dp"
-    android:paddingBottom="10dp"
-    android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-    android:textColor="?attr/colorPrimary" />
+    android:paddingEnd="16dp"
+    android:paddingBottom="10dp">
+
+    <TextView
+        android:id="@android:id/title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+        android:textColor="?attr/colorPrimary" />
+
+    <ImageView
+        android:id="@android:id/icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:importantForAccessibility="no" />
+
+</LinearLayout>
