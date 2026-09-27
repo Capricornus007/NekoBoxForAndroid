@@ -146,6 +146,11 @@ def main():
         assets[abi] = {"name": apk.name, "size": apk.stat().st_size, "sha256": sha256(apk)}
 
     (dist / "SHA256SUMS").write_text("".join(f"{a['sha256']}  {a['name']}\n" for a in assets.values()), newline="\n")
+    # throne-update.json is the in-app updater manifest; only the stable channel publishes the Releases the
+    # updater reads, so preview artifacts carry the APKs and SHA256SUMS only.
+    if channel != "stable":
+        print(f"channel {channel}: skipped throne-update.json")
+        return
     update = {
         "schema": 1,
         "packageName": manifest["packageName"],
