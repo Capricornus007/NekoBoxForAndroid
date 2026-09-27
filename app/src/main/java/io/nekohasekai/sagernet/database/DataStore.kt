@@ -337,9 +337,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var speedTestFallbackServerListURL by configurationStore.string(Key.SPEED_TEST_FALLBACK_SERVER_LIST_URL) {
         SagerNet.application.getString(R.string.default_speed_test_fallback_server_list_url)
     }
-    var simpleDownloadURL by configurationStore.string(Key.SIMPLE_DOWNLOAD_URL) {
-        SagerNet.application.getString(R.string.default_simple_download_url)
-    }
     var alwaysShowAddress by configurationStore.boolean(Key.ALWAYS_SHOW_ADDRESS)
 
     var tunImplementation by configurationStore.stringToInt(Key.TUN_IMPLEMENTATION) { TunImplementation.GVISOR }

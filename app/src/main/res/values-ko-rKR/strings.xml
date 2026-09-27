@@ -893,7 +893,6 @@
     <string name="wireguard_persistent_keepalive">지속적 연결 유지 간격(초)</string>
     <string name="wireguard_peer_allowed_ips">피어 허용 IP</string>
     <string name="wireguard_extra_peers">추가 피어</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">이 그룹 속도 테스트</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="tun_implementation_hev_override">Hev TUN이 관리 중입니다. 선택하려면 끄세요</string>
@@ -902,7 +901,6 @@
     <string name="speed_test_mode">속도 테스트 모드</string>
     <string name="speed_test_mode_download">다운로드만</string>
     <string name="speed_test_mode_download_upload">다운로드 + 업로드</string>
-    <string name="speed_test_mode_simple_download">간단한 다운로드</string>
     <string name="speed_test_mode_upload">업로드만</string>
     <string name="speed_test_timeout_ms">속도 테스트 시간 제한 (ms)</string>
     <string name="speed_test_timeout_invalid">0보다 큰 시간 제한(밀리초)을 입력하세요</string>

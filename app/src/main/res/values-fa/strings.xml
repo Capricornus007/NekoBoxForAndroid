@@ -664,7 +664,6 @@
     <string name="snell_mode">حالت</string>
     <string name="snell_reuse">استفادهٔ مجدد</string>
     <string name="snell_reuse_summary">فقط v4-v6</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">آزمون سرعت این گروه</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">فعال‌سازی Hev TUN</string>
@@ -676,7 +675,6 @@
     <string name="speed_test_mode">حالت تست سرعت</string>
     <string name="speed_test_mode_download">فقط دانلود</string>
     <string name="speed_test_mode_download_upload">دانلود + آپلود</string>
-    <string name="speed_test_mode_simple_download">دانلود ساده</string>
     <string name="speed_test_mode_upload">فقط آپلود</string>
     <string name="speed_test_timeout_ms">مهلت تست سرعت (ms)</string>
     <string name="speed_test_timeout_invalid">مهلتی بزرگ‌تر از صفر میلی‌ثانیه وارد کنید</string>

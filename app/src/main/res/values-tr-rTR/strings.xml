@@ -889,7 +889,6 @@ Devam edilsin mi?</string>
     <string name="wireguard_persistent_keepalive">Kalıcı bağlantı sürdürme aralığı (saniye)</string>
     <string name="wireguard_peer_allowed_ips">Üyenin izin verilen IP\'leri</string>
     <string name="wireguard_extra_peers">Ek üyeler</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Bu grubun hızını test et</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Hev TUN\'u etkinleştir</string>
@@ -898,7 +897,6 @@ Devam edilsin mi?</string>
     <string name="speed_test_mode">Hız testi modu</string>
     <string name="speed_test_mode_download">Yalnızca indirme</string>
     <string name="speed_test_mode_download_upload">İndirme + yükleme</string>
-    <string name="speed_test_mode_simple_download">Basit indirme</string>
     <string name="speed_test_mode_upload">Yalnızca yükleme</string>
     <string name="speed_test_timeout_ms">Hız testi zaman aşımı (ms)</string>
     <string name="speed_test_timeout_invalid">Sıfırdan büyük bir zaman aşımı girin</string>

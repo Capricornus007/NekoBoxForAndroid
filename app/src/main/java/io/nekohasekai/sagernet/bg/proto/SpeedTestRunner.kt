@@ -107,15 +107,21 @@ class AndroidSpeedTestSession(profile: ProxyEntity) : BoxInstance(profile), Spee
         if (processes.processCount > 0) delay(500)
         if (BuildConfig.DEBUG) Logs.d(config.config)
 
+        // 簡單下載模式已移除（要量下載速度用 speedtest.net 之類外部工具更老實），
+        // 但 gomobile 的簽名還在，所以這個位置傳空字串。
+        // 舊使用者可能把模式存成已被移除的 simple_download：不可信的外部狀態在邊界處退回預設，
+        // 否則會把手機上存的值直接送進 libcore。
+        val mode = DataStore.speedTestMode.takeIf(SpeedTestSettings::isValidMode)
+            ?: SpeedTestSettings.MODE_DOWNLOAD_UPLOAD
         val session = Libcore.newSpeedTestSession(
             profile.id.toString(),
             config.config,
             LocalResolverImpl,
-            DataStore.speedTestMode,
+            mode,
             DataStore.speedTestTimeoutMs,
             DataStore.speedTestServerListURL,
             DataStore.speedTestFallbackServerListURL,
-            DataStore.simpleDownloadURL,
+            "",
         )
         nativeSession = session
         try {

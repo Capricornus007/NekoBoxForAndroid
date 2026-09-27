@@ -12,13 +12,11 @@ object SpeedTestSettings {
     const val MODE_DOWNLOAD_UPLOAD = "download_upload"
     const val MODE_DOWNLOAD = "download"
     const val MODE_UPLOAD = "upload"
-    const val MODE_SIMPLE_DOWNLOAD = "simple_download"
 
     val modes = setOf(
         MODE_DOWNLOAD_UPLOAD,
         MODE_DOWNLOAD,
         MODE_UPLOAD,
-        MODE_SIMPLE_DOWNLOAD,
     )
 
     fun isValidMode(value: String): Boolean = value in modes
@@ -45,9 +43,5 @@ object SpeedTestSettings {
         settings["speed_test_timeout_ms"]
             ?.takeIf(::isValidTimeout)
             ?.let { put(Key.SPEED_TEST_TIMEOUT_MS, it) }
-        settings["simple_dl_url"]
-            ?.trim()
-            ?.takeIf(::isValidHttpUrl)
-            ?.let { put(Key.SIMPLE_DOWNLOAD_URL, it) }
     }
 }

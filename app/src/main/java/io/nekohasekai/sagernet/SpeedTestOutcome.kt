@@ -23,7 +23,6 @@ data class SpeedTestOutcome(
         )
 
         SpeedTestSettings.MODE_DOWNLOAD,
-        SpeedTestSettings.MODE_SIMPLE_DOWNLOAD,
         ->
             listOf(SpeedTestRate(SpeedTestDirection.DOWNLOAD, downloadBitsPerSecond))
 

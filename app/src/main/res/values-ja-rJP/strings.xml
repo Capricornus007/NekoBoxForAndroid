@@ -902,7 +902,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="wireguard_persistent_keepalive">永続キープアライブ間隔（秒）</string>
     <string name="wireguard_peer_allowed_ips">ピアの許可 IP</string>
     <string name="wireguard_extra_peers">追加のピア</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">このグループの速度テスト</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="tun_implementation_hev_override">Hev TUN が管理しています。選択するには無効にしてください</string>
@@ -911,7 +910,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="speed_test_mode">スピードテスト方式</string>
     <string name="speed_test_mode_download">ダウンロードのみ</string>
     <string name="speed_test_mode_download_upload">ダウンロード + アップロード</string>
-    <string name="speed_test_mode_simple_download">簡易ダウンロード</string>
     <string name="speed_test_mode_upload">アップロードのみ</string>
     <string name="speed_test_timeout_ms">スピードテストのタイムアウト (ms)</string>
     <string name="speed_test_timeout_invalid">0 より大きいタイムアウト（ミリ秒）を入力してください</string>

@@ -822,7 +822,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="preset_cn_apps">Pilih aplikasi domestik</string>
     <string name="preset_foreign_apps">Pilih aplikasi luar negeri</string>
     <string name="url_test_finished_summary">Uji URL selesai: %1$d berhasil / %2$d gagal</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Uji kecepatan grup ini</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Aktifkan Hev TUN</string>
@@ -834,7 +833,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="speed_test_mode">Mode uji kecepatan</string>
     <string name="speed_test_mode_download">Hanya unduh</string>
     <string name="speed_test_mode_download_upload">Unduh + unggah</string>
-    <string name="speed_test_mode_simple_download">Unduh sederhana</string>
     <string name="speed_test_mode_upload">Hanya unggah</string>
     <string name="speed_test_timeout_ms">Batas waktu uji kecepatan (ms)</string>
     <string name="speed_test_timeout_invalid">Masukkan batas waktu lebih dari nol milidetik</string>

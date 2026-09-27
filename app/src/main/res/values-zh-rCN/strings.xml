@@ -658,10 +658,8 @@
     <string name="speed_test_mode_download_upload">下载 + 上传</string>
     <string name="speed_test_mode_download">仅下载</string>
     <string name="speed_test_mode_upload">仅上传</string>
-    <string name="speed_test_mode_simple_download">简单下载</string>
     <string name="speed_test_timeout_ms">速度测试超时（毫秒）</string>
     <string name="speed_test_timeout_invalid">请输入大于零毫秒的超时时间</string>
-    <string name="simple_download_url">简单下载 URL</string>
     <string name="speed_test_url_invalid">请输入有效的 HTTP 或 HTTPS URL</string>
     <string name="speed_test_group">速度测试本组</string>
     <string name="speed_test_confirm_title">运行速度测试？</string>

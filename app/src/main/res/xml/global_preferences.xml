@@ -331,11 +331,6 @@
             app:key="speedTestTimeoutMs"
             app:title="@string/speed_test_timeout_ms"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
-            app:defaultValue="@string/default_simple_download_url"
-            app:key="simpleDownloadURL"
-            app:title="@string/simple_download_url"
-            app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
             app:icon="@drawable/baseline_construction_24"
             app:key="enableClashAPI"

@@ -712,7 +712,6 @@
     <string name="snell_mode">Режим</string>
     <string name="snell_reuse">Повторное использование</string>
     <string name="snell_reuse_summary">Только v4-v6</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Проверить скорость этой группы</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Включить Hev TUN</string>
@@ -724,7 +723,6 @@
     <string name="speed_test_mode">Режим теста скорости</string>
     <string name="speed_test_mode_download">Только загрузка</string>
     <string name="speed_test_mode_download_upload">Загрузка + отдача</string>
-    <string name="speed_test_mode_simple_download">Простая загрузка</string>
     <string name="speed_test_mode_upload">Только отдача</string>
     <string name="speed_test_timeout_ms">Тайм-аут теста скорости (мс)</string>
     <string name="speed_test_timeout_invalid">Укажите тайм-аут больше нуля миллисекунд</string>

@@ -540,7 +540,6 @@
     <string name="preset_cn_apps">Yerel uygulamaları seç</string>
     <string name="preset_foreign_apps">Uluslararası uygulamaları seç</string>
     <string name="url_test_finished_summary">URL testi bitti: %1$d başarılı / %2$d başarısız</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Bu grubun hızını test et</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Hev TUN\'u etkinleştir</string>
@@ -549,7 +548,6 @@
     <string name="speed_test_mode">Hız testi modu</string>
     <string name="speed_test_mode_download">Yalnızca indirme</string>
     <string name="speed_test_mode_download_upload">İndirme + yükleme</string>
-    <string name="speed_test_mode_simple_download">Basit indirme</string>
     <string name="speed_test_mode_upload">Yalnızca yükleme</string>
     <string name="speed_test_timeout_ms">Hız testi zaman aşımı (ms)</string>
     <string name="speed_test_timeout_invalid">Sıfırdan büyük bir zaman aşımı girin</string>

@@ -908,7 +908,6 @@
     <string name="wireguard_persistent_keepalive">الفاصل الزمني للإبقاء المستمر على الاتصال (بالثواني)</string>
     <string name="wireguard_peer_allowed_ips">العناوين المسموح بها للقرين</string>
     <string name="wireguard_extra_peers">القرائن الإضافية</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">اختبار سرعة هذه المجموعة</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">تمكين Hev TUN</string>
@@ -917,7 +916,6 @@
     <string name="speed_test_mode">وضع اختبار السرعة</string>
     <string name="speed_test_mode_download">تنزيل فقط</string>
     <string name="speed_test_mode_download_upload">تنزيل + رفع</string>
-    <string name="speed_test_mode_simple_download">تنزيل بسيط</string>
     <string name="speed_test_mode_upload">رفع فقط</string>
     <string name="speed_test_timeout_ms">مهلة اختبار السرعة (ms)</string>
     <string name="speed_test_timeout_invalid">أدخل مهلة أكبر من صفر مللي ثانية</string>

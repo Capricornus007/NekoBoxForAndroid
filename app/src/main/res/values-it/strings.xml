@@ -843,7 +843,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="preset_cn_apps">Seleziona app nazionali</string>
     <string name="preset_foreign_apps">Seleziona app internazionali</string>
     <string name="url_test_finished_summary">Test URL completato: %1$d riusciti / %2$d non riusciti</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Test velocità di questo gruppo</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Attiva Hev TUN</string>
@@ -855,7 +854,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="speed_test_mode">Modalità speed test</string>
     <string name="speed_test_mode_download">Solo download</string>
     <string name="speed_test_mode_download_upload">Download + upload</string>
-    <string name="speed_test_mode_simple_download">Download semplice</string>
     <string name="speed_test_mode_upload">Solo upload</string>
     <string name="speed_test_timeout_ms">Timeout speed test (ms)</string>
     <string name="speed_test_timeout_invalid">Inserisci un timeout maggiore di zero millisecondi</string>

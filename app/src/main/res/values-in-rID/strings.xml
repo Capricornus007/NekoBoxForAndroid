@@ -905,7 +905,6 @@ Lanjutkan?</string>
     <string name="wireguard_persistent_keepalive">Interval keepalive persisten (detik)</string>
     <string name="wireguard_peer_allowed_ips">IP Diizinkan Rekan</string>
     <string name="wireguard_extra_peers">Rekan Tambahan</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Uji kecepatan grup ini</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Aktifkan Hev TUN</string>
@@ -914,7 +913,6 @@ Lanjutkan?</string>
     <string name="speed_test_mode">Mode uji kecepatan</string>
     <string name="speed_test_mode_download">Hanya unduh</string>
     <string name="speed_test_mode_download_upload">Unduh + unggah</string>
-    <string name="speed_test_mode_simple_download">Unduh sederhana</string>
     <string name="speed_test_mode_upload">Hanya unggah</string>
     <string name="speed_test_timeout_ms">Batas waktu uji kecepatan (ms)</string>
     <string name="speed_test_timeout_invalid">Masukkan batas waktu lebih dari nol milidetik</string>

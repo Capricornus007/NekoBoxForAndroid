@@ -352,7 +352,6 @@
     <string name="preset_cn_apps">Inlands-Apps auswählen</string>
     <string name="preset_foreign_apps">Internationale Apps auswählen</string>
     <string name="url_test_finished_summary">URL-Test abgeschlossen: %1$d erfolgreich / %2$d fehlgeschlagen</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Geschwindigkeitstest für diese Gruppe</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Hev TUN aktivieren</string>
@@ -361,7 +360,6 @@
     <string name="speed_test_mode">Speedtest-Modus</string>
     <string name="speed_test_mode_download">Nur Download</string>
     <string name="speed_test_mode_download_upload">Download + Upload</string>
-    <string name="speed_test_mode_simple_download">Einfacher Download</string>
     <string name="speed_test_mode_upload">Nur Upload</string>
     <string name="speed_test_timeout_ms">Speedtest-Timeout (ms)</string>
     <string name="speed_test_timeout_invalid">Gib ein Timeout größer als null Millisekunden ein</string>

@@ -280,10 +280,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="speed_test_mode_download_upload">下載 + 上載</string>
     <string name="speed_test_mode_download">僅下載</string>
     <string name="speed_test_mode_upload">僅上載</string>
-    <string name="speed_test_mode_simple_download">簡單下載</string>
     <string name="speed_test_timeout_ms">速度測試逾時（毫秒）</string>
     <string name="speed_test_timeout_invalid">請輸入大於零毫秒的逾時時間</string>
-    <string name="simple_download_url">簡單下載 URL</string>
     <string name="speed_test_url_invalid">請輸入有效的 HTTP 或 HTTPS URL</string>
     <string name="speed_test_group">速度測試本組</string>
     <string name="speed_test_confirm_title">執行速度測試？</string>

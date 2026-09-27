@@ -910,7 +910,6 @@
     <string name="wireguard_peer_allowed_ips">Дозволені IP піра</string>
     <string name="wireguard_extra_peers">Додаткові піри</string>
     <string name="speed_test_group">Перевірити швидкість цієї групи</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Увімкнути Hev TUN</string>
     <string name="enable_hev_tun_summary">Створювати TUN-пристрій через hev-socks5-tunnel</string>
@@ -918,7 +917,6 @@
     <string name="speed_test_mode">Режим тесту швидкості</string>
     <string name="speed_test_mode_download">Лише завантаження</string>
     <string name="speed_test_mode_download_upload">Завантаження + вивантаження</string>
-    <string name="speed_test_mode_simple_download">Просте завантаження</string>
     <string name="speed_test_mode_upload">Лише вивантаження</string>
     <string name="speed_test_timeout_ms">Тайм-аут тесту швидкості (мс)</string>
     <string name="speed_test_timeout_invalid">Вкажіть тайм-аут більше нуля мілісекунд</string>

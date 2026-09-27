@@ -915,7 +915,6 @@ Continuer ?</string>
     <string name="wireguard_persistent_keepalive">Intervalle de maintien de connexion persistant (secondes)</string>
     <string name="wireguard_peer_allowed_ips">IP autorisées du pair</string>
     <string name="wireguard_extra_peers">Pairs supplémentaires</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Tester la vitesse de ce groupe</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Activer Hev TUN</string>
@@ -924,7 +923,6 @@ Continuer ?</string>
     <string name="speed_test_mode">Mode de test de vitesse</string>
     <string name="speed_test_mode_download">Téléchargement seulement</string>
     <string name="speed_test_mode_download_upload">Téléchargement + envoi</string>
-    <string name="speed_test_mode_simple_download">Téléchargement simple</string>
     <string name="speed_test_mode_upload">Envoi seulement</string>
     <string name="speed_test_timeout_ms">Délai du test de vitesse (ms)</string>
     <string name="speed_test_timeout_invalid">Saisissez un délai supérieur à zéro milliseconde</string>

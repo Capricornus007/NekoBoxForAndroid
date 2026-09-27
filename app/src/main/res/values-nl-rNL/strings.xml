@@ -904,7 +904,6 @@ Doorgaan?</string>
     <string name="wireguard_persistent_keepalive">Interval voor permanente keepalive (seconden)</string>
     <string name="wireguard_peer_allowed_ips">Toegestane IP\'s van peer</string>
     <string name="wireguard_extra_peers">Extra peers</string>
-    <string name="simple_download_url">Simple download URL</string>
     <string name="speed_test_group">Snelheidstest voor deze groep</string>
     <string name="speed_test_rate_mbps">%1$.2f Mbps</string>
     <string name="enable_hev_tun">Hev TUN inschakelen</string>
@@ -913,7 +912,6 @@ Doorgaan?</string>
     <string name="speed_test_mode">Snelheidstestmodus</string>
     <string name="speed_test_mode_download">Alleen downloaden</string>
     <string name="speed_test_mode_download_upload">Downloaden + uploaden</string>
-    <string name="speed_test_mode_simple_download">Eenvoudige download</string>
     <string name="speed_test_mode_upload">Alleen uploaden</string>
     <string name="speed_test_timeout_ms">Time-out snelheidstest (ms)</string>
     <string name="speed_test_timeout_invalid">Voer een time-out in van meer dan nul milliseconden</string>
