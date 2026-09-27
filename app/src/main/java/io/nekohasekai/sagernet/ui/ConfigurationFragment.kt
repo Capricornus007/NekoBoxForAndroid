@@ -1249,7 +1249,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
                 onMainDispatcher {
                     refreshRows(profilesList.mapTo(mutableSetOf()) { it.id })
-                    showToast(app.getString(R.string.connection_test_testing))
+                    showToast(getString(R.string.connection_test_testing))
                 }
 
                 val profiles = ConcurrentLinkedQueue(profilesList)
@@ -1291,7 +1291,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 val ok = results.count { it.status == 1 }
                 val bad = results.count { it.status != 1 }
                 onMainDispatcher {
-                    showToast(app.getString(R.string.url_test_finished_summary, ok, bad))
+                    showToast(getString(R.string.url_test_finished_summary, ok, bad))
                 }
             } finally {
                 // 正常結束與中途取消都走這裡：把已測到的結果寫回資料庫，並釋放 runningTest
