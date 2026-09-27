@@ -26,13 +26,13 @@
 - [x] 4.1 补齐 `values-ar`、`values-fa`、`values-be` 的全部缺失条目并新建三地 `arrays.xml`；ar 复数须覆盖 zero/one/two/few/many/other 分类，RTL 文案保持占位符顺序语义正确；验证方式为诊断脚本中三地全部指标为 0
 - [x] 4.2 本地静态校验：诊断脚本确认 XML 良构、占位符一致、复数分类完整
 - [x] 4.3 提交本批次（6 个文件），确认 diff 范围仅限三地资源
-- [ ] 4.4 CI/真机验证：推送触发 `preview.yml` 预览构建成功；真机场景为切换阿拉伯语（RTL 布局）与波斯语抽查界面方向与文案，白俄罗斯语抽查列表页；回传证据为 workflow 链接 + RTL 界面截图
+- [x] 4.4 CI/真机验证：推送触发 `preview.yml` 预览构建成功；真机场景为切换阿拉伯语（RTL 布局）与波斯语抽查界面方向与文案，白俄罗斯语抽查列表页；回传证据为 workflow 链接 + RTL 界面截图
 
 ## 5. 批次 5：主要欧洲语言补齐（de / es / fr / it / nl / pt-rBR）
 
-- [ ] 5.1 补齐 `values-de`、`values-es`、`values-fr`、`values-it`、`values-nl`、`values-pt-rBR` 的全部缺失条目（it/nl/pt-rBR 缺口最大，约 1400+ 条/语言）并新建六地 `arrays.xml`；验证方式为诊断脚本中六地全部指标为 0
-- [ ] 5.2 本地静态校验：诊断脚本确认 XML 良构、占位符一致、无不可翻译条目泄漏
-- [ ] 5.3 提交本批次（12 个文件），确认 diff 范围仅限六地资源
+- [x] 5.1 补齐 `values-de`、`values-es`、`values-fr`、`values-it`、`values-nl`、`values-pt-rBR` 的全部缺失条目（it/nl/pt-rBR 缺口最大，约 1400+ 条/语言）并新建六地 `arrays.xml`；验证方式为诊断脚本中六地全部指标为 0
+- [x] 5.2 本地静态校验：诊断脚本确认 XML 良构、占位符一致、无不可翻译条目泄漏
+- [x] 5.3 提交本批次（12 个文件），确认 diff 范围仅限六地资源
 - [ ] 5.4 CI/真机验证：推送触发 `preview.yml` 预览构建成功；真机场景为切换德语、法语、西班牙语抽查设置页与路由页文案完整；回传证据为 workflow 链接 + 截图
 
 ## 6. 批次 6：印尼语/挪威语/土耳其语补齐（in / nb-rNO / tr）
