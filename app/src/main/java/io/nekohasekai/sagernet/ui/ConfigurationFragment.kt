@@ -1,123 +1,114 @@
 package io.nekohasekai.sagernet.ui
 
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.os.Bundle
-import android.provider.OpenableColumns
-import android.text.SpannableStringBuilder
-import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-import android.text.format.Formatter
-import android.text.style.ForegroundColorSpan
-import android.view.KeyEvent
-import android.widget.Toast
-import android.view.Menu
-import android.view.MenuItem
-import android.view.MotionEvent
-import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.PopupMenu
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
-import androidx.core.net.toUri
-import androidx.core.view.isGone
-import androidx.core.view.size
-import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceDataStore
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
-import io.nekohasekai.sagernet.GroupType
-import io.nekohasekai.sagernet.Key
-import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.SagerNet
-import io.nekohasekai.sagernet.SpeedTestOutcome
-import io.nekohasekai.sagernet.aidl.TrafficData
-import io.nekohasekai.sagernet.bg.proto.AndroidSpeedTestSession
-import io.nekohasekai.sagernet.bg.proto.SpeedTestQueueRunner
-import io.nekohasekai.sagernet.bg.proto.SpeedTestSnapshot
-import io.nekohasekai.sagernet.bg.proto.UrlTest
-import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.database.GroupManager
-import io.nekohasekai.sagernet.database.ProfileManager
-import io.nekohasekai.sagernet.database.ProxyEntity
-import io.nekohasekai.sagernet.database.ProxyGroup
-import io.nekohasekai.sagernet.database.SagerDatabase
-import io.nekohasekai.sagernet.database.SubscriptionBean
-import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
-import io.nekohasekai.sagernet.databinding.LayoutGroupListBinding
-import io.nekohasekai.sagernet.databinding.LayoutProgressListBinding
-import io.nekohasekai.sagernet.fmt.AbstractBean
-import io.nekohasekai.sagernet.fmt.internal.ChainBean
-import io.nekohasekai.sagernet.group.GroupUpdater
-import io.nekohasekai.sagernet.group.RawUpdater
-import io.nekohasekai.sagernet.ktx.Logs
-import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
-import io.nekohasekai.sagernet.ktx.SubscriptionFoundException
-import io.nekohasekai.sagernet.ktx.USER_AGENT
-import io.nekohasekai.sagernet.ktx.getColorAttr
-import io.nekohasekai.sagernet.ktx.getColour
-import io.nekohasekai.sagernet.ktx.onMainDispatcher
-import io.nekohasekai.sagernet.ktx.readBytesBounded
-import io.nekohasekai.sagernet.ktx.readTextBounded
-import io.nekohasekai.sagernet.ktx.readableMessage
-import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
-import io.nekohasekai.sagernet.ktx.runOnLifecycleDispatcher
-import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
-import io.nekohasekai.sagernet.ktx.scrollTo
-import io.nekohasekai.sagernet.plugin.PluginManager
-import io.nekohasekai.sagernet.ui.profile.AmneziaWGSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.BalancerSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.ByeDPISettingsActivity
-import io.nekohasekai.sagernet.ui.profile.ChainSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.HttpSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.HysteriaSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.JuicitySettingsActivity
-import io.nekohasekai.sagernet.ui.profile.MasterDnsVpnSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.MieruSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.NaiveSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.OlcrtcSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.SSHSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.ShadowQUICSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.ShadowsocksRSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.ShadowsocksSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.SnellSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.SocksSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.TrojanGoSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.TrojanSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.TrustTunnelSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.TuicSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.VMessSettingsActivity
-import io.nekohasekai.sagernet.ui.profile.WireGuardSettingsActivity
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import libcore.Libcore
-import moe.matsuri.nb4a.Protocols
-import moe.matsuri.nb4a.Protocols.getProtocolColor
-import moe.matsuri.nb4a.proxy.anytls.AnyTLSSettingsActivity
-import moe.matsuri.nb4a.proxy.config.ConfigSettingActivity
-import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSSettingsActivity
-import moe.matsuri.nb4a.ui.ConnectionTestNotification
-import moe.matsuri.nb4a.utils.Util
-import java.io.Closeable
-import java.net.URLDecoder
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.atomic.AtomicLong
-import java.util.zip.ZipInputStream
-import kotlin.collections.set
+import import android.annotation.SuppressLint
+import import android.content.Intent
+import import android.os.Bundle
+import import android.provider.OpenableColumns
+import import android.text.format.Formatter
+import import android.view.KeyEvent
+import import android.view.Menu
+import import android.view.MenuItem
+import import android.view.MotionEvent
+import import android.view.View
+import import android.widget.Toast
+import import androidx.activity.result.contract.ActivityResultContracts
+import import androidx.appcompat.app.AlertDialog
+import import androidx.appcompat.widget.PopupMenu
+import import androidx.appcompat.widget.SearchView
+import import androidx.appcompat.widget.Toolbar
+import import androidx.core.net.toUri
+import import androidx.core.view.isGone
+import import androidx.core.view.size
+import import androidx.fragment.app.Fragment
+import import androidx.preference.PreferenceDataStore
+import import androidx.recyclerview.widget.LinearLayoutManager
+import import androidx.viewpager2.adapter.FragmentStateAdapter
+import import androidx.viewpager2.widget.ViewPager2
+import import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import import com.google.android.material.tabs.TabLayout
+import import com.google.android.material.tabs.TabLayoutMediator
+import import io.nekohasekai.sagernet.GroupType
+import import io.nekohasekai.sagernet.Key
+import import io.nekohasekai.sagernet.R
+import import io.nekohasekai.sagernet.SagerNet
+import import io.nekohasekai.sagernet.SpeedTestOutcome
+import import io.nekohasekai.sagernet.aidl.TrafficData
+import import io.nekohasekai.sagernet.bg.proto.AndroidSpeedTestSession
+import import io.nekohasekai.sagernet.bg.proto.SpeedTestQueueRunner
+import import io.nekohasekai.sagernet.bg.proto.SpeedTestSnapshot
+import import io.nekohasekai.sagernet.bg.proto.UrlTest
+import import io.nekohasekai.sagernet.database.DataStore
+import import io.nekohasekai.sagernet.database.GroupManager
+import import io.nekohasekai.sagernet.database.ProfileManager
+import import io.nekohasekai.sagernet.database.ProxyEntity
+import import io.nekohasekai.sagernet.database.ProxyGroup
+import import io.nekohasekai.sagernet.database.SagerDatabase
+import import io.nekohasekai.sagernet.database.SubscriptionBean
+import import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
+import import io.nekohasekai.sagernet.databinding.LayoutGroupListBinding
+import import io.nekohasekai.sagernet.databinding.LayoutProgressListBinding
+import import io.nekohasekai.sagernet.fmt.AbstractBean
+import import io.nekohasekai.sagernet.fmt.internal.ChainBean
+import import io.nekohasekai.sagernet.group.GroupUpdater
+import import io.nekohasekai.sagernet.group.RawUpdater
+import import io.nekohasekai.sagernet.ktx.Logs
+import import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
+import import io.nekohasekai.sagernet.ktx.SubscriptionFoundException
+import import io.nekohasekai.sagernet.ktx.USER_AGENT
+import import io.nekohasekai.sagernet.ktx.onMainDispatcher
+import import io.nekohasekai.sagernet.ktx.readBytesBounded
+import import io.nekohasekai.sagernet.ktx.readTextBounded
+import import io.nekohasekai.sagernet.ktx.readableMessage
+import import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
+import import io.nekohasekai.sagernet.ktx.runOnLifecycleDispatcher
+import import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
+import import io.nekohasekai.sagernet.ktx.scrollTo
+import import io.nekohasekai.sagernet.plugin.PluginManager
+import import io.nekohasekai.sagernet.ui.profile.AmneziaWGSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.BalancerSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.ByeDPISettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.ChainSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.HttpSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.HysteriaSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.JuicitySettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.MasterDnsVpnSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.MieruSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.NaiveSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.OlcrtcSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.SSHSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.ShadowQUICSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.ShadowsocksRSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.ShadowsocksSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.SnellSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.SocksSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.TrojanGoSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.TrojanSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.TrustTunnelSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.TuicSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.VMessSettingsActivity
+import import io.nekohasekai.sagernet.ui.profile.WireGuardSettingsActivity
+import import java.io.Closeable
+import import java.net.URLDecoder
+import import java.util.concurrent.ConcurrentLinkedQueue
+import import java.util.concurrent.atomic.AtomicLong
+import import java.util.zip.ZipInputStream
+import import kotlin.collections.set
+import import kotlinx.coroutines.CancellationException
+import import kotlinx.coroutines.DelicateCoroutinesApi
+import import kotlinx.coroutines.Dispatchers
+import import kotlinx.coroutines.Job
+import import kotlinx.coroutines.isActive
+import import kotlinx.coroutines.joinAll
+import import kotlinx.coroutines.launch
+import import kotlinx.coroutines.withContext
+import import kotlinx.coroutines.withTimeoutOrNull
+import import libcore.Libcore
+import import moe.matsuri.nb4a.Protocols
+import import moe.matsuri.nb4a.proxy.anytls.AnyTLSSettingsActivity
+import import moe.matsuri.nb4a.proxy.config.ConfigSettingActivity
+import import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSSettingsActivity
+import import moe.matsuri.nb4a.ui.ConnectionTestNotification
+import import moe.matsuri.nb4a.utils.Util
 
 class ConfigurationFragment @JvmOverloads constructor(
     val select: Boolean = false,

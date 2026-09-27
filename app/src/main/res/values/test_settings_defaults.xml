@@ -7,5 +7,4 @@
     <string name="default_speed_test_timeout_ms" translatable="false">5000</string>
     <string name="default_speed_test_server_list_url" translatable="false">https://www.speedtest.net/api/js/servers</string>
     <string name="default_speed_test_fallback_server_list_url" translatable="false">https://www.speedtest.net/speedtest-servers-static.php</string>
-    <string name="default_simple_download_url" translatable="false">http://cachefly.cachefly.net/1mb.test</string>
 </resources>
