@@ -833,8 +833,6 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="preset_cn_apps">Seleccionar apps nacionales</string>
     <string name="preset_foreign_apps">Seleccionar apps internacionales</string>
     <string name="url_test_finished_summary">Prueba de URL finalizada: %1$d con éxito / %2$d fallidas</string>
-    <string name="tcp_ping_finished_summary">Prueba de TCP Ping finalizada: %1$d con éxito / %2$d fallidas</string>
-    <string name="connection_test_tcp_ping">Probar TCP Ping de este grupo</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
     <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>

@@ -275,8 +275,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="preset_applied_toast">預設分流規則已成功加入</string>
     <string name="preset_cn_apps">勾選常用國內應用</string>
     <string name="preset_foreign_apps">勾選常用海外應用</string>
-    <string name="tcp_ping_finished_summary">TCP Ping 完成：%1$d 成功 / %2$d 失敗</string>
-    <string name="connection_test_tcp_ping">TCP Ping 測試本組</string>
     <string name="speed_test_settings">速度測試</string>
     <string name="speed_test_mode">速度測試模式</string>
     <string name="speed_test_mode_download_upload">下載 + 上載</string>

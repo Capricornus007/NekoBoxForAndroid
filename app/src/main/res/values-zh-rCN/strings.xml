@@ -653,8 +653,6 @@
     <string name="preset_applied_toast">预设分流规则已成功加入</string>
     <string name="preset_cn_apps">勾选常用国内应用</string>
     <string name="preset_foreign_apps">勾选常用海外应用</string>
-    <string name="tcp_ping_finished_summary">TCP Ping 完成：%1$d 成功 / %2$d 失败</string>
-    <string name="connection_test_tcp_ping">TCP Ping 测试本组</string>
     <string name="speed_test_settings">速度测试</string>
     <string name="speed_test_mode">速度测试模式</string>
     <string name="speed_test_mode_download_upload">下载 + 上传</string>

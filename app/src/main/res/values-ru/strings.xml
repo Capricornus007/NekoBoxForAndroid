@@ -127,8 +127,6 @@
     <string name="preset_cn_apps">Выбрать местные приложения</string>
     <string name="preset_foreign_apps">Выбрать международные приложения</string>
     <string name="url_test_finished_summary">Тест URL завершён: %1$d успешно / %2$d не удалось</string>
-    <string name="tcp_ping_finished_summary">TCP Ping завершён: %1$d успешно / %2$d не удалось</string>
-    <string name="connection_test_tcp_ping">TCP Ping this group</string>
     <string name="copy">Копировать</string>
     <string name="copy_toast_msg">Ссылка скопирована в буфер обмена.</string>
     <string name="create_shortcut">Создать ярлык</string>

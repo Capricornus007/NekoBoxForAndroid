@@ -834,8 +834,6 @@
     <string name="preset_cn_apps">Вибрати місцеві застосунки</string>
     <string name="preset_foreign_apps">Вибрати міжнародні застосунки</string>
     <string name="url_test_finished_summary">Тест URL завершено: %1$d успішно / %2$d не вдалося</string>
-    <string name="tcp_ping_finished_summary">TCP Ping завершено: %1$d успішно / %2$d не вдалося</string>
-    <string name="connection_test_tcp_ping">Перевірити TCP Ping цієї групи</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
     <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
     <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>

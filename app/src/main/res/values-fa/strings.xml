@@ -313,8 +313,6 @@
     <string name="preset_cn_apps">انتخاب برنامه‌های داخلی</string>
     <string name="preset_foreign_apps">انتخاب برنامه‌های بین‌المللی</string>
     <string name="url_test_finished_summary">آزمون URL تمام شد: %1$d موفق / %2$d ناموفق</string>
-    <string name="tcp_ping_finished_summary">TCP Ping تمام شد: %1$d موفق / %2$d ناموفق</string>
-    <string name="connection_test_tcp_ping">آزمون TCP Ping این گروه</string>
     <string name="connection_test_domain_not_found">دامنه یافت نشد</string>
     <string name="connection_test_refused">اتصال رد شد</string>
     <string name="connection_test_unreachable">متصل نمی‌شود</string>
