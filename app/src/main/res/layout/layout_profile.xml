@@ -5,10 +5,10 @@
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="4dp"
+    android:layout_marginVertical="6dp"
     android:clickable="true"
     android:focusable="true"
-    android:minHeight="76dp"
+    android:minHeight="92dp"
     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
     app:cardCornerRadius="28dp"
     app:cardElevation="0dp"
@@ -23,39 +23,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:minHeight="76dp"
-            android:orientation="horizontal">
+            android:minHeight="92dp"
+            android:orientation="horizontal"
+            android:paddingEnd="6dp"
+            tools:ignore="RtlSymmetry">
 
-
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/profile_icon_container"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="10dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:strokeWidth="1dp">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/profile_icon"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@null"
-                    app:srcCompat="@drawable/ic_profile_hub"
-                    app:tint="?attr/colorPrimary" />
-            </com.google.android.material.card.MaterialCardView>
-
+            <!-- 文字欄：名稱 / 協定＋狀態 / 地址＋流量。左側那顆 40dp 圓形 hub 圖示已移除——
+                 它在 Kotlin 裡從未被引用（純裝飾），卻固定吃掉 50dp 寬度。 -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:paddingVertical="10dp">
+                android:paddingStart="20dp"
+                android:paddingVertical="12dp"
+                tools:ignore="RtlSymmetry">
 
                 <TextView
                     android:id="@+id/profile_name"
@@ -72,6 +54,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -84,16 +67,36 @@
                         tools:text="VLESS" />
 
                     <TextView
+                        android:id="@+id/profile_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:maxLines="1"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                        android:textColor="@color/ui_success"
+                        tools:text="18 ms" />
+                </LinearLayout>
+
+                <!-- 這一行由 ConfigurationGroupFragment 用「有流量或有地址才顯示」控制
+                     （它抓的是 traffic_text.parent），所以流量文字必須待在同一行裡。 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:orientation="horizontal">
+
+                    <TextView
                         android:id="@+id/profile_address"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
                         android:layout_weight="1"
+                        android:breakStrategy="simple"
                         android:ellipsize="end"
+                        android:hyphenationFrequency="none"
                         android:maxLines="1"
                         android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        tools:text="· nl-ams-01.example.com" />
+                        tools:text="nl-ams-01.example.com:8443" />
 
                     <TextView
                         android:id="@+id/traffic_text"
@@ -107,15 +110,11 @@
                         tools:text="12 MB"
                         tools:visibility="visible" />
                 </LinearLayout>
-<TextView
-                    android:id="@+id/profile_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                    android:textColor="@color/ui_success"
-                    tools:text="18 ms" />
             </LinearLayout>
+
+            <!-- 節點清單（ConfigurationGroupFragment）把這三個圖標全部隱藏，動作一律收進
+                 double_column_menu 的三點選單；但 layout 是共用的，Chain／Balancer 兩個設定頁
+                 仍直接點這三個 View，所以它們必須留在這裡。 -->
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/edit"
                 android:layout_width="48dp"

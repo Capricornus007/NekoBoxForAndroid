@@ -1,6 +1,5 @@
 package io.nekohasekai.sagernet.ui
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.format.Formatter
 import android.view.LayoutInflater
@@ -1125,10 +1124,7 @@ class ConfigurationGroupFragment : Fragment() {
 
         val trafficText: TextView = binding.trafficText
         private val card = view as MaterialCardView
-        val editButton: ImageView = binding.edit
-        val doubleColumnMenuButton: ImageView = binding.doubleColumnMenu
-        val shareButton: ImageView = binding.shareIcon
-        val removeButton: ImageView = binding.remove
+        private val menuButton: ImageView = binding.doubleColumnMenu
 
         init {
             view.setOnClickListener {
@@ -1144,10 +1140,7 @@ class ConfigurationGroupFragment : Fragment() {
                 if (profile.status == 3) alert(profile.error ?: "<?>").tryToShow()
             }
             profileStatus.isFocusable = false
-            editButton.setOnClickListener { openSettings(it, entity.id) }
-            removeButton.setOnClickListener { requestRemove(entity.id) }
-            doubleColumnMenuButton.setOnClickListener { showDoubleColumnMenu(it, entity.id) }
-            shareButton.setOnClickListener { showShareMenu(it, entity.id) }
+            menuButton.setOnClickListener { showDoubleColumnMenu(it, entity.id) }
         }
 
         fun isBoundTo(profileId: Long) = ::entity.isInitialized && entity.id == profileId
@@ -1363,31 +1356,16 @@ class ConfigurationGroupFragment : Fragment() {
             }
 
             val selectOrChain = select || proxyEntity.type == ProxyEntity.TYPE_CHAIN
-            val isDoubleColumn = DataStore.groupLayoutMode == 1
-
-            if (isDoubleColumn) {
-                editButton.isGone = true
-                shareButton.isGone = true
-                removeButton.isGone = true
-                doubleColumnMenuButton.isVisible = true
-            } else {
-                shareButton.isGone = selectOrChain
-                editButton.isGone = select
-                removeButton.isGone = select
-                doubleColumnMenuButton.isGone = true
-            }
+            # 動作一律收進三點菜單（double_column_item_menu 裡本來就有編輯／分享／刪除三項），
+            # 這三個圖標在節點清單恆隱藏，把寬度還給名稱與地址；選取／鏈模式沒有可做的動作，
+            # 連三點按鈕也不顯示（與原本行為一致）。
+            binding.edit.isGone = true
+            binding.shareIcon.isGone = true
+            binding.remove.isGone = true
+            menuButton.isVisible = !selectOrChain
 
             val selected = pf.isSelectedProfile(proxyEntity.id)
-            val running = pf.isRunningProfile(proxyEntity.id)
-            editButton.isEnabled = !running
-            removeButton.isEnabled = !running
             applySelected(selected)
-
-            if (!(select || proxyEntity.type == ProxyEntity.TYPE_CHAIN)) {
-                shareButton.setImageResource(R.drawable.ic_social_share)
-                shareButton.setColorFilter(Color.GRAY)
-                shareButton.isVisible = true
-            }
         }
 
         private fun speedTestResultText(proxyEntity: ProxyEntity): String? {
