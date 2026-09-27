@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -42,7 +41,6 @@ import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.ThemedActivity
 import io.nekohasekai.sagernet.widget.ListListener
-import kotlinx.parcelize.Parcelize
 import kotlin.properties.Delegates
 
 @Suppress("UNCHECKED_CAST")
@@ -62,21 +60,6 @@ abstract class ProfileSettingsActivity<T : AbstractBean>(
                 requireActivity().finish()
             }
             setNeutralButton(android.R.string.cancel, null)
-        }
-    }
-
-    @Parcelize
-    data class ProfileIdArg(val profileId: Long, val groupId: Long) : Parcelable
-    class DeleteConfirmationDialogFragment : AlertDialogFragment<ProfileIdArg, Empty>() {
-        override fun AlertDialog.Builder.prepare(listener: DialogInterface.OnClickListener) {
-            setTitle(R.string.delete_confirm_prompt)
-            setPositiveButton(R.string.yes) { _, _ ->
-                runOnDefaultDispatcher {
-                    ProfileManager.deleteProfile(arg.groupId, arg.profileId)
-                }
-                requireActivity().finish()
-            }
-            setNegativeButton(R.string.no, null)
         }
     }
 
@@ -264,23 +247,6 @@ abstract class ProfileSettingsActivity<T : AbstractBean>(
 
         @SuppressLint("CheckResult")
         override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-            R.id.action_delete -> {
-                if (DataStore.editingId == 0L) {
-                    requireActivity().finish()
-                } else {
-                    DeleteConfirmationDialogFragment().apply {
-                        arg(
-                            ProfileIdArg(
-                                DataStore.editingId,
-                                DataStore.editingGroup,
-                            ),
-                        )
-                        key()
-                    }.show(parentFragmentManager, null)
-                }
-                true
-            }
-
             R.id.action_apply -> {
                 runOnDefaultDispatcher {
                     activity?.saveAndExit()
