@@ -313,6 +313,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="connection_test">Verbindingstest</string>
     <string name="connection_test_clear_results">Testresultaten wissen</string>
     <string name="connection_test_domain_not_found">Domein niet gevonden</string>
+    <string name="connection_test_dns_error">DNS-zoekopsporing mislukt</string>
     <string name="connection_test_refused">Verbinding geweigerd</string>
     <string name="connection_test_unreachable">Onbereikbaar</string>
     <string name="connection_test_timeout_error">Time-out</string>

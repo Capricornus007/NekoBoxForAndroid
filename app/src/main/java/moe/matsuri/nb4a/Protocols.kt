@@ -49,6 +49,15 @@ object Protocols {
     fun genFriendlyMsg(msg: String): String {
         val msgL = msg.lowercase()
         return when {
+            // Must be checked before the timeout branch: a dead resolver surfaces as
+            // "lookup <node host>: context deadline exceeded", which would otherwise be
+            // reported as a plain timeout and read as "this node is slow/down" when in
+            // fact every node in the group fails for the same DNS reason.
+            msgL.contains("lookup ") || msgL.contains("unable to resolve host") ||
+                msgL.contains("no address associated") -> {
+                app.getString(R.string.connection_test_dns_error)
+            }
+
             msgL.contains("timeout") || msgL.contains("deadline") -> {
                 app.getString(R.string.connection_test_timeout_error)
             }

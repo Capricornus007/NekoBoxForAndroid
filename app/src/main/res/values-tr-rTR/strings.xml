@@ -302,6 +302,7 @@
     <string name="connection_test">Bağlantı testi</string>
     <string name="connection_test_clear_results">Test sonuçlarını temizle</string>
     <string name="connection_test_domain_not_found">Alan adı bulunamadı</string>
+    <string name="connection_test_dns_error">DNS araması başarısız</string>
     <string name="connection_test_refused">Bağlantı reddedildi</string>
     <string name="connection_test_unreachable">Ulaşılamaz</string>
     <string name="connection_test_timeout_error">Zaman aşımı</string>

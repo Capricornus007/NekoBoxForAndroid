@@ -315,6 +315,7 @@
     <string name="connection_test">اختبار الاتصال</string>
     <string name="connection_test_clear_results">مسح نتائج الاختبار</string>
     <string name="connection_test_domain_not_found">النطاق غير موجود</string>
+    <string name="connection_test_dns_error">فشل البحث في DNS</string>
     <string name="connection_test_refused">تم رفض الاتصال</string>
     <string name="connection_test_unreachable">غير قابل للوصول</string>
     <string name="connection_test_timeout_error">مهلة</string>

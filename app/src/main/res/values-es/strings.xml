@@ -481,6 +481,7 @@
     <string name="preset_foreign_apps">Seleccionar apps internacionales</string>
     <string name="url_test_finished_summary">Prueba de URL finalizada: %1$d con éxito / %2$d fallidas</string>
     <string name="connection_test_domain_not_found">Dominio no encontrado</string>
+    <string name="connection_test_dns_error">Error de búsqueda de DNS</string>
  
     <string name="connection_test_refused">Conexión denegada</string>
  

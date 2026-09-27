@@ -108,6 +108,7 @@
     <string name="connection_test_clear_results">Очистить результаты теста</string>
     <string name="connection_test_delete_unavailable">Удалить недоступные</string>
     <string name="connection_test_domain_not_found">Домен не найден</string>
+    <string name="connection_test_dns_error">Сбой запроса DNS</string>
     <string name="connection_test_error">Ошибка: %s</string>
     <string name="connection_test_refused">В соединении отказано</string>
     <string name="connection_test_testing">Тестирование…</string>

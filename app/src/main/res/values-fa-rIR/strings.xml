@@ -309,6 +309,7 @@
     <string name="connection_test">تست اتصال</string>
     <string name="connection_test_clear_results">پاک کردن نتایج تست</string>
     <string name="connection_test_domain_not_found">دامنه پیدا نشد</string>
+    <string name="connection_test_dns_error">خطا در جست‌وجوی DNS</string>
     <string name="connection_test_refused">اتصال رد شد</string>
     <string name="connection_test_unreachable">غیرقابل دسترسی</string>
     <string name="connection_test_timeout_error">زمان‌گیری</string>

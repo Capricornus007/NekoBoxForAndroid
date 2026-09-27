@@ -372,6 +372,7 @@
     <string name="preset_foreign_apps">Вибрати міжнародні застосунки</string>
     <string name="url_test_finished_summary">Тест URL завершено: %1$d успішно / %2$d не вдалося</string>
     <string name="connection_test_domain_not_found">Домен не знайдено</string>
+    <string name="connection_test_dns_error">Помилка DNS-запиту</string>
     <string name="connection_test_refused">З\'єднання відхилено</string>
     <string name="connection_test_unreachable">Недоступний</string>
     <string name="connection_test_timeout_error">Тайм-аут</string>

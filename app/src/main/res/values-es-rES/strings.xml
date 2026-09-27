@@ -310,6 +310,7 @@
     <string name="connection_test">Prueba de conexión</string>
     <string name="connection_test_clear_results">Borrar resultados de prueba</string>
     <string name="connection_test_domain_not_found">Dominio no encontrado</string>
+    <string name="connection_test_dns_error">Error de búsqueda de DNS</string>
     <string name="connection_test_refused">Conexión rechazada</string>
     <string name="connection_test_unreachable">Inalcanzable</string>
     <string name="connection_test_timeout_error">Tiempo de espera agotado</string>

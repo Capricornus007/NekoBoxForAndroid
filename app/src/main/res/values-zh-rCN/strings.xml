@@ -303,6 +303,7 @@
     <string name="connection_test">连接测试</string>
     <string name="connection_test_clear_results">清理测试结果</string>
     <string name="connection_test_domain_not_found">域名不存在</string>
+    <string name="connection_test_dns_error">域名解析失败</string>
     <string name="connection_test_refused">连接重置</string>
     <string name="connection_test_unreachable">不可达</string>
     <string name="connection_test_timeout_error">超时</string>

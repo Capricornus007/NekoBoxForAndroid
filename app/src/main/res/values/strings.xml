@@ -404,6 +404,7 @@
     <string name="preset_cn_apps">Select domestic apps</string>
     <string name="preset_foreign_apps">Select overseas apps</string>
     <string name="connection_test_domain_not_found">Domain not found</string>
+    <string name="connection_test_dns_error">DNS lookup failed</string>
     <string name="connection_test_refused">Connection refused</string>
     <string name="connection_test_unreachable">Unreachable</string>
     <string name="connection_test_timeout_error">Timeout</string>

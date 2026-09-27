@@ -359,6 +359,7 @@
     <string name="connection_test">Test de connexion</string>
     <string name="connection_test_clear_results">Effacer les résultats du test</string>
     <string name="connection_test_domain_not_found">Domaine non trouvé</string>
+    <string name="connection_test_dns_error">Échec de la résolution DNS</string>
     <string name="connection_test_refused">Connexion refusée</string>
     <string name="connection_test_unreachable">Inaccessible</string>
     <string name="connection_test_timeout_error">Délai d\'attente</string>

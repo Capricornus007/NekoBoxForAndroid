@@ -349,6 +349,7 @@
     <string name="connection_test">Tilkoblingstest</string>
     <string name="connection_test_clear_results">Nullstill testresultater</string>
     <string name="connection_test_domain_not_found">Domene ikke funnet</string>
+    <string name="connection_test_dns_error">DNS-oppslag mislyktes</string>
     <string name="connection_test_refused">Tilkobling avvist</string>
     <string name="connection_test_unreachable">Utilgjengelig</string>
     <string name="connection_test_timeout_error">Tidsavbrudd</string>

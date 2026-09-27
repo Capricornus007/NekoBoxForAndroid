@@ -314,6 +314,7 @@
     <string name="preset_foreign_apps">انتخاب برنامه‌های بین‌المللی</string>
     <string name="url_test_finished_summary">آزمون URL تمام شد: %1$d موفق / %2$d ناموفق</string>
     <string name="connection_test_domain_not_found">دامنه یافت نشد</string>
+    <string name="connection_test_dns_error">خطا در جست‌وجوی DNS</string>
     <string name="connection_test_refused">اتصال رد شد</string>
     <string name="connection_test_unreachable">متصل نمی‌شود</string>
     <string name="connection_test_timeout_error">بدون پاسخ</string>

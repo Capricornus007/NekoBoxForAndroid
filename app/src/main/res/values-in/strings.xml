@@ -329,6 +329,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="connection_test">Tes koneksi</string>
     <string name="connection_test_clear_results">Hapus hasil tes</string>
     <string name="connection_test_domain_not_found">Domain tidak ditemukan</string>
+    <string name="connection_test_dns_error">Pencarian DNS gagal</string>
     <string name="connection_test_refused">Koneksi ditolak</string>
     <string name="connection_test_unreachable">Tidak dapat dijangkau</string>
     <string name="connection_test_timeout_error">Timeout</string>

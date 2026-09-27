@@ -312,6 +312,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="connection_test">Test connessione</string>
     <string name="connection_test_clear_results">Cancella risultati test</string>
     <string name="connection_test_domain_not_found">Dominio non trovato</string>
+    <string name="connection_test_dns_error">Ricerca DNS non riuscita</string>
     <string name="connection_test_refused">Connessione rifiutata</string>
     <string name="connection_test_unreachable">Irraggiungibile</string>
     <string name="connection_test_timeout_error">Timeout</string>

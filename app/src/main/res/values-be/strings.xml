@@ -169,6 +169,7 @@
     <string name="vpn_connected">Падключана, нажмите для проверки подключения</string>
     <string name="follow_system">Выкарыстоўваць сістэмную тэму</string>
     <string name="connection_test_domain_not_found">Дамен не найден</string>
+    <string name="connection_test_dns_error">Памылка DNS-запыту</string>
     <string name="mixed_auth_no_auth">Не зададзена (без аутентификации)</string>
     <string name="wireguard_listen_port">Порт праслухоўвання</string>
     <string name="tools_network">Сетка</string>

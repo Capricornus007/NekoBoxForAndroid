@@ -406,6 +406,7 @@
     <string name="connection_test">Verbindungstest</string>
     <string name="connection_test_clear_results">Testergebnisse löschen</string>
     <string name="connection_test_domain_not_found">Domain nicht gefunden</string>
+    <string name="connection_test_dns_error">DNS-Suche fehlgeschlagen</string>
     <string name="connection_test_refused">Verbindung abgelehnt</string>
     <string name="connection_test_unreachable">Nicht erreichbar</string>
     <string name="connection_test_timeout_error">Zeitüberschreitung</string>

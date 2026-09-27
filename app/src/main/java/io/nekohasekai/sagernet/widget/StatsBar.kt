@@ -26,6 +26,7 @@ import io.nekohasekai.sagernet.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import moe.matsuri.nb4a.Protocols
 
 class StatsBar @JvmOverloads constructor(
     context: Context,
@@ -306,7 +307,7 @@ class StatsBar @JvmOverloads constructor(
                     activity.snackbar(
                         app.getString(
                             R.string.connection_test_error,
-                            e.readableMessage,
+                            Protocols.genFriendlyMsg(e.readableMessage),
                         ),
                     ).show()
                 }

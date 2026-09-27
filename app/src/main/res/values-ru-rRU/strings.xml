@@ -314,6 +314,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="connection_test">Тест подключения</string>
     <string name="connection_test_clear_results">Очистить результаты теста</string>
     <string name="connection_test_domain_not_found">Домен не найден</string>
+    <string name="connection_test_dns_error">Сбой запроса DNS</string>
     <string name="connection_test_refused">Соединение отклонено</string>
     <string name="connection_test_unreachable">Недоступен</string>
     <string name="connection_test_timeout_error">Тайм-аут</string>

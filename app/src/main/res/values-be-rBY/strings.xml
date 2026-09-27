@@ -308,6 +308,7 @@
     <string name="connection_test">Тэст злучэння</string>
     <string name="connection_test_clear_results">Ачысціць вынікі тэсту</string>
     <string name="connection_test_domain_not_found">Дамен не знойдзены</string>
+    <string name="connection_test_dns_error">Памылка DNS-запыту</string>
     <string name="connection_test_refused">Злучэнне адхілена</string>
     <string name="connection_test_unreachable">Недаступны</string>
     <string name="connection_test_timeout_error">Час чакання выйшаў</string>
