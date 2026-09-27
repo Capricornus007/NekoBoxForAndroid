@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.bg.proto
 
 import io.nekohasekai.sagernet.BuildConfig
+import io.nekohasekai.sagernet.SpeedTestSettings
 import io.nekohasekai.sagernet.bg.GuardedProcessPool
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
