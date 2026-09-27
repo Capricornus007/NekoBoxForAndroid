@@ -12,7 +12,7 @@
 - [x] 2.1 补齐 `values-zh-rCN`、`values-zh-rTW`、`values-zh-rHK` 的全部缺失 `<string>` 与 `<plurals>`（保留既有译文，仅补缺与修复占位符不匹配项），并为三地新建 `arrays.xml` 翻译 49 个可翻译数组；验证方式为 `uv run tools/diagnostics/i18n_coverage.py` 中三地缺失/多余/占位符不匹配均为 0
 - [x] 2.2 本地静态校验：对三地全部 `strings.xml`、`arrays.xml` 执行 XML 良构解析（由诊断脚本内置完成），确认无解析错误、无 `translatable="false"` 条目泄漏、无重复 `name`
 - [x] 2.3 提交本批次（6 个文件：3 个 `strings.xml` 修改 + 3 个 `arrays.xml` 新增；另按用户批准包含诊断脚本 `i18n_coverage.py` 按条目类型判定的缺陷修复与 delta spec 对应措辞修正），确认 diff 不含基准与代码改动
-- [ ] 2.4 CI/真机验证：推送触发 `preview.yml` 预览构建，预期 `processDebugResources` 与 lint 通过；真机场景为系统语言分别切换简体中文、繁体中文（台湾/香港），抽查设置页、配置列表、测试面板文案无英文回退；回传证据为 workflow 成功链接 + 三地界面截图
+- [x] 2.4 CI/真机验证：推送触发 `preview.yml` 预览构建，预期 `processDebugResources` 与 lint 通过；真机场景为系统语言分别切换简体中文、繁体中文（台湾/香港），抽查设置页、配置列表、测试面板文案无英文回退；回传证据为 workflow 成功链接 + 三地界面截图
 
 ## 3. 批次 3：日韩俄乌补齐（ja / ko / ru / uk）
 
