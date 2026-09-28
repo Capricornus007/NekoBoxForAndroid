@@ -411,3 +411,74 @@ func TestConsistentHashSubnetMasking(t *testing.T) {
 		t.Fatalf("expected IPv6 in same /48 to map to same node, got %d and %d", ipv6A[0], ipv6B[0])
 	}
 }
+
+func TestStickySession(t *testing.T) {
+	tags := []string{"node-0", "node-1", "node-2"}
+	n := len(tags)
+	lb := &LoadBalance{
+		tags:           tags,
+		stats:          make([]*nodeStats, n),
+		strategy:       "leastPing",
+		outbounds:      make([]adapter.Outbound, n),
+		stickySessions: make(map[string]stickyEntry),
+	}
+	for i := 0; i < n; i++ {
+		lb.stats[i] = new(nodeStats)
+	}
+
+	// Node 1 has lowest latency (30ms), Node 0 has 50ms, Node 2 has 100ms
+	lb.stats[0].latencyEmaMs.Store(50)
+	lb.stats[1].latencyEmaMs.Store(30)
+	lb.stats[2].latencyEmaMs.Store(100)
+
+	// Default selection without sticky session -> node 1 is first
+	cands := lb.candidateIndices(nil, M.Socksaddr{Fqdn: "youtube.com"})
+	if cands[0] != 1 {
+		t.Fatalf("expected node 1 to be first, got %d", cands[0])
+	}
+
+	// Set sticky session to node 0 for youtube.com
+	lb.setStickySession("youtube.com", 0)
+
+	// With sticky session active, node 0 must be promoted to index 0
+	stickyCands := lb.candidateIndices(nil, M.Socksaddr{Fqdn: "youtube.com"})
+	if stickyCands[0] != 0 {
+		t.Fatalf("expected sticky node 0 to be promoted to first, got %d", stickyCands[0])
+	}
+
+	// Subdomain of same root domain (video.youtube.com) should also stick to node 0
+	subCands := lb.candidateIndices(nil, M.Socksaddr{Fqdn: "video.youtube.com"})
+	if subCands[0] != 0 {
+		t.Fatalf("expected subdomain video.youtube.com to stick to node 0, got %d", subCands[0])
+	}
+
+	// If node 0 degrades, sticky session should yield to healthy node 1
+	lb.stats[0].consecutiveFails.Store(2)
+	lb.stats[0].lastFailTime.Store(time.Now().UnixMilli())
+
+	fallbackCands := lb.candidateIndices(nil, M.Socksaddr{Fqdn: "youtube.com"})
+	if fallbackCands[0] != 1 {
+		t.Fatalf("expected degraded sticky node 0 to yield to healthy node 1, got %d", fallbackCands[0])
+	}
+}
+
+func TestTrackedConnZeroCopy(t *testing.T) {
+	tc := &trackedConn{}
+	if !tc.ReaderReplaceable() {
+		t.Fatal("trackedConn must be ReaderReplaceable for kernel zero-copy splice")
+	}
+	if !tc.WriterReplaceable() {
+		t.Fatal("trackedConn must be WriterReplaceable for kernel zero-copy splice")
+	}
+	if tc.Upstream() != nil {
+		// nil Conn returns nil
+	}
+
+	tpc := &trackedPacketConn{}
+	if !tpc.ReaderReplaceable() {
+		t.Fatal("trackedPacketConn must be ReaderReplaceable")
+	}
+	if !tpc.WriterReplaceable() {
+		t.Fatal("trackedPacketConn must be WriterReplaceable")
+	}
+}

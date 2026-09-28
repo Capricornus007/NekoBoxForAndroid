@@ -13,6 +13,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	urltestPkg "libcore/protocol/urltest"
@@ -60,10 +61,14 @@ type nodeStats struct {
 	latencyEmaMs     atomic.Int64
 }
 
-func (s *nodeStats) recordSuccess(latencyMs int64) {
+func (s *nodeStats) recordDialSuccess() {
 	s.consecutiveFails.Store(0)
 	s.totalDials.Add(1)
 	s.successDials.Add(1)
+}
+
+func (s *nodeStats) recordSuccess(latencyMs int64) {
+	s.recordDialSuccess()
 	if latencyMs > 0 {
 		old := s.latencyEmaMs.Load()
 		if old <= 0 {
@@ -202,6 +207,8 @@ type LoadBalance struct {
 	lastActive                   common.TypedValue[time.Time]
 	checking                     atomic.Bool
 	access                       sync.Mutex
+	stickyMu                     sync.RWMutex
+	stickySessions               map[string]stickyEntry
 }
 
 func NewLoadBalance(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options LoadBalanceOptions) (adapter.Outbound, error) {
@@ -233,6 +240,7 @@ func NewLoadBalance(ctx context.Context, router adapter.Router, logger log.Conte
 		idleTimeout:                  idleTimeout,
 		interruptExternalConnections: options.InterruptExistConnections,
 		interruptGroup:               interrupt.NewGroup(),
+		stickySessions:               make(map[string]stickyEntry),
 		close:                        make(chan struct{}),
 	}
 	if len(lb.tags) == 0 {
@@ -428,7 +436,12 @@ func extractRootDomain(fqdn string) string {
 	return parts[n-2] + "." + parts[n-1]
 }
 
-func hashDestination(ctx context.Context, dest M.Socksaddr) uint32 {
+type stickyEntry struct {
+	nodeIdx  int
+	expireAt int64 // UnixMilli
+}
+
+func destinationKey(ctx context.Context, dest M.Socksaddr) string {
 	var domain string
 	if dest.Fqdn != "" {
 		domain = dest.Fqdn
@@ -440,28 +453,83 @@ func hashDestination(ctx context.Context, dest M.Socksaddr) uint32 {
 	if domain != "" {
 		root := extractRootDomain(domain)
 		if root != "" {
-			return hash32(root)
+			return root
 		}
-		return hash32(strings.ToLower(domain))
+		return strings.ToLower(domain)
 	}
 	if dest.IsIP() {
 		addr := dest.Addr
 		if addr.Is4() {
 			b := addr.As4()
-			key := net.IPv4(b[0], b[1], b[2], 0).String() + "/24"
-			return hash32(key)
+			return net.IPv4(b[0], b[1], b[2], 0).String() + "/24"
 		} else if addr.Is6() {
 			b := addr.As16()
-			key := net.IP{b[0], b[1], b[2], b[3], b[4], b[5], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}.String() + "/48"
-			return hash32(key)
+			return net.IP{b[0], b[1], b[2], b[3], b[4], b[5], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}.String() + "/48"
 		}
-		return hash32(addr.String())
+		return addr.String()
 	}
 	s := dest.String()
 	if s != "" && s != "0.0.0.0:0" && s != "[::]:0" {
-		return hash32(s)
+		return s
+	}
+	return ""
+}
+
+func hashDestination(ctx context.Context, dest M.Socksaddr) uint32 {
+	key := destinationKey(ctx, dest)
+	if key != "" {
+		return hash32(key)
 	}
 	return 0
+}
+
+func (s *LoadBalance) getStickySession(key string, now int64) (int, bool) {
+	s.stickyMu.RLock()
+	defer s.stickyMu.RUnlock()
+	if s.stickySessions == nil {
+		return 0, false
+	}
+	entry, ok := s.stickySessions[key]
+	if !ok || now > entry.expireAt {
+		return 0, false
+	}
+	if entry.nodeIdx < 0 || entry.nodeIdx >= len(s.outbounds) {
+		return 0, false
+	}
+	return entry.nodeIdx, true
+}
+
+func (s *LoadBalance) setStickySession(key string, nodeIdx int) {
+	if key == "" || nodeIdx < 0 || nodeIdx >= len(s.outbounds) {
+		return
+	}
+	now := time.Now().UnixMilli()
+	s.stickyMu.Lock()
+	defer s.stickyMu.Unlock()
+	if s.stickySessions == nil {
+		s.stickySessions = make(map[string]stickyEntry)
+	}
+	if len(s.stickySessions) > 1024 {
+		for k, v := range s.stickySessions {
+			if now > v.expireAt {
+				delete(s.stickySessions, k)
+			}
+		}
+		if len(s.stickySessions) > 1024 {
+			count := 0
+			for k := range s.stickySessions {
+				delete(s.stickySessions, k)
+				count++
+				if count > 512 {
+					break
+				}
+			}
+		}
+	}
+	s.stickySessions[key] = stickyEntry{
+		nodeIdx:  nodeIdx,
+		expireAt: now + 5*60*1000,
+	}
 }
 
 func (s *LoadBalance) isNodeDegraded(idx int, now int64) bool {
@@ -487,6 +555,7 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 	}
 	now := time.Now().UnixMilli()
 
+	var result []int
 	switch s.strategy {
 	case "failover":
 		healthy := make([]int, 0, n)
@@ -499,9 +568,10 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 			}
 		}
 		if len(healthy) == 0 {
-			return indices
+			result = indices
+		} else {
+			result = append(healthy, degraded...)
 		}
-		return append(healthy, degraded...)
 
 	case "stable":
 		scores := make([]int64, n)
@@ -532,7 +602,9 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 			}
 			scores[i] = (successRate * 10) - failPenalty - (latency / 5)
 		}
-		slices.SortStableFunc(indices, func(a, b int) int {
+		res := make([]int, n)
+		copy(res, indices)
+		slices.SortStableFunc(res, func(a, b int) int {
 			sa := scores[a]
 			sb := scores[b]
 			if sa > sb {
@@ -542,7 +614,7 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 			}
 			return 0
 		})
-		return indices
+		result = res
 
 	case "leastPing", "least_ping":
 		healthy := make([]int, 0, n)
@@ -592,7 +664,7 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 			}
 			return 0
 		})
-		return append(healthy, degraded...)
+		result = append(healthy, degraded...)
 
 	case "leastLoad", "least_load":
 		healthy := make([]int, 0, n)
@@ -629,7 +701,7 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 			}
 			return 0
 		})
-		return append(rotated, degraded...)
+		result = append(rotated, degraded...)
 
 	case "consistent_hash", "consistentHash":
 		if s.ring == nil && len(s.tags) > 0 {
@@ -649,11 +721,12 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 			if h == 0 {
 				h = uint32(atomic.AddUint64(&s.counter, 1))
 			}
-			return s.ring.getCandidates(h, n, func(idx int) bool {
+			result = s.ring.getCandidates(h, n, func(idx int) bool {
 				return s.isNodeDegraded(idx, now)
 			})
+		} else {
+			result = indices
 		}
-		return indices
 
 	case "random":
 		healthy := make([]int, 0, n)
@@ -675,7 +748,7 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 		for i := 0; i < hn; i++ {
 			rotated[i] = healthy[(start+i)%hn]
 		}
-		return append(rotated, degraded...)
+		result = append(rotated, degraded...)
 
 	case "round_robin", "roundRobin":
 		fallthrough
@@ -699,8 +772,24 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 		for i := 0; i < hn; i++ {
 			rotated[i] = healthy[(start+i)%hn]
 		}
-		return append(rotated, degraded...)
+		result = append(rotated, degraded...)
 	}
+
+	destKey := destinationKey(ctx, dest)
+	if destKey != "" && len(result) > 1 {
+		if stickyIdx, ok := s.getStickySession(destKey, now); ok {
+			for i, idx := range result {
+				if idx == stickyIdx && !s.isNodeDegraded(idx, now) {
+					if i > 0 {
+						copy(result[1:i+1], result[0:i])
+						result[0] = stickyIdx
+					}
+					break
+				}
+			}
+		}
+	}
+	return result
 }
 
 type trackedConn struct {
@@ -718,6 +807,26 @@ func (c *trackedConn) Close() error {
 	return c.Conn.Close()
 }
 
+func (c *trackedConn) ReaderReplaceable() bool {
+	return true
+}
+
+func (c *trackedConn) WriterReplaceable() bool {
+	return true
+}
+
+func (c *trackedConn) Upstream() any {
+	return c.Conn
+}
+
+func (c *trackedConn) SyscallConn() (syscall.RawConn, error) {
+	syscallConn, isSyscallConn := c.Conn.(syscall.Conn)
+	if !isSyscallConn {
+		return nil, syscall.EINVAL
+	}
+	return syscallConn.SyscallConn()
+}
+
 func (s *LoadBalance) DialContext(ctx context.Context, network string, destination M.Socksaddr) (net.Conn, error) {
 	s.Touch()
 	indices := s.candidateIndices(ctx, destination)
@@ -732,23 +841,24 @@ func (s *LoadBalance) DialContext(ctx context.Context, network string, destinati
 			conn net.Conn
 			err  error
 		)
-		start := time.Now()
 		if i < n-1 {
-			timeout := 5 * time.Second
+			timeout := 3 * time.Second
 			if s.isLeastPing() {
-				timeout = 2000 * time.Millisecond
+				timeout = 1200 * time.Millisecond
 				if idx < len(s.stats) && s.stats[idx] != nil {
-					ema := s.stats[idx].latencyEmaMs.Load()
 					if s.stats[idx].consecutiveFails.Load() > 0 {
-						timeout = 1000 * time.Millisecond
-					} else if ema > 0 {
-						dynamic := time.Duration(ema*3) * time.Millisecond
-						if dynamic < 800*time.Millisecond {
-							timeout = 800 * time.Millisecond
-						} else if dynamic > 2000*time.Millisecond {
-							timeout = 2000 * time.Millisecond
-						} else {
-							timeout = dynamic
+						timeout = 600 * time.Millisecond
+					} else {
+						ema := s.stats[idx].latencyEmaMs.Load()
+						if ema > 0 {
+							dynamic := time.Duration(ema*3) * time.Millisecond
+							if dynamic < 600*time.Millisecond {
+								timeout = 600 * time.Millisecond
+							} else if dynamic > 1200*time.Millisecond {
+								timeout = 1200 * time.Millisecond
+							} else {
+								timeout = dynamic
+							}
 						}
 					}
 				}
@@ -760,9 +870,12 @@ func (s *LoadBalance) DialContext(ctx context.Context, network string, destinati
 			conn, err = candidate.DialContext(ctx, network, destination)
 		}
 		if err == nil {
-			elapsed := time.Since(start).Milliseconds()
 			if idx < len(s.stats) && s.stats[idx] != nil {
-				s.stats[idx].recordSuccess(elapsed)
+				s.stats[idx].recordDialSuccess()
+			}
+			destKey := destinationKey(ctx, destination)
+			if destKey != "" {
+				s.setStickySession(destKey, idx)
 			}
 			if (s.strategy == "leastLoad" || s.strategy == "least_load") && idx < len(s.activeConns) && s.activeConns[idx] != nil {
 				s.activeConns[idx].Add(1)
@@ -798,6 +911,26 @@ func (c *trackedPacketConn) Close() error {
 	return c.PacketConn.Close()
 }
 
+func (c *trackedPacketConn) ReaderReplaceable() bool {
+	return true
+}
+
+func (c *trackedPacketConn) WriterReplaceable() bool {
+	return true
+}
+
+func (c *trackedPacketConn) Upstream() any {
+	return c.PacketConn
+}
+
+func (c *trackedPacketConn) SyscallConn() (syscall.RawConn, error) {
+	syscallConn, isSyscallConn := c.PacketConn.(syscall.Conn)
+	if !isSyscallConn {
+		return nil, syscall.EINVAL
+	}
+	return syscallConn.SyscallConn()
+}
+
 func (s *LoadBalance) ListenPacket(ctx context.Context, destination M.Socksaddr) (net.PacketConn, error) {
 	s.Touch()
 	indices := s.candidateIndices(ctx, destination)
@@ -812,23 +945,24 @@ func (s *LoadBalance) ListenPacket(ctx context.Context, destination M.Socksaddr)
 			conn net.PacketConn
 			err  error
 		)
-		start := time.Now()
 		if i < n-1 {
-			timeout := 5 * time.Second
+			timeout := 3 * time.Second
 			if s.isLeastPing() {
-				timeout = 2000 * time.Millisecond
+				timeout = 1200 * time.Millisecond
 				if idx < len(s.stats) && s.stats[idx] != nil {
-					ema := s.stats[idx].latencyEmaMs.Load()
 					if s.stats[idx].consecutiveFails.Load() > 0 {
-						timeout = 1000 * time.Millisecond
-					} else if ema > 0 {
-						dynamic := time.Duration(ema*3) * time.Millisecond
-						if dynamic < 800*time.Millisecond {
-							timeout = 800 * time.Millisecond
-						} else if dynamic > 2000*time.Millisecond {
-							timeout = 2000 * time.Millisecond
-						} else {
-							timeout = dynamic
+						timeout = 600 * time.Millisecond
+					} else {
+						ema := s.stats[idx].latencyEmaMs.Load()
+						if ema > 0 {
+							dynamic := time.Duration(ema*3) * time.Millisecond
+							if dynamic < 600*time.Millisecond {
+								timeout = 600 * time.Millisecond
+							} else if dynamic > 1200*time.Millisecond {
+								timeout = 1200 * time.Millisecond
+							} else {
+								timeout = dynamic
+							}
 						}
 					}
 				}
@@ -840,9 +974,12 @@ func (s *LoadBalance) ListenPacket(ctx context.Context, destination M.Socksaddr)
 			conn, err = candidate.ListenPacket(ctx, destination)
 		}
 		if err == nil {
-			elapsed := time.Since(start).Milliseconds()
 			if idx < len(s.stats) && s.stats[idx] != nil {
-				s.stats[idx].recordSuccess(elapsed)
+				s.stats[idx].recordDialSuccess()
+			}
+			destKey := destinationKey(ctx, destination)
+			if destKey != "" {
+				s.setStickySession(destKey, idx)
 			}
 			if (s.strategy == "leastLoad" || s.strategy == "least_load") && idx < len(s.activeConns) && s.activeConns[idx] != nil {
 				s.activeConns[idx].Add(1)

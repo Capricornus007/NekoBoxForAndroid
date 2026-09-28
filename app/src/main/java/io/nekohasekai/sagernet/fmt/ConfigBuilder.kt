@@ -745,10 +745,10 @@ fun buildConfig(
                 tag = "tun-in"
                 interface_name = "tun0"
                 stack = when (DataStore.tunImplementation) {
-                    TunImplementation.GVISOR -> "gvisor"
+                    TunImplementation.GVISOR -> null // sing-box 1.15 移除 gVisor，平滑兼容为官方最新原生 Go 高性能栈
                     TunImplementation.SYSTEM -> "system"
                     TunImplementation.MIXED -> "mixed"
-                    TunImplementation.SING_TUN -> null
+                    TunImplementation.SING_TUN -> null // 官方最新自研原生 Go 栈（推荐，默认最高性能）
                     else -> null
                 }
                 mtu = DataStore.mtu
