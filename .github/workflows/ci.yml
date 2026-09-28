@@ -26,6 +26,8 @@ jobs:
         run: bash ./scripts/check-lint-baseline.sh
       - name: Guard - release publication requires explicit opt-in
         run: bash scripts/check-release-publish-gate.sh --self-test
+      - name: Guard - core pins must agree with sing-box go.mod
+        run: bash ./scripts/check-core-pins.sh
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
