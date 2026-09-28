@@ -155,13 +155,13 @@ replace github.com/amnezia-vpn/amneziawg-go/v3 => github.com/Capricornus007/amne
 
 replace github.com/sagernet/sing-box => ../../sing-box
 
-replace github.com/sagernet/sing-vmess => github.com/Capricornus007/sing-vmess v0.2.9-0.20260902104811-b3e975d5372a
+replace github.com/sagernet/sing-vmess => github.com/Capricornus007/sing-vmess v0.2.9-0.20260925134622-eb38beec5e11
 
 // sing-juicity was renamed dyhkwong -> exclavenetwork at v0.1.x; the import path
 // in libcore stays dyhkwong. v0.1.4 targets quic-go v0.59 / sing v0.8 / sing-quic v0.6.1.
 replace github.com/dyhkwong/sing-juicity => github.com/exclavenetwork/sing-juicity v0.1.4
 
-replace github.com/sagernet/sing-snell => github.com/Capricornus007/sing-snell v0.0.0-20260920030852-2c97c522fbc2
+replace github.com/sagernet/sing-snell => github.com/Capricornus007/sing-snell v0.0.0-20260928042222-723b01c971dd
 
 replace github.com/sagernet/wireguard-go => ../../wireguard-go
 
@@ -177,11 +177,11 @@ replace github.com/sagernet/sing-quic => ../../sing-quic
 // sing-quic: SagerNet 版には sing-box 1.14.x が必要とする realm PortMapping が含まれる。
 // replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
 
-replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20260925124650-5e3cd25460f7
+replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20260928095234-8e939c013edf
 
 replace github.com/sagernet/quic-go => github.com/Capricornus007/quic-go v0.61.0-sing-box-mod.9
 
-replace github.com/sagernet/sing-mux => github.com/Capricornus007/sing-mux v0.3.7-0.20260924041331-2cbd52d50a66
+replace github.com/sagernet/sing-mux => github.com/Capricornus007/sing-mux v0.3.7-0.20260928040855-6f936a848cd2
 
 replace github.com/metacubex/utls => github.com/Capricornus007/utls v0.0.0-20260926050627-c3856ce79ce4
 
@@ -189,7 +189,7 @@ replace github.com/exclavenetwork/sing-juicity => ../../sing-juicity
 
 replace github.com/xchacha20-poly1305/sing-trusttunnel => ../../sing-trusttunnel
 
-replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.5-0.20260928045111-76b7c496b147
+replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.5-0.20260928094240-dd4463a4f399
 
 // sing-shadowquic 復刻到自有 fork（與 sing 家族其他包一致），跟 Capricornus007/sing-shadowquic main。
 replace github.com/exclavenetwork/sing-shadowquic => github.com/Capricornus007/sing-shadowquic v0.0.0-20260904152941-03a261e772e4

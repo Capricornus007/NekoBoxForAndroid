@@ -65,6 +65,39 @@ for pair in $HARD_PAIRS; do
     fi
 done
 
+echo "== 段 1b：libcore/go.mod 的模組 replace vs sing-box go.mod（硬比較）=="
+# 為什麼要比這一段：libcore 是**獨立主模組**，Go 只有主模組的 replace 生效，所以 libcore 一旦
+# 自己釘了某個模組，它就**蓋掉** sing-box go.mod 裡的要求。結果是「APK 裡跑的」跟
+# 「sing-box 自己 CI 測過的」是兩份代碼，而本機因 `replace … => ../../sing-box` 永遠綠。
+# 2026-09-28 實測到這正是既存狀態：sing-box 釘 sing-tun a3c6c0d、libcore 釘 5e3cd25（差 25 筆），
+# 而上面的段 1 完全看不見——因為 nb4a 根本沒有 COMMIT_SING_TUN 這種鍵。
+LCORE="libcore/go.mod"
+if [ ! -f "$LCORE" ]; then
+    echo "  FAIL: 找不到 $LCORE（libcore 這側沒可比）"
+    failures=$((failures + 1))
+else
+    while read -r repo; do
+        [ -n "$repo" ] || continue
+        esc=${repo//./\\.}
+        # 比「完整版本字串」而不是只取結尾 12 位 hash：pseudo-version 與標籤式版本
+        # （quic-go 的 v0.61.0-sing-box-mod.9、amneziawg-go 的 v3.1.20260828-mod.2）都要能比，
+        # 否則守門對那兩顆是瞎的——它們恰恰是最容易一邊抬了一邊沒抬的模組。
+        lc=$(grep -oP "=> github\.com/$OWNER/${esc} \K\S+" "$LCORE" | head -1 || true)
+        sb=$(grep -oP "=> github\.com/$OWNER/${esc} \K\S+" "$gomod" | head -1 || true)
+        if [ -z "$sb" ]; then
+            echo "  僅 libcore 釘 $repo（sing-box go.mod 沒這個模組，無可比）"
+            continue
+        fi
+        if [ "$lc" = "$sb" ]; then
+            echo "  一致      $repo  $lc"
+        else
+            echo "  **不同步**  $repo  libcore=$lc sing-box=$sb"
+            echo "            → APK 吃 libcore 那版、核心倉 CI 測的是另一版；把兩邊抬到同一個 commit。"
+            failures=$((failures + 1))
+        fi
+    done < <(grep -oP "=> github\.com/$OWNER/\K[a-z0-9._/-]+(?= v)" "$LCORE" | sort -u)
+fi
+
 echo "== 段 2：每條 COMMIT_* 是否等於該 fork 預設分支尖端（僅報告）=="
 while read -r key; do
     [ -n "$key" ] || continue
