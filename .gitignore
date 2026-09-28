@@ -29,7 +29,6 @@ jniLibs/
 /library/libcore_build/
 /libcore/.build/
 /libcore/version_gen.go
-/.masterdnsvpn-build/
 /.mieru-build/
 /.naive-build/
 /app/executableSo/
