@@ -9,11 +9,11 @@ require (
 	github.com/miekg/dns v1.1.72
 	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/sagernet/quic-go v0.61.0-sing-box-mod.7
-	github.com/sagernet/sing v0.9.5
+	github.com/sagernet/sing v0.9.6-0.20260922013354-87c33f17688f
 	github.com/sagernet/sing-box v1.0.0 // replaced
-	github.com/sagernet/sing-tun v0.9.5
-	github.com/ulikunitz/xz v0.5.15
-	golang.org/x/mobile v0.0.0-20240520174638-fa72addaaa1b
+	github.com/sagernet/sing-tun v0.9.6-0.20260924001923-ddaa4ca25e3b
+	github.com/ulikunitz/xz v0.5.17
+	golang.org/x/mobile v0.0.0-20260908204917-8b95e45f8d3e
 	golang.org/x/sys v0.48.0
 )
 
@@ -62,7 +62,7 @@ require (
 	github.com/mholt/acmez/v3 v3.1.6 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/reF1nd/sing-snell v0.0.8 // indirect
-	github.com/sagernet/bbolt v0.0.0-20260823094646-e24805439c9c // indirect
+	github.com/sagernet/bbolt v0.0.0-20260915102804-500ee1e84832 // indirect
 	github.com/sagernet/cors v1.2.1 // indirect
 	github.com/sagernet/fswatch v0.1.2 // indirect
 	github.com/sagernet/gomobile v0.1.13 // indirect
@@ -70,7 +70,7 @@ require (
 	github.com/sagernet/netlink v0.0.0-20260814022025-64455d367bbf // indirect
 	github.com/sagernet/nftables v0.3.0-mod.4 // indirect
 	github.com/sagernet/sing-mux v0.3.8 // indirect
-	github.com/sagernet/sing-quic v0.7.0 // indirect
+	github.com/sagernet/sing-quic v0.7.1 // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.8 // indirect
 	github.com/sagernet/sing-shadowsocks2 v0.2.1 // indirect
 	github.com/sagernet/sing-shadowtls v0.2.1 // indirect
@@ -94,7 +94,7 @@ require (
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	golang.org/x/tools v0.49.0 // indirect
+	golang.org/x/tools v0.50.0 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/grpc v1.79.3 // indirect
@@ -110,7 +110,7 @@ replace github.com/sagernet/sing-box => ../../sing-box
 replace github.com/sagernet/sing-vmess => github.com/hawkff/sing-vmess v0.2.8-mod.1
 
 // Keep the existing import path across the module rename.
-replace github.com/dyhkwong/sing-juicity => github.com/exclavenetwork/sing-juicity v0.3.0
+replace github.com/dyhkwong/sing-juicity => github.com/exclavenetwork/sing-juicity v0.3.1
 
 replace github.com/reF1nd/sing-snell => github.com/reF1nd/sing-snell-reF1nd v0.0.8
 
