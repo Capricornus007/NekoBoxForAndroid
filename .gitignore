@@ -26,16 +26,11 @@ buildSrc/build
 .externalNativeBuild/
 .cxx/
 jniLibs/
-/library/libcore_build/
 /libcore/.build/
 /libcore/version_gen.go
 /.mieru-build/
 /.naive-build/
 /app/executableSo/
-/.olcrtc-build/
-/.olcrtc-gomobile/
-/.olcrtc-wrapper/
-/buildScript/lib/olcrtc-src/go.sum
 
 # Local config / generated app artifacts
 local.properties
