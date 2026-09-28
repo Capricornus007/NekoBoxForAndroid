@@ -21,7 +21,7 @@
         app:fastScrollThumbInactiveColor="?colorPrimary"
         tools:listitem="@layout/layout_profile" />
 
-    <!-- The bottom padding keeps it clear of the FAB and the stats bar like the list's. -->
+    <!-- fillViewport lets gravity="center" centre the block; taller content stays scrollable. -->
     <ScrollView
         android:id="@+id/profiles_empty"
         android:layout_width="match_parent"
@@ -33,13 +33,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center_horizontal"
+            android:gravity="center"
             android:orientation="vertical"
             android:paddingStart="32dp"
             android:paddingTop="24dp"
             android:paddingEnd="32dp"
-            android:paddingBottom="104dp">
+            android:paddingBottom="24dp">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/profiles_empty_icon"
