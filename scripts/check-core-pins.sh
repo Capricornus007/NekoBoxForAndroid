@@ -66,7 +66,8 @@ for pair in $HARD_PAIRS; do
 done
 
 echo "== 段 2：每條 COMMIT_* 是否等於該 fork 預設分支尖端（僅報告）=="
-for key in $(grep -oP '^export COMMIT_\K[A-Z_]+' "$ENV_FILE"); do
+while read -r key; do
+    [ -n "$key" ] || continue
     pin=$(read_pin "$key")
     repo=$(printf '%s' "$key" | tr 'A-Z_' 'a-z-')
     tip=$(git ls-remote --symref "https://github.com/$OWNER/$repo.git" HEAD 2>/dev/null | awk '!/^ref:/ && NF >= 2 {print $1; exit}')
@@ -80,7 +81,7 @@ for key in $(grep -oP '^export COMMIT_\K[A-Z_]+' "$ENV_FILE"); do
         echo "  落後      COMMIT_$key=${pin:0:12} 尖端=${tip:0:12}  ($repo) ← 該抬了"
         behind=$((behind + 1))
     fi
-done
+done < <(grep -oP '^export COMMIT_\K[A-Z_]+' "$ENV_FILE")
 
 if [ "$failures" -gt 0 ]; then
     echo "FAIL: $failures 條核心 pin 與 sing-box 不同步"
