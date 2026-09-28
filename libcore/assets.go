@@ -10,6 +10,7 @@ const (
 	yacdVersion   = "yacd.version.txt"
 )
 
-var apkAssetPrefixSingBox = "sing-box/"
+const apkAssetPrefixSingBox = "sing-box/"
+
 var internalAssetsPath string
 var externalAssetsPath string

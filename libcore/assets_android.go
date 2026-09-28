@@ -15,17 +15,11 @@ import (
 
 func extractAssets() {
 	useOfficialAssets := intfNB4A.UseOfficialAssets()
-
-	extract := func(name string) {
-		err := extractAssetName(name, useOfficialAssets)
-		if err != nil {
-			log.Println("Extract", geoipDat, "failed:", err)
+	for _, name := range []string{geoipDat, geositeDat, yacdDstFolder} {
+		if err := extractAssetName(name, useOfficialAssets); err != nil {
+			log.Println("Extract", name, "failed:", err)
 		}
 	}
-
-	extract(geoipDat)
-	extract(geositeDat)
-	extract(yacdDstFolder)
 }
 
 // this extracts the ones inside the apk
@@ -56,26 +50,11 @@ func extractAssetName(name string, useOfficialAssets bool) error {
 	}
 	dstName := dir + name
 
-	var localVersion string
-	var assetVersion string
-
-	// loadAssetVersion from APK
-	loadAssetVersion := func() error {
-		av, err := asset.Open(apkPrefix + version)
-		if err != nil {
-			return fmt.Errorf("open version in assets: %v", err)
-		}
-		b, err := io.ReadAll(av)
-		av.Close()
-		if err != nil {
-			return fmt.Errorf("read internal version: %v", err)
-		}
-		assetVersion = string(b)
-		return nil
+	b, err := readAsset(apkPrefix + version)
+	if err != nil {
+		return fmt.Errorf("read version in assets: %v", err)
 	}
-	if err := loadAssetVersion(); err != nil {
-		return err
-	}
+	assetVersion := string(b)
 
 	var doExtract bool
 
@@ -88,9 +67,8 @@ func extractAssetName(name string, useOfficialAssets bool) error {
 		if err != nil {
 			// versionFileMissing
 			doExtract = true
-			_ = os.RemoveAll(version)
 		} else {
-			localVersion = string(b)
+			localVersion := string(b)
 			if localVersion == "Custom" {
 				doExtract = false
 			} else {
@@ -111,70 +89,57 @@ func extractAssetName(name string, useOfficialAssets bool) error {
 		return nil
 	}
 
-	extractXz := func(f asset.File) error {
-		tmpXzName := dstName + ".xz"
-		err := extractAsset(f, tmpXzName)
-		if err == nil {
-			err = Unxz(tmpXzName, dstName)
-			os.Remove(tmpXzName)
-		}
-		if err != nil {
-			return fmt.Errorf("extract xz: %v", err)
-		}
-		return nil
+	switch name {
+	case yacdDstFolder:
+		err = extractArchive("yacd.zip", dstName, unzipReplaceDir)
+	default:
+		err = extractArchive(apkPrefix+name+".xz", dstName, Unxz)
 	}
-
-	extracZip := func(f asset.File, outDir string) error {
-		tmpZipName := dstName + ".zip"
-		err := extractAsset(f, tmpZipName)
-		if err == nil {
-			err = Unzip(tmpZipName, outDir)
-			os.Remove(tmpZipName)
-		}
-		if err != nil {
-			return fmt.Errorf("extract zip: %v", err)
-		}
-		return nil
-	}
-
-	if f, err := asset.Open(apkPrefix + name + ".xz"); err == nil {
-		extractXz(f)
-	} else if f, err := asset.Open("yacd.zip"); err == nil {
-		os.RemoveAll(dstName)
-		extracZip(f, internalAssetsPath)
-		m, err := filepath.Glob(internalAssetsPath + "/Yacd-*")
-		if err != nil {
-			return fmt.Errorf("glob Yacd: %v", err)
-		}
-		if len(m) != 1 {
-			return fmt.Errorf("glob Yacd found %d result, expect 1", len(m))
-		}
-		err = os.Rename(m[0], dstName)
-		if err != nil {
-			return fmt.Errorf("rename Yacd: %v", err)
-		}
-
-	} // TODO normal file
-
-	o, err := os.Create(dir + version)
 	if err != nil {
-		return fmt.Errorf("create version: %v", err)
+		return err
 	}
-	_, err = io.WriteString(o, assetVersion)
-	o.Close()
-	return err
+	// Record the version only once the asset is in place, so a failed
+	// extraction is retried on the next start instead of being masked.
+	return os.WriteFile(dir+version, []byte(assetVersion), 0o644)
 }
 
-func extractAsset(i asset.File, path string) error {
+func readAsset(name string) ([]byte, error) {
+	f, err := asset.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return io.ReadAll(f)
+}
+
+// extractArchive copies an APK asset to a temp file next to dst and unpacks it
+// with unpack, which is responsible for replacing dst atomically.
+func extractArchive(assetName, dst string, unpack func(archive, dst string) error) error {
+	tmp := dst + filepath.Ext(assetName)
+	defer os.Remove(tmp)
+	if err := extractAsset(assetName, tmp); err != nil {
+		return err
+	}
+	return unpack(tmp, dst)
+}
+
+func extractAsset(name, path string) error {
+	i, err := asset.Open(name)
+	if err != nil {
+		return err
+	}
 	defer i.Close()
 	o, err := os.Create(path)
 	if err != nil {
 		return err
 	}
-	defer o.Close()
 	_, err = io.Copy(o, i)
-	if err == nil {
-		log.Println("Extract >>", path)
+	if closeErr := o.Close(); err == nil {
+		err = closeErr
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	log.Println("Extract >>", path)
+	return nil
 }

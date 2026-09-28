@@ -107,12 +107,12 @@ object RawUpdater : GroupUpdater() {
             updateFromContent(
                 proxyGroup,
                 subscription,
-                Util.getStringBox(response.getContentStringLimited(MAX_IMPORT_BYTES)),
+                response.getContentStringLimited(MAX_IMPORT_BYTES),
                 userInterface,
                 byUser,
-                Util.getStringBox(response.getHeader("Profile-Title")),
-                Util.getStringBox(response.getHeader("Subscription-Userinfo")),
-                Util.getStringBox(response.getHeader("Content-Disposition")),
+                response.getHeader("Profile-Title"),
+                response.getHeader("Subscription-Userinfo"),
+                response.getHeader("Content-Disposition"),
             )
         }
     }

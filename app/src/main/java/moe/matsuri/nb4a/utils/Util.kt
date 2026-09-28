@@ -8,7 +8,6 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.nekohasekai.sagernet.ktx.ImportTooLargeException
 import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
-import libcore.StringBox
 import java.io.ByteArrayOutputStream
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -19,33 +18,6 @@ import java.util.zip.Inflater
 
 object Util {
 
-    /**
-     * Get the text value between two pieces of text
-     *
-     * @param text  source text, e.g. the full text to extract from is 12345
-     * @param left  text before
-     * @param right text after
-     * @return returns String
-     */
-    fun getSubString(text: String, left: String?, right: String?): String {
-        var zLen: Int
-        if (left.isNullOrEmpty()) {
-            zLen = 0
-        } else {
-            zLen = text.indexOf(left)
-            if (zLen > -1) {
-                zLen += left.length
-            } else {
-                zLen = 0
-            }
-        }
-        var yLen = if (right == null) -1 else text.indexOf(right, zLen)
-        if (yLen < 0 || right.isNullOrEmpty()) {
-            yLen = text.length
-        }
-        return text.substring(zLen, yLen)
-    }
-
     // Base64 for all
 
     fun b64EncodeUrlSafe(s: String): String = b64EncodeUrlSafe(s.toByteArray())
@@ -54,8 +26,6 @@ object Util {
 
     // v2rayN Style
     fun b64EncodeOneLine(b: ByteArray): String = String(Base64.encode(b, Base64.NO_WRAP))
-
-    fun b64EncodeDefault(b: ByteArray): String = String(Base64.encode(b, Base64.DEFAULT))
 
     fun b64Decode(b: String): ByteArray {
         var ret: ByteArray? = null
@@ -212,13 +182,6 @@ object Util {
 
     fun timeStamp2Text(t: Long): String = sdf1.format(Date(t))
 
-    fun tryToSetField(o: Any, name: String, value: Any) {
-        try {
-            o.javaClass.getField(name).set(o, value)
-        } catch (_: Exception) {
-        }
-    }
-
     @SuppressLint("WrongConstant")
     fun collapseStatusBar(context: Context) {
         try {
@@ -227,13 +190,6 @@ object Util {
             collapse.invoke(statusBarManager)
         } catch (_: Exception) {
         }
-    }
-
-    fun getStringBox(b: StringBox?): String {
-        if (b != null && b.value != null) {
-            return b.value
-        }
-        return ""
     }
 
     fun decodeFilename(headerValue: String): String {

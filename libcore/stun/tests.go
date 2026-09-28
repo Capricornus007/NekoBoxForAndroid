@@ -19,14 +19,14 @@ import (
 	"net"
 )
 
-func (c *Client) sendWithLog(conn net.PacketConn, addr *net.UDPAddr, changeIP bool, changePort bool) (*response, error) {
-	c.logger.Debugln("Send To:", addr)
+// sendChecked sends a binding request and rejects responses that did not
+// honour the requested IP/port change.
+func (c *Client) sendChecked(conn net.PacketConn, addr *net.UDPAddr, changeIP bool, changePort bool) (*response, error) {
 	resp, err := c.sendBindingReq(conn, addr, changeIP, changePort)
 	if err != nil {
 		return nil, err
 	}
-	c.logger.Debugln("Received:", resp)
-	if resp == nil && changeIP == false && changePort == false {
+	if resp == nil && !changeIP && !changePort {
 		return nil, errors.New("NAT blocked.")
 	}
 	if resp != nil && !addrCompare(resp.serverAddr, addr, changeIP, changePort) {
@@ -43,15 +43,15 @@ func addrCompare(host *Host, addr *net.UDPAddr, IPChange, portChange bool) bool 
 }
 
 func (c *Client) test(conn net.PacketConn, addr *net.UDPAddr) (*response, error) {
-	return c.sendWithLog(conn, addr, false, false)
+	return c.sendChecked(conn, addr, false, false)
 }
 
 func (c *Client) testChangePort(conn net.PacketConn, addr *net.UDPAddr) (*response, error) {
-	return c.sendWithLog(conn, addr, false, true)
+	return c.sendChecked(conn, addr, false, true)
 }
 
 func (c *Client) testChangeBoth(conn net.PacketConn, addr *net.UDPAddr) (*response, error) {
-	return c.sendWithLog(conn, addr, true, true)
+	return c.sendChecked(conn, addr, true, true)
 }
 
 func (c *Client) test1(conn net.PacketConn, addr net.Addr) (*response, error) {

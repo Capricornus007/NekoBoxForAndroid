@@ -16,7 +16,6 @@ package stun
 
 import (
 	"bytes"
-	"encoding/hex"
 	"errors"
 	"net"
 	"time"
@@ -36,7 +35,7 @@ func (c *Client) sendBindingReq(conn net.PacketConn, addr net.Addr, changeIP boo
 		return nil, err
 	}
 	pkt.types = typeBindingRequest
-	attribute := newSoftwareAttribute(c.softwareName)
+	attribute := newSoftwareAttribute(DefaultSoftwareName)
 	pkt.addAttribute(*attribute)
 	if changeIP || changePort {
 		attribute = newChangeReqAttribute(changeIP, changePort)
@@ -57,7 +56,6 @@ func (c *Client) sendBindingReq(conn net.PacketConn, addr net.Addr, changeIP boo
 // Retransmissions continue with intervals of 1.6s until a response is
 // received, or a total of 9 requests have been sent.
 func (c *Client) send(pkt *packet, conn net.PacketConn, addr net.Addr) (*response, error) {
-	c.logger.Info("\n" + hex.Dump(pkt.bytes()))
 	timeout := defaultTimeout
 	packetBytes := make([]byte, maxPacketSize)
 	for i := 0; i < numRetransmit; i++ {
@@ -94,7 +92,6 @@ func (c *Client) send(pkt *packet, conn net.PacketConn, addr net.Addr) (*respons
 			if !bytes.Equal(pkt.transID, p.transID) {
 				continue
 			}
-			c.logger.Info("\n" + hex.Dump(packetBytes[0:length]))
 			resp := newResponse(p, conn)
 			resp.serverAddr = newHostFromStr(raddr.String())
 			return resp, err

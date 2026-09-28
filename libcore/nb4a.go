@@ -2,7 +2,6 @@ package libcore
 
 import (
 	"fmt"
-	"libcore/device"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -33,11 +32,19 @@ func ForceGc() {
 	go debug.FreeOSMemory()
 }
 
+// deferPanicToError converts a panic in the calling function into an error
+// passed to onError. Use with defer.
+func deferPanicToError(name string, onError func(error)) {
+	if r := recover(); r != nil {
+		onError(fmt.Errorf("%s panic: %s\n%s", name, r, debug.Stack()))
+	}
+}
+
 func InitCore(process, cachePath, internalAssets, externalAssets string,
 	maxLogSizeKb int32, logEnable bool,
 	if1 NB4AInterface, if2 BoxPlatformInterface, if3 LocalDNSTransport,
 ) {
-	defer device.DeferPanicToError("InitCore", func(err error) { log.Println(err) })
+	defer deferPanicToError("InitCore", func(err error) { log.Println(err) })
 	isBgProcess = strings.HasSuffix(process, ":bg")
 
 	neko_common.RunMode = neko_common.RunMode_NekoBoxForAndroid
@@ -69,8 +76,7 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 
 	// Set up some component
 	go func() {
-		defer device.DeferPanicToError("InitCore-go", func(err error) { log.Println(err) })
-		device.GoDebug(process)
+		defer deferPanicToError("InitCore-go", func(err error) { log.Println(err) })
 
 		// certs
 		pem, err := os.ReadFile(externalAssetsPath + "ca.pem")

@@ -29,23 +29,13 @@ import androidx.recyclerview.widget.RecyclerView
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import moe.matsuri.nb4a.utils.NGUtil
-import java.io.FileDescriptor
-import java.net.HttpURLConnection
 import java.net.InetAddress
-import java.net.Socket
 import java.net.URLEncoder
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
@@ -83,33 +73,6 @@ inline fun <T> Iterable<T>.forEachTry(action: (T) -> Unit) {
 
 val Throwable.readableMessage
     get() = localizedMessage.takeIf { !it.isNullOrBlank() } ?: javaClass.simpleName
-
-/**
- * https://android.googlesource.com/platform/prebuilts/runtime/+/94fec32/appcompat/hiddenapi-light-greylist.txt#9466
- */
-
-private val socketGetFileDescriptor by lazy {
-    Socket::class.java.getDeclaredMethod("getFileDescriptor\$")
-}
-val Socket.fileDescriptor get() = socketGetFileDescriptor.invoke(this) as FileDescriptor
-
-private val getInt by lazy {
-    FileDescriptor::class.java.getDeclaredMethod("getInt$")
-}
-val FileDescriptor.int get() = getInt.invoke(this) as Int
-
-suspend fun <T> HttpURLConnection.useCancellable(block: suspend HttpURLConnection.() -> T): T = suspendCancellableCoroutine { cont ->
-    cont.invokeOnCancellation {
-        if (Build.VERSION.SDK_INT >= 26) disconnect() else GlobalScope.launch(Dispatchers.IO) { disconnect() }
-    }
-    GlobalScope.launch(Dispatchers.IO) {
-        try {
-            cont.resume(block())
-        } catch (e: Throwable) {
-            cont.resumeWithException(e)
-        }
-    }
-}
 
 fun parsePort(str: String?, default: Int, min: Int = 1025): Int {
     val value = str?.toIntOrNull() ?: default
@@ -182,11 +145,6 @@ fun DialogFragment.showAllowingStateLoss(fragmentManager: FragmentManager, tag: 
     if (!fragmentManager.isStateSaved) show(fragmentManager, tag)
 }
 
-fun String.pathSafe(): String {
-    // " " encoded as +
-    return URLEncoder.encode(this, "UTF-8")
-}
-
 fun String.urlSafe(): String = URLEncoder.encode(this, "UTF-8").replace("+", "%20")
 
 fun String.unUrlSafe(): String = NGUtil.urlDecode(this)
@@ -256,20 +214,6 @@ val isExpert: Boolean by lazy { BuildConfig.DEBUG || DataStore.isExpert }
 const val isOss = BuildConfig.FLAVOR == "oss"
 const val isPlay = BuildConfig.FLAVOR == "play"
 const val isPreview = BuildConfig.FLAVOR == "preview"
-
-fun <T> Continuation<T>.tryResume(value: T) {
-    try {
-        resumeWith(Result.success(value))
-    } catch (ignored: IllegalStateException) {
-    }
-}
-
-fun <T> Continuation<T>.tryResumeWithException(exception: Throwable) {
-    try {
-        resumeWith(Result.failure(exception))
-    } catch (ignored: IllegalStateException) {
-    }
-}
 
 operator fun <F> KProperty0<F>.getValue(thisRef: Any?, property: KProperty<*>): F = get()
 operator fun <F> KMutableProperty0<F>.setValue(thisRef: Any?, property: KProperty<*>, value: F) = set(value)

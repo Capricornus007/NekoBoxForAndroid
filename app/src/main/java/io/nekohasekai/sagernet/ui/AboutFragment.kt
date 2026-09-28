@@ -31,7 +31,6 @@ import io.nekohasekai.sagernet.utils.PackageCache
 import io.nekohasekai.sagernet.widget.ListListener
 import libcore.Libcore
 import moe.matsuri.nb4a.plugin.Plugins
-import moe.matsuri.nb4a.utils.Util
 import org.json.JSONObject
 
 /**
@@ -187,7 +186,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         setURL("https://api.github.com/repos/hawkff/NekoBoxForAndroid/releases/latest")
                     }
                 }.execute()
-                val release = JSONObject(Util.getStringBox(response.getContentStringLimited(10L * 1024 * 1024)))
+                val release = JSONObject(response.getContentStringLimited(10L * 1024 * 1024))
                 val releaseName = release.getString("name")
                 val releaseUrl = release.getString("html_url")
                 var haveUpdate = releaseName.isNotBlank()

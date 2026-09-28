@@ -57,12 +57,7 @@ func (h *Host) Port() uint16 {
 	return h.port
 }
 
-// TransportAddr returns the transport layer address of the host.
-func (h *Host) TransportAddr() string {
-	return net.JoinHostPort(h.ip, strconv.Itoa(int(h.port)))
-}
-
 // String returns the string representation of the host address.
 func (h *Host) String() string {
-	return h.TransportAddr()
+	return net.JoinHostPort(h.ip, strconv.Itoa(int(h.port)))
 }

@@ -16,6 +16,8 @@ jobs:
         run: bash ./scripts/check-lint-baseline.sh
       - name: Guard - release publication requires explicit opt-in
         run: bash scripts/check-release-publish-gate.sh --self-test
+      - name: Guard - native toolchain init caching and failure propagation
+        run: bash scripts/check-native-init.sh
   test:
     name: Unit Tests
     runs-on: namespace-profile-nekoyay

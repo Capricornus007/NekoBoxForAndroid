@@ -3,14 +3,10 @@ package libcore
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
 	"crypto/tls"
-	"crypto/x509"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
-	"libcore/device"
 	"libcore/ech"
 	"log"
 	"net"
@@ -38,15 +34,13 @@ const (
 	// so GetContentLimited/WriteToLimited cannot block forever on a stalled body.
 	// It is generous enough for large rule-asset downloads over slow links.
 	defaultHTTPRequestTimeout = 10 * time.Minute
-	defaultHTTPStringLimit    = 10 * 1024 * 1024
-	defaultHTTPFileLimit      = 256 * 1024 * 1024
+	// defaultHTTPStringLimit caps how much of an error body is read for messages.
+	defaultHTTPStringLimit = 10 * 1024 * 1024
 )
 
 type HTTPClient interface {
 	RestrictedTLS()
 	ModernTLS()
-	PinnedTLS12()
-	PinnedSHA256(sumHex string)
 	TrySocks5(port int32, username string, password string)
 	TryH3Direct()
 	KeepAlive()
@@ -66,12 +60,9 @@ type HTTPRequest interface {
 }
 
 type HTTPResponse interface {
-	GetHeader(string) *StringBox
-	GetContent() ([]byte, error)
+	GetHeader(string) string
 	GetContentLimited(limit int64) ([]byte, error)
-	GetContentString() (*StringBox, error)
-	GetContentStringLimited(limit int64) (*StringBox, error)
-	WriteTo(path string) error
+	GetContentStringLimited(limit int64) (string, error)
 	WriteToLimited(path string, limit int64) error
 }
 
@@ -115,23 +106,6 @@ func (c *httpClient) RestrictedTLS() {
 	// }), func(it *tls.CipherSuite) uint16 {
 	// 	return it.ID
 	// })
-}
-
-func (c *httpClient) PinnedTLS12() {
-	c.tls.MinVersion = tls.VersionTLS12
-	c.tls.MaxVersion = tls.VersionTLS12
-}
-
-func (c *httpClient) PinnedSHA256(sumHex string) {
-	c.tls.VerifyPeerCertificate = func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
-		for _, rawCert := range rawCerts {
-			certSum := sha256.Sum256(rawCert)
-			if sumHex == hex.EncodeToString(certSum[:]) {
-				return nil
-			}
-		}
-		return errors.New("pinned sha256 sum mismatch")
-	}
 }
 
 func (c *httpClient) TrySocks5(port int32, username string, password string) {
@@ -227,7 +201,7 @@ func (r *httpRequest) SetContentString(content string) {
 }
 
 func (r *httpRequest) Execute() (HTTPResponse, error) {
-	defer device.DeferPanicToError("http execute", func(err error) { log.Println(err) })
+	defer deferPanicToError("http execute", func(err error) { log.Println(err) })
 	// full direct
 	if r.tryH3Direct && !r.trySocks5 {
 		return r.doH3Direct()
@@ -307,7 +281,7 @@ func raceHTTPRequests(ctx context.Context, funcs []labeledRequestFunc) (*http.Re
 				}
 				doneCh <- struct{}{}
 			}()
-			defer device.DeferPanicToError("http", func(err error) {
+			defer deferPanicToError("http", func(err error) {
 				addError(fmt.Errorf("%s: %w", f.label, err))
 				log.Println(err)
 			})
@@ -459,7 +433,7 @@ type httpResponse struct {
 }
 
 func (h *httpResponse) errorString() string {
-	content, err := h.getContentString()
+	content, err := h.GetContentStringLimited(defaultHTTPStringLimit)
 	if err != nil {
 		return fmt.Sprint("HTTP ", h.Status)
 	}
@@ -469,12 +443,8 @@ func (h *httpResponse) errorString() string {
 	return fmt.Sprint("HTTP ", h.Status, ": ", content)
 }
 
-func (h *httpResponse) GetHeader(key string) *StringBox {
-	return wrapString(h.Header.Get(key))
-}
-
-func (h *httpResponse) GetContent() ([]byte, error) {
-	return h.GetContentLimited(defaultHTTPStringLimit)
+func (h *httpResponse) GetHeader(key string) string {
+	return h.Header.Get(key)
 }
 
 func (h *httpResponse) GetContentLimited(limit int64) ([]byte, error) {
@@ -495,32 +465,12 @@ func (h *httpResponse) GetContentLimited(limit int64) ([]byte, error) {
 	return h.content, h.contentError
 }
 
-func (h *httpResponse) GetContentString() (*StringBox, error) {
-	return h.GetContentStringLimited(defaultHTTPStringLimit)
-}
-
-func (h *httpResponse) GetContentStringLimited(limit int64) (*StringBox, error) {
-	content, err := h.getContentStringLimited(limit)
-	if err != nil {
-		return nil, err
-	}
-	return wrapString(content), nil
-}
-
-func (h *httpResponse) getContentString() (string, error) {
-	return h.getContentStringLimited(defaultHTTPStringLimit)
-}
-
-func (h *httpResponse) getContentStringLimited(limit int64) (string, error) {
+func (h *httpResponse) GetContentStringLimited(limit int64) (string, error) {
 	content, err := h.GetContentLimited(limit)
 	if err != nil {
 		return "", err
 	}
 	return string(content), nil
-}
-
-func (h *httpResponse) WriteTo(path string) error {
-	return h.WriteToLimited(path, defaultHTTPFileLimit)
 }
 
 func (h *httpResponse) WriteToLimited(path string, limit int64) (err error) {

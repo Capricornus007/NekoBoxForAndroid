@@ -52,7 +52,40 @@ func Unxz(archive string, path string) (err error) {
 	return err
 }
 
-func Unzip(archive string, path string) error {
+// unzipReplaceDir unpacks an archive whose only top-level entry is a directory
+// and moves that directory to dst. dst is left untouched if unpacking fails,
+// and restored if the final swap fails.
+func unzipReplaceDir(archive, dst string) error {
+	tmpDir, err := os.MkdirTemp(filepath.Dir(dst), filepath.Base(dst)+".*.tmp")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tmpDir)
+	unpacked := filepath.Join(tmpDir, "new")
+	if err := unzip(archive, unpacked); err != nil {
+		return err
+	}
+	entries, err := os.ReadDir(unpacked)
+	if err != nil {
+		return err
+	}
+	if len(entries) != 1 || !entries[0].IsDir() {
+		return E.New("unzip ", archive, ": expected one top-level directory, found ", len(entries), " entries")
+	}
+	// Park the current dst inside tmpDir: the deferred cleanup removes it on
+	// success, and it can be moved back if the swap fails.
+	previous := filepath.Join(tmpDir, "old")
+	if err := os.Rename(dst, previous); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if err := os.Rename(filepath.Join(unpacked, entries[0].Name()), dst); err != nil {
+		_ = os.Rename(previous, dst)
+		return err
+	}
+	return nil
+}
+
+func unzip(archive string, path string) error {
 	r, err := zip.OpenReader(archive)
 	if err != nil {
 		return err

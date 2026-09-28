@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"libcore/device"
 	"log"
 	"runtime"
 	"runtime/debug"
@@ -80,7 +79,7 @@ type BoxInstance struct {
 }
 
 func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *BoxInstance, err error) {
-	defer device.DeferPanicToError("NewSingBoxInstance", func(err_ error) { err = err_ })
+	defer deferPanicToError("NewSingBoxInstance", func(err_ error) { err = err_ })
 
 	// create box context
 	ctx, cancel := context.WithCancel(context.Background())
@@ -130,7 +129,7 @@ func (b *BoxInstance) Start() (err error) {
 	b.access.Lock()
 	defer b.access.Unlock()
 
-	defer device.DeferPanicToError("box.Start", func(err_ error) { err = err_ })
+	defer deferPanicToError("box.Start", func(err_ error) { err = err_ })
 
 	if b.state == 0 {
 		b.state = 1
@@ -143,7 +142,7 @@ func (b *BoxInstance) Close() (err error) {
 	b.access.Lock()
 	defer b.access.Unlock()
 
-	defer device.DeferPanicToError("box.Close", func(err_ error) { err = err_ })
+	defer deferPanicToError("box.Close", func(err_ error) { err = err_ })
 
 	// no double close
 	if b.state == 2 {
@@ -215,7 +214,7 @@ func (b *BoxInstance) SelectOutbound(tag string) bool {
 }
 
 func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err error) {
-	defer device.DeferPanicToError("box.UrlTest", func(err_ error) { err = err_ })
+	defer deferPanicToError("box.UrlTest", func(err_ error) { err = err_ })
 	var connectionTracker adapter.ConnectionTracker
 	// test i
 	if i != nil {

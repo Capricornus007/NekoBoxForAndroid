@@ -15,7 +15,6 @@
 package stun
 
 import (
-	"fmt"
 	"net"
 )
 
@@ -59,18 +58,4 @@ func newResponse(pkt *packet, conn net.PacketConn) *response {
 	}
 
 	return resp
-}
-
-// String is only used for verbose mode output.
-func (r *response) String() string {
-	if r == nil {
-		return "Nil"
-	}
-	return fmt.Sprintf("{packet nil: %v, local: %v, remote: %v, changed: %v, other: %v, identical: %v}",
-		r.packet == nil,
-		r.mappedAddr,
-		r.serverAddr,
-		r.changedAddr,
-		r.otherAddr,
-		r.identical)
 }
