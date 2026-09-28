@@ -4,8 +4,8 @@
 
 - [x] 1.1 修改 `app/src/main/res/layout/layout_profile_list.xml`：`profiles_empty` 内层 `LinearLayout` 的 `android:gravity` 改为 `center`（水平+垂直），删除无效的 `android:layout_gravity="center"`，不对称 padding（top 24dp / bottom 104dp）改为对称（上下 24dp 量级）；保留 `fillViewport="true"` 与 `wrap_content` 以维持超高内容可滚动。验证：diff 仅触及该 LinearLayout 属性，`ScrollView` 结构与 id 不变
 - [x] 1.2 对照 `openspec/changes/fix-ui-glitches/specs/ui-layout/spec.md` 的"空状态提示块屏幕居中"requirement 复核实现覆盖三个场景（空分组居中、空订阅含按钮居中、超高内容可滚动），并运行 `openspec validate fix-ui-glitches` 确认 delta 格式通过；本地仅做此静态校验（不跑 Android 编译，构建交 CI）
-- [ ] 1.3 提交本批次改动（由用户执行 git 提交，批次独立可回退）
-- [ ] 1.4 CI/真机验证阶段（结果回传前不开始批次 2）：CI 走 `.github/workflows/ci.yml` 的 `build` job（`app:testOssDebugUnitTest app:assembleOssDebug`）；真机场景：打开空分组首页、打开空订阅分组首页，各截整屏；将字体缩放调至最大后再次查看并上下滑动提示内容。预期：提示块（含"更新订阅"按钮）视觉重心在屏幕中心、不贴上部，超高内容可滚动。需回传证据：两张整屏截图（含空订阅态）+ 大字体下滑动后的截图或说明
+- [x] 1.3 提交本批次改动（由用户执行 git 提交，批次独立可回退）
+- [x] 1.4 CI/真机验证阶段（结果回传前不开始批次 2）：CI 走 `.github/workflows/ci.yml` 的 `build` job（`app:testOssDebugUnitTest app:assembleOssDebug`）；真机场景：打开空分组首页、打开空订阅分组首页，各截整屏；将字体缩放调至最大后再次查看并上下滑动提示内容。预期：提示块（含"更新订阅"按钮）视觉重心在屏幕中心、不贴上部，超高内容可滚动。需回传证据：两张整屏截图（含空订阅态）+ 大字体下滑动后的截图或说明
 
 ## 2. 配置切换栏高度与字号调整
 
