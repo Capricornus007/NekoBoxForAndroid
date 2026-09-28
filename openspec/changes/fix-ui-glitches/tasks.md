@@ -9,8 +9,8 @@
 
 ## 2. 配置切换栏高度与字号调整
 
-- [ ] 2.1 在 `app/src/main/res/values/themes.xml` 新增 `TextAppearance.SagerNet.Tab`（parent `TextAppearance.SagerNet.Button`，`android:textSize="16sp"`），不改动 `TextAppearance.SagerNet.Button` 与 `Widget.SagerNet.TabLayout`；在 `app/src/main/res/layout/layout_group_list.xml` 的 `group_tab` 上设 `android:layout_height="40dp"` 并以 `app:tabTextAppearance` 引用新样式。验证：diff 确认按钮/对话框共用样式无变化，`group_tab` 之外的样式与布局无改动
-- [ ] 2.2 对照 spec 的"配置切换栏尺寸"requirement 复核两个场景（标签栏约 40dp 高/16sp 字；其他控件字尺寸不变），并运行 `openspec validate fix-ui-glitches` 通过
+- [x] 2.1 在 `app/src/main/res/values/themes.xml` 新增 `TextAppearance.SagerNet.Tab`（parent `TextAppearance.SagerNet.Button`，`android:textSize="16sp"`），不改动 `TextAppearance.SagerNet.Button` 与 `Widget.SagerNet.TabLayout`；在 `app/src/main/res/layout/layout_group_list.xml` 的 `group_tab` 上设 `android:layout_height="40dp"` 并以 `app:tabTextAppearance` 引用新样式。验证：diff 确认按钮/对话框共用样式无变化，`group_tab` 之外的样式与布局无改动
+- [x] 2.2 对照 spec 的"配置切换栏尺寸"requirement 复核两个场景（标签栏约 40dp 高/16sp 字；其他控件字尺寸不变），并运行 `openspec validate fix-ui-glitches` 通过
 - [ ] 2.3 提交本批次改动（由用户执行 git 提交，批次独立可回退）
 - [ ] 2.4 CI/真机验证阶段（结果回传前不开始批次 3）：CI 同 `ci.yml` `build` job；真机场景：存在至少两个分组时打开首页截整屏，进入任一对话框/设置页截按钮文字。预期：分组标签栏明显更矮、标签文字明显更大（约 40dp/16sp 观感），按钮与对话框文字尺寸与之前一致。需回传证据：首页整屏截图 + 对话框截图；若"稍微"的量级观感不符，回传建议数值后在本批次内微调重验
 

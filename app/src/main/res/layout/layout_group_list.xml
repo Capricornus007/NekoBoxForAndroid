@@ -15,7 +15,7 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/group_tab"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:background="?colorPrimary"
         android:elevation="0dp"
         android:visibility="gone"
@@ -25,6 +25,7 @@
         app:tabPaddingStart="16dp"
         app:tabRippleColor="?tabRippleColor"
         app:tabSelectedTextColor="?tabSelectedTextColor"
+        app:tabTextAppearance="@style/TextAppearance.SagerNet.Tab"
         app:tabTextColor="?tabTextColor"
         app:tabUnboundedRipple="false" />
 

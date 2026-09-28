@@ -153,6 +153,11 @@
         <item name="android:letterSpacing">0.00714</item>
     </style>
 
+    <!-- Home group tabs: slightly larger label than the shared button text -->
+    <style name="TextAppearance.SagerNet.Tab" parent="TextAppearance.SagerNet.Button">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <!-- Tab colours stay the theme attrs the layouts pass (tabTextColor and the rest) -->
     <style name="Widget.SagerNet.TabLayout" parent="Widget.MaterialComponents.TabLayout">
         <item name="tabTextAppearance">@style/TextAppearance.SagerNet.Button</item>
