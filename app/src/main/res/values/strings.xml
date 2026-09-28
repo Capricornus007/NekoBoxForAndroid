@@ -306,6 +306,10 @@
         <item quantity="other">%d proxies added</item>
     </plurals>
     <string name="undo">Undo</string>
+    <string name="redo">Redo</string>
+    <string name="format">Format</string>
+    <string name="insert_tab">Insert tab</string>
+    <string name="more_options">More options</string>
     <string name="insecure">Insecure</string>
     <string name="deprecated">Deprecated</string>
     <!-- tasker -->

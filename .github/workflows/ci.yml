@@ -73,7 +73,7 @@ jobs:
             echo "kvm=false" >> "$GITHUB_OUTPUT"
             echo "::warning::KVM is unavailable or inaccessible; emulator test skipped"
           fi
-      - name: Run migration test on emulator
+      - name: Run instrumented tests on emulator
         if: steps.kvm.outputs.kvm == 'true'
         uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
         with:
@@ -85,7 +85,11 @@ jobs:
           disable-animations: true
           script: |
             echo "sdk.dir=${ANDROID_HOME}" > local.properties
-            ./gradlew :app:connectedOssDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=io.nekohasekai.sagernet.database.SagerDatabaseMigrationTest --no-configuration-cache
+            # Migrations plus the theme palette checks (attr resolution, contrast floors).
+            # ThemeSmokeTest's screenshot pass stays a manual tool: minutes long, 70 PNGs.
+            ./gradlew :app:connectedOssDebugAndroidTest \
+              -Pandroid.testInstrumentationRunnerArguments.class=io.nekohasekai.sagernet.database.SagerDatabaseMigrationTest,io.nekohasekai.sagernet.database.ProfileArchiveMigrationTest,io.nekohasekai.sagernet.ui.ThemeSmokeTest#everyPaletteResolvesLayoutAttrs,io.nekohasekai.sagernet.ui.ThemeSmokeTest#everyPaletteMeetsContrastFloors \
+              --no-configuration-cache
       - name: Result note
         if: steps.kvm.outputs.kvm == 'false'
         run: echo "Instrumented test skipped because KVM is unavailable; the manual device gate applies."

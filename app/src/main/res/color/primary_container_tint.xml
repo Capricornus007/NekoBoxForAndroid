@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Container role for the single-hue palettes: the primary at 24% over the surface.
+     Over white this is the palette's 100 tint; over a dark surface it stays dark, so
+     the regular text color reads on it in both modes for every hue. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="0.24" android:color="?attr/colorPrimary" />
+</selector>

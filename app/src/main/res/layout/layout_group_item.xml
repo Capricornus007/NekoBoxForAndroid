@@ -73,8 +73,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/more_options"
                 android:focusable="true"
-                android:nextFocusLeft="@+id/container"
                 android:padding="12dp"
                 app:srcCompat="@drawable/ic_baseline_more_vert_24" />
 

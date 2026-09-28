@@ -73,7 +73,7 @@ open class SimpleMenuPreference
         private val radius = 12f * context.resources.displayMetrics.density
 
         // Highlight the selected item with a translucent primary tint rather than
-        // an opaque colorMaterial100 fill: the light fill made the (light) item
+        // an opaque palette-tint fill: the light fill made the (light) item
         // text low-contrast on dark themes. ~20% alpha reads on any background
         // while keeping the text legible.
         private val selectedColor = ColorUtils.setAlphaComponent(

@@ -23,7 +23,6 @@ import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.databinding.LayoutEditConfigBinding
-import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.toStringPretty
 import io.nekohasekai.sagernet.ui.ThemedActivity
@@ -139,7 +138,6 @@ class ConfigEditActivity : ThemedActivity() {
             }
             setHasFixedSize(true)
             submitList("{},:_\"".map { it.toString() })
-            setBackgroundColor(getColorAttr(R.attr.primaryOrTextPrimary))
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.keyboardContainer) { v, windowInsets ->

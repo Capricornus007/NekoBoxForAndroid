@@ -22,7 +22,7 @@
         <item>@color/material_deep_orange_500</item>
 
         <item>@color/material_brown_500</item>
-        <item>@color/material_grey_500</item>
+        <item>@color/material_grey_600</item>
         <item>@color/material_blue_grey_500</item>
         <item>@color/material_light_black</item>
         <item>@color/color_verdant_mint</item>
@@ -137,6 +137,7 @@
     <color name="material_grey_200">#EEEEEE</color>
     <color name="material_grey_400">#BDBDBD</color>
     <color name="material_grey_500">#9E9E9E</color>
+    <color name="material_grey_600">#757575</color>
     <color name="material_grey_700">#616161</color>
     <color name="material_indigo_100">#C5CAE9</color>
     <color name="material_indigo_200">#9FA8DA</color>
@@ -287,41 +288,26 @@
     <color name="fab_color_progress">@color/material_light_black</color>
 
     <color name="color_pink_ssr">#fb7299</color>
+    <color name="color_pink_ssr_dark">#E10645</color> <!-- SSR pink darkened to 4.5:1 on the light surface -->
     <color name="color_verdant_mint">#00B96B</color>
-    <color name="color_verdant_mint_dark">#00875E</color>
+    <color name="color_verdant_mint_dark">#00824B</color> <!-- 4.6:1 as text on the light surface -->
     <color name="color_verdant_mint_accent">#00D685</color>
-    <color name="color_verdant_mint_100">#B4D7C6</color>
-    <color name="color_verdant_mint_300">#509177</color>
 
-    <!-- Dracula theme accents (https://draculatheme.com). Purple primary,
-         pink accent. Surfaces are overridden in values-night for the true
-         #282a36 canvas; see Theme.SagerNet.Dracula. -->
+    <!-- Classic-grid swatch for the legacy Dracula id, which now applies the Dracula
+         (M3) palette. -->
     <color name="color_dracula">#BD93F9</color>
     <!-- Representative swatch for the Dynamic (Material You) theme option (wallpaper-based on
          Android 12+); a neutral system-accent stand-in since it has no fixed color. -->
     <color name="color_dynamic_swatch">#5E6472</color>
-    <color name="color_dracula_dark">#6272A4</color>
-    <color name="color_dracula_accent">#FF79C6</color>
-    <color name="color_dracula_100">#E9DDFB</color>
-    <color name="color_dracula_300">#9A7BD0</color>
     <!-- Dracula green (#50fa7b), used for the protocol/type label. -->
-    <color name="color_dracula_green">#50FA7B</color>
     <!-- Dracula red (#ff5555): failures / stopped state. -->
-    <color name="color_dracula_red">#FF5555</color>
     <!-- Dracula yellow (#f1fa8c): profile name label. -->
-    <color name="color_dracula_yellow">#F1FA8C</color>
     <!-- Dracula cyan (#8be9fd): the Dracula "blue" (e.g. proxy route rules). -->
-    <color name="color_dracula_cyan">#8BE9FD</color>
 
     <color name="color_ng_black_accent">#9E9E9E</color>
     <color name="color_ng_black_primary">#2B2B2B</color>
 
-    <!-- M3 container/surface-variant roles for the special themes, so M3 widgets
-         (chips, tonal buttons, cards) don't fall back to library grayscale.
-         Dracula: dark purple container on its #282A36 canvas; Black: near-black. -->
-    <color name="color_dracula_container">#44355E</color>
-    <color name="color_dracula_surface_variant">#3C3F52</color>
-    <color name="color_dracula_outline">#6272A4</color>
+    <!-- Black: near-black M3 container/surface-variant roles. -->
     <color name="color_ng_black_container">#383838</color>
     <color name="color_ng_black_surface_variant">#2E2E2E</color>
 
@@ -339,6 +325,17 @@
     <!-- M3 colorOutline: neutral mid-gray for borders/dividers on light surfaces.
          Night equivalent in values-night/colors.xml. -->
     <color name="m3_outline">#79747E</color>
+
+    <!-- M3 colorSurfaceVariant (light #E7E0EC / night #49454F): switch tracks and other
+         surface-variant fills need a real tone, not the surface itself. -->
+    <color name="m3_surface_variant">#E7E0EC</color>
+
+    <!-- Text-safe tones for hues whose own 900 shade stays under 4.5:1 on the light
+         surface: the 500 hue darkened at constant hue/saturation until it passes. -->
+    <color name="text_tone_lime">#6E7715</color>
+    <color name="text_tone_yellow">#7F7200</color>
+    <color name="text_tone_amber">#8F6C00</color>
+    <color name="text_tone_orange">#A36100</color>
 
     <!-- Elevated-card tonal surface colors (light: white base + ~8% primary tint);
          see values-night/colors.xml for the dark equivalents. -->
@@ -364,15 +361,7 @@
     <color name="card_elevated_yellow">#FFFDEF</color>
     <color name="card_elevated_black">#EEEEEE</color>
     <color name="card_elevated_verdant_mint">#EBF9F3</color>
-    <color name="card_elevated_dracula">#F1EAFB</color>
 
-    <!-- Dracula canvas surfaces. The Dracula theme forces night mode on, so the live
-         values come from values-night; these base declarations exist so the resources
-         always resolve (avoids MissingDefaultResource / a crash if queried in a non-night
-         configuration) and intentionally use the same dark Dracula palette. -->
-    <color name="dracula_background">#282A36</color>
-    <color name="dracula_surface">#343746</color>
-    <color name="dracula_on_surface">#F8F8F2</color>
 
     <!-- Dark High Contrast (OLED): a full Material 3 dark-only theme on a true
          black canvas. Green-primary (GitHub action-button style) with a bright
@@ -383,7 +372,6 @@
     <color name="dhc_primary">#3FB950</color>          <!-- green action accent -->
     <color name="dhc_primary_dark">#2EA043</color>     <!-- darker green (status bar) -->
     <color name="dhc_on_primary">#0A0A0A</color> <!-- dark text on green -->
-    <color name="dhc_accent">#71B7FF</color>           <!-- bright blue secondary -->
     <color name="dhc_blue">#4493F8</color>   <!-- link/route blue -->
     <color name="dhc_background">#000000</color>       <!-- true OLED black -->
     <color name="dhc_surface">#0D0D0D</color>
@@ -396,8 +384,6 @@
     <color name="dhc_green">#3FB950</color>
     <color name="dhc_red">#F85149</color>
     <color name="dhc_yellow">#D29922</color>
-    <color name="dhc_100">#1C1C1C</color>            <!-- colorMaterial100 stand-in -->
-    <color name="dhc_300">#2EA043</color>            <!-- colorMaterial300 stand-in -->
     <color name="card_elevated_dhc">#0D0D0D</color>
 
     <!-- ===================== Phase 3: modern M3 dark themes =====================
@@ -422,8 +408,6 @@
     <color name="draculam3_green">#50FA7B</color>
     <color name="draculam3_red">#FF5555</color>
     <color name="draculam3_yellow">#F1FA8C</color>
-    <color name="draculam3_100">#44475A</color>
-    <color name="draculam3_300">#6272A4</color>
     <color name="card_elevated_draculam3">#343746</color>
 
     <!-- Nord (official palette). -->
@@ -443,8 +427,6 @@
     <color name="nord_green">#A3BE8C</color>
     <color name="nord_red">#BF616A</color>
     <color name="nord_yellow">#EBCB8B</color>
-    <color name="nord_100">#434C5E</color>
-    <color name="nord_300">#5E81AC</color>
     <color name="card_elevated_nord">#3B4252</color>
 
     <!-- Monokai (classic palette). -->
@@ -464,8 +446,6 @@
     <color name="monokai_green">#A6E22E</color>
     <color name="monokai_red">#F92672</color>            <!-- pink/red -->
     <color name="monokai_yellow">#E6DB74</color>
-    <color name="monokai_100">#3E3D32</color>
-    <color name="monokai_300">#75715E</color>
     <color name="card_elevated_monokai">#31322B</color>
 
     <!-- Ayu Mirage (official palette). -->
@@ -485,8 +465,6 @@
     <color name="ayu_green">#BAE67E</color>
     <color name="ayu_red">#FF6666</color>
     <color name="ayu_yellow">#FFD580</color>
-    <color name="ayu_100">#2D3440</color>
-    <color name="ayu_300">#FFA759</color>
     <color name="card_elevated_ayu">#232834</color>
 
     <!-- Catppuccin Mocha (official palette: https://catppuccin.com/palette). -->
@@ -506,8 +484,6 @@
     <color name="catppuccin_green">#A6E3A1</color>
     <color name="catppuccin_red">#F38BA8</color>
     <color name="catppuccin_yellow">#F9E2AF</color>
-    <color name="catppuccin_100">#45475A</color>
-    <color name="catppuccin_300">#6C7086</color>
     <color name="card_elevated_catppuccin">#181825</color>
 
 </resources>

@@ -36,7 +36,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:paddingLeft="12dp"
+                    android:paddingStart="12dp"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp">
 
@@ -73,7 +73,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/edit"
+                    android:contentDescription="@string/more_options"
                     android:focusable="true"
                     android:padding="12dp"
                     android:visibility="gone"

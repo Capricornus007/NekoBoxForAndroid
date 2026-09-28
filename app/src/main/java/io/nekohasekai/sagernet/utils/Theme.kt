@@ -96,84 +96,59 @@ object Theme {
         ThemeInfo(DYNAMIC, R.string.theme_dynamic, R.color.color_dynamic_swatch),
     )
 
-    fun apply(context: Context) {
-        context.setTheme(getTheme())
+    /**
+     * Themes a context: the structural base (app or dialog window), the shared
+     * overlay with every role and semantic default, then the palette. Layering at
+     * runtime keeps each palette written once for both window kinds. The base is
+     * re-applied explicitly because setTheme is a no-op when the base is unchanged,
+     * and a palette switch must not keep values a previous palette set.
+     */
+    fun apply(context: Context, theme: Int = DataStore.appTheme, dialog: Boolean = false) {
+        val base = if (dialog) R.style.Theme_SagerNet_Dialog else R.style.Theme_SagerNet
+        context.setTheme(base)
+        context.theme.apply {
+            applyStyle(base, true)
+            applyStyle(R.style.ThemeOverlay_SagerNet_Common, true)
+            applyStyle(palette(theme), true)
+            // The dark schemes paint the app canvas via windowBackground; a dialog keeps its frame.
+            if (dialog) applyStyle(R.style.ThemeOverlay_SagerNet_DialogWindow, true)
+        }
     }
 
-    fun applyDialog(context: Context) {
-        context.setTheme(getDialogTheme())
-    }
+    fun applyDialog(context: Context) = apply(context, dialog = true)
 
-    fun getTheme(): Int = getTheme(DataStore.appTheme)
-
-    fun getDialogTheme(): Int = getDialogTheme(DataStore.appTheme)
-
-    fun getTheme(theme: Int): Int = when (theme) {
-        RED -> R.style.Theme_SagerNet_Red
-        PINK -> R.style.Theme_SagerNet
-        PINK_SSR -> R.style.Theme_SagerNet_Pink_SSR
-        PURPLE -> R.style.Theme_SagerNet_Purple
-        DEEP_PURPLE -> R.style.Theme_SagerNet_DeepPurple
-        INDIGO -> R.style.Theme_SagerNet_Indigo
-        BLUE -> R.style.Theme_SagerNet_Blue
-        LIGHT_BLUE -> R.style.Theme_SagerNet_LightBlue
-        CYAN -> R.style.Theme_SagerNet_Cyan
-        TEAL -> R.style.Theme_SagerNet_Teal
-        GREEN -> R.style.Theme_SagerNet_Green
-        LIGHT_GREEN -> R.style.Theme_SagerNet_LightGreen
-        LIME -> R.style.Theme_SagerNet_Lime
-        YELLOW -> R.style.Theme_SagerNet_Yellow
-        AMBER -> R.style.Theme_SagerNet_Amber
-        ORANGE -> R.style.Theme_SagerNet_Orange
-        DEEP_ORANGE -> R.style.Theme_SagerNet_DeepOrange
-        BROWN -> R.style.Theme_SagerNet_Brown
-        GREY -> R.style.Theme_SagerNet_Grey
-        BLUE_GREY -> R.style.Theme_SagerNet_BlueGrey
-        BLACK -> R.style.Theme_SagerNet_Black
-        VERDANT_MINT -> R.style.Theme_SagerNet_VerdantMint
-        DRACULA -> R.style.Theme_SagerNet_Dracula
-        DARK_HIGH_CONTRAST -> R.style.Theme_SagerNet_DarkHighContrast
-        DRACULA_M3 -> R.style.Theme_SagerNet_DraculaM3
-        NORD -> R.style.Theme_SagerNet_Nord
-        MONOKAI -> R.style.Theme_SagerNet_Monokai
-        AYU -> R.style.Theme_SagerNet_Ayu
-        CATPPUCCIN -> R.style.Theme_SagerNet_Catppuccin
-        DYNAMIC -> R.style.Theme_SagerNet
-        else -> getTheme(defaultTheme())
-    }
-
-    fun getDialogTheme(theme: Int): Int = when (theme) {
-        RED -> R.style.Theme_SagerNet_Dialog_Red
-        PINK -> R.style.Theme_SagerNet_Dialog
-        PINK_SSR -> R.style.Theme_SagerNet_Dialog_Pink_SSR
-        PURPLE -> R.style.Theme_SagerNet_Dialog_Purple
-        DEEP_PURPLE -> R.style.Theme_SagerNet_Dialog_DeepPurple
-        INDIGO -> R.style.Theme_SagerNet_Dialog_Indigo
-        BLUE -> R.style.Theme_SagerNet_Dialog_Blue
-        LIGHT_BLUE -> R.style.Theme_SagerNet_Dialog_LightBlue
-        CYAN -> R.style.Theme_SagerNet_Dialog_Cyan
-        TEAL -> R.style.Theme_SagerNet_Dialog_Teal
-        GREEN -> R.style.Theme_SagerNet_Dialog_Green
-        LIGHT_GREEN -> R.style.Theme_SagerNet_Dialog_LightGreen
-        LIME -> R.style.Theme_SagerNet_Dialog_Lime
-        YELLOW -> R.style.Theme_SagerNet_Dialog_Yellow
-        AMBER -> R.style.Theme_SagerNet_Dialog_Amber
-        ORANGE -> R.style.Theme_SagerNet_Dialog_Orange
-        DEEP_ORANGE -> R.style.Theme_SagerNet_Dialog_DeepOrange
-        BROWN -> R.style.Theme_SagerNet_Dialog_Brown
-        GREY -> R.style.Theme_SagerNet_Dialog_Grey
-        BLUE_GREY -> R.style.Theme_SagerNet_Dialog_BlueGrey
-        BLACK -> R.style.Theme_SagerNet_Dialog_Black
-        VERDANT_MINT -> R.style.Theme_SagerNet_Dialog_VerdantMint
-        DRACULA -> R.style.Theme_SagerNet_Dialog_Dracula
-        DARK_HIGH_CONTRAST -> R.style.Theme_SagerNet_Dialog_DarkHighContrast
-        DRACULA_M3 -> R.style.Theme_SagerNet_Dialog_DraculaM3
-        NORD -> R.style.Theme_SagerNet_Dialog_Nord
-        MONOKAI -> R.style.Theme_SagerNet_Dialog_Monokai
-        AYU -> R.style.Theme_SagerNet_Dialog_Ayu
-        CATPPUCCIN -> R.style.Theme_SagerNet_Dialog_Catppuccin
-        DYNAMIC -> R.style.Theme_SagerNet_Dialog
-        else -> getDialogTheme(defaultTheme())
+    fun palette(theme: Int): Int = when (theme) {
+        RED -> R.style.ThemeOverlay_SagerNet_Palette_Red
+        PINK -> R.style.ThemeOverlay_SagerNet_Palette_Pink
+        PINK_SSR -> R.style.ThemeOverlay_SagerNet_Palette_Pink_SSR
+        PURPLE -> R.style.ThemeOverlay_SagerNet_Palette_Purple
+        DEEP_PURPLE -> R.style.ThemeOverlay_SagerNet_Palette_DeepPurple
+        INDIGO -> R.style.ThemeOverlay_SagerNet_Palette_Indigo
+        BLUE -> R.style.ThemeOverlay_SagerNet_Palette_Blue
+        LIGHT_BLUE -> R.style.ThemeOverlay_SagerNet_Palette_LightBlue
+        CYAN -> R.style.ThemeOverlay_SagerNet_Palette_Cyan
+        TEAL -> R.style.ThemeOverlay_SagerNet_Palette_Teal
+        GREEN -> R.style.ThemeOverlay_SagerNet_Palette_Green
+        LIGHT_GREEN -> R.style.ThemeOverlay_SagerNet_Palette_LightGreen
+        LIME -> R.style.ThemeOverlay_SagerNet_Palette_Lime
+        YELLOW -> R.style.ThemeOverlay_SagerNet_Palette_Yellow
+        AMBER -> R.style.ThemeOverlay_SagerNet_Palette_Amber
+        ORANGE -> R.style.ThemeOverlay_SagerNet_Palette_Orange
+        DEEP_ORANGE -> R.style.ThemeOverlay_SagerNet_Palette_DeepOrange
+        BROWN -> R.style.ThemeOverlay_SagerNet_Palette_Brown
+        GREY -> R.style.ThemeOverlay_SagerNet_Palette_Grey
+        BLUE_GREY -> R.style.ThemeOverlay_SagerNet_Palette_BlueGrey
+        BLACK -> R.style.ThemeOverlay_SagerNet_Palette_Black
+        VERDANT_MINT -> R.style.ThemeOverlay_SagerNet_Palette_VerdantMint
+        // The legacy Dracula id keeps working; it applies the same official palette.
+        DRACULA, DRACULA_M3 -> R.style.ThemeOverlay_SagerNet_Palette_DraculaM3
+        DARK_HIGH_CONTRAST -> R.style.ThemeOverlay_SagerNet_Palette_DarkHighContrast
+        NORD -> R.style.ThemeOverlay_SagerNet_Palette_Nord
+        MONOKAI -> R.style.ThemeOverlay_SagerNet_Palette_Monokai
+        AYU -> R.style.ThemeOverlay_SagerNet_Palette_Ayu
+        CATPPUCCIN -> R.style.ThemeOverlay_SagerNet_Palette_Catppuccin
+        DYNAMIC -> R.style.ThemeOverlay_SagerNet_Palette_Dynamic
+        else -> palette(defaultTheme())
     }
 
     var currentNightMode = -1

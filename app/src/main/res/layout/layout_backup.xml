@@ -13,9 +13,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:clickable="true"
-            android:focusable="true">
+            android:layout_margin="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -78,24 +76,21 @@
                         style="@style/Widget.SagerNet.Button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/share"
-                        android:textColor="?whiteOrTextPrimary" />
+                        android:text="@string/share" />
 
                     <Button
                         android:id="@+id/action_export"
                         style="@style/Widget.SagerNet.Button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/action_export_file"
-                        android:textColor="?whiteOrTextPrimary" />
+                        android:text="@string/action_export_file" />
 
                     <Button
                         android:id="@+id/action_import_file"
                         style="@style/Widget.SagerNet.Button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/action_import_file"
-                        android:textColor="?whiteOrTextPrimary" />
+                        android:text="@string/action_import_file" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -105,9 +100,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:clickable="true"
-            android:focusable="true">
+            android:layout_margin="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -140,24 +133,21 @@
                         style="@style/Widget.SagerNet.Button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/webdav_settings"
-                        android:textColor="?whiteOrTextPrimary" />
+                        android:text="@string/webdav_settings" />
 
                     <Button
                         android:id="@+id/backup_to_webdav"
                         style="@style/Widget.SagerNet.Button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/backup_to_webdav"
-                        android:textColor="?whiteOrTextPrimary" />
+                        android:text="@string/backup_to_webdav" />
 
                     <Button
                         android:id="@+id/restore_from_webdav"
                         style="@style/Widget.SagerNet.Button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/restore_from_webdav"
-                        android:textColor="?whiteOrTextPrimary" />
+                        android:text="@string/restore_from_webdav" />
 
                 </LinearLayout>
             </LinearLayout>

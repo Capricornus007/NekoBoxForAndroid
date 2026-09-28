@@ -1,0 +1,33 @@
+<resources>
+    <!-- Dynamic (Material You) chrome. Color roles come from DynamicColors, applied on
+         top of this palette by ThemedActivity; this overlay only places the chrome the
+         way the other Material 3 schemes do: app bar and bottom bar on the surface,
+         primary reserved for actions and status. The concrete app-bar/card colors are
+         the system neutral tones DynamicColors uses for surface and container. -->
+    <style name="Base.ThemeOverlay.SagerNet.Palette.Dynamic" parent="">
+        <item name="actionBarTheme">@style/ThemeOverlay.Material3.ActionBar</item>
+        <item name="bottomAppBarStyle">@style/Widget.SagerNet.BottomAppBar.Surface</item>
+        <item name="tabTextColor">?attr/colorOnSurfaceVariant</item>
+        <item name="tabSelectedTextColor">?attr/colorPrimary</item>
+        <item name="tabIndicatorColor">?attr/colorPrimary</item>
+        <item name="tabRippleColor">?attr/colorPrimary</item>
+        <item name="primaryOrTextPrimary">?attr/colorPrimary</item>
+        <item name="primaryOrTextSecondary">?attr/colorPrimary</item>
+        <item name="protocolColor">?attr/colorPrimary</item>
+        <item name="statusConnectedColor">?attr/colorPrimary</item>
+        <item name="statusStoppedColor">?attr/colorError</item>
+        <item name="statusConnectingColor">?attr/colorTertiary</item>
+        <item name="statusTestingColor">?attr/colorTertiary</item>
+        <item name="statusDetailColor">?attr/colorOnSurfaceVariant</item>
+        <item name="speedTextColor">?attr/colorOnSurfaceVariant</item>
+        <item name="testFailColor">?attr/colorError</item>
+        <item name="fabStoppedColor">?attr/colorOnPrimary</item>
+        <item name="fabConnectedColor">?attr/colorOnPrimary</item>
+        <item name="navSelectedColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="ThemeOverlay.SagerNet.Palette.Dynamic" parent="Base.ThemeOverlay.SagerNet.Palette.Dynamic">
+        <item name="appBarBackgroundColor">@android:color/system_neutral1_10</item>
+        <item name="cardElevatedSurfaceColor">@android:color/system_neutral1_50</item>
+    </style>
+</resources>

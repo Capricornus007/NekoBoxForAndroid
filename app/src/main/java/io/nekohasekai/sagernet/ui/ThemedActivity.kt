@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.ui
 
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,13 +19,13 @@ import com.google.android.material.color.DynamicColors
 import com.google.android.material.snackbar.Snackbar
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.utils.Theme
 
 abstract class ThemedActivity : AppCompatActivity {
     constructor() : super()
     constructor(contentLayoutId: Int) : super(contentLayoutId)
 
-    var themeResId = 0
     var uiMode = 0
     open val isDialog = false
 
@@ -49,8 +51,11 @@ abstract class ThemedActivity : AppCompatActivity {
 
             val insetController = WindowCompat.getInsetsController(window, window.decorView)
             insetController.isAppearanceLightNavigationBars = !Theme.usingNightMode()
+            // The transparent status bar sits over the app bar: dark icons whenever white
+            // would not read on it (the same 3:1 floor the light-primary palettes use).
+            val appBar = getColorAttr(R.attr.appBarBackgroundColor)
             insetController.isAppearanceLightStatusBars =
-                if (DataStore.appTheme == Theme.BLACK) !Theme.usingNightMode() else false
+                Color.alpha(appBar) == 0xFF && ColorUtils.calculateContrast(Color.WHITE, appBar) < 3.0
         }
 
         // findViewById (not ViewBinding): ThemedActivity is a base class applied over arbitrary
@@ -71,12 +76,6 @@ abstract class ThemedActivity : AppCompatActivity {
             }
             insets
         }
-    }
-
-    override fun setTheme(resId: Int) {
-        super.setTheme(resId)
-
-        themeResId = resId
     }
 
     /**

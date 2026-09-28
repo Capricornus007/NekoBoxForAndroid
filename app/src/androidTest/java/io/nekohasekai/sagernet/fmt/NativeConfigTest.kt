@@ -27,8 +27,10 @@ class NativeConfigTest {
         try {
             instance.start()
             val version = Libcore.versionBox()
-            assertTrue(version.contains("sing-box: 1.14.1"))
-            assertTrue(version.contains("go1.27."))
+            // The exact pin lives in buildScript/lib/core/get_source_env.sh and changes on
+            // every core bump; what must hold is that build.sh injected a real version.
+            assertTrue(version, version.startsWith("sing-box: 1."))
+            assertTrue(version, version.contains("go1.27."))
         } finally {
             instance.close()
         }

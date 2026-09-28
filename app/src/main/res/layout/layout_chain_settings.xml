@@ -13,12 +13,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <LinearLayout
+    <View
         android:id="@+id/list_cell"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@android:color/darker_gray"
-        android:orientation="horizontal" />
+        android:layout_height="1dp"
+        android:background="?attr/colorOutlineVariant" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/configuration_list"

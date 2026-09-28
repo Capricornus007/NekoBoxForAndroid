@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <attr name="colorMaterial100" format="color" />
-    <attr name="colorMaterial300" format="color" />
-    <attr name="accentOrTextSecondary" format="color" />
-    <attr name="accentOrTextPrimary" format="color" />
-    <attr name="primaryOrTextSecondary" format="color" />
+    <!-- The primary hue at a tone that passes 4.5:1 as text on the light surface.
+         Text-like accents use it in day mode; night mode uses the bright primary. -->
+    <attr name="colorPrimaryText" format="color" />
+    <!-- Accent for text-like uses, falling back to the text colors on neutral
+         palettes (Black): dialog buttons, checked chip text, swipe-refresh spinner. -->
     <attr name="primaryOrTextPrimary" format="color" />
+    <!-- Same, secondary weight: the connect-FAB progress ring. -->
+    <attr name="primaryOrTextSecondary" format="color" />
     <attr name="fabColorBackground" format="color" />
-    <attr name="selectedColorPrimary" format="color" />
-    <attr name="whiteOrTextPrimary" format="color" />
-    <!-- Text color for the protocol/type label on a profile row. Defaults to
-         the accent color; Dracula overrides it with its green. -->
+    <!-- Text color for the protocol/type label on a profile row. Defaults to the
+         text-safe primary (day) or the accent (night); dark schemes use their green. -->
     <attr name="protocolColor" format="color" />
     <!-- Profile name label color. Defaults to primary text; Dracula = yellow. -->
     <attr name="profileNameColor" format="color" />

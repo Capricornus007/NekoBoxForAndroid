@@ -99,10 +99,9 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                     Theme.applyNightTheme()
                 }
             }
-            val theme = Theme.getTheme(themeId)
-            app.setTheme(theme)
+            Theme.apply(app, themeId)
             requireActivity().apply {
-                setTheme(theme)
+                Theme.apply(this, themeId)
                 ActivityCompat.recreate(this)
             }
             true

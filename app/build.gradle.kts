@@ -99,5 +99,13 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.7.0")
     androidTestImplementation("androidx.room:room-testing:2.8.5")
 
+    constraints {
+        // room-migration 2.8.5 ships serializers compiled against kotlinx-serialization
+        // 1.8.1 (JVM default methods). The transitive core from savedstate/lifecycle is
+        // older and lands in the app APK, so the test APK's copy is dropped and the
+        // migration tests die with AbstractMethodError unless the app resolves 1.8.1 too.
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
+    }
+
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }

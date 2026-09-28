@@ -240,9 +240,10 @@ class ThemePickerPreference
             val colors = context.resources.getIntArray(R.array.material_colors)
             for ((index, color) in colors.withIndex()) {
                 // Swatch index+1 is the Theme id (see Theme.kt). Skip themes that
-                // are presented in the modern named list instead of the grid.
+                // are presented in the modern named list instead of the grid, and the
+                // legacy Dracula id, which now applies the Dracula (M3) palette.
                 val themeId = index + 1
-                if (Theme.MODERN_THEMES.any { it.id == themeId }) continue
+                if (themeId == Theme.DRACULA || Theme.MODERN_THEMES.any { it.id == themeId }) continue
 
                 addView(
                     nekoImageView(color, 64, 0).apply {
