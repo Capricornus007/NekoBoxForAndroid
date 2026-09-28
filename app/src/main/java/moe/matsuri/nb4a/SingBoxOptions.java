@@ -2029,6 +2029,9 @@ public class SingBoxOptions {
 
         public String certificate_path;
 
+        // Generate note: Listable
+        public List<String> certificate_sha256;
+
         public OutboundECHOptions ech;
 
         public OutboundUTLSOptions utls;
@@ -4944,6 +4947,8 @@ public class SingBoxOptions {
         public List<String> server_ports;
 
         public String hop_interval;
+
+        public Boolean disable_chrome_parrot;
 
     }
 

@@ -147,6 +147,26 @@ private fun HttpUrl.queryParameterPreservingPlus(name: String): String? {
     return URLDecoder.decode(encodedValue.replace("+", "%2B"), Charsets.UTF_8.name())
 }
 
+private val PIN_SHA256_HEX = Regex("^[0-9a-fA-F]{64}$")
+
+/**
+ * Normalise Hysteria 2 certificate pins into a comma-separated lowercase hex list.
+ *
+ * Links carry them either as repeated `pinSHA256` parameters or as one comma-separated
+ * value, and some panels prefix `sha256/`. Anything that is not a bare SHA-256 hex digest
+ * is dropped: a single malformed entry must not make the core reject the whole outbound.
+ */
+internal fun normalizeHysteria2Pins(values: List<String?>): String = values.filterNotNull()
+    .flatMap { it.split(',') }
+    .map { it.trim().removePrefix("sha256/").lowercase() }
+    .filter { it.matches(PIN_SHA256_HEX) }
+    .distinct()
+    .joinToString(",")
+
+fun HysteriaBean.pinList(): List<String> = pinSHA256.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+
+private fun String.hexToBytes(): ByteArray = ByteArray(length / 2) { substring(it * 2, it * 2 + 2).toInt(16).toByte() }
+
 // hysteria://host:port?auth=123456&peer=sni.domain&insecure=1|0&upmbps=100&downmbps=100&alpn=hysteria&obfs=xplus&obfsParam=123456#remarks
 fun parseHysteria1(url: String): HysteriaBean {
     val link = url.replace("hysteria://", "https://").toHttpUrlOrNull() ?: error(
@@ -254,9 +274,10 @@ fun parseHysteria2(url: String): HysteriaBean {
         link.queryParameter("obfs-max-packet-size")?.toIntOrNull()?.also {
             geckoMaxPacketSize = it
         }
-//        link.queryParameter("pinSHA256")?.also {
-//            // TODO your box do not support it
-//        }
+        // Repeated parameter form (hysteria 2 spec) and the comma-separated form both occur.
+        pinSHA256 = normalizeHysteria2Pins(
+            link.queryParameterValues("pinSHA256") + link.queryParameterValues("pin_sha256"),
+        )
     }
 }
 
@@ -314,6 +335,9 @@ fun HysteriaBean.toUri(): String {
     } else {
         if (sni.isNotBlank()) {
             builder.addQueryParameter("sni", sni)
+        }
+        pinList().forEach {
+            builder.addQueryParameter("pinSHA256", it)
         }
         udpFragment?.let {
             builder.addQueryParameter("udp_fragment", if (it) "1" else "0")
@@ -418,6 +442,15 @@ fun JSONObject.parseHysteria2Json(): HysteriaBean {
                 echConfig = canonicalHysteria2ECHConfig(it)
                 enableECH = true
             }
+            // pinSHA256 is a string or an array of strings in the official client config.
+            val rawPins = mutableListOf<String?>()
+            val pinned = tls.optJSONArray("pinSHA256")
+            if (pinned != null) {
+                for (i in 0 until pinned.length()) rawPins.add(pinned.optString(i))
+            } else {
+                tls.getStr("pinSHA256")?.also { rawPins.add(it) }
+            }
+            pinSHA256 = normalizeHysteria2Pins(rawPins)
         }
         // obfs block: { type: "salamander"|"gecko", salamander: { password }, gecko: {...} }.
         optJSONObject("obfs")?.also { obfs ->
@@ -617,6 +650,11 @@ fun buildSingBoxOutboundHysteriaBean(bean: HysteriaBean): SingBoxOptions.SingBox
                 else -> server_port = getFirstPort(bean.serverPorts)
             }
             hop_interval = "${bean.hopInterval}s"
+            // 這支核心的 Chrome 指紋模仿（世界加的 fork 功能）目前連不上任何 Hysteria2
+            // 服務端：本機 sing-box 自建伺服器、以及訂閱節點，開著它都是 15 秒超時且
+            // 不吐任何錯誤（關掉即通，實測於 loopback 與遠端各兩輪）。指紋模仿只是
+            // 抗 DPI，不影響能不能連上，所以在核心修好之前一律關掉。
+            disable_chrome_parrot = true
             up_mbps = bean.uploadMbps
             down_mbps = bean.downloadMbps
             // Leave the field unwritten when the profile did not choose a value: the
@@ -661,6 +699,15 @@ fun buildSingBoxOutboundHysteriaBean(bean: HysteriaBean): SingBoxOptions.SingBox
                 alpn = listOf("h3")
                 if (bean.caText.isNotBlank()) {
                     certificate = bean.caText
+                }
+                // A pin replaces chain verification, and the core rejects pin and CA
+                // together, so the CA wins when a profile carries both.
+                if (bean.caText.isBlank()) {
+                    bean.pinList().takeIf { it.isNotEmpty() }?.also { pins ->
+                        certificate_sha256 = pins.map {
+                            Base64.getEncoder().encodeToString(it.hexToBytes())
+                        }
+                    }
                 }
                 if (bean.enableECH == true) {
                     ech = SingBoxOptions.OutboundECHOptions().apply {

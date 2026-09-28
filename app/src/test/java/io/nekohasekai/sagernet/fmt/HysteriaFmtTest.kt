@@ -317,4 +317,73 @@ class HysteriaFmtTest {
         val absent = JSONObject("""{ "server": "example.com:443" }""").parseHysteria2Json()
         assertNull(absent.udpFragment)
     }
+
+    @Test
+    fun pinSHA256_becomesCertificateSha256AndSurvivesTheLinkRoundTrip() {
+        val pin = "5343bfcb1c5db62de169584dd7ae238dc9a8f2659283f1ee99b06d744c644806"
+        val parsed = parseHysteria2(
+            "hy2://secret@example.com:443/?sni=cdn.example.com&insecure=false&pinSHA256=$pin#pinned",
+        ).apply { initializeDefaultValues() }
+
+        assertEquals(pin, parsed.pinSHA256)
+        val expectedBase64 = java.util.Base64.getEncoder().encodeToString(
+            ByteArray(32) { pin.substring(it * 2, it * 2 + 2).toInt(16).toByte() },
+        )
+        assertEquals(listOf(expectedBase64), buildHysteria2(parsed).tls.certificate_sha256)
+        assertEquals(pin, parseHysteria2(parsed.toUri()).pinSHA256)
+    }
+
+    @Test
+    fun parseHysteria2_acceptsRepeatedAndCommaSeparatedPinsAndDropsGarbage() {
+        val first = "0".repeat(63) + "a"
+        val second = "f".repeat(64)
+
+        val repeated = parseHysteria2(
+            "hy2://pw@example.com:443/?pinSHA256=$first&pinSHA256=$second",
+        )
+        assertEquals("$first,$second", repeated.pinSHA256)
+
+        val comma = parseHysteria2("hy2://pw@example.com:443/?pinSHA256=sha256/$first,$second,zz")
+        assertEquals("$first,$second", comma.pinSHA256)
+
+        // 一指紋非法就丟掉該條，不能讓整個 outbound 被核心拒收。
+        assertEquals("", parseHysteria2("hy2://pw@example.com:443/?pinSHA256=deadbeef").pinSHA256)
+        assertNull(
+            buildHysteria2(
+                parseHysteria2("hy2://pw@example.com:443/").apply { initializeDefaultValues() },
+            ).tls.certificate_sha256,
+        )
+    }
+
+    @Test
+    fun parseHysteria2Json_readsTlsPinSHA256AsArrayOrString() {
+        val pin = "a".repeat(64)
+        val array = JSONObject(
+            """{ "server": "h:443", "tls": { "pinSHA256": ["$pin", "bad"] } }""",
+        ).parseHysteria2Json()
+        val string = JSONObject(
+            """{ "server": "h:443", "tls": { "pinSHA256": "$pin" } }""",
+        ).parseHysteria2Json()
+
+        assertEquals(pin, array.pinSHA256)
+        assertEquals(pin, string.pinSHA256)
+    }
+
+    @Test
+    fun caText_winsOverPinBecauseTheCoreRejectsBoth() {
+        val bean = hysteria2Bean().apply {
+            pinSHA256 = "b".repeat(64)
+            caText = "-----BEGIN CERTIFICATE-----"
+        }
+
+        val outbound = buildHysteria2(bean)
+
+        assertEquals("-----BEGIN CERTIFICATE-----", outbound.tls.certificate)
+        assertNull(outbound.tls.certificate_sha256)
+    }
+
+    @Test
+    fun hysteria2_disablesChromeParrotBecauseTheCoreCannotCompleteWithIt() {
+        assertTrue(buildHysteria2(hysteria2Bean()).disable_chrome_parrot!!)
+    }
 }

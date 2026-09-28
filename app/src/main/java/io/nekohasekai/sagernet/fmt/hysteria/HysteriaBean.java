@@ -27,6 +27,11 @@ public class HysteriaBean extends AbstractBean {
     public Integer uploadMbps;
     public Integer downloadMbps;
     public Boolean allowInsecure;
+    // Hysteria 2 servers with a CN-only self-signed certificate cannot pass chain
+    // verification at all (Go rejects such certificates outright), so the link carries
+    // a SHA-256 fingerprint of the leaf instead. Comma-separated hex; maps to
+    // sing-box tls.certificate_sha256.
+    public String pinSHA256;
     public Integer streamReceiveWindow;
     public Integer connectionReceiveWindow;
     public Boolean disableMtuDiscovery;
@@ -89,6 +94,7 @@ public class HysteriaBean extends AbstractBean {
         if (alpn == null) alpn = "";
         if (caText == null) caText = "";
         if (allowInsecure == null) allowInsecure = false;
+        if (pinSHA256 == null) pinSHA256 = "";
 
         if (protocolVersion == 1) {
             if (uploadMbps == null) uploadMbps = 10;
@@ -107,7 +113,7 @@ public class HysteriaBean extends AbstractBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(10);
+        output.writeInt(11);
         super.serialize(output);
 
         output.writeInt(protocolVersion);
@@ -139,6 +145,8 @@ public class HysteriaBean extends AbstractBean {
 
         // 0 = unset (core default), 1 = forced on, 2 = forced off.
         output.writeInt(triStateToInt(udpFragment));
+
+        output.writeString(pinSHA256);
     }
 
     @Override
@@ -199,6 +207,11 @@ public class HysteriaBean extends AbstractBean {
             udpFragment = readTriState(input.readInt());
         } else {
             udpFragment = null;
+        }
+        if (version >= 11) {
+            pinSHA256 = input.readString();
+        } else {
+            pinSHA256 = "";
         }
         // For version < 8, hysteria2ObfsType/gecko* stay null and are derived in
         // initializeDefaultValues() (Salamander when an obfuscation password exists).
