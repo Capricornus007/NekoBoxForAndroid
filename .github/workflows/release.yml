@@ -19,14 +19,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
       - name: Golang Status
         run: find buildScript libcore/*.sh nb4a.properties | xargs cat | sha1sum > golang_status
       - name: Libcore Status
         run: git ls-files libcore | xargs cat | sha1sum > libcore_status
       - name: LibCore Cache
         id: cache
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: |
             app/libs/libcore.aar
@@ -46,7 +46,7 @@ jobs:
           unzip -l /tmp/libcore-classes.jar | grep -q 'libcore/Libcore.class'
           unzip -l /tmp/libcore-classes.jar | grep -q 'go/Seq.class'
       - name: Upload LibCore AAR
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: libcore-aar
           path: app/libs/libcore.aar
@@ -60,14 +60,14 @@ jobs:
       - libcore
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
       - name: Setup Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
       - name: Download LibCore AAR
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v4
         with:
           name: libcore-aar
           path: app/libs
@@ -78,7 +78,7 @@ jobs:
           unzip -l /tmp/libcore-classes.jar | grep -q 'libcore/Libcore.class'
           unzip -l /tmp/libcore-classes.jar | grep -q 'go/Seq.class'
       - name: Gradle cache
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: ~/.gradle
           key: gradle-oss-${{ hashFiles('**/*.gradle.kts') }}
