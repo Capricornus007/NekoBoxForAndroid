@@ -183,7 +183,7 @@ replace github.com/sagernet/quic-go => github.com/Capricornus007/quic-go v0.61.0
 
 replace github.com/sagernet/sing-mux => github.com/Capricornus007/sing-mux v0.3.7-0.20260928040855-6f936a848cd2
 
-replace github.com/metacubex/utls => github.com/Capricornus007/utls v0.0.0-20260926050627-c3856ce79ce4
+replace github.com/metacubex/utls => github.com/Capricornus007/utls v1.8.8-0.20260928121433-db7df0e7cabd
 
 replace github.com/exclavenetwork/sing-juicity => ../../sing-juicity
 

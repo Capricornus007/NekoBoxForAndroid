@@ -18,8 +18,8 @@ github.com/Capricornus007/sing-tun v0.9.4-0.20260928095234-8e939c013edf h1:J9322
 github.com/Capricornus007/sing-tun v0.9.4-0.20260928095234-8e939c013edf/go.mod h1:gL0xE4X4x5c5JKcP0ZKETnGDPAhw6fkcKFjygs2X6/o=
 github.com/Capricornus007/sing-vmess v0.2.9-0.20260925134622-eb38beec5e11 h1:N1wnTrePrvyQKC+dVk80vVaZAtRmunYRX2jwCixFWV8=
 github.com/Capricornus007/sing-vmess v0.2.9-0.20260925134622-eb38beec5e11/go.mod h1:mZjljwCAsUOwEn1MRMEXtTJakcw4rbhEWfRmhbDRS1Q=
-github.com/Capricornus007/utls v0.0.0-20260926050627-c3856ce79ce4 h1:ug0fWv9o2ZSohrI2CV6ghM4pIMnoSiGhSI2OfiDDz1U=
-github.com/Capricornus007/utls v0.0.0-20260926050627-c3856ce79ce4/go.mod h1:VdT++SaMiWajp06FuL1kzmswLRK1ajiAjsJ3esXn/Ug=
+github.com/Capricornus007/utls v1.8.8-0.20260928121433-db7df0e7cabd h1:EavuxBUHMVGJ/RK12XOVg11pJ+xulXWTgzjbygT7aak=
+github.com/Capricornus007/utls v1.8.8-0.20260928121433-db7df0e7cabd/go.mod h1:VdT++SaMiWajp06FuL1kzmswLRK1ajiAjsJ3esXn/Ug=
 github.com/Mahdi-zarei/speedtest-go v1.7.13-0.20260107171856-79c565dfd83a h1:11VlAp2Xf/V+W4xXYtWwMAkkm2oBcPRB6oZrSxVoFug=
 github.com/Mahdi-zarei/speedtest-go v1.7.13-0.20260107171856-79c565dfd83a/go.mod h1:b1H+UBFUnLKH1YquN2xao8d1hokcnDFFhEKDARTzddM=
 github.com/RyuaNerin/go-krypto v1.3.0 h1:smavTzSMAx8iuVlGb4pEwl9MD2qicqMzuXR2QWp2/Pg=
