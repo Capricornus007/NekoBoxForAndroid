@@ -3,7 +3,7 @@
 <p align="center">
   <img src="docs/logo.png" width="128" height="128" alt="OwnBox Logo">
   <br>
-  <b>基于 Sing-box 1.15.0 Alpha 9 适用于 Android 的现代化通用代理工具链与网络调试客户端</b>
+  <b>A modern, versatile proxy toolchain and network debugging client based on Sing-box 1.15.0 Alpha 9 for Android</b>
   <br>
   <b>A Modern Universal Proxy Toolchain & Network Debugging Client for Android</b>
 </p>
@@ -18,49 +18,39 @@
 ---
 <div align="center">
 
-## 支持本项目
-
-·如果这个项目对你有帮助,请加入 TG 频道就是对我的最大鼓励
+## Support this project
 
 ·If this project helps you, joining our TG channel is the best support you can give me.
 
 ---
-## 📖 项目介绍 / Introduction
-
-**OwnBox for Android** 是一款基于 Sing-box 官方原生核心深度定制打造的 Android 通用网络代理客户端。集合全协议栈支持、自定义桌面图标切换 (9 款精选质感图标，支持系统深浅色主题自适应)、TCP Ping 极速真连测试、常用应用分流一键预设、单节点独立测速、并发拨号、双网络加速、WebDAV 云备份同步、控制中心快捷磁贴与桌面小组件等丰富功能，兼具极速连接、低耗电量与优雅简洁的用户界面。
+## 📖Introduction
 
 **OwnBox for Android** is a universal network proxy client for Android, deeply customized and built on top of the official native Sing-box core. It brings together full-protocol-stack support, customizable home screen icons (9 stylish icon designs with system light/dark auto-adaptation), lightning-fast real-connection TCP Ping testing, one-tap presets for routing common apps, standalone latency testing per node, concurrent dialing, dual-network acceleration, WebDAV cloud backup and sync, a Quick Settings tile, and home screen widgets — all combined with blazing-fast connections, low battery consumption, and an elegant, clean user interface.
 
 ---
 
-## 📥 发行版下载 / Downloads
-
-请前往官方发行版页面获取经过正式签名的全架构 APK 安装包：
+## 📥 Downloads
 
 Please visit the official Releases page to download officially signed APK packages for all supported architectures:
 
-👉 **[前往 GitHub Releases 官方发布页面 / Go to the Official GitHub Releases Page](https://github.com/Own716/OwnBoxForAndroid/releases)**
+👉 **[Go to the Official GitHub Releases Page](https://github.com/Own716/OwnBoxForAndroid/releases)**
 
 ---
 
-### 📦 安装包架构说明 / Architecture Notes
+### 📦 Architecture Notes
 
-* **ARM64 (v8a)**：适用于绝大多数主流 64 位安卓手机与平板设备；
 * **ARM64 (v8a)**: Suitable for the vast majority of mainstream 64-bit Android phones and tablets;
 
-* **ARMeabi-v7a**：适用于较老款的 32 位安卓设备或部分电视盒子；
 * **ARMeabi-v7a**: Suitable for older 32-bit Android devices or some TV boxes;
 
-* **x86_64 / x86**：适用于主流 PC 电脑安卓模拟器。
 * **x86_64 / x86**: Suitable for mainstream Android emulators running on PC.
 
 ---
 
-## 💬 反馈与建议 / Issues & Feedback
+## 💬 Issues & Feedback
 
-遇到任何使用问题、连接异常或有新的功能建议，欢迎前往仓库议题页面提交反馈：
 
 If you encounter any issues, connection errors, or have feature requests, please feel free to submit an issue:
 
-👉 **[前往提交议题 / Submit an Issue on GitHub](https://github.com/Own716/OwnBoxForAndroid/issues)**
+👉 **[Submit an Issue on GitHub](https://github.com/Own716/OwnBoxForAndroid/issues)**
 
