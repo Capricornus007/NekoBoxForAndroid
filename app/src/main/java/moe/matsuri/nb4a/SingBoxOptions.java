@@ -3008,8 +3008,6 @@ public class SingBoxOptions {
 
         public Boolean endpoint_independent_nat;
 
-        public Boolean gso;
-
         public Long udp_timeout;
 
         public String stack;
