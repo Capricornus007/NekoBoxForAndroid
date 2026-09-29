@@ -237,16 +237,14 @@ object ProfileManager {
                     outbound = -2,
                 ),
             )
-            val fuckedCountry = mutableListOf("cn:中国")
+            val bypassCountries = mutableListOf("cn")
             if (Locale.getDefault().country != Locale.CHINA.country) {
                 // non-Chinese users
-                fuckedCountry += "ir:Iran"
-                fuckedCountry += "ru:Russia"
+                bypassCountries += "ir"
+                bypassCountries += "ru"
             }
-            for (c in fuckedCountry) {
-                val country = c.substringBefore(":")
-                val displayCountry = c.substringAfter(":")
-                //
+            for (country in bypassCountries) {
+                val displayCountry = Locale("", country).displayCountry
                 if (country == "cn") {
                     createRule(
                         RuleEntity(

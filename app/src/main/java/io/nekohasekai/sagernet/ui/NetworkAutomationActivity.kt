@@ -172,6 +172,7 @@ class NetworkAutomationActivity : ThemedActivity() {
             binding.title.text = if (rule.kind == Kind.SSID) getString(R.string.network_rule_wifi_named, rule.ssid) else kindLabel(rule.kind)
             binding.more.setOnClickListener { adapter.removeAt(bindingAdapterPosition) }
             binding.more.setImageResource(R.drawable.ic_baseline_delete_24)
+            binding.more.contentDescription = getString(R.string.delete)
             binding.summary.text = when {
                 rule.action == Action.DISCONNECT -> getString(R.string.network_rule_disconnect)
 

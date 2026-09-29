@@ -15,7 +15,7 @@ class ZlibDecompressTest {
 
     @Test
     fun roundTripUnderLimit() {
-        val original = "hello world — proxy config 世界".toByteArray(Charsets.UTF_8)
+        val original = "hello world — proxy config €".toByteArray(Charsets.UTF_8)
         val compressed = Util.zlibCompress(original, Deflater.BEST_COMPRESSION)
         val restored = Util.zlibDecompress(compressed)
         assertArrayEquals(original, restored)

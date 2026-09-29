@@ -280,7 +280,7 @@ class RawUpdaterParseTest {
             RawUpdater.readSubscriptionContent("#".repeat(MAX_IMPORT_BYTES.toInt() + 1))
         }
         assertThrows(ImportTooLargeException::class.java) {
-            RawUpdater.readSubscriptionContent("界".repeat(MAX_IMPORT_BYTES.toInt() / 3 + 1))
+            RawUpdater.readSubscriptionContent("€".repeat(MAX_IMPORT_BYTES.toInt() / 3 + 1))
         }
     }
 

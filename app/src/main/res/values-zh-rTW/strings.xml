@@ -533,6 +533,7 @@
     <string name="webdav_test">測試連線</string>
     <string name="webdav_test_success">連線成功</string>
     <string name="webdav_test_failed" formatted="false">連線失敗: %s</string>
+    <string name="webdav_test_wait">請稍後再試</string>
     <string name="backup_to_webdav">備份到 WebDAV</string>
     <string name="restore_from_webdav">從 WebDAV 恢復</string>
     <string name="webdav_backup_success">備份到 WebDAV 成功</string>

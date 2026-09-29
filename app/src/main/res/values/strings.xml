@@ -108,7 +108,7 @@
         is as secure as plaintext</string>
     <string name="traffic" translatable="false">%1$s↑ %2$s↓</string>
     <string name="lifetime_traffic">All-time: %1$s↑ %2$s↓</string>
-    <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirect： %3$s↑ %4$s↓</string>
+    <string name="speed_detail">Proxy: %1$s↑ %2$s↓\nDirect: %3$s↑ %4$s↓</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_testing">Testing…</string>
     <string name="connection_test_available">Success: HTTPS handshake took %dms</string>
@@ -248,6 +248,9 @@
         device.</string>
     <!-- alert category -->
     <string name="profile_empty">Please select a profile</string>
+    <string name="profile_list_empty">No profiles in this group</string>
+    <string name="profile_list_empty_hint">Tap “Add Profile” in the toolbar to import or create one.</string>
+    <string name="profile_list_no_matches">No profiles match your search</string>
     <string name="connect">Connect</string>
     <string name="clipboard_empty">Clipboard is empty</string>
     <!-- menu category -->
@@ -768,6 +771,7 @@
     <string name="webdav_test">Test Connection</string>
     <string name="webdav_test_success">Connection Successful</string>
     <string name="webdav_test_failed" formatted="false">Connection Failed: %s</string>
+    <string name="webdav_test_wait">Please wait a moment and try again</string>
     <string name="backup_to_webdav">Backup to WebDAV</string>
     <string name="restore_from_webdav">Restore from WebDAV</string>
     <string name="webdav_backup_success">Backup to WebDAV successful</string>
@@ -823,11 +827,11 @@
 
     <!-- Snell Protocol -->
     <string name="action_snell">Snell</string>
-    <string name="snell_psk">密钥</string>
-    <string name="snell_version">版本</string>
-    <string name="snell_network">协议</string>
-    <string name="snell_obfs_mode">Obfs 模式</string>
-    <string name="snell_obfs_host">Obfs 主机</string>
+    <string name="snell_psk">PSK</string>
+    <string name="snell_version">Version</string>
+    <string name="snell_network">Protocol</string>
+    <string name="snell_obfs_mode">Obfs mode</string>
+    <string name="snell_obfs_host">Obfs host</string>
     <string name="snell_reuse">Reuse</string>
     <string name="snell_reuse_summary">v4/v5 only</string>
 

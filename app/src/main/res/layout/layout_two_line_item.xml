@@ -46,6 +46,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/more_options"
             android:padding="12dp"
             android:src="@drawable/ic_baseline_more_vert_24"
             app:tint="?android:attr/textColorSecondary" />

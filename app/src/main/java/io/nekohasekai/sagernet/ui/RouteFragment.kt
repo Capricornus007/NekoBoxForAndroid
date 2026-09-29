@@ -290,16 +290,17 @@ class RouteFragment :
                 // set text color based on route type
                 val ctx = itemView.context
                 val outboundColor = when (rule.outbound) {
-                    -2L -> ContextCompat.getColor(ctx, R.color.color_route_block)
-
                     // block: red
-                    -1L -> ContextCompat.getColor(ctx, R.color.color_route_direct)
+                    -2L -> ctx.getColorAttr(R.attr.routeBlockColor)
 
                     // direct: green
-                    0L -> ctx.getColorAttr(R.attr.routeProxyColor)
+                    -1L -> ctx.getColorAttr(R.attr.routeDirectColor)
 
                     // proxy: blue/cyan
-                    else -> ContextCompat.getColor(ctx, R.color.color_route_config) // config: purple
+                    0L -> ctx.getColorAttr(R.attr.routeProxyColor)
+
+                    // config: purple
+                    else -> ContextCompat.getColor(ctx, R.color.color_route_config)
                 }
                 routeOutbound.setTextColor(outboundColor)
 

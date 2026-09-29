@@ -167,6 +167,7 @@ class ConfigurationGroupFragment : Fragment() {
         itemTouchHelper.attachToRecyclerView(configurationListView)
     }
     lateinit var configurationListView: RecyclerView
+    private lateinit var emptyHint: TextView
 
     val select by lazy {
         try {
@@ -290,7 +291,9 @@ class ConfigurationGroupFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (!::proxyGroup.isInitialized) return
 
-        configurationListView = LayoutProfileListBinding.bind(view).configurationList
+        val binding = LayoutProfileListBinding.bind(view)
+        configurationListView = binding.configurationList
+        emptyHint = binding.emptyHint
         setupLayoutManager()
         configurationListView.layoutManager = layoutManager
         adapter?.let {
@@ -452,6 +455,17 @@ class ConfigurationGroupFragment : Fragment() {
             configurationStamps.putAll(submission.stamps)
             pendingRemovalIds.removeAll { id -> id !in configurationList && id !in masterProfiles }
             rebuildDisplayPositions()
+            updateEmptyHint()
+        }
+
+        private fun updateEmptyHint() {
+            emptyHint.isVisible = configurationIdList.isEmpty()
+            if (configurationIdList.isNotEmpty()) return
+            emptyHint.text = when {
+                filterQuery.isNotEmpty() -> getString(R.string.profile_list_no_matches)
+                select -> getString(R.string.profile_list_empty)
+                else -> getString(R.string.profile_list_empty) + "\n\n" + getString(R.string.profile_list_empty_hint)
+            }
         }
 
         private fun submit(submission: ProfileListSubmission) {
@@ -1247,7 +1261,7 @@ class ConfigurationGroupFragment : Fragment() {
                 }
             } else if (proxyEntity.status == 1) {
                 profileStatus.text = getString(R.string.available, proxyEntity.ping)
-                profileStatus.setTextColor(requireContext().getColour(R.color.material_green_500))
+                profileStatus.setTextColor(requireContext().getColorAttr(R.attr.testAvailableColor))
             } else {
                 profileStatus.setTextColor(requireContext().getColorAttr(R.attr.testFailColor))
                 if (proxyEntity.status == 2) {

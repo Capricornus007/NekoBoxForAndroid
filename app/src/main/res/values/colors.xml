@@ -311,15 +311,22 @@
     <color name="color_ng_black_container">#383838</color>
     <color name="color_ng_black_surface_variant">#2E2E2E</color>
 
-    <!-- 路由规则类型颜色（日间）-->
-    <color name="color_route_block">#E53935</color>   <!-- 屏蔽：红色 -->
-    <color name="color_route_direct">#43A047</color>  <!-- 直连：绿色 -->
-    <color name="color_route_proxy">#1E88E5</color>   <!-- 代理：蓝色 -->
-    <color name="color_route_config">#8E24AA</color>  <!-- 配置：紫色 -->
+    <!-- Route rule outbound colors (day). Proxy is blue 800: the 600 shade was under
+         4.5:1 as text on the tinted elevated cards. Direct and block reuse
+         test_available/test_fail through the routeDirectColor/routeBlockColor attrs. -->
+    <color name="color_route_proxy">@color/material_blue_800</color>   <!-- proxy: blue -->
+    <color name="color_route_config">#8E24AA</color>  <!-- config: purple -->
+
+    <!-- Connection-test result text on the surface, the 10%-primary selected card and the
+         tinted elevated cards: green 900 / red 800 pass 4.5:1 on all; night uses the 400
+         tones. The dark schemes override the attrs with their own green/red. -->
+    <color name="test_available">@color/material_green_900</color>
+    <color name="test_fail">@color/material_red_800</color>
 
     <color name="preference_simple_menu_background">#FAFAFA</color>
 
-    <!-- 卡片默认细边框：约 12% 黑（低对比分隔线），夜间见 values-night/colors.xml -->
+    <!-- Default thin card stroke: ~12% black (low-contrast divider); night value in
+         values-night/colors.xml. -->
     <color name="card_stroke">#1F000000</color>
 
     <!-- M3 colorOutline: neutral mid-gray for borders/dividers on light surfaces.

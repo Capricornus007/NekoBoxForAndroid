@@ -54,7 +54,6 @@ import io.nekohasekai.sagernet.ktx.SubscriptionFoundException
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.dp2px
 import io.nekohasekai.sagernet.ktx.getColorAttr
-import io.nekohasekai.sagernet.ktx.getColour
 import io.nekohasekai.sagernet.ktx.isIpAddress
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.readBytesBounded
@@ -868,7 +867,7 @@ class ConfigurationFragment @JvmOverloads constructor(
 
                     1 -> {
                         profileStatusText = getString(R.string.available, profile.ping)
-                        profileStatusColor = context.getColour(R.color.material_green_500)
+                        profileStatusColor = context.getColorAttr(R.attr.testAvailableColor)
                     }
 
                     2 -> {

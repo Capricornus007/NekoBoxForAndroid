@@ -22,7 +22,10 @@
     <!-- "Connecting…" in-progress status text. Default on-primary; Dracula = yellow
          (on-primary resolved to dark on Dracula's light-purple primary). -->
     <attr name="statusConnectingColor" format="color" />
-    <!-- Connection-test failure color. Default Material red; Dracula = #ff5555. -->
+    <!-- Connection-test result colors as text on the surface. Defaults are day/night
+         Material tones that pass 4.5:1 on the light surface and the selected card;
+         the dark schemes use their own green/red. -->
+    <attr name="testAvailableColor" format="color" />
     <attr name="testFailColor" format="color" />
     <!-- Bottom-bar speed text (arrows + rate). Default on-primary; Dracula = yellow. -->
     <attr name="speedTextColor" format="color" />
@@ -41,8 +44,12 @@
     <attr name="statusDetailColor" format="color" />
     <!-- "Testing…" connection-test in-progress text. Default on-primary; Dracula = yellow. -->
     <attr name="statusTestingColor" format="color" />
-    <!-- Proxy route-rule color. Default blue; Dracula = cyan. -->
+    <!-- Route-rule outbound colors. Proxy defaults to blue (Dracula = cyan); direct and
+         block follow the connection-test green/red, so every palette and mode that
+         reads on the card for those reads here too. -->
     <attr name="routeProxyColor" format="color" />
+    <attr name="routeDirectColor" format="color" />
+    <attr name="routeBlockColor" format="color" />
     <!-- Selected nav-drawer item color (fill tint + icon/text). Default primary;
          Dracula uses its accent (pink) to match the toggle-on color. -->
     <attr name="navSelectedColor" format="color" />

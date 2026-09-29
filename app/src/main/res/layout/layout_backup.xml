@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- 本地备份部分 -->
+        <!-- Local backup section -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                     android:layout_margin="8dp"
                     android:orientation="vertical">
 
-                    <!-- 本地备份部分的按钮 -->
+                    <!-- Local backup buttons -->
                     <Button
                         android:id="@+id/action_share"
                         style="@style/Widget.SagerNet.Button"
@@ -96,7 +96,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- WebDAV 备份部分 -->
+        <!-- WebDAV backup section -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -127,7 +127,7 @@
                     android:layout_margin="8dp"
                     android:orientation="vertical">
 
-                    <!-- WebDAV 备份部分的按钮 -->
+                    <!-- WebDAV backup buttons -->
                     <Button
                         android:id="@+id/webdav_settings"
                         style="@style/Widget.SagerNet.Button"

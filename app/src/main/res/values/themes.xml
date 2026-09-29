@@ -101,11 +101,14 @@
         <item name="statusTestingColor">?attr/colorOnPrimary</item>
         <item name="statusDetailColor">?attr/colorOnPrimary</item>
         <item name="speedTextColor">?attr/colorOnPrimary</item>
-        <item name="testFailColor">@color/material_red_500</item>
+        <item name="testAvailableColor">@color/test_available</item>
+        <item name="testFailColor">@color/test_fail</item>
         <item name="fabStoppedColor">?attr/colorOnPrimary</item>
         <item name="fabConnectedColor">?attr/statusConnectedColor</item>
         <item name="fabColorBackground">?colorPrimary</item>
         <item name="routeProxyColor">@color/color_route_proxy</item>
+        <item name="routeDirectColor">?attr/testAvailableColor</item>
+        <item name="routeBlockColor">?attr/testFailColor</item>
         <item name="navSelectedColor">?attr/colorPrimary</item>
         <item name="itemShapeFillColor">?colorPrimary</item>
     </style>
@@ -359,6 +362,7 @@
         <item name="statusConnectedColor">@color/dhc_green</item>
         <item name="statusStoppedColor">@color/dhc_red</item>
         <item name="statusConnectingColor">@color/dhc_yellow</item>
+        <item name="testAvailableColor">@color/dhc_green</item>
         <item name="testFailColor">@color/dhc_red</item>
         <item name="speedTextColor">@color/dhc_on_surface_variant</item>
         <item name="fabStoppedColor">@color/dhc_on_primary</item>
@@ -411,6 +415,7 @@
         <item name="statusConnectedColor">@color/draculam3_green</item>
         <item name="statusStoppedColor">@color/draculam3_red</item>
         <item name="statusConnectingColor">@color/draculam3_yellow</item>
+        <item name="testAvailableColor">@color/draculam3_green</item>
         <item name="testFailColor">@color/draculam3_red</item>
         <item name="speedTextColor">@color/draculam3_accent</item>
         <item name="fabStoppedColor">@color/draculam3_on_primary</item>
@@ -462,6 +467,7 @@
         <item name="statusConnectedColor">@color/nord_green</item>
         <item name="statusStoppedColor">@color/nord_red</item>
         <item name="statusConnectingColor">@color/nord_yellow</item>
+        <item name="testAvailableColor">@color/nord_green</item>
         <item name="testFailColor">@color/nord_red</item>
         <item name="speedTextColor">@color/nord_accent</item>
         <item name="fabStoppedColor">@color/nord_on_primary</item>
@@ -513,6 +519,7 @@
         <item name="statusConnectedColor">@color/monokai_green</item>
         <item name="statusStoppedColor">@color/monokai_red</item>
         <item name="statusConnectingColor">@color/monokai_yellow</item>
+        <item name="testAvailableColor">@color/monokai_green</item>
         <item name="testFailColor">@color/monokai_red</item>
         <item name="speedTextColor">@color/monokai_accent</item>
         <item name="fabStoppedColor">@color/monokai_on_primary</item>
@@ -564,6 +571,7 @@
         <item name="statusConnectedColor">@color/ayu_green</item>
         <item name="statusStoppedColor">@color/ayu_red</item>
         <item name="statusConnectingColor">@color/ayu_yellow</item>
+        <item name="testAvailableColor">@color/ayu_green</item>
         <item name="testFailColor">@color/ayu_red</item>
         <item name="speedTextColor">@color/ayu_accent</item>
         <item name="fabStoppedColor">@color/ayu_on_primary</item>
@@ -616,6 +624,7 @@
         <item name="statusConnectedColor">@color/catppuccin_green</item>
         <item name="statusStoppedColor">@color/catppuccin_red</item>
         <item name="statusConnectingColor">@color/catppuccin_yellow</item>
+        <item name="testAvailableColor">@color/catppuccin_green</item>
         <item name="testFailColor">@color/catppuccin_red</item>
         <item name="speedTextColor">@color/catppuccin_accent</item>
         <item name="fabStoppedColor">@color/catppuccin_on_primary</item>

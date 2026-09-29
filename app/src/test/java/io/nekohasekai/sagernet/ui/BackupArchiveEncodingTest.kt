@@ -34,7 +34,7 @@ class BackupArchiveEncodingTest {
 
     @Test
     fun nonAsciiJson_preservesUtf8() {
-        val json = "{\"name\":\"配置 café\"}"
+        val json = "{\"name\":\"€ café\"}"
 
         val encoded = encodeBackupArchive(json, BackupArchiveFormat.JSON)
 

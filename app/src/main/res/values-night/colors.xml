@@ -2,7 +2,7 @@
 <resources>
     <color name="fab_color_progress">@color/material_light_white</color>
     <color name="preference_simple_menu_background">#303030</color>
-    <!-- 卡片默认细边框：约 12% 白 -->
+    <!-- Default thin card stroke: ~12% white. -->
     <color name="card_stroke">#1FFFFFFF</color>
 
     <!-- M3 colorOutline (night): neutral light-gray for borders/dividers on dark surfaces.
@@ -11,11 +11,13 @@
     <color name="m3_outline">#938F99</color>
     <color name="m3_surface_variant">#49454F</color>
 
-    <!-- 路由规则类型颜色（夜间，稍浅） -->
-    <color name="color_route_block">#EF5350</color>   <!-- 屏蔽：浅红 -->
-    <color name="color_route_direct">#66BB6A</color>  <!-- 直连：浅绿 -->
-    <color name="color_route_proxy">#42A5F5</color>   <!-- 代理：浅蓝 -->
-    <color name="color_route_config">#AB47BC</color>  <!-- 配置：浅紫 -->
+    <!-- Route rule outbound colors (night, lighter). -->
+    <color name="color_route_proxy">#42A5F5</color>   <!-- proxy: light blue -->
+    <color name="color_route_config">#AB47BC</color>  <!-- config: light purple -->
+
+    <!-- Connection-test result text on the dark surface. -->
+    <color name="test_available">@color/material_green_400</color>
+    <color name="test_fail">@color/material_red_400</color>
 
     <!-- Elevated-card tonal surface colors (dark: #121212 base + ~11% primary tint). -->
     <color name="card_elevated_pink">#2A131B</color>

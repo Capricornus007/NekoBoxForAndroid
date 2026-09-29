@@ -36,7 +36,7 @@ class BoundedReadTest {
 
     @Test
     fun readTextBoundedDecodesUtf8() {
-        val text = "héllo, 世界 — proxy"
+        val text = "héllo, wörld — € proxy"
         val out = ByteArrayInputStream(text.toByteArray(Charsets.UTF_8)).readTextBounded(limit = 4096)
         assertEquals(text, out)
     }

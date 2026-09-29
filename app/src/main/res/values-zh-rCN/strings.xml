@@ -533,6 +533,7 @@
     <string name="webdav_test">测试连接</string>
     <string name="webdav_test_success">连接成功</string>
     <string name="webdav_test_failed">连接失败: %s</string>
+    <string name="webdav_test_wait">请稍后再试</string>
     <string name="backup_to_webdav">备份到 WebDAV</string>
     <string name="restore_from_webdav">从 WebDAV 恢复</string>
     <string name="webdav_backup_success">备份到 WebDAV 成功</string>
@@ -588,4 +589,9 @@
     <string name="vless_encryption_hint">mlkem768x25519plus.native.0rtt.KEY1.KEY2...</string>
     <string name="app_list_permission_denied">无法读取已安装的应用。\n这通常是由于系统限制了应用的读取权限（例如某些中国厂商系统）。\n请在系统设置中授予权限。</string>
     <string name="open_app_settings">打开系统设置</string>
+    <string name="snell_psk">密钥</string>
+    <string name="snell_version">版本</string>
+    <string name="snell_network">协议</string>
+    <string name="snell_obfs_mode">Obfs 模式</string>
+    <string name="snell_obfs_host">Obfs 主机</string>
 </resources>
