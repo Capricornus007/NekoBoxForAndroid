@@ -117,5 +117,9 @@ class FormatsSubscriptionPromoTest {
         val output = capturedLogs.joinToString("\n")
         assertFalse("訂閱內容不得進日誌", output.contains("panel.example"))
         assertFalse("節點名稱不得進日誌", output.contains("客服"))
+        // 這行是「neko.log 裡看不到 promo guard 就等于沒命中」這個推論的前提：
+        // 攔截必須留得下痕跡，否則觀測口一旦靜默，實測的 0 筆就毫無意義。
+        assertTrue("攔截要留下可計數的痕跡", output.contains("no proxy evidence"))
+        assertTrue(output.contains("promo guard"))
     }
 }
