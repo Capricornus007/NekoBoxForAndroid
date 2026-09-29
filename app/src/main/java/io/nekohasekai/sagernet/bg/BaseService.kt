@@ -89,7 +89,11 @@ class BaseService {
                     }
                 }
 
-                else -> service.stopRunner()
+                else -> {
+                    // A stop the user asked for pauses network automation until the next start.
+                    if (!intent.getBooleanExtra(Action.EXTRA_AUTOMATED, false)) DataStore.automationPaused = true
+                    service.stopRunner()
+                }
             }
         }
         var closeReceiverRegistered = false
@@ -172,6 +176,8 @@ class BaseService {
                 error(Protocols.genFriendlyMsg(e.readableMessage))
             }
         }
+
+        override fun connections(includeClosed: Boolean): String = data?.proxy?.takeIf { it.isInitialized() }?.box?.connections(includeClosed) ?: "[]"
 
         fun stateChanged(s: State, msg: String?) = launch {
             val profileName = profileName
@@ -397,6 +403,7 @@ class BaseService {
 
         suspend fun preInit() {
             DefaultNetworkListener.start(this) {
+                NetworkAutomation.onNetwork(it, serviceRunning = true)
                 SagerNet.connectivity.getLinkProperties(it)?.also { link ->
                     SagerNet.underlyingNetwork = it
                     DataStore.vpnService?.updateUnderlyingNetwork()

@@ -48,11 +48,19 @@ class RouteSettingsActivity(
 ) : ThemedActivity(resId),
     OnPreferenceDataStoreChangeListener {
 
-    fun init(packageName: String?) {
+    fun init(packageName: String?, domain: String? = null, ip: String? = null) {
         RuleEntity().apply {
             if (!packageName.isNullOrBlank()) {
                 packages = setOf(packageName)
                 name = app.getString(R.string.route_for, PackageCache.loadLabel(packageName))
+            }
+            if (!domain.isNullOrBlank()) {
+                domains = domain
+                name = app.getString(R.string.route_for, domain)
+            }
+            if (!ip.isNullOrBlank()) {
+                this.ip = ip
+                name = app.getString(R.string.route_for, ip)
             }
         }.init()
     }
@@ -216,6 +224,8 @@ class RouteSettingsActivity(
     companion object {
         const val EXTRA_ROUTE_ID = "id"
         const val EXTRA_PACKAGE_NAME = "pkg"
+        const val EXTRA_DOMAIN = "domain"
+        const val EXTRA_IP = "ip"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -242,7 +252,11 @@ class RouteSettingsActivity(
             DataStore.editingId = editingId
             runOnDefaultDispatcher {
                 if (editingId == 0L) {
-                    init(intent.getStringExtra(EXTRA_PACKAGE_NAME))
+                    init(
+                        intent.getStringExtra(EXTRA_PACKAGE_NAME),
+                        intent.getStringExtra(EXTRA_DOMAIN),
+                        intent.getStringExtra(EXTRA_IP),
+                    )
                 } else {
                     val ruleEntity = SagerDatabase.rulesDao.getById(editingId)
                     if (ruleEntity == null) {

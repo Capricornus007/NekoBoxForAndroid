@@ -3,6 +3,7 @@ package io.nekohasekai.sagernet.bg.proto
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.ServiceNotification
 import io.nekohasekai.sagernet.bg.runRequiredCompletion
+import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +46,8 @@ class ProxyInstance(profile: ProxyEntity, var service: BaseService.Interface? = 
     override fun launch() {
         box.setAsMain()
         super.launch() // start box
+        // ponytail: fixed cap; make it a setting if anyone needs a longer history.
+        box.setConnectionHistory(if (DataStore.connectionDiagnostics) 300 else 0)
         // Assign the looper synchronously so close() always observes it (no
         // launch/close race). GlobalScope matches the previous scope semantics:
         // runOnDefaultDispatcher was GlobalScope.launch(Dispatchers.Default), and

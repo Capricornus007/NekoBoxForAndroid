@@ -328,7 +328,7 @@
     <!-- tasker -->
     <!-- status -->
     <string name="connecting">Connecting…</string>
-    <string name="vpn_connected">Connected, tap to check connection</string>
+    <string name="vpn_connected">Service started, tap to verify connectivity</string>
     <string name="not_connected">Not connected</string>
     <!-- subscriptions -->
     <string name="subscriptions">Subscriptions</string>
@@ -378,6 +378,62 @@
         <item quantity="other">%d lines</item>
     </plurals>
     <string name="not_set">Not set</string>
+    <!-- import preview -->
+    <string name="import_preview_title">Import preview</string>
+    <string name="import_preview_confirm">Import</string>
+    <string name="import_preview_accepted">Accepted: %d nodes</string>
+    <string name="import_preview_skipped_builtin">Skipped: %d built-in or group outbounds</string>
+    <string name="import_preview_skipped_unparsed">Skipped: %d entries that are unsupported or did not parse</string>
+    <string name="import_preview_dropped">Not imported: %s. Only nodes are imported, so the result will not behave like the source configuration.</string>
+    <string name="import_section_proxy_groups">proxy groups</string>
+    <string name="import_section_rules">routing rules</string>
+    <string name="import_section_rule_providers">rule providers</string>
+    <string name="import_section_dns">DNS settings</string>
+    <string name="import_section_inbounds">inbounds</string>
+    <!-- connection diagnostics -->
+    <string name="menu_connections">Connections</string>
+    <string name="connections_show_closed">Show closed connections</string>
+    <string name="connection_diagnostics">Connection diagnostics</string>
+    <string name="connection_diagnostics_summary">Resolve the app behind each connection and keep the last 300 closed connections in memory while the service runs. Off by default.</string>
+    <string name="connections_status_stopped">Service not running.</string>
+    <string name="connections_status_live">%1$d live · %2$d closed. Diagnostics %3$s.</string>
+    <string name="connections_status_on">on</string>
+    <string name="connections_status_off">off: app names and closed connections are not collected</string>
+    <string name="connections_closed">closed %s</string>
+    <string name="connections_rule_domain">New rule for this domain</string>
+    <string name="connections_rule_ip">New rule for this address</string>
+    <string name="connections_rule_app">New rule for this app</string>
+    <string name="connections_detail">App: %1$s\nDestination: %2$s\nResolved: %3$s\nRule: %4$s\nOutbound: %5$s\nTraffic: %6$s</string>
+    <!-- network automation -->
+    <string name="network_automation">Network automation</string>
+    <string name="network_automation_summary">Connect, switch profile or disconnect when the network changes</string>
+    <string name="network_automation_rules">Network rules</string>
+    <string name="network_automation_explanation">Rules run when the underlying network changes while the app or the service is alive. A Wi-Fi name rule beats a Wi-Fi rule, which beats a mobile data rule. Stopping the service yourself pauses connect rules until you start it again. Wi-Fi name rules need the location permission, and some Android versions hide the name while the app is in the background.</string>
+    <string name="network_rule_add">Add rule</string>
+    <string name="network_rule_network">Network</string>
+    <string name="network_rule_mobile">Mobile data</string>
+    <string name="network_rule_wifi">Any Wi-Fi</string>
+    <string name="network_rule_ssid">Wi-Fi with name</string>
+    <string name="network_rule_ssid_hint">Network name (SSID)</string>
+    <string name="network_rule_wifi_named">Wi-Fi “%s”</string>
+    <string name="network_rule_action">Action</string>
+    <string name="network_rule_connect_current">Connect with the selected profile</string>
+    <string name="network_rule_connect_profile">Connect with a specific profile…</string>
+    <string name="network_rule_connect_named">Connect with %s</string>
+    <string name="network_rule_disconnect">Disconnect (trusted network)</string>
+    <string name="network_rule_ssid_permission">Without the location permission Android hides the Wi-Fi name, so this rule cannot match.</string>
+    <!-- routing profiles -->
+    <string name="routing_profiles">Routing profiles</string>
+    <string name="routing_profile_save_current">Save current as profile</string>
+    <string name="routing_profile_switch">Switch to this profile</string>
+    <string name="routing_profile_rename">Rename profile</string>
+    <string name="routing_profile_active">Active · %s</string>
+    <string name="routing_profile_delete_message">Delete the routing profile “%s”? Rules and settings currently in use stay as they are.</string>
+    <string name="routing_profile_import_invalid">The file is not an exported routing profile.</string>
+    <plurals name="routing_profile_rules">
+        <item quantity="one">%d rule</item>
+        <item quantity="other">%d rules</item>
+    </plurals>
     <string name="night_mode">Night Mode</string>
     <string name="language">Language</string>
     <string name="follow_system">Follow System</string>

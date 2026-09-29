@@ -46,6 +46,7 @@ import io.nekohasekai.sagernet.databinding.LayoutGroupListBinding
 import io.nekohasekai.sagernet.databinding.LayoutProgressListBinding
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.group.GroupUpdater
+import io.nekohasekai.sagernet.group.ImportPreview
 import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
@@ -360,6 +361,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                                         .let(cursor::getString)
                                 }
                         val proxies = mutableListOf<AbstractBean>()
+                        var sourceText: String? = null
                         if (fileName != null && fileName.endsWith(".zip")) {
                             // try parse wireguard zip (bounded per-entry + cumulative to stop
                             // a decompression bomb from exhausting memory)
@@ -387,13 +389,14 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 }
                             RawUpdater.parseRaw(fileText, fileName ?: "")
                                 ?.let { pl -> proxies.addAll(pl) }
+                            sourceText = fileText
                         }
                         if (proxies.isEmpty()) {
                             onMainDispatcher {
                                 snackbar(getString(R.string.no_proxies_found_in_file)).show()
                             }
                         } else {
-                            import(proxies)
+                            confirmImport(sourceText, proxies)
                         }
                     } catch (e: SubscriptionFoundException) {
                         (requireActivity() as MainActivity).importSubscription(e.link.toUri())
@@ -406,6 +409,54 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
             }
         }
+
+    /** Show what the import keeps and drops before creating profiles. Sources without text (zip) import directly. */
+    private suspend fun confirmImport(source: String?, proxies: List<AbstractBean>) {
+        if (source == null) return import(proxies)
+        val preview = ImportPreview.of(source, proxies)
+        onMainDispatcher {
+            if (!isAdded) return@onMainDispatcher
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.import_preview_title)
+                .setMessage(describe(preview))
+                .setPositiveButton(R.string.import_preview_confirm) { _, _ -> runOnDefaultDispatcher { import(proxies) } }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+    }
+
+    private fun describe(preview: ImportPreview): String = buildString {
+        append(getString(R.string.import_preview_accepted, preview.acceptedCount))
+        if (preview.accepted.isNotEmpty()) {
+            append(preview.accepted.entries.joinToString(", ", " (", ")") { "${it.key} ${it.value}" })
+        }
+        for ((reason, count) in preview.skipped) {
+            append('\n')
+            append(
+                getString(
+                    when (reason) {
+                        ImportPreview.Reason.BUILTIN -> R.string.import_preview_skipped_builtin
+                        ImportPreview.Reason.UNPARSED -> R.string.import_preview_skipped_unparsed
+                    },
+                    count,
+                ),
+            )
+        }
+        if (preview.behaviorDiffers) {
+            val sections = preview.dropped.joinToString(", ") {
+                getString(
+                    when (it) {
+                        ImportPreview.Section.PROXY_GROUPS -> R.string.import_section_proxy_groups
+                        ImportPreview.Section.RULES -> R.string.import_section_rules
+                        ImportPreview.Section.RULE_PROVIDERS -> R.string.import_section_rule_providers
+                        ImportPreview.Section.DNS -> R.string.import_section_dns
+                        ImportPreview.Section.INBOUNDS -> R.string.import_section_inbounds
+                    },
+                )
+            }
+            append("\n\n").append(getString(R.string.import_preview_dropped, sections))
+        }
+    }
 
     suspend fun import(proxies: List<AbstractBean>) {
         val targetId = DataStore.selectedGroupForImport()
@@ -476,7 +527,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                                     snackbar(getString(R.string.no_proxies_found_in_clipboard)).show()
                                 }
                             } else {
-                                import(proxies)
+                                confirmImport(text, proxies)
                             }
                         } catch (e: SubscriptionFoundException) {
                             onMainDispatcher {

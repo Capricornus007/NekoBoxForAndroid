@@ -465,6 +465,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         val route = RouteOptions().apply {
             auto_detect_interface = true
             override_android_vpn = true
+            // Connection diagnostics shows the app behind each connection; the owner lookup is a
+            // system call per connection, so it is only paid when the user opted in.
+            if (!forTest && DataStore.connectionDiagnostics) find_process = true
             rules = routeRules
             rule_set = routeRuleSets
 

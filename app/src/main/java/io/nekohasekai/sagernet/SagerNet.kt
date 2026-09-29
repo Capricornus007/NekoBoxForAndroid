@@ -16,6 +16,7 @@ import android.os.UserManager
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import go.Seq
+import io.nekohasekai.sagernet.bg.NetworkAutomation
 import io.nekohasekai.sagernet.bg.SagerConnection
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ktx.Logs
@@ -105,6 +106,7 @@ class SagerNet :
             runOnDefaultDispatcher {
                 DefaultNetworkListener.start(this) {
                     underlyingNetwork = it
+                    NetworkAutomation.onNetwork(it, DataStore.serviceState.started)
                 }
             }
         }
@@ -226,12 +228,16 @@ class SagerNet :
         // last selected, even if the async write-through DB commit hasn't landed yet. Callers with
         // a specific id (e.g. a shortcut switching profile) pass it explicitly. A non-resolving id
         // (incl. 0L "none") is ignored by :bg, which then falls back to its refreshed snapshot/DB.
-        fun startService(profileId: Long = DataStore.selectedProxy) = ContextCompat.startForegroundService(
-            application,
-            Intent(application, SagerConnection.serviceClass).apply {
-                if (profileId >= 0L) putExtra(Action.EXTRA_PROFILE_ID, profileId)
-            },
-        )
+        fun startService(profileId: Long = DataStore.selectedProxy) {
+            // Any start lifts the pause a user-requested stop put on network automation.
+            DataStore.automationPaused = false
+            ContextCompat.startForegroundService(
+                application,
+                Intent(application, SagerConnection.serviceClass).apply {
+                    if (profileId >= 0L) putExtra(Action.EXTRA_PROFILE_ID, profileId)
+                },
+            )
+        }
 
         fun reloadService(profileId: Long = -1L) = application.sendBroadcast(
             Intent(Action.RELOAD).setPackage(application.packageName).apply {
@@ -239,7 +245,9 @@ class SagerNet :
             },
         )
 
-        fun stopService() = application.sendBroadcast(Intent(Action.CLOSE).setPackage(application.packageName))
+        fun stopService(byUser: Boolean = true) = application.sendBroadcast(
+            Intent(Action.CLOSE).setPackage(application.packageName).putExtra(Action.EXTRA_AUTOMATED, !byUser),
+        )
 
         var underlyingNetwork: Network? = null
 

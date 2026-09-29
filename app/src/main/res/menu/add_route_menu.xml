@@ -11,6 +11,10 @@
         android:title="@string/route_reset"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_routing_profiles"
+        android:title="@string/routing_profiles"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_manage_assets"
         android:title="@string/route_manage_assets"
         app:showAsAction="never" />

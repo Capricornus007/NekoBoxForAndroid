@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_show_closed"
+        android:checkable="true"
+        android:title="@string/connections_show_closed"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_diagnostics"
+        android:checkable="true"
+        android:title="@string/connection_diagnostics"
+        app:showAsAction="never" />
+</menu>

@@ -113,6 +113,16 @@
             app:key="wakeResetConnections"
             app:title="@string/wake_reset_connections"
             app:useSimpleSummaryProvider="true" />
+        <SwitchPreference
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_legend_toggle_24"
+            app:key="networkAutomation"
+            app:summary="@string/network_automation_summary"
+            app:title="@string/network_automation" />
+        <Preference
+            app:dependency="networkAutomation"
+            app:key="networkAutomationRules"
+            app:title="@string/network_automation_rules" />
     </PreferenceScreen>
 
     <PreferenceScreen

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_rule_domain"
+        android:title="@string/connections_rule_domain" />
+    <item
+        android:id="@+id/action_rule_ip"
+        android:title="@string/connections_rule_ip" />
+    <item
+        android:id="@+id/action_rule_app"
+        android:title="@string/connections_rule_app" />
+</menu>

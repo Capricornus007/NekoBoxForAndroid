@@ -161,6 +161,10 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         findPreference<Preference>(Key.METERED_NETWORK)?.let {
             if (Build.VERSION.SDK_INT < 28) it.remove()
         }
+        findPreference<Preference>(Key.NETWORK_AUTOMATION_RULES)?.setOnPreferenceClickListener {
+            startActivity(Intent(activity, NetworkAutomationActivity::class.java))
+            true
+        }
         for (key in listOf(
             Key.TUN_IMPLEMENTATION,
             Key.MTU,

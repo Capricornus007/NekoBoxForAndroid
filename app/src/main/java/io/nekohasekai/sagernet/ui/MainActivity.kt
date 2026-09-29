@@ -483,6 +483,8 @@ class MainActivity :
 
             R.id.nav_settings -> displayFragment(SettingsFragment())
 
+            R.id.nav_connections -> displayFragment(ConnectionsFragment())
+
             R.id.nav_traffic -> displayFragment(WebviewFragment())
 
             R.id.nav_tools -> displayFragment(ToolsFragment())

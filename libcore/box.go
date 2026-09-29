@@ -74,6 +74,7 @@ type BoxInstance struct {
 	state  int
 
 	v2api        *boxapi.SbV2rayServer
+	connections  *connectionTracker
 	selector     *group.Selector
 	pauseManager pause.Manager
 }
@@ -113,7 +114,9 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 		Box:          instance,
 		cancel:       cancel,
 		pauseManager: service.FromContext[pause.Manager](ctx),
+		connections:  newConnectionTracker(),
 	}
+	b.Box.Router().AppendTracker(b.connections)
 
 	// selector
 	if proxy, ok := b.Outbound().Outbound("proxy"); ok {

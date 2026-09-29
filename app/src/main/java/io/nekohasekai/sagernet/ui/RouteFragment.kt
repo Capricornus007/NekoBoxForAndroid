@@ -123,6 +123,10 @@ class RouteFragment :
             R.id.action_manage_assets -> {
                 startActivity(Intent(requireContext(), AssetsActivity::class.java))
             }
+
+            R.id.action_routing_profiles -> {
+                startActivity(Intent(requireContext(), RoutingProfilesActivity::class.java))
+            }
         }
         return true
     }
@@ -253,12 +257,10 @@ class RouteFragment :
             }
         }
 
+        // The whole table was replaced (routing profile switch): re-read it.
         override suspend fun onCleared() {
-            ruleListView.post {
-                ruleList.clear()
-                ruleAdapter.notifyDataSetChanged()
-                needReload()
-            }
+            reload()
+            onMainDispatcher { if (isAdded) needReload() }
         }
 
         inner class DocumentHolder(binding: LayoutEmptyRouteBinding) : RecyclerView.ViewHolder(binding.root) {
