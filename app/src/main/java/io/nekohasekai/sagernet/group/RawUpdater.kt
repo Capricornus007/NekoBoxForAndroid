@@ -1434,7 +1434,7 @@ object RawUpdater : GroupUpdater() {
 
         try {
             val decoded = text.linesNoComments().joinToString("\n").decodeBase64UrlSafe()
-            val links = parseProxies(decoded)
+            val links = parseProxies(decoded, subscription = true)
             if (links.isNotEmpty()) return links
             // 有些面板會把整份 Clash/YAML 訂閱再 base64 一次：解開後不是連結清單，
             // 必須讓它再走一次 parseRaw 才認得。深度上限防止自我循環。
@@ -1447,7 +1447,7 @@ object RawUpdater : GroupUpdater() {
         }
 
         try {
-            return parseProxies(text).takeIf { it.isNotEmpty() } ?: error("Not found")
+            return parseProxies(text, subscription = true).takeIf { it.isNotEmpty() } ?: error("Not found")
         } catch (e: SubscriptionFoundException) {
             throw e
         } catch (ignored: Exception) {

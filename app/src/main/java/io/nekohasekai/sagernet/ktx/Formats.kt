@@ -26,6 +26,7 @@ import moe.matsuri.nb4a.proxy.anytls.parseAnytls
 import moe.matsuri.nb4a.utils.JavaUtil.gson
 import moe.matsuri.nb4a.utils.Util
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -138,7 +139,18 @@ fun String.linesNoComments(): List<String> {
         .filterNot { it.startsWith("#") || it.isEmpty() }
 }
 
-suspend fun parseProxies(text: String): List<AbstractBean> {
+// 「代理證據」＝有帳號密碼、端口不是協定預設值、或自帶查詢參數。面板習慣在訂閱末尾
+// 放自己的官網／客服連結（https://panel.example/），那種網址路徑剛好是 "/"，而
+// parseHttp 只檢查路徑，於是 promo 會被收成一顆沒有憑證、永遠測速超時的假節點。
+// 這個閘門只用在訂閱解析路徑；使用者手動貼連結時照舊全收。
+internal fun hasHttpProxyEvidence(link: String): Boolean {
+    val httpUrl = link.toHttpUrlOrNull() ?: return false
+    if (httpUrl.username.isNotEmpty() || httpUrl.password.isNotEmpty()) return true
+    if (httpUrl.port != if (httpUrl.scheme == "https") 443 else 80) return true
+    return !httpUrl.encodedQuery.isNullOrEmpty()
+}
+
+suspend fun parseProxies(text: String, subscription: Boolean = false): List<AbstractBean> {
     val lines = text.linesNoComments()
     val links = lines.flatMap { it.split(' ') }
     val linksByLine = lines
@@ -150,6 +162,21 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
     // links alongside a plain promo/Telegram URL. Remember the first candidate and only
     // treat the input as a subscription if NO profiles parsed at all.
     var subscriptionCandidate: String? = null
+    var promoSkipped = 0
+
+    fun rememberSubscriptionCandidate(link: String) {
+        if (subscriptionCandidate == null) {
+            val clashUrl = HttpUrl.Builder()
+                .scheme("https")
+                .host("install-config")
+                .addQueryParameter("url", link)
+                .build()
+                .toString()
+                .replaceFirst("https://", "clash://")
+            // Defer: only thrown later if no profile links were parsed.
+            subscriptionCandidate = clashUrl
+        }
+    }
 
     fun String.parseLink(entities: ArrayList<AbstractBean>) {
         if (startsWith("clash://install-config?") || startsWith("sn://subscription?")) {
@@ -174,21 +201,21 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
                 Logs.w("SOCKS parser rejected input")
             }
         } else if (matches("(http|https)://.*".toRegex())) {
-            Logs.d("Trying HTTP parser")
-            runCatching {
-                entities.add(parseHttp(this))
-            }.onFailure {
-                Logs.w("HTTP parser rejected input")
-                if (subscriptionCandidate == null) {
-                    val clashUrl = HttpUrl.Builder()
-                        .scheme("https")
-                        .host("install-config")
-                        .addQueryParameter("url", this)
-                        .build()
-                        .toString()
-                        .replaceFirst("https://", "clash://")
-                    // Defer: only thrown later if no profile links were parsed.
-                    subscriptionCandidate = clashUrl
+            // 面板常在訂閱裡附上自己的官網／客服連結。這種網址的路徑剛好是 "/"，
+            // parseHttp 會把它收成一顆沒有帳號密碼、永遠測速超時的假節點，所以訂閱
+            // 解析要求「代理證據」（見 hasHttpProxyEvidence）；手動貼連結的路徑照舊全收。
+            // 被擋下的網址仍走原本那條「說不定是訂閱網址」的路，行為跟解析失敗一致。
+            if (subscription && !hasHttpProxyEvidence(this)) {
+                promoSkipped++
+                Logs.w("HTTP parser skipped input: no proxy evidence")
+                rememberSubscriptionCandidate(this)
+            } else {
+                Logs.d("Trying HTTP parser")
+                runCatching {
+                    entities.add(parseHttp(this))
+                }.onFailure {
+                    Logs.w("HTTP parser rejected input")
+                    rememberSubscriptionCandidate(this)
                 }
             }
         } else if (startsWith("vmess://")) {
@@ -346,6 +373,10 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
                 }
             }
         }
+    }
+    if (promoSkipped > 0) {
+        // 每個連結會被掃兩遍（逐空格與逐行），所以這個數是兩次掃描的合計，只作觀測用。
+        Logs.w("promo guard: $promoSkipped http(s) link(s) rejected for lacking proxy evidence")
     }
     return if (entities.size > entitiesByLine.size) entities else entitiesByLine
 }
