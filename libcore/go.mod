@@ -12,10 +12,10 @@ require (
 	github.com/miekg/dns v1.1.72
 	github.com/oschwald/maxminddb-golang v1.13.1
 	github.com/sagernet/quic-go v0.61.0-sing-box-mod.7
-	github.com/sagernet/sing v0.9.6-0.20260927091435-fcc22e2b9f96
+	github.com/sagernet/sing v0.9.7-0.20260927091435-fcc22e2b9f96
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-snell v0.0.0-20260904135315-bc5a12ac736f
-	github.com/sagernet/sing-tun v0.9.6-0.20260925112405-97d11460f2ea
+	github.com/sagernet/sing-tun v0.9.7-0.20260925112405-97d11460f2ea
 	github.com/ulikunitz/xz v0.5.15
 	github.com/xchacha20-poly1305/sing-trusttunnel v0.3.0-beta.6
 	golang.org/x/mobile v0.0.0-20240520174638-fa72addaaa1b
@@ -114,8 +114,8 @@ require (
 	github.com/sagernet/netlink v0.0.0-20260814022025-64455d367bbf // indirect
 	github.com/sagernet/nftables v0.3.0-mod.4 // indirect
 	github.com/sagernet/sing-anytls v0.0.0-20260924021732-7ca72921ac6a // indirect
-	github.com/sagernet/sing-mux v0.3.9-0.20260927144857-0257b84c582a // indirect
-	github.com/sagernet/sing-quic v0.7.1-0.20260927144857-8601a428f4db // indirect
+	github.com/sagernet/sing-mux v0.3.9 // indirect
+	github.com/sagernet/sing-quic v0.7.1 // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.8 // indirect
 	github.com/sagernet/sing-shadowsocks2 v0.2.1 // indirect
 	github.com/sagernet/sing-shadowtls v0.2.1 // indirect
@@ -155,7 +155,7 @@ replace github.com/amnezia-vpn/amneziawg-go/v3 => github.com/Capricornus007/amne
 
 replace github.com/sagernet/sing-box => ../../sing-box
 
-replace github.com/sagernet/sing-vmess => github.com/Capricornus007/sing-vmess v0.2.9-0.20260925134622-eb38beec5e11
+replace github.com/sagernet/sing-vmess => github.com/Capricornus007/sing-vmess v0.2.9-0.20260929032806-b6d843cb08eb
 
 // sing-juicity was renamed dyhkwong -> exclavenetwork at v0.1.x; the import path
 // in libcore stays dyhkwong. v0.1.4 targets quic-go v0.59 / sing v0.8 / sing-quic v0.6.1.
@@ -166,7 +166,7 @@ replace github.com/sagernet/sing-snell => github.com/Capricornus007/sing-snell v
 replace github.com/sagernet/wireguard-go => ../../wireguard-go
 
 // replace github.com/sagernet/sing-quic => github.com/matsuridayo/sing-quic v0.0.0-20241009042333-b49ce60d9b36
-replace github.com/sagernet/sing-quic => ../../sing-quic
+replace github.com/sagernet/sing-quic => github.com/Capricornus007/sing-quic v0.7.1-0.20260929032814-0c4f8a863389
 
 // replace github.com/sagernet/sing => ../../sing
 
@@ -177,13 +177,13 @@ replace github.com/sagernet/sing-quic => ../../sing-quic
 // sing-quic: SagerNet 版には sing-box 1.14.x が必要とする realm PortMapping が含まれる。
 // replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
 
-replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20260928095234-8e939c013edf
+replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20260929040205-1f1dbb4170c5
 
-replace github.com/sagernet/quic-go => github.com/Capricornus007/quic-go v0.61.0-sing-box-mod.9
+replace github.com/sagernet/quic-go => github.com/Capricornus007/quic-go v0.61.0-sing-box-mod.9.0.20260929041602-4655e27b7002
 
-replace github.com/sagernet/sing-mux => github.com/Capricornus007/sing-mux v0.3.7-0.20260928040855-6f936a848cd2
+replace github.com/sagernet/sing-mux => github.com/Capricornus007/sing-mux v0.3.7-0.20260929032806-ca99ccf9a52b
 
-replace github.com/metacubex/utls => github.com/Capricornus007/utls v1.8.8-0.20260928121433-db7df0e7cabd
+replace github.com/metacubex/utls => github.com/Capricornus007/utls v1.8.8-0.20260929041425-17f78e340ecb
 
 replace github.com/exclavenetwork/sing-juicity => ../../sing-juicity
 
