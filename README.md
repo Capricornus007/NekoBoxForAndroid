@@ -3,7 +3,7 @@
 <p align="center">
   <img src="docs/logo.png" width="128" height="128" alt="OwnBox Logo">
   <br>
-  <b>基于 Sing-box 1.15.0 Alpha 7 适用于 Android 的现代化通用代理工具链与网络调试客户端</b>
+  <b>基于 Sing-box 1.15.0 Alpha 9 适用于 Android 的现代化通用代理工具链与网络调试客户端</b>
   <br>
   <b>A Modern Universal Proxy Toolchain & Network Debugging Client for Android</b>
 </p>
