@@ -19,3 +19,9 @@ jniLibs/
 # submodules
 /external
 .kotlin/
+
+# signing & credentials
+*.keystore
+*.jks
+release.keystore
+keystore_base64.txt

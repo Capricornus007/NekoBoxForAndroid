@@ -115,14 +115,14 @@ fun Project.setupAppCommon() {
     setupCommon()
 
     val lp = requireLocalProperties()
-    val keystorePwd = lp.getProperty("KEYSTORE_PASS") ?: System.getenv("KEYSTORE_PASS") ?: "ownbox123"
-    val alias = lp.getProperty("ALIAS_NAME") ?: System.getenv("ALIAS_NAME") ?: "ownbox"
-    val pwd = lp.getProperty("ALIAS_PASS") ?: System.getenv("ALIAS_PASS") ?: "ownbox123"
+    val keystorePwd = lp.getProperty("KEYSTORE_PASS") ?: System.getenv("KEYSTORE_PASS") ?: ""
+    val alias = lp.getProperty("ALIAS_NAME") ?: System.getenv("ALIAS_NAME") ?: ""
+    val pwd = lp.getProperty("ALIAS_PASS") ?: System.getenv("ALIAS_PASS") ?: ""
 
     android.apply {
         signingConfigs {
             create("release") {
-                if (rootProject.file("release.keystore").exists()) {
+                if (rootProject.file("release.keystore").exists() && keystorePwd.isNotEmpty() && alias.isNotEmpty()) {
                     storeFile = rootProject.file("release.keystore")
                     storePassword = keystorePwd
                     keyAlias = alias
