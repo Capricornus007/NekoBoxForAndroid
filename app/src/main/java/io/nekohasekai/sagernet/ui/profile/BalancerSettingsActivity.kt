@@ -43,12 +43,13 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == Activity.RESULT_OK) runOnDefaultDispatcher {
-            val profile = ProfileManager.getProfile(
-                it.data!!.getLongExtra(ProfileSelectActivity.EXTRA_PROFILE_ID, 0)
-            ) ?: return@runOnDefaultDispatcher
+            val profileId = it.data?.getLongExtra(ProfileSelectActivity.EXTRA_PROFILE_ID, 0) ?: 0L
+            val profile = ProfileManager.getProfile(profileId) ?: return@runOnDefaultDispatcher
             DataStore.balancerFrontProxy = profile.id
             onMainDispatcher {
-                frontProxyPreference.value = OutboundPreference.VALUE_SELECT_PROFILE
+                if (::frontProxyPreference.isInitialized) {
+                    frontProxyPreference.value = OutboundPreference.VALUE_SELECT_PROFILE
+                }
             }
         }
     }
@@ -57,12 +58,13 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == Activity.RESULT_OK) runOnDefaultDispatcher {
-            val profile = ProfileManager.getProfile(
-                it.data!!.getLongExtra(ProfileSelectActivity.EXTRA_PROFILE_ID, 0)
-            ) ?: return@runOnDefaultDispatcher
+            val profileId = it.data?.getLongExtra(ProfileSelectActivity.EXTRA_PROFILE_ID, 0) ?: 0L
+            val profile = ProfileManager.getProfile(profileId) ?: return@runOnDefaultDispatcher
             DataStore.balancerLandingProxy = profile.id
             onMainDispatcher {
-                landingProxyPreference.value = OutboundPreference.VALUE_SELECT_PROFILE
+                if (::landingProxyPreference.isInitialized) {
+                    landingProxyPreference.value = OutboundPreference.VALUE_SELECT_PROFILE
+                }
             }
         }
     }
@@ -145,8 +147,8 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
     ) {
         addPreferencesFromResource(R.xml.balancer_preferences)
 
-        frontProxyPreference = findPreference("balancerFrontProxy")!!
-        frontProxyPreference.apply {
+        findPreference<OutboundPreference>("balancerFrontProxy")?.apply {
+            frontProxyPreference = this
             setEntries(R.array.front_proxy_entry)
             setEntryValues(R.array.front_proxy_value)
             value = DataStore.balancerFrontProxyTmp.toString()
@@ -168,8 +170,8 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
             }
         }
 
-        landingProxyPreference = findPreference("balancerLandingProxy")!!
-        landingProxyPreference.apply {
+        findPreference<OutboundPreference>("balancerLandingProxy")?.apply {
+            landingProxyPreference = this
             setEntries(R.array.front_proxy_entry)
             setEntryValues(R.array.front_proxy_value)
             value = DataStore.balancerLandingProxyTmp.toString()
@@ -250,8 +252,12 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
             useLandingProxyPref?.isVisible = isGroup
             nameExcludePref?.isVisible = isGroup
             nameIncludePref?.isVisible = isGroup
-            configurationList.isVisible = !isGroup
-            listCell.isVisible = !isGroup
+            if (::configurationList.isInitialized) {
+                configurationList.isVisible = !isGroup
+            }
+            if (::listCell.isInitialized) {
+                listCell.isVisible = !isGroup
+            }
         }
 
         val typePref = findPreference<SimpleMenuPreference>("balancerType")
@@ -355,14 +361,21 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        supportActionBar!!.setTitle(R.string.balancer_settings)
+        supportActionBar?.setTitle(R.string.balancer_settings)
         configurationList = findViewById(R.id.configuration_list)
         listCell = findViewById(R.id.list_cell)
+        val isGroup = DataStore.balancerType == BalancerBean.TYPE_GROUP
+        configurationList.isVisible = !isGroup
+        listCell.isVisible = !isGroup
         layoutManager = FixedLinearLayoutManager(configurationList)
         configurationList.layoutManager = layoutManager
         configurationAdapter = ProxiesAdapter()
         configurationList.adapter = configurationAdapter
         configurationList.isNestedScrollingEnabled = false
+
+        runOnDefaultDispatcher {
+            configurationAdapter.reload()
+        }
 
         findViewById<NestedScrollView>(R.id.nested_scroll_view)?.apply {
             clipToPadding = false
@@ -422,8 +435,10 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
             }
         }
 
-        runOnDefaultDispatcher {
-            configurationAdapter.reload()
+        if (::configurationAdapter.isInitialized) {
+            runOnDefaultDispatcher {
+                configurationAdapter.reload()
+            }
         }
     }
 
@@ -432,13 +447,16 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
         suspend fun reload() {
             val idList = DataStore.serverProtocol.split(",")
                 .mapNotNull { it.takeIf { it.isNotBlank() }?.toLong() }
+            val loaded = ArrayList<ProxyEntity>()
             if (idList.isNotEmpty()) {
-                val profiles = ProfileManager.getProfiles(idList).map { it.id to it }.toMap()
+                val profiles = ProfileManager.getProfiles(idList).associateBy { it.id }
                 for (id in idList) {
-                    proxyList.add(profiles[id] ?: continue)
+                    profiles[id]?.let { loaded.add(it) }
                 }
             }
             onMainDispatcher {
+                proxyList.clear()
+                proxyList.addAll(loaded)
                 notifyDataSetChanged()
             }
         }

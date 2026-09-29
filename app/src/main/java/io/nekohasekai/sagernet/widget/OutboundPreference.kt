@@ -45,7 +45,7 @@ class OutboundPreference
         dropdownOpened = false
         super.onBindViewHolder(holder)
 
-        val spinner = holder.itemView.findViewById<Spinner>(R.id.spinner)
+        val spinner = holder.itemView.findViewById<Spinner>(R.id.spinner) ?: return
         (spinner as? ReselectableSpinner)?.onPopupClosed = { dropdownOpened = false }
         var selectionReady = false
         holder.itemView.post { selectionReady = true }

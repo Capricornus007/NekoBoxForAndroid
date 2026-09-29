@@ -104,24 +104,31 @@ abstract class ProfileSettingsActivity<T : AbstractBean>(
             isSubscription = intent.getBooleanExtra(EXTRA_IS_SUBSCRIPTION, false)
             DataStore.editingId = editingId
             runOnDefaultDispatcher {
-                if (editingId == 0L) {
-                    DataStore.editingGroup = DataStore.selectedGroupForImport()
-                    createEntity().applyDefaultValues().init()
-                } else {
-                    if (proxyEntity == null) {
-                        onMainDispatcher {
-                            finish()
+                try {
+                    if (editingId == 0L) {
+                        DataStore.editingGroup = DataStore.selectedGroupForImport()
+                        createEntity().applyDefaultValues().init()
+                    } else {
+                        if (proxyEntity == null) {
+                            onMainDispatcher {
+                                finish()
+                            }
+                            return@runOnDefaultDispatcher
                         }
-                        return@runOnDefaultDispatcher
+                        DataStore.editingGroup = proxyEntity!!.groupId
+                        (proxyEntity!!.requireBean() as T).init()
                     }
-                    DataStore.editingGroup = proxyEntity!!.groupId
-                    (proxyEntity!!.requireBean() as T).init()
-                }
 
-                onMainDispatcher {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.settings, MyPreferenceFragmentCompat())
-                        .commit()
+                    onMainDispatcher {
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.settings, MyPreferenceFragmentCompat())
+                            .commit()
+                    }
+                } catch (e: Throwable) {
+                    Logs.e(e)
+                    onMainDispatcher {
+                        finish()
+                    }
                 }
             }
 

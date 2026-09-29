@@ -46,8 +46,8 @@ open class SimpleMenuPreference
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
-        val mSpinner = holder.itemView.findViewById<Spinner>(R.id.spinner)
-        mSpinner.layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+        val mSpinner = holder.itemView.findViewById<Spinner>(R.id.spinner) ?: return
+        mSpinner.layoutParams?.width = ViewGroup.LayoutParams.WRAP_CONTENT
         mSpinner.setPopupBackgroundResource(R.drawable.bg_spinner_dropdown)
     }
 
