@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.SagerNet
-import io.nekohasekai.sagernet.database.DataStore
 import moe.matsuri.nb4a.utils.NGUtil
 import java.net.InetAddress
 import java.net.URLEncoder
@@ -210,7 +209,6 @@ fun Context.getColorAttr(@AttrRes resId: Int): Int {
     }
 }
 
-val isExpert: Boolean by lazy { BuildConfig.DEBUG || DataStore.isExpert }
 const val isOss = BuildConfig.FLAVOR == "oss"
 const val isPlay = BuildConfig.FLAVOR == "play"
 const val isPreview = BuildConfig.FLAVOR == "preview"

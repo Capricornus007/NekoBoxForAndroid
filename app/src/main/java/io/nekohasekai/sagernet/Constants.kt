@@ -16,7 +16,6 @@ object Key {
     const val KILL_SWITCH = "killSwitch"
     const val PLUGIN_SIGNER_APPROVALS = "pluginSignerApprovals"
 
-    const val APP_EXPERT = "isExpert"
     const val APP_THEME = "appTheme"
     const val NIGHT_THEME = "nightTheme"
 
@@ -122,11 +121,7 @@ object Key {
     const val SERVER_PROTOCOL_PARAM = "serverProtocolParam"
     const val SERVER_OBFS_PARAM = "serverObfsParam"
 
-    const val SERVER_NETWORK = "serverNetwork"
-    const val SERVER_HOST = "serverHost"
-    const val SERVER_PATH = "serverPath"
     const val SERVER_SNI = "serverSNI"
-    const val SERVER_ENCRYPTION = "serverEncryption"
     const val SERVER_ALPN = "serverALPN"
     const val SERVER_CERTIFICATES = "serverCertificates"
     const val SERVER_MTU = "serverMTU"
@@ -139,7 +134,6 @@ object Key {
     const val SERVER_TLS_CAMOUFLAGE_CATEGORY = "serverTlsCamouflageCategory"
     const val SERVER_ECH_CATEORY = "serverECHCategory"
     const val SERVER_WS_CATEGORY = "serverWsCategory"
-    const val SERVER_SS_CATEGORY = "serverSsCategory"
     const val SERVER_HEADERS = "serverHeaders"
     const val SERVER_ALLOW_INSECURE = "serverAllowInsecure"
 
@@ -263,6 +257,5 @@ object Action {
     // Boolean extra on CLOSE: the stop came from network automation, not from the user.
     const val EXTRA_AUTOMATED = "io.nekohasekai.sagernet.EXTRA_AUTOMATED"
 
-    // const val SWITCH_WAKE_LOCK = "io.nekohasekai.sagernet.SWITCH_WAKELOCK"
     const val RESET_UPSTREAM_CONNECTIONS = "moe.nb4a.RESET_UPSTREAM_CONNECTIONS"
 }

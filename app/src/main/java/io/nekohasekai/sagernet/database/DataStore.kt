@@ -125,7 +125,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     //
 
-    var isExpert by configurationStore.boolean(Key.APP_EXPERT)
     var appTheme by configurationStore.int(Key.APP_THEME)
     var nightTheme by configurationStore.stringToInt(Key.NIGHT_THEME)
 
@@ -294,18 +293,12 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var serverPassword1 by profileCacheStore.string(Key.SERVER_PASSWORD1)
     var serverMethod by profileCacheStore.string(Key.SERVER_METHOD)
 
-    var sharedStorage by profileCacheStore.string("sharedStorage")
-
     var serverProtocol by profileCacheStore.string(Key.SERVER_PROTOCOL)
     var serverObfs by profileCacheStore.string(Key.SERVER_OBFS)
     var serverProtocolParam by profileCacheStore.string(Key.SERVER_PROTOCOL_PARAM)
     var serverObfsParam by profileCacheStore.string(Key.SERVER_OBFS_PARAM)
 
-    var serverNetwork by profileCacheStore.string(Key.SERVER_NETWORK)
-    var serverHost by profileCacheStore.string(Key.SERVER_HOST)
-    var serverPath by profileCacheStore.string(Key.SERVER_PATH)
     var serverSNI by profileCacheStore.string(Key.SERVER_SNI)
-    var serverEncryption by profileCacheStore.string(Key.SERVER_ENCRYPTION)
     var serverALPN by profileCacheStore.string(Key.SERVER_ALPN)
     var serverCertificates by profileCacheStore.string(Key.SERVER_CERTIFICATES)
     var serverMTU by profileCacheStore.stringToInt(Key.SERVER_MTU)

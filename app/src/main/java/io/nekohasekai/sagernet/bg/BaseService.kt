@@ -66,7 +66,6 @@ class BaseService {
                     intent.getLongExtra(Action.EXTRA_PROFILE_ID, -1L),
                 )
 
-                // Action.SWITCH_WAKE_LOCK -> runOnDefaultDispatcher { service.switchWakeLock() }
                 PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
                     // Only act once fully Connected: the close receiver is now registered during
                     // Connecting (so stop/reload aren't lost), but proxy.box is a lateinit that
@@ -566,7 +565,6 @@ class BaseService {
                 addAction(Action.RELOAD)
                 addAction(Intent.ACTION_SHUTDOWN)
                 addAction(Action.CLOSE)
-                // addAction(Action.SWITCH_WAKE_LOCK)
                 addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
                 addAction(Action.RESET_UPSTREAM_CONNECTIONS)
             }
