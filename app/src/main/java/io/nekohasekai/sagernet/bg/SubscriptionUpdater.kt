@@ -35,9 +35,9 @@ internal data class SubscriptionScheduleInput(
 )
 
 /**
- * [remindsExpiry] caps the period at a day: expiry reminders need a daily run even when no
- * subscription auto-updates or every interval is longer. The update loop still honors each
- * subscription's own interval.
+ * [remindsExpiry] caps the period and the first run at a day: expiry reminders need a daily run
+ * even when no subscription auto-updates or every interval is longer. The update loop still honors
+ * each subscription's own interval.
  */
 internal fun computeSubscriptionWorkSchedule(
     subscriptions: List<SubscriptionScheduleInput>,
@@ -56,7 +56,10 @@ internal fun computeSubscriptionWorkSchedule(
         dueAt - nowSeconds
     }.coerceAtLeast(0L)
 
-    return SubscriptionWorkSchedule(intervalMinutes, initialDelaySeconds)
+    return SubscriptionWorkSchedule(
+        intervalMinutes,
+        if (remindsExpiry) initialDelaySeconds.coerceAtMost(24 * 3600L) else initialDelaySeconds,
+    )
 }
 
 object SubscriptionUpdater {

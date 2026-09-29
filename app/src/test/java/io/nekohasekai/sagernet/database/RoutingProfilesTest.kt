@@ -5,6 +5,7 @@ import io.nekohasekai.sagernet.fmt.ConfigBuilderTestEnv
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -71,11 +72,23 @@ class RoutingProfilesTest {
 
         assertNull(RoutingProfiles.import("""{"rules": []}"""))
         assertNull(RoutingProfiles.import("not json"))
+        // Malformed content is refused whole rather than read as empty rules or settings.
+        assertNull(RoutingProfiles.import("""{"routingProfile": 1, "name": "Copy", "content": {}}"""))
+        assertNull(RoutingProfiles.import("""{"routingProfile": 1, "name": "Copy", "content": {"rules": "x", "settings": []}}"""))
+        assertNull(RoutingProfiles.import("""{"routingProfile": 1, "name": "Copy", "content": {"rules": [{"id": 1}], "settings": []}}"""))
+        // A setting whose bytes do not fit its type would only fail while being applied, after earlier keys were written.
+        val truncated = """{"key": "${Key.ENABLE_FAKEDNS}", "valueType": 1, "value": ""}"""
+        assertNull(RoutingProfiles.import("""{"routingProfile": 1, "name": "Copy", "content": {"rules": [], "settings": [$truncated]}}"""))
+        assertEquals(1, RoutingProfiles.list().first { it.id == imported.id }.ruleCount)
         assertNull(RoutingProfiles.import(RoutingProfiles.LINK_PREFIX + "!!!"))
 
         RoutingProfiles.delete(original.id)
         assertEquals(0L, RoutingProfiles.activeId)
         assertEquals(listOf(imported.id), RoutingProfiles.list().map { it.id })
+
+        // Already stored content without the arrays applies as an empty profile.
+        RoutingProfiles.applyLive(JSONObject())
+        assertTrue(SagerDatabase.rulesDao.allRules().isEmpty())
     }
 
     @Test

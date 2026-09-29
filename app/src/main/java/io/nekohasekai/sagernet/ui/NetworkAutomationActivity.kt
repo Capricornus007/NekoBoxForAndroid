@@ -123,14 +123,15 @@ class NetworkAutomationActivity : ThemedActivity() {
         if (result.resultCode == RESULT_OK && profileId > 0L) add(rule.copy(profileId = profileId))
     }
 
-    private val requestLocation = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (!granted) snackbar(R.string.network_rule_ssid_permission).show()
+    private val requestLocation = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
+        if (granted[Manifest.permission.ACCESS_FINE_LOCATION] != true) snackbar(R.string.network_rule_ssid_permission).show()
     }
 
     private fun add(rule: Rule) {
         adapter.add(rule)
         if (rule.kind == Kind.SSID && !NetworkAutomation.hasLocationPermission(this)) {
-            requestLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            // Android 12 and later ignore a fine location request that does not also carry coarse.
+            requestLocation.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION))
         }
     }
 

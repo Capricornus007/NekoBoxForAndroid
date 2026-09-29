@@ -12,8 +12,6 @@ import kotlinx.coroutines.runBlocking
 
 class ProxyInstance(profile: ProxyEntity, var service: BaseService.Interface? = null) : BoxInstance(profile) {
 
-    var notTmp = true
-
     var lastSelectorGroupId = -1L
     var lastAutoSelect = false
     var displayProfileName = ServiceNotification.genTitle(profile)
@@ -25,22 +23,11 @@ class ProxyInstance(profile: ProxyEntity, var service: BaseService.Interface? = 
         super.buildConfig()
         lastSelectorGroupId = super.config.selectorGroupId
         lastAutoSelect = super.config.autoSelect
-        if (notTmp) Logs.d(safeConfigDiagnostics(config, 0))
-    }
-
-    // only use this in temporary instance
-    fun buildConfigTmp() {
-        notTmp = false
-        buildConfig()
     }
 
     override suspend fun init() {
         super.init()
         Logs.d(safeConfigDiagnostics(config, pluginConfigs.size))
-    }
-
-    override suspend fun loadConfig() {
-        super.loadConfig()
     }
 
     override fun launch() {

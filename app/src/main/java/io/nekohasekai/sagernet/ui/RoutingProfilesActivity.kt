@@ -20,6 +20,7 @@ import io.nekohasekai.sagernet.databinding.LayoutTwoLineItemBinding
 import io.nekohasekai.sagernet.ktx.FixedLinearLayoutManager
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
+import io.nekohasekai.sagernet.ktx.readTextBounded
 import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 
@@ -74,7 +75,7 @@ class RoutingProfilesActivity : ThemedActivity() {
         uri ?: return@registerForActivityResult
         runOnDefaultDispatcher {
             val text = try {
-                contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                contentResolver.openInputStream(uri)?.use { it.readTextBounded() }
             } catch (e: Exception) {
                 Logs.w(e)
                 null

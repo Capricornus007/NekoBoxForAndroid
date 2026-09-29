@@ -40,8 +40,8 @@ class ServiceStopGateTest {
     @Test
     fun explicitStopDuringRestartTeardown_cancelsRestart() {
         val gate = ServiceStopGate()
-        assertFalse(gate.onStopRequested(restart = true, alreadyStopping = false))
-        assertTrue(gate.onStopRequested(restart = false, alreadyStopping = true))
+        assertFalse(gate.onStopRequested(restart = true, hold = true, alreadyStopping = false))
+        assertTrue(gate.onStopRequested(restart = false, hold = false, alreadyStopping = true))
         assertFalse(gate.consumeRestart())
     }
 
@@ -49,7 +49,7 @@ class ServiceStopGateTest {
     @Test
     fun restartSurvivesWhenNoExplicitStop() {
         val gate = ServiceStopGate()
-        assertFalse(gate.onStopRequested(restart = true, alreadyStopping = false))
+        assertFalse(gate.onStopRequested(restart = true, hold = true, alreadyStopping = false))
         assertTrue(gate.consumeRestart())
     }
 
@@ -57,8 +57,8 @@ class ServiceStopGateTest {
     @Test
     fun secondRestartRequestDuringTeardown_keepsRestart() {
         val gate = ServiceStopGate()
-        assertFalse(gate.onStopRequested(restart = true, alreadyStopping = false))
-        assertTrue(gate.onStopRequested(restart = true, alreadyStopping = true))
+        assertFalse(gate.onStopRequested(restart = true, hold = true, alreadyStopping = false))
+        assertTrue(gate.onStopRequested(restart = true, hold = true, alreadyStopping = true))
         assertTrue(gate.consumeRestart())
     }
 
@@ -81,9 +81,54 @@ class ServiceStopGateTest {
     @Test
     fun clearedThenRestartDuringSameTeardown_remainsCleared() {
         val gate = ServiceStopGate()
-        assertFalse(gate.onStopRequested(restart = true, alreadyStopping = false))
-        assertTrue(gate.onStopRequested(restart = false, alreadyStopping = true))
-        assertTrue(gate.onStopRequested(restart = true, alreadyStopping = true))
+        assertFalse(gate.onStopRequested(restart = true, hold = true, alreadyStopping = false))
+        assertTrue(gate.onStopRequested(restart = false, hold = false, alreadyStopping = true))
+        assertTrue(gate.onStopRequested(restart = true, hold = true, alreadyStopping = true))
         assertFalse(gate.consumeRestart())
+    }
+
+    /**
+     * An explicit stop merged into a kill-switch teardown (a failure here, a restart is the same)
+     * releases the hold: the teardown's second pass then closes the tun it kept, and with the
+     * hold gone it ends stopped instead of blocking with a retry scheduled.
+     */
+    @Test
+    fun explicitStopDuringHeldTeardown_releasesHoldForSecondPass() {
+        val gate = ServiceStopGate()
+        assertFalse(gate.onStopRequested(restart = false, hold = true, alreadyStopping = false))
+        assertTrue(gate.holdTun)
+        assertFalse(gate.holdReleased())
+        assertTrue(gate.onStopRequested(restart = false, hold = false, alreadyStopping = true))
+        assertFalse(gate.holdTun)
+        assertTrue(gate.holdReleased())
+    }
+
+    /** A failure or restart merged into a held teardown keeps the hold; nothing to close twice. */
+    @Test
+    fun heldRequestDuringHeldTeardown_keepsHold() {
+        val gate = ServiceStopGate()
+        assertFalse(gate.onStopRequested(restart = false, hold = true, alreadyStopping = false))
+        assertTrue(gate.onStopRequested(restart = true, hold = true, alreadyStopping = true))
+        assertTrue(gate.holdTun)
+        assertFalse(gate.holdReleased())
+    }
+
+    /** A teardown that never held has nothing to release, so a merged request adds no second pass. */
+    @Test
+    fun plainTeardown_neverReportsRelease() {
+        val gate = ServiceStopGate()
+        assertFalse(gate.onStopRequested(restart = false, hold = false, alreadyStopping = false))
+        assertTrue(gate.onStopRequested(restart = true, hold = true, alreadyStopping = true))
+        assertFalse(gate.holdTun)
+        assertFalse(gate.holdReleased())
+    }
+
+    /** VpnService dropping the hold itself (no interface to keep) reads as released too: the second pass is a no-op. */
+    @Test
+    fun holdDroppedByVpnService_readsAsReleased() {
+        val gate = ServiceStopGate()
+        assertFalse(gate.onStopRequested(restart = false, hold = true, alreadyStopping = false))
+        gate.holdTun = false
+        assertTrue(gate.holdReleased())
     }
 }

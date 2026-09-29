@@ -28,7 +28,9 @@ class SubscriptionUpdaterScheduleTest {
         assertEquals(SubscriptionWorkSchedule(24 * 60L, 0L), computeSubscriptionWorkSchedule(emptyList(), nowSeconds = 0, remindsExpiry = true))
         val weekly = listOf(SubscriptionScheduleInput(lastUpdated = 0, autoUpdateDelay = 7 * 24 * 60))
         assertEquals(7 * 24 * 60L, computeSubscriptionWorkSchedule(weekly, nowSeconds = 0)!!.intervalMinutes)
-        assertEquals(24 * 60L, computeSubscriptionWorkSchedule(weekly, nowSeconds = 0, remindsExpiry = true)!!.intervalMinutes)
+        assertEquals(7 * 24 * 3600L, computeSubscriptionWorkSchedule(weekly, nowSeconds = 0)!!.initialDelaySeconds)
+        // A subscription updated a moment ago still gets its first reminder run within a day.
+        assertEquals(SubscriptionWorkSchedule(24 * 60L, 24 * 3600L), computeSubscriptionWorkSchedule(weekly, nowSeconds = 0, remindsExpiry = true))
         val hourly = listOf(SubscriptionScheduleInput(lastUpdated = 0, autoUpdateDelay = 60))
         assertEquals(60L, computeSubscriptionWorkSchedule(hourly, nowSeconds = 0, remindsExpiry = true)!!.intervalMinutes)
     }

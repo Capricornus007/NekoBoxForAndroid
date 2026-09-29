@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.database
 
 import io.nekohasekai.sagernet.Key
-import io.nekohasekai.sagernet.database.preference.KeyValuePair
 import io.nekohasekai.sagernet.database.preference.PublicDatabase
 import io.nekohasekai.sagernet.ui.BackupFormatV2
 import kotlinx.coroutines.sync.Mutex
@@ -101,6 +100,11 @@ object RoutingProfiles {
     // other.
     private val listLock = Any()
 
+    // Serializes every capture or apply of the live state (switch, save, sync, refresh of the
+    // active profile), so a subscription refresh landing during a switch cannot mark one profile
+    // active with another's rules or overwrite saved content with a half-applied live state.
+    private val applyLock = Mutex()
+
     private fun <T> mutate(block: (MutableList<Profile>) -> T): T = synchronized(listLock) {
         val profiles = list().toMutableList()
         val result = block(profiles)
@@ -117,22 +121,28 @@ object RoutingProfiles {
             .put("settings", BackupFormatV2.encodeSettings(settings))
     }
 
+    /**
+     * Typed value of every profile setting in [settings], in [SETTING_KEYS] order; null for a key that is
+     * absent or of an unknown type. A truncated value throws here, so callers see it before any write.
+     */
+    private fun settingValues(settings: JSONArray): List<Pair<String, Any?>> {
+        val pairs = BackupFormatV2.decodeSettings(settings).associateBy { it.key }
+        return SETTING_KEYS.map { key -> key to pairs[key]?.let { it.boolean ?: it.float ?: it.long ?: it.string ?: it.stringSet } }
+    }
+
     /** Replace the live rules and profile settings with [content]. Keys absent in it return to defaults. */
     suspend fun applyLive(content: JSONObject) {
         val rules = BackupFormatV2.decodeRules(content.optJSONArray("rules") ?: JSONArray())
-        val settings = BackupFormatV2.decodeSettings(content.optJSONArray("settings") ?: JSONArray())
-            .filter { it.key in SETTING_KEYS }
-            .associateBy { it.key }
+        val settings = settingValues(content.optJSONArray("settings") ?: JSONArray())
         val store = DataStore.configurationStore
-        for (key in SETTING_KEYS) {
-            val pair = settings[key]
-            when {
-                pair == null -> store.remove(key)
-                pair.valueType == KeyValuePair.TYPE_BOOLEAN -> store.putBoolean(key, pair.boolean!!)
-                pair.valueType == KeyValuePair.TYPE_STRING -> store.putString(key, pair.string)
-                pair.valueType == KeyValuePair.TYPE_STRING_SET -> store.putStringSet(key, pair.stringSet?.toMutableSet())
-                pair.valueType == KeyValuePair.TYPE_FLOAT -> store.putFloat(key, pair.float!!)
-                else -> pair.long?.let { store.putLong(key, it) } ?: store.remove(key)
+        for ((key, value) in settings) {
+            when (value) {
+                null -> store.remove(key)
+                is Boolean -> store.putBoolean(key, value)
+                is Float -> store.putFloat(key, value)
+                is Long -> store.putLong(key, value)
+                is String -> store.putString(key, value)
+                is Set<*> -> store.putStringSet(key, value.filterIsInstance<String>().toMutableSet())
             }
         }
         store.awaitWrites()
@@ -145,17 +155,19 @@ object RoutingProfiles {
     }
 
     /** Store the live state as a new profile and make it the active one. */
-    suspend fun saveLiveAs(name: String): Profile {
+    suspend fun saveLiveAs(name: String): Profile = applyLock.withLock {
         val content = captureLive()
         val profile = mutate { profiles ->
             Profile((profiles.maxOfOrNull { it.id } ?: 0L) + 1, name, content).also { profiles += it }
         }
         activeId = profile.id
-        return profile
+        profile
     }
 
     /** Persist the live state into the active profile, if there is one. */
-    suspend fun syncActive() {
+    suspend fun syncActive() = applyLock.withLock { syncActiveLocked() }
+
+    private suspend fun syncActiveLocked() {
         val id = activeId
         if (list().none { it.id == id }) return
         val content = captureLive()
@@ -169,11 +181,13 @@ object RoutingProfiles {
     }
 
     suspend fun switchTo(id: Long) {
-        val target = list().firstOrNull { it.id == id } ?: return
-        if (target.id == activeId) return
-        syncActive()
-        applyLive(target.content)
-        activeId = target.id
+        applyLock.withLock {
+            val target = list().firstOrNull { it.id == id } ?: return
+            if (target.id == activeId) return
+            syncActiveLocked()
+            applyLive(target.content)
+            activeId = target.id
+        }
     }
 
     fun rename(id: Long, name: String) {
@@ -198,6 +212,13 @@ object RoutingProfiles {
         val json = runCatching { JSONObject(jsonText) }.getOrNull() ?: return null
         if (json.optInt("routingProfile", 0) != FORMAT) return null
         val content = json.optJSONObject("content") ?: return null
+        // Decode here, typed values included, so malformed content is refused before it can replace a
+        // stored profile or the live rules and settings.
+        val decodes = runCatching {
+            BackupFormatV2.decodeRules(content.getJSONArray("rules"))
+            settingValues(content.getJSONArray("settings"))
+        }.isSuccess
+        if (!decodes) return null
         return Profile(0L, json.optString("name").ifBlank { "Imported" }, content, source)
     }
 
@@ -219,10 +240,6 @@ object RoutingProfiles {
     // Sources whose subscription is gone; a store that finishes after the delete is dropped instead
     // of leaving an orphan. Group ids are never reused, so this grows by one entry per deletion.
     private val deletedSources = HashSet<String>()
-
-    // Serializes the live apply of refreshed active profiles, so two refreshes landing together
-    // leave the live rules matching the stored profile, in store order.
-    private val applyLock = Mutex()
 
     suspend fun store(candidate: Profile): Profile = applyLock.withLock {
         val (stored, refreshedActive) = mutate { profiles ->

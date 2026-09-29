@@ -53,7 +53,7 @@ class VpnService :
     @Suppress("EXPERIMENTAL_API_USAGE")
     override suspend fun killProcesses() {
         runServiceTeardown(after = { super.killProcesses() }) {
-            if (data.holdTun) {
+            if (data.stopGate.holdTun) {
                 // Kill switch: the interface stays up with nobody reading it, so traffic drops until
                 // the next core replaces it (startVpn) or the user stops. A failure ahead of the
                 // core opening the tun has to block too, hence the bare interface. Without any
@@ -63,7 +63,7 @@ class VpnService :
                         .onFailure { Logs.w("kill switch could not establish a bare tun", it) }
                         .getOrNull()
                 }
-                if (conn == null) data.holdTun = false
+                if (conn == null) data.stopGate.holdTun = false
             } else {
                 conn?.close()
                 conn = null

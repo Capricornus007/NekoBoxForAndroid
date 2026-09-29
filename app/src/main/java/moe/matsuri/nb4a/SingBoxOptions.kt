@@ -143,24 +143,6 @@ class SingBoxOptions {
         @JvmField var default_mode: String? = null
     }
 
-    class Options : SingBoxOption() {
-        @JvmField var `$schema`: String? = null
-
-        @JvmField var log: LogOptions? = null
-
-        @JvmField var dns: DNSOptions? = null
-
-        @JvmField var ntp: NTPOptions? = null
-
-        @JvmField var inbounds: List<Inbound>? = null
-
-        @JvmField var outbounds: List<Outbound>? = null
-
-        @JvmField var route: RouteOptions? = null
-
-        @JvmField var experimental: ExperimentalOptions? = null
-    }
-
     class LogOptions : SingBoxOption() {
         @JvmField var disabled: Boolean? = null
 
@@ -320,40 +302,6 @@ class SingBoxOptions {
         @JvmField var length: String? = null
 
         @JvmField var interval: String? = null
-    }
-
-    class DialerOptions : SingBoxOption() {
-        @JvmField var detour: String? = null
-
-        @JvmField var bind_interface: String? = null
-
-        @JvmField var inet4_bind_address: String? = null
-
-        @JvmField var inet6_bind_address: String? = null
-
-        @JvmField var protect_path: String? = null
-
-        @JvmField var routing_mark: Int? = null
-
-        @JvmField var reuse_addr: Boolean? = null
-
-        @JvmField var connect_timeout: Long? = null
-
-        @JvmField var tcp_fast_open: Boolean? = null
-
-        @JvmField var tcp_multi_path: Boolean? = null
-
-        @JvmField var udp_fragment: Boolean? = null
-
-        @JvmField var domain_strategy: String? = null
-
-        @JvmField var fallback_delay: Long? = null
-    }
-
-    class ServerOptions : SingBoxOption() {
-        @JvmField var server: String? = null
-
-        @JvmField var server_port: Int? = null
     }
 
     class MultiplexOptions : SingBoxOption() {

@@ -105,14 +105,12 @@ class BaseService {
         val binder = Binder(this)
         var connectingJob: Job? = null
 
-        // Kill switch: true while a teardown keeps the VPN interface up (restart or failure), so
-        // VpnService.killProcesses() leaves the tun open and the listeners stay registered.
-        var holdTun = false
+        // Kill switch reconnect while stopGate.holdTun keeps the interface up with no core behind it.
         var retryJob: Job? = null
         var retryDelayMs = KILL_SWITCH_RETRY_INITIAL_MS
 
-        // The stop/reload decision core (pendingRestart + stopGeneration); see ServiceStopGate
-        // for the invariants and threading contract.
+        // The stop/reload decision core (pendingRestart, stopGeneration, holdTun); see
+        // ServiceStopGate for the invariants and threading contract.
         val stopGate = ServiceStopGate()
 
         fun changeState(s: State, msg: String? = null) {
@@ -238,8 +236,10 @@ class BaseService {
                     }
                     // Compute the in-place selector decision here (off the main thread) so
                     // reloadInner() does no DAO reads on the UI thread (Plan 027). null tag =>
-                    // no fast-path (fall through to the state machine).
-                    val selectorTag = resolveSelectorReloadTag()
+                    // no fast-path (fall through to the state machine). Only a profile switch
+                    // carries an id; a reload without one comes from a settings change, and the
+                    // in-place select would leave DNS, rules and app routing as they were.
+                    val selectorTag = if (profileId > 0L) resolveSelectorReloadTag() else null
                     onMainDispatcher { reloadInner(reloadStopGeneration, selectorTag) }
                 } catch (e: CancellationException) {
                     throw e
@@ -338,7 +338,7 @@ class BaseService {
                         wakeLock = null
                     }
                     // Network automation keeps evaluating while the kill switch holds the tun.
-                    if (!data.holdTun) DefaultNetworkListener.stop(this@Interface)
+                    if (!data.stopGate.holdTun) DefaultNetworkListener.stop(this@Interface)
                 },
             ) {
                 data.proxy?.closeAndPersist()
@@ -350,16 +350,16 @@ class BaseService {
             DataStore.vpnService = null
             DataStore.mixedInboundAuthed = false
 
-            // A teardown already in progress merges this request (explicit stop cancels a
-            // pending restart; see ServiceStopGate.onStopRequested) and we must return.
-            if (data.stopGate.onStopRequested(restart, data.state == State.Stopping)) return
-            // Job.cancel() is the member; the wildcard import also brings the extension into scope.
-            //noinspection MemberExtensionConflict
-            data.retryJob?.cancel()
             // Kill switch: a restart or a failure (every stop that carries a message) keeps the VPN
             // interface up so nothing leaks while the core is down. An explicit stop releases it.
             val hold = this is VpnService && DataStore.killSwitch && (restart || msg != null)
-            data.holdTun = hold
+            // A teardown already in progress merges this request (explicit stop cancels a
+            // pending restart and releases the hold, so that teardown ends stopped rather than
+            // blocking; see ServiceStopGate.onStopRequested) and we must return.
+            if (data.stopGate.onStopRequested(restart, hold, data.state == State.Stopping)) return
+            // Job.cancel() is the member; the wildcard import also brings the extension into scope.
+            //noinspection MemberExtensionConflict
+            data.retryJob?.cancel()
             // Blocked: the failure case. The service stays in the foreground with the tun held and
             // no core, reports Connecting (stoppable, reload-able) and retries with backoff.
             val mayBlock = hold && !restart
@@ -378,9 +378,12 @@ class BaseService {
                     killProcesses()
                     data.proxy = null
                 }
+                // A stop merged after the teardown kept the tun released the hold: a second pass
+                // closes the tun and unregisters the network listener.
+                if (data.stopGate.holdReleased()) killProcesses()
                 // VpnService drops the hold when it ended up without an interface: then nothing
                 // blocks, and the service stops normally instead of claiming protection.
-                val blocked = mayBlock && data.holdTun
+                val blocked = mayBlock && data.stopGate.holdTun
                 if (!blocked) {
                     val data = data
                     if (data.closeReceiverRegistered) {
@@ -426,7 +429,7 @@ class BaseService {
             data.retryDelayMs = (delayMs * 2).coerceAtMost(KILL_SWITCH_RETRY_MAX_MS)
             data.retryJob = runOnMainDispatcher {
                 delay(delayMs)
-                if (data.holdTun && data.state == State.Connecting && data.proxy == null) stopRunner(true)
+                if (data.stopGate.holdTun && data.state == State.Connecting && data.proxy == null) stopRunner(true)
             }
         }
 
@@ -621,7 +624,7 @@ class BaseService {
                     }
 
                     startProcesses()
-                    data.holdTun = false
+                    data.stopGate.holdTun = false
                     data.retryDelayMs = KILL_SWITCH_RETRY_INITIAL_MS
                     data.changeState(State.Connected)
 
@@ -633,7 +636,8 @@ class BaseService {
                     Toast.makeText(this@Interface, e.readableMessage, Toast.LENGTH_SHORT).show()
                     Logs.w(e)
                     data.binder.missingPlugin(e.plugin)
-                    stopRunner(false, null)
+                    // Carries a message so the kill switch treats it as a failure and holds the tun.
+                    stopRunner(false, e.readableMessage)
                 } catch (exc: Throwable) {
                     if (exc.javaClass.name.endsWith("proxyerror")) {
                         // error from golang
