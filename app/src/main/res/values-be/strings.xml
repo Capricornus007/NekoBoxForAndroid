@@ -57,13 +57,11 @@
     <string name="show_direct_speed">Паказаць прамую хуткасць</string>
     <string name="show_stop_sum">Калі вы не хочаце выкарыстоўваць кнопку панэлі апавяшчэнняў у якасці пераключальніка злучэння</string>
     <string name="show_stop">Паказаць кнопку прыпынку</string>
-    <string name="cag_misc">Розныя налады</string>
     <string name="speed_interval">Інтэрвал абнаўлення апавяшчэнняў аб хуткасці</string>
     <string name="ws_browser_forwarding_sum">Перадайце адпаведныя WebSockets праз браўзэр.</string>
     <string name="ws_browser_forwarding">Пераадрасацыя браўзэра</string>
     <string name="cag_ws">Налады WebSocket</string>
     <string name="require_http">Уключыць увод HTTP</string>
-    <string name="general_settings">Налады прыкладання</string>
     <string name="allow_access_sum">Прывязаць уваходныя серверы да 0.0.0.0</string>
     <string name="allow_access">Дазволіць злучэнне з лакальнай сеткі</string>
     <string name="cag_route">Налады маршруту</string>

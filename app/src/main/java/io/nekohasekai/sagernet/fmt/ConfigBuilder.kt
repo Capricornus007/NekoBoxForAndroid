@@ -177,6 +177,8 @@ class ConfigBuildResult(
     // leak the egress IP (issue #1166). The plugin listens with these creds and the
     // sing-box socks outbound dials with them.
     val localProxyCredentials: Map<Int, Pair<String, String>> = emptyMap(),
+    // True when the selector group is driven by sing-box urltest instead of the user.
+    val autoSelect: Boolean = false,
 ) {
     data class IndexEntity(var chain: LinkedHashMap<Int, ProxyEntity>)
 }
@@ -819,13 +821,26 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             list.forEach {
                 tagMap[it.id] = buildChain(it.id, it)
             }
+            val memberTags = tagMap.values.toList()
             outbounds.add(
                 0,
-                Outbound_SelectorOptions().apply {
-                    type = "selector"
-                    tag = TAG_PROXY
-                    default_ = tagMap[proxy.id]
-                    this.outbounds = tagMap.values.toList()
+                if (group.autoSelect) {
+                    // sing-box urltest does the health checks, failover and recovery; its defaults
+                    // (3 min probe interval, 50 ms tolerance, 30 min idle timeout) already limit
+                    // probing and stop the group flapping between near-equal members.
+                    Outbound_URLTestOptions().apply {
+                        type = "urltest"
+                        tag = TAG_PROXY
+                        url = DataStore.connectionTestURL
+                        this.outbounds = memberTags
+                    }
+                } else {
+                    Outbound_SelectorOptions().apply {
+                        type = "selector"
+                        tag = TAG_PROXY
+                        default_ = tagMap[proxy.id]
+                        this.outbounds = memberTags
+                    }
                 },
             )
         } else {
@@ -1284,6 +1299,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             tagMap,
             if (buildSelector) group.id else -1L,
             localProxyCredentials,
+            buildSelector && group.autoSelect,
         )
     }
 }

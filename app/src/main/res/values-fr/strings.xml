@@ -36,7 +36,6 @@
     <string name="apps">Applications</string>
     <string name="clear_profiles_message">Êtes-vous sûr(e) de vouloir supprimer ce groupe \?</string>
     <string name="profile_import_message">Confirmez-vous que vous voulez importer le profil %s \?</string>
-    <string name="general_settings">Paramètres de l\'appli</string>
     <string name="cag_route">Paramètres d\'itinéraire</string>
     <string name="service_mode">Mode service</string>
     <string name="group_delete_confirm_prompt">Êtes-vous sûr(e) de vouloir supprimer ce groupe \?</string>
@@ -145,7 +144,6 @@
     <string name="speed_detail">Proxy： %1$s↑ %2$s↓
 \nDirecte： %3$s↑ %4$s↓</string>
     <string name="subscriptions">Souscriptions</string>
-    <string name="cag_misc">Paramètres divers</string>
     <string name="enable_dns_routing">Activer le routage DNS</string>
     <string name="port_http">Port du Proxy HTTP</string>
     <string name="invalid_server">Nom de serveur invalide</string>

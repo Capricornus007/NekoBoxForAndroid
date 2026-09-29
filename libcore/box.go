@@ -213,6 +213,19 @@ func (b *BoxInstance) SelectOutbound(tag string) bool {
 	return false
 }
 
+// SelectedOutbound returns the member tag the "proxy" group (selector or urltest) currently
+// routes through, or "" when the config has no such group or urltest has not picked one yet.
+func (b *BoxInstance) SelectedOutbound() string {
+	proxy, ok := b.Outbound().Outbound("proxy")
+	if !ok {
+		return ""
+	}
+	if outboundGroup, ok := proxy.(adapter.OutboundGroup); ok {
+		return outboundGroup.Now()
+	}
+	return ""
+}
+
 func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err error) {
 	defer deferPanicToError("box.UrlTest", func(err_ error) { err = err_ })
 	var connectionTracker adapter.ConnectionTracker

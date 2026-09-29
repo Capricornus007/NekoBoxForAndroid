@@ -22,6 +22,8 @@ data class ProxyGroup(
     var isSelector: Boolean = false,
     var frontProxy: Long = -1L,
     var landingProxy: Long = -1L,
+    // With isSelector: let sing-box urltest pick the member instead of the user.
+    @ColumnInfo(defaultValue = "0") var autoSelect: Boolean = false,
 ) : Serializable() {
 
     @Transient

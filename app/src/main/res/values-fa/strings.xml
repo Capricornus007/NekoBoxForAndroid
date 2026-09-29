@@ -59,14 +59,12 @@
     <string name="allow_access">اجازه اتصال از شبکه محلی</string>
     <string name="allow_access_sum">اجازه اتصال سرورهای ورودی به 0.0.0.0</string>
     <string name="inbound_settings">تنظیمات اتصالات ورودی</string>
-    <string name="general_settings">تنظیمات برنامه</string>
     <string name="require_http">فعال‌کردن ورودی HTTP</string>
     <string name="cag_ws">تنظیمات WebSocket</string>
     <string name="ws_max_early_data" translatable="false">Max early data</string>
     <string name="ws_browser_forwarding">اتصال مرورگر</string>
     <string name="ws_browser_forwarding_sum">ارسال WebSocketهای مربوطه از طریق مرورگر</string>
     <string name="speed_interval">تنظیم فاصله زمانی نمایش سرعت</string>
-    <string name="cag_misc">تنظیمات متفرقه</string>
     <string name="show_stop">نمایش دکمه توقف</string>
     <string name="show_stop_sum">اگر دکمه تغییر وضعیت در نوار اعلان را نمی‌خواهید</string>
     <string name="show_direct_speed">نمایش سرعت</string>

@@ -29,6 +29,13 @@
         app:key="groupIsSelector"
         app:title="@string/use_selector" />
 
+    <SwitchPreference
+        app:dependency="groupIsSelector"
+        app:icon="@drawable/ic_baseline_speed_24"
+        app:key="groupAutoSelect"
+        app:summary="@string/auto_select_sum"
+        app:title="@string/auto_select" />
+
     <io.nekohasekai.sagernet.widget.OutboundPreference
         app:icon="@drawable/ic_hardware_router"
         app:key="groupFrontProxy"

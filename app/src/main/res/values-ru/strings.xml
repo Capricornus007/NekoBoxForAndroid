@@ -71,7 +71,6 @@
 <string name="bypass_apps">Обход</string>
 <string name="bypass_lan_in_core">Обход LAN в ядре</string>
 <string name="cag_dns">Настройки DNS</string>
-<string name="cag_misc">Прочие настройки</string>
 <string name="cag_route">Настройки маршрута</string>
 <string name="cag_ws">Настройки WebSocket</string>
 <string name="certificates">Сертификаты</string>
@@ -169,7 +168,6 @@
 <string name="force_resolve_sum">При обновлении преобразовать все доменные имена в IP-адреса. Хост и SNI будут добавлены автоматически, если это возможно</string>
 <string name="forward_success">Прокси запустился.</string>
 <string name="front_proxy">Прямой прокси</string>
-<string name="general_settings">Настройки приложения</string>
 <string name="generating">Создание…</string>
 <string name="github">Исходный код</string>
 <string name="global_allow_insecure">Всегда разрешать небезопасные</string>

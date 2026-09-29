@@ -14,6 +14,7 @@ class ProxyInstance(profile: ProxyEntity, var service: BaseService.Interface? = 
     var notTmp = true
 
     var lastSelectorGroupId = -1L
+    var lastAutoSelect = false
     var displayProfileName = ServiceNotification.genTitle(profile)
 
     // for TrafficLooper
@@ -22,6 +23,7 @@ class ProxyInstance(profile: ProxyEntity, var service: BaseService.Interface? = 
     override fun buildConfig() {
         super.buildConfig()
         lastSelectorGroupId = super.config.selectorGroupId
+        lastAutoSelect = super.config.autoSelect
         if (notTmp) Logs.d(safeConfigDiagnostics(config, 0))
     }
 

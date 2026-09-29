@@ -15,7 +15,7 @@ import io.nekohasekai.sagernet.fmt.KryoConverters
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 13,
+    version = 14,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
@@ -28,6 +28,8 @@ import io.nekohasekai.sagernet.fmt.KryoConverters
         // v12: additive lifetimeRx/lifetimeTx columns on proxy_entities (default 0). Pure column
         // adds are auto-migratable without a spec; never destructive.
         AutoMigration(from = 11, to = 12),
+        // v14: additive proxy_groups.autoSelect column (default 0).
+        AutoMigration(from = 13, to = 14),
     ],
 )
 @TypeConverters(KryoConverters::class)

@@ -44,13 +44,11 @@
     <string name="show_direct_speed">Tampilkan Kecepatan Direk</string>
     <string name="show_stop_sum">Jika Anda tidak ingin menggunakan Tombol Ubin sebagai pengalih</string>
     <string name="show_stop">Tampilkan Tombol Henti</string>
-    <string name="cag_misc">Pengaturan Lainnya</string>
     <string name="speed_interval">Interval Pembaruan Notifikasi Kecepatan</string>
     <string name="ws_browser_forwarding_sum">Teruskan WebSocket yang sesuai melalui browser.</string>
     <string name="ws_browser_forwarding">Penerusan Peramban</string>
     <string name="cag_ws">Pengaturan WebSocket</string>
     <string name="require_http">Aktifkan HTTP inbound</string>
-    <string name="general_settings">Pengaturan Aplikasi</string>
     <string name="inbound_settings">Pengaturan Inbound</string>
     <string name="allow_access_sum">Ikat server masuk ke 0.0.0.0</string>
     <string name="allow_access">Izinkan koneksi dari LAN</string>

@@ -47,7 +47,6 @@
     <string name="cag_dns">DNS 設定</string>
     <string name="cag_route">路由設定</string>
     <string name="inbound_settings">傳入設定</string>
-    <string name="general_settings">應用程式設定</string>
     <string name="require_http">啟用 HTTP 傳入伺服器</string>
     <string name="cag_ws">WebSocket 設定</string>
     <string name="ws_browser_forwarding">瀏覽器轉發</string>
@@ -196,7 +195,6 @@
     <string name="show_direct_speed">顯示直連速度</string>
     <string name="show_stop_sum">如果您不想使用快速設定圖塊進行切換</string>
     <string name="show_stop">顯示停止按鈕</string>
-    <string name="cag_misc">其他設定</string>
     <string name="port_transproxy">透明代理連接埠</string>
     <string name="group_duplicate">重複：
 \n%s</string>

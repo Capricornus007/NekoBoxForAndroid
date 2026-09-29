@@ -49,6 +49,7 @@ class GroupSettingsActivity(
         DataStore.groupType = type
         DataStore.groupOrder = order
         DataStore.groupIsSelector = isSelector
+        DataStore.groupAutoSelect = autoSelect
 
         DataStore.frontProxy = frontProxy
         DataStore.landingProxy = landingProxy
@@ -75,6 +76,8 @@ class GroupSettingsActivity(
         type = DataStore.groupType
         order = DataStore.groupOrder
         isSelector = DataStore.groupIsSelector
+        // The switch is only disabled, not cleared, when the selector is turned off.
+        autoSelect = isSelector && DataStore.groupAutoSelect
 
         frontProxy =
             if (DataStore.frontProxyTmp == OutboundPreference.VALUE_SELECT_PROFILE.toInt()) {
@@ -112,6 +115,14 @@ class GroupSettingsActivity(
 
     fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.group_preferences)
+
+        // Turning the selector off clears automatic selection so the disabled switch shows the
+        // value that will be saved.
+        val autoSelectPreference = findPreference<SwitchPreference>(Key.GROUP_AUTO_SELECT)!!
+        findPreference<SwitchPreference>(Key.GROUP_IS_SELECTOR)!!.setOnPreferenceChangeListener { _, newValue ->
+            if (newValue == false) autoSelectPreference.isChecked = false
+            true
+        }
 
         frontProxyPreference = findPreference(Key.GROUP_FRONT_PROXY)!!
         frontProxyPreference.apply {
@@ -345,7 +356,16 @@ class GroupSettingsActivity(
             if (!keepUserInfo) {
                 entity.subscription?.subscriptionUserinfo = ""
             }
+            val previousMode = Triple(entity.isSelector, entity.autoSelect, entity.frontProxy to entity.landingProxy)
             GroupManager.updateGroup(entity.apply { serialize() })
+            val currentMode = Triple(entity.isSelector, entity.autoSelect, entity.frontProxy to entity.landingProxy)
+            // The running config bakes in the group's selection mode and chain, so apply changes
+            // to it right away instead of leaving the old mode active until the next restart.
+            if (previousMode != currentMode && DataStore.serviceState.started &&
+                SagerDatabase.proxyDao.getById(DataStore.currentProfile)?.groupId == entity.id
+            ) {
+                SagerNet.reloadService()
+            }
         }
 
         finish()

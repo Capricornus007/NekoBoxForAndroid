@@ -104,6 +104,7 @@ dependencies {
         // 1.8.1 (JVM default methods). The transitive core from savedstate/lifecycle is
         // older and lands in the app APK, so the test APK's copy is dropped and the
         // migration tests die with AbstractMethodError unless the app resolves 1.8.1 too.
+        //noinspection NewerVersionAvailable
         implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
     }
 

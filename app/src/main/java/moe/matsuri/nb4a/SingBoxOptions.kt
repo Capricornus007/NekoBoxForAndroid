@@ -1513,6 +1513,20 @@ class SingBoxOptions {
         var default_: String? = null
     }
 
+    class Outbound_URLTestOptions : Outbound() {
+        @JvmField var outbounds: List<String>? = null
+
+        @JvmField var url: String? = null
+
+        @JvmField var interval: String? = null
+
+        @JvmField var tolerance: Int? = null
+
+        @JvmField var idle_timeout: String? = null
+
+        @JvmField var interrupt_exist_connections: Boolean? = null
+    }
+
     class Rule_DefaultOptions : Rule() {
         @JvmField var inbound: List<String>? = null
 

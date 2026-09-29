@@ -67,8 +67,6 @@
     <string name="group_show_diff">變化</string>
     <string name="group_duplicate">重複：
 \n%s</string>
-    <string name="general_settings">應用程式設定</string>
-    <string name="cag_misc">其他設定</string>
     <string name="speed">%s/s</string>
     <string name="connection_test_error">失敗：%s</string>
     <string name="connection_test_available_http">連接成功: HTTP 握手需時 %dms</string>

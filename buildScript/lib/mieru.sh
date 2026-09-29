@@ -6,7 +6,7 @@
 # (moe.matsuri.exe.mieru). PluginManager.initNativeInternal resolves
 # "mieru-plugin" -> libmieru.so from nativeLibraryDir.
 #
-# Usage: ./run lib mieru
+# Usage: buildScript/lib/mieru.sh (from the repository root)
 set -e
 set -o pipefail
 

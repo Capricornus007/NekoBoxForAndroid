@@ -57,13 +57,11 @@
     <string name="allow_access">LAN에서의 연결 허용</string>
     <string name="allow_access_sum">인바운드 서버를 0.0.0.0에 바인딩</string>
     <string name="inbound_settings">인바운드 설정</string>
-    <string name="general_settings">앱 설정</string>
     <string name="require_http">HTTP 인바운드 활성화</string>
     <string name="cag_ws">WebSocket 설정</string>
     <string name="ws_browser_forwarding">브라우저 포워딩</string>
     <string name="ws_browser_forwarding_sum">해당 WebSocket을 브라우저를 통해 전달합니다.</string>
     <string name="speed_interval">속도 알림 업데이트 간격</string>
-    <string name="cag_misc">기타 설정</string>
     <string name="show_stop">정지 버튼 표시</string>
     <string name="show_stop_sum">빠른 설정 타일을 스위치로 사용하지 않으려는 경우</string>
     <string name="show_direct_speed">직접 연결 속도 표시</string>

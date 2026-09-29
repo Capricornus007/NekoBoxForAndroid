@@ -237,6 +237,28 @@ class ConfigBuilderGoldenTest {
     }
 
     @Test
+    fun autoSelectGroup_emitsUrltestOverEveryMember() {
+        DataStore.connectionTestURL = "http://example.com/generate_204"
+        val group = addGroup(isSelector = true, autoSelect = true)
+        val first = addSocks(group, "192.0.2.47", 1087, "auto-first")
+        val second = addSocks(group, "192.0.2.48", 1088, "auto-second")
+
+        val result = build(first)
+        val root = JSONObject(result.config)
+        val urltest = outbound(root, "urltest")
+
+        assertEquals("proxy", urltest.getString("tag"))
+        assertEquals("http://example.com/generate_204", urltest.getString("url"))
+        assertEquals(
+            setOf(result.profileTagMap.getValue(first.id), result.profileTagMap.getValue(second.id)),
+            strings(urltest.getJSONArray("outbounds")).toSet(),
+        )
+        assertTrue(objects(root.getJSONArray("outbounds")).none { it.optString("type") == "selector" })
+        assertEquals(group, result.selectorGroupId)
+        assertResultMaps(result, first)
+    }
+
+    @Test
     fun selectorGroup_skipsArchivedEntriesWithoutDeletingThem() {
         val group = addGroup(isSelector = true)
         val active = addSocks(group, "192.0.2.42", 1080, "active")
@@ -349,8 +371,8 @@ class ConfigBuilderGoldenTest {
         assertTrue(rules.indexOf(hostsRule) > directRuleIndex)
     }
 
-    private fun addGroup(isSelector: Boolean = false) = ConfigBuilderTestEnv.io {
-        SagerDatabase.groupDao.createGroup(ProxyGroup(ungrouped = true, isSelector = isSelector))
+    private fun addGroup(isSelector: Boolean = false, autoSelect: Boolean = false) = ConfigBuilderTestEnv.io {
+        SagerDatabase.groupDao.createGroup(ProxyGroup(ungrouped = true, isSelector = isSelector, autoSelect = autoSelect))
     }
 
     private fun addSocks(groupId: Long, address: String, port: Int, name: String) = addProfile(

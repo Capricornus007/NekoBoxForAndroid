@@ -76,14 +76,27 @@
     <string name="proxy_mode_inbound_auth">Authenticate local proxy in Proxy mode</string>
     <string name="proxy_mode_inbound_auth_sum">Require username/password on the local SOCKS/HTTP proxy when running in Proxy (non-VPN) mode. Enable to stop other apps from using it as an open relay.</string>
     <string name="inbound_settings">Inbound Settings</string>
-    <string name="general_settings">App Settings</string>
+    <!-- settings hub rows (global_preferences.xml) -->
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_appearance_summary">Theme, night mode, language, interface behavior</string>
+    <string name="settings_connection">Connection</string>
+    <string name="settings_connection_summary">Auto-connect, service mode, TUN, MTU, reconnect behavior</string>
+    <string name="settings_protection">Leak protection</string>
+    <string name="settings_protection_summary">Always-on VPN, block connections without VPN, battery optimization</string>
+    <string name="settings_route_summary">Proxied apps, LAN bypass, sniffing, IPv6, rule sets</string>
+    <string name="settings_dns_summary">Remote and direct DNS, domain strategy, FakeDNS, hosts</string>
+    <string name="settings_inbound_summary">Local proxy port, LAN access, authentication</string>
+    <string name="settings_tls_summary">Certificate checks, TLS version, fragmentation</string>
+    <string name="settings_notification">Notification &amp; statistics</string>
+    <string name="settings_notification_summary">Speed updates, traffic statistics, notification content</string>
+    <string name="settings_advanced">Advanced</string>
+    <string name="settings_advanced_summary">Logging, custom config, Clash API, reset, cache</string>
     <string name="require_http">Enable HTTP inbound</string>
     <string name="cag_ws">WebSocket Settings</string>
     <string name="ws_max_early_data" translatable="false">Max early data</string>
     <string name="ws_browser_forwarding">Browser Forwarding</string>
     <string name="ws_browser_forwarding_sum">Forward corresponding WebSockets through the browser.</string>
     <string name="speed_interval">Speed Notification Update Interval</string>
-    <string name="cag_misc">Misc Settings</string>
     <string name="show_stop">Show Stop Button</string>
     <string name="show_stop_sum">If you don\'t want to use Quick Tile as the switch</string>
     <string name="show_direct_speed">Show Direct Speed</string>
@@ -626,6 +639,23 @@
     <string name="bypass_lan_in_core">Bypass LAN in Core</string>
     <string name="need_restart">Restart APP to apply changes</string>
     <string name="use_selector">Use selector</string>
+    <!-- leak protection page -->
+    <string name="protection_always_on">Always-on VPN</string>
+    <string name="protection_always_on_enabled">On. Android restarts the VPN after a reboot or after the service stops.</string>
+    <string name="protection_always_on_disabled">Off. After a reboot or a crash the VPN stays down until you start it. Tap to open the system VPN settings and enable it for this app.</string>
+    <string name="protection_lockdown">Block connections without VPN</string>
+    <string name="protection_lockdown_enabled">On. Android drops every connection that does not go through the VPN, including while this app starts or reconnects.</string>
+    <string name="protection_lockdown_disabled">Off. While the VPN is down, apps reach the network directly. Tap to open the system VPN settings and enable it.</string>
+    <string name="protection_proxy_mode">Not available in proxy-only service mode.</string>
+    <string name="protection_unknown">This Android version does not report the state. Tap to check the system VPN settings.</string>
+    <string name="protection_battery">Battery optimization</string>
+    <string name="protection_battery_unrestricted">Unrestricted. Android will not stop the service to save power.</string>
+    <string name="protection_battery_optimized">Optimized. Android may stop the service in the background. Tap and set this app to Unrestricted.</string>
+    <string name="protection_notes_title">How these settings interact</string>
+    <string name="protection_notes">Both VPN settings are enforced by Android, not by this app, and only apply in VPN service mode. With Block connections without VPN on, apps excluded from the tunnel in Proxied apps bypass mode lose connectivity instead of reaching the network directly. A running service is not proof of protection: use the connection test after every start and reconnect.</string>
+    <string name="auto_select">Automatic selection</string>
+    <string name="auto_select_active">Automatic selection is on for this group. Turn it off in the group settings to pick a member.</string>
+    <string name="auto_select_sum">Route through the member with the lowest connection-test latency and switch when it fails or a faster one recovers. Manual selection within this group is off while enabled.</string>
     <string name="front_proxy">Front proxy</string>
     <string name="landing_proxy">Landing Proxy</string>
     <string name="action_shadowtls" translatable="false">ShadowTLS</string>

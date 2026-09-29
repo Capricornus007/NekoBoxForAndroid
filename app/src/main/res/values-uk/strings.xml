@@ -59,14 +59,12 @@
     <string name="allow_access">Дозволити підключення з локальної мережі</string>
     <string name="allow_access_sum">Прив’язати вхідні сервери до 0.0.0.0</string>
     <string name="inbound_settings">Вхідні налаштування</string>
-    <string name="general_settings">Налаштування програми</string>
     <string name="require_http">Увімкнути вхідний протокол HTTP</string>
     <string name="cag_ws">Налаштування WebSocket</string>
     <string name="ws_max_early_data" translatable="false">Max early data</string>
     <string name="ws_browser_forwarding">Переадресація браузера</string>
     <string name="ws_browser_forwarding_sum">Пересилайте відповідні WebSockets через браузер.</string>
     <string name="speed_interval">Інтервал оновлення сповіщення про швидкість</string>
-    <string name="cag_misc">Різні налаштування</string>
     <string name="show_stop">Показати кнопку зупинки</string>
     <string name="show_stop_sum">Якщо ви не хочете використовувати Quick Tile як перемикач</string>
     <string name="show_direct_speed">Показати пряму швидкість</string>

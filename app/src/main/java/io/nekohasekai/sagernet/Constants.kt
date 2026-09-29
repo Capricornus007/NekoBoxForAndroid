@@ -10,6 +10,9 @@ object Key {
     const val PERSIST_ACROSS_REBOOT = "isAutoConnect"
 
     const val CLEAR_CACHE = "clearCache"
+    const val PROTECTION_ALWAYS_ON = "protectionAlwaysOn"
+    const val PROTECTION_LOCKDOWN = "protectionLockdown"
+    const val PROTECTION_BATTERY = "protectionBattery"
     const val PLUGIN_SIGNER_APPROVALS = "pluginSignerApprovals"
 
     const val APP_EXPERT = "isExpert"
@@ -175,6 +178,7 @@ object Key {
     const val GROUP_TYPE = "groupType"
     const val GROUP_ORDER = "groupOrder"
     const val GROUP_IS_SELECTOR = "groupIsSelector"
+    const val GROUP_AUTO_SELECT = "groupAutoSelect"
     const val GROUP_FRONT_PROXY = "groupFrontProxy"
     const val GROUP_LANDING_PROXY = "groupLandingProxy"
 

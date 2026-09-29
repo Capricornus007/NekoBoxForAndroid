@@ -92,10 +92,11 @@ class MainActivity :
             displayFragmentWithId(R.id.nav_configuration)
         }
         onBackPressedDispatcher.addCallback {
-            if (supportFragmentManager.findFragmentById(R.id.fragment_holder) is ConfigurationFragment) {
-                moveTaskToBack(true)
-            } else {
-                displayFragmentWithId(R.id.nav_configuration)
+            val current = supportFragmentManager.findFragmentById(R.id.fragment_holder) as? ToolbarFragment
+            when {
+                current?.onBackPressed() == true -> Unit
+                current is ConfigurationFragment -> moveTaskToBack(true)
+                else -> displayFragmentWithId(R.id.nav_configuration)
             }
         }
 

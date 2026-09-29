@@ -294,13 +294,11 @@
     <string name="show_direct_speed">Vis direkte hastighet</string>
     <string name="show_stop_sum">Hvis du ikke vil bruke Quick Tile som bryter</string>
     <string name="show_stop">Vis stoppknapp</string>
-    <string name="cag_misc">Diverse innstillinger</string>
     <string name="speed_interval">Oppdateringsintervall for hastighetsvarsling</string>
     <string name="ws_browser_forwarding_sum">Videresend tilsvarende WebSockets gjennom nettleseren.</string>
     <string name="ws_browser_forwarding">Videresending av nettleser</string>
     <string name="cag_ws">WebSocket -innstillinger</string>
     <string name="require_http">Aktiver HTTP inbound</string>
-    <string name="general_settings">Appinnstillinger</string>
     <string name="inbound_settings">Innkommende innstillinger</string>
     <string name="allow_access_sum">Bind innkommende servere til 0.0.0.0</string>
     <string name="allow_access">Tillat tilkoblinger fra LAN</string>

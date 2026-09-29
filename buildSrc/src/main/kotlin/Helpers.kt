@@ -23,17 +23,10 @@ private val Project.android get() = extensions.getByName<ApplicationExtension>("
 private val Project.androidComponents
     get() = extensions.getByName<ApplicationAndroidComponentsExtension>("androidComponents")
 
-private lateinit var metadata: Properties
 private lateinit var localProperties: Properties
 
-fun Project.requireMetadata(): Properties {
-    if (!::metadata.isInitialized) {
-        metadata = Properties().apply {
-            load(rootProject.file("nb4a.properties").inputStream())
-        }
-    }
-    return metadata
-}
+// App identity/version values are declared in the root gradle.properties.
+private fun Project.metadata(name: String): String = providers.gradleProperty(name).get()
 
 fun Project.requireLocalProperties(): Properties {
     if (!::localProperties.isInitialized) {
@@ -174,9 +167,9 @@ fun Project.setupAppCommon() {
 }
 
 fun Project.setupApp() {
-    val pkgName = requireMetadata().getProperty("PACKAGE_NAME")
-    val verName = requireMetadata().getProperty("VERSION_NAME")
-    val verCode = (requireMetadata().getProperty("VERSION_CODE").toInt()) * 5
+    val pkgName = metadata("PACKAGE_NAME")
+    val verName = metadata("VERSION_NAME")
+    val verCode = metadata("VERSION_CODE").toInt() * 5
     android.apply {
         defaultConfig {
             applicationId = pkgName
@@ -225,7 +218,7 @@ fun Project.setupApp() {
                 buildConfigField(
                     "String",
                     "PRE_VERSION_NAME",
-                    "\"${requireMetadata().getProperty("PRE_VERSION_NAME")}\"",
+                    "\"${metadata("PRE_VERSION_NAME")}\"",
                 )
             }
         }
@@ -241,7 +234,7 @@ fun Project.setupApp() {
     // AGP 9 (new DSL). Instead we react to artifact creation and copy the produced APKs into
     // build/outputs/renamed_apks/<variant> with friendly NekoBox-<version>[-<abi>].apk names.
     // The preview flavor uses PRE_VERSION_NAME to match the previous behaviour.
-    val previewVersionName = requireMetadata().getProperty("PRE_VERSION_NAME")
+    val previewVersionName = metadata("PRE_VERSION_NAME")
     androidComponents.onVariants { variant ->
         variant.sources.jniLibs?.addGeneratedSourceDirectory(
             bundledExecutables,

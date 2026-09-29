@@ -56,12 +56,14 @@ class ThemeSmokeTest {
             R.layout.layout_import,
             R.layout.item_keyboard_key,
         )
-        for (id in allThemes) for (dialog in booleanArrayOf(false, true)) {
-            val ctx = themed(id, night = false, dialog = dialog)
-            val inflater = LayoutInflater.from(ctx)
-            for (layout in layouts) inflater.inflate(layout, null)
-            for (attr in intArrayOf(R.attr.fabConnectedColor, R.attr.appBarBackgroundColor, R.attr.colorPrimaryText)) {
-                assertNotEquals("theme $id dialog=$dialog: attr unresolved", Color.TRANSPARENT, ctx.getColorAttr(attr))
+        for (id in allThemes) {
+            for (dialog in booleanArrayOf(false, true)) {
+                val ctx = themed(id, night = false, dialog = dialog)
+                val inflater = LayoutInflater.from(ctx)
+                for (layout in layouts) inflater.inflate(layout, null)
+                for (attr in intArrayOf(R.attr.fabConnectedColor, R.attr.appBarBackgroundColor, R.attr.colorPrimaryText)) {
+                    assertNotEquals("theme $id dialog=$dialog: attr unresolved", Color.TRANSPARENT, ctx.getColorAttr(attr))
+                }
             }
         }
     }

@@ -48,7 +48,6 @@
     <string name="cag_dns">DNS 设置</string>
     <string name="cag_route">路由设置</string>
     <string name="inbound_settings">入站设置</string>
-    <string name="general_settings">软件设置</string>
     <string name="require_http">启用 HTTP 入站</string>
     <string name="cag_ws">WebSocket 设置</string>
     <string name="ws_browser_forwarding">浏览器转发</string>
@@ -181,7 +180,6 @@
     <string name="domain_strategy">域名解析策略</string>
     <string name="traffic_sniffing">启用流量探测</string>
     <string name="disable">禁用</string>
-    <string name="cag_misc">杂项</string>
     <string name="enable_mux">启用多路复用</string>
     <string name="mux_concurrency">最大流数</string>
     <string name="mux_mode">模式</string>

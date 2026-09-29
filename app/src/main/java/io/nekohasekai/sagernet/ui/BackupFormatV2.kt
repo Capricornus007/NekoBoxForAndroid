@@ -82,6 +82,7 @@ internal object BackupFormatV2 {
         put("type", group.type)
         put("order", group.order)
         put("isSelector", group.isSelector)
+        put("autoSelect", group.autoSelect)
         put("frontProxy", group.frontProxy)
         put("landingProxy", group.landingProxy)
         putNullable("subscription", group.subscription?.let { encodeBytes(KryoConverters.serialize(it)) })
@@ -98,6 +99,7 @@ internal object BackupFormatV2 {
         },
         order = json.getInt("order"),
         isSelector = json.optBoolean("isSelector", false),
+        autoSelect = json.optBoolean("autoSelect", false),
         frontProxy = json.optLong("frontProxy", -1L),
         landingProxy = json.optLong("landingProxy", -1L),
     )

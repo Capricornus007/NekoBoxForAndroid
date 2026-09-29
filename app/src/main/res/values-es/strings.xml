@@ -55,14 +55,12 @@
     <string name="allow_access">Permitir conexiones desde la LAN</string> 
     <string name="allow_access_sum">Vincular servidores entrantes a 0.0.0.0</string> 
     <string name="inbound_settings">Ajustes de entrada</string> 
-    <string name="general_settings">Ajustes de la app</string> 
     <string name="require_http">Activar HTTP entrante</string> 
     <string name="cag_ws">Ajustes de WebSocket</string> 
     <string name="ws_max_early_data" translatable="false">Max early data</string> 
     <string name="ws_browser_forwarding">Reenvío del navegador</string> 
     <string name="ws_browser_forwarding_sum">Reenvía los WebSockets correspondientes a través del navegador.</string> 
     <string name="speed_interval">Intervalo de actualización de notificación de velocidad</string> 
-    <string name="cag_misc">Ajustes misceláneos</string> 
     <string name="show_stop">Mostrar botón Detener</string> 
     <string name="show_stop_sum">Si no desea utilizar mosaico como interruptor</string> 
     <string name="show_direct_speed">Mostrar velocidad directa</string> 

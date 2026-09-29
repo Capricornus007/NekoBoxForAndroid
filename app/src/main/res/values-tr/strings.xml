@@ -28,13 +28,11 @@
     <string name="show_direct_speed">Direkt Hızı Göster</string>
     <string name="show_stop_sum">Hızlı Ayarlar kısayolunu anahtar olarak kullanmak istemiyorsanız kullanın</string>
     <string name="show_stop">Durdur Butonunu Göster</string>
-    <string name="cag_misc">Diğer Ayarlar</string>
     <string name="speed_interval">Hız Bildirimi Güncelleme Aralığı</string>
     <string name="ws_browser_forwarding_sum">İlgili WebSocket bağlantılarını tarayıcı üzerinden yönlendir.</string>
     <string name="ws_browser_forwarding">Tarayıcı Yönlendirmesi</string>
     <string name="cag_ws">WebSocket Ayarları</string>
     <string name="require_http">HTTP üzerinden istekleri etkinleştir</string>
-    <string name="general_settings">Uygulama Ayarları</string>
     <string name="inbound_settings">Geliş Ayarları</string>
     <string name="allow_access_sum">Gelen sunucu isteklerini 0.0.0.0 üzerine bağla</string>
     <string name="allow_access">Yerel ağdan bağlantılara izin ver</string>

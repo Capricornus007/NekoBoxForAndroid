@@ -54,7 +54,6 @@
     <string name="cag_dns">DNS設定</string>
     <string name="speed">%s/s</string>
     <string name="traffic">%1$s↑ %2$s↓</string>
-    <string name="general_settings">アブリ設定</string>
     <string name="menu_route">ルート</string>
     <string name="uuid">ユーザーID</string>
     <string name="obfs_param">Obfsパラメータ</string>
@@ -97,7 +96,6 @@
     <string name="show_direct_speed_sum">プロキシなしの通信速度も通知に表示する</string>
     <string name="allow_insecure_sum">証明書のチェックを無効にします。この設定を有効にすると、平文と同等の安全性になります。</string>
     <string name="connection_test_available">成功: HTTPS ハンドシェイクに要した時間は %dms です。</string>
-    <string name="cag_misc">その他の設定</string>
     <string name="header_type">ヘッダータイプ</string>
     <string name="key_opt">キー（オプション）</string>
     <string name="network">ネットワーク</string>

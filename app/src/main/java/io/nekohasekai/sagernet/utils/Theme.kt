@@ -119,35 +119,64 @@ object Theme {
 
     fun palette(theme: Int): Int = when (theme) {
         RED -> R.style.ThemeOverlay_SagerNet_Palette_Red
+
         PINK -> R.style.ThemeOverlay_SagerNet_Palette_Pink
+
         PINK_SSR -> R.style.ThemeOverlay_SagerNet_Palette_Pink_SSR
+
         PURPLE -> R.style.ThemeOverlay_SagerNet_Palette_Purple
+
         DEEP_PURPLE -> R.style.ThemeOverlay_SagerNet_Palette_DeepPurple
+
         INDIGO -> R.style.ThemeOverlay_SagerNet_Palette_Indigo
+
         BLUE -> R.style.ThemeOverlay_SagerNet_Palette_Blue
+
         LIGHT_BLUE -> R.style.ThemeOverlay_SagerNet_Palette_LightBlue
+
         CYAN -> R.style.ThemeOverlay_SagerNet_Palette_Cyan
+
         TEAL -> R.style.ThemeOverlay_SagerNet_Palette_Teal
+
         GREEN -> R.style.ThemeOverlay_SagerNet_Palette_Green
+
         LIGHT_GREEN -> R.style.ThemeOverlay_SagerNet_Palette_LightGreen
+
         LIME -> R.style.ThemeOverlay_SagerNet_Palette_Lime
+
         YELLOW -> R.style.ThemeOverlay_SagerNet_Palette_Yellow
+
         AMBER -> R.style.ThemeOverlay_SagerNet_Palette_Amber
+
         ORANGE -> R.style.ThemeOverlay_SagerNet_Palette_Orange
+
         DEEP_ORANGE -> R.style.ThemeOverlay_SagerNet_Palette_DeepOrange
+
         BROWN -> R.style.ThemeOverlay_SagerNet_Palette_Brown
+
         GREY -> R.style.ThemeOverlay_SagerNet_Palette_Grey
+
         BLUE_GREY -> R.style.ThemeOverlay_SagerNet_Palette_BlueGrey
+
         BLACK -> R.style.ThemeOverlay_SagerNet_Palette_Black
+
         VERDANT_MINT -> R.style.ThemeOverlay_SagerNet_Palette_VerdantMint
+
         // The legacy Dracula id keeps working; it applies the same official palette.
         DRACULA, DRACULA_M3 -> R.style.ThemeOverlay_SagerNet_Palette_DraculaM3
+
         DARK_HIGH_CONTRAST -> R.style.ThemeOverlay_SagerNet_Palette_DarkHighContrast
+
         NORD -> R.style.ThemeOverlay_SagerNet_Palette_Nord
+
         MONOKAI -> R.style.ThemeOverlay_SagerNet_Palette_Monokai
+
         AYU -> R.style.ThemeOverlay_SagerNet_Palette_Ayu
+
         CATPPUCCIN -> R.style.ThemeOverlay_SagerNet_Palette_Catppuccin
+
         DYNAMIC -> R.style.ThemeOverlay_SagerNet_Palette_Dynamic
+
         else -> palette(defaultTheme())
     }
 

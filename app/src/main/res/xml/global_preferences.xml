@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Root screen is the settings hub: each nested PreferenceScreen renders as one row and opens as
+  its own page (SettingsPreferenceFragment inflates this file with the nested screen's key as
+  rootKey). Keep screen keys stable; SettingsFragment restores the open page from them.
+-->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <PreferenceCategory app:title="@string/general_settings">
-        <SwitchPreference
-            app:defaultValue="false"
-            app:icon="@drawable/ic_communication_phonelink_ring"
-            app:key="isAutoConnect"
-            app:summary="@string/auto_connect_summary"
-            app:title="@string/auto_connect" />
+
+    <PreferenceScreen
+        app:icon="@drawable/ic_baseline_color_lens_24"
+        app:key="screen_appearance"
+        app:summary="@string/settings_appearance_summary"
+        app:title="@string/settings_appearance">
         <moe.matsuri.nb4a.ui.ThemePickerPreference
             android:title="@string/theme"
             app:icon="@drawable/ic_baseline_color_lens_24"
@@ -28,6 +32,35 @@
             app:key="appLanguage"
             app:title="@string/language"
             app:useSimpleSummaryProvider="true" />
+        <SwitchPreference
+            app:key="showBottomBar"
+            app:title="@string/show_bottom_bar" />
+        <SwitchPreference
+            app:icon="@drawable/ic_baseline_center_focus_weak_24"
+            app:key="alwaysShowAddress"
+            app:summary="@string/always_show_address_sum"
+            app:title="@string/always_show_address" />
+        <SwitchPreference
+            app:defaultValue="true"
+            app:key="confirmProfileDelete"
+            app:title="@string/confirm_profile_delete" />
+        <SwitchPreference
+            app:key="hideFromRecentApps"
+            app:summary="@string/hide_from_recent_apps_summary"
+            app:title="@string/hide_from_recent_apps" />
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        app:icon="@drawable/ic_hardware_router"
+        app:key="screen_connection"
+        app:summary="@string/settings_connection_summary"
+        app:title="@string/settings_connection">
+        <SwitchPreference
+            app:defaultValue="false"
+            app:icon="@drawable/ic_communication_phonelink_ring"
+            app:key="isAutoConnect"
+            app:summary="@string/auto_connect_summary"
+            app:title="@string/auto_connect" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="vpn"
             app:entries="@array/service_modes"
@@ -51,38 +84,15 @@
             app:icon="@drawable/baseline_public_24"
             app:key="mtu"
             app:title="@string/mtu" />
-        <moe.matsuri.nb4a.ui.SimpleMenuPreference
-            app:defaultValue="1000"
-            app:entries="@array/notification_entry"
-            app:entryValues="@array/notification_value"
-            app:icon="@drawable/ic_baseline_shutter_speed_24"
-            app:key="speedInterval"
-            app:title="@string/speed_interval"
-            app:useSimpleSummaryProvider="true" />
         <SwitchPreference
             app:defaultValue="true"
-            app:key="profileTrafficStatistics"
-            app:summary="@string/profile_traffic_statistics_summary"
-            app:title="@string/profile_traffic_statistics" />
+            app:key="strictRoute"
+            app:title="@string/strict_route" />
         <SwitchPreference
-            app:defaultValue="true"
-            app:icon="@drawable/ic_baseline_speed_24"
-            app:key="showDirectSpeed"
-            app:summary="@string/show_direct_speed_sum"
-            app:title="@string/show_direct_speed"
-            app:useSimpleSummaryProvider="true" />
-        <SwitchPreference
-            app:key="showGroupInNotification"
-            app:title="@string/show_group_in_notification" />
-        <SwitchPreference
-            app:key="confirmProfileDelete"
-            app:defaultValue="true"
-            app:title="@string/confirm_profile_delete" />
-        <SwitchPreference
-            app:icon="@drawable/ic_baseline_center_focus_weak_24"
-            app:key="alwaysShowAddress"
-            app:summary="@string/always_show_address_sum"
-            app:title="@string/always_show_address" />
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="concurrentDial"
+            app:summary="@string/concurrent_dial_summary"
+            app:title="@string/concurrent_dial" />
         <SwitchPreference
             app:icon="@drawable/ic_device_data_usage"
             app:key="meteredNetwork"
@@ -94,25 +104,47 @@
             app:summary="@string/acquire_wake_lock_summary"
             app:title="@string/acquire_wake_lock" />
         <SwitchPreference
-            app:key="hideFromRecentApps"
-            app:summary="@string/hide_from_recent_apps_summary"
-            app:title="@string/hide_from_recent_apps" />
-        <moe.matsuri.nb4a.ui.LongClickListPreference
-            app:defaultValue="0"
-            app:entries="@array/log_level"
-            app:entryValues="@array/int_array_5"
-            app:icon="@drawable/ic_baseline_bug_report_24"
-            app:key="logLevel"
-            app:title="@string/log_level"
+            app:defaultValue="true"
+            app:icon="@drawable/ic_baseline_flip_camera_android_24"
+            app:key="networkChangeResetConnections"
+            app:title="@string/network_change_reset_connections"
             app:useSimpleSummaryProvider="true" />
-        <moe.matsuri.nb4a.ui.EditConfigPreference
-            app:icon="@drawable/ic_baseline_layers_24"
-            app:key="globalCustomConfig"
-            app:title="@string/custom_config"
+        <SwitchPreference
+            app:key="wakeResetConnections"
+            app:title="@string/wake_reset_connections"
             app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
+    </PreferenceScreen>
 
-    <PreferenceCategory app:title="@string/cag_route">
+    <PreferenceScreen
+        app:icon="@drawable/ic_baseline_security_24"
+        app:key="screen_protection"
+        app:summary="@string/settings_protection_summary"
+        app:title="@string/settings_protection">
+        <Preference
+            app:icon="@drawable/ic_baseline_vpn_key_24"
+            app:key="protectionAlwaysOn"
+            app:title="@string/protection_always_on" />
+        <Preference
+            app:icon="@drawable/ic_action_lock"
+            app:key="protectionLockdown"
+            app:title="@string/protection_lockdown" />
+        <Preference
+            app:icon="@drawable/baseline_developer_board_24"
+            app:key="protectionBattery"
+            app:title="@string/protection_battery" />
+        <Preference
+            app:icon="@drawable/ic_baseline_info_24"
+            app:key="protectionNotes"
+            app:selectable="false"
+            app:summary="@string/protection_notes"
+            app:title="@string/protection_notes_title" />
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        app:icon="@drawable/ic_maps_directions"
+        app:key="screen_route"
+        app:summary="@string/settings_route_summary"
+        app:title="@string/cag_route">
         <SwitchPreference
             app:icon="@drawable/ic_navigation_apps"
             app:key="proxyApps"
@@ -125,11 +157,6 @@
         <SwitchPreference
             app:key="bypassLanInCore"
             app:title="@string/bypass_lan_in_core" />
-        <SwitchPreference
-             app:icon="@drawable/ic_baseline_compare_arrows_24"
-             app:key="concurrentDial"
-             app:title="@string/concurrent_dial"
-             app:summary="@string/concurrent_dial_summary" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="1"
             app:entries="@array/traffic_sniffing_values"
@@ -171,31 +198,19 @@
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
             app:defaultValue="0"
-            app:key="rulesUpdateInterval"
             app:icon="@drawable/ic_baseline_shutter_speed_24"
-            app:title="@string/ruleset_update_interval"
-            app:summary="@string/ruleset_update_interval_summary" />
-    </PreferenceCategory>
+            app:key="rulesUpdateInterval"
+            app:summary="@string/ruleset_update_interval_summary"
+            app:title="@string/ruleset_update_interval" />
+    </PreferenceScreen>
 
-    <PreferenceCategory app:title="@string/fragment_settings">
-        <SwitchPreference
-            app:key="enableTLSFragment"
-            app:title="@string/enable_tls_fragment" />
+    <PreferenceScreen
+        app:icon="@drawable/ic_action_dns"
+        app:key="screen_dns"
+        app:summary="@string/settings_dns_summary"
+        app:title="@string/cag_dns">
         <EditTextPreference
-            app:defaultValue="100-200"
-            app:key="fragmentLength"
-            app:title="@string/fragment_length"
-            app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
-            app:defaultValue="10-20"
-            app:key="fragmentInterval"
-            app:title="@string/fragment_interval"
-            app:useSimpleSummaryProvider="true" />
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/cag_dns">
-        <EditTextPreference
-      app:defaultValue="https://dns.quad9.net/dns-query"
+            app:defaultValue="https://dns.quad9.net/dns-query"
             app:icon="@drawable/ic_action_dns"
             app:key="remoteDns"
             app:title="@string/remote_dns"
@@ -245,9 +260,13 @@
             app:icon="@drawable/ic_baseline_transform_24"
             app:key="dnsHosts"
             app:title="@string/dns_hosts" />
-    </PreferenceCategory>
+    </PreferenceScreen>
 
-    <PreferenceCategory app:title="@string/inbound_settings">
+    <PreferenceScreen
+        app:icon="@drawable/ic_baseline_nat_24"
+        app:key="screen_inbound"
+        app:summary="@string/settings_inbound_summary"
+        app:title="@string/inbound_settings">
         <EditTextPreference
             app:icon="@drawable/ic_maps_directions_boat"
             app:key="mixedPort"
@@ -263,10 +282,6 @@
             app:summary="@string/http_proxy_bypass_sum"
             app:title="@string/http_proxy_bypass" />
         <SwitchPreference
-            app:defaultValue="true"
-            app:key="strictRoute"
-            app:title="@string/strict_route" />
-        <SwitchPreference
             app:icon="@drawable/ic_baseline_nat_24"
             app:key="allowAccess"
             app:summary="@string/allow_access_sum"
@@ -281,30 +296,13 @@
             app:key="proxyModeInboundAuth"
             app:summary="@string/proxy_mode_inbound_auth_sum"
             app:title="@string/proxy_mode_inbound_auth" />
-    </PreferenceCategory>
+    </PreferenceScreen>
 
-    <PreferenceCategory app:title="@string/cag_misc">
-        <moe.matsuri.nb4a.ui.UrlTestPreference
-            app:defaultValue="http://www.gstatic.com/generate_204"
-            app:icon="@drawable/ic_baseline_cast_connected_24"
-            app:key="connectionTestURL"
-            app:title="@string/connection_test_url"
-            app:useSimpleSummaryProvider="true" />
-        <SwitchPreference
-            app:icon="@drawable/baseline_construction_24"
-            app:key="enableClashAPI"
-            app:summary="@string/enable_clash_api_summary"
-            app:title="@string/enable_clash_api" />
-        <SwitchPreference
-            app:defaultValue="true"
-            app:icon="@drawable/ic_baseline_flip_camera_android_24"
-            app:key="networkChangeResetConnections"
-            app:title="@string/network_change_reset_connections"
-            app:useSimpleSummaryProvider="true" />
-        <SwitchPreference
-            app:key="wakeResetConnections"
-            app:title="@string/wake_reset_connections"
-            app:useSimpleSummaryProvider="true" />
+    <PreferenceScreen
+        app:icon="@drawable/ic_notification_enhanced_encryption"
+        app:key="screen_tls"
+        app:summary="@string/settings_tls_summary"
+        app:title="@string/security_settings">
         <SwitchPreference
             app:icon="@drawable/ic_action_lock_open"
             app:key="globalAllowInsecure"
@@ -319,9 +317,82 @@
             app:key="appTLSVersion"
             app:title="@string/app_tls_version"
             app:useSimpleSummaryProvider="true" />
+        <PreferenceCategory app:title="@string/fragment_settings">
+            <SwitchPreference
+                app:key="enableTLSFragment"
+                app:title="@string/enable_tls_fragment" />
+            <EditTextPreference
+                app:defaultValue="100-200"
+                app:key="fragmentLength"
+                app:title="@string/fragment_length"
+                app:useSimpleSummaryProvider="true" />
+            <EditTextPreference
+                app:defaultValue="10-20"
+                app:key="fragmentInterval"
+                app:title="@string/fragment_interval"
+                app:useSimpleSummaryProvider="true" />
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        app:icon="@drawable/ic_baseline_speed_24"
+        app:key="screen_notification"
+        app:summary="@string/settings_notification_summary"
+        app:title="@string/settings_notification">
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:defaultValue="1000"
+            app:entries="@array/notification_entry"
+            app:entryValues="@array/notification_value"
+            app:icon="@drawable/ic_baseline_shutter_speed_24"
+            app:key="speedInterval"
+            app:title="@string/speed_interval"
+            app:useSimpleSummaryProvider="true" />
         <SwitchPreference
-            app:key="showBottomBar"
-            app:title="@string/show_bottom_bar" />
+            app:defaultValue="true"
+            app:key="profileTrafficStatistics"
+            app:summary="@string/profile_traffic_statistics_summary"
+            app:title="@string/profile_traffic_statistics" />
+        <SwitchPreference
+            app:defaultValue="true"
+            app:icon="@drawable/ic_baseline_speed_24"
+            app:key="showDirectSpeed"
+            app:summary="@string/show_direct_speed_sum"
+            app:title="@string/show_direct_speed"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreference
+            app:key="showGroupInNotification"
+            app:title="@string/show_group_in_notification" />
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        app:icon="@drawable/ic_baseline_tune_24"
+        app:key="screen_advanced"
+        app:summary="@string/settings_advanced_summary"
+        app:title="@string/settings_advanced">
+        <moe.matsuri.nb4a.ui.LongClickListPreference
+            app:defaultValue="0"
+            app:entries="@array/log_level"
+            app:entryValues="@array/int_array_5"
+            app:icon="@drawable/ic_baseline_bug_report_24"
+            app:key="logLevel"
+            app:title="@string/log_level"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.EditConfigPreference
+            app:icon="@drawable/ic_baseline_layers_24"
+            app:key="globalCustomConfig"
+            app:title="@string/custom_config"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreference
+            app:icon="@drawable/baseline_construction_24"
+            app:key="enableClashAPI"
+            app:summary="@string/enable_clash_api_summary"
+            app:title="@string/enable_clash_api" />
+        <moe.matsuri.nb4a.ui.UrlTestPreference
+            app:defaultValue="http://www.gstatic.com/generate_204"
+            app:icon="@drawable/ic_baseline_cast_connected_24"
+            app:key="connectionTestURL"
+            app:title="@string/connection_test_url"
+            app:useSimpleSummaryProvider="true" />
         <Preference
             app:icon="@drawable/baseline_undo_24"
             app:key="resetSettings"
@@ -329,7 +400,8 @@
         <Preference
             app:icon="@drawable/ic_baseline_delete_24"
             app:key="clearCache"
-            app:title="@string/clear_cache"
-            app:summary="@string/clear_cache_summary" />
-    </PreferenceCategory>
+            app:summary="@string/clear_cache_summary"
+            app:title="@string/clear_cache" />
+    </PreferenceScreen>
+
 </PreferenceScreen>

@@ -281,7 +281,8 @@ class BaseService {
         }
 
         fun canReloadSelector(): Boolean {
-            val running = data.proxy?.lastSelectorGroupId ?: -1L
+            val proxy = data.proxy ?: return false
+            val running = proxy.lastSelectorGroupId
             if (running < 0L) return false
             val ent = SagerDatabase.proxyDao.getById(DataStore.selectedProxy) ?: return false
             // Mirrors ConfigBuilder.buildConfig()'s selectorGroupId derivation
@@ -294,7 +295,9 @@ class BaseService {
             }
             val group = SagerDatabase.groupDao.getById(ent.groupId) ?: return false
             val newSelectorGroupId = if (group.isSelector) group.id else -1L
-            return newSelectorGroupId == running
+            // A switch between manual and automatic selection needs a rebuilt config; in automatic
+            // mode the in-place select is a no-op (urltest owns the choice) so no restart happens.
+            return newSelectorGroupId == running && group.autoSelect == proxy.lastAutoSelect
         }
 
         suspend fun startProcesses() {

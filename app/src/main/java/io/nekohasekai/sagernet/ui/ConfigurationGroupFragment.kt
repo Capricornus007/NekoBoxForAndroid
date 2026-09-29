@@ -1119,8 +1119,12 @@ class ConfigurationGroupFragment : Fragment() {
 
         private fun selectProfile(profileId: Long) {
             val host = parentFragment as? ConfigurationFragment ?: return
-            if (adapter?.profileById(profileId) == null) return
+            val profile = adapter?.profileById(profileId) ?: return
             runOnDefaultDispatcher {
+                if (DataStore.serviceState.canStop && runningGroupSelectsAutomatically(profile.groupId)) {
+                    onMainDispatcher { if (host.isAdded) host.snackbar(R.string.auto_select_active).show() }
+                    return@runOnDefaultDispatcher
+                }
                 var update: Boolean
                 var lastSelected: Long
                 profileAccess.withLock {
@@ -1147,6 +1151,13 @@ class ConfigurationGroupFragment : Fragment() {
                     }
                 }
             }
+        }
+
+        // While urltest drives the running group, a manual pick inside it has nothing to act on.
+        private fun runningGroupSelectsAutomatically(groupId: Long): Boolean {
+            val running = SagerDatabase.proxyDao.getById(DataStore.currentProfile) ?: return false
+            val group = SagerDatabase.groupDao.getById(groupId) ?: return false
+            return running.groupId == groupId && group.isSelector && group.autoSelect
         }
 
         private fun applySelected(selected: Boolean) {

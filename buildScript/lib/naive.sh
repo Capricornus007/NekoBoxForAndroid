@@ -9,7 +9,7 @@
 # bundled Mieru mechanism, and falls back to the external APK plugin
 # when the bundled binary is absent.
 #
-# Usage: ./run lib naive
+# Usage: buildScript/lib/naive.sh (from the repository root)
 set -e
 set -o pipefail
 

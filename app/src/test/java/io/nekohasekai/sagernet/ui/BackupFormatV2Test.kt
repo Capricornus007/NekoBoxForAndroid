@@ -134,6 +134,7 @@ class BackupFormatV2Test {
                 name = null,
                 type = GroupType.BASIC,
                 isSelector = true,
+                autoSelect = true,
                 frontProxy = 10L,
                 landingProxy = 11L,
             ),
@@ -153,6 +154,8 @@ class BackupFormatV2Test {
         assertEquals(true, decoded[0].ungrouped)
         assertNull(decoded[0].name)
         assertEquals(true, decoded[0].isSelector)
+        assertEquals(true, decoded[0].autoSelect)
+        assertEquals(false, decoded[1].autoSelect)
         assertEquals(10L, decoded[0].frontProxy)
         assertEquals(11L, decoded[0].landingProxy)
         assertEquals(GroupType.SUBSCRIPTION, decoded[1].type)

@@ -4,6 +4,7 @@ import io.nekohasekai.sagernet.aidl.SpeedDisplayData
 import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.SagerConnection
+import io.nekohasekai.sagernet.bg.ServiceNotification
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.fmt.TAG_BYPASS
@@ -137,6 +138,21 @@ class TrafficLooper(
         }
     }
 
+    // The "proxy" group picks members on its own (urltest failover, or a selector switched from
+    // the dashboard), so poll its current pick each tick and move accounting, notification title
+    // and the UI's selected profile along with it.
+    private suspend fun followGroupSelection(proxy: ProxyInstance) {
+        val nowTag = proxy.box.selectedOutbound()
+        if (nowTag.isEmpty() || nowTag == selectorNowFakeTag) return
+        val id = proxy.config.profileTagMap.entries.firstOrNull { it.value == nowTag }?.key ?: return
+        if (id == selectorNowId) return
+        val ent = ProfileManager.getProfile(id) ?: return
+        applySelect(id)
+        proxy.displayProfileName = ServiceNotification.genTitle(ent)
+        data.notification?.postNotificationTitle(proxy.displayProfileName)
+        data.binder.broadcast { it.cbSelectorUpdate(id) }
+    }
+
     private suspend fun loop() {
         val delayMs = DataStore.speedInterval.toLong()
         val showDirectSpeed = DataStore.showDirectSpeed
@@ -198,6 +214,7 @@ class TrafficLooper(
                 val sel = selectChannel.tryReceive().getOrNull() ?: break
                 applySelect(sel)
             }
+            if (proxy.config.selectorGroupId >= 0L) followGroupSelection(proxy)
 
             trafficUpdater.updateAll()
             if (!sc.isActive) return
