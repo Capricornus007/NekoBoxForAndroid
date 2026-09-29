@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
 import android.system.Os
@@ -103,15 +102,6 @@ fun Context.listenForPackageChanges(onetime: Boolean = true, callback: () -> Uni
             addDataScheme("package")
         },
     )
-}
-
-/**
- * Based on: https://stackoverflow.com/a/26348729/2245107
- */
-fun Resources.Theme.resolveResourceId(@AttrRes resId: Int): Int {
-    val typedValue = TypedValue()
-    if (!resolveAttribute(resId, typedValue, true)) throw Resources.NotFoundException()
-    return typedValue.resourceId
 }
 
 fun Preference.remove() = parent!!.removePreference(this)

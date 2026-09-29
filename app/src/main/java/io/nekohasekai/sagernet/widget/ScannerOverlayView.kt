@@ -45,11 +45,6 @@ class ScannerOverlayView @JvmOverloads constructor(
         setLayerType(LAYER_TYPE_HARDWARE, null)
     }
 
-    fun setBorderColor(color: Int) {
-        borderPaint.color = color
-        invalidate()
-    }
-
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         // Square window ~70% of the shorter side, centered.

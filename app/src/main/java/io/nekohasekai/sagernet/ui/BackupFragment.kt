@@ -3,8 +3,6 @@ package io.nekohasekai.sagernet.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
 import android.provider.OpenableColumns
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,7 +31,6 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import moe.matsuri.nb4a.utils.Util
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Credentials
@@ -605,16 +602,6 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
             } finally {
                 isRestoreInProgress = false
             }
-        }
-    }
-
-    fun Parcelable.toBase64Str(): String {
-        val parcel = Parcel.obtain()
-        writeToParcel(parcel, 0)
-        try {
-            return Util.b64EncodeUrlSafe(parcel.marshall())
-        } finally {
-            parcel.recycle()
         }
     }
 

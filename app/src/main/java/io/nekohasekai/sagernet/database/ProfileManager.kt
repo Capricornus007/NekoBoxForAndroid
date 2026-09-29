@@ -118,13 +118,6 @@ object ProfileManager {
         SagerDatabase.proxyDao.addLifetimeTraffic(profileId, rxDelta, txDelta)
     }
 
-    suspend fun deleteProfile2(groupId: Long, profileId: Long) {
-        if (SagerDatabase.proxyDao.deleteById(profileId) == 0) return
-        if (DataStore.selectedProxy == profileId) {
-            DataStore.selectedProxy = 0L
-        }
-    }
-
     suspend fun deleteProfiles(profiles: List<ProxyEntity>) {
         if (profiles.isEmpty()) return
         val ids = profiles.map { it.id }

@@ -14,7 +14,7 @@ import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.databinding.LayoutWebviewBinding
-import moe.matsuri.nb4a.utils.WebViewUtil
+import io.nekohasekai.sagernet.ktx.Logs
 
 // Fragment must have a no-argument public constructor, otherwise it will crash during data restoration
 
@@ -59,11 +59,7 @@ class WebviewFragment :
         }
         mWebView.webViewClient = object : WebViewClient() {
             override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-                WebViewUtil.onReceivedError(view, request, error)
-            }
-
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
+                Logs.e("WebView error: ${error?.description}")
             }
         }
         mWebView.loadUrl(dashboardUrl())

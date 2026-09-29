@@ -2,7 +2,6 @@ package io.nekohasekai.sagernet.bg.proto
 
 import android.os.SystemClock
 import io.nekohasekai.sagernet.SagerNet
-import io.nekohasekai.sagernet.bg.AbstractInstance
 import io.nekohasekai.sagernet.bg.GuardedProcessPool
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
@@ -21,12 +20,13 @@ import kotlinx.coroutines.*
 import libcore.BoxInstance
 import libcore.Libcore
 import moe.matsuri.nb4a.net.LocalResolverImpl
+import java.io.Closeable
 import java.io.File
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
 
-abstract class BoxInstance(val profile: ProxyEntity) : AbstractInstance {
+abstract class BoxInstance(val profile: ProxyEntity) : Closeable {
     lateinit var config: ConfigBuildResult
     lateinit var box: BoxInstance
     val pluginPath = hashMapOf<String, PluginManager.InitResult>()
@@ -78,7 +78,7 @@ abstract class BoxInstance(val profile: ProxyEntity) : AbstractInstance {
         loadConfig()
     }
 
-    override fun launch() {
+    open fun launch() {
         val cacheDir = File(SagerNet.application.cacheDir, "tmpcfg")
         cacheDir.mkdirs()
         for ((chain) in config.externalIndex) {

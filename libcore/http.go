@@ -1,7 +1,6 @@
 package libcore
 
 import (
-	"bytes"
 	"context"
 	"crypto/tls"
 	"errors"
@@ -50,10 +49,6 @@ type HTTPClient interface {
 
 type HTTPRequest interface {
 	SetURL(link string) error
-	SetMethod(method string)
-	SetHeader(key string, value string)
-	SetContent(content []byte)
-	SetContentString(content string)
 	SetUserAgent(userAgent string)
 	AllowInsecure()
 	Execute() (HTTPResponse, error)
@@ -177,27 +172,8 @@ func (r *httpRequest) SetURL(link string) (err error) {
 	return
 }
 
-func (r *httpRequest) SetMethod(method string) {
-	r.request.Method = method
-}
-
-func (r *httpRequest) SetHeader(key string, value string) {
-	r.request.Header.Set(key, value)
-}
-
 func (r *httpRequest) SetUserAgent(userAgent string) {
 	r.request.Header.Set("User-Agent", userAgent)
-}
-
-func (r *httpRequest) SetContent(content []byte) {
-	buffer := bytes.Buffer{}
-	buffer.Write(content)
-	r.request.Body = io.NopCloser(bytes.NewReader(buffer.Bytes()))
-	r.request.ContentLength = int64(len(content))
-}
-
-func (r *httpRequest) SetContentString(content string) {
-	r.SetContent([]byte(content))
 }
 
 func (r *httpRequest) Execute() (HTTPResponse, error) {

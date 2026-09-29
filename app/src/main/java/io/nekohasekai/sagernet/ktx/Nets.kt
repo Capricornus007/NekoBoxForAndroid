@@ -3,7 +3,6 @@
 package io.nekohasekai.sagernet.ktx
 
 import io.nekohasekai.sagernet.BuildConfig
-import io.nekohasekai.sagernet.fmt.AbstractBean
 import moe.matsuri.nb4a.utils.NGUtil
 import okhttp3.HttpUrl
 import java.net.InetSocketAddress
@@ -45,8 +44,6 @@ fun String.wrapIPV6Host(): String {
         return this
     }
 }
-
-fun AbstractBean.wrapUri(): String = "${finalAddress!!.wrapIPV6Host()}:$finalPort"
 
 fun mkPort(): Int {
     val socket = Socket()
