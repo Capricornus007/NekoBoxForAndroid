@@ -150,6 +150,23 @@ internal fun hasHttpProxyEvidence(link: String): Boolean {
     return !httpUrl.encodedQuery.isNullOrEmpty()
 }
 
+// 只觀測、不刪。面板還有另一種做法：把官網／客服文字塞進節點 remark（`客服👉 - https://…`
+// 那種），它不是 http 連結，上面的證據閘門擋不到。留一行可計數的痕跡，下次真出現時能拿到
+// 實際形狀而不是靠回憶猜。名稱本身不寫進日誌——訂閱內容不得入日誌。
+internal fun promoNamePattern(name: String): String? {
+    if (name.isEmpty()) return null
+    return when {
+        name.contains("://") -> "url-in-name"
+        name.contains("客服") || name.contains("官網") || name.contains("官网") -> "support-site"
+        name.contains("到期") || name.contains("流量") -> "quota-info"
+        name.contains(
+            "訂閱",
+        ) || name.contains("订阅") || name.contains("subscription", ignoreCase = true) -> "subscription-info"
+        name.contains("t.me", ignoreCase = true) -> "telegram-link"
+        else -> null
+    }
+}
+
 suspend fun parseProxies(text: String, subscription: Boolean = false): List<AbstractBean> {
     val lines = text.linesNoComments()
     val links = lines.flatMap { it.split(' ') }
@@ -378,7 +395,15 @@ suspend fun parseProxies(text: String, subscription: Boolean = false): List<Abst
         // 每個連結會被掃兩遍（逐空格與逐行），所以這個數是兩次掃描的合計，只作觀測用。
         Logs.w("promo guard: $promoSkipped http(s) link(s) rejected for lacking proxy evidence")
     }
-    return if (entities.size > entitiesByLine.size) entities else entitiesByLine
+    val result = if (entities.size > entitiesByLine.size) entities else entitiesByLine
+    if (subscription) {
+        val named = result.count { promoNamePattern(it.displayName()) != null }
+        if (named > 0) {
+            // 只報數量：名稱可能就是訂閱內容本身，不得進日誌。
+            Logs.w("promo guard: $named node name(s) look like panel info text (observed, not filtered)")
+        }
+    }
+    return result
 }
 
 fun <T : Serializable> T.applyDefaultValues(): T {

@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
@@ -121,5 +122,33 @@ class FormatsSubscriptionPromoTest {
         // 攔截必須留得下痕跡，否則觀測口一旦靜默，實測的 0 筆就毫無意義。
         assertTrue("攔截要留下可計數的痕跡", output.contains("no proxy evidence"))
         assertTrue(output.contains("promo guard"))
+    }
+
+    // 另一種假節點來源：面板把官網／客服文字塞進節點 remark。那種不是 http 連結，
+    // 證據閘門擋不到，只能先觀測。這裡釘住兩頭：要命中該命中的，且不得把
+    // `xhttp` 這種協定字誤判成 promo（實測 DB 裡就有 VLESS-xhttp-Reality 這種真節點）。
+    @Test
+    fun promoNamePatternMatchesPanelFooterNotProtocolNames() {
+        assertEquals("support-site", promoNamePattern("客服👉 官网"))
+        assertEquals("quota-info", promoNamePattern("剩余流量 100GB"))
+        assertEquals("quota-info", promoNamePattern("到期时间"))
+        assertEquals("subscription-info", promoNamePattern("续费订阅"))
+        assertEquals("telegram-link", promoNamePattern("加 T.ME 频道"))
+        assertEquals("url-in-name", promoNamePattern("a https://x.invalid b"))
+
+        assertNull("協定字 xhttp 不得被當成 promo", promoNamePattern("VLESS-xhttp-Reality-Vision"))
+        assertNull(promoNamePattern("马来西亚03|x8.5|Stream|AI"))
+        assertNull(promoNamePattern("日本05|x2.0|Stream"))
+        assertNull(promoNamePattern(""))
+    }
+
+    @Test
+    fun promoNamedNodeIsObservedButNotDropped() = runTest {
+        // remark 帶 promo 文字的連結仍是合法節點：只能記一筆觀測，不能刪。
+        val link = "socks://reader:password@192.0.2.8:1080#客服👉 官网入口"
+        val beans = parseProxies(link, subscription = true)
+
+        assertEquals(1, beans.size)
+        assertTrue(capturedLogs.joinToString("\n").contains("look like panel info text"))
     }
 }
