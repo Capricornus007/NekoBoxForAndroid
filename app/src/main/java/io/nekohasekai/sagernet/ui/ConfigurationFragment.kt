@@ -55,6 +55,7 @@ import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
 import io.nekohasekai.sagernet.ktx.SubscriptionFoundException
 import io.nekohasekai.sagernet.ktx.USER_AGENT
+import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.readBytesBounded
 import io.nekohasekai.sagernet.ktx.readTextBounded
@@ -109,6 +110,22 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicLong
 import java.util.zip.ZipInputStream
 import kotlin.collections.set
+
+/**
+ * URL 測速單列期限的寬限。
+ *
+ * 核心的 Libcore.urlTest 只吃自己那個 timeout(ms)，但一列還要等外部插件
+ * sidecar 綁好迴埠（awaitExternalProcessesReady），所以外層期限必須比它寬，
+ * 否則會把「還在正常等待」誤判成逾時。
+ */
+private const val URL_TEST_SLACK_MS = 15_000L
+
+/**
+ * 這個檔案 import 了 CoroutineScope.isActive 擴充，再寫 job?.isActive 會被 lint
+ * 判成 MemberExtensionConflict（成員與擴充同名）。對 Job 來說「未完成」等價於
+ * 「還活著」，所以統一從 isCompleted 推導。
+ */
+private fun Job?.isRunning(): Boolean = this != null && !isCompleted
 
 class ConfigurationFragment @JvmOverloads constructor(
     val select: Boolean = false,
@@ -432,7 +449,6 @@ class ConfigurationFragment @JvmOverloads constructor(
             speedTestHidden = false
             speedTestRunner = null
             speedTestJob = null
-            DataStore.runningTest = false
         }
         releaseViewListeners()
         super.onDestroy()
@@ -1023,7 +1039,7 @@ class ConfigurationFragment @JvmOverloads constructor(
     }
 
     private fun confirmSpeedTest() {
-        if (DataStore.runningTest) return
+        if (anyTestRunning()) return
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.speed_test_confirm_title)
             .setMessage(R.string.speed_test_confirm_message)
@@ -1033,7 +1049,7 @@ class ConfigurationFragment @JvmOverloads constructor(
     }
 
     private fun speedTest() {
-        if (DataStore.runningTest) return else DataStore.runningTest = true
+        if (anyTestRunning()) return
         val group = DataStore.currentGroup()
         val binding = LayoutProgressListBinding.inflate(layoutInflater)
         val builder = MaterialAlertDialogBuilder(requireContext())
@@ -1153,7 +1169,6 @@ class ConfigurationFragment @JvmOverloads constructor(
                 speedTestHidden = false
                 speedTestRunner = null
                 speedTestJob = null
-                DataStore.runningTest = false
             }
         }
     }
@@ -1217,12 +1232,22 @@ class ConfigurationFragment @JvmOverloads constructor(
     // 再點一次同一個選單項＝中止（彈窗時代靠它的取消按鈕，現在沒有彈窗了）。
     private var urlTestJob: Job? = null
 
+    /**
+     * 「有沒有在測」只從 Job 推導，不再用全域布林。
+     *
+     * 原本 DataStore.runningTest 一個布林被速測、URL 測、確認框三處共用，
+     * 而 URL 測的取消掐不斷阻塞中的原生 Libcore.urlTest，負責復位的 finally 就走不到 ——
+     * 之後所有測速都變成靜默空轉，只能重啟進程。
+     */
+    private fun anyTestRunning(): Boolean = speedTestJob.isRunning() || urlTestJob.isRunning()
+
     fun urlTest() {
-        if (DataStore.runningTest) {
-            urlTestJob?.cancel()
+        val existing = urlTestJob
+        if (existing.isRunning()) {
+            existing?.cancel()
             return
         }
-        DataStore.runningTest = true
+        if (speedTestJob.isRunning()) return
         val results = mutableListOf<ProxyEntity>()
         val group = DataStore.currentGroup()
 
@@ -1252,11 +1277,23 @@ class ConfigurationFragment @JvmOverloads constructor(
                             while (isActive) {
                                 val profile = profiles.poll() ?: break
                                 try {
-                                    val result = urlTest.doTest(profile)
-                                    profile.status = 1
-                                    profile.ping = result
-                                    profile.error = null
-                                    Logs.d("URLTest ${profile.displayName()}: done, ping=${result}ms")
+                                    // 原生呼叫本身不吃 cancellation，死節點會把這個協程停在
+                                    // Libcore.urlTest 裡，復位的 finally 就走不到。
+                                    // 外面再罩一層期限（比核心的 timeout 寬，因為还要等
+                                    // sidecar 綁好埠）：逾時就當失敗算，絕不讓它拖著整組。
+                                    val result = withTimeoutOrNull(
+                                        DataStore.connectionTestTimeout + URL_TEST_SLACK_MS,
+                                    ) { urlTest.doTest(profile) }
+                                    if (result == null) {
+                                        profile.status = 2
+                                        profile.error = app.getString(R.string.connection_test_timeout_error)
+                                        Logs.w("URLTest ${profile.displayName()}: deadline exceeded")
+                                    } else {
+                                        profile.status = 1
+                                        profile.ping = result
+                                        profile.error = null
+                                        Logs.d("URLTest ${profile.displayName()}: done, ping=${result}ms")
+                                    }
                                 } catch (e: PluginManager.PluginNotFoundException) {
                                     if (!isActive) break
                                     profile.status = 2
@@ -1285,14 +1322,13 @@ class ConfigurationFragment @JvmOverloads constructor(
                     showToast(getString(R.string.url_test_finished_summary, ok, bad))
                 }
             } finally {
-                // 正常結束與中途取消都走這裡：把已測到的結果寫回資料庫，並釋放 runningTest
+                // 正常結束與中途取消都走這裡：把已測到的結果寫回資料庫
                 try {
                     ProfileManager.updateProfileQuietly(synchronized(results) { results.toList() })
                 } catch (e: Exception) {
                     Logs.w(e)
                 }
                 GroupManager.postReload(group.id)
-                DataStore.runningTest = false
             }
         }
     }

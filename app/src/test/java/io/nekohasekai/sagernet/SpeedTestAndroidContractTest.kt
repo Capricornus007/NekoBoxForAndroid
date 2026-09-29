@@ -210,7 +210,17 @@ class SpeedTestAndroidContractTest {
         assertTrue(urlTest.contains("repeat(DataStore.connectionTestConcurrent)"))
         assertTrue(urlTest.contains("val urlTest = UrlTest()"))
         assertTrue(urlTest.contains("profile.ping = result"))
-        assertTrue(urlTest.contains("DataStore.runningTest = false"))
+        // 「有沒有在測」只能從 Job 推導。那個被三處共用的全域布林就是快速連點卡死的根：
+        // 取消掐不斷原生呼叫 → 復位的 finally 走不到 → 之後所有測速變靜默空轉。
+        assertFalse("不得再用全域 runningTest 布林當閂", urlTest.contains("runningTest"))
+        assertTrue(urlTest.contains("if (existing.isRunning())"))
+        assertTrue(urlTest.contains("if (speedTestJob.isRunning()) return"))
+        // 對 Job 一律走 isRunning()：直接寫 job?.isActive 會撞上本檔 import 的
+        // CoroutineScope.isActive 擴充（lint MemberExtensionConflict）。
+        assertFalse(urlTest.contains("?.isActive"))
+        // 阻塞的原生呼叫外面必須有期限，且要比核心自己的 timeout 寬。
+        assertTrue(urlTest.contains("withTimeoutOrNull("))
+        assertTrue(urlTest.contains("URL_TEST_SLACK_MS"))
         // 測速改為「無彈窗＋逐列即時」：開頭清全部列、每列測完立刻單列刷新、
         // 收尾用 toast 報成功/失敗數，且取消也要落庫（finally）。
         assertTrue(urlTest.contains("refreshRows(profilesList)"))
