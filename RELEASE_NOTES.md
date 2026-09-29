@@ -1,3 +1,16 @@
+# OwnBox for Android v2.9.2 预览版 (v2.9.2-preview)
+
+### 1. 新增功能
+* Hysteria 2 协议支持完整混淆类型配置（salamander / gecko）
+* 引入高吞吐量 TUN GSO（通用分段卸载）与连接优化
+
+### 2. 优化与修复
+* 彻底解耦 Sticky Session，恢复最低延迟、最低负载、轮询等策略的原始调度语义
+* 优化策略组会话保持内存管理，采用线程安全 LRU 淘汰与标准公用后缀解析
+* 加固数据库安全机制，升级故障保护与多进程连接池调度
+* 强化 CI/CD 构建签名安全与 Android 备份隔离保护
+* 递增版本号至 2.9.2 预览版（versionCode 321）
+
 # OwnBox for Android v2.9.1 预览版 (v2.9.1-preview)
 
 ### 1. 新加的功能等

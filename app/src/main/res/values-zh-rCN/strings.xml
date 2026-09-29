@@ -441,6 +441,7 @@
     <string name="select_apps">选择应用</string>
     <string name="apps_message">%d 个应用</string>
     <string name="hysteria_obfs">混淆密码</string>
+    <string name="hysteria2_obfs_type">混淆类型</string>
     <string name="hysteria_auth_type">认证类型</string>
     <string name="hysteria_auth_payload">认证密码</string>
     <string name="hysteria_upload_mbps">最大上行 (Mbps)</string>

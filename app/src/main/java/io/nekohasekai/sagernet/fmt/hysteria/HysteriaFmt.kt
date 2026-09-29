@@ -92,6 +92,9 @@ fun parseHysteria2(url: String): HysteriaBean {
 //        link.queryParameter("downmbps")?.also {
 //            downloadMbps = it.toIntOrNull() ?: downloadMbps
 //        }
+        link.queryParameter("obfs")?.takeIf { it.isNotBlank() }?.also {
+            obfsType = it
+        }
         link.queryParameter("obfs-password")?.also {
             obfuscation = it
         }
@@ -157,7 +160,8 @@ fun HysteriaBean.toUri(): String {
             builder.addQueryParameter("sni", sni)
         }
         if (obfuscation.isNotBlank()) {
-            builder.addQueryParameter("obfs", "salamander")
+            val effObfsType = obfsType?.takeIf { it.isNotBlank() } ?: "salamander"
+            builder.addQueryParameter("obfs", effObfsType)
             builder.addQueryParameter("obfs-password", obfuscation)
         }
     }
@@ -334,7 +338,7 @@ fun buildSingBoxOutboundHysteriaBean(bean: HysteriaBean): SingBoxOptions.SingBox
             down_mbps = bean.downloadMbps
             if (!bean.obfuscation.isNullOrBlank()) {
                 obfs = SingBoxOptions.Hysteria2Obfs().apply {
-                    type = "salamander"
+                    type = bean.obfsType?.takeIf { it.isNotBlank() } ?: "salamander"
                     password = bean.obfuscation
                 }
             }

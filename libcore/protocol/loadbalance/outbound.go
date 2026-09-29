@@ -18,6 +18,8 @@ import (
 
 	urltestPkg "libcore/protocol/urltest"
 
+	"golang.org/x/net/publicsuffix"
+
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/adapter/outbound"
 	"github.com/sagernet/sing-box/common/interrupt"
@@ -416,29 +418,21 @@ func extractRootDomain(fqdn string) string {
 		s = s[:idx]
 	}
 
-	parts := strings.Split(s, ".")
-	n := len(parts)
-	if n <= 2 {
-		return s
+	root, err := publicsuffix.EffectiveTLDPlusOne(s)
+	if err == nil && root != "" {
+		return root
 	}
-
-	tld := parts[n-1]
-	sld := parts[n-2]
-	if len(tld) == 2 {
-		switch sld {
-		case "com", "net", "org", "edu", "gov", "co", "ne", "ac", "go", "gen", "firm", "ind", "re", "mil":
-			if n >= 3 {
-				return parts[n-3] + "." + sld + "." + tld
-			}
-		}
-	}
-
-	return parts[n-2] + "." + parts[n-1]
+	return s
 }
 
 type stickyEntry struct {
-	nodeIdx  int
-	expireAt int64 // UnixMilli
+	nodeIdx    int
+	lastAccess int64 // UnixMilli
+	expireAt   int64 // UnixMilli
+}
+
+func (s *LoadBalance) isStickyEnabled() bool {
+	return s.strategy == "consistent_hash" || s.strategy == "consistentHash"
 }
 
 func destinationKey(ctx context.Context, dest M.Socksaddr) string {
@@ -484,18 +478,24 @@ func hashDestination(ctx context.Context, dest M.Socksaddr) uint32 {
 }
 
 func (s *LoadBalance) getStickySession(key string, now int64) (int, bool) {
-	s.stickyMu.RLock()
-	defer s.stickyMu.RUnlock()
+	s.stickyMu.Lock()
+	defer s.stickyMu.Unlock()
 	if s.stickySessions == nil {
 		return 0, false
 	}
 	entry, ok := s.stickySessions[key]
 	if !ok || now > entry.expireAt {
+		if ok {
+			delete(s.stickySessions, key)
+		}
 		return 0, false
 	}
 	if entry.nodeIdx < 0 || entry.nodeIdx >= len(s.outbounds) {
 		return 0, false
 	}
+	entry.lastAccess = now
+	entry.expireAt = now + 5*60*1000
+	s.stickySessions[key] = entry
 	return entry.nodeIdx, true
 }
 
@@ -509,26 +509,30 @@ func (s *LoadBalance) setStickySession(key string, nodeIdx int) {
 	if s.stickySessions == nil {
 		s.stickySessions = make(map[string]stickyEntry)
 	}
-	if len(s.stickySessions) > 1024 {
+	if len(s.stickySessions) >= 1024 {
 		for k, v := range s.stickySessions {
 			if now > v.expireAt {
 				delete(s.stickySessions, k)
 			}
 		}
-		if len(s.stickySessions) > 1024 {
-			count := 0
-			for k := range s.stickySessions {
-				delete(s.stickySessions, k)
-				count++
-				if count > 512 {
-					break
+		if len(s.stickySessions) >= 1024 {
+			var oldestKey string
+			var oldestTime int64 = 1<<62 - 1
+			for k, v := range s.stickySessions {
+				if v.lastAccess < oldestTime {
+					oldestTime = v.lastAccess
+					oldestKey = k
 				}
+			}
+			if oldestKey != "" {
+				delete(s.stickySessions, oldestKey)
 			}
 		}
 	}
 	s.stickySessions[key] = stickyEntry{
-		nodeIdx:  nodeIdx,
-		expireAt: now + 5*60*1000,
+		nodeIdx:    nodeIdx,
+		lastAccess: now,
+		expireAt:   now + 5*60*1000,
 	}
 }
 
@@ -775,16 +779,18 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 		result = append(rotated, degraded...)
 	}
 
-	destKey := destinationKey(ctx, dest)
-	if destKey != "" && len(result) > 1 {
-		if stickyIdx, ok := s.getStickySession(destKey, now); ok {
-			for i, idx := range result {
-				if idx == stickyIdx && !s.isNodeDegraded(idx, now) {
-					if i > 0 {
-						copy(result[1:i+1], result[0:i])
-						result[0] = stickyIdx
+	if s.isStickyEnabled() {
+		destKey := destinationKey(ctx, dest)
+		if destKey != "" && len(result) > 1 {
+			if stickyIdx, ok := s.getStickySession(destKey, now); ok {
+				for i, idx := range result {
+					if idx == stickyIdx && !s.isNodeDegraded(idx, now) {
+						if i > 0 {
+							copy(result[1:i+1], result[0:i])
+							result[0] = stickyIdx
+						}
+						break
 					}
-					break
 				}
 			}
 		}
@@ -804,7 +810,10 @@ func (c *trackedConn) Close() error {
 			c.onClose()
 		}
 	}
-	return c.Conn.Close()
+	if c.Conn != nil {
+		return c.Conn.Close()
+	}
+	return nil
 }
 
 func (c *trackedConn) ReaderReplaceable() bool {
@@ -842,23 +851,24 @@ func (s *LoadBalance) DialContext(ctx context.Context, network string, destinati
 			err  error
 		)
 		if i < n-1 {
-			timeout := 3 * time.Second
+			timeout := 3500 * time.Millisecond
 			if s.isLeastPing() {
-				timeout = 1200 * time.Millisecond
+				timeout = 2500 * time.Millisecond
 				if idx < len(s.stats) && s.stats[idx] != nil {
+					ema := s.stats[idx].latencyEmaMs.Load()
+					if ema > 0 {
+						dynamic := time.Duration(ema*3) * time.Millisecond
+						if dynamic < 2000*time.Millisecond {
+							timeout = 2000 * time.Millisecond
+						} else if dynamic > 4500*time.Millisecond {
+							timeout = 4500 * time.Millisecond
+						} else {
+							timeout = dynamic
+						}
+					}
 					if s.stats[idx].consecutiveFails.Load() > 0 {
-						timeout = 600 * time.Millisecond
-					} else {
-						ema := s.stats[idx].latencyEmaMs.Load()
-						if ema > 0 {
-							dynamic := time.Duration(ema*3) * time.Millisecond
-							if dynamic < 600*time.Millisecond {
-								timeout = 600 * time.Millisecond
-							} else if dynamic > 1200*time.Millisecond {
-								timeout = 1200 * time.Millisecond
-							} else {
-								timeout = dynamic
-							}
+						if timeout > 2000*time.Millisecond {
+							timeout = 2000 * time.Millisecond
 						}
 					}
 				}
@@ -873,16 +883,21 @@ func (s *LoadBalance) DialContext(ctx context.Context, network string, destinati
 			if idx < len(s.stats) && s.stats[idx] != nil {
 				s.stats[idx].recordDialSuccess()
 			}
-			destKey := destinationKey(ctx, destination)
-			if destKey != "" {
-				s.setStickySession(destKey, idx)
+			if s.isStickyEnabled() {
+				destKey := destinationKey(ctx, destination)
+				if destKey != "" {
+					s.setStickySession(destKey, idx)
+				}
 			}
 			if (s.strategy == "leastLoad" || s.strategy == "least_load") && idx < len(s.activeConns) && s.activeConns[idx] != nil {
 				s.activeConns[idx].Add(1)
 				conn = &trackedConn{
 					Conn: conn,
 					onClose: func() {
-						s.activeConns[idx].Add(-1)
+						val := s.activeConns[idx].Add(-1)
+						if val < 0 {
+							s.activeConns[idx].Store(0)
+						}
 					},
 				}
 			}
@@ -908,7 +923,10 @@ func (c *trackedPacketConn) Close() error {
 			c.onClose()
 		}
 	}
-	return c.PacketConn.Close()
+	if c.PacketConn != nil {
+		return c.PacketConn.Close()
+	}
+	return nil
 }
 
 func (c *trackedPacketConn) ReaderReplaceable() bool {
@@ -946,23 +964,24 @@ func (s *LoadBalance) ListenPacket(ctx context.Context, destination M.Socksaddr)
 			err  error
 		)
 		if i < n-1 {
-			timeout := 3 * time.Second
+			timeout := 3500 * time.Millisecond
 			if s.isLeastPing() {
-				timeout = 1200 * time.Millisecond
+				timeout = 2500 * time.Millisecond
 				if idx < len(s.stats) && s.stats[idx] != nil {
+					ema := s.stats[idx].latencyEmaMs.Load()
+					if ema > 0 {
+						dynamic := time.Duration(ema*3) * time.Millisecond
+						if dynamic < 2000*time.Millisecond {
+							timeout = 2000 * time.Millisecond
+						} else if dynamic > 4500*time.Millisecond {
+							timeout = 4500 * time.Millisecond
+						} else {
+							timeout = dynamic
+						}
+					}
 					if s.stats[idx].consecutiveFails.Load() > 0 {
-						timeout = 600 * time.Millisecond
-					} else {
-						ema := s.stats[idx].latencyEmaMs.Load()
-						if ema > 0 {
-							dynamic := time.Duration(ema*3) * time.Millisecond
-							if dynamic < 600*time.Millisecond {
-								timeout = 600 * time.Millisecond
-							} else if dynamic > 1200*time.Millisecond {
-								timeout = 1200 * time.Millisecond
-							} else {
-								timeout = dynamic
-							}
+						if timeout > 2000*time.Millisecond {
+							timeout = 2000 * time.Millisecond
 						}
 					}
 				}
@@ -977,16 +996,21 @@ func (s *LoadBalance) ListenPacket(ctx context.Context, destination M.Socksaddr)
 			if idx < len(s.stats) && s.stats[idx] != nil {
 				s.stats[idx].recordDialSuccess()
 			}
-			destKey := destinationKey(ctx, destination)
-			if destKey != "" {
-				s.setStickySession(destKey, idx)
+			if s.isStickyEnabled() {
+				destKey := destinationKey(ctx, destination)
+				if destKey != "" {
+					s.setStickySession(destKey, idx)
+				}
 			}
 			if (s.strategy == "leastLoad" || s.strategy == "least_load") && idx < len(s.activeConns) && s.activeConns[idx] != nil {
 				s.activeConns[idx].Add(1)
 				conn = &trackedPacketConn{
 					PacketConn: conn,
 					onClose: func() {
-						s.activeConns[idx].Add(-1)
+						val := s.activeConns[idx].Add(-1)
+						if val < 0 {
+							s.activeConns[idx].Store(0)
+						}
 					},
 				}
 			}

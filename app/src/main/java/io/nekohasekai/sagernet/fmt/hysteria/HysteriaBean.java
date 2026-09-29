@@ -22,6 +22,7 @@ public class HysteriaBean extends AbstractBean {
 
     public String authPayload;
     public String obfuscation;
+    public String obfsType;
     public String sni;
     public String caText;
     public Integer uploadMbps;
@@ -60,6 +61,7 @@ public class HysteriaBean extends AbstractBean {
         if (authPayload == null) authPayload = "";
         if (protocol == null) protocol = PROTOCOL_UDP;
         if (obfuscation == null) obfuscation = "";
+        if (obfsType == null) obfsType = "salamander";
         if (sni == null) sni = "";
         if (alpn == null) alpn = "";
         if (caText == null) caText = "";
@@ -82,7 +84,7 @@ public class HysteriaBean extends AbstractBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(7);
+        output.writeInt(8);
         super.serialize(output);
 
         output.writeInt(protocolVersion);
@@ -104,6 +106,7 @@ public class HysteriaBean extends AbstractBean {
         output.writeBoolean(disableMtuDiscovery);
         output.writeInt(hopInterval);
         output.writeString(serverPorts);
+        output.writeString(obfsType);
     }
 
     @Override
@@ -147,6 +150,11 @@ public class HysteriaBean extends AbstractBean {
             } else {
                 serverPorts = serverPort.toString();
             }
+        }
+        if (version >= 8) {
+            obfsType = input.readString();
+        } else {
+            obfsType = "salamander";
         }
     }
 

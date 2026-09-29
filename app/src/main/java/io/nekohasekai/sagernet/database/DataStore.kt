@@ -308,6 +308,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     var serverProtocol by profileCacheStore.string(Key.SERVER_PROTOCOL)
     var serverObfs by profileCacheStore.string(Key.SERVER_OBFS)
+    var serverObfsType by profileCacheStore.string(Key.SERVER_OBFS_TYPE) { "salamander" }
     var serverProtocolParam by profileCacheStore.string(Key.SERVER_PROTOCOL_PARAM)
     var serverObfsParam by profileCacheStore.string(Key.SERVER_OBFS_PARAM)
 

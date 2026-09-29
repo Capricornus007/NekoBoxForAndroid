@@ -22,6 +22,7 @@ class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
         DataStore.serverAddress = serverAddress
         DataStore.serverPorts = serverPorts
         DataStore.serverObfs = obfuscation
+        DataStore.serverObfsType = obfsType ?: "salamander"
         DataStore.serverAuthType = authPayloadType
         DataStore.serverProtocolInt = protocol
         DataStore.serverPassword = authPayload
@@ -43,6 +44,7 @@ class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
         serverAddress = DataStore.serverAddress
         serverPorts = DataStore.serverPorts
         obfuscation = DataStore.serverObfs
+        obfsType = DataStore.serverObfsType
         authPayloadType = DataStore.serverAuthType
         authPayload = DataStore.serverPassword
         protocol = DataStore.serverProtocolInt
@@ -74,10 +76,12 @@ class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
 
         val protocol = findPreference<SimpleMenuPreference>(Key.SERVER_PROTOCOL)!!
         val alpn = findPreference<EditTextPreference>(Key.SERVER_ALPN)!!
+        val obfsTypePref = findPreference<SimpleMenuPreference>(Key.SERVER_OBFS_TYPE)
 
         fun updateVersion(v: Int) {
             if (v == 2) {
                 authPayload.isVisible = true
+                obfsTypePref?.isVisible = true
                 //
                 authType.isVisible = false
                 protocol.isVisible = false
@@ -94,6 +98,7 @@ class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
             } else {
                 authType.isVisible = true
                 authPayload.isVisible = true
+                obfsTypePref?.isVisible = false
                 protocol.isVisible = true
                 alpn.isVisible = true
                 //

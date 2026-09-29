@@ -12,8 +12,9 @@ import android.os.SystemClock
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.runBlocking
 import java.net.UnknownHostException
@@ -34,7 +35,8 @@ object DefaultNetworkListener {
         class Lost(val network: Network) : NetworkMessage()
     }
 
-    private val networkActor = GlobalScope.actor<NetworkMessage>(Dispatchers.Unconfined) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
+    private val networkActor = scope.actor<NetworkMessage> {
         val listeners = mutableMapOf<Any, (Network?) -> Unit>()
         var network: Network? = null
         val pendingRequests = arrayListOf<NetworkMessage.Get>()

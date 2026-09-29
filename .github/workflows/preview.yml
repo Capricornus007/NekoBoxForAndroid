@@ -8,7 +8,7 @@ on:
     inputs:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   libcore:
@@ -62,7 +62,6 @@ jobs:
       - name: Gradle Build
         env:
           BUILD_PLUGIN: none
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
           KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
           ALIAS_NAME: ${{ secrets.ALIAS_NAME }}
@@ -73,11 +72,14 @@ jobs:
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
           fi
-          if [ -n "$KEYSTORE_PASS" ]; then
-            echo "KEYSTORE_PASS=$KEYSTORE_PASS" >> local.properties
-            echo "ALIAS_NAME=$ALIAS_NAME" >> local.properties
-            echo "ALIAS_PASS=$ALIAS_PASS" >> local.properties
+          if [ ! -f "release.keystore" ] || [ -z "$KEYSTORE_PASS" ]; then
+            echo "::error::Release signing credentials missing. Refusing to build unsigned preview release."
+            exit 1
           fi
+          echo "KEYSTORE_PASS=$KEYSTORE_PASS" >> local.properties
+          echo "ALIAS_NAME=$ALIAS_NAME" >> local.properties
+          echo "ALIAS_PASS=$ALIAS_PASS" >> local.properties
+
           export LOCAL_PROPERTIES="${{ secrets.LOCAL_PROPERTIES }}"
           ./run init action gradle
           ./gradlew app:assemblePreviewRelease
@@ -89,21 +91,28 @@ jobs:
             APK_DIR="app/build/outputs/apk/preview/release"
           fi
 
-          if [ -f "release.keystore" ] && [ -n "$KEYSTORE_PASS" ]; then
-            APKSIGNER=$(find ${ANDROID_HOME}/build-tools -name apksigner | sort -V | tail -n 1)
-            [ -z "$APKSIGNER" ] && APKSIGNER="apksigner"
-            echo "Using apksigner: $APKSIGNER"
+          APKSIGNER=$(find ${ANDROID_HOME}/build-tools -name apksigner | sort -V | tail -n 1)
+          [ -z "$APKSIGNER" ] && APKSIGNER="apksigner"
+          echo "Using apksigner: $APKSIGNER"
 
-            echo "Signing unsigned APKs in $APK_DIR..."
-            for apk in "$APK_DIR"/*-unsigned.apk; do
-              if [ -f "$apk" ]; then
-                signed_apk="${apk%-unsigned.apk}-signed.apk"
-                echo "Signing $apk -> $signed_apk"
-                $APKSIGNER sign --ks release.keystore --ks-pass pass:"$KEYSTORE_PASS" --key-pass pass:"${ALIAS_PASS:-$KEYSTORE_PASS}" --ks-key-alias "${ALIAS_NAME:-ownbox}" --out "$signed_apk" "$apk"
-                rm "$apk"
-              fi
-            done
-          fi
+          echo "Signing unsigned APKs in $APK_DIR..."
+          for apk in "$APK_DIR"/*-unsigned.apk; do
+            if [ -f "$apk" ]; then
+              signed_apk="${apk%-unsigned.apk}-signed.apk"
+              echo "Signing $apk -> $signed_apk"
+              $APKSIGNER sign --ks release.keystore --ks-pass pass:"$KEYSTORE_PASS" --key-pass pass:"${ALIAS_PASS:-$KEYSTORE_PASS}" --ks-key-alias "${ALIAS_NAME:-ownbox}" --out "$signed_apk" "$apk"
+              rm "$apk"
+            fi
+          done
+
+          echo "Verifying signed APKs..."
+          for apk in "$APK_DIR"/*.apk; do
+            if [ -f "$apk" ]; then
+              echo "Verifying $apk..."
+              $APKSIGNER verify --verbose "$apk" || { echo "::error::Signature verification failed for $apk"; exit 1; }
+            fi
+          done
+
           rm -f release.keystore
 
           echo "APK=$APK_DIR" >> $GITHUB_ENV
@@ -130,10 +139,13 @@ jobs:
         with:
           name: APKs
           path: artifacts
-      - name: Prepare APKs
+      - name: Prepare APKs and Checksums
         run: |
           mkdir -p apks
           find artifacts -name "*.apk" -exec cp {} apks/ \;
+          cd apks
+          sha256sum *.apk > sha256sums.txt
+          cd ..
           ls -la apks/
       - name: Publish to GitHub Releases
         uses: softprops/action-gh-release@v2
@@ -141,7 +153,9 @@ jobs:
           tag_name: v${{ env.PRE_VERSION }}
           name: OwnBox v${{ env.PRE_VERSION }}
           body_path: RELEASE_NOTES.md
-          files: apks/*.apk
+          files: |
+            apks/*.apk
+            apks/sha256sums.txt
           draft: false
           prerelease: true
           make_latest: false

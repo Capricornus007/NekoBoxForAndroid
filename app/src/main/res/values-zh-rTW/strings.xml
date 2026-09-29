@@ -389,6 +389,7 @@
     <string name="hysteria_auth_payload">認證密碼</string>
     <string name="hysteria_auth_type">認證類型</string>
     <string name="hysteria_obfs">混淆密碼</string>
+    <string name="hysteria2_obfs_type">混淆類型</string>
     <string name="menu_tools">工具</string>
     <string name="translate_platform">翻譯平台</string>
     <string name="menu_log">記錄檔</string>

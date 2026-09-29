@@ -11,9 +11,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.fmt.gson.GsonConverters
 import io.nekohasekai.sagernet.ktx.Logs
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.asExecutor
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -58,8 +56,6 @@ abstract class SagerDatabase : RoomDatabase() {
             }
         }
 
-        @OptIn(DelicateCoroutinesApi::class)
-        @Suppress("EXPERIMENTAL_API_USAGE")
         val instance by lazy {
             val app = SagerNet.application
             app.getDatabasePath(Key.DB_PROFILE).parentFile?.mkdirs()
@@ -69,9 +65,7 @@ abstract class SagerDatabase : RoomDatabase() {
                     .allowMainThreadQueries()
                     .enableMultiInstanceInvalidation()
                     .addMigrations(MIGRATION_9_10)
-                    .fallbackToDestructiveMigration()
-                    .fallbackToDestructiveMigrationOnDowngrade()
-                    .setQueryExecutor { GlobalScope.launch { it.run() } }
+                    .setQueryExecutor(kotlinx.coroutines.Dispatchers.IO.asExecutor())
                     .build()
             }
             try {
@@ -79,22 +73,35 @@ abstract class SagerDatabase : RoomDatabase() {
                 db.openHelper.writableDatabase
                 db
             } catch (e: Throwable) {
-                Logs.e(e)
+                Logs.e("SagerDatabase initial open failed, performing emergency backup", e)
+                val timestamp = System.currentTimeMillis()
                 try {
                     val dbFile = app.getDatabasePath(Key.DB_PROFILE)
                     if (dbFile.exists()) {
-                        val bakFile = java.io.File(dbFile.parentFile, "${Key.DB_PROFILE}.bak_${System.currentTimeMillis()}")
-                        dbFile.copyTo(bakFile, overwrite = true)
+                        val parent = dbFile.parentFile
+                        dbFile.copyTo(java.io.File(parent, "${Key.DB_PROFILE}.bak_$timestamp"), overwrite = true)
+                        val wal = java.io.File(parent, "${Key.DB_PROFILE}-wal")
+                        if (wal.exists()) wal.copyTo(java.io.File(parent, "${Key.DB_PROFILE}-wal.bak_$timestamp"), overwrite = true)
+                        val shm = java.io.File(parent, "${Key.DB_PROFILE}-shm")
+                        if (shm.exists()) shm.copyTo(java.io.File(parent, "${Key.DB_PROFILE}-shm.bak_$timestamp"), overwrite = true)
                     }
                 } catch (t: Throwable) {
-                    Logs.e(t)
+                    Logs.e("Failed to create emergency backup for corrupted database", t)
                 }
+                // Try recovery: attempt to reopen before any destructive actions
                 try {
-                    app.deleteDatabase(Key.DB_PROFILE)
-                } catch (t: Throwable) {
-                    Logs.e(t)
+                    val recoveredDb = buildDatabase()
+                    recoveredDb.openHelper.writableDatabase
+                    recoveredDb
+                } catch (fatal: Throwable) {
+                    Logs.e("SagerDatabase unrecoverable after backup, recreating clean database", fatal)
+                    try {
+                        app.deleteDatabase(Key.DB_PROFILE)
+                    } catch (t: Throwable) {
+                        Logs.e(t)
+                    }
+                    buildDatabase()
                 }
-                buildDatabase()
             }
         }
 

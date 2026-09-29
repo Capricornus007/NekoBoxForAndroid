@@ -531,9 +531,6 @@
             android:label="@string/widget_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="io.nekohasekai.sagernet.widget.ACTION_TOGGLE" />
-                <action android:name="com.ownbox.app.widget.ACTION_TOGGLE" />
-                <action android:name="io.nekohasekai.sagernet.widget.ACTION_SWITCH_NODE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -546,7 +543,6 @@
             android:label="OwnBox 1×1 (水滴微球)">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.ownbox.app.widget.ACTION_TOGGLE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -559,7 +555,6 @@
             android:label="OwnBox 2×2 (紧凑状态)">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.ownbox.app.widget.ACTION_TOGGLE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -572,7 +567,6 @@
             android:label="OwnBox 4×1 (胶囊操作栏)">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.ownbox.app.widget.ACTION_TOGGLE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -585,7 +579,6 @@
             android:label="OwnBox 4×2 (全景仪表板)">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.ownbox.app.widget.ACTION_TOGGLE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

@@ -119,28 +119,23 @@ fun Project.setupAppCommon() {
     val alias = lp.getProperty("ALIAS_NAME") ?: System.getenv("ALIAS_NAME") ?: ""
     val pwd = lp.getProperty("ALIAS_PASS") ?: System.getenv("ALIAS_PASS") ?: ""
 
+    val hasReleaseSigning = rootProject.file("release.keystore").exists() && keystorePwd.isNotEmpty() && alias.isNotEmpty()
+
     android.apply {
         signingConfigs {
             create("release") {
-                if (rootProject.file("release.keystore").exists() && keystorePwd.isNotEmpty() && alias.isNotEmpty()) {
+                if (hasReleaseSigning) {
                     storeFile = rootProject.file("release.keystore")
                     storePassword = keystorePwd
                     keyAlias = alias
                     keyPassword = pwd
-                } else {
-                    val debugConfig = getByName("debug")
-                    storeFile = debugConfig.storeFile
-                    storePassword = debugConfig.storePassword
-                    keyAlias = debugConfig.keyAlias
-                    keyPassword = debugConfig.keyPassword
                 }
             }
         }
         buildTypes {
-            val key = signingConfigs.findByName("release")
-            if (key != null) {
-                getByName("release").signingConfig = key
-                getByName("debug").signingConfig = key
+            getByName("debug").signingConfig = signingConfigs.getByName("debug")
+            if (hasReleaseSigning) {
+                getByName("release").signingConfig = signingConfigs.getByName("release")
             }
         }
     }

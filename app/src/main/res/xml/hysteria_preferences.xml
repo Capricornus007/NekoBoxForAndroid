@@ -34,6 +34,14 @@
             app:title="@string/hysteria_obfs"
             app:useSimpleSummaryProvider="true" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:defaultValue="salamander"
+            app:entries="@array/hysteria2_obfs_type"
+            app:entryValues="@array/hysteria2_obfs_type"
+            app:icon="@drawable/ic_baseline_texture_24"
+            app:key="serverObfsType"
+            app:title="@string/hysteria2_obfs_type"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:entries="@array/hysteria_auth_type"
             app:entryValues="@array/int_array_3"
             app:icon="@drawable/ic_baseline_compare_arrows_24"

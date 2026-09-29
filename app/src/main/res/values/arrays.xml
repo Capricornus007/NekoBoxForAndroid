@@ -540,6 +540,11 @@
         <item>2</item>
     </string-array>
 
+    <string-array name="hysteria2_obfs_type">
+        <item>salamander</item>
+        <item>gecko</item>
+    </string-array>
+
     <string-array name="tuic_version">
         <item>5</item>
         <item>4</item>

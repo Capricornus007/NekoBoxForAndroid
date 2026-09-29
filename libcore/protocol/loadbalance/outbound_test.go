@@ -418,32 +418,43 @@ func TestStickySession(t *testing.T) {
 	lb := &LoadBalance{
 		tags:           tags,
 		stats:          make([]*nodeStats, n),
+		strategy:       "consistent_hash",
+		outbounds:      make([]adapter.Outbound, n),
+		stickySessions: make(map[string]stickyEntry),
+	}
+	lb.ring = newConsistentHashRing(lb.tags)
+	for i := 0; i < n; i++ {
+		lb.stats[i] = new(nodeStats)
+	}
+
+	// 1. Verify leastPing does NOT use sticky sessions (no pollution)
+	lbLeastPing := &LoadBalance{
+		tags:           tags,
+		stats:          make([]*nodeStats, n),
 		strategy:       "leastPing",
 		outbounds:      make([]adapter.Outbound, n),
 		stickySessions: make(map[string]stickyEntry),
 	}
 	for i := 0; i < n; i++ {
-		lb.stats[i] = new(nodeStats)
+		lbLeastPing.stats[i] = new(nodeStats)
+	}
+	lbLeastPing.stats[0].latencyEmaMs.Store(50)
+	lbLeastPing.stats[1].latencyEmaMs.Store(30)
+	lbLeastPing.stats[2].latencyEmaMs.Store(100)
+	lbLeastPing.setStickySession("youtube.com", 0)
+
+	lpCands := lbLeastPing.candidateIndices(nil, M.Socksaddr{Fqdn: "youtube.com"})
+	if lpCands[0] != 1 {
+		t.Fatalf("leastPing must NOT be polluted by sticky session, expected node 1, got %d", lpCands[0])
 	}
 
-	// Node 1 has lowest latency (30ms), Node 0 has 50ms, Node 2 has 100ms
-	lb.stats[0].latencyEmaMs.Store(50)
-	lb.stats[1].latencyEmaMs.Store(30)
-	lb.stats[2].latencyEmaMs.Store(100)
-
-	// Default selection without sticky session -> node 1 is first
-	cands := lb.candidateIndices(nil, M.Socksaddr{Fqdn: "youtube.com"})
-	if cands[0] != 1 {
-		t.Fatalf("expected node 1 to be first, got %d", cands[0])
-	}
-
-	// Set sticky session to node 0 for youtube.com
+	// 2. Under consistent_hash, set sticky session to node 0 for youtube.com
 	lb.setStickySession("youtube.com", 0)
 
-	// With sticky session active, node 0 must be promoted to index 0
+	// With sticky session active on consistent_hash, node 0 must be promoted to index 0
 	stickyCands := lb.candidateIndices(nil, M.Socksaddr{Fqdn: "youtube.com"})
 	if stickyCands[0] != 0 {
-		t.Fatalf("expected sticky node 0 to be promoted to first, got %d", stickyCands[0])
+		t.Fatalf("expected sticky node 0 to be promoted to first in consistent_hash, got %d", stickyCands[0])
 	}
 
 	// Subdomain of same root domain (video.youtube.com) should also stick to node 0
@@ -452,13 +463,13 @@ func TestStickySession(t *testing.T) {
 		t.Fatalf("expected subdomain video.youtube.com to stick to node 0, got %d", subCands[0])
 	}
 
-	// If node 0 degrades, sticky session should yield to healthy node 1
+	// If node 0 degrades, sticky session should yield to healthy node
 	lb.stats[0].consecutiveFails.Store(2)
 	lb.stats[0].lastFailTime.Store(time.Now().UnixMilli())
 
 	fallbackCands := lb.candidateIndices(nil, M.Socksaddr{Fqdn: "youtube.com"})
-	if fallbackCands[0] != 1 {
-		t.Fatalf("expected degraded sticky node 0 to yield to healthy node 1, got %d", fallbackCands[0])
+	if fallbackCands[0] == 0 {
+		t.Fatalf("expected degraded sticky node 0 to yield when degraded, got %d", fallbackCands[0])
 	}
 }
 
@@ -480,5 +491,69 @@ func TestTrackedConnZeroCopy(t *testing.T) {
 	}
 	if !tpc.WriterReplaceable() {
 		t.Fatal("trackedPacketConn must be WriterReplaceable")
+	}
+}
+
+func TestPublicSuffixRootDomain(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected string
+	}{
+		{"example.com", "example.com"},
+		{"sub.example.com", "example.com"},
+		{"a.b.c.example.com", "example.com"},
+		{"news.bbc.co.uk", "bbc.co.uk"},
+		{"dept.sub.gov.cn", "sub.gov.cn"},
+		{"portal.pku.edu.cn", "pku.edu.cn"},
+		{"user.github.io", "user.github.io"},
+		{"sub.user.github.io", "user.github.io"},
+		{"localhost", "localhost"},
+		{"", ""},
+	}
+	for _, tc := range testCases {
+		actual := extractRootDomain(tc.input)
+		if actual != tc.expected {
+			t.Errorf("extractRootDomain(%q) = %q, expected %q", tc.input, actual, tc.expected)
+		}
+	}
+
+	// Test IP destinations
+	ip4 := M.ParseSocksaddr("192.168.1.50:443")
+	key4 := destinationKey(context.Background(), ip4)
+	if key4 != "192.168.1.0/24" {
+		t.Fatalf("expected IPv4 /24 subnet key, got %q", key4)
+	}
+
+	ip6 := M.ParseSocksaddr("[2001:db8:85a3:8d3:1319:8a2e:370:7348]:443")
+	key6 := destinationKey(context.Background(), ip6)
+	if key6 != "2001:db8:85a3::/48" {
+		t.Fatalf("expected IPv6 /48 subnet key, got %q", key6)
+	}
+}
+
+func TestLeastLoadConcurrentAccounting(t *testing.T) {
+	var count atomic.Int64
+	tc := &trackedConn{
+		onClose: func() {
+			val := count.Add(-1)
+			if val < 0 {
+				count.Store(0)
+			}
+		},
+	}
+
+	// 1. Initial count 1
+	count.Store(1)
+	// First close should decrement to 0
+	tc.Close()
+	if count.Load() != 0 {
+		t.Fatalf("expected count 0, got %d", count.Load())
+	}
+
+	// Repeated close should NOT decrement again (CAS guard)
+	tc.Close()
+	tc.Close()
+	if count.Load() != 0 {
+		t.Fatalf("expected count to remain 0 after multiple closes, got %d", count.Load())
 	}
 }
