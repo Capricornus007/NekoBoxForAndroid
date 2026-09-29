@@ -82,7 +82,7 @@
     <string name="settings_connection">Connection</string>
     <string name="settings_connection_summary">Auto-connect, service mode, TUN, MTU, reconnect behavior</string>
     <string name="settings_protection">Leak protection</string>
-    <string name="settings_protection_summary">Always-on VPN, block connections without VPN, battery optimization</string>
+    <string name="settings_protection_summary">Kill switch, always-on VPN, block connections without VPN, battery optimization</string>
     <string name="settings_route_summary">Proxied apps, LAN bypass, sniffing, IPv6, rule sets</string>
     <string name="settings_dns_summary">Remote and direct DNS, domain strategy, FakeDNS, hosts</string>
     <string name="settings_inbound_summary">Local proxy port, LAN access, authentication</string>
@@ -429,7 +429,10 @@
     <string name="routing_profile_rename">Rename profile</string>
     <string name="routing_profile_active">Active · %s</string>
     <string name="routing_profile_delete_message">Delete the routing profile “%s”? Rules and settings currently in use stay as they are.</string>
-    <string name="routing_profile_import_invalid">The file is not an exported routing profile.</string>
+    <string name="routing_profile_import_invalid">Not an exported routing profile or sn://routing/ link.</string>
+    <string name="routing_profile_replace_message">Replace the routing profile “%s” with the imported one?</string>
+    <string name="routing_profile_replace_active_message">Replace the active routing profile “%s” with the imported one? Its rules and settings apply right away.</string>
+    <string name="routing_profile_import_message">Import the routing profile “%1$s” (%2$d rules)? It is added to your routing profiles without being activated; a profile with the same name is replaced.</string>
     <plurals name="routing_profile_rules">
         <item quantity="one">%d rule</item>
         <item quantity="other">%d rules</item>
@@ -528,6 +531,11 @@
     <string name="subscription_used">%s Used</string>
     <string name="subscription_traffic">%s Used / %s Remaining</string>
     <string name="subscription_expire">Expire: %s</string>
+    <string name="subscription_support">Support</string>
+    <string name="subscription_website">Website</string>
+    <string name="subscription_expiring_title">Subscription expiring</string>
+    <string name="subscription_expiring_message">%1$s expires on %2$s.</string>
+    <string name="subscription_expired_message">%s has expired.</string>
     <string name="subscription_import">Import subscription</string>
     <string name="subscription_import_message">Confirm you want to import subscription %s? If you
         are coming from an untrusted source, doing this may result in your IP and this behavior
@@ -696,6 +704,9 @@
     <string name="need_restart">Restart APP to apply changes</string>
     <string name="use_selector">Use selector</string>
     <!-- leak protection page -->
+    <string name="kill_switch">Kill switch</string>
+    <string name="kill_switch_summary">Keep the VPN interface up while the proxy restarts or fails, so traffic is dropped instead of reaching the network directly. Apps excluded in Proxied apps bypass mode keep their direct access. The service reconnects with backoff; stop it to release the block. Applies from the next start.</string>
+    <string name="kill_switch_blocking">Kill switch: traffic blocked</string>
     <string name="protection_always_on">Always-on VPN</string>
     <string name="protection_always_on_enabled">On. Android restarts the VPN after a reboot or after the service stops.</string>
     <string name="protection_always_on_disabled">Off. After a reboot or a crash the VPN stays down until you start it. Tap to open the system VPN settings and enable it for this app.</string>
@@ -708,7 +719,7 @@
     <string name="protection_battery_unrestricted">Unrestricted. Android will not stop the service to save power.</string>
     <string name="protection_battery_optimized">Optimized. Android may stop the service in the background. Tap and set this app to Unrestricted.</string>
     <string name="protection_notes_title">How these settings interact</string>
-    <string name="protection_notes">Both VPN settings are enforced by Android, not by this app, and only apply in VPN service mode. With Block connections without VPN on, apps excluded from the tunnel in Proxied apps bypass mode lose connectivity instead of reaching the network directly. A running service is not proof of protection: use the connection test after every start and reconnect.</string>
+    <string name="protection_notes">The kill switch is enforced by this app and cannot survive the process being killed; Always-on VPN with Block connections without VPN covers that case. Both VPN settings are enforced by Android, not by this app, and only apply in VPN service mode. With Block connections without VPN on, apps excluded from the tunnel in Proxied apps bypass mode lose connectivity instead of reaching the network directly. A running service is not proof of protection: use the connection test after every start and reconnect.</string>
     <string name="auto_select">Automatic selection</string>
     <string name="auto_select_active">Automatic selection is on for this group. Turn it off in the group settings to pick a member.</string>
     <string name="auto_select_sum">Route through the member with the lowest connection-test latency and switch when it fails or a faster one recovers. Manual selection within this group is off while enabled.</string>

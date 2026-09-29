@@ -204,6 +204,57 @@ class RawUpdaterTransactionTest {
     }
 
     @Test
+    fun providerMetadata_isStoredValidatedAndClearedWhenOmitted() = runTest {
+        withContext(Dispatchers.IO) {
+            val body = "#announce: base64:${Base64.getEncoder().encodeToString("Body notice".toByteArray())}\n#support-url: https://body.example\n$validContent"
+            var reconfigured = 0
+            RawUpdater.updateFromContent(
+                group,
+                subscription,
+                body,
+                httpMeta = mapOf(
+                    "support-url" to "https://t.me/support",
+                    "profile-web-page-url" to "javascript:alert(1)",
+                    "announce" to "x".repeat(300),
+                    "profile-update-interval" to "12",
+                ),
+                reconfigureUpdater = { reconfigured++ },
+            )
+            assertEquals(1, reconfigured)
+            assertEquals("https://t.me/support", subscription.supportUrl)
+            assertEquals("", subscription.webPageUrl)
+            assertEquals("x".repeat(200), subscription.announce)
+            assertEquals(true, subscription.autoUpdate)
+            assertEquals(12 * 60, subscription.autoUpdateDelay)
+            assertEquals(12 * 60, subscription.providerUpdateInterval)
+            val stored = SagerDatabase.groupDao.getById(group.id)!!.subscription!!
+            assertArrayEquals(KryoConverters.serialize(subscription), KryoConverters.serialize(stored))
+
+            // The user's schedule survives an unchanged provider interval and applies again on a new one.
+            subscription.autoUpdate = false
+            subscription.autoUpdateDelay = 45
+            RawUpdater.updateFromContent(group, subscription, body, httpMeta = mapOf("profile-update-interval" to "12"), reconfigureUpdater = { reconfigured++ })
+            assertEquals(false, subscription.autoUpdate)
+            assertEquals(45, subscription.autoUpdateDelay)
+            assertEquals(1, reconfigured)
+            RawUpdater.updateFromContent(group, subscription, body, httpMeta = mapOf("profile-update-interval" to "6"), reconfigureUpdater = { reconfigured++ })
+            assertEquals(true, subscription.autoUpdate)
+            assertEquals(6 * 60, subscription.autoUpdateDelay)
+            assertEquals(2, reconfigured)
+
+            // Preamble values apply when the response carries no headers; omitted keys clear.
+            RawUpdater.updateFromContent(group, subscription, body)
+            assertEquals("https://body.example", subscription.supportUrl)
+            assertEquals("Body notice", subscription.announce)
+            assertEquals(0, subscription.providerUpdateInterval)
+            RawUpdater.updateFromContent(group, subscription, validContent)
+            assertEquals("", subscription.supportUrl)
+            assertEquals("", subscription.announce)
+            assertEquals(6 * 60, subscription.autoUpdateDelay)
+        }
+    }
+
+    @Test
     fun metadataFallbacks_preserveCustomNamesAndFileUsage() = runTest {
         withContext(Dispatchers.IO) {
             RawUpdater.updateFromContent(group, subscription, validContent, httpTitle = "base64:!", contentDisposition = "attachment; filename*=UTF-8''Disposition%20title")

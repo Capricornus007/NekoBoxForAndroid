@@ -256,6 +256,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var networkAutomation by configurationStore.boolean(Key.NETWORK_AUTOMATION) { false }
     var automationPaused by configurationStore.boolean(Key.NETWORK_AUTOMATION_PAUSED) { false }
     var connectionDiagnostics by configurationStore.boolean(Key.CONNECTION_DIAGNOSTICS) { false }
+    var killSwitch by configurationStore.boolean(Key.KILL_SWITCH) { false }
 
     var appendHttpProxy by configurationStore.boolean(Key.APPEND_HTTP_PROXY)
     var httpProxyBypass by configurationStore.string(Key.HTTP_PROXY_BYPASS) { DEFAULT_HTTP_PROXY_BYPASS }

@@ -187,6 +187,25 @@ class RawUpdaterParseTest {
     }
 
     @Test
+    fun providerMetadata_isPreambleOnlyOuterFirstAndKnownKeysOnly() {
+        val inner = "#support-url: https://inner.example\n#announce: base64:${encode("Inner")}\nsocks://192.0.2.4:1080#kept"
+        val content = RawUpdater.readSubscriptionContent(
+            "#Support-URL: https://outer.example\n#support-url: https://duplicate.example\n#routing: sn://routing/abc\n" +
+                "#profile-update-interval: 12\n#hidden-proxy: socks://192.0.2.3:1080\n#announce:\n${encode(inner)}",
+        )
+        assertEquals(
+            mapOf(
+                "support-url" to "https://outer.example",
+                "routing" to "sn://routing/abc",
+                "profile-update-interval" to "12",
+                "announce" to "base64:${encode("Inner")}",
+            ),
+            content.meta,
+        )
+        assertTrue(RawUpdater.readSubscriptionContent("socks://192.0.2.4:1080\n#support-url: https://late.example").meta.isEmpty())
+    }
+
+    @Test
     fun malformedOrEmptyBase64Titles_areIgnored() {
         for (title in listOf("", "base64:", "base64:!!!", "base64:/w==", "base64:${encode("\n")}")) {
             assertNull(RawUpdater.decodeProfileTitle(title))

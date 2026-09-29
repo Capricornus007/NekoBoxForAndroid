@@ -53,8 +53,21 @@ class VpnService :
     @Suppress("EXPERIMENTAL_API_USAGE")
     override suspend fun killProcesses() {
         runServiceTeardown(after = { super.killProcesses() }) {
-            conn?.close()
-            conn = null
+            if (data.holdTun) {
+                // Kill switch: the interface stays up with nobody reading it, so traffic drops until
+                // the next core replaces it (startVpn) or the user stops. A failure ahead of the
+                // core opening the tun has to block too, hence the bare interface. Without any
+                // interface there is nothing that blocks, and the service must not claim otherwise.
+                if (conn == null) {
+                    conn = runCatching { tunBuilder(needBypassRootUid = false).establish() }
+                        .onFailure { Logs.w("kill switch could not establish a bare tun", it) }
+                        .getOrNull()
+                }
+                if (conn == null) data.holdTun = false
+            } else {
+                conn?.close()
+                conn = null
+            }
         }
     }
 
@@ -94,7 +107,18 @@ class VpnService :
 //        Logs.d(tunOptionsJson)
 //        Logs.d(tunPlatformOptionsJson)
 //        val tunOptions = JSONObject(tunOptionsJson)
+        val needBypassRootUid = data.proxy!!.config.trafficMap.values.any {
+            it[0].hysteriaBean?.protocol == HysteriaBean.PROTOCOL_FAKETCP
+        }
+        val previous = conn
+        conn = tunBuilder(needBypassRootUid).establish() ?: throw NullConnectionException()
+        // Android replaces the previous interface atomically, so an interface the kill switch held
+        // across the restart hands over without a gap; only the stale descriptor is left to close.
+        previous?.close()
+        return conn!!.fd
+    }
 
+    private fun tunBuilder(needBypassRootUid: Boolean): Builder {
         // address & route & MTU ...... use NB4A GUI config
         val builder = Builder().setConfigureIntent(SagerNet.configureIntent(this))
             .setSession(getString(R.string.app_name))
@@ -134,10 +158,6 @@ class VpnService :
         val packageName = packageName
         val proxyApps = DataStore.proxyApps
         var bypass = DataStore.bypass
-        val workaroundSYSTEM = false /* DataStore.tunImplementation == TunImplementation.SYSTEM */
-        val needBypassRootUid = workaroundSYSTEM || data.proxy!!.config.trafficMap.values.any {
-            it[0].hysteriaBean?.protocol == HysteriaBean.PROTOCOL_FAKETCP
-        }
 
         if (proxyApps || needBypassRootUid) {
             val individual = mutableSetOf<String>()
@@ -221,9 +241,7 @@ class VpnService :
 
         metered = DataStore.meteredNetwork
         if (Build.VERSION.SDK_INT >= 29) builder.setMetered(metered)
-        conn = builder.establish() ?: throw NullConnectionException()
-
-        return conn!!.fd
+        return builder
     }
 
     // Build a validated exclusion list for the system HTTP proxy. Entries are
@@ -269,6 +287,8 @@ class VpnService :
 
     override fun onDestroy() {
         DataStore.vpnService = null
+        conn?.close()
+        conn = null
         super.onDestroy()
         data.binder.close()
     }

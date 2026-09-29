@@ -197,6 +197,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     private fun refreshProtection() {
         val alwaysOn = findPreference<Preference>(Key.PROTECTION_ALWAYS_ON) ?: return
         val lockdown = findPreference<Preference>(Key.PROTECTION_LOCKDOWN) ?: return
+        findPreference<Preference>(Key.KILL_SWITCH)?.isEnabled = DataStore.serviceMode == Key.MODE_VPN
         when {
             DataStore.serviceMode != Key.MODE_VPN -> {
                 alwaysOn.setSummary(R.string.protection_proxy_mode)

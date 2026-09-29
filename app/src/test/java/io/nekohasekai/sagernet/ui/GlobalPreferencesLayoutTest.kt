@@ -77,7 +77,7 @@ class GlobalPreferencesLayoutTest {
             "domain_strategy_for_direct", "domain_strategy_for_remote", "domain_strategy_for_server",
             "enableClashAPI", "enableDnsRouting", "enableFakeDns", "enableTLSFragment", "fragmentInterval",
             "fragmentLength", "globalAllowInsecure", "globalCustomConfig", "hideFromRecentApps",
-            "httpProxyBypass", "ipv6Mode", "isAutoConnect", "logLevel", "meteredNetwork", "mixedPort", "mtu",
+            "httpProxyBypass", "ipv6Mode", "isAutoConnect", "killSwitch", "logLevel", "meteredNetwork", "mixedPort", "mtu",
             "networkAutomation", "networkAutomationRules", "networkChangeResetConnections", "nightTheme", "profileTrafficStatistics", "protectionAlwaysOn",
             "protectionBattery", "protectionLockdown", "protectionNotes", "proxyApps", "proxyModeInboundAuth", "remoteDns", "requireProxyInVPN", "resetSettings", "resolveDestination",
             "rulesGeoipUrl", "rulesGeositeUrl", "rulesProvider", "rulesUpdateInterval", "serviceMode",

@@ -87,6 +87,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import libcore.Libcore
 import moe.matsuri.nb4a.Protocols
 import moe.matsuri.nb4a.Protocols.getProtocolColor
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSSettingsActivity
@@ -413,7 +414,8 @@ class ConfigurationFragment @JvmOverloads constructor(
     /** Show what the import keeps and drops before creating profiles. Sources without text (zip) import directly. */
     private suspend fun confirmImport(source: String?, proxies: List<AbstractBean>) {
         if (source == null) return import(proxies)
-        val preview = ImportPreview.of(source, proxies)
+        // Preview the body the parser saw: a base64 envelope would otherwise read as a link list.
+        val preview = ImportPreview.of(RawUpdater.readSubscriptionContent(source).body, proxies)
         onMainDispatcher {
             if (!isAdded) return@onMainDispatcher
             MaterialAlertDialogBuilder(requireContext())
@@ -767,6 +769,10 @@ class ConfigurationFragment @JvmOverloads constructor(
                 pingTest(false)
             }
 
+            R.id.action_connection_icmp_ping -> {
+                pingTest(true)
+            }
+
             R.id.action_connection_url_test -> {
                 urlTest()
             }
@@ -957,7 +963,13 @@ class ConfigurationFragment @JvmOverloads constructor(
                             }
                             try {
                                 if (icmpPing) {
-                                    // removed
+                                    // libcore protects the socket so the echo bypasses a running VPN.
+                                    val latency = Libcore.icmpPing(address, DataStore.connectionTestTimeout)
+                                    if (!isActive) break
+                                    profile.status = 1
+                                    profile.ping = latency
+                                    profile.error = null
+                                    test.update(profile)
                                 } else {
                                     val socket =
                                         SagerNet.underlyingNetwork?.socketFactory?.createSocket()
@@ -989,7 +1001,9 @@ class ConfigurationFragment @JvmOverloads constructor(
 
                                 if (icmpPing) {
                                     profile.status = 2
-                                    profile.error = getString(R.string.connection_test_unreachable)
+                                    profile.error = getString(
+                                        if (message.contains("timeout")) R.string.connection_test_timeout_error else R.string.connection_test_unreachable,
+                                    )
                                 } else {
                                     profile.status = 2
                                     when {

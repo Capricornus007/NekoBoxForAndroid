@@ -4,6 +4,9 @@ import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.database.preference.KeyValuePair
 import io.nekohasekai.sagernet.database.preference.PublicDatabase
 import io.nekohasekai.sagernet.ui.BackupFormatV2
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import moe.matsuri.nb4a.utils.Util
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -19,6 +22,9 @@ import org.json.JSONObject
 object RoutingProfiles {
 
     const val FORMAT = 1
+
+    /** Deep link prefix; the rest is the export JSON in base64 (either alphabet). */
+    const val LINK_PREFIX = "sn://routing/"
 
     /** Settings keys that belong to a routing profile. Everything else stays global. */
     val SETTING_KEYS = listOf(
@@ -43,10 +49,14 @@ object RoutingProfiles {
         Key.RULES_GEOIP_URL,
     )
 
-    class Profile(val id: Long, var name: String, var content: JSONObject) {
+    /**
+     * [source] marks who owns a profile: "" for the user's own, or a subscription tag for profiles
+     * delivered through the `routing` subscription key, so a provider only ever refreshes its own.
+     */
+    class Profile(val id: Long, var name: String, var content: JSONObject, val source: String = "") {
         val ruleCount: Int get() = content.optJSONArray("rules")?.length() ?: 0
 
-        fun toJson(): JSONObject = JSONObject().put("id", id).put("name", name).put("content", content)
+        fun toJson(): JSONObject = JSONObject().put("id", id).put("name", name).put("content", content).put("source", source)
 
         /** Export form: self-describing so a file can be told apart from other JSON. */
         fun toExportJson(): JSONObject = JSONObject()
@@ -54,11 +64,14 @@ object RoutingProfiles {
             .put("name", name)
             .put("content", content)
 
+        fun toLink(): String = LINK_PREFIX + Util.b64EncodeUrlSafe(toExportJson().toString())
+
         companion object {
             fun fromJson(json: JSONObject) = Profile(
                 json.getLong("id"),
                 json.getString("name"),
                 json.getJSONObject("content"),
+                json.optString("source"),
             )
         }
     }
@@ -80,6 +93,19 @@ object RoutingProfiles {
             Key.ROUTING_PROFILES,
             JSONArray().apply { profiles.forEach { put(it.toJson()) } }.toString(),
         )
+    }
+
+    // Every mutation is a read-modify-write of the whole list. Concurrent subscription updates
+    // and a subscription delete racing one of them go through this lock; the main-thread
+    // rename/delete below are the only writers outside it and never run concurrently with each
+    // other.
+    private val listLock = Any()
+
+    private fun <T> mutate(block: (MutableList<Profile>) -> T): T = synchronized(listLock) {
+        val profiles = list().toMutableList()
+        val result = block(profiles)
+        save(profiles)
+        result
     }
 
     /** Snapshot of the live rules and profile settings. */
@@ -120,19 +146,26 @@ object RoutingProfiles {
 
     /** Store the live state as a new profile and make it the active one. */
     suspend fun saveLiveAs(name: String): Profile {
-        val profiles = list()
-        val profile = Profile((profiles.maxOfOrNull { it.id } ?: 0L) + 1, name, captureLive())
-        save(profiles + profile)
+        val content = captureLive()
+        val profile = mutate { profiles ->
+            Profile((profiles.maxOfOrNull { it.id } ?: 0L) + 1, name, content).also { profiles += it }
+        }
         activeId = profile.id
         return profile
     }
 
     /** Persist the live state into the active profile, if there is one. */
     suspend fun syncActive() {
-        val profiles = list()
-        val active = profiles.firstOrNull { it.id == activeId } ?: return
-        active.content = captureLive()
-        save(profiles)
+        val id = activeId
+        if (list().none { it.id == id }) return
+        val content = captureLive()
+        mutate { profiles -> profiles.firstOrNull { it.id == id }?.content = content }
+    }
+
+    /** The profile as the user sees it: the active one carries the live edits made since the last switch. */
+    suspend fun exportable(id: Long): Profile? {
+        if (id == activeId) syncActive()
+        return list().firstOrNull { it.id == id }
     }
 
     suspend fun switchTo(id: Long) {
@@ -144,26 +177,82 @@ object RoutingProfiles {
     }
 
     fun rename(id: Long, name: String) {
-        save(list().onEach { if (it.id == id) it.name = name })
+        mutate { profiles -> profiles.forEach { if (it.id == id) it.name = name } }
     }
 
     fun delete(id: Long) {
-        save(list().filterNot { it.id == id })
+        mutate { profiles -> profiles.removeAll { it.id == id } }
         if (activeId == id) activeId = 0L
     }
 
-    /** Add an exported profile without applying it. Returns null when the JSON is not a profile. */
-    fun import(text: String): Profile? {
-        val json = runCatching { JSONObject(text) }.getOrNull() ?: return null
+    fun subscriptionSource(groupId: Long) = "subscription:$groupId"
+
+    /** Reads export JSON or an [LINK_PREFIX] link into an unsaved profile (id 0), or null. */
+    fun parse(text: String, source: String = ""): Profile? {
+        val trimmed = text.trim()
+        val jsonText = if (trimmed.startsWith(LINK_PREFIX)) {
+            runCatching { String(Util.b64Decode(trimmed.removePrefix(LINK_PREFIX)), Charsets.UTF_8) }.getOrNull() ?: return null
+        } else {
+            trimmed
+        }
+        val json = runCatching { JSONObject(jsonText) }.getOrNull() ?: return null
         if (json.optInt("routingProfile", 0) != FORMAT) return null
         val content = json.optJSONObject("content") ?: return null
-        val profiles = list()
-        val profile = Profile(
-            (profiles.maxOfOrNull { it.id } ?: 0L) + 1,
-            json.optString("name").ifBlank { "Imported" },
-            content,
-        )
-        save(profiles + profile)
-        return profile
+        return Profile(0L, json.optString("name").ifBlank { "Imported" }, content, source)
+    }
+
+    /**
+     * Store an exported profile or link. A user's import refreshes the user's profile of the same
+     * name; a subscription owns at most one profile and refreshes it whatever it is called, so a
+     * link delivered repeatedly never piles up copies. When the refreshed profile is the active
+     * one the live rules follow: activating a provider's profile is the consent to track it, and
+     * the next switch would otherwise overwrite the refreshed content with the stale live state.
+     * Nothing is activated here. Returns null when [text] is not a profile.
+     */
+    suspend fun import(text: String, source: String = ""): Profile? = parse(text, source)?.let { store(it) }
+
+    /** The stored profile [candidate] would refresh, or null when it would be added. */
+    fun replacementFor(candidate: Profile): Profile? = list().firstOrNull {
+        it.source == candidate.source && (candidate.source.isNotEmpty() || it.name == candidate.name)
+    }
+
+    // Sources whose subscription is gone; a store that finishes after the delete is dropped instead
+    // of leaving an orphan. Group ids are never reused, so this grows by one entry per deletion.
+    private val deletedSources = HashSet<String>()
+
+    // Serializes the live apply of refreshed active profiles, so two refreshes landing together
+    // leave the live rules matching the stored profile, in store order.
+    private val applyLock = Mutex()
+
+    suspend fun store(candidate: Profile): Profile = applyLock.withLock {
+        val (stored, refreshedActive) = mutate { profiles ->
+            if (candidate.source.isNotEmpty() && candidate.source in deletedSources) return@mutate candidate to false
+            val existing = profiles.firstOrNull {
+                it.source == candidate.source && (candidate.source.isNotEmpty() || it.name == candidate.name)
+            }
+            if (existing == null) {
+                val profile = Profile((profiles.maxOfOrNull { it.id } ?: 0L) + 1, candidate.name, candidate.content, candidate.source)
+                profiles += profile
+                profile to false
+            } else {
+                existing.name = candidate.name
+                existing.content = candidate.content
+                existing to (existing.id == activeId)
+            }
+        }
+        if (refreshedActive) applyLive(stored.content)
+        stored
+    }
+
+    /** Removes the profiles a deleted subscription delivered; an active one is deactivated, live state stays. */
+    fun deleteBySource(source: String) {
+        if (source.isEmpty()) return
+        val removed = mutate { profiles ->
+            deletedSources += source
+            val removed = profiles.filter { it.source == source }
+            profiles.removeAll(removed)
+            removed
+        }
+        if (removed.any { it.id == activeId }) activeId = 0L
     }
 }

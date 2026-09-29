@@ -7,6 +7,10 @@
         android:title="@string/routing_profile_save_current"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_import_clipboard"
+        android:title="@string/action_import"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_import_file"
         android:title="@string/action_import_file"
         app:showAsAction="never" />

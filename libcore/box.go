@@ -252,6 +252,12 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 
 var protectCloser io.Closer
 
+// ServeProtect keeps socket protection available to the UI process while the kill switch holds
+// the tun with no core running; SetAsMain replaces the server once a core starts again.
+func ServeProtect(start bool) {
+	goServeProtect(start)
+}
+
 func goServeProtect(start bool) {
 	if protectCloser != nil {
 		protectCloser.Close()

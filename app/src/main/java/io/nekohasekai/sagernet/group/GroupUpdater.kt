@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.group
 
 import io.nekohasekai.sagernet.*
+import io.nekohasekai.sagernet.bg.SubscriptionUpdater
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.GroupManager
 import io.nekohasekai.sagernet.database.ProxyGroup
@@ -160,6 +161,7 @@ abstract class GroupUpdater {
 
                 try {
                     RawUpdater.doUpdate(proxyGroup, subscription, userInterface, byUser)
+                    SubscriptionUpdater.notifyExpiry(proxyGroup)
                     true
                 } catch (e: CancellationException) {
                     finishUpdate(proxyGroup)

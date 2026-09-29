@@ -224,6 +224,23 @@ The Hysteria 2 client supports Salamander and Gecko obfuscation.
 Imports the common formats: Shadowsocks, ClashMeta, v2rayN, and sing-box outbounds.
 Only nodes are parsed; routing rules and other non-node fields are ignored.
 
+### Provider metadata
+
+The app reads these keys from response headers or from `#key: value` lines at the top of the body. Headers win, and a fetch that omits a key clears it.
+
+| Key | Effect |
+| --- | --- |
+| `profile-title` | Group name (plain or `base64:` prefixed) |
+| `subscription-userinfo` | Traffic and `expire=` shown on the group; a reminder is posted daily during the last three days and once after expiry |
+| `support-url`, `profile-web-page-url` | Menu entries on the group (`http` and `https` links only) |
+| `announce` | Text shown on the group, up to 200 characters, plain or `base64:` prefixed |
+| `profile-update-interval` | Auto-update interval in hours, applied when the provider changes it; your own edits stay in between |
+| `routing` | An `sn://routing/` link, see below; the subscription stores it and refreshes only the profile it delivered, never activates it and never touches your own profiles |
+
+### Routing profile links
+
+`sn://routing/<base64>` carries an exported routing profile (Route → Routing profiles → Export to clipboard). Opening the link, pasting it into Routing profiles → Import from Clipboard, or delivering it through the `routing` subscription key imports the profile. A profile with the same name is replaced; the active profile is applied live when refreshed.
+
 <br>
 
 ## Credits

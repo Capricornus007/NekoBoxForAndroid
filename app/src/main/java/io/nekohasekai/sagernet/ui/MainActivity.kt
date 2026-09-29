@@ -34,6 +34,7 @@ import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.GroupManager
 import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.database.ProxyGroup
+import io.nekohasekai.sagernet.database.RoutingProfiles
 import io.nekohasekai.sagernet.database.SubscriptionBean
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
 import io.nekohasekai.sagernet.databinding.LayoutMainBinding
@@ -180,11 +181,31 @@ class MainActivity :
         val uri = intent.data ?: return
 
         runOnDefaultDispatcher {
-            if ((uri.scheme == "sn" && uri.host == "subscription") || uri.scheme == "clash") {
-                importSubscription(uri)
-            } else {
-                importProfile(uri)
+            when {
+                (uri.scheme == "sn" && uri.host == "subscription") || uri.scheme == "clash" -> importSubscription(uri)
+                uri.scheme == "sn" && uri.host == "routing" -> importRoutingProfile(uri)
+                else -> importProfile(uri)
             }
+        }
+    }
+
+    private suspend fun importRoutingProfile(uri: Uri) {
+        val candidate = RoutingProfiles.parse(uri.toString())
+        onMainDispatcher {
+            if (candidate == null) {
+                alert(getString(R.string.routing_profile_import_invalid)).show()
+                return@onMainDispatcher
+            }
+            MaterialAlertDialogBuilder(this@MainActivity).setTitle(R.string.routing_profiles)
+                .setMessage(getString(R.string.routing_profile_import_message, candidate.name, candidate.ruleCount))
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    runOnDefaultDispatcher {
+                        RoutingProfiles.store(candidate)
+                        onMainDispatcher { startActivity(Intent(this@MainActivity, RoutingProfilesActivity::class.java)) }
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
         }
     }
 

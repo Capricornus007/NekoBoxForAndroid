@@ -25,6 +25,12 @@
         </menu>
     </item>
     <item
+        android:id="@+id/action_support_url"
+        android:title="@string/subscription_support" />
+    <item
+        android:id="@+id/action_web_page_url"
+        android:title="@string/subscription_website" />
+    <item
         android:id="@+id/action_clear"
         android:title="@string/clear_profiles" />
     <item

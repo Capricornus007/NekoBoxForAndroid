@@ -30,6 +30,10 @@ import moe.matsuri.nb4a.utils.Util
 import java.net.UnknownHostException
 import java.util.concurrent.ConcurrentHashMap
 
+// Kill switch reconnect backoff while the VPN interface is held with no core behind it.
+private const val KILL_SWITCH_RETRY_INITIAL_MS = 5_000L
+private const val KILL_SWITCH_RETRY_MAX_MS = 60_000L
+
 class BaseService {
 
     enum class State(
@@ -100,6 +104,12 @@ class BaseService {
 
         val binder = Binder(this)
         var connectingJob: Job? = null
+
+        // Kill switch: true while a teardown keeps the VPN interface up (restart or failure), so
+        // VpnService.killProcesses() leaves the tun open and the listeners stay registered.
+        var holdTun = false
+        var retryJob: Job? = null
+        var retryDelayMs = KILL_SWITCH_RETRY_INITIAL_MS
 
         // The stop/reload decision core (pendingRestart + stopGeneration); see ServiceStopGate
         // for the invariants and threading contract.
@@ -327,7 +337,8 @@ class BaseService {
                         release()
                         wakeLock = null
                     }
-                    DefaultNetworkListener.stop(this@Interface)
+                    // Network automation keeps evaluating while the kill switch holds the tun.
+                    if (!data.holdTun) DefaultNetworkListener.stop(this@Interface)
                 },
             ) {
                 data.proxy?.closeAndPersist()
@@ -342,8 +353,20 @@ class BaseService {
             // A teardown already in progress merges this request (explicit stop cancels a
             // pending restart; see ServiceStopGate.onStopRequested) and we must return.
             if (data.stopGate.onStopRequested(restart, data.state == State.Stopping)) return
-            data.notification?.destroy()
-            data.notification = null
+            // Job.cancel() is the member; the wildcard import also brings the extension into scope.
+            //noinspection MemberExtensionConflict
+            data.retryJob?.cancel()
+            // Kill switch: a restart or a failure (every stop that carries a message) keeps the VPN
+            // interface up so nothing leaks while the core is down. An explicit stop releases it.
+            val hold = this is VpnService && DataStore.killSwitch && (restart || msg != null)
+            data.holdTun = hold
+            // Blocked: the failure case. The service stays in the foreground with the tun held and
+            // no core, reports Connecting (stoppable, reload-able) and retries with backoff.
+            val mayBlock = hold && !restart
+            if (!mayBlock) {
+                data.notification?.destroy()
+                data.notification = null
+            }
             this as Service
 
             data.changeState(State.Stopping)
@@ -353,13 +376,36 @@ class BaseService {
                 // we use a coroutineScope here to allow clean-up in parallel
                 coroutineScope {
                     killProcesses()
+                    data.proxy = null
+                }
+                // VpnService drops the hold when it ended up without an interface: then nothing
+                // blocks, and the service stops normally instead of claiming protection.
+                val blocked = mayBlock && data.holdTun
+                if (!blocked) {
                     val data = data
                     if (data.closeReceiverRegistered) {
                         unregisterReceiver(data.receiver)
                         data.closeReceiverRegistered = false
                     }
-                    data.proxy = null
+                    data.notification?.destroy()
+                    data.notification = null
                 }
+
+                if (blocked) {
+                    // startForegroundService demands a notification; a failure ahead of
+                    // onStartConnect has not created one yet.
+                    val title = getString(R.string.kill_switch_blocking)
+                    val notification = data.notification
+                    if (notification == null) data.notification = createNotification(title) else notification.postNotificationTitle(title)
+                    // Keep socket protection for the UI process so connection tests still leave
+                    // through the underlying network while the tun drops everything else.
+                    DataStore.vpnService = this@Interface as VpnService
+                    Libcore.serveProtect(true)
+                    data.changeState(State.Connecting, msg)
+                    scheduleKillSwitchRetry()
+                    return@runOnMainDispatcher
+                }
+                Libcore.serveProtect(false)
 
                 // change the state
                 data.changeState(State.Stopped, msg)
@@ -370,6 +416,17 @@ class BaseService {
                 } else {
                     stopSelf()
                 }
+            }
+        }
+
+        // Doubling backoff capped at a minute; no jitter and no failure classification, so a
+        // deterministic failure (no profile, bad config) retries once a minute until stopped.
+        private fun scheduleKillSwitchRetry() {
+            val delayMs = data.retryDelayMs
+            data.retryDelayMs = (delayMs * 2).coerceAtMost(KILL_SWITCH_RETRY_MAX_MS)
+            data.retryJob = runOnMainDispatcher {
+                delay(delayMs)
+                if (data.holdTun && data.state == State.Connecting && data.proxy == null) stopRunner(true)
             }
         }
 
@@ -546,6 +603,8 @@ class BaseService {
                 try {
                     // Reuse the title computed during ProxyInstance construction (off the main
                     // thread); calling genTitle() here would do a groupDao read on the main thread.
+                    // A kill-switch hold left the previous notification alive; replace it.
+                    data.notification?.destroy()
                     data.notification = createNotification(proxy.displayProfileName)
 
                     Executable.killAll() // clean up old processes
@@ -562,6 +621,8 @@ class BaseService {
                     }
 
                     startProcesses()
+                    data.holdTun = false
+                    data.retryDelayMs = KILL_SWITCH_RETRY_INITIAL_MS
                     data.changeState(State.Connected)
 
                     lateInit()

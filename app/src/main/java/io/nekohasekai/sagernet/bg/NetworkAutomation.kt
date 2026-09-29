@@ -11,6 +11,7 @@ import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -113,15 +114,28 @@ object NetworkAutomation {
         when (rule.action) {
             Action.DISCONNECT -> if (serviceRunning) SagerNet.stopService(byUser = false)
 
-            Action.CONNECT -> when {
-                // Not acted on: forget the snapshot so the same network is re-evaluated once
-                // the user starts the service again and the pause lifts.
-                DataStore.automationPaused -> lastEvaluated = null
-
-                !serviceRunning -> SagerNet.startService(if (rule.profileId > 0) rule.profileId else DataStore.selectedProxy)
-
-                rule.profileId > 0 && rule.profileId != DataStore.currentProfile -> SagerNet.reloadService(rule.profileId)
+            Action.CONNECT -> if (serviceRunning) {
+                if (rule.profileId > 0 && rule.profileId != DataStore.currentProfile) SagerNet.reloadService(rule.profileId)
+            } else {
+                runOnDefaultDispatcher { connectUnlessPaused(rule, snapshot) }
             }
         }
+    }
+
+    // A user stop records the pause in the service process, and this process's settings snapshot
+    // learns about it asynchronously. Read the database before starting anything, so a network
+    // event that lands right after the stop cannot revive the service.
+    private suspend fun connectUnlessPaused(rule: Rule, snapshot: Snapshot) {
+        DataStore.configurationStore.refreshSuspend()
+        // A newer network event was evaluated meanwhile; its own task decides.
+        if (lastEvaluated != snapshot) return
+        if (DataStore.automationPaused) {
+            // Not acted on: forget the snapshot so the same network is re-evaluated once the user
+            // starts the service again and the pause lifts.
+            lastEvaluated = null
+            return
+        }
+        if (DataStore.serviceState.started) return
+        SagerNet.startService(if (rule.profileId > 0) rule.profileId else DataStore.selectedProxy)
     }
 }

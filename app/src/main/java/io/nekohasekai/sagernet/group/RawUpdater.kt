@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.core.net.toUri
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SubscriptionFilterMode
+import io.nekohasekai.sagernet.bg.SubscriptionUpdater
 import io.nekohasekai.sagernet.database.*
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.KryoConverters
@@ -113,9 +114,23 @@ object RawUpdater : GroupUpdater() {
                 response.getHeader("Profile-Title"),
                 response.getHeader("Subscription-Userinfo"),
                 response.getHeader("Content-Disposition"),
+                META_KEYS.associateWith { response.getHeader(it).trim() }.filterValues { it.isNotEmpty() },
             )
         }
     }
+
+    /** Provider metadata keys read from response headers and `#key: value` preamble lines. */
+    internal val META_KEYS = listOf(
+        "support-url",
+        "profile-web-page-url",
+        "announce",
+        "profile-update-interval",
+        "routing",
+    )
+
+    private fun httpUrl(value: String?): String = value?.trim()?.takeIf {
+        it.startsWith("https://") || it.startsWith("http://")
+    } ?: ""
 
     internal suspend fun updateFromContent(
         proxyGroup: ProxyGroup,
@@ -126,8 +141,14 @@ object RawUpdater : GroupUpdater() {
         httpTitle: String = "",
         httpUserinfo: String? = null,
         contentDisposition: String = "",
+        httpMeta: Map<String, String> = emptyMap(),
+        reconfigureUpdater: suspend () -> Unit = { SubscriptionUpdater.reconfigureUpdater() },
     ) {
         val content = readSubscriptionContent(text)
+        // Header values win over preamble lines, and a fetch that omits a key clears it.
+        val meta = content.meta + httpMeta
+        val updateIntervalMinutes = meta["profile-update-interval"]?.toIntOrNull()?.takeIf { it > 0 }
+            ?.coerceAtMost(MAX_UPDATE_INTERVAL_HOURS)?.times(60)
         var proxies = parseRawContent(content.body)?.takeIf { it.isNotEmpty() }
             ?: error(app.getString(R.string.no_proxies_found_in_subscription))
 
@@ -279,7 +300,20 @@ object RawUpdater : GroupUpdater() {
         val updatedSubscription = KryoConverters.deserialize(SubscriptionBean(), KryoConverters.serialize(subscription)).apply {
             subscriptionUserinfo = userinfo
             lastUpdated = (System.currentTimeMillis() / 1000).toInt()
+            supportUrl = httpUrl(meta["support-url"])
+            webPageUrl = httpUrl(meta["profile-web-page-url"])
+            announce = meta["announce"]?.let { decodeProfileTitle(it) }?.take(MAX_ANNOUNCE_CHARS) ?: ""
+            // A provider interval applies when it changes; between changes the user's settings win.
+            if (updateIntervalMinutes != null && updateIntervalMinutes != providerUpdateInterval) {
+                autoUpdate = true
+                autoUpdateDelay = updateIntervalMinutes
+            }
+            providerUpdateInterval = updateIntervalMinutes ?: 0
         }
+        // The worker also runs for expiry reminders, so an expiry appearing or vanishing reschedules.
+        val scheduleChanged = updatedSubscription.autoUpdate != subscription.autoUpdate ||
+            updatedSubscription.autoUpdateDelay != subscription.autoUpdateDelay ||
+            (updatedSubscription.expiry() != null) != (subscription.expiry() != null)
         val updatedGroup = proxyGroup.copy(subscription = updatedSubscription)
         if (updatedGroup.name?.startsWith("Subscription #") == true && remoteName != null) {
             updatedGroup.name = remoteName
@@ -311,6 +345,23 @@ object RawUpdater : GroupUpdater() {
         proxyGroup.name = updatedGroup.name
         subscription.subscriptionUserinfo = updatedSubscription.subscriptionUserinfo
         subscription.lastUpdated = updatedSubscription.lastUpdated
+        subscription.supportUrl = updatedSubscription.supportUrl
+        subscription.webPageUrl = updatedSubscription.webPageUrl
+        subscription.announce = updatedSubscription.announce
+        subscription.autoUpdate = updatedSubscription.autoUpdate
+        subscription.autoUpdateDelay = updatedSubscription.autoUpdateDelay
+        subscription.providerUpdateInterval = updatedSubscription.providerUpdateInterval
+        if (scheduleChanged) reconfigureUpdater()
+        // A provider-supplied routing profile is stored, or refreshed when this subscription
+        // delivered it before; it never replaces the user's own profiles and is never activated.
+        meta["routing"]?.let { link ->
+            val source = RoutingProfiles.subscriptionSource(proxyGroup.id)
+            val imported = runCatching { RoutingProfiles.import(link, source) }.getOrElse {
+                Logs.w(it)
+                null
+            }
+            if (imported == null) Logs.w("subscription routing profile rejected")
+        }
 
         Logs.d("Inserted profiles: ${toInsert.size}")
         Logs.d("Updated profiles: $updatedCount")
@@ -328,7 +379,15 @@ object RawUpdater : GroupUpdater() {
         )
     }
 
-    internal data class SubscriptionContent(val body: String, val title: String?, val userinfo: String?)
+    internal data class SubscriptionContent(
+        val body: String,
+        val title: String?,
+        val userinfo: String?,
+        val meta: Map<String, String> = emptyMap(),
+    )
+
+    private const val MAX_ANNOUNCE_CHARS = 200
+    private const val MAX_UPDATE_INTERVAL_HOURS = 24 * 365
 
     private fun decodeSubscriptionBase64(value: String): String? = try {
         val encoded = value.filterNot { it.isWhitespace() }
@@ -356,17 +415,19 @@ object RawUpdater : GroupUpdater() {
         val lines = text.removePrefix("\uFEFF").lines()
         var title: String? = null
         var userinfo: String? = null
+        val meta = mutableMapOf<String, String>()
         val preamble = lines.takeWhile { it.isBlank() || it.trimStart().startsWith('#') }
         for (line in preamble) {
             val header = line.trim().removePrefix("#").trim()
             if (!header.contains(':')) continue
             val value = header.substringAfter(':').trim()
-            when (header.substringBefore(':').trim().lowercase()) {
+            when (val key = header.substringBefore(':').trim().lowercase()) {
                 "profile-title" -> if (title == null) title = decodeProfileTitle(value)
                 "subscription-userinfo" -> if (userinfo == null) userinfo = value.takeIf { it.isNotEmpty() }
+                in META_KEYS -> if (value.isNotEmpty()) meta.putIfAbsent(key, value)
             }
         }
-        return SubscriptionContent(lines.drop(preamble.size).joinToString("\n"), title, userinfo)
+        return SubscriptionContent(lines.drop(preamble.size).joinToString("\n"), title, userinfo, meta)
     }
 
     internal fun readSubscriptionContent(text: String): SubscriptionContent {
@@ -378,7 +439,11 @@ object RawUpdater : GroupUpdater() {
             ?: return outer
         val inner = readPreamble(decoded)
         // Decode one envelope only. Outer metadata takes precedence over encoded metadata.
-        return inner.copy(title = outer.title ?: inner.title, userinfo = outer.userinfo ?: inner.userinfo)
+        return inner.copy(
+            title = outer.title ?: inner.title,
+            userinfo = outer.userinfo ?: inner.userinfo,
+            meta = inner.meta + outer.meta,
+        )
     }
 
     suspend fun parseRaw(text: String, fileName: String = ""): List<AbstractBean>? = parseRawContent(readSubscriptionContent(text).body, fileName)

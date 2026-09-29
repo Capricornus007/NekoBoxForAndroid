@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.bg
 
 import android.Manifest.permission.POST_NOTIFICATIONS
+import android.app.Notification
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -13,11 +14,14 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import androidx.work.multiprocess.RemoteWorkManager
 import io.nekohasekai.sagernet.R
+import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.ProxyGroup
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
+import moe.matsuri.nb4a.utils.Util
 import java.util.concurrent.TimeUnit
 
 internal data class SubscriptionWorkSchedule(
@@ -30,15 +34,22 @@ internal data class SubscriptionScheduleInput(
     val autoUpdateDelay: Int,
 )
 
+/**
+ * [remindsExpiry] caps the period at a day: expiry reminders need a daily run even when no
+ * subscription auto-updates or every interval is longer. The update loop still honors each
+ * subscription's own interval.
+ */
 internal fun computeSubscriptionWorkSchedule(
     subscriptions: List<SubscriptionScheduleInput>,
     nowSeconds: Long = System.currentTimeMillis() / 1000L,
+    remindsExpiry: Boolean = false,
 ): SubscriptionWorkSchedule? {
-    if (subscriptions.isEmpty()) return null
+    if (subscriptions.isEmpty()) return if (remindsExpiry) SubscriptionWorkSchedule(24 * 60L, 0L) else null
 
     val intervalMinutes = subscriptions
         .minOf { it.autoUpdateDelay.toLong() }
         .coerceAtLeast(15L)
+        .let { if (remindsExpiry) it.coerceAtMost(24 * 60L) else it }
     val initialDelaySeconds = subscriptions.minOf { subscription ->
         val dueAt = subscription.lastUpdated.toLong() +
             subscription.autoUpdateDelay.toLong().coerceAtLeast(15L) * 60L
@@ -51,22 +62,81 @@ internal fun computeSubscriptionWorkSchedule(
 object SubscriptionUpdater {
 
     private const val WORK_NAME = "SubscriptionUpdater"
+    private const val EXPIRY_NOTIFICATION_ID_BASE = 1000
+    private const val EXPIRY_WARNING_SECONDS = 3 * 24 * 3600L
+    private const val DAY_SECONDS = 24 * 3600L
+
+    /**
+     * Reminds about a subscription whose `expire=` is within three days, once a day, and once more
+     * after it passed. Runs from the periodic worker and after every successful update.
+     */
+    fun notifyExpiry(group: ProxyGroup, nowSeconds: Long = System.currentTimeMillis() / 1000L) {
+        val subscription = group.subscription ?: return
+        val expiry = subscription.expiry() ?: return
+        if (!expiryReminderDue(expiry, subscription.expiryNotifiedAt ?: 0, nowSeconds)) return
+        val context = app
+        val text = if (nowSeconds < expiry) {
+            context.getString(R.string.subscription_expiring_message, group.displayName(), Util.timeStamp2Text(expiry * 1000))
+        } else {
+            context.getString(R.string.subscription_expired_message, group.displayName())
+        }
+        val notification = NotificationCompat.Builder(context, "service-subscription")
+            .setContentTitle(context.getString(R.string.subscription_expiring_title))
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setSmallIcon(R.drawable.ic_service_active)
+            .setContentIntent(SagerNet.configureIntent(context))
+            .setAutoCancel(true)
+            .build()
+        if (!NotificationManagerCompat.from(context).post((EXPIRY_NOTIFICATION_ID_BASE + group.id).toInt(), notification)) return
+        subscription.expiryNotifiedAt = nowSeconds.toInt()
+        // Write the stamp onto the current row so a concurrent group edit or update is kept.
+        val stored = SagerDatabase.groupDao.getById(group.id) ?: return
+        stored.subscription?.expiryNotifiedAt = nowSeconds.toInt()
+        SagerDatabase.groupDao.updateGroup(stored)
+    }
+
+    internal fun expiryReminderDue(expiry: Long, notifiedAt: Int, nowSeconds: Long): Boolean = when {
+        // One reminder after expiry, whenever the worker next runs.
+        nowSeconds >= expiry -> notifiedAt < expiry
+
+        expiry - nowSeconds <= EXPIRY_WARNING_SECONDS -> nowSeconds - notifiedAt >= DAY_SECONDS
+
+        else -> false
+    }
+
+    /** Posts when notifications are allowed; false when the permission or channel blocks it. */
+    private fun NotificationManagerCompat.post(id: Int, notification: Notification): Boolean {
+        if (!areNotificationsEnabled()) return false
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(app, POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return false
+        }
+        return try {
+            notify(id, notification)
+            true
+        } catch (e: SecurityException) {
+            Logs.w("notification skipped", e)
+            false
+        }
+    }
 
     suspend fun reconfigureUpdater() {
         RemoteWorkManager.getInstance(app).cancelUniqueWork(WORK_NAME)
 
-        val subscriptions = SagerDatabase.groupDao.subscriptions()
-            .mapNotNull { group -> group.subscription?.let { group to it } }
-            .filter { (_, sub) -> sub.autoUpdate!! }
-        if (subscriptions.isEmpty()) return
+        val all = SagerDatabase.groupDao.subscriptions().mapNotNull { it.subscription }
+        val subscriptions = all.filter { it.autoUpdate!! }
 
         val schedule = computeSubscriptionWorkSchedule(
-            subscriptions.map { (_, sub) ->
+            subscriptions.map { sub ->
                 SubscriptionScheduleInput(
                     lastUpdated = sub.lastUpdated ?: 0,
                     autoUpdateDelay = sub.autoUpdateDelay ?: 1440,
                 )
             },
+            remindsExpiry = all.any { it.expiry() != null },
         ) ?: return
 
         // main process
@@ -142,23 +212,14 @@ object SubscriptionUpdater {
                 Logs.w("subscription notification cancel skipped", e)
             }
 
+            // Expiry reminders cover every subscription, including ones that never auto-update.
+            SagerDatabase.groupDao.subscriptions().forEach { notifyExpiry(it) }
+
             return if (attempted && failed) Result.retry() else Result.success()
         }
 
         private fun notifyProgress() {
-            if (!nm.areNotificationsEnabled()) return
-            if (
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                ContextCompat.checkSelfPermission(applicationContext, POST_NOTIFICATIONS) !=
-                PackageManager.PERMISSION_GRANTED
-            ) {
-                return
-            }
-            try {
-                nm.notify(2, notification.build())
-            } catch (e: SecurityException) {
-                Logs.w("subscription notification update skipped", e)
-            }
+            nm.post(2, notification.build())
         }
     }
 }

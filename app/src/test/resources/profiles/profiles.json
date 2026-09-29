@@ -2,7 +2,7 @@
   {
     "name": "SubscriptionBean-defaults",
     "class": "io.nekohasekai.sagernet.database.SubscriptionBean",
-    "hex": "0300000000000000810000008100a00500000000000080000000008181",
+    "hex": "0400000000000000810000008100a005000000000000800000000081818181810000000000000000",
     "decoded": {
       "type": 0,
       "link": "",
@@ -22,9 +22,14 @@
       "username": "",
       "expiryDate": 0,
       "protocols": [],
-      "subscriptionUserinfo": null
+      "subscriptionUserinfo": null,
+      "supportUrl": "",
+      "webPageUrl": "",
+      "announce": "",
+      "expiryNotifiedAt": 0,
+      "providerUpdateInterval": 0
     },
-    "canonicalHex": "0300000000000000810000008100a00500000000000080000000008181"
+    "canonicalHex": "0400000000000000810000008100a005000000000000800000000081818181810000000000000000"
   },
   {
     "name": "SubscriptionBean-v0",
@@ -49,9 +54,14 @@
       "username": "",
       "expiryDate": 0,
       "protocols": [],
-      "subscriptionUserinfo": "subscriptionUserinfo-测试"
+      "subscriptionUserinfo": "subscriptionUserinfo-测试",
+      "supportUrl": "",
+      "webPageUrl": "",
+      "announce": "",
+      "expiryNotifiedAt": 0,
+      "providerUpdateInterval": 0
     },
-    "canonicalHex": "0300000025000000886c696e6b2de6b58be8af9501010193637573746f6d557365724167656e742de6b58be8af9501250000002500000098737562736372697074696f6e55736572696e666f2de6b58be8af95000000008181"
+    "canonicalHex": "0400000025000000886c696e6b2de6b58be8af9501010193637573746f6d557365724167656e742de6b58be8af9501250000002500000098737562736372697074696f6e55736572696e666f2de6b58be8af950000000081818181810000000000000000"
   },
   {
     "name": "SubscriptionBean-v1",
@@ -76,9 +86,14 @@
       "username": "",
       "expiryDate": 0,
       "protocols": [],
-      "subscriptionUserinfo": "subscriptionUserinfo-测试"
+      "subscriptionUserinfo": "subscriptionUserinfo-测试",
+      "supportUrl": "",
+      "webPageUrl": "",
+      "announce": "",
+      "expiryNotifiedAt": 0,
+      "providerUpdateInterval": 0
     },
-    "canonicalHex": "0300000025000000886c696e6b2de6b58be8af9501010193637573746f6d557365724167656e742de6b58be8af9501250000002500000098737562736372697074696f6e55736572696e666f2de6b58be8af95000000008181"
+    "canonicalHex": "0400000025000000886c696e6b2de6b58be8af9501010193637573746f6d557365724167656e742de6b58be8af9501250000002500000098737562736372697074696f6e55736572696e666f2de6b58be8af950000000081818181810000000000000000"
   },
   {
     "name": "SubscriptionBean-v2",
@@ -103,9 +118,14 @@
       "username": "",
       "expiryDate": 0,
       "protocols": [],
-      "subscriptionUserinfo": "subscriptionUserinfo-测试"
+      "subscriptionUserinfo": "subscriptionUserinfo-测试",
+      "supportUrl": "",
+      "webPageUrl": "",
+      "announce": "",
+      "expiryNotifiedAt": 0,
+      "providerUpdateInterval": 0
     },
-    "canonicalHex": "0300000025000000886c696e6b2de6b58be8af9501010193637573746f6d557365724167656e742de6b58be8af9501250000002500000098737562736372697074696f6e55736572696e666f2de6b58be8af95250000008f66696c74657252656765782de6b58be8af9581"
+    "canonicalHex": "0400000025000000886c696e6b2de6b58be8af9501010193637573746f6d557365724167656e742de6b58be8af9501250000002500000098737562736372697074696f6e55736572696e666f2de6b58be8af95250000008f66696c74657252656765782de6b58be8af95818181810000000000000000"
   },
   {
     "name": "SubscriptionBean-v3",
@@ -130,9 +150,46 @@
       "username": "",
       "expiryDate": 0,
       "protocols": [],
-      "subscriptionUserinfo": "subscriptionUserinfo-测试"
+      "subscriptionUserinfo": "subscriptionUserinfo-测试",
+      "supportUrl": "",
+      "webPageUrl": "",
+      "announce": "",
+      "expiryNotifiedAt": 0,
+      "providerUpdateInterval": 0
     },
-    "canonicalHex": "0300000025000000886c696e6b2de6b58be8af9501010193637573746f6d557365724167656e742de6b58be8af9501250000002500000098737562736372697074696f6e55736572696e666f2de6b58be8af95250000008f66696c74657252656765782de6b58be8af9595637573746f6d446e735265736f6c7665722de6b58be8af95"
+    "canonicalHex": "0400000025000000886c696e6b2de6b58be8af9501010193637573746f6d557365724167656e742de6b58be8af9501250000002500000098737562736372697074696f6e55736572696e666f2de6b58be8af95250000008f66696c74657252656765782de6b58be8af9595637573746f6d446e735265736f6c7665722de6b58be8af958181810000000000000000"
+  },
+  {
+    "name": "SubscriptionBean-v4",
+    "class": "io.nekohasekai.sagernet.database.SubscriptionBean",
+    "hex": "0400000025000000886c696e6b2de6b58be8af9501010193637573746f6d557365724167656e742de6b58be8af9501250000002500000098737562736372697074696f6e55736572696e666f2de6b58be8af95250000008f66696c74657252656765782de6b58be8af9595637573746f6d446e735265736f6c7665722de6b58be8af958e737570706f727455726c2de6b58be8af958e7765625061676555726c2de6b58be8af958c616e6e6f756e63652de6b58be8af952500000025000000",
+    "decoded": {
+      "type": 37,
+      "link": "link-测试",
+      "token": "",
+      "forceResolve": true,
+      "deduplication": true,
+      "updateWhenConnectedOnly": true,
+      "customUserAgent": "customUserAgent-测试",
+      "autoUpdate": true,
+      "autoUpdateDelay": 37,
+      "lastUpdated": 37,
+      "filterMode": 37,
+      "filterRegex": "filterRegex-测试",
+      "customDnsResolver": "customDnsResolver-测试",
+      "bytesUsed": 0,
+      "bytesRemaining": 0,
+      "username": "",
+      "expiryDate": 0,
+      "protocols": [],
+      "subscriptionUserinfo": "subscriptionUserinfo-测试",
+      "supportUrl": "supportUrl-测试",
+      "webPageUrl": "webPageUrl-测试",
+      "announce": "announce-测试",
+      "expiryNotifiedAt": 37,
+      "providerUpdateInterval": 37
+    },
+    "canonicalHex": "0400000025000000886c696e6b2de6b58be8af9501010193637573746f6d557365724167656e742de6b58be8af9501250000002500000098737562736372697074696f6e55736572696e666f2de6b58be8af95250000008f66696c74657252656765782de6b58be8af9595637573746f6d446e735265736f6c7665722de6b58be8af958e737570706f727455726c2de6b58be8af958e7765625061676555726c2de6b58be8af958c616e6e6f756e63652de6b58be8af952500000025000000"
   },
   {
     "name": "AmneziaWGBean-defaults",

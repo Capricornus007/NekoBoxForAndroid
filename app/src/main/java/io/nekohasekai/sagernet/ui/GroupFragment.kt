@@ -362,6 +362,10 @@ class GroupFragment :
                     startFilesForResult(exportProfiles, "profiles_${proxyGroup.displayName()}.txt")
                 }
 
+                R.id.action_support_url -> requireContext().launchCustomTab(proxyGroup.subscription!!.supportUrl!!)
+
+                R.id.action_web_page_url -> requireContext().launchCustomTab(proxyGroup.subscription!!.webPageUrl!!)
+
                 R.id.action_clear -> {
                     MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.confirm)
                         .setMessage(R.string.clear_profiles_message)
@@ -420,6 +424,8 @@ class GroupFragment :
                 if (proxyGroup.type != GroupType.SUBSCRIPTION) {
                     popup.menu.removeItem(R.id.action_share_subscription)
                 }
+                if (proxyGroup.subscription?.supportUrl.isNullOrBlank()) popup.menu.removeItem(R.id.action_support_url)
+                if (proxyGroup.subscription?.webPageUrl.isNullOrBlank()) popup.menu.removeItem(R.id.action_web_page_url)
                 if (proxyGroup.ungrouped || proxyGroup.id in GroupUpdater.updating) {
                     popup.menu.removeItem(R.id.action_delete_group)
                 }
@@ -528,6 +534,12 @@ class GroupFragment :
             } else {
                 groupTraffic.isVisible = false
                 groupStatus.setPadding(0, 0, 0, dp2px(4))
+            }
+
+            subscription?.announce?.takeIf { it.isNotBlank() }?.let { announce ->
+                groupTraffic.text = if (groupTraffic.isVisible) "${groupTraffic.text}\n$announce" else announce
+                groupTraffic.isVisible = true
+                groupStatus.setPadding(0)
             }
 
             groupUser.text = subscription?.username ?: ""

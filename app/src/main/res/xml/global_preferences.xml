@@ -130,6 +130,12 @@
         app:key="screen_protection"
         app:summary="@string/settings_protection_summary"
         app:title="@string/settings_protection">
+        <SwitchPreference
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="killSwitch"
+            app:summary="@string/kill_switch_summary"
+            app:title="@string/kill_switch" />
         <Preference
             app:icon="@drawable/ic_baseline_vpn_key_24"
             app:key="protectionAlwaysOn"

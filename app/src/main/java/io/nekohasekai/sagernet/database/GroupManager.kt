@@ -111,6 +111,7 @@ object GroupManager {
             SagerDatabase.groupDao.deleteById(groupId)
         }
         clearDeletedSelection(selected, clearSelected)
+        RoutingProfiles.deleteBySource(RoutingProfiles.subscriptionSource(groupId))
         iterator { groupRemoved(groupId) }
         reconfigureUpdater()
     }
@@ -127,6 +128,7 @@ object GroupManager {
             SagerDatabase.groupDao.deleteGroup(group)
         }
         clearDeletedSelection(selected, clearSelected)
+        for (id in ids) RoutingProfiles.deleteBySource(RoutingProfiles.subscriptionSource(id))
         for (proxyGroup in group) iterator { groupRemoved(proxyGroup.id) }
         reconfigureUpdater()
     }

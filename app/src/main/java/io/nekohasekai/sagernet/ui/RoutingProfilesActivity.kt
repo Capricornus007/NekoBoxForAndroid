@@ -63,6 +63,8 @@ class RoutingProfilesActivity : ThemedActivity() {
 
             R.id.action_import_file -> importFile.launch("*/*")
 
+            R.id.action_import_clipboard -> importText(SagerNet.getClipboardText())
+
             else -> return super.onOptionsItemSelected(item)
         }
         return true
@@ -71,18 +73,49 @@ class RoutingProfilesActivity : ThemedActivity() {
     private val importFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri ?: return@registerForActivityResult
         runOnDefaultDispatcher {
-            val imported = try {
+            val text = try {
                 contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
-                    ?.let(RoutingProfiles::import)
             } catch (e: Exception) {
                 Logs.w(e)
                 null
             }
+            onMainDispatcher { importText(text.orEmpty()) }
+        }
+    }
+
+    // Accepts export JSON and sn://routing/ links alike. Replacing one of the user's profiles
+    // (and applying it live when that profile is active) needs a confirmation first.
+    private fun importText(text: String) {
+        val candidate = RoutingProfiles.parse(text)
+        if (candidate == null) {
+            snackbar(R.string.routing_profile_import_invalid).show()
+            return
+        }
+        val replaced = RoutingProfiles.replacementFor(candidate)
+        if (replaced == null) {
+            store(candidate)
+            return
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.confirm)
+            .setMessage(
+                getString(
+                    if (replaced.id == RoutingProfiles.activeId) R.string.routing_profile_replace_active_message else R.string.routing_profile_replace_message,
+                    replaced.name,
+                ),
+            )
+            .setPositiveButton(R.string.yes) { _, _ -> store(candidate) }
+            .setNegativeButton(R.string.no, null)
+            .show()
+    }
+
+    private fun store(candidate: RoutingProfiles.Profile) {
+        runOnDefaultDispatcher {
+            val stored = runCatching { RoutingProfiles.store(candidate) }.onFailure { Logs.w(it) }.getOrNull()
             onMainDispatcher {
-                if (imported == null) {
-                    snackbar(R.string.routing_profile_import_invalid).show()
-                } else {
-                    adapter.reload()
+                adapter.reload()
+                if (stored?.id == RoutingProfiles.activeId && DataStore.serviceState.started) {
+                    snackbar(R.string.need_reload).setAction(R.string.apply) { SagerNet.reloadService() }.show()
                 }
             }
         }
@@ -94,8 +127,9 @@ class RoutingProfilesActivity : ThemedActivity() {
         uri ?: return@registerForActivityResult
         runOnDefaultDispatcher {
             try {
+                val current = RoutingProfiles.exportable(profile.id) ?: profile
                 contentResolver.openOutputStream(uri)?.bufferedWriter()?.use {
-                    it.write(profile.toExportJson().toString(2))
+                    it.write(current.toExportJson().toString(2))
                 }
             } catch (e: Exception) {
                 onMainDispatcher { snackbar(e.readableMessage).show() }
@@ -138,6 +172,13 @@ class RoutingProfilesActivity : ThemedActivity() {
                     R.id.action_rename -> askName(getString(R.string.routing_profile_rename), profile.name) { name ->
                         RoutingProfiles.rename(profile.id, name)
                         adapter.reload()
+                    }
+
+                    R.id.action_export_clipboard -> runOnDefaultDispatcher {
+                        val link = (RoutingProfiles.exportable(profile.id) ?: profile).toLink()
+                        onMainDispatcher {
+                            snackbar(if (SagerNet.trySetPrimaryClip(link)) R.string.action_export_msg else R.string.action_export_err).show()
+                        }
                     }
 
                     R.id.action_export -> {

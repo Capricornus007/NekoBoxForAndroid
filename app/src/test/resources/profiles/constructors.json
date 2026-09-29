@@ -20,7 +20,12 @@
       "username": null,
       "expiryDate": null,
       "protocols": null,
-      "subscriptionUserinfo": null
+      "subscriptionUserinfo": null,
+      "supportUrl": null,
+      "webPageUrl": null,
+      "announce": null,
+      "expiryNotifiedAt": null,
+      "providerUpdateInterval": null
     },
     "defaults": {
       "type": 0,
@@ -41,7 +46,12 @@
       "username": "",
       "expiryDate": 0,
       "protocols": [],
-      "subscriptionUserinfo": null
+      "subscriptionUserinfo": null,
+      "supportUrl": "",
+      "webPageUrl": "",
+      "announce": "",
+      "expiryNotifiedAt": 0,
+      "providerUpdateInterval": 0
     },
     "fields": {
       "type": "java.lang.Integer",
@@ -62,7 +72,12 @@
       "username": "java.lang.String",
       "expiryDate": "java.lang.Integer",
       "protocols": "java.util.List",
-      "subscriptionUserinfo": "java.lang.String"
+      "subscriptionUserinfo": "java.lang.String",
+      "supportUrl": "java.lang.String",
+      "webPageUrl": "java.lang.String",
+      "announce": "java.lang.String",
+      "expiryNotifiedAt": "java.lang.Integer",
+      "providerUpdateInterval": "java.lang.Integer"
     }
   },
   {
