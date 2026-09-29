@@ -70,38 +70,41 @@ jobs:
         run: |
           echo "sdk.dir=${ANDROID_HOME}" > local.properties
           echo "ndk.dir=${ANDROID_HOME}/ndk/25.0.8775105" >> local.properties
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+          fi
+          if [ -n "$KEYSTORE_PASS" ]; then
+            echo "KEYSTORE_PASS=$KEYSTORE_PASS" >> local.properties
+            echo "ALIAS_NAME=$ALIAS_NAME" >> local.properties
+            echo "ALIAS_PASS=$ALIAS_PASS" >> local.properties
+          fi
           export LOCAL_PROPERTIES="${{ secrets.LOCAL_PROPERTIES }}"
           ./run init action gradle
           ./gradlew app:assemblePreviewRelease
 
-          KEYSTORE_PATH="/tmp/release.keystore"
-          if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
-          elif [ -f "release.keystore" ]; then
-            KEYSTORE_PATH="release.keystore"
+          APK=$(find app/build/outputs/apk -name '*arm64-v8a*.apk' | head -n 1)
+          if [ -n "$APK" ]; then
+            APK_DIR=$(dirname "$APK")
+          else
+            APK_DIR="app/build/outputs/apk/preview/release"
           fi
 
-          if [ -f "$KEYSTORE_PATH" ] && [ -n "$KEYSTORE_PASS" ]; then
+          if [ -f "release.keystore" ] && [ -n "$KEYSTORE_PASS" ]; then
             APKSIGNER=$(find ${ANDROID_HOME}/build-tools -name apksigner | sort -V | tail -n 1)
-            if [ -z "$APKSIGNER" ]; then
-              APKSIGNER="apksigner"
-            fi
+            [ -z "$APKSIGNER" ] && APKSIGNER="apksigner"
             echo "Using apksigner: $APKSIGNER"
 
-            APK=$(find app/build/outputs/apk -name '*arm64-v8a*.apk')
-            APK_DIR=$(dirname $APK)
-
-            echo "Signing APKs in $APK_DIR..."
+            echo "Signing unsigned APKs in $APK_DIR..."
             for apk in "$APK_DIR"/*-unsigned.apk; do
               if [ -f "$apk" ]; then
                 signed_apk="${apk%-unsigned.apk}-signed.apk"
                 echo "Signing $apk -> $signed_apk"
-                $APKSIGNER sign --ks "$KEYSTORE_PATH" --ks-pass pass:"$KEYSTORE_PASS" --key-pass pass:"${ALIAS_PASS:-$KEYSTORE_PASS}" --ks-key-alias "${ALIAS_NAME:-ownbox}" --out "$signed_apk" "$apk"
+                $APKSIGNER sign --ks release.keystore --ks-pass pass:"$KEYSTORE_PASS" --key-pass pass:"${ALIAS_PASS:-$KEYSTORE_PASS}" --ks-key-alias "${ALIAS_NAME:-ownbox}" --out "$signed_apk" "$apk"
                 rm "$apk"
               fi
             done
-            rm -f /tmp/release.keystore
           fi
+          rm -f release.keystore
 
           echo "APK=$APK_DIR" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v4
