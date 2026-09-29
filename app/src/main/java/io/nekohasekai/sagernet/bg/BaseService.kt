@@ -37,7 +37,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import libcore.Libcore
 import moe.matsuri.nb4a.Protocols
-import moe.matsuri.nb4a.proxy.config.ConfigBean
 import moe.matsuri.nb4a.utils.Util
 import java.net.UnknownHostException
 import java.util.concurrent.ConcurrentHashMap
@@ -267,11 +266,12 @@ class BaseService {
                         profileId > 0L && SagerDatabase.proxyDao.getById(profileId) != null ->
                             DataStore.selectedProxy = profileId
                     }
-                    // Compute the in-place selector decision here (off the main thread) so
-                    // reloadInner() does no DAO reads on the UI thread (Plan 027). null tag =>
-                    // no fast-path (fall through to the state machine).
-                    val selectorTag = resolveSelectorReloadTag()
-                    onMainDispatcher { reloadInner(reloadStopGeneration, selectorTag) }
+                    // 切換節點一律走完整 stop→start，不再走 in-place selector 快速路徑：
+                    // 使用者要求「切換之後就得斷開再連接，不管上一個在測速還是在幹什麼」
+                    // （2026-09-29 明示）。那條快速路徑既不重建核心、也不重置舊節點上
+                    // 已經建立的連線，切了等於沒切。（NodeSwitchContractTest 用 grep 守這條，
+                    // 所以這裡不要把那個 API 的名字寫回來。）
+                    onMainDispatcher { reloadInner(reloadStopGeneration) }
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
@@ -286,7 +286,7 @@ class BaseService {
             }
         }
 
-        private fun reloadInner(reloadStopGeneration: Long, selectorTag: String?) {
+        private fun reloadInner(reloadStopGeneration: Long) {
             // A stop raced the async refresh: drop this stale reload so it can't restart a service
             // the user stopped. (A Connecting->Connected transition does NOT bump stopGeneration,
             // so an in-flight legitimate reload still applies.)
@@ -295,66 +295,16 @@ class BaseService {
                 stopRunner(false, (this as Context).getString(R.string.profile_empty))
                 return
             }
-            val s = data.state
-            // Only take the in-place selector fast-path when fully Connected: during Connecting
-            // data.proxy is set but proxy.init() may not have built config/box yet, and during
-            // Stopping the box is being torn down — touching them would throw or act on a dead
-            // instance. In those states fall through to the state machine below. selectorTag was
-            // resolved off the main thread by the caller (null => no fast-path).
-            if (s == State.Connected && selectorTag != null && selectorTag.isNotBlank()) {
-                val proxy = data.proxy
-                if (proxy != null && proxy.isInitialized()) {
-                    try {
-                        // select from GUI
-                        proxy.box.selectOutbound(selectorTag)
-                        // or select from webui
-                        // => selector_OnProxySelected
-                        return
-                    } catch (e: Exception) {
-                        // The core refused the tag (selector group changed underneath us) or the
-                        // box went away while we were switching. Either way this runs on the main
-                        // thread, so an uncaught exception here kills the whole process instead of
-                        // just costing a fast path: log it and fall through to the full reload.
-                        // (OwnBox 7fe530afd "node switch crash".)
-                        Logs.w("selectOutbound($selectorTag) failed, reloading instead: ${e.readableMessage}")
-                    }
-                }
-            }
-            when {
-                s == State.Stopped -> startRunner()
-                s.canStop -> stopRunner(true)
-                else -> Logs.w("Illegal state $s when invoking use")
+            // 這裡以前有一條「切換器群組只叫核心的換出口 API、不重建核心」的 in-place
+            // 快速路徑，已依使用者要求移除：那條路徑不重建核心、也不重置舊節點上已建立的
+            // 連線，換完節點常常還是走舊出口。現在切換一律 stopRunner(true) → startRunner()。
+            // （NodeSwitchContractTest 用 grep 守這條，註解裡不要寫回那個 API 名字。）
+            when (val s = data.state) {
+                State.Stopped -> startRunner()
+                else -> if (s.canStop) stopRunner(true) else Logs.w("Illegal state $s when invoking use")
             }
         }
 
-        // Off-main-thread resolver for reloadInner's in-place selector fast-path. Returns the
-        // outbound tag to select, or null if the selector fast-path does not apply. Does all the
-        // DAO reads (proxy/group) so reloadInner touches no DB on the UI thread.
-        fun resolveSelectorReloadTag(): String? {
-            if (data.state != State.Connected) return null
-            if (!canReloadSelector()) return null
-            val ent = SagerDatabase.proxyDao.getById(DataStore.selectedProxy) ?: return null
-            val proxy = data.proxy ?: return null
-            val tag = proxy.config.profileTagMap[ent.id] ?: ""
-            return tag.ifBlank { null }
-        }
-
-        fun canReloadSelector(): Boolean {
-            val running = data.proxy?.lastSelectorGroupId ?: -1L
-            if (running < 0L) return false
-            val ent = SagerDatabase.proxyDao.getById(DataStore.selectedProxy) ?: return false
-            // Mirrors ConfigBuilder.buildConfig()'s selectorGroupId derivation
-            // (TYPE_CONFIG/type==0 early exit; else group.isSelector -> group.id).
-            // Keep in sync with ConfigBuilder.kt:106-119,179,1194.
-            if (ent.type == ProxyEntity.TYPE_CONFIG &&
-                (ent.requireBean() as? ConfigBean)?.type == 0
-            ) {
-                return false
-            }
-            val group = SagerDatabase.groupDao.getById(ent.groupId) ?: return false
-            val newSelectorGroupId = if (group.isSelector) group.id else -1L
-            return newSelectorGroupId == running
-        }
         fun startTimeoutMonitor() {
             if (!DataStore.enableAutoSwitchTimeout) return
 

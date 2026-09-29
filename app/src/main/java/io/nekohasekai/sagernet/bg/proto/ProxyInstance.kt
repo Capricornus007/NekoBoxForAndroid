@@ -17,8 +17,6 @@ class ProxyInstance(
 
     var notTmp = true
 
-    var lastSelectorGroupId = -1L
-
     // Keep construction free of database access: BaseService resolves the optional group title
     // on its existing worker before creating this instance on the service main thread.
     var displayProfileName = initialDisplayProfileName
@@ -28,7 +26,6 @@ class ProxyInstance(
 
     override fun buildConfig() {
         super.buildConfig()
-        lastSelectorGroupId = super.config.selectorGroupId
         if (notTmp) Logs.d(safeConfigDiagnostics(config, 0))
     }
 
