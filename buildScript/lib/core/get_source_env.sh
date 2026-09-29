@@ -16,8 +16,8 @@ export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # 「本機用 sibling checkout 編得過、CI 用這個 commit 編不過」（CI 實測報 q.peer.WritePackets undefined）。
 # 兩邊必須是同一個 commit。
 export COMMIT_WIREGUARD_GO="aceae72d2393b19fd0a8c0e52925e0a1d376a7c1"
-# 2026-09-27 前推到 d5db986：吃下 upstream/dev 的 client API（SetKeepIdleConnections /
-# CloseIdleConnections / ContextWithKeepSession）。上游 6a3a24d 那個 port hopping 修復我方早已以
+# 歷史：2026-09-27 曾推到 d5db986（吃下 upstream/dev 的 client API（SetKeepIdleConnections /
+# CloseIdleConnections / ContextWithKeepSession），現值見下方 export。上游 6a3a24d 那個 port hopping 修復我方早已以
 # 32c2895 合併、又在 a8f70b4 把目的地判斷從 IsFqdn 改成 IsDomain，所以 hop.go 那處衝突保留我方。
 # 隔離副本 go build（host 與 android/arm64）＋ go vet 全 rc=0 才抬。
 # sing-box and libcore both replace github.com/sagernet/sing-quic with the
