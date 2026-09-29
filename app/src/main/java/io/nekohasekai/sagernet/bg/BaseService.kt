@@ -48,7 +48,12 @@ private const val NETWORK_CHANGE_RESTART_DEBOUNCE_MS = 500L
 // 而且探测跑在 binder 的 Main 作用域上，每次 3 秒的阻塞 native 调用都会冻住界面。
 private const val AUTO_SWITCH_PROBE_TIMEOUT_MS = 3000L
 private const val AUTO_SWITCH_PROBE_SLACK_MS = 2000L
-private const val AUTO_SWITCH_RELOAD_SETTLE_MS = 500L
+
+// reload() 是異步的（自己丟到 Default 執行緒），以前這裡只 delay(500) 就探下一個節點，
+// 結果五個核心重啟疊在同一時間跑，實測 :bg 的 CPU 一路從 100% 爬到 470%
+// （2026-09-29 手機取樣）。改成等狀態真的回到 Connected。
+private const val AUTO_SWITCH_RELOAD_WAIT_MS = 15_000L
+private const val AUTO_SWITCH_RELOAD_POLL_MS = 200L
 private const val AUTO_SWITCH_MAX_PROBES_PER_ROUND = 5
 private const val AUTO_SWITCH_MAX_BACKOFF_SECONDS = 300L
 
@@ -80,6 +85,9 @@ class BaseService {
         // 超時自動切換的輪詢游標：記住上一輪試到第幾個，下一輪從這裡接續，
         // 不必每次都把整組從頭 reload 一遍。-1 表示還沒開始或已掃完整圈。
         var timeoutSwitchCursor = -1
+
+        // 上一輪是否把整組掃完都沒活：是的話監控直接跳到最長退避。
+        var timeoutSweptAll = false
 
         val receiver = broadcastReceiverWithSelf { self, ctx, intent ->
             when (intent.action) {
@@ -334,8 +342,15 @@ class BaseService {
                     val found = switchToNextAvailableProxy()
                     if (found) {
                         consecutiveFailures = 0
+                        data.timeoutSweptAll = false
                     } else {
                         consecutiveFailures++
+                        if (data.timeoutSweptAll) {
+                            // 整組掃完都沒活：直接跳到最長退避，不再 5→10→20 慢慢加。
+                            consecutiveFailures = 16
+                            data.timeoutSweptAll = false
+                            Logs.d("超时监控：整组都试过且不可用，直接进入最长退避。")
+                        }
                         Logs.d(
                             "超时监控：本轮没有可用代理，连续失败 $consecutiveFailures 次，" +
                                 "下次间隔 ${backoffSeconds(baseSeconds, consecutiveFailures)}s。",
@@ -399,9 +414,13 @@ class BaseService {
                 data.timeoutSwitchCursor = nextIndex
                 val candidate = groupProxies[nextIndex]
                 DataStore.selectedProxy = candidate.id
-                // reload() 自己會派發到 Default，不需要再繞 Main；繞 Main 只是多一次排程。
+                // reload() 自己會派發到 Default；必須等它真的跑完（狀態回到 Connected），
+                // 否則連續 reload 會疊著跑，:bg 的 CPU 實測能爬到 470%。
                 reload()
-                delay(AUTO_SWITCH_RELOAD_SETTLE_MS) // 等待 reload 生效
+                if (!awaitConnected()) {
+                    Logs.d("代理不可用: ${candidate.id}（重連未在期限內完成），本轮已试 $tried/$proxyCount 个。")
+                    continue
+                }
 
                 if (isConnectionAlive()) {
                     Logs.d("切换到可用代理: ${candidate.id}")
@@ -411,8 +430,24 @@ class BaseService {
                 }
             }
 
+            // 這一輪把整組都掃完了還是沒有可用的：標記起來，讓監控直接跳到最長退避，
+            // 不要一路 5→10→20… 慢慢加（那種情況下每輪都是幾十秒的核心重啟）。
+            data.timeoutSweptAll = tried >= proxyCount
             Logs.d("本轮试过 $tried 个代理均不可用，下一轮从游标 ${data.timeoutSwitchCursor} 继续。")
             return false
+        }
+
+        /** 等 reload 真的走完（Connected）；逾時代表這個節點連不起來。 */
+        private suspend fun awaitConnected(): Boolean {
+            val deadline = System.currentTimeMillis() + AUTO_SWITCH_RELOAD_WAIT_MS
+            while (System.currentTimeMillis() < deadline) {
+                when (data.state) {
+                    State.Connected -> return true
+                    State.Stopping, State.Stopped -> return false
+                    else -> delay(AUTO_SWITCH_RELOAD_POLL_MS)
+                }
+            }
+            return data.state == State.Connected
         }
 
         fun switchToNextProxy() {

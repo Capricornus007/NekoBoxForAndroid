@@ -39,6 +39,12 @@ class TimeoutMonitorContractTest {
         // 每轮只试有限个节点，不再整组 reload 一遍（旧代码是 do/while 扫完整组）。
         assertTrue(monitor.contains("tried < AUTO_SWITCH_MAX_PROBES_PER_ROUND"))
         assertFalse("不得恢复无上限整组轮询", monitor.contains("} while (tried < proxyCount)"))
+        // reload() 是异步的：必须等状态回到 Connected 再探下一个，否则几个核心重啟会叠着跑
+        // （2026-09-29 手机实测 :bg 爬到 470%）。
+        assertTrue(monitor.contains("awaitConnected()"))
+        assertFalse("不得再用固定 delay 等 reload", monitor.contains("AUTO_SWITCH_RELOAD_SETTLE_MS"))
+        // 整组扫完都没活：直接跳到最长退避。
+        assertTrue(monitor.contains("timeoutSweptAll"))
         // 失败不再 break 掉整个监控，否则网络恢复后不会自愈；改由退避压制频率。
         assertFalse(monitor.contains("所有代理均不可用，停止超时自动切换监控"))
     }
