@@ -522,7 +522,6 @@
     <string name="rule_network">Red</string>
     <string name="rule_protocol">Protocolo</string>
     <string name="udp_over_tcp">UDP sobre TCP</string>
-    <string name="dialog_watchdog_start">Iniciar</string>
     <string name="shadowquic_udp_over_stream">UDP sobre flujo</string>
     <string name="shadowquic_zero_rtt">Enlace 0-RTT</string>
     <string name="shadowquic_sunny_quic">Sunny QUIC</string>
@@ -549,15 +548,6 @@
     <string name="debug_button_crash_from_kt">Provocar fallo desde Kotlin</string>
     <string name="debug_button_reset_settings">Restablecer ajustes</string>
     <string name="toast_create_preferences_failed">No se pudieron crear las preferencias. Inténtalo de nuevo.</string>
-    <string name="dialog_watchdog_test_title">Probar el watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">La VPN no está activa. Conéctate primero a la VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Probar la reconexión automática</string>
-    <string name="dialog_watchdog_force_restart">El watchdog forzará el reinicio de la VPN.
-
-La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáticamente.
-
-¿Continuar?</string>
-    <string name="snackbar_watchdog_test_started">Prueba iniciada. Reinicio en ≤30 s…</string>
     <string name="dialog_log_buffer_size">Tamaño del búfer de registro (KB)</string>
     <string name="invalid_naive_link">Enlace de Naive no válido: %1$s</string>
     <string name="invalid_ss_android_link">Enlace de ss-android no válido: %1$s</string>
@@ -1092,11 +1082,6 @@ La VPN se desconectará durante 1–3 segundos y volverá a conectarse automáti
     <string name="append_http_proxy_security_title">Aviso de seguridad</string>
     <string name="append_http_proxy_security_message">Si se activa, otras aplicaciones del dispositivo pueden usar directamente el prox</string>
     <string name="enable_anyway">Activar de todos modos</string>
-    <string name="vpn_watchdog">Reconexión automática</string>
-    <string name="vpn_watchdog_summary">Reiniciar la VPN si se corta la conexión</string>
-    <string name="vpn_watchdog_test">🧪 Probar watchdog</string>
-    <string name="vpn_watchdog_test_summary">Reiniciar la VPN a la fuerza para probar el watchdog</string>
-    <string name="vpn_watchdog_interval">Intervalo de comprobación (seg)</string>
     <string name="batch_update_summary" formatted="false">Actualización por lotes finalizada: %1$d correctas, %2$d fallidas</string>
     <string name="probe_tolerance">Tolerancia de cambio del balanceador (ms)</string>
     <string name="byedpi_cli_strategy">Estrategia de CLI</string>

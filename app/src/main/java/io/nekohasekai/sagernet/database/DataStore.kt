@@ -65,8 +65,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var vpnService: VpnService? = null
     var baseService: BaseService.Interface? = null
 
-    var runningTest = false
-
     val pluginSignerApprovals: Set<String>
         get() = configurationStore.getStringSet(Key.PLUGIN_SIGNER_APPROVALS).orEmpty()
 
@@ -145,9 +143,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         Key.RESTART_PROFILE_ON_NETWORK_CHANGE,
     ) { true }
     var wakeResetConnections by configurationStore.boolean(Key.WAKE_RESET_CONNECTIONS)
-
-    var vpnWatchdogEnabled by configurationStore.boolean(Key.VPN_WATCHDOG_ENABLED) { false }
-    var vpnWatchdogInterval by configurationStore.stringToInt(Key.VPN_WATCHDOG_INTERVAL) { 7 }
 
     var isExpert by configurationStore.boolean(Key.APP_EXPERT)
     var appTheme by configurationStore.stringToInt(Key.APP_THEME) { 0 }

@@ -766,11 +766,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="auto_switch_timeout">Alternar automaticamente no timeout</string>
     <string name="auto_switch_timeout_summary">Alternar automaticamente para a próxima configuração se não houver resposta</string>
     <string name="auto_switch_timeout_duration">Duração do timeout (segundos)</string>
-    <string name="vpn_watchdog">Reconexão automática</string>
-    <string name="vpn_watchdog_summary">Reiniciar a VPN se a conexão cair</string>
-    <string name="vpn_watchdog_test">🧪 Testar watchdog</string>
-    <string name="vpn_watchdog_test_summary">Forçar reinício da VPN para testar o watchdog</string>
-    <string name="vpn_watchdog_interval">Intervalo de verificação (s)</string>
     <string name="dual_network_acceleration">Aceleração de rede dupla</string>
     <string name="dual_network_acceleration_summary">Conectar simultaneamente via Wi-Fi e dados móveis. Exige que Wi-Fi e dados móveis permaneçam ativados nas configurações do sistema e aumenta o consumo de bateria.</string>
     <string name="app_name">NekoBox</string>
@@ -854,21 +849,12 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="dns_hosts_lines">%d linhas de hosts DNS</string>
     <string name="rule_network">Rede</string>
     <string name="rule_protocol">Protocolo</string>
-    <string name="dialog_watchdog_start">Iniciar</string>
     <string name="action_import_throne_desktop">Importar do Throne Desktop</string>
     <string name="backup_import_throne_desktop_summary">Importe perfis, rotas e definições de um ficheiro .thrbackup do Throne Desktop. Os ícones personalizados serão ignorados. Os dados existentes nas categorias selecionadas serão substituídos.</string>
     <string name="backup_not_throne_desktop">Não é uma cópia de segurança do Throne Desktop: era esperado um ficheiro .thrbackup, mas foi encontrado %s</string>
     <string name="debug_button_crash_from_kt">Provocar falha pelo Kotlin</string>
     <string name="debug_button_reset_settings">Repor definições</string>
     <string name="dialog_log_buffer_size">Tamanho do buffer de registo (KB)</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Testar reconexão automática</string>
-    <string name="dialog_watchdog_force_restart">O watchdog irá forçar o reinício da VPN.
-
-A VPN será desligada durante 1 a 3 segundos e voltará a ligar-se automaticamente.
-
-Continuar?</string>
-    <string name="dialog_watchdog_test_title">Testar watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">A VPN não está em execução. Ligue-se primeiro à VPN.</string>
     <string name="invalid_http_link">Ligação HTTP(S) inválida: %1$s</string>
     <string name="invalid_hysteria_link">Ligação Hysteria inválida: %1$s</string>
     <string name="invalid_jms_link">Ligação JMS inválida: %1$s</string>
@@ -895,7 +881,6 @@ Continuar?</string>
     <string name="shadowquic_sunny_quic">Sunny QUIC</string>
     <string name="shadowquic_udp_over_stream">UDP sobre fluxo</string>
     <string name="shadowquic_zero_rtt">Handshake 0-RTT</string>
-    <string name="snackbar_watchdog_test_started">Teste iniciado. A reiniciar dentro de ≤30 s…</string>
     <string name="toast_create_preferences_failed">Não foi possível criar as preferências. Tente novamente.</string>
     <string name="trusttunnel_congestion_control">Controlo de congestionamento QUIC</string>
     <string name="trusttunnel_health_check">Verificação de estado</string>

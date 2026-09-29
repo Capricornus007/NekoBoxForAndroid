@@ -624,11 +624,6 @@
     <string name="auto_switch_timeout">Zaman aşımında otomatik geçiş</string>
     <string name="auto_switch_timeout_summary">Yanıt yoksa otomatik olarak sonraki yapılandırmaya geç</string>
     <string name="auto_switch_timeout_duration">Zaman aşımı süresi (saniye)</string>
-    <string name="vpn_watchdog">Otomatik yeniden bağlan</string>
-    <string name="vpn_watchdog_summary">Bağlantı kesilirse VPN\'i yeniden başlat</string>
-    <string name="vpn_watchdog_test">🧪 Watchdog\'u test et</string>
-    <string name="vpn_watchdog_test_summary">Watchdog\'u test etmek için VPN\'i yeniden başlatmaya zorla</string>
-    <string name="vpn_watchdog_interval">Kontrol aralığı (sn)</string>
     <string name="quick_clear_cache_restart">Önbelleği Temizle &amp; Yeniden Başlat</string>
     <string name="ech_query_server_name">ECH Query Server Name</string>
     <string name="action_amneziawg">AmneziaWG</string>
@@ -812,15 +807,12 @@
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">Başlat</string>
     <string name="rule_network">Ağ</string>
     <string name="rule_protocol">Protokol</string>
     <string name="not_set">Ayarlanmadı</string>
     <string name="rule_ruleset">Kural kümesi (.srs)</string>
-    <string name="snackbar_watchdog_test_started">Test başladı. ≤30 sn içinde yeniden başlatılıyor…</string>
     <string name="fastest_regex_preview_count">Eşleşen proxy sayısı: %1$d</string>
     <string name="invalid_http_link">Geçersiz HTTP(S) bağlantısı: %1$s</string>
-    <string name="dialog_watchdog_test_title">Watchdog\'u test et</string>
     <string name="proxy_fastest_regex">En hızlı (düzenli ifade)</string>
     <string name="invalid_trojan_link">Geçersiz Trojan bağlantısı: %1$s</string>
     <string name="rule_domain">Alan adı</string>
@@ -836,12 +828,10 @@
     <string name="fastest_regex_source_group">Kaynak abonelik</string>
     <string name="udp_over_tcp">TCP üzerinden UDP</string>
     <string name="rule_dst_port">Hedef bağlantı noktası</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN çalışmıyor. Önce VPN\'e bağlanın.</string>
     <string name="webdav_check_dir_failed">Dizin denetlenemedi (%1$s): %2$s</string>
     <string name="reality_public_key">Reality ortak anahtarı</string>
     <string name="backup_not_throne_desktop">Throne Desktop yedeği değil: .thrbackup bekleniyordu, ancak %s bulundu</string>
     <string name="fastest_regex_preview_no_matches">Eşleşen proxy yok</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Otomatik yeniden bağlanmayı test et</string>
     <string name="invalid_v2rayn_link">Geçersiz v2rayN bağlantısı: %1$s</string>
     <string name="fastest_regex_pattern">Düzenli ifade</string>
     <string name="fastest_regex_error_invalid">Geçersiz düzenli ifade: %1$s</string>
@@ -867,11 +857,6 @@
     <string name="toast_create_preferences_failed">Tercihler oluşturulamadı. Lütfen tekrar deneyin.</string>
     <string name="trusttunnel_health_check">Durum denetimi</string>
     <string name="fastest_regex_options">Abonelik düzenli ifadesi</string>
-    <string name="dialog_watchdog_force_restart">Watchdog VPN\'i zorla yeniden başlatacak.
-
-VPN bağlantısı 1-3 saniye kesilecek ve ardından otomatik olarak yeniden kurulacak.
-
-Devam edilsin mi?</string>
     <string name="invalid_masterdns_link">Geçersiz MasterDNS bağlantısı: %1$s</string>
     <string name="action_import_throne_desktop">Throne Desktop\'tan içe aktar</string>
     <string name="shadowquic_sunny_quic">Sunny QUIC</string>

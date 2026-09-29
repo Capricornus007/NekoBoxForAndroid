@@ -408,11 +408,6 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="auto_switch_timeout">Automatisk bytte ved timeout</string>
     <string name="auto_switch_timeout_summary">Bytt automatisk til neste konfigurasjon hvis det ikke kommer noe svar</string>
     <string name="auto_switch_timeout_duration">Tidsavbrudd (sekunder)</string>
-    <string name="vpn_watchdog">Automatisk tilkobling på nytt</string>
-    <string name="vpn_watchdog_summary">Start VPN på nytt hvis tilkoblingen faller</string>
-    <string name="vpn_watchdog_test">🧪 Test vakthund</string>
-    <string name="vpn_watchdog_test_summary">Tving VPN til å starte på nytt for å teste vakthunden</string>
-    <string name="vpn_watchdog_interval">Kontrollintervall (sek)</string>
     <string name="quick_clear_cache_restart">Tøm hurtiglager &amp; start på nytt</string>
     <string name="mixed_auth_config">Konfigurer autentisering</string>
     <string name="mixed_auth_username_hint">Brukernavn (la begge stå tomme for ingen autentisering)</string>
@@ -861,14 +856,6 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="debug_button_crash_from_kt">Utløs krasj fra Kotlin</string>
     <string name="debug_button_reset_settings">Tilbakestill innstillinger</string>
     <string name="toast_create_preferences_failed">Kunne ikke opprette innstillinger. Prøv igjen.</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN er ikke aktiv. Koble til VPN først.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Test automatisk tilkobling på nytt</string>
-    <string name="dialog_watchdog_force_restart">Watchdog vil tvinge VPN til å starte på nytt.
-
-VPN kobles fra i 1–3 sekunder og kobles deretter til igjen automatisk.
-
-Fortsette?</string>
-    <string name="snackbar_watchdog_test_started">Test startet. Starter på nytt innen ≤30 s…</string>
     <string name="dialog_log_buffer_size">Størrelse på loggbuffer (KB)</string>
     <string name="hide_unavailable_profiles">Skjul utilgjengelige profiler</string>
     <string name="default_subscription_user_agent">Standard User-Agent for abonnement</string>

@@ -826,11 +826,6 @@
     <string name="append_http_proxy_security_title">Sicherheitswarnung</string>
     <string name="append_http_proxy_security_message">Bei Aktivierung können andere Apps auf diesem Gerät den lokalen Pro</string>
     <string name="enable_anyway">Trotzdem aktivieren</string>
-    <string name="vpn_watchdog">Automatische Wiederverbindung</string>
-    <string name="vpn_watchdog_summary">VPN bei Verbindungsabbruch neu starten</string>
-    <string name="vpn_watchdog_test">🧪 Watchdog testen</string>
-    <string name="vpn_watchdog_test_summary">VPN zum Testen des Watchdogs erzwingt neu starten</string>
-    <string name="vpn_watchdog_interval">Prüfintervall (Sek.)</string>
     <string name="rule_domain">Domain</string>
     <string name="rule_dst_ip">Ziel-IP</string>
     <string name="rule_dst_port">Ziel-Port</string>
@@ -844,12 +839,6 @@
     <string name="debug_button_crash_from_kt">Absturz aus Kotlin</string>
     <string name="debug_button_reset_settings">Einstellungen zurücksetzen</string>
     <string name="toast_create_preferences_failed">Einstellungen konnten nicht erstellt werden. Bitte erneut versuchen.</string>
-    <string name="dialog_watchdog_test_title">Watchdog testen</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN läuft nicht. Zuerst mit dem VPN verbinden.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Auto-Wiederverbindung testen</string>
-    <string name="dialog_watchdog_force_restart">Der Watchdog startet das VPN erzwungen neu.  Das VPN trennt 1–3 Sekunden die Verbindung…</string>
-    <string name="dialog_watchdog_start">Starten</string>
-    <string name="snackbar_watchdog_test_started">Test gestartet. Neustart innerhalb ≤30 s…</string>
     <string name="dialog_log_buffer_size">Log-Puffergröße (KB)</string>
     <string name="batch_update_summary" formatted="false">Stapelaktualisierung abgeschlossen: %1$d erfolgreich, %2$d fehlgeschlagen</string>
     <string name="probe_tolerance">Balancer-Wechseltoleranz (ms)</string>

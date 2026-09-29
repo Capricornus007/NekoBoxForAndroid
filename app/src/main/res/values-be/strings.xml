@@ -264,11 +264,6 @@
     <string name="dns_hosts_lines">запісаў hosts: %d</string>
     <string name="append_http_proxy_security_title">Папярэджанне бяспекі</string>
     <string name="enable_anyway">Усё роўна ўключыць</string>
-    <string name="vpn_watchdog">Аўтаперадключэнне</string>
-    <string name="vpn_watchdog_summary">Перазапускаць VPN пры абрыве злучэння</string>
-    <string name="vpn_watchdog_test">🧪 Тэст watchdog</string>
-    <string name="vpn_watchdog_test_summary">Прымушова перазапускаць VPN для тэсту watchdog</string>
-    <string name="vpn_watchdog_interval">Інтэрвал праверкі (сек)</string>
     <string name="rule_domain">Дамен</string>
     <string name="rule_dst_ip">IP прызначэння</string>
     <string name="rule_dst_port">Порт прызначэння</string>
@@ -281,11 +276,6 @@
     <string name="debug_button_crash_from_kt">Збой з Kotlin</string>
     <string name="debug_button_reset_settings">Скінуць налады</string>
     <string name="toast_create_preferences_failed">Не ўдалося стварыць налады. Паспрабуйце зноў.</string>
-    <string name="dialog_watchdog_test_title">Тэст watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN не запушчаны. Спачатку падключыцеся да VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Тэст аўтаперадключэння</string>
-    <string name="dialog_watchdog_start">Пачаць</string>
-    <string name="snackbar_watchdog_test_started">Тэст пачаты. Перазапуск на працягу ≤30 с…</string>
     <string name="dialog_log_buffer_size">Памер буфера журнала (КБ)</string>
     <string name="quick_clear_cache_restart">Перазапуск пасля ачысткі</string>
     <string name="menu_dashboard">Панэль sing-box</string>
@@ -801,7 +791,6 @@
     <string name="append_http_proxy_sum">Дадаваць HTTP-проксі да ўсіх злучэнняў</string>
     <string name="append_http_proxy_security_message">Пры ўключэнні іншыя прыкладанні прылады могуць непасрэдна выкарыстоўваць лака</string>
     <string name="pref_sing_box_server">сервер sing-box</string>
-    <string name="dialog_watchdog_force_restart">Watchdog прымусова перазапусціць VPN.  VPN адключыцца на 1–3 секунды…</string>
     <string name="url_test_finished_summary">URL-тэст завершаны: %1$d паспяхова / %2$d з правалам</string>
     <string name="logcat">Экспарт logcat</string>
     <string name="encryption">Шыфраванне</string>

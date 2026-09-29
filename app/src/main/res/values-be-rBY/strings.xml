@@ -629,11 +629,6 @@
     <string name="auto_switch_timeout">Аўтаматычнае пераключэнне па таймаўце</string>
     <string name="auto_switch_timeout_summary">Аўтаматычна пераключацца на наступную канфігурацыю, калі няма адказу</string>
     <string name="auto_switch_timeout_duration">Працягласць таймаўту (секунды)</string>
-    <string name="vpn_watchdog">Аўтаматычнае перападключэнне</string>
-    <string name="vpn_watchdog_summary">Перазапускаць VPN пры абрыве злучэння</string>
-    <string name="vpn_watchdog_test">🧪 Тэст watchdog</string>
-    <string name="vpn_watchdog_test_summary">Прымусова перазапусціць VPN для тэставання watchdog</string>
-    <string name="vpn_watchdog_interval">Інтэрвал праверкі (сек)</string>
     <string name="quick_clear_cache_restart">Ачысціць кэш і перазапусціць</string>
     <string name="mixed_auth_config">Configure authentication</string>
     <string name="mixed_auth_enabled_sum">Username: %1$s</string>
@@ -816,7 +811,6 @@
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">Старт</string>
     <string name="rule_network">Сетка</string>
     <string name="rule_protocol">Пратакол</string>
     <string name="not_set">Не зададзена</string>
@@ -850,15 +844,6 @@
     <string name="debug_button_crash_from_kt">Выклікаць збой з Kotlin</string>
     <string name="debug_button_reset_settings">Скінуць налады</string>
     <string name="toast_create_preferences_failed">Не ўдалося стварыць налады. Паўтарыце спробу.</string>
-    <string name="dialog_watchdog_test_title">Праверыць Watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN не запушчаны. Спачатку падключыцеся да VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Праверыць аўтаперападключэнне</string>
-    <string name="dialog_watchdog_force_restart">Watchdog прымусова перазапусціць VPN.
-
-VPN адключыцца на 1–3 секунды, а затым падключыцца аўтаматычна.
-
-Працягнуць?</string>
-    <string name="snackbar_watchdog_test_started">Праверка пачалася. Перазапуск на працягу ≤30 с…</string>
     <string name="dialog_log_buffer_size">Памер буфера журнала (КБ)</string>
     <string name="invalid_naive_link">Няправільная спасылка Naive: %1$s</string>
     <string name="invalid_ss_android_link">Няправільная спасылка ss-android: %1$s</string>

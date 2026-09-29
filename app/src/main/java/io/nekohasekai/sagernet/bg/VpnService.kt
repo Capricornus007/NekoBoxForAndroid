@@ -17,15 +17,12 @@ import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.ui.VpnRequestActivity
 import io.nekohasekai.sagernet.utils.Subnet
-import kotlinx.coroutines.GlobalScope
 import moe.matsuri.nb4a.hevtun.HevTunRuntime
 import android.net.VpnService as BaseVpnService
 
 class VpnService :
     BaseVpnService(),
     BaseService.Interface {
-
-    private val watchdog = VpnWatchdog(this)
 
     companion object {
 
@@ -64,7 +61,6 @@ class VpnService :
             val tunFd = establishTun()
             HevTunRuntime.start(this, tunFd)
         }
-        watchdog.start(GlobalScope)
     }
 
     override var wakeLock: PowerManager.WakeLock? = null
@@ -79,7 +75,6 @@ class VpnService :
     override suspend fun killProcesses() {
         HevTunRuntime.stop()
         RootLanSharing.stopClientSharing(this)
-        watchdog.stop()
         conn?.close()
         conn = null
         super.killProcesses()

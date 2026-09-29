@@ -634,11 +634,6 @@
     <string name="auto_switch_timeout">تعویض خودکار در پایان مهلت</string>
     <string name="auto_switch_timeout_summary">در صورت عدم پاسخ، به‌طور خودکار به پیکربندی بعدی بروید</string>
     <string name="auto_switch_timeout_duration">مدت مهلت (ثانیه)</string>
-    <string name="vpn_watchdog">اتصال مجدد خودکار</string>
-    <string name="vpn_watchdog_summary">راه‌اندازی مجدد VPN هنگام قطع اتصال</string>
-    <string name="vpn_watchdog_test">🧪 تست نگهبان</string>
-    <string name="vpn_watchdog_test_summary">اجبار به راه‌اندازی مجدد VPN برای تست نگهبان</string>
-    <string name="vpn_watchdog_interval">فاصله بررسی (ثانیه)</string>
     <string name="quick_clear_cache_restart">Restart After Clear</string>
     <string name="mixed_auth_config">پیکربندی احراز هویت</string>
     <string name="mixed_auth_username_hint">نام کاربری (خالی گذاشتن هر دو یعنی بدون احراز هویت)</string>
@@ -825,7 +820,6 @@
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">شروع</string>
     <string name="rule_network">شبکه</string>
     <string name="rule_protocol">پروتکل</string>
     <string name="backup_not_throne_desktop">پشتیبان Throne دسکتاپ نیست: انتظار .thrbackup می‌رفت اما %s است</string>
@@ -858,15 +852,6 @@
     <string name="debug_button_crash_from_kt">ایجاد خرابی از Kotlin</string>
     <string name="debug_button_reset_settings">بازنشانی تنظیمات</string>
     <string name="toast_create_preferences_failed">ایجاد تنظیمات برگزیده ناموفق بود. دوباره تلاش کنید.</string>
-    <string name="dialog_watchdog_test_title">آزمایش Watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN در حال اجرا نیست. ابتدا به VPN متصل شوید.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">آزمایش اتصال مجدد خودکار</string>
-    <string name="dialog_watchdog_force_restart">Watchdog، ‏VPN را به‌اجبار دوباره راه‌اندازی می‌کند.
-
-اتصال VPN برای ۱ تا ۳ ثانیه قطع می‌شود و سپس به‌طور خودکار دوباره برقرار خواهد شد.
-
-ادامه می‌دهید؟</string>
-    <string name="snackbar_watchdog_test_started">آزمایش آغاز شد. راه‌اندازی مجدد در ≤۳۰ ثانیه…</string>
     <string name="dialog_log_buffer_size">اندازه بافر گزارش (KB)</string>
     <string name="invalid_naive_link">پیوند Naive نامعتبر است: %1$s</string>
     <string name="invalid_ss_android_link">پیوند ss-android نامعتبر است: %1$s</string>

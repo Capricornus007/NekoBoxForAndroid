@@ -640,11 +640,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="auto_switch_timeout">Automatisch overschakelen bij timeout</string>
     <string name="auto_switch_timeout_summary">Automatisch overschakelen naar de volgende configuratie bij geen reactie</string>
     <string name="auto_switch_timeout_duration">Timeout-duur (seconden)</string>
-    <string name="vpn_watchdog">Automatisch opnieuw verbinden</string>
-    <string name="vpn_watchdog_summary">VPN herstarten bij verbindingsverlies</string>
-    <string name="vpn_watchdog_test">🧪 Watchdog testen</string>
-    <string name="vpn_watchdog_test_summary">VPN geforceerd herstarten om de watchdog te testen</string>
-    <string name="vpn_watchdog_interval">Controle-interval (sec)</string>
     <string name="quick_clear_cache_restart">Cache legen &amp; Herstarten</string>
     <string name="mixed_auth_config">Configure authentication</string>
     <string name="mixed_auth_enabled_sum">Username: %1$s</string>
@@ -860,16 +855,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="debug_button_crash_from_kt">Crash vanuit Kotlin veroorzaken</string>
     <string name="debug_button_reset_settings">Instellingen resetten</string>
     <string name="toast_create_preferences_failed">Kan voorkeuren niet maken. Probeer het opnieuw.</string>
-    <string name="dialog_watchdog_test_title">Watchdog testen</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN is niet actief. Maak eerst verbinding met VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Automatisch opnieuw verbinden testen</string>
-    <string name="dialog_watchdog_force_restart">De watchdog forceert een herstart van VPN.
-
-De VPN-verbinding wordt 1–3 seconden verbroken en daarna automatisch hersteld.
-
-Doorgaan?</string>
-    <string name="dialog_watchdog_start">Starten</string>
-    <string name="snackbar_watchdog_test_started">Test gestart. Herstart binnen ≤30 s…</string>
     <string name="dialog_log_buffer_size">Grootte van logbuffer (KB)</string>
     <string name="invalid_naive_link">Ongeldige Naive-link: %1$s</string>
     <string name="invalid_ss_android_link">Ongeldige ss-android-link: %1$s</string>

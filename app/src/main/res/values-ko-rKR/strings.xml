@@ -625,11 +625,6 @@
     <string name="auto_switch_timeout">시간 초과 시 자동 전환</string>
     <string name="auto_switch_timeout_summary">응답이 없으면 다음 구성으로 자동 전환</string>
     <string name="auto_switch_timeout_duration">시간 초과(초)</string>
-    <string name="vpn_watchdog">자동 재연결</string>
-    <string name="vpn_watchdog_summary">연결 끊김 시 VPN 자동 재시작</string>
-    <string name="vpn_watchdog_test">🧪 워치독 테스트</string>
-    <string name="vpn_watchdog_test_summary">워치독 테스트를 위해 VPN 강제 재시작</string>
-    <string name="vpn_watchdog_interval">확인 간격(초)</string>
     <string name="quick_clear_cache_restart">재시작 후 지우기</string>
     <string name="mixed_auth_config">인증 설정</string>
     <string name="mixed_auth_username_hint">사용자 이름 (둘 다 비워 두면 인증 없음)</string>
@@ -820,7 +815,6 @@
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">시작</string>
     <string name="rule_network">네트워크</string>
     <string name="rule_protocol">프로토콜</string>
     <string name="backup_not_throne_desktop">Throne 데스크톱 백업이 아닙니다: .thrbackup을 예상했으나 %s</string>
@@ -862,11 +856,6 @@
     <string name="debug_button_crash_from_kt">Kotlin에서 비정상 종료</string>
     <string name="debug_button_reset_settings">설정 재설정</string>
     <string name="toast_create_preferences_failed">환경설정을 만들지 못했습니다. 다시 시도하세요.</string>
-    <string name="dialog_watchdog_test_title">워치독 테스트</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN이 실행 중이 아닙니다. 먼저 VPN에 연결하세요.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">자동 재연결 테스트</string>
-    <string name="dialog_watchdog_force_restart">워치독이 VPN을 강제로 재시작합니다.\n\nVPN 연결이 1~3초 끊긴 뒤 자동으로 다시 연결됩니다.\n\n계속하시겠습니까?</string>
-    <string name="snackbar_watchdog_test_started">테스트가 시작되었습니다. 30초 이내에 재시작합니다…</string>
     <string name="dialog_log_buffer_size">로그 버퍼 크기(KB)</string>
     <string name="invalid_naive_link">잘못된 Naive: %1$s</string>
     <string name="invalid_ss_android_link">잘못된 ss-android: %1$s</string>

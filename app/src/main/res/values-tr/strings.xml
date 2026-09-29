@@ -860,11 +860,6 @@
     <string name="webdav_insecure_url">Güvensiz WebDAV URL\'si</string>
     <string name="extra_subscription_links_hint">Abonelik bağlantılarını girin, satır başına bir tane</string>
     <string name="dns_hosts_lines">%d hosts kaydı</string>
-    <string name="vpn_watchdog">Otomatik yeniden bağlanma</string>
-    <string name="vpn_watchdog_summary">Bağlantı koptuğunda VPN\'i yeniden başlat</string>
-    <string name="vpn_watchdog_test">🧪 Watchdog\'u test et</string>
-    <string name="vpn_watchdog_test_summary">Watchdog\'u test etmek için VPN\'i zorla yeniden başlat</string>
-    <string name="vpn_watchdog_interval">Kontrol aralığı (sn)</string>
     <string name="rule_domain">Alan adı</string>
     <string name="rule_dst_ip">Hedef IP</string>
     <string name="rule_dst_port">Hedef port</string>
@@ -878,12 +873,6 @@
     <string name="debug_button_crash_from_kt">Kotlin\'den çökme</string>
     <string name="debug_button_reset_settings">Ayarları sıfırla</string>
     <string name="toast_create_preferences_failed">Tercihler oluşturulamadı. Lütfen tekrar deneyin.</string>
-    <string name="dialog_watchdog_test_title">Watchdog\'u test et</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN çalışmıyor. Önce VPN\'e bağlanın.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Otomatik yeniden bağlanmayı test et</string>
-    <string name="dialog_watchdog_force_restart">Watchdog VPN\'i zorla yeniden başlatacak.  VPN 1–3 saniye kesilecek…</string>
-    <string name="dialog_watchdog_start">Başlat</string>
-    <string name="snackbar_watchdog_test_started">Test başladı. ≤30 sn içinde yeniden başlatma…</string>
     <string name="dialog_log_buffer_size">Günlük arabellek boyutu (KB)</string>
     <string name="trusttunnel_health_check">Sağlık kontrolü</string>
     <string name="trusttunnel_congestion_control">QUIC tıkanıklık kontrolü</string>

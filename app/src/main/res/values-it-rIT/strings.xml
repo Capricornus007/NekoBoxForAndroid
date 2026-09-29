@@ -640,11 +640,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="auto_switch_timeout">Cambio automatico al timeout</string>
     <string name="auto_switch_timeout_summary">Passa automaticamente alla configurazione successiva se non c\'è risposta</string>
     <string name="auto_switch_timeout_duration">Durata timeout (secondi)</string>
-    <string name="vpn_watchdog">Riconnessione automatica</string>
-    <string name="vpn_watchdog_summary">Riavvia la VPN in caso di caduta della connessione</string>
-    <string name="vpn_watchdog_test">🧪 Testa watchdog</string>
-    <string name="vpn_watchdog_test_summary">Forza il riavvio della VPN per testare il watchdog</string>
-    <string name="vpn_watchdog_interval">Intervallo di controllo (s)</string>
     <string name="quick_clear_cache_restart">Svuota cache e riavvia</string>
     <string name="mixed_auth_config">Configure authentication</string>
     <string name="mixed_auth_enabled_sum">Username: %1$s</string>
@@ -827,7 +822,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">Avvia</string>
     <string name="rule_network">Rete</string>
     <string name="rule_protocol">Protocollo</string>
     <string name="not_set">Non impostato</string>
@@ -861,15 +855,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="debug_button_crash_from_kt">Provoca arresto anomalo da Kotlin</string>
     <string name="debug_button_reset_settings">Reimposta impostazioni</string>
     <string name="toast_create_preferences_failed">Impossibile creare le preferenze. Riprova.</string>
-    <string name="dialog_watchdog_test_title">Testa il watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">La VPN non è attiva. Connettiti prima alla VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Testa la riconnessione automatica</string>
-    <string name="dialog_watchdog_force_restart">Il watchdog forzerà il riavvio della VPN.
-
-La VPN si disconnetterà per 1–3 secondi, quindi si riconnetterà automaticamente.
-
-Continuare?</string>
-    <string name="snackbar_watchdog_test_started">Test avviato. Riavvio entro ≤30 s…</string>
     <string name="dialog_log_buffer_size">Dimensione buffer del registro (KB)</string>
     <string name="invalid_naive_link">Link Naive non valido: %1$s</string>
     <string name="invalid_ss_android_link">Link ss-android non valido: %1$s</string>

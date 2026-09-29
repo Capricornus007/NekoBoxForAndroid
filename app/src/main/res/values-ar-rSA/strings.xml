@@ -639,11 +639,6 @@
     <string name="auto_switch_timeout">التبديل التلقائي عند انتهاء المهلة</string>
     <string name="auto_switch_timeout_summary">التبديل تلقائيًا إلى الإعداد التالي في حالة عدم الاستجابة</string>
     <string name="auto_switch_timeout_duration">مدة المهلة (ثوانٍ)</string>
-    <string name="vpn_watchdog">إعادة الاتصال تلقائيًا</string>
-    <string name="vpn_watchdog_summary">إعادة تشغيل VPN عند انقطاع الاتصال</string>
-    <string name="vpn_watchdog_test">🧪 اختبار الحارس</string>
-    <string name="vpn_watchdog_test_summary">فرض إعادة تشغيل VPN لاختبار الحارس</string>
-    <string name="vpn_watchdog_interval">فترة الفحص (ثوانٍ)</string>
     <string name="quick_clear_cache_restart">مسح ذاكرة التخزين المؤقت وإعادة التشغيل</string>
     <string name="mixed_auth_config">إعداد المصادقة</string>
     <string name="mixed_auth_username_hint">اسم المستخدم (اترك الحقلين فارغين لعدم المصادقة)</string>
@@ -831,7 +826,6 @@
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">ابدأ</string>
     <string name="rule_network">الشبكة</string>
     <string name="rule_protocol">البروتوكول</string>
     <string name="not_set">غير مضبوط</string>
@@ -865,15 +859,6 @@
     <string name="debug_button_crash_from_kt">إحداث تعطل من Kotlin</string>
     <string name="debug_button_reset_settings">إعادة ضبط الإعدادات</string>
     <string name="toast_create_preferences_failed">تعذر إنشاء التفضيلات. يُرجى المحاولة مرة أخرى.</string>
-    <string name="dialog_watchdog_test_title">اختبار Watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN غير متصل. اتصل بـ VPN أولاً.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">اختبار إعادة الاتصال التلقائي</string>
-    <string name="dialog_watchdog_force_restart">سيعيد Watchdog تشغيل VPN بالقوة.
-
-سينقطع VPN لمدة 1–3 ثوانٍ، ثم سيُعاد الاتصال تلقائيًا.
-
-هل تريد المتابعة؟</string>
-    <string name="snackbar_watchdog_test_started">بدأ الاختبار. ستتم إعادة التشغيل خلال ≤30 ثانية…</string>
     <string name="dialog_log_buffer_size">حجم مخزن السجل (KB)</string>
     <string name="invalid_naive_link">رابط Naive غير صالح: %1$s</string>
     <string name="invalid_ss_android_link">رابط ss-android غير صالح: %1$s</string>

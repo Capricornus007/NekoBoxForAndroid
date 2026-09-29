@@ -750,11 +750,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="auto_switch_timeout">Beralih otomatis saat timeout</string>
     <string name="auto_switch_timeout_summary">Beralih otomatis ke konfigurasi berikutnya jika tidak ada respons</string>
     <string name="auto_switch_timeout_duration">Durasi timeout (detik)</string>
-    <string name="vpn_watchdog">Sambungkan ulang otomatis</string>
-    <string name="vpn_watchdog_summary">Mulai ulang VPN saat koneksi terputus</string>
-    <string name="vpn_watchdog_test">🧪 Uji watchdog</string>
-    <string name="vpn_watchdog_test_summary">Paksa mulai ulang VPN untuk menguji watchdog</string>
-    <string name="vpn_watchdog_interval">Interval pemeriksaan (dtk)</string>
     <string name="dual_network_acceleration">Akselerasi jaringan ganda</string>
     <string name="dual_network_acceleration_summary">Terhubung secara bersamaan melalui Wi-Fi dan data seluler. Membutuhkan Wi-Fi dan data seluler tetap aktif di pengaturan sistem, dan meningkatkan penggunaan baterai.</string>
     <string name="app_name">NekoBox</string>
@@ -905,12 +900,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="debug_button_crash_from_kt">Crash dari Kotlin</string>
     <string name="debug_button_reset_settings">Atur ulang pengaturan</string>
     <string name="toast_create_preferences_failed">Gagal membuat preferensi. Silakan coba lagi.</string>
-    <string name="dialog_watchdog_test_title">Uji watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN tidak berjalan. Sambungkan ke VPN terlebih dahulu.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Uji sambungkan ulang otomatis</string>
-    <string name="dialog_watchdog_force_restart">Watchdog akan memulai ulang VPN secara paksa.  VPN akan terputus 1–3 detik…</string>
-    <string name="dialog_watchdog_start">Mulai</string>
-    <string name="snackbar_watchdog_test_started">Uji dimulai. Memulai ulang dalam ≤30 dtk…</string>
     <string name="dialog_log_buffer_size">Ukuran buffer log (KB)</string>
     <string name="batch_update_summary" formatted="false">Pembaruan batch selesai: %1$d berhasil, %2$d gagal</string>
     <string name="probe_tolerance">Toleransi alih penyeimbang (ms)</string>

@@ -965,12 +965,6 @@
     <string name="append_http_proxy_security_title">Security Warning</string>
     <string name="append_http_proxy_security_message">When enabled, other apps on this device can directly use the local proxy port.\n\nRecommendation: Only enable this if you trust all installed apps.</string>
     <string name="enable_anyway">Enable Anyway</string>
-    <string name="vpn_watchdog">Auto-reconnect</string>
-    <string name="vpn_watchdog_summary">Restart VPN on connection drop</string>
-    <string name="vpn_watchdog_test">🧪 Test watchdog</string>
-    <string name="vpn_watchdog_test_summary">Force restart VPN to test watchdog</string>
-    <string name="vpn_watchdog_interval">Check interval (sec)</string>
-
     <string name="rule_domain">Domain</string>
     <string name="rule_dst_ip">Destination IP</string>
     <string name="rule_dst_port">Destination port</string>
@@ -987,16 +981,6 @@
     <string name="debug_button_crash_from_kt">Crash from Kotlin</string>
     <string name="debug_button_reset_settings">Reset Settings</string>
     <string name="toast_create_preferences_failed">Failed to create preferences. Please try again.</string>
-    <string name="dialog_watchdog_test_title">Test watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN is not running. Connect to VPN first.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Test auto-reconnect</string>
-    <string name="dialog_watchdog_force_restart">Watchdog will force-restart the VPN.
-
-VPN will disconnect for 1-3 seconds, then reconnect automatically.
-
-Continue?</string>
-    <string name="dialog_watchdog_start">Start</string>
-    <string name="snackbar_watchdog_test_started">Test started. Restarting within ≤30 s…</string>
     <string name="dialog_log_buffer_size">Log buffer size (KB)</string>
         <string name="enable_hev_tun">Enable Hev TUN</string>
         <string name="enable_hev_tun_summary">Use hev-socks5-tunnel to create the TUN device</string>

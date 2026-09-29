@@ -642,11 +642,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="auto_switch_timeout">Автоматическое переключение по таймауту</string>
     <string name="auto_switch_timeout_summary">Автоматически переключаться на следующую конфигурацию, если нет ответа</string>
     <string name="auto_switch_timeout_duration">Длительность таймаута (сек)</string>
-    <string name="vpn_watchdog_interval">Интервал проверки (сек)</string>
-    <string name="vpn_watchdog">Авто-переподключение</string>
-    <string name="vpn_watchdog_summary">Перезапускать VPN при зависании (~90 сек)</string>
-    <string name="vpn_watchdog_test">🧪 Протестировать watchdog</string>
-    <string name="vpn_watchdog_test_summary">Форсировать перезапуск VPN прямо сейчас для проверки</string>
     <string name="quick_clear_cache_restart">Перезапуск после очистки</string>
     <string name="mixed_auth_config">Настроить аутентификацию</string>
     <string name="mixed_auth_username_hint">Имя пользователя (оставьте оба поля пустыми — без аутентификации)</string>
@@ -836,7 +831,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">Запустить</string>
     <string name="rule_network">Сеть</string>
     <string name="rule_protocol">Протокол</string>
     <string name="not_set">Не указано</string>
@@ -880,11 +874,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="debug_button_crash_from_kt">Сбой из Kotlin</string>
     <string name="debug_button_reset_settings">Сбросить настройки</string>
     <string name="toast_create_preferences_failed">Не удалось создать настройки. Повторите попытку.</string>
-    <string name="dialog_watchdog_test_title">Проверка сторожевого таймера</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN не запущен. Сначала подключитесь к VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Проверка автоподключения</string>
-    <string name="dialog_watchdog_force_restart">Сторожевой таймер принудительно перезапустит VPN.\n\nVPN отключится на 1–3 секунды, а затем подключится автоматически.\n\nПродолжить?</string>
-    <string name="snackbar_watchdog_test_started">Проверка запущена. Перезапуск в течение 30 с…</string>
     <string name="dialog_log_buffer_size">Размер буфера журнала (КБ)</string>
     <string name="invalid_naive_link">Недопустимая ссылка Naive: %1$s</string>
     <string name="invalid_ss_android_link">Недопустимая ссылка ss-android: %1$s</string>

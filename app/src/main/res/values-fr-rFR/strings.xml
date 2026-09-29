@@ -646,11 +646,6 @@
     <string name="auto_switch_timeout">Bascule automatique en cas de délai dépassé</string>
     <string name="auto_switch_timeout_summary">Basculer automatiquement vers la configuration suivante en cas d\'absence de réponse</string>
     <string name="auto_switch_timeout_duration">Durée du délai (secondes)</string>
-    <string name="vpn_watchdog">Reconnexion automatique</string>
-    <string name="vpn_watchdog_summary">Redémarrer le VPN en cas de coupure</string>
-    <string name="vpn_watchdog_test">🧪 Tester le gardien</string>
-    <string name="vpn_watchdog_test_summary">Forcer le redémarrage du VPN pour tester le gardien</string>
-    <string name="vpn_watchdog_interval">Intervalle de vérification (s)</string>
     <string name="quick_clear_cache_restart">Vider le cache &amp; Redémarrer</string>
     <string name="mixed_auth_config">Configurer l\'authentification</string>
     <string name="mixed_auth_username_hint">Nom d\'utilisateur (laissez les deux vides pour aucune authentification)</string>
@@ -838,7 +833,6 @@
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">Démarrer</string>
     <string name="rule_network">Réseau</string>
     <string name="rule_protocol">Protocole</string>
     <string name="not_set">Non défini</string>
@@ -872,15 +866,6 @@
     <string name="debug_button_crash_from_kt">Provoquer un plantage depuis Kotlin</string>
     <string name="debug_button_reset_settings">Réinitialiser les paramètres</string>
     <string name="toast_create_preferences_failed">Impossible de créer les préférences. Réessayez.</string>
-    <string name="dialog_watchdog_test_title">Tester le watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">Le VPN n’est pas actif. Connectez-vous d’abord au VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Tester la reconnexion automatique</string>
-    <string name="dialog_watchdog_force_restart">Le watchdog va forcer le redémarrage du VPN.
-
-Le VPN sera déconnecté pendant 1 à 3 secondes, puis se reconnectera automatiquement.
-
-Continuer ?</string>
-    <string name="snackbar_watchdog_test_started">Test démarré. Redémarrage dans ≤30 s…</string>
     <string name="dialog_log_buffer_size">Taille du tampon de journalisation (Ko)</string>
     <string name="invalid_naive_link">Lien Naive non valide : %1$s</string>
     <string name="invalid_ss_android_link">Lien ss-android non valide : %1$s</string>

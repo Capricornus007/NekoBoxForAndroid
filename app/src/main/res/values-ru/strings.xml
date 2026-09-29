@@ -873,11 +873,6 @@
     <string name="dns_hosts_lines">записей hosts: %d</string>
     <string name="append_http_proxy_security_title">Предупреждение безопасности</string>
     <string name="enable_anyway">Всё равно включить</string>
-    <string name="vpn_watchdog">Автопереподключение</string>
-    <string name="vpn_watchdog_summary">Перезапускать VPN при обрыве соединения</string>
-    <string name="vpn_watchdog_test">🧪 Тест watchdog</string>
-    <string name="vpn_watchdog_test_summary">Принудительно перезапустить VPN для теста watchdog</string>
-    <string name="vpn_watchdog_interval">Интервал проверки (сек)</string>
     <string name="rule_domain">Домен</string>
     <string name="rule_dst_ip">IP назначения</string>
     <string name="rule_dst_port">Порт назначения</string>
@@ -891,12 +886,6 @@
     <string name="debug_button_crash_from_kt">Сбой из Kotlin</string>
     <string name="debug_button_reset_settings">Сбросить настройки</string>
     <string name="toast_create_preferences_failed">Не удалось создать настройки. Попробуйте снова.</string>
-    <string name="dialog_watchdog_test_title">Тест watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN не запущен. Сначала подключитесь к VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Тест автопереподключения</string>
-    <string name="dialog_watchdog_force_restart">Watchdog принудительно перезапустит VPN.  VPN отключится на 1–3 секунды…</string>
-    <string name="dialog_watchdog_start">Начать</string>
-    <string name="snackbar_watchdog_test_started">Тест запущен. Перезапуск в течение ≤30 с…</string>
     <string name="dialog_log_buffer_size">Размер буфера журнала (КБ)</string>
     <string name="batch_update_summary" formatted="false">Пакетное обновление завершено: успешно %1$d, с ошибками %2$d</string>
     <string name="probe_tolerance">Допуск переключения балансировщика (мс)</string>

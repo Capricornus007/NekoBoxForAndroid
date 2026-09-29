@@ -837,11 +837,6 @@
     <string name="waterfall_settings">تنظیمات آبشاری</string>
     <string name="webdav_insecure_url">آدرس WebDAV ناامن</string>
     <string name="dns_hosts_lines">%d خط hosts</string>
-    <string name="vpn_watchdog">اتصال مجدد خودکار</string>
-    <string name="vpn_watchdog_summary">در صورت قطع اتصال، VPN را مجدداً راه‌اندازی کن</string>
-    <string name="vpn_watchdog_test">🧪 تست watchdog</string>
-    <string name="vpn_watchdog_test_summary">برای تست watchdog، VPN را اجباری راه‌اندازی مجدد کن</string>
-    <string name="vpn_watchdog_interval">فاصله بررسی (ثانیه)</string>
     <string name="rule_domain">دامنه</string>
     <string name="rule_dst_ip">IP مقصد</string>
     <string name="rule_dst_port">پورت مقصد</string>
@@ -855,12 +850,6 @@
     <string name="debug_button_crash_from_kt">کرش از Kotlin</string>
     <string name="debug_button_reset_settings">بازنشانی تنظیمات</string>
     <string name="toast_create_preferences_failed">ایجاد تنظیمات ناموفق بود. دوباره تلاش کنید.</string>
-    <string name="dialog_watchdog_test_title">تست watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN در حال اجرا نیست. ابتدا به VPN وصل شوید.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">تست اتصال مجدد خودکار</string>
-    <string name="dialog_watchdog_force_restart">watchdog وصل شدن VPN را اجباری راه‌اندازی مجدد می‌کند.  اتصال VPN ۱ تا ۳ ثانیه قطع می‌شود…</string>
-    <string name="dialog_watchdog_start">شروع</string>
-    <string name="snackbar_watchdog_test_started">تست شروع شد. راه‌اندازی مجدد تا ۳۰ ثانیه…</string>
     <string name="dialog_log_buffer_size">اندازه بافر لاگ (KB)</string>
     <string name="wireguard_listen_port">پورت شنیدن</string>
     <string name="wireguard_persistent_keepalive">فاصله keepalive پایدار (ثانیه)</string>

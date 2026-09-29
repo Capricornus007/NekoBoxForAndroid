@@ -643,11 +643,6 @@
     <string name="auto_switch_timeout">Автоматичне перемикання за таймаутом</string>
     <string name="auto_switch_timeout_summary">Автоматично перемикатися на наступну конфігурацію, якщо немає відповіді</string>
     <string name="auto_switch_timeout_duration">Тривалість таймауту (секунди)</string>
-    <string name="vpn_watchdog">Автоматичне перепідключення</string>
-    <string name="vpn_watchdog_summary">Перезапускати VPN при обриві з\'єднання</string>
-    <string name="vpn_watchdog_test">🧪 Тест watchdog</string>
-    <string name="vpn_watchdog_test_summary">Примусово перезапустити VPN для тестування watchdog</string>
-    <string name="vpn_watchdog_interval">Інтервал перевірки (сек)</string>
     <string name="quick_clear_cache_restart">Очистити кеш &amp; Перезапустити</string>
     <string name="mixed_auth_config">Налаштувати автентифікацію</string>
     <string name="mixed_auth_username_hint">Ім\'я користувача (залиште обидва поля порожніми — без автентифікації)</string>
@@ -836,7 +831,6 @@
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">Почати</string>
     <string name="rule_network">Мережа</string>
     <string name="rule_protocol">Протокол</string>
     <string name="not_set">Не встановлено</string>
@@ -878,11 +872,6 @@
     <string name="debug_button_crash_from_kt">Збій із Kotlin</string>
     <string name="debug_button_reset_settings">Скинути налаштування</string>
     <string name="toast_create_preferences_failed">Не вдалося створити налаштування. Спробуйте ще раз.</string>
-    <string name="dialog_watchdog_test_title">Перевірка сторожового таймера</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN не запущено. Спочатку підключіться до VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Перевірка автопідключення</string>
-    <string name="dialog_watchdog_force_restart">Сторожовий таймер примусово перезапустить VPN.\n\nVPN відключиться на 1–3 секунди, а потім підключиться автоматично.\n\nПродовжити?</string>
-    <string name="snackbar_watchdog_test_started">Перевірку розпочато. Перезапуск протягом 30 с…</string>
     <string name="dialog_log_buffer_size">Розмір буфера журналу (КБ)</string>
     <string name="invalid_naive_link">Недійсне посилання Naive: %1$s</string>
     <string name="invalid_ss_android_link">Недійсне посилання ss-android: %1$s</string>

@@ -44,6 +44,15 @@ import java.util.concurrent.ConcurrentHashMap
 
 private const val NETWORK_CHANGE_RESTART_DEBOUNCE_MS = 500L
 
+// 超時自動切換的節流參數。以前这条监控没有任何退避：节点全挂时每隔几秒就把整组
+// 代理逐个 reload 一遍，一个 60 节点的分组一轮就是几十次核心重建，手机发烫、耗电，
+// 而且探测跑在 binder 的 Main 作用域上，每次 3 秒的阻塞 native 调用都会冻住界面。
+private const val AUTO_SWITCH_PROBE_TIMEOUT_MS = 3000L
+private const val AUTO_SWITCH_PROBE_SLACK_MS = 2000L
+private const val AUTO_SWITCH_RELOAD_SETTLE_MS = 500L
+private const val AUTO_SWITCH_MAX_PROBES_PER_ROUND = 5
+private const val AUTO_SWITCH_MAX_BACKOFF_SECONDS = 300L
+
 class BaseService {
 
     enum class State(
@@ -68,6 +77,10 @@ class BaseService {
         var proxy: ProxyInstance? = null
         var notification: ServiceNotification? = null
         var timeoutMonitorJob: Job? = null
+
+        // 超時自動切換的輪詢游標：記住上一輪試到第幾個，下一輪從這裡接續，
+        // 不必每次都把整組從頭 reload 一遍。-1 表示還沒開始或已掃完整圈。
+        var timeoutSwitchCursor = -1
 
         val receiver = broadcastReceiverWithSelf { self, ctx, intent ->
             when (intent.action) {
@@ -346,39 +359,67 @@ class BaseService {
             if (!DataStore.enableAutoSwitchTimeout) return
 
             data.timeoutMonitorJob?.cancel()
-            data.timeoutMonitorJob = data.binder.launch {
+            // binder 的作用域是 Dispatchers.Main.immediate，探测是阻塞 native 呼叫，
+            // 留在上面會每輪凍住界面 3 秒，所以整段監控改掛到 IO。
+            data.timeoutMonitorJob = data.binder.launch(Dispatchers.IO) {
+                var consecutiveFailures = 0
                 while (isActive) {
-                    val timeoutSeconds = DataStore.autoSwitchTimeoutDuration.toLong().takeIf { it > 0 } ?: 10L
-                    delay(timeoutSeconds * 1000L)
+                    val baseSeconds =
+                        DataStore.autoSwitchTimeoutDuration.toLong().takeIf { it > 0 } ?: 10L
+                    val waitSeconds = backoffSeconds(baseSeconds, consecutiveFailures)
+                    delay(waitSeconds * 1000L)
 
                     if (!isActive) break
 
                     // 检查连接是否存活
                     if (isConnectionAlive()) {
+                        if (consecutiveFailures > 0) {
+                            Logs.d("超时监控：连接恢复，退避重置为 ${baseSeconds}s。")
+                        }
+                        consecutiveFailures = 0
                         continue // 连接存活，进入下次循环
                     }
 
                     // 未存活，切换到下一个可用代理并测试
                     val found = switchToNextAvailableProxy()
-                    if (!found) {
-                        Logs.d("所有代理均不可用，停止超时自动切换监控。")
-                        break
+                    if (found) {
+                        consecutiveFailures = 0
+                    } else {
+                        consecutiveFailures++
+                        Logs.d(
+                            "超时监控：本轮没有可用代理，连续失败 $consecutiveFailures 次，" +
+                                "下次间隔 ${backoffSeconds(baseSeconds, consecutiveFailures)}s。",
+                        )
                     }
                     // 切换可用代理后，监控继续（回到循环起点）
                 }
             }
         }
 
-        private fun isConnectionAlive(): Boolean {
+        /**
+         * 失敗次數越多等越久：base、2*base、4*base… 上限 [AUTO_SWITCH_MAX_BACKOFF_SECONDS]。
+         * 目的是死節點不再被無間隔重試——以前是幾秒一趟整組 reload，手機直接發燙。
+         */
+        private fun backoffSeconds(baseSeconds: Long, consecutiveFailures: Int): Long {
+            if (consecutiveFailures <= 0) return baseSeconds
+            var factor = 1L
+            repeat(consecutiveFailures.coerceAtMost(16)) { factor *= 2L }
+            return (baseSeconds * factor).coerceAtMost(AUTO_SWITCH_MAX_BACKOFF_SECONDS)
+        }
+
+        private suspend fun isConnectionAlive(): Boolean {
+            val box = data.proxy?.box ?: return false
             return try {
-                data.proxy?.box?.let { box ->
-                    val result = Libcore.urlTest(
+                // 外層包一層比 native 更宽的超时：native 自己有 3s，但取消不了它的話
+                // 至少不會把這條監控永久卡死在一次呼叫上。
+                val result = withTimeoutOrNull(AUTO_SWITCH_PROBE_TIMEOUT_MS + AUTO_SWITCH_PROBE_SLACK_MS) {
+                    Libcore.urlTest(
                         box,
                         DataStore.connectionTestURL,
-                        3000,
+                        AUTO_SWITCH_PROBE_TIMEOUT_MS.toInt(),
                     )
-                    result > 0
-                } ?: false
+                }
+                result?.let { it > 0 } ?: false
             } catch (e: Exception) {
                 Logs.d("Timeout check error: ${e.readableMessage}")
                 false
@@ -386,8 +427,8 @@ class BaseService {
         }
 
         /**
-         * 只轮回一圈尝试所有代理，每切换一次就 reload 并检测，找到可用就返回 true。
-         * 全部代理都不可用才返回 false。
+         * 從上次的游標往後試，每輪最多 [AUTO_SWITCH_MAX_PROBES_PER_ROUND] 個，
+         * 找到可用就返回 true。整組掃完都不通才返回 false（游標保留，下一輪繼續）。
          * 如果代理数量小于等于1，则不做测试直接返回 false。
          */
         private suspend fun switchToNextAvailableProxy(): Boolean {
@@ -397,26 +438,30 @@ class BaseService {
             if (groupProxies.size <= 1) return false
 
             val proxyCount = groupProxies.size
-            var nextIndex = groupProxies.indexOfFirst { it.id == currentProfile.id }
+            var nextIndex = data.timeoutSwitchCursor.takeIf { it in 0 until proxyCount }
+                ?: groupProxies.indexOfFirst { it.id == currentProfile.id }
+            if (nextIndex < 0) nextIndex = 0
 
-            // 只试一圈
             var tried = 0
-            do {
-                nextIndex = (nextIndex + 1) % proxyCount
-                DataStore.selectedProxy = groupProxies[nextIndex].id
-                runOnMainDispatcher { reload() }
-                delay(200) // 等待 reload 生效，实际可根据情况调整
-
+            while (tried < proxyCount && tried < AUTO_SWITCH_MAX_PROBES_PER_ROUND) {
                 tried++
+                nextIndex = (nextIndex + 1) % proxyCount
+                data.timeoutSwitchCursor = nextIndex
+                val candidate = groupProxies[nextIndex]
+                DataStore.selectedProxy = candidate.id
+                // reload() 自己會派發到 Default，不需要再繞 Main；繞 Main 只是多一次排程。
+                reload()
+                delay(AUTO_SWITCH_RELOAD_SETTLE_MS) // 等待 reload 生效
+
                 if (isConnectionAlive()) {
-                    Logs.d("切换到可用代理: ${groupProxies[nextIndex].id}")
+                    Logs.d("切换到可用代理: ${candidate.id}")
                     return true
                 } else {
-                    Logs.d("代理不可用: ${groupProxies[nextIndex].id}，继续尝试下一个。")
+                    Logs.d("代理不可用: ${candidate.id}，本轮已试 $tried/$proxyCount 个。")
                 }
-            } while (tried < proxyCount)
+            }
 
-            Logs.d("一圈轮询后所有代理均不可用。")
+            Logs.d("本轮试过 $tried 个代理均不可用，下一轮从游标 ${data.timeoutSwitchCursor} 继续。")
             return false
         }
 

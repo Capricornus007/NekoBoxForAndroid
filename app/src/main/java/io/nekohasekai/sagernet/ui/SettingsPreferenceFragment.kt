@@ -483,38 +483,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
-        // ── VPN Watchdog test button ─────────────────────────────────
-        findPreference<Preference>("vpnWatchdogTest")?.setOnPreferenceClickListener {
-            if (!DataStore.serviceState.connected) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.dialog_watchdog_test_title)
-                    .setMessage(R.string.dialog_watchdog_vpn_not_running)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show()
-                return@setOnPreferenceClickListener true
-            }
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.dialog_watchdog_auto_reconnect_title)
-                .setMessage(R.string.dialog_watchdog_force_restart)
-                .setPositiveButton(R.string.dialog_watchdog_start) { _, _ ->
-                    io.nekohasekai.sagernet.bg.VpnWatchdog.testModeRequested = true
-                    com.google.android.material.snackbar.Snackbar
-                        .make(
-                            requireView(),
-                            R.string.snackbar_watchdog_test_started,
-                            com.google.android.material.snackbar.Snackbar.LENGTH_LONG,
-                        )
-                        .show()
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .show()
-            true
-        }
-
-        val vpnWatchdogInterval = findPreference<EditTextPreference>(Key.VPN_WATCHDOG_INTERVAL)
-        vpnWatchdogInterval?.setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-        vpnWatchdogInterval?.onPreferenceChangeListener = reloadListener
-
         // 放在最後：上面那一大批 findPreference(...)!! 要在整棵樹都還完整時綁定，
         // 折疊只改 isVisible，不影響查找，但綁定先跑完才不會有「藏在收合群組裡的項沒接上」。
         preferenceScreen?.enableCollapsibleCategories("global")

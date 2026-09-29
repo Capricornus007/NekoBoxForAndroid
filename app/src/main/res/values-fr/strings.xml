@@ -782,11 +782,6 @@
     <string name="auto_switch_timeout">Bascule automatique en cas de délai dépassé</string>
     <string name="auto_switch_timeout_summary">Basculer automatiquement vers la configuration suivante en cas d\'absence de réponse</string>
     <string name="auto_switch_timeout_duration">Durée du délai (secondes)</string>
-    <string name="vpn_watchdog">Reconnexion automatique</string>
-    <string name="vpn_watchdog_summary">Redémarrer le VPN en cas de coupure</string>
-    <string name="vpn_watchdog_test">🧪 Tester le gardien</string>
-    <string name="vpn_watchdog_test_summary">Forcer le redémarrage du VPN pour tester le gardien</string>
-    <string name="vpn_watchdog_interval">Intervalle de vérification (s)</string>
     <string name="dual_network_acceleration">Accélération double réseau</string>
     <string name="dual_network_acceleration_summary">Connecter simultanément via Wi-Fi et données mobiles. Nécessite que le Wi-Fi et les données mobiles restent activés dans les paramètres système, et augmente la consommation de batterie.</string>
     <string name="app_name">NekoBox</string>
@@ -935,12 +930,6 @@
     <string name="debug_button_crash_from_kt">Crash depuis Kotlin</string>
     <string name="debug_button_reset_settings">Réinitialiser les réglages</string>
     <string name="toast_create_preferences_failed">Échec de la création des préférences. Veuillez réessayer.</string>
-    <string name="dialog_watchdog_test_title">Tester le watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">Le VPN n\'est pas actif. Connectez-vous d\'abord au VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Tester la reconnexion automatique</string>
-    <string name="dialog_watchdog_force_restart">Le watchdog redémarrera le VPN de force.  Le VPN se déconnectera pendant 1 à 3 secondes…</string>
-    <string name="dialog_watchdog_start">Démarrer</string>
-    <string name="snackbar_watchdog_test_started">Test lancé. Redémarrage dans ≤30 s…</string>
     <string name="dialog_log_buffer_size">Taille du tampon de journal (Ko)</string>
     <string name="batch_update_summary" formatted="false">Mise à jour par lot terminée : %1$d réussies, %2$d échouées</string>
     <string name="probe_tolerance">Tolérance de bascule du répartiteur (ms)</string>

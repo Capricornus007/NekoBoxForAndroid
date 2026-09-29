@@ -772,11 +772,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="auto_switch_timeout">Cambio automatico al timeout</string>
     <string name="auto_switch_timeout_summary">Passa automaticamente alla configurazione successiva se non c\'è risposta</string>
     <string name="auto_switch_timeout_duration">Durata timeout (secondi)</string>
-    <string name="vpn_watchdog">Riconnessione automatica</string>
-    <string name="vpn_watchdog_summary">Riavvia la VPN in caso di caduta della connessione</string>
-    <string name="vpn_watchdog_test">🧪 Testa watchdog</string>
-    <string name="vpn_watchdog_test_summary">Forza il riavvio della VPN per testare il watchdog</string>
-    <string name="vpn_watchdog_interval">Intervallo di controllo (s)</string>
     <string name="dual_network_acceleration">Accelerazione doppia rete</string>
     <string name="dual_network_acceleration_summary">Connetti contemporaneamente tramite Wi-Fi e dati mobili. Richiede che Wi-Fi e dati mobili restino attivi nelle impostazioni di sistema e aumenta il consumo della batteria.</string>
     <string name="app_name">NekoBox</string>
@@ -928,12 +923,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="debug_button_crash_from_kt">Crash da Kotlin</string>
     <string name="debug_button_reset_settings">Reimposta impostazioni</string>
     <string name="toast_create_preferences_failed">Creazione delle preferenze non riuscita. Riprova.</string>
-    <string name="dialog_watchdog_test_title">Prova il watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">La VPN non è attiva. Connettiti prima alla VPN.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Prova la riconnessione automatica</string>
-    <string name="dialog_watchdog_force_restart">Il watchdog riavvierà forzatamente la VPN.  La VPN si disconnetterà per 1–3 secondi…</string>
-    <string name="dialog_watchdog_start">Avvia</string>
-    <string name="snackbar_watchdog_test_started">Test avviato. Riavvio entro ≤30 s…</string>
     <string name="dialog_log_buffer_size">Dimensione buffer log (KB)</string>
     <string name="batch_update_summary" formatted="false">Aggiornamento batch completato: %1$d riuscite, %2$d fallite</string>
     <string name="probe_tolerance">Tolleranza di cambio del bilanciatore (ms)</string>

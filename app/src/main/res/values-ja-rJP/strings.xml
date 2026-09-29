@@ -774,11 +774,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="auto_switch_timeout">タイムアウトで自動切り替え</string>
     <string name="auto_switch_timeout_summary">応答がない場合に次の設定へ自動的に切り替える</string>
     <string name="auto_switch_timeout_duration">タイムアウト時間（秒）</string>
-    <string name="vpn_watchdog">自動再接続</string>
-    <string name="vpn_watchdog_summary">接続が切れたらVPNを再起動する</string>
-    <string name="vpn_watchdog_test">🧪 ウォッチドッグをテスト</string>
-    <string name="vpn_watchdog_test_summary">VPNを強制再起動してウォッチドッグをテストする</string>
-    <string name="vpn_watchdog_interval">チェック間隔（秒）</string>
     <string name="mixed_auth_config">認証を設定</string>
     <string name="mixed_auth_username_hint">ユーザー名（両方空欄で認証なし）</string>
     <string name="mixed_auth_no_auth">未設定（認証なし）</string>
@@ -829,7 +824,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">開始</string>
     <string name="rule_network">ネットワーク</string>
     <string name="rule_protocol">プロトコル</string>
     <string name="backup_not_throne_desktop">Throne デスクトップのバックアップではありません: .thrbackup を期待しましたが %s でした</string>
@@ -871,11 +865,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="debug_button_crash_from_kt">Kotlin からクラッシュ</string>
     <string name="debug_button_reset_settings">設定をリセット</string>
     <string name="toast_create_preferences_failed">設定を作成できませんでした。もう一度お試しください。</string>
-    <string name="dialog_watchdog_test_title">ウォッチドッグをテスト</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN が実行されていません。先に VPN に接続してください。</string>
-    <string name="dialog_watchdog_auto_reconnect_title">自動再接続をテスト</string>
-    <string name="dialog_watchdog_force_restart">ウォッチドッグが VPN を強制的に再起動します。\n\nVPN は 1～3 秒切断された後、自動的に再接続します。\n\n続行しますか？</string>
-    <string name="snackbar_watchdog_test_started">テストを開始しました。30 秒以内に再起動します…</string>
     <string name="dialog_log_buffer_size">ログバッファサイズ（KB）</string>
     <string name="invalid_naive_link">無効なNaive：%1$s</string>
     <string name="invalid_ss_android_link">無効なss-android：%1$s</string>

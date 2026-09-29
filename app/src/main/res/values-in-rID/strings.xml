@@ -641,11 +641,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="auto_switch_timeout">Beralih otomatis saat timeout</string>
     <string name="auto_switch_timeout_summary">Beralih otomatis ke konfigurasi berikutnya jika tidak ada respons</string>
     <string name="auto_switch_timeout_duration">Durasi timeout (detik)</string>
-    <string name="vpn_watchdog">Sambungkan ulang otomatis</string>
-    <string name="vpn_watchdog_summary">Mulai ulang VPN saat koneksi terputus</string>
-    <string name="vpn_watchdog_test">🧪 Uji watchdog</string>
-    <string name="vpn_watchdog_test_summary">Paksa mulai ulang VPN untuk menguji watchdog</string>
-    <string name="vpn_watchdog_interval">Interval pemeriksaan (dtk)</string>
     <string name="quick_clear_cache_restart">Hapus Cache &amp; Mulai Ulang</string>
     <string name="mixed_auth_config">Configure authentication</string>
     <string name="mixed_auth_enabled_sum">Username: %1$s</string>
@@ -828,7 +823,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="pcap">Pcap</string>
     <string name="mtu">MTU</string>
     <string name="action_shadowtls">ShadowTLS</string>
-    <string name="dialog_watchdog_start">Mulai</string>
     <string name="rule_network">Jaringan</string>
     <string name="rule_protocol">Protokol</string>
     <string name="not_set">Tidak diatur</string>
@@ -862,15 +856,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="debug_button_crash_from_kt">Picu crash dari Kotlin</string>
     <string name="debug_button_reset_settings">Setel ulang setelan</string>
     <string name="toast_create_preferences_failed">Gagal membuat preferensi. Coba lagi.</string>
-    <string name="dialog_watchdog_test_title">Uji watchdog</string>
-    <string name="dialog_watchdog_vpn_not_running">VPN tidak berjalan. Hubungkan ke VPN terlebih dahulu.</string>
-    <string name="dialog_watchdog_auto_reconnect_title">Uji penyambungan ulang otomatis</string>
-    <string name="dialog_watchdog_force_restart">Watchdog akan memulai ulang VPN secara paksa.
-
-VPN akan terputus selama 1–3 detik, lalu tersambung kembali secara otomatis.
-
-Lanjutkan?</string>
-    <string name="snackbar_watchdog_test_started">Pengujian dimulai. Memulai ulang dalam ≤30 dtk…</string>
     <string name="dialog_log_buffer_size">Ukuran buffer log (KB)</string>
     <string name="invalid_naive_link">Tautan Naive tidak valid: %1$s</string>
     <string name="invalid_ss_android_link">Tautan ss-android tidak valid: %1$s</string>

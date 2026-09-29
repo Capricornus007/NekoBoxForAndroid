@@ -309,9 +309,6 @@ object Key {
 
     const val GLOBAL_MODE = "globalMode"
 
-    const val VPN_WATCHDOG_ENABLED = "vpnWatchdogEnabled"
-    const val VPN_WATCHDOG_INTERVAL = "vpnWatchdogInterval"
-
     // ---- 新增（缺失的常量） ----
     const val APPEND_HTTP_PROXY = "appendHttpProxy"
     const val DISABLE_MIXED_INBOUND = "disableMixedInbound"
