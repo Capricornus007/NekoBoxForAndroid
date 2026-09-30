@@ -136,6 +136,12 @@
             app:key="killSwitch"
             app:summary="@string/kill_switch_summary"
             app:title="@string/kill_switch" />
+        <SwitchPreference
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_fingerprint_24"
+            app:key="webrtcLeakProtection"
+            app:summary="@string/webrtc_leak_protection_summary"
+            app:title="@string/webrtc_leak_protection" />
         <Preference
             app:icon="@drawable/ic_baseline_vpn_key_24"
             app:key="protectionAlwaysOn"

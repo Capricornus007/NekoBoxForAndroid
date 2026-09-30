@@ -164,6 +164,11 @@ const val TAG_DNS_HOSTS = "dns-hosts"
 
 const val LOCALHOST = "127.0.0.1"
 
+// IANA STUN/TURN ports (plain and TLS) plus Google's 19302-19309 STUN/TURN range. Only
+// the fallback for what the STUN sniffer cannot see: TURN over TCP or TLS.
+val WEBRTC_STUN_PORTS = listOf(3478, 3479, 5349, 5350)
+const val WEBRTC_STUN_PORT_RANGE = "19302:19309"
+
 class ConfigBuildResult(
     var config: String,
     var externalIndex: List<IndexEntity>,
@@ -488,6 +493,40 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 routeRules.add(
                     Rule_DefaultOptions().apply {
                         action = "sniff"
+                    },
+                )
+            }
+            // WebRTC leak protection: reject STUN, which ICE uses to discover server-reflexive
+            // and relay candidates, so no address is learned through WebRTC. The sniffer catches
+            // STUN on any UDP port; the port rule covers TURN over TCP/TLS. Only meaningful in
+            // VPN mode, where every UDP packet of a tunneled app passes through here. A stun-only
+            // sniff is added when general sniffing is off; sing-box skips TCP streams for it.
+            // Scoped to the app-facing inbounds: the plugin mapping inbounds forward to the
+            // user's own server, which may itself listen on one of these ports.
+            if (!forTest && isVPN && DataStore.webrtcLeakProtection) {
+                val appInbounds = listOfNotNull("tun-in", TAG_MIXED.takeIf { keepMixedInbound })
+                if (!needSniff) {
+                    routeRules.add(
+                        Rule_DefaultOptions().apply {
+                            inbound = appInbounds
+                            action = "sniff"
+                            sniffer = listOf("stun")
+                        },
+                    )
+                }
+                routeRules.add(
+                    Rule_DefaultOptions().apply {
+                        inbound = appInbounds
+                        protocol = listOf("stun")
+                        action = "reject"
+                    },
+                )
+                routeRules.add(
+                    Rule_DefaultOptions().apply {
+                        inbound = appInbounds
+                        port = WEBRTC_STUN_PORTS
+                        port_range = listOf(WEBRTC_STUN_PORT_RANGE)
+                        action = "reject"
                     },
                 )
             }

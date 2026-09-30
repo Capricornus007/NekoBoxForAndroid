@@ -14,6 +14,7 @@ object Key {
     const val PROTECTION_LOCKDOWN = "protectionLockdown"
     const val PROTECTION_BATTERY = "protectionBattery"
     const val KILL_SWITCH = "killSwitch"
+    const val WEBRTC_LEAK_PROTECTION = "webrtcLeakProtection"
     const val PLUGIN_SIGNER_APPROVALS = "pluginSignerApprovals"
 
     const val APP_THEME = "appTheme"

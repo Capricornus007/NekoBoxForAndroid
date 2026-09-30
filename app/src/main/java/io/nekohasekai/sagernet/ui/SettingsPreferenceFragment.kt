@@ -189,6 +189,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             openSystemSettings(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
             true
         }
+        findPreference<SwitchPreference>(Key.WEBRTC_LEAK_PROTECTION)?.onPreferenceChangeListener = reloadListener
         refreshProtection()
     }
 
@@ -197,7 +198,9 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     private fun refreshProtection() {
         val alwaysOn = findPreference<Preference>(Key.PROTECTION_ALWAYS_ON) ?: return
         val lockdown = findPreference<Preference>(Key.PROTECTION_LOCKDOWN) ?: return
-        findPreference<Preference>(Key.KILL_SWITCH)?.isEnabled = DataStore.serviceMode == Key.MODE_VPN
+        val vpnMode = DataStore.serviceMode == Key.MODE_VPN
+        findPreference<Preference>(Key.KILL_SWITCH)?.isEnabled = vpnMode
+        findPreference<Preference>(Key.WEBRTC_LEAK_PROTECTION)?.isEnabled = vpnMode
         when {
             DataStore.serviceMode != Key.MODE_VPN -> {
                 alwaysOn.setSummary(R.string.protection_proxy_mode)

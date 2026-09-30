@@ -82,7 +82,7 @@
     <string name="settings_connection">Connection</string>
     <string name="settings_connection_summary">Auto-connect, service mode, TUN, MTU, reconnect behavior</string>
     <string name="settings_protection">Leak protection</string>
-    <string name="settings_protection_summary">Kill switch, always-on VPN, block connections without VPN, battery optimization</string>
+    <string name="settings_protection_summary">Kill switch, WebRTC leak protection, always-on VPN, block connections without VPN, battery optimization</string>
     <string name="settings_route_summary">Proxied apps, LAN bypass, sniffing, IPv6, rule sets</string>
     <string name="settings_dns_summary">Remote and direct DNS, domain strategy, FakeDNS, hosts</string>
     <string name="settings_inbound_summary">Local proxy port, LAN access, authentication</string>
@@ -710,6 +710,8 @@
     <string name="kill_switch">Kill switch</string>
     <string name="kill_switch_summary">Keep the VPN interface up while the proxy restarts or fails, so traffic is dropped instead of reaching the network directly. Apps excluded in Proxied apps bypass mode keep their direct access. The service reconnects with backoff; stop it to release the block. Applies from the next start.</string>
     <string name="kill_switch_blocking">Kill switch: traffic blocked</string>
+    <string name="webrtc_leak_protection">WebRTC leak protection</string>
+    <string name="webrtc_leak_protection_summary">Reject STUN, and TURN on its standard ports, inside the tunnel, so websites cannot use WebRTC to discover your addresses. Voice and video calls in tunneled apps may stop working; for per-app control, turn this off, keep traffic sniffing on and add a routing rule with protocol stun. Apps that bypass the VPN are not covered.</string>
     <string name="protection_always_on">Always-on VPN</string>
     <string name="protection_always_on_enabled">On. Android restarts the VPN after a reboot or after the service stops.</string>
     <string name="protection_always_on_disabled">Off. After a reboot or a crash the VPN stays down until you start it. Tap to open the system VPN settings and enable it for this app.</string>

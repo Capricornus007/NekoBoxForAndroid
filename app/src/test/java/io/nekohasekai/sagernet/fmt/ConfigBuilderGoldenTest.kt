@@ -1,8 +1,10 @@
 package io.nekohasekai.sagernet.fmt
 
+import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.ProxyGroup
+import io.nekohasekai.sagernet.database.RuleEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
@@ -339,6 +341,43 @@ class ConfigBuilderGoldenTest {
         assertEquals(1, outbound.getJSONObject("marker").getInt("inner"))
         assertEquals("custom-final", root.getJSONObject("route").getString("final"))
         assertTrue(root.getBoolean("top_level_marker"))
+    }
+
+    @Test
+    fun webrtcLeakProtection_rejectsStunAheadOfUserRulesInVpnModeOnly() {
+        val profile = addSocks(addGroup(), "192.0.2.80", 1080, "webrtc")
+        ConfigBuilderTestEnv.io {
+            SagerDatabase.rulesDao.createRule(RuleEntity(network = "udp", outbound = 0, enabled = true))
+        }
+        fun rules() = objects(JSONObject(build(profile).config).getJSONObject("route").getJSONArray("rules"))
+        fun stunRules(rules: List<JSONObject>) = rules.filter {
+            it.optJSONArray("protocol")?.toString()?.contains("stun") == true || it.optJSONArray("port_range") != null
+        }
+
+        DataStore.serviceMode = Key.MODE_VPN
+        assertTrue(stunRules(rules()).isEmpty())
+
+        DataStore.webrtcLeakProtection = true
+        var rules = rules()
+        val sniff = rules.single { it.optString("action") == "sniff" }
+        val stun = rules.single { it.optJSONArray("protocol")?.toString()?.contains("stun") == true }
+        val ports = rules.single { it.optJSONArray("port_range") != null }
+        assertEquals(listOf("stun"), strings(sniff.getJSONArray("sniffer")))
+        assertTrue(listOf(sniff, stun, ports).all { strings(it.getJSONArray("inbound")) == listOf("tun-in") })
+        assertEquals("reject", stun.getString("action"))
+        assertEquals("reject", ports.getString("action"))
+        assertEquals(listOf(3478, 3479, 5349, 5350), (0 until ports.getJSONArray("port").length()).map(ports.getJSONArray("port")::getInt))
+        assertEquals(listOf("19302:19309"), strings(ports.getJSONArray("port_range")))
+        val userRule = rules.indexOfFirst { it.optJSONArray("network") != null }
+        assertTrue(rules.indexOf(sniff) < rules.indexOf(stun) && rules.indexOf(stun) < rules.indexOf(ports) && rules.indexOf(ports) < userRule)
+
+        DataStore.trafficSniffing = 1
+        rules = rules()
+        assertFalse(rules.single { it.optString("action") == "sniff" }.has("sniffer"))
+        assertEquals(2, stunRules(rules).size)
+
+        DataStore.serviceMode = Key.MODE_PROXY
+        assertTrue(stunRules(rules()).isEmpty())
     }
 
     @Test
