@@ -36,19 +36,20 @@
    - 备选：放大 `TextAppearance.SagerNet.Button`——按钮/对话框共用，波及面失控；被否。
    - 40dp/16sp 是"稍微小一点/稍大一点"的量化解析，真机观感可在验证阶段微调（Risks 记录）。
 
-3. **legacy 界面：从 `fitsSystemWindows` + `statusBarForeground` 迁移到 `applyTopInset()` 模式，绕开上游 #3404。**
-   三个布局各做同样四处改动：root `CoordinatorLayout`、`AppBarLayout`、`CollapsingToolbarLayout` 去掉 `fitsSystemWindows`；`AppBarLayout` 去掉 `app:statusBarForeground`；header 去掉硬编码 `paddingTop="56dp"`。状态栏空间改由 `ThemedActivity.onContentChanged` 自动安装的 `applyTopInset()` 提供（AppBarLayout top + horizontal inset padding，背景色自然填满状态栏区域，fling 时没有任何动态绘制的 foreground 可脱开）。Activity 侧同步调整：toolbar/header 的 `applyInsetPadding(horizontal = true)` 移除（AppBarLayout 已含 horizontal padding，否则双倍侧距），`binding.list.applyListInsets(ime = true, horizontal = false)` 改 `horizontal = true`（root 不再消费 horizontal inset），注释同步更新。
-   - 备选：升级 material 到修复版——#3404 至今 Open，无修复版本可升；被否。
-   - 备选：列表 `overScrollMode="never"`——#3404 是 fling settle 时 foreground 绘制位置问题，与 over-scroll 效果开关无关，且损失 over-scroll 反馈；被否。
-   - 备选：状态栏区域自绘一个色块 View 兜底——增加 hack 层且折叠几何仍留在问题模式里；被否。
-   - 代价：折叠头部的几何从"Collapse 内容含 56dp 状态栏占位 + foreground"变为"AppBarLayout padding 固定占位 + 内容在其下折叠"，折叠/展开视觉需真机确认等价（Risks 记录）。
+3. **legacy 界面：从 `fitsSystemWindows` + `statusBarForeground` 迁移到 `applyTopInset()` 模式，并改为一体化固定标题，绕开上游 #3404。**
+    三个布局各做同样改动：root `CoordinatorLayout`、`AppBarLayout`、`CollapsingToolbarLayout` 去掉 `fitsSystemWindows`；`AppBarLayout` 去掉 `app:statusBarForeground`；`CollapsingToolbarLayout` 去掉 `app:layout_scrollFlags="scroll|enterAlways|exitUntilCollapsed"`，使 toolbar（pin）与 header 作为一体化标题区固定不滑动（与首页 appbar 一致，真机验证反馈的期望）；header 保留硬编码 `paddingTop="56dp"`——状态栏空间移除后它的语义变为顶开 pinned toolbar，避免 header 内容与 toolbar 重叠穿插。状态栏空间改由 `ThemedActivity.onContentChanged` 自动安装的 `applyTopInset()` 提供（AppBarLayout top + horizontal inset padding，背景色自然填满状态栏区域，fling 时没有任何动态绘制的 foreground 可脱开，也没有会溢出 padding 区的滚动子内容）。Activity 侧同步调整：toolbar/header 的 `applyInsetPadding(horizontal = true)` 移除（AppBarLayout 已含 horizontal padding，否则双倍侧距），`binding.list.applyListInsets(ime = true, horizontal = false)` 改 `horizontal = true`（root 不再消费 horizontal inset），注释同步更新。
+    - 备选：升级 material 到修复版——#3404 至今 Open，无修复版本可升；被否。
+    - 备选：列表 `overScrollMode="never"`——#3404 是 fling settle 时 foreground 绘制位置问题，与 over-scroll 效果开关无关，且损失 over-scroll 反馈；被否。
+    - 备选：状态栏区域自绘一个色块 View 兜底——增加 hack 层且几何仍留在问题模式里；被否。
+    - 备选（首轮真机验证后的回退方案）：保留折叠滚动、仅恢复 `fitsSystemWindows` 去 `statusBarForeground` + root 固定 top padding——真机反馈明确要求标题区一体化固定不滑动（"如首页那样"），折叠滚动本身不再是期望行为；被否，改为移除 scroll flags。
+    - 注：首轮迁移去掉 header `paddingTop` 后真机出现 header 与 pinned toolbar 重叠、滑动时内容溢出状态栏区（AppBarLayout padding 不裁剪子视图），故 header `paddingTop="56dp"` 保留、滚动 flags 移除。
 
 ## Risks / Trade-offs
 
 - [空状态居中区域含 bottom inset，中心比纯屏幕中心略高（约半个导航栏高度）] → 视觉差异在数 dp 量级，真机确认可接受；若要求严格屏幕中心，可在验证阶段把 `applyListInsets()` 换成对称 inset 处理，spec 场景不变。
 - [40dp / 16sp 的"稍微"量级因屏幕密度/字体缩放观感不同] → 真机截图核对，不符即微调数值；spec 以"约"表述，改动不越出行为边界。
-- [legacy 布局迁移后折叠/展开几何与 56dp 硬编码时代的像素级差异] → 真机验证场景覆盖折叠/展开与横屏；若折叠异常，回退方案是恢复 `fitsSystemWindows` 但去掉 `statusBarForeground`、以 root 固定 top padding 顶替（同批次内调整，不跨批次累积）。
-- [Material AppBarLayout 在 padding 模式下与 CollapsingToolbarLayout 的组合未在本仓库其他界面出现过（其他界面均为非折叠 appbar）] → 该组合是 Material 文档支持的标准用法；风险由问题 3 的真机 fling/折叠验证批次兜底。
+- [一体化固定标题后头部常驻，列表可视高度比折叠形态更小（尤其分应用代理的搜索框常驻）] → 属用户明确期望的取舍；真机验证场景确认可用性，若头部过高可另行在本批次内收紧内部间距。
+- [Material AppBarLayout 在 padding 模式下与 CollapsingToolbarLayout 的组合未在本仓库其他界面出现过（其他界面均为非折叠 appbar），且去 scroll flags 后 CollapsingToolbarLayout 实际不再折叠] → 该组合是 Material 文档支持的标准用法（无 scroll flags 即固定）；风险由问题 3 的真机 fling/固定标题验证批次兜底。
 - [三个 Activity 的 inset 调用调整若漏改会出双倍 padding 或列表贴边] → tasks 中列为同批次必改项，验证场景含横竖屏侧边/底部导航栏检查。
 
 ## Migration Plan

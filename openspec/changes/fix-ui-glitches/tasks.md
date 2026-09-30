@@ -20,7 +20,8 @@
 - [x] 3.2 同步调整 `AppManagerActivity.kt`、`AppListActivity.kt`、`RuleSetPickerActivity.kt`：移除 toolbar/header 的 `applyInsetPadding(horizontal = true)`（AppBarLayout 已含 horizontal padding），`binding.list.applyListInsets(ime = true, horizontal = false)` 改 `horizontal = true`，更新原 "the app bar fits system windows (status bar foreground)" 注释。验证：diff 确认三处代码模式一致、无其他 inset 调用残留双份
 - [x] 3.3 对照 spec 的"legacy 界面状态栏空间固定"requirement 复核三个场景（fling 顶部不动、其他 legacy 界面同样固定、折叠头部滚动正常），并运行 `openspec validate fix-ui-glitches` 通过
 - [ ] 3.4 提交本批次改动（由用户执行 git 提交，批次独立可回退）
-- [ ] 3.5 CI/真机验证阶段：CI 同 `ci.yml` `build` job；真机场景：分应用代理界面用力上滑/下滑（fling）各一次并录屏或连拍、缓慢滚动折叠/展开头部各一次、横屏重复 fling 一次；应用列表选择（路由内选应用）与规则集选择界面各 fling 一次。预期：顶部状态栏区域全程主题色填充，无白色/窗口背景露出、头部不随 fling 下移，折叠/展开正常，横屏侧边无内容被导航栏遮挡。需回传证据：分应用代理 fling 录屏（或连拍截图）+ 另两个界面的 fling 截图；若折叠几何与迁移前有可见差异或折叠异常，回传录屏并在本批次内按 design 的回退方案调整重验
+- [x] 3.1b（真机反馈后同批次调整，2026-09 起）三个布局移除 `app:layout_scrollFlags="scroll|enterAlways|exitUntilCollapsed"`，header 恢复 `android:paddingTop="56dp"`（语义改为顶开 pinned toolbar），标题区（toolbar+header）一体化固定不滑动、与首页一致；spec 场景"折叠头部滚动不受影响"相应改为"标题区一体化固定"，proposal/design 同步更新。验证：三布局 diff 一致、`@id/appbar`/`@id/collapsing`/`@id/header`/`@id/toolbar` 保留
+- [ ] 3.5 CI/真机验证阶段（3.1b 调整后重验）：CI 同 `ci.yml` `build` job；真机场景：分应用代理界面用力上滑/下滑（fling）各一次并录屏或连拍、横屏重复 fling 一次；应用列表选择（路由内选应用）与规则集选择界面各 fling 一次。预期：顶部状态栏区域全程主题色填充，无白色/窗口背景露出；标题区（toolbar、模式开关、搜索框）整体固定不滑动、不与 toolbar 重叠穿插、不侵入状态栏区域；初始进入即有正确顶部预留；横屏侧边无内容被导航栏遮挡。需回传证据：分应用代理初始态 + fling 录屏（或连拍截图）+ 另两个界面的 fling 截图；若仍有层级/预留问题，回传截图并在本批次内继续调整重验
 
 ## 4. 收尾核对
 

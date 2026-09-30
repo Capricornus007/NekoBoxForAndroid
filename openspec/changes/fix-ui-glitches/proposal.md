@@ -8,7 +8,7 @@
 
 - 首页空状态提示块（`layout_profile_list.xml` 的 `profiles_empty` 区域）改为在整个屏幕（视口）内几何居中，不再顶偏；底部为 FAB/状态栏预留的不对称 padding 不再把内容推高。
 - 首页配置切换栏（`layout_group_list.xml` 的 `group_tab` TabLayout）高度略减（48dp → 40dp 量级），tab 文字略增大（14sp → 16sp 量级）；不影响其他 TabLayout 用法与按钮文字样式。
-- 三个 T4A v1.x 布局（`layout_apps.xml` 分应用代理、`layout_app_list.xml` 应用列表选择、`layout_rule_set_picker.xml` 规则集选择）从 `fitsSystemWindows` + `statusBarForeground` 的状态栏处理模式迁移到仓库既有的 `applyTopInset()` inset padding 模式，使状态栏空间固定不随 fling 滑动，规避上游 #3404。
+- 三个 T4A v1.x 布局（`layout_apps.xml` 分应用代理、`layout_app_list.xml` 应用列表选择、`layout_rule_set_picker.xml` 规则集选择）从 `fitsSystemWindows` + `statusBarForeground` 的状态栏处理模式迁移到仓库既有的 `applyTopInset()` inset padding 模式，使状态栏空间固定不随 fling 滑动，规避上游 #3404；同时移除 collapsing 滚动 flags，标题区（toolbar 与头部内容）改为与首页一致的一体化固定标题，不随列表滑动。
 
 ## Capabilities
 

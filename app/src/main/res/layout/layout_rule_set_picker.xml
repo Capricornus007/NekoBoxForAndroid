@@ -11,18 +11,19 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary">
 
+        <!-- No scroll flags: the toolbar and the header form one fixed title block (like the home screen). -->
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_scrollFlags="scroll|enterAlways|exitUntilCollapsed"
             app:titleEnabled="false">
 
             <LinearLayout
                 android:id="@+id/header"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingTop="56dp">
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
