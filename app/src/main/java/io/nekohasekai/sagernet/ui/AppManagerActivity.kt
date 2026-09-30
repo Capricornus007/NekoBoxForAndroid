@@ -38,7 +38,6 @@ import io.nekohasekai.sagernet.ktx.crossFadeFrom
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.utils.PackageCache
-import io.nekohasekai.sagernet.widget.applyInsetPadding
 import io.nekohasekai.sagernet.widget.applyListInsets
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -278,10 +277,8 @@ class AppManagerActivity : ThemedActivity() {
         binding.list.itemAnimator = DefaultItemAnimator()
         binding.list.adapter = appsAdapter
 
-        // the app bar fits system windows (status bar foreground); the list pads the navigation bar
-        binding.list.applyListInsets(ime = true, horizontal = false)
-        binding.toolbar.applyInsetPadding(horizontal = true)
-        binding.header.applyInsetPadding(horizontal = true)
+        // the app bar pads the status bar and the sides itself (applyTopInset); the list pads the navigation bar and the sides
+        binding.list.applyListInsets(ime = true, horizontal = true)
 
         binding.search.addTextChangedListener {
             appsAdapter.filter.filter(it?.toString() ?: "")

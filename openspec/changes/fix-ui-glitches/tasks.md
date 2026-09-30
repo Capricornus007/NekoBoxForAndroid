@@ -16,9 +16,9 @@
 
 ## 3. legacy 界面状态栏空间固定（规避 material #3404）
 
-- [ ] 3.1 修改 `app/src/main/res/layout/layout_apps.xml`、`layout_app_list.xml`、`layout_rule_set_picker.xml`：root `CoordinatorLayout`、`AppBarLayout`、`CollapsingToolbarLayout` 去掉 `fitsSystemWindows`，`AppBarLayout` 去掉 `app:statusBarForeground`，header 去掉硬编码 `paddingTop="56dp"`；状态栏空间由 `ThemedActivity.onContentChanged` 自动安装的 `applyTopInset()` 提供。验证：三布局 diff 结构一致、`@id/appbar` 保留
-- [ ] 3.2 同步调整 `AppManagerActivity.kt`、`AppListActivity.kt`、`RuleSetPickerActivity.kt`：移除 toolbar/header 的 `applyInsetPadding(horizontal = true)`（AppBarLayout 已含 horizontal padding），`binding.list.applyListInsets(ime = true, horizontal = false)` 改 `horizontal = true`，更新原 "the app bar fits system windows (status bar foreground)" 注释。验证：diff 确认三处代码模式一致、无其他 inset 调用残留双份
-- [ ] 3.3 对照 spec 的"legacy 界面状态栏空间固定"requirement 复核三个场景（fling 顶部不动、其他 legacy 界面同样固定、折叠头部滚动正常），并运行 `openspec validate fix-ui-glitches` 通过
+- [x] 3.1 修改 `app/src/main/res/layout/layout_apps.xml`、`layout_app_list.xml`、`layout_rule_set_picker.xml`：root `CoordinatorLayout`、`AppBarLayout`、`CollapsingToolbarLayout` 去掉 `fitsSystemWindows`，`AppBarLayout` 去掉 `app:statusBarForeground`，header 去掉硬编码 `paddingTop="56dp"`；状态栏空间由 `ThemedActivity.onContentChanged` 自动安装的 `applyTopInset()` 提供。验证：三布局 diff 结构一致、`@id/appbar` 保留
+- [x] 3.2 同步调整 `AppManagerActivity.kt`、`AppListActivity.kt`、`RuleSetPickerActivity.kt`：移除 toolbar/header 的 `applyInsetPadding(horizontal = true)`（AppBarLayout 已含 horizontal padding），`binding.list.applyListInsets(ime = true, horizontal = false)` 改 `horizontal = true`，更新原 "the app bar fits system windows (status bar foreground)" 注释。验证：diff 确认三处代码模式一致、无其他 inset 调用残留双份
+- [x] 3.3 对照 spec 的"legacy 界面状态栏空间固定"requirement 复核三个场景（fling 顶部不动、其他 legacy 界面同样固定、折叠头部滚动正常），并运行 `openspec validate fix-ui-glitches` 通过
 - [ ] 3.4 提交本批次改动（由用户执行 git 提交，批次独立可回退）
 - [ ] 3.5 CI/真机验证阶段：CI 同 `ci.yml` `build` job；真机场景：分应用代理界面用力上滑/下滑（fling）各一次并录屏或连拍、缓慢滚动折叠/展开头部各一次、横屏重复 fling 一次；应用列表选择（路由内选应用）与规则集选择界面各 fling 一次。预期：顶部状态栏区域全程主题色填充，无白色/窗口背景露出、头部不随 fling 下移，折叠/展开正常，横屏侧边无内容被导航栏遮挡。需回传证据：分应用代理 fling 录屏（或连拍截图）+ 另两个界面的 fling 截图；若折叠几何与迁移前有可见差异或折叠异常，回传录屏并在本批次内按 design 的回退方案调整重验
 
