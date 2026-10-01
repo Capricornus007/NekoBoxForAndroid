@@ -30,6 +30,7 @@ import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
+import io.nekohasekai.sagernet.ktx.isIpAddress
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.widget.ListListener
@@ -506,15 +507,20 @@ private fun isValidServerDns(raw: String): Boolean {
     if (value.isEmpty()) return true
     if (value.any { it.isISOControl() || it.isWhitespace() }) return false
 
-    if (value.contains("://")) {
-        val scheme = value.substringBefore("://").lowercase()
+    // 同一欄可以用 `#IP` 附帶這台解析器自己的位址，省掉 sing-box 起動時「先解析域名」這一步。
+    val pin = value.substringAfter('#', "")
+    if (pin.isNotEmpty() && !pin.isIpAddress()) return false
+    val address = value.substringBefore('#')
+
+    if (address.contains("://")) {
+        val scheme = address.substringBefore("://").lowercase()
         if (scheme !in setOf("https", "tls", "quic")) return false
-        val rest = value.substringAfter("://")
+        val rest = address.substringAfter("://")
         val host = rest.substringBefore("/").substringBefore("?")
         val bare = host.substringBeforeLast(":").trim('[', ']')
         return bare.isNotEmpty()
     }
 
-    val host = value.substringBeforeLast(":").trim('[', ']')
+    val host = address.substringBeforeLast(":").trim('[', ']')
     return host.isNotEmpty()
 }

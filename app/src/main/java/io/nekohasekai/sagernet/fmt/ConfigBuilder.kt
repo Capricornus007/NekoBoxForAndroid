@@ -316,6 +316,25 @@ internal fun parseDnsHosts(value: String): Map<String, List<String>> {
     return hosts.mapValues { (_, addresses) -> addresses.distinct() }
 }
 
+// 「自訂伺服器 DNS」同一欄允許寫 `https://host/dns-query#1.2.3.4`：井號後面是那台解析器自己的
+// IP，用來把 sing-box 的 bootstrap 需求整個省掉（見 perGroupResolver 那段註解）。
+internal fun splitResolverPin(value: String): Pair<String, String?> {
+    val hash = value.indexOf('#')
+    if (hash < 0) return value to null
+    val address = value.substring(0, hash)
+    val pin = value.substring(hash + 1).trim().removeSurrounding("[", "]")
+    return address to pin.takeIf { it.isIpAddress() }
+}
+
+// 取 `scheme://host[:port]/path` 裡的 host；純 host 或純 IP 一律照原樣交回。
+internal fun resolverHostName(value: String): String? {
+    if (value.isIpAddress()) return null
+    val rest = value.substringAfter("://", value).substringBefore("?")
+    val authority = rest.substringBefore("/")
+    if (authority.startsWith("[")) return authority.substringAfter('[').substringBefore(']').takeIf { it.isNotBlank() }
+    return authority.substringBefore(":").takeIf { it.isNotBlank() }
+}
+
 private fun serverHostOf(bean: AbstractBean): String? {
     val fallback = bean.serverAddress?.takeIf { it.isNotBlank() }
     if (bean is ConfigBean) {
@@ -1610,14 +1629,26 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     ?.map { "full:$it" }
                 if (hosts.isNullOrEmpty()) return@forEach
 
+                // 這顆伺服器寫的是域名時，得先解析它才用得上。之前 address_resolver 指向
+                // dns-direct，而本機的 directDns 正是那台「需要被人解析」的 AGH —— 自我循環，
+                // 它 SERVFAIL 之後連節點域名都查不到，使用者只看到「域名解析失敗」。
+                // 現在依序：同一欄寫 `https://host/path#1.2.3.4` 直接釘 IP → 全域 hosts 表裡有
+                // 這顆域名就拿它的位址 → 兩條都沒有才退回 address_resolver，且改用系統解析的
+                // dns-local，不再問那台可能正在等自己的 dns-direct。
+                val (resolverAddress, inlineIp) = splitResolverPin(resolver)
+                val pinnedIp = inlineIp ?: resolverHostName(resolverAddress)
+                    ?.lowercase()
+                    ?.let { host -> dnsHosts[host]?.firstOrNull { it.isIpAddress() } }
                 val serverTag = "dns-sub-$gid"
                 dns.servers.add(
                     DNSServerOptions().apply {
-                        address = resolver
+                        address = resolverAddress
                         tag = serverTag
                         detour = TAG_DIRECT
-                        if (!resolver.isIpAddress()) {
-                            address_resolver = "dns-direct"
+                        if (pinnedIp != null) {
+                            server_ip = pinnedIp
+                        } else if (!resolverAddress.isIpAddress()) {
+                            address_resolver = "dns-local"
                         }
                         strategy = autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("server"))
                     },

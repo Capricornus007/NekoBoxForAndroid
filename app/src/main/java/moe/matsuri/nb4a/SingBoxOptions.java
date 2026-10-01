@@ -452,6 +452,8 @@ public class SingBoxOptions {
 
         public Long address_fallback_delay;
 
+        public String server_ip;
+
         public String strategy;
 
         public String detour;
