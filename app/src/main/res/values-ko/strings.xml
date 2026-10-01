@@ -101,6 +101,8 @@
     <string name="forward_success">프록시가 시작되었습니다.</string>
     <string name="invalid_server">잘못된 서버 이름</string>
     <string name="service_failed">실패: </string>
+    <string name="local_dns_failed">연결할 수 없습니다: 네트워크 DNS(%1$s)가 응답하지 않았습니다. 작동하는 직접 DNS를 설정하세요.</string>
+    <string name="local_dns_failed_system">연결할 수 없습니다: 시스템 DNS가 응답하지 않았습니다. 작동하는 직접 DNS를 설정하세요.</string>
     <string name="stop">정지</string>
     <string name="stopping">종료 중…</string>
     <string name="vpn_error">%s</string>

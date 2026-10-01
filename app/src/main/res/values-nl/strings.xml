@@ -121,6 +121,8 @@
     <string name="forward_success">Proxy gestart.</string>
     <string name="invalid_server">Ongeldige servernaam</string>
     <string name="service_failed">Mislukt: </string>
+    <string name="local_dns_failed">Kon niet verbinden: de DNS van het netwerk (%1$s) gaf geen antwoord. Stel een werkende directe DNS in.</string>
+    <string name="local_dns_failed_system">Kon niet verbinden: de DNS van het systeem gaf geen antwoord. Stel een werkende directe DNS in.</string>
     <string name="stop">Stoppen</string>
     <string name="stopping">Afsluiten…</string>
     <string name="vpn_error">%s</string>

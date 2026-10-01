@@ -99,6 +99,8 @@
     <string name="forward_success">پراکسی راه‌اندازی شد.</string>
     <string name="invalid_server">نام سرور نادرست است</string>
     <string name="service_failed">ناموفق: </string>
+    <string name="local_dns_failed">اتصال برقرار نشد: DNS شبکه (%1$s) پاسخی نداد. یک DNS مستقیم کارآمد تنظیم کنید.</string>
+    <string name="local_dns_failed_system">اتصال برقرار نشد: DNS سیستم پاسخی نداد. یک DNS مستقیم کارآمد تنظیم کنید.</string>
     <string name="stop">توقف</string>
     <string name="stopping">خاموش کردن...</string>
     <string name="vpn_error">%s</string>

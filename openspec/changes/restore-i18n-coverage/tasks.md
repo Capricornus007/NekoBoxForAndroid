@@ -2,9 +2,9 @@
 
 ## 1. 补齐 19 语言翻译（实现批次）
 
-- [ ] 1.1 为 19 个语言目录（values-ar/be/de/es/fa/fr/in/it/ja/ko/nb-rNO/nl/pt-rBR/ru/tr/uk/zh-rCN/zh-rHK/zh-rTW）的 `strings.xml` 在 `service_failed` 之后各插入 `local_dns_failed` 与 `local_dns_failed_system` 两条翻译：参照各语言既有网络错误文案的术语与语气，`local_dns_failed` 保留 `%1$s` 占位符，撇号按 Android 规则转义（`\'` 或双引号包裹），不修改任何既有条目
-- [ ] 1.2 运行 `uv run tools/diagnostics/i18n_coverage.py`，确认输出 `0 issue(s)` 且退出码为 0（本地静态校验，覆盖缺失/多余/占位符/XML 良构）
-- [ ] 1.3 提交本批次（单 commit，说明为 merge 后新增的 2 条 DNS 错误字符串补齐翻译、恢复 i18n 全覆盖）
+- [x] 1.1 为 19 个语言目录（values-ar/be/de/es/fa/fr/in/it/ja/ko/nb-rNO/nl/pt-rBR/ru/tr/uk/zh-rCN/zh-rHK/zh-rTW）的 `strings.xml` 在 `service_failed` 之后各插入 `local_dns_failed` 与 `local_dns_failed_system` 两条翻译：参照各语言既有网络错误文案的术语与语气，`local_dns_failed` 保留 `%1$s` 占位符，撇号按 Android 规则转义（`\'` 或双引号包裹），不修改任何既有条目
+- [x] 1.2 运行 `uv run tools/diagnostics/i18n_coverage.py`，确认输出 `0 issue(s)` 且退出码为 0（本地静态校验，覆盖缺失/多余/占位符/XML 良构）
+- [x] 1.3 提交本批次（单 commit，说明为 merge 后新增的 2 条 DNS 错误字符串补齐翻译、恢复 i18n 全覆盖）
 
 ## 2. 批次 1 的 CI/真机验证阶段
 

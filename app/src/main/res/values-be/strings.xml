@@ -1073,6 +1073,8 @@
     <string name="select_apps">Выбраць праграмы</string>
     <string name="select_profile">Выбраць профіль</string>
     <string name="service_failed">Прайграў: </string>
+    <string name="local_dns_failed">Не атрымалася злучыцца: DNS сеткі (%1$s) не адказаў. Задайце працуючы прамы DNS.</string>
+    <string name="local_dns_failed_system">Не атрымалася злучыцца: DNS сістэмы не адказаў. Задайце працуючы прамы DNS.</string>
     <string name="service_proxy">Сэрвіс проксі</string>
     <string name="service_subscription">Сэрвіс абнаўлення падпіскі</string>
     <string name="service_vpn">Сэрвіс VPN</string>

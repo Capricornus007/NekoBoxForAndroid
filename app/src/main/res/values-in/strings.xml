@@ -72,6 +72,8 @@
     <string name="stopping">Mematikan…</string>
     <string name="stop">Berhenti</string>
     <string name="service_failed">Gagal:</string>
+    <string name="local_dns_failed">Tidak dapat terhubung: DNS jaringan (%1$s) tidak merespons. Atur DNS langsung yang berfungsi.</string>
+    <string name="local_dns_failed_system">Tidak dapat terhubung: DNS sistem tidak merespons. Atur DNS langsung yang berfungsi.</string>
     <string name="invalid_server">Nama server tidak valid</string>
     <string name="forward_success">Proksi menyala.</string>
     <string name="service_proxy">Layanan Proksi</string>

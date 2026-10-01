@@ -113,6 +113,8 @@
     <string name="stopping">Slår av…</string>
     <string name="stop">Stoppe</string>
     <string name="service_failed">Mislyktes:</string>
+    <string name="local_dns_failed">Kunne ikke koble til: DNS-en i nettverket (%1$s) svarte ikke. Angi en fungerende direkte DNS.</string>
+    <string name="local_dns_failed_system">Kunne ikke koble til: system-DNS-en svarte ikke. Angi en fungerende direkte DNS.</string>
     <string name="forward_success">Mellomtjener startet.</string>
     <string name="auto_connect_summary">Aktiver mellomtjener ved oppstart/programoppgradering hvis den kjørte før</string>
     <string name="auto_connect">Automatisk tilkobling</string>

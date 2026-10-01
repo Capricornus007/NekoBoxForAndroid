@@ -1412,6 +1412,8 @@
     <string name="enable_mux">啟用多工器</string>
     <string name="mux_concurrency">多工器同時連線數目</string>
     <string name="service_failed">失敗：</string>
+    <string name="local_dns_failed">無法連線：網路的 DNS (%1$s) 未回應。請設定可用的直連 DNS。</string>
+    <string name="local_dns_failed_system">無法連線：系統 DNS 未回應。請設定可用的直連 DNS。</string>
     <string name="select_profile">選取設定檔</string>
     <string name="proxy_chain">代理鏈結</string>
     <string name="custom_config">客製化設定檔</string>

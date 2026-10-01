@@ -178,6 +178,8 @@
 <string name="server_address">Сервер</string>
 <string name="server_port">Удаленный порт</string>
 <string name="service_failed">Не удалось:</string>
+<string name="local_dns_failed">Не удалось подключиться: DNS сети (%1$s) не ответил. Настройте рабочий прямой DNS.</string>
+<string name="local_dns_failed_system">Не удалось подключиться: DNS системы не ответил. Настройте рабочий прямой DNS.</string>
 <string name="service_mode">Сервисный режим</string>
 <string name="service_mode_proxy">Только прокси</string>
 <string name="service_proxy">Прокси-сервис</string>

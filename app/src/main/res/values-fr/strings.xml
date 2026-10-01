@@ -121,6 +121,8 @@
     <string name="forward_success">Proxy démarré.</string>
     <string name="invalid_server">Nom de serveur invalide</string>
     <string name="service_failed">Échec :</string>
+    <string name="local_dns_failed">Impossible de se connecter : le DNS du réseau (%1$s) n\'a pas répondu. Configurez un DNS Direct fonctionnel.</string>
+    <string name="local_dns_failed_system">Impossible de se connecter : le DNS du système n\'a pas répondu. Configurez un DNS Direct fonctionnel.</string>
     <string name="stop">Arrêter</string>
     <string name="stopping">En train de s\'éteindre…</string>
     <string name="vpn_error">%s</string>

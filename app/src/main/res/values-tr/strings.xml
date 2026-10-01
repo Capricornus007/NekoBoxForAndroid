@@ -162,6 +162,8 @@
     <string name="stopping">Kapatılıyor…</string>
     <string name="stop">Durdur</string>
     <string name="service_failed">Başarısız:</string>
+    <string name="local_dns_failed">Bağlanılamadı: Ağ DNS\'i (%1$s) yanıt vermedi. Çalışan bir direkt DNS ayarlayın.</string>
+    <string name="local_dns_failed_system">Bağlanılamadı: Sistem DNS\'i yanıt vermedi. Çalışan bir direkt DNS ayarlayın.</string>
     <string name="invalid_server">Geçersiz sunucu adı</string>
     <string name="forward_success">Vekil sunucu başlatıldı.</string>
     <string name="service_proxy">Vekil Sunucu Servisi</string>

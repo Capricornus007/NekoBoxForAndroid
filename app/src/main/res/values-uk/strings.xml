@@ -99,6 +99,8 @@
     <string name="forward_success">Проксі запущено.</string>
     <string name="invalid_server">Неправильне ім\'я сервера</string>
     <string name="service_failed">Не вдалося: </string>
+    <string name="local_dns_failed">Не вдалося підключитися: DNS мережі (%1$s) не відповів. Задайте працюючий прямий DNS.</string>
+    <string name="local_dns_failed_system">Не вдалося підключитися: DNS системи не відповів. Задайте працюючий прямий DNS.</string>
     <string name="stop">Зупинити</string>
     <string name="stopping">Зупинка…</string>
     <string name="vpn_error">%s</string>
