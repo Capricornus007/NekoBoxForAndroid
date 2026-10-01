@@ -456,17 +456,6 @@
 
     <issue
         id="UseKtx"
-        message="Use the KTX extension function `String.toUri` instead?"
-        errorLine1="        val uri = Uri.parse(uriString)"
-        errorLine2="                  ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/moe/matsuri/nb4a/utils/NGUtil.kt"
-            line="183"
-            column="19"/>
-    </issue>
-
-    <issue
-        id="UseKtx"
         message="Use the KTX extension function `ViewGroup.isEmpty` instead?"
         errorLine1="        if (widgetFrame.childCount == 0) {"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
