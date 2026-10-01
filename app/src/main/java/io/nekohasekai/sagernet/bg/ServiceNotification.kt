@@ -57,7 +57,10 @@ class ServiceNotification(
             } else {
                 null
             }
-            return if (gn == null) ent.displayName() else "[$gn] ${ent.displayName()}"
+            val title = if (gn == null) ent.displayName() else "[$gn] ${ent.displayName()}"
+            // Sharing opens the proxy to other devices; keep that visible for as long as it lasts.
+            if (!DataStore.allowAccess) return title
+            return "$title · " + app.getString(R.string.share_connection_notification, DataStore.mixedPort)
         }
     }
 

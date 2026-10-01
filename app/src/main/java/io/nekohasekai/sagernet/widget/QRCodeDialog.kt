@@ -21,7 +21,7 @@ import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnLifecycleDispatcher
-import io.nekohasekai.sagernet.ui.MainActivity
+import io.nekohasekai.sagernet.ui.ThemedActivity
 import java.nio.charset.StandardCharsets
 import kotlin.math.roundToInt
 
@@ -100,7 +100,7 @@ class QRCodeDialog() : DialogFragment() {
                 } catch (e: WriterException) {
                     Logs.w(e)
                     onMainDispatcher {
-                        (activity as? MainActivity)?.snackbar(e.readableMessage)?.show()
+                        (activity as? ThemedActivity)?.snackbar(e.readableMessage)?.show()
                         dismiss()
                     }
                 }
@@ -120,7 +120,7 @@ class QRCodeDialog() : DialogFragment() {
         }
     } catch (e: WriterException) {
         Logs.w(e)
-        (activity as MainActivity).snackbar(e.readableMessage).show()
+        (activity as? ThemedActivity)?.snackbar(e.readableMessage)?.show()
         dismiss()
         null
     }

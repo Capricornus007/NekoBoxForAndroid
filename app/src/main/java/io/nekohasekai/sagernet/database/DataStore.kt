@@ -178,25 +178,25 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     // hopefully hashCode = mHandle doesn't change, currently this is true from KitKat to Nougat
     private val userIndex by lazy { Binder.getCallingUserHandle().hashCode() }
-    val mixedSecret: String
-        @Synchronized get() {
-            var s = configurationStore.getString(Key.MIXED_SECRET)
-            if (s.isNullOrEmpty()) {
-                s = java.util.UUID.randomUUID().toString().replace("-", "")
-                configurationStore.putString(Key.MIXED_SECRET, s)
-            }
-            return s
-        }
+    val mixedSecret: String get() = storedSecret(Key.MIXED_SECRET)
+    val clashApiSecret: String get() = storedSecret(Key.CLASH_API_SECRET)
 
-    val clashApiSecret: String
-        @Synchronized get() {
-            var s = configurationStore.getString(Key.CLASH_API_SECRET)
-            if (s.isNullOrEmpty()) {
-                s = java.util.UUID.randomUUID().toString().replace("-", "")
-                configurationStore.putString(Key.CLASH_API_SECRET, s)
-            }
-            return s
+    // Credential handed to other devices when the connection is shared. Regenerating it revokes
+    // their access on the next reload while the app's own loopback user stays valid.
+    val shareSecret: String get() = storedSecret(Key.SHARE_SECRET)
+    fun regenerateShareSecret() = configurationStore.putString(Key.SHARE_SECRET, newSecret())
+
+    private fun newSecret() = java.util.UUID.randomUUID().toString().replace("-", "")
+
+    @Synchronized
+    private fun storedSecret(key: String): String {
+        var s = configurationStore.getString(key)
+        if (s.isNullOrEmpty()) {
+            s = newSecret()
+            configurationStore.putString(key, s)
         }
+        return s
+    }
 
     var mixedPort: Int
         get() = getLocalPort(Key.MIXED_PORT, 2080)
