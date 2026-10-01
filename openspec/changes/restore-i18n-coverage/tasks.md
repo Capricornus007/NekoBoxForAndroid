@@ -8,5 +8,5 @@
 
 ## 2. 批次 1 的 CI/真机验证阶段
 
-- [ ] 2.1 CI 验证：push 后确认 `CI` workflow（.github/workflows/ci.yml）的 `build` job（Unit tests and debug build）通过——AAPT 资源编译成功即证明 38 条新翻译 XML 良构、占位符与转义合法；回传该 job 的运行链接与结论，失败则仅回退对应语言条目修复后重跑
-- [ ] 2.2 真机验证：将系统语言切换为 zh-rCN，把 Direct DNS 设置为不可达地址后启动代理触发连接失败，观察首页 snackbar 显示中文文案"网络的 DNS (%1$s) 未应答…"且参数被实际地址正确替换；再抽查 zh-rTW 与 ja 的文案显示；回传截图。其余 16 个语言的显示效果依赖对应母语能力，不逐语言真机抽查，由 1.2 静态校验与 2.1 CI 构建兜底
+- [x] 2.1 CI 验证：push 后确认 `CI` workflow（.github/workflows/ci.yml）的 `build` job（Unit tests and debug build）通过——AAPT 资源编译成功即证明 38 条新翻译 XML 良构、占位符与转义合法；回传该 job 的运行链接与结论，失败则仅回退对应语言条目修复后重跑
+- [x] 2.2 真机验证：将系统语言切换为 zh-rCN，把 Direct DNS 设置为不可达地址后启动代理触发连接失败，观察首页 snackbar 显示中文文案"网络的 DNS (%1$s) 未应答…"且参数被实际地址正确替换；再抽查 zh-rTW 与 ja 的文案显示；回传截图。其余 16 个语言的显示效果依赖对应母语能力，不逐语言真机抽查，由 1.2 静态校验与 2.1 CI 构建兜底
