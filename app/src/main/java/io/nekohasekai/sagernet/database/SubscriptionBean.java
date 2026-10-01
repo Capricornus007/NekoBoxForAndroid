@@ -5,45 +5,25 @@ import androidx.annotation.NonNull;
 import com.esotericsoftware.kryo.io.ByteBufferInput;
 import com.esotericsoftware.kryo.io.ByteBufferOutput;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.nekohasekai.sagernet.fmt.Serializable;
 
 public class SubscriptionBean extends Serializable {
 
     public Integer type;
     public String link;
-    public List<String> extraLinks;
-    public String token;
     public Boolean forceResolve;
     public Boolean deduplication;
     public Boolean updateWhenConnectedOnly;
     public String customUserAgent;
-    public Boolean sendHwid;
-    public String customHwidParams;
     public Boolean autoUpdate;
     public Integer autoUpdateDelay;
     public Integer lastUpdated;
     public Integer filterMode;
     public String filterRegex;
+    // 只解析「這組訂閱自己的伺服器域名」；空＝未設定，沿用全域 DNS。
+    // ⚠️ 10-01：這個欄位之前**完全沒進序列化**（版本停在 3），所以使用者在 UI 填了、
+    //    當次生成的配置有效，但重啟 App／重載群組後就變 null、dns-sub 規則消失。
     public String serverDnsResolver;
-
-    // Optional resolver used ONLY for this subscription's server domains.
-    // Empty/null = unset (global DNS is used, unchanged behavior).
-    public String customDnsResolver;
-
-    // SIP008
-
-    public Long bytesUsed;
-    public Long bytesRemaining;
-
-    // Open Online Config
-
-    public String username;
-    public Integer expiryDate;
-    public List<String> protocols;
-
 
     // https://github.com/crossutility/Quantumult/blob/master/extra-subscription-feature.md
 
@@ -54,7 +34,7 @@ public class SubscriptionBean extends Serializable {
 
     @Override
     public void serializeToBuffer(ByteBufferOutput output) {
-        output.writeInt(3);
+        output.writeInt(5);
 
         output.writeInt(type);
 
@@ -74,13 +54,12 @@ public class SubscriptionBean extends Serializable {
         output.writeInt(filterMode);
         output.writeString(filterRegex);
 
-        // v3
-        output.writeBoolean(sendHwid);
-        output.writeString(customHwidParams);
+        // v5（原 v4）：serverDnsResolver 之前漏了持久化，補上（見欄位註解）。
+        output.writeString(serverDnsResolver);
     }
 
     public void serializeForShare(ByteBufferOutput output) {
-        output.writeInt(1);
+        output.writeInt(2);
 
         output.writeInt(type);
 
@@ -90,8 +69,6 @@ public class SubscriptionBean extends Serializable {
         output.writeBoolean(deduplication);
         output.writeBoolean(updateWhenConnectedOnly);
         output.writeString(customUserAgent);
-        output.writeBoolean(sendHwid);
-        output.writeString(customHwidParams);
     }
 
     @Override
@@ -114,9 +91,15 @@ public class SubscriptionBean extends Serializable {
             filterMode = input.readInt();
             filterRegex = input.readString();
         }
-        if (version >= 3) {
-            sendHwid = input.readBoolean();
-            customHwidParams = input.readString();
+        // v3、v4 的舊資料在 filterRegex 之後帶一對 HWID 欄位；HWID 功能已整個移除，
+        // 但讀舊列時仍要把這兩格吃掉，否則後面的欄位會全部錯位。
+        if (version == 3 || version == 4) {
+            input.readBoolean();
+            input.readString();
+        }
+        // v4 起才有 serverDnsResolver；更舊的資料保持 null，由 initializeDefaultValues 補空字串。
+        if (version >= 4) {
+            serverDnsResolver = input.readString();
         }
     }
 
@@ -129,9 +112,10 @@ public class SubscriptionBean extends Serializable {
         deduplication = input.readBoolean();
         updateWhenConnectedOnly = input.readBoolean();
         customUserAgent = input.readString();
-        if (version >= 1) {
-            sendHwid = input.readBoolean();
-            customHwidParams = input.readString();
+        // 舊版分享格式（v1）尾端帶一對已移除的 HWID 欄位，吃掉以對齊結尾。
+        if (version == 1) {
+            input.readBoolean();
+            input.readString();
         }
     }
 
@@ -139,26 +123,16 @@ public class SubscriptionBean extends Serializable {
     public void initializeDefaultValues() {
         if (type == null) type = 0;
         if (link == null) link = "";
-        if (token == null) token = "";
         if (forceResolve == null) forceResolve = false;
         if (deduplication == null) deduplication = false;
         if (updateWhenConnectedOnly == null) updateWhenConnectedOnly = false;
         if (customUserAgent == null) customUserAgent = "";
-        if (sendHwid == null) sendHwid = false;
-        if (customHwidParams == null) customHwidParams = "";
         if (autoUpdate == null) autoUpdate = false;
         if (autoUpdateDelay == null) autoUpdateDelay = 1440;
         if (lastUpdated == null) lastUpdated = 0;
         if (filterMode == null) filterMode = 0;
         if (filterRegex == null) filterRegex = "";
-        if (customDnsResolver == null) customDnsResolver = "";
-
-        if (bytesUsed == null) bytesUsed = 0L;
-        if (bytesRemaining == null) bytesRemaining = 0L;
-
-        if (username == null) username = "";
-        if (expiryDate == null) expiryDate = 0;
-        if (protocols == null) protocols = new ArrayList<>();
+        if (serverDnsResolver == null) serverDnsResolver = "";
     }
 
     public static final Creator<SubscriptionBean> CREATOR = new CREATOR<SubscriptionBean>() {

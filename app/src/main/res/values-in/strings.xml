@@ -361,9 +361,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="filter_include">Sertakan</string>
     <string name="filter_exclude">Kecualikan</string>
     <string name="filter_regex">Filter (Regex)</string>
-    <string name="subscription_custom_dns">Resolver kustom</string>
-    <string name="subscription_custom_dns_sum">DNS opsional yang hanya digunakan untuk meresolusi domain server langganan ini. Biarkan kosong untuk menggunakan DNS global. Menerima https://, tls://, quic:// atau host[:port].</string>
-    <string name="subscription_custom_dns_invalid">Resolver tidak valid. Gunakan https://, tls://, quic:// atau host[:port], atau biarkan kosong.</string>
     <string name="raw">Mentah</string>
     <string name="update_settings">Pengaturan Pembaruan</string>
     <string name="auto_update">Pembaruan Otomatis</string>
@@ -371,10 +368,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="update_when_connected_only">Perbarui hanya saat terhubung</string>
     <string name="update_when_connected_only_sum">Cegah kebocoran alamat IP</string>
     <string name="subscription_user_agent">UserAgent</string>
-    <string name="subscription_send_hwid">Kirim HWID</string>
-    <string name="subscription_send_hwid_summary">Kirim HWID, versi Android, dan model perangkat saat memperbarui langganan ini</string>
-    <string name="subscription_custom_hwid_params">Parameter HWID Kustom</string>
-    <string name="subscription_custom_hwid_params_summary">Format: hwid=nilai,os=nilai,osVersion=nilai,model=nilai. Kosongkan untuk menggunakan nilai perangkat ini; jika diisi, hanya nilai yang terdaftar yang dikirim.</string>
     <string name="confirm">Konfirmasi</string>
     <string name="missing_plugin">Plugin Hilang</string>
     <string name="profile_requiring_plugin" formatted="false">Profil %1$s memerlukan plugin %2$s untuk diinstal, tetapi
@@ -798,8 +791,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="backup_import_throne_desktop_summary">Mengimpor profil, rute, dan pengaturan dari file .thrbackup Throne desktop. Ikon kustom diabaikan. Data yang ada pada kategori terpilih akan ditimpa.</string>
     <string name="connection_test_url_test">Uji URL grup ini</string>
 
-    <string name="group_is_load_balance">Penyeimbang beban (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Distribusikan koneksi ke semua node dalam grup ini</string>
 
     <string name="action_auto_lowest_latency">Pilih latensi terendah otomatis (URL-Test)</string>
     <string name="route_preset_title">Preset aturan perutean</string>
@@ -845,10 +836,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="speed_test_finished_summary">Selesai: %1$d, gagal: %2$d, dibatalkan: %3$d</string>
     <string name="spoof_user_agent">User-Agent bawaan</string>
     <string name="spoof_user_agent_summary">Digunakan untuk pembaruan langganan saat langganan tidak memiliki User-Agent sendiri</string>
-    <string name="spoof_device_os">OS perangkat yang dipalsukan</string>
-    <string name="spoof_device_os_summary">Menimpa header x-device-os HWID yang dikirim pada pembaruan langganan. Biarkan kosong untuk melaporkan OS asli (Android).</string>
-    <string name="spoof_device_os_version">Versi OS yang dipalsukan</string>
-    <string name="spoof_device_model">Model perangkat yang dipalsukan</string>
     <string name="stun_binding_test">Pengikatan cepat (hanya alamat eksternal)</string>
     <string name="wireguard_listen_port">Porta dengar</string>
     <string name="wireguard_persistent_keepalive">Interval keepalive persisten (detik)</string>
@@ -885,7 +872,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="fastest_regex_error_invalid">Ekspresi reguler tidak valid: %1$s</string>
     <string name="fastest_regex_error_source_missing">Pilih langganan sumber yang ada</string>
     <string name="fastest_regex_error_source_not_subscription">Grup yang dipilih bukan langganan</string>
-    <string name="extra_subscription_links_hint">Masukkan tautan langganan, satu per baris</string>
     <string name="dns_hosts_lines">%d baris hosts</string>
     <string name="rule_domain">Domain</string>
     <string name="rule_dst_ip">IP tujuan</string>

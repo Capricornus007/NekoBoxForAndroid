@@ -31,11 +31,6 @@ class TrafficLooper(
     private val stateMutex = Mutex()
     private var trafficUpdater: TrafficUpdater? = null
 
-    private data class LoopSnapshot(
-        val speed: SpeedDisplayData,
-        val trafficUpdates: ArrayList<TrafficData>,
-    )
-
     private suspend fun <T> withStateLock(block: suspend () -> T): T {
         stateMutex.lock()
         return try {

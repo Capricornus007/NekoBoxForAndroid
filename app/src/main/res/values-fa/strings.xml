@@ -304,8 +304,6 @@
     <string name="connection_test_clear_results">پاک کردن نتایج آزمایش</string>
     <string name="connection_test_url_test">آزمون URL این گروه</string>
 
-    <string name="group_is_load_balance">توزیع بار (چرخشی)</string>
-    <string name="group_is_load_balance_sum">توزیع اتصالات بین تمام گره‌های این گروه</string>
 
     <string name="action_auto_lowest_latency">انتخاب خودکار کم‌ترین تأخیر (URL-Test)</string>
     <string name="route_preset_title">قالب‌های آماده قواعد مسیریابی</string>
@@ -690,10 +688,6 @@
     <string name="speed_test_finished_summary">پایان‌یافته: %1$d، ناموفق: %2$d، لغوشده: %3$d</string>
     <string name="spoof_user_agent">User-Agent پیش‌فرض</string>
     <string name="spoof_user_agent_summary">برای به‌روزرسانی‌های اشتراک استفاده می‌شود وقتی اشتراک User-Agent خودش را ندارد</string>
-    <string name="spoof_device_os">جعل سیستم‌عامل دستگاه</string>
-    <string name="spoof_device_os_summary">هدر x-device-os HWID ارسالی در به‌روزرسانی‌های اشتراک را بازنویسی می‌کند. برای گزارش سیستم‌عامل واقعی (Android) خالی بگذارید.</string>
-    <string name="spoof_device_os_version">جعل نسخه سیستم‌عامل</string>
-    <string name="spoof_device_model">جعل مدل دستگاه</string>
     <string name="stun_binding_test">اتصال سریع (فقط آدرس خارجی)</string>
     <string name="use_system_theme">استفاده از تم سیستم</string>
     <string name="use_system_theme_summary">استفاده از رنگ‌های پویای سیستم (اندروید ۱۲+)</string>
@@ -733,8 +727,6 @@
     <string name="dynamic_colors_classic">کلاسیک</string>
     <string name="dynamic_colors_summary">استفاده از رنگ‌های پویای سیستم</string>
     <string name="dynamic_colors_unavailable">رنگ‌های پویا در دسترس نیستند</string>
-    <string name="extra_subscription_links">لینک‌های اشتراک اضافی</string>
-    <string name="extra_subscription_links_hint">لینک‌های اشتراک را وارد کنید، هر خط یکی</string>
     <string name="fastest_settings">تنظیمات سریع‌ترین</string>
     <string name="http_proxy_bypass_sum">این میزبان‌ها از پروکسی عبور نکنند</string>
     <string name="hysteria2_ech_config_hint">پیکربندی ECH</string>
@@ -823,13 +815,6 @@
     <string name="scan_torch_turn_on">روشن کردن چراغ‌قوه</string>
     <string name="shortcut_pin_not_supported">سنجاق میان‌بر پشتیبانی نمی‌شود</string>
     <string name="shortcut_pin_requested">درخواست سنجاق میان‌بر شد</string>
-    <string name="subscription_custom_dns">DNS سفارشی</string>
-    <string name="subscription_custom_dns_invalid">DNS سفارشی نامعتبر است</string>
-    <string name="subscription_custom_dns_sum">استفاده از DNS سفارشی برای اشتراک</string>
-    <string name="subscription_custom_hwid_params">پارامترهای HWID سفارشی</string>
-    <string name="subscription_custom_hwid_params_summary">پارامترهای سفارشی شناسه سخت‌افزار</string>
-    <string name="subscription_send_hwid">ارسال HWID</string>
-    <string name="subscription_send_hwid_summary">ارسال شناسه سخت‌افزار همراه درخواست اشتراک</string>
     <string name="theme_fallback_summary">استفاده از تم پشتیبان</string>
     <string name="ui_style">سبک رابط کاربری</string>
     <string name="ui_style_classic">کلاسیک</string>

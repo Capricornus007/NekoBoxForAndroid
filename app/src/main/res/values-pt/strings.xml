@@ -385,9 +385,6 @@
     <string name="filter_include">Incluir</string>
     <string name="filter_exclude">Excluir</string>
     <string name="filter_regex">Filtro (Regex)</string>
-    <string name="subscription_custom_dns">Resolvedor personalizado</string>
-    <string name="subscription_custom_dns_sum">DNS opcional usado apenas para resolver os domínios do servidor desta assinatura. Deixe vazio para usar o DNS global. Aceita https://, tls://, quic:// ou host[:porta].</string>
-    <string name="subscription_custom_dns_invalid">Resolvedor inválido. Use https://, tls://, quic:// ou host[:porta], ou deixe vazio.</string>
     <string name="raw">Bruto</string>
     <string name="update_settings">Configurações de Atualização</string>
     <string name="auto_update">Atualização Automática</string>
@@ -395,10 +392,6 @@
     <string name="update_when_connected_only">Atualizar apenas quando conectado</string>
     <string name="update_when_connected_only_sum">Evitar vazamento de endereço IP</string>
     <string name="subscription_user_agent">UserAgent</string>
-    <string name="subscription_send_hwid">Enviar HWID</string>
-    <string name="subscription_send_hwid_summary">Enviar HWID, versão do Android e modelo do dispositivo ao atualizar esta assinatura</string>
-    <string name="subscription_custom_hwid_params">Parâmetros HWID personalizados</string>
-    <string name="subscription_custom_hwid_params_summary">Formato: hwid=valor,os=valor,osVersion=valor,model=valor. Deixe vazio para usar os valores deste dispositivo; quando preenchido, apenas os valores listados são enviados.</string>
     <string name="confirm">Confirmar</string>
     <string name="missing_plugin">Plugin Ausente</string>
     <string name="profile_requiring_plugin" formatted="false">O perfil %1$s requer que o plugin %2$s esteja instalado, mas
@@ -799,8 +792,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Testar URL deste grupo</string>
 
-    <string name="group_is_load_balance">Balanceamento de carga (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Distribuir conexões entre todos os nós do grupo</string>
 
     <string name="action_auto_lowest_latency">Selecionar automaticamente a menor latência (URL-Test)</string>
     <string name="route_preset_title">Predefinições de regras de roteamento</string>
@@ -827,7 +818,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="preview_hint_dont_show_again">Não mostrar novamente</string>
     <string name="action_amneziawg">AmneziaWG</string>
     <string name="bottomsheet_drag_handle_clicked">Alça de arrasto tocada</string>
-    <string name="extra_subscription_links">Ligações de subscrição adicionais</string>
     <string name="lan_sharing">Partilha na LAN</string>
     <string name="lan_sharing_requires_root">A partilha na LAN requer root</string>
     <string name="lan_sharing_summary">Permitir ligações de dispositivos da LAN</string>
@@ -845,7 +835,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="fastest_regex_error_invalid">Expressão regular inválida: %1$s</string>
     <string name="fastest_regex_error_source_missing">Selecione uma subscrição de origem existente</string>
     <string name="fastest_regex_error_source_not_subscription">O grupo de origem selecionado não é uma subscrição</string>
-    <string name="extra_subscription_links_hint">Introduza uma ligação de subscrição por linha</string>
     <string name="dns_hosts_lines">%d linhas de hosts DNS</string>
     <string name="rule_network">Rede</string>
     <string name="rule_protocol">Protocolo</string>
@@ -923,10 +912,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="speed_test_finished_summary">Concluídos: %1$d, falharam: %2$d, cancelados: %3$d</string>
     <string name="spoof_user_agent">User-Agent predefinido</string>
     <string name="spoof_user_agent_summary">Usado nas atualizações de subscrição quando a subscrição não tem User-Agent próprio</string>
-    <string name="spoof_device_os">SO do dispositivo falsificado</string>
-    <string name="spoof_device_os_summary">Substitui o cabeçalho x-device-os HWID enviado nas atualizações de subscrição. Deixe vazio para reportar o SO real (Android).</string>
-    <string name="spoof_device_os_version">Versão do SO falsificada</string>
-    <string name="spoof_device_model">Modelo do dispositivo falsificado</string>
     <string name="stun_binding_test">Ligação rápida (apenas endereço externo)</string>
     <string name="batch_update_summary" formatted="false">Atualização em lote concluída: %1$d êxitos, %2$d falhas</string>
     <string name="probe_tolerance">Tolerância de alternância do balanceador (ms)</string>

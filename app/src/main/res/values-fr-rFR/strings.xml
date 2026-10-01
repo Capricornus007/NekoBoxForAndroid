@@ -766,13 +766,6 @@
     <string name="scan_torch_turn_on">Allumer la lampe torche</string>
     <string name="shortcut_pin_not_supported">Le lanceur ne prend pas en charge l\'épinglage de raccourcis</string>
     <string name="shortcut_pin_requested">Demande de raccourci envoyée au lanceur</string>
-    <string name="subscription_custom_dns">Résolveur personnalisé</string>
-    <string name="subscription_custom_dns_invalid">Résolveur invalide. Utilisez https://, tls://, quic:// ou hôte[:port], ou laissez vide.</string>
-    <string name="subscription_custom_dns_sum">DNS optionnel utilisé uniquement pour résoudre les domaines du serveur de cet abonnement. Laissez vide pour utiliser le DNS global. Accepte https://, tls://, quic:// ou hôte[:port].</string>
-    <string name="subscription_custom_hwid_params">Paramètres HWID personnalisés</string>
-    <string name="subscription_custom_hwid_params_summary">Format : hwid=valeur,os=valeur,osVersion=valeur,model=valeur. Laissez vide pour utiliser les valeurs de cet appareil ; lorsque rempli, seules les valeurs listées sont envoyées.</string>
-    <string name="subscription_send_hwid">Envoyer l\'identifiant matériel</string>
-    <string name="subscription_send_hwid_summary">Envoyer l\'identifiant matériel, la version Android et le modèle de l\'appareil lors de la mise à jour de cet abonnement</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">Thème couleur %1$d</string>
@@ -813,8 +806,6 @@
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Tester l’URL de ce groupe</string>
 
-    <string name="group_is_load_balance">Répartition de charge (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Répartir les connexions sur tous les nœuds du groupe</string>
 
     <string name="action_auto_lowest_latency">Sélection auto de la latence la plus basse (URL-Test)</string>
     <string name="route_preset_title">Modèles de règles de routage</string>
@@ -921,8 +912,6 @@
     <string name="speed_test_stage_error">Erreur</string>
     <string name="speed_test_url_invalid">Saisissez une URL HTTP ou HTTPS valide</string>
     <string name="profile_requiring_plugin">Le profil %s nécessite l\'installation du plugin %s, mais il est introuvable.</string>
-    <string name="extra_subscription_links">Liens d\'abonnement supplémentaires</string>
-    <string name="extra_subscription_links_hint">Saisissez les liens d\'abonnement, un par ligne</string>
     <string name="plugin_exists_but_on_shit_system">Le profil %1$s nécessite le plugin %2$s, mais votre
         fournisseur d\'équipement propriétaire (généralement des géants du capital de surveillance et des créateurs de logiciels malveillants)
         a altéré votre Android, rendant le plugin inutilisable.</string>
@@ -931,10 +920,6 @@
     <string name="speed_test_finished_summary">Terminés : %1$d, échoués : %2$d, annulés : %3$d</string>
     <string name="spoof_user_agent">User-Agent par défaut</string>
     <string name="spoof_user_agent_summary">Utilisé pour les mises à jour d\'abonnement quand l\'abonnement n\'a pas son propre User-Agent</string>
-    <string name="spoof_device_os">OS de l\'appareil usurpé</string>
-    <string name="spoof_device_os_summary">Remplace l\'en-tête x-device-os HWID envoyé lors des mises à jour d\'abonnement. Laissez vide pour signaler l\'OS réel (Android).</string>
-    <string name="spoof_device_os_version">Version de l\'OS usurpée</string>
-    <string name="spoof_device_model">Modèle d\'appareil usurpé</string>
     <string name="stun_binding_test">Liaison rapide (adresse externe uniquement)</string>
     <string name="hide_unavailable_profiles">Masquer les profils indisponibles</string>
     <string name="default_subscription_user_agent">User-Agent d\'abonnement par défaut</string>

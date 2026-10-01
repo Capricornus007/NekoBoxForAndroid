@@ -2,7 +2,6 @@ package io.nekohasekai.sagernet.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.format.Formatter
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -367,7 +366,6 @@ class GroupFragment :
         val groupName = binding.groupName
         val groupStatus = binding.groupStatus
         val groupTraffic = binding.groupTraffic
-        val groupUser = binding.groupUser
         val editButton = binding.edit
         val optionsButton = binding.options
         val updateButton = binding.groupUpdate
@@ -501,31 +499,7 @@ class GroupFragment :
             }
 
             val subscription = proxyGroup.subscription
-            if (subscription != null && subscription.bytesUsed > 0L) { // SIP008 & Open Online Config
-                groupTraffic.isVisible = true
-                groupTraffic.text = if (subscription.bytesRemaining > 0L) {
-                    app.getString(
-                        R.string.subscription_traffic,
-                        Formatter.formatFileSize(
-                            app,
-                            subscription.bytesUsed,
-                        ),
-                        Formatter.formatFileSize(
-                            app,
-                            subscription.bytesRemaining,
-                        ),
-                    )
-                } else {
-                    app.getString(
-                        R.string.subscription_used,
-                        Formatter.formatFileSize(
-                            app,
-                            subscription.bytesUsed,
-                        ),
-                    )
-                }
-                groupStatus.setPadding(0)
-            } else if (subscription != null && !subscription.subscriptionUserinfo.isNullOrBlank()) { // Raw
+            if (subscription != null && !subscription.subscriptionUserinfo.isNullOrBlank()) { // Raw
                 var text = ""
 
                 fun get(regex: String): String? {
@@ -575,8 +549,6 @@ class GroupFragment :
                 groupTraffic.isVisible = false
                 groupStatus.setPadding(0, 0, 0, dp2px(4))
             }
-
-            groupUser.text = subscription?.username ?: ""
 
             runOnDefaultDispatcher {
                 val size = SagerDatabase.proxyDao.countByGroup(group.id)

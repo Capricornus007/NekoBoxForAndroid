@@ -667,8 +667,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dynamic_colors_classic">クラシック</string>
     <string name="dynamic_colors_summary">システムのダイナミックカラーを使用</string>
     <string name="dynamic_colors_unavailable">この端末ではダイナミックカラーは使用できません</string>
-    <string name="extra_subscription_links">追加サブスクリプションリンク</string>
-    <string name="extra_subscription_links_hint">サブスクリプションリンクを1行に1つ入力</string>
     <string name="fastest_settings">最速設定</string>
     <string name="http_proxy_bypass_sum">これらのホストはプロキシをバイパス</string>
     <string name="hysteria2_ech_config_hint">ECH設定</string>
@@ -749,13 +747,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="scan_torch_turn_on">トーチを点ける</string>
     <string name="shortcut_pin_not_supported">ショートカットのピン留めは非対応</string>
     <string name="shortcut_pin_requested">ショートカットのピン留めを要求</string>
-    <string name="subscription_custom_dns">カスタム DNS</string>
-    <string name="subscription_custom_dns_invalid">無効なカスタム DNS</string>
-    <string name="subscription_custom_dns_sum">サブスクリプションにカスタム DNS を使用</string>
-    <string name="subscription_custom_hwid_params">カスタム HWID パラメータ</string>
-    <string name="subscription_custom_hwid_params_summary">カスタムハードウェア ID パラメータ</string>
-    <string name="subscription_send_hwid">HWID を送信</string>
-    <string name="subscription_send_hwid_summary">サブスクリプション要求時にハードウェア ID を送信</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">クラシックカラースウォッチ %1$d</string>
@@ -804,8 +795,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">URL テスト</string>
 
-    <string name="group_is_load_balance">ロードバランス（ラウンドロビン）</string>
-    <string name="group_is_load_balance_sum">このグループの全ノードに接続を分散</string>
 
     <string name="action_auto_lowest_latency">最低遅延ノードを自動選択 (URL-Test)</string>
     <string name="route_preset_title">ルーティングルールのプリセット</string>
@@ -914,10 +903,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="speed_test_finished_summary">完了: %1$d、失敗: %2$d、キャンセル: %3$d</string>
     <string name="spoof_user_agent">既定の User-Agent</string>
     <string name="spoof_user_agent_summary">サブスクリプションが独自の User-Agent を持たない場合の更新に使用されます</string>
-    <string name="spoof_device_os">偽装デバイス OS</string>
-    <string name="spoof_device_os_summary">サブスクリプション更新時に送信される x-device-os HWID ヘッダーを上書きします。空のままにすると実際の OS (Android) を報告します。</string>
-    <string name="spoof_device_os_version">偽装 OS バージョン</string>
-    <string name="spoof_device_model">偽装デバイスモデル</string>
     <string name="stun_binding_test">クイックバインド（外部アドレスのみ）</string>
     <string name="hide_unavailable_profiles">利用不可のノードを非表示</string>
     <string name="default_subscription_user_agent">デフォルトの購読 User-Agent</string>

@@ -158,13 +158,6 @@ internal fun buildUrlTestOutbound(memberTags: List<String>) = Outbound_URLTestOp
     tolerance = 50
 }
 
-// 負載平衡（OwnBox 移植）：round-robin 分發到所有成員
-internal fun buildLoadBalanceOutbound(memberTags: List<String>) = Outbound_SelectorOptions().apply {
-    type = "loadbalance"
-    tag = TAG_PROXY
-    outbounds = memberTags
-}
-
 private fun endpointTag(value: Any?): String? =
     (value as? Map<*, *>)?.get("tag")?.toString()?.takeIf { it.isNotBlank() }
 
@@ -1096,17 +1089,14 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         buildDynamicGroupImpl = ::buildDynamicGroup
 
         val useAutoSelect = !forTest && !forExport && DataStore.autoSelectLowestLatency
-        val useLoadBalance = !forTest && !forExport && group?.let { DataStore.isGroupLoadBalance(it.id) } == true
-        if (buildSelector || useAutoSelect || useLoadBalance) {
+        if (buildSelector || useAutoSelect) {
             val list = group?.id?.let { SagerDatabase.proxyDao.getByGroup(it) } ?: listOf(proxy)
             list.forEach {
                 tagMap[it.id] = buildChain(it.id, it)
             }
             outbounds.add(
                 0,
-                if (useLoadBalance && tagMap.isNotEmpty()) {
-                    buildLoadBalanceOutbound(tagMap.values.toList())
-                } else if (useAutoSelect && tagMap.isNotEmpty()) {
+                if (useAutoSelect && tagMap.isNotEmpty()) {
                     buildUrlTestOutbound(tagMap.values.toList())
                 } else {
                     buildSelectorOutbound(tagMap[proxy.id], tagMap.values.toList())
@@ -1148,7 +1138,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             tagMap[key] = buildChain(key, p)
         }
 
-        val mainProxyTag = (if (buildSelector || useAutoSelect || useLoadBalance) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
+        val mainProxyTag = (if (buildSelector || useAutoSelect) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
 
         if (!forTest && DataStore.globalMode) {
             if (DataStore.bypassLan) {

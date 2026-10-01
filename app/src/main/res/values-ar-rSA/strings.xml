@@ -759,13 +759,6 @@
     <string name="scan_torch_turn_on">تشغيل المصباح</string>
     <string name="shortcut_pin_not_supported">المشغّل لا يدعم تثبيت الاختصارات</string>
     <string name="shortcut_pin_requested">تم إرسال طلب الاختصار إلى المشغّل</string>
-    <string name="subscription_custom_dns">محلل مخصص</string>
-    <string name="subscription_custom_dns_invalid">محلل غير صالح. استخدم https://، tls://، quic:// أو host[:port]، أو اتركه فارغًا.</string>
-    <string name="subscription_custom_dns_sum">DNS اختياري يُستخدم فقط لحل نطاقات خادم هذا الاشتراك. اتركه فارغًا لاستخدام DNS العمومي. يقبل https://، tls://، quic:// أو host[:port].</string>
-    <string name="subscription_custom_hwid_params">معلمات HWID مخصصة</string>
-    <string name="subscription_custom_hwid_params_summary">التنسيق: hwid=value,os=value,osVersion=value,model=value. اتركه فارغًا لاستخدام قيم هذا الجهاز؛ وعند ملئه، تُرسَل القيم المدرجة فقط.</string>
-    <string name="subscription_send_hwid">إرسال HWID</string>
-    <string name="subscription_send_hwid_summary">إرسال HWID وإصدار Android وطراز الجهاز عند تحديث هذا الاشتراك</string>
     <string name="theme_ayu">آيو</string>
     <string name="theme_catppuccin">كاتبوتشين</string>
     <string name="theme_classic_color_swatch">نظام ألوان %1$d</string>
@@ -806,8 +799,6 @@
     <string name="available">%dms</string>
     <string name="connection_test_url_test">اختبار URL لهذه المجموعة</string>
 
-    <string name="group_is_load_balance">توزيع الحمل (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">توزيع الاتصالات على جميع العقد في هذه المجموعة</string>
 
     <string name="action_auto_lowest_latency">الاختيار التلقائي لأقل زمن استجابة (URL-Test)</string>
     <string name="route_preset_title">قوالب قواعد التوجيه الجاهزة</string>
@@ -914,18 +905,12 @@
     <string name="speed_test_stage_error">خطأ</string>
     <string name="speed_test_url_invalid">أدخل رابط HTTP أو HTTPS صالحًا</string>
     <string name="profile_requiring_plugin">الملف التعريفي %s يتطلب تثبيت الإضافة %s، ولكنها غير موجودة.</string>
-    <string name="extra_subscription_links">روابط اشتراك إضافية</string>
-    <string name="extra_subscription_links_hint">أدخل روابط الاشتراك، رابط لكل سطر</string>
     <string name="plugin_exists_but_on_shit_system">يتطلب الملف التعریف %s المكوّن الإضافي %s، لكن بائع المعدات المملوكة لك (عادةً عمالقة المراقبة وصانع البرامج الضارة) تلاعب بجهاز أندرويد، مما يجعل المكون الإضافي غير قابل للاستخدام.</string>
     <string name="plugin_approval_conflict_message">توفر أكثر من حزمة غير موثوقة هذا الملحق: %1$s\n\nأزل التعارض قبل الموافقة على حزمة.</string>
     <string name="ws_max_early_data">الحد الأقصى للبيانات المبكرة</string>
     <string name="speed_test_finished_summary">انتهى: %1$d، فشل: %2$d، أُلغي: %3$d</string>
     <string name="spoof_user_agent">User-Agent الافتراضي</string>
     <string name="spoof_user_agent_summary">يُستخدم لتحديثات الاشتراك عندما لا يكون للاشتراك User-Agent خاص به</string>
-    <string name="spoof_device_os">انتحال نظام تشغيل الجهاز</string>
-    <string name="spoof_device_os_summary">يتجاوز ترويسة x-device-os HWID المرسلة في تحديثات الاشتراك. اتركه فارغًا للإبلاغ عن نظام التشغيل الحقيقي (Android).</string>
-    <string name="spoof_device_os_version">انتحال إصدار نظام التشغيل</string>
-    <string name="spoof_device_model">انتحال طراز الجهاز</string>
     <string name="stun_binding_test">ربط سريع (العنوان الخارجي فقط)</string>
     <string name="hide_unavailable_profiles">إخفاء الملفات غير المتاحة</string>
     <string name="default_subscription_user_agent">وكيل المستخدم الافتراضي للاشتراك</string>

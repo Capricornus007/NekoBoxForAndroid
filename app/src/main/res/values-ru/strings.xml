@@ -113,8 +113,6 @@
     <string name="connection_test_url">URL проверки задержки</string>
     <string name="connection_test_url_test">Проверить URL этой группы</string>
 
-    <string name="group_is_load_balance">Балансировка нагрузки (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Распределять соединения по всем узлам группы</string>
 
     <string name="action_auto_lowest_latency">Автовыбор узла с наименьшей задержкой (URL-Test)</string>
     <string name="route_preset_title">Готовые шаблоны правил маршрутизации</string>
@@ -736,10 +734,6 @@
     <string name="speed_test_finished_summary">Завершено: %1$d, с ошибкой: %2$d, отменено: %3$d</string>
     <string name="spoof_user_agent">User-Agent по умолчанию</string>
     <string name="spoof_user_agent_summary">Используется при обновлениях подписки, если у подписки нет своего User-Agent</string>
-    <string name="spoof_device_os">Поддельная ОС устройства</string>
-    <string name="spoof_device_os_summary">Переопределяет заголовок x-device-os HWID, отправляемый при обновлениях подписки. Оставьте пустым, чтобы сообщать реальную ОС (Android).</string>
-    <string name="spoof_device_os_version">Поддельная версия ОС</string>
-    <string name="spoof_device_model">Поддельная модель устройства</string>
     <string name="stun_binding_test">Быстрая привязка (только внешний адрес)</string>
     <string name="use_system_theme">Использовать системную тему</string>
     <string name="use_system_theme_summary">Использовать системные цвета Monet (Android 12+)</string>
@@ -856,20 +850,12 @@
     <string name="scan_torch_turn_on">Включить фонарик</string>
     <string name="shortcut_pin_not_supported">Закрепление ярлыка не поддерживается</string>
     <string name="shortcut_pin_requested">Запрошено закрепление ярлыка</string>
-    <string name="subscription_custom_dns">Свой DNS</string>
-    <string name="subscription_custom_dns_invalid">Недействительный свой DNS</string>
-    <string name="subscription_custom_dns_sum">Использовать свой DNS для подписки</string>
-    <string name="subscription_custom_hwid_params">Свои параметры HWID</string>
-    <string name="subscription_custom_hwid_params_summary">Пользовательские параметры аппаратного ID</string>
-    <string name="subscription_send_hwid">Отправлять HWID</string>
-    <string name="subscription_send_hwid_summary">Отправлять аппаратный ID с запросом подписки</string>
     <string name="theme_fallback_summary">Использовать резервную тему</string>
     <string name="ui_style">Стиль интерфейса</string>
     <string name="ui_style_classic">Классический</string>
     <string name="ui_style_expressive">Экспрессивный</string>
     <string name="waterfall_settings">Настройки водопада</string>
     <string name="webdav_insecure_url">Небезопасная URL WebDAV</string>
-    <string name="extra_subscription_links_hint">Введите ссылки подписок, по одной в строке</string>
     <string name="dns_hosts_lines">записей hosts: %d</string>
     <string name="append_http_proxy_security_title">Предупреждение безопасности</string>
     <string name="enable_anyway">Всё равно включить</string>

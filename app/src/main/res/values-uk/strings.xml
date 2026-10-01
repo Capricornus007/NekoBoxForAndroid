@@ -362,8 +362,6 @@
     <string name="connection_test_clear_results">Очистити результати тесту</string>
     <string name="connection_test_url_test">Перевірити URL цієї групи</string>
 
-    <string name="group_is_load_balance">Балансування навантаження (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Розподіляти з\'єднання між усіма вузлами групи</string>
 
     <string name="action_auto_lowest_latency">Автовибір вузла з найменшою затримкою (URL-Test)</string>
     <string name="route_preset_title">Готові шаблони правил маршрутизації</string>
@@ -405,9 +403,6 @@
     <string name="filter_include">Включити</string>
     <string name="filter_exclude">Виключити</string>
     <string name="filter_regex">Фільтр (Regex)</string>
-    <string name="subscription_custom_dns">Користувацький резолвер</string>
-    <string name="subscription_custom_dns_sum">Додатковий DNS, який використовується лише для розпізнавання доменів серверів цієї підписки. Залиште порожнім, щоб використовувати глобальний DNS. Приймає https://, tls://, quic:// або хост[:порт].</string>
-    <string name="subscription_custom_dns_invalid">Недійсний резолвер. Використовуйте https://, tls://, quic:// або хост[:порт], або залиште порожнім.</string>
     <string name="raw">Сирий</string>
     <string name="update_settings">Налаштування оновлення</string>
     <string name="auto_update">Автоматичне оновлення</string>
@@ -415,10 +410,6 @@
     <string name="update_when_connected_only">Оновлювати тільки при підключенні</string>
     <string name="update_when_connected_only_sum">Запобігати витоку IP-адреси</string>
     <string name="subscription_user_agent">підписку user agent</string>
-    <string name="subscription_send_hwid">Надсилати HWID</string>
-    <string name="subscription_send_hwid_summary">Надсилати HWID, версію Android та модель пристрою під час оновлення цієї підписки</string>
-    <string name="subscription_custom_hwid_params">Користувацькі параметри HWID</string>
-    <string name="subscription_custom_hwid_params_summary">Формат: hwid=значення,os=значення,osVersion=значення,model=значення. Залиште порожнім, щоб використовувати значення цього пристрою; якщо заповнено, надсилаються лише вказані значення.</string>
     <string name="confirm">Підтвердити</string>
     <string name="missing_plugin">Відсутній плагін</string>
     <string name="profile_requiring_plugin" formatted="false">Профіль %s вимагає встановлення плагіна %s, але\n        його не знайдено.</string>
@@ -733,10 +724,6 @@
     <string name="speed_test_finished_summary">Завершено: %1$d, з помилкою: %2$d, скасовано: %3$d</string>
     <string name="spoof_user_agent">User-Agent за замовчуванням</string>
     <string name="spoof_user_agent_summary">Використовується для оновлень підписки, якщо підписка не має власного User-Agent</string>
-    <string name="spoof_device_os">Підроблена ОС пристрою</string>
-    <string name="spoof_device_os_summary">Перевизначає заголовок x-device-os HWID, що надсилається під час оновлень підписки. Залиште порожнім, щоб повідомляти реальну ОС (Android).</string>
-    <string name="spoof_device_os_version">Підроблена версія ОС</string>
-    <string name="spoof_device_model">Підроблена модель пристрою</string>
     <string name="stun_binding_test">Швидка прив\'язка (лише зовнішня адреса)</string>
     <string name="use_system_theme">Використовувати системну тему</string>
     <string name="use_system_theme_summary">Використовувати системні кольори Monet (Android 12+)</string>
@@ -847,7 +834,6 @@
     <string name="dynamic_colors_classic">Класичні</string>
     <string name="dynamic_colors_summary">Використовувати системні динамічні кольори</string>
     <string name="dynamic_colors_unavailable">Динамічні кольори недоступні</string>
-    <string name="extra_subscription_links">Додаткові посилання на підписки</string>
     <string name="interface_settings">Налаштування інтерфейсу</string>
     <string name="mal_close">Закрити</string>
     <string name="more_options">Більше опцій</string>

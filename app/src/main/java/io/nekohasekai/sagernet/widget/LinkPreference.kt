@@ -12,7 +12,10 @@ import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.resolveStyleAttr
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
-class LinkOrContentPreference
+// 10-01：原本這控件叫 LinkWithExtraPreference，右側掛一顆「+」開附加連結對話框。
+// 用戶判定該功能多餘、連功能一起刪，所以這裡只留「訂閱連結 + 輸入時校驗 URL」，
+// 拿掉 widgetLayoutResource（那顆按鈕）與 onExtraLinksClick。
+class LinkPreference
 @JvmOverloads
 constructor(
     context: Context,
@@ -28,8 +31,6 @@ constructor(
         dialogLayoutResource = R.layout.layout_urltest_preference_dialog
 
         setOnBindEditTextListener {
-            // findViewById (not ViewBinding): the dialog view is supplied by the AndroidX
-            // EditTextPreference bind callback (it.rootView), not an app layout binding.
             val linkLayout = it.rootView.findViewById<TextInputLayout>(R.id.input_layout)
             fun validate() {
                 val link = it.text

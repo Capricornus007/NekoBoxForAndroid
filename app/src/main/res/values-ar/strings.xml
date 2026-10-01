@@ -300,9 +300,6 @@
     <string name="filter_include">تضمين</string>
     <string name="filter_exclude">استبعاد</string>
     <string name="filter_regex">تصفية (تعبير عادي)</string>
-    <string name="subscription_custom_dns">محلل مخصص</string>
-    <string name="subscription_custom_dns_sum">DNS اختياري يُستخدم فقط لحل نطاقات خادم هذا الاشتراك. اتركه فارغًا لاستخدام DNS العمومي. يقبل https://، tls://، quic:// أو host[:port].</string>
-    <string name="subscription_custom_dns_invalid">محلل غير صالح. استخدم https://، tls://، quic:// أو host[:port]، أو اتركه فارغًا.</string>
     <string name="raw">خام</string>
     <string name="update_settings">إعدادات التحديث</string>
     <string name="auto_update">تحديث تلقائي</string>
@@ -310,10 +307,6 @@
     <string name="update_when_connected_only">تحديث فقط عند الاتصال</string>
     <string name="update_when_connected_only_sum">منع تسرب عنوان IP</string>
     <string name="subscription_user_agent">وكيل المستخدم</string>
-    <string name="subscription_send_hwid">إرسال HWID</string>
-    <string name="subscription_send_hwid_summary">إرسال HWID وإصدار Android وطراز الجهاز عند تحديث هذا الاشتراك</string>
-    <string name="subscription_custom_hwid_params">معلمات HWID مخصصة</string>
-    <string name="subscription_custom_hwid_params_summary">التنسيق: hwid=value,os=value,osVersion=value,model=value. اتركه فارغًا لاستخدام قيم هذا الجهاز؛ وعند ملئه، تُرسَل القيم المدرجة فقط.</string>
     <string name="confirm">تأكيد</string>
     <string name="missing_plugin">المكون الإضافي المفقود</string>
     <string name="profile_requiring_plugin" formatted="false">الملف الشخصي %1$s يتطلب تثبيت ملحق %2$s، لكن
@@ -796,8 +789,6 @@
     <string name="backup_import_throne_desktop_summary">استيراد الملفات الشخصية والمسارات والإعدادات من ملف .thrbackup لـ Throne لسطح المكتب. يتم تجاهل الأيقونات المخصصة. ستُستبدل البيانات الحالية للفئات المحددة.</string>
     <string name="connection_test_url_test">اختبار URL لهذه المجموعة</string>
 
-    <string name="group_is_load_balance">توزيع الحمل (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">توزيع الاتصالات على جميع العقد في هذه المجموعة</string>
 
     <string name="action_auto_lowest_latency">الاختيار التلقائي لأقل زمن استجابة (URL-Test)</string>
     <string name="route_preset_title">قوالب قواعد التوجيه الجاهزة</string>
@@ -838,10 +829,6 @@
     <string name="speed_test_finished_summary">انتهى: %1$d، فشل: %2$d، أُلغي: %3$d</string>
     <string name="spoof_user_agent">User-Agent الافتراضي</string>
     <string name="spoof_user_agent_summary">يُستخدم لتحديثات الاشتراك عندما لا يكون للاشتراك User-Agent خاص به</string>
-    <string name="spoof_device_os">انتحال نظام تشغيل الجهاز</string>
-    <string name="spoof_device_os_summary">يتجاوز ترويسة x-device-os HWID المرسلة في تحديثات الاشتراك. اتركه فارغًا للإبلاغ عن نظام التشغيل الحقيقي (Android).</string>
-    <string name="spoof_device_os_version">انتحال إصدار نظام التشغيل</string>
-    <string name="spoof_device_model">انتحال طراز الجهاز</string>
     <string name="stun_binding_test">ربط سريع (العنوان الخارجي فقط)</string>
     <string name="wireguard_listen_port">منفذ الاستماع</string>
     <string name="wireguard_persistent_keepalive">فاصلالإبقاء على الاتصال بالثواني</string>
@@ -878,7 +865,6 @@
     <string name="fastest_regex_error_invalid">تعبير نمطي غير صالح: %1$s</string>
     <string name="fastest_regex_error_source_missing">اختر اشتراك مصدر موجودًا</string>
     <string name="fastest_regex_error_source_not_subscription">المجموعة المحددة ليست اشتراكًا</string>
-    <string name="extra_subscription_links_hint">أدخل روابط الاشتراك، رابط لكل سطر</string>
     <string name="dns_hosts_lines">%d سجلات hosts</string>
     <string name="rule_domain">النطاق</string>
     <string name="rule_dst_ip">IP الوجهة</string>

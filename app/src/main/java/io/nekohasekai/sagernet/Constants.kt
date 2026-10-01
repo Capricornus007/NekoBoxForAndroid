@@ -63,7 +63,6 @@ object Key {
     const val MIXED_PASSWORD = "mixedPassword"
     const val MIXED_SECRET = "mixedSecret" // storage key for the generated inbound secret
     const val CLASH_API_SECRET = "clashApiSecret" // per-install secret for the local Clash API
-    const val SUBSCRIPTION_HWID = "subscriptionHwid"
 
     const val ALLOW_ACCESS = "allowAccess"
     const val REQUIRE_PROXY_IN_VPN = "requireProxyInVPN" // keep local mixed inbound open in VPN mode
@@ -256,7 +255,6 @@ object Key {
     const val GROUP_LANDING_PROXY = "groupLandingProxy"
 
     const val GROUP_SUBSCRIPTION = "groupSubscription"
-    const val SUBSCRIPTION_EXTRA_LINKS = "subscriptionExtraLinks"
     const val SUBSCRIPTION_LINK = "subscriptionLink"
     const val SUBSCRIPTION_FORCE_RESOLVE = "subscriptionForceResolve"
     const val SUBSCRIPTION_DEDUPLICATION = "subscriptionDeduplication"
@@ -267,17 +265,11 @@ object Key {
     const val DEFAULT_SUBSCRIPTION_USER_AGENT = "defaultSubscriptionUserAgent"
     const val SPOOF_USER_AGENT = "spoofUserAgent"
     const val AUTO_SELECT_LOWEST_LATENCY = "autoSelectLowestLatency"
-    const val SPOOF_DEVICE_OS = "spoofDeviceOs"
-    const val SPOOF_DEVICE_OS_VERSION = "spoofDeviceOsVersion"
-    const val SPOOF_DEVICE_MODEL = "spoofDeviceModel"
-    const val SUBSCRIPTION_SEND_HWID = "subscriptionSendHwid"
-    const val SUBSCRIPTION_CUSTOM_HWID_PARAMS = "subscriptionCustomHwidParams"
     const val SUBSCRIPTION_AUTO_UPDATE = "subscriptionAutoUpdate"
     const val SUBSCRIPTION_AUTO_UPDATE_DELAY = "subscriptionAutoUpdateDelay"
     const val SUBSCRIPTION_FILTER_MODE = "subscriptionFilterMode"
     const val SUBSCRIPTION_FILTER_REGEX = "subscriptionFilterRegex"
     const val SUBSCRIPTION_SERVER_DNS = "subscriptionServerDns"
-    const val SUBSCRIPTION_CUSTOM_DNS = "subscriptionCustomDns"
 
     // Balancer
     const val BALANCER_TYPE = "balancerType"

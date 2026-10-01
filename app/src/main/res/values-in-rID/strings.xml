@@ -756,13 +756,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="scan_torch_turn_on">Nyalakan senter</string>
     <string name="shortcut_pin_not_supported">Peluncur tidak mendukung penyematan pintasan</string>
     <string name="shortcut_pin_requested">Permintaan pintasan dikirim ke peluncur</string>
-    <string name="subscription_custom_dns">Resolver kustom</string>
-    <string name="subscription_custom_dns_invalid">Resolver tidak valid. Gunakan https://, tls://, quic:// atau host[:port], atau biarkan kosong.</string>
-    <string name="subscription_custom_dns_sum">DNS opsional yang hanya digunakan untuk meresolusi domain server langganan ini. Biarkan kosong untuk menggunakan DNS global. Menerima https://, tls://, quic:// atau host[:port].</string>
-    <string name="subscription_custom_hwid_params">Parameter HWID Kustom</string>
-    <string name="subscription_custom_hwid_params_summary">Format: hwid=nilai,os=nilai,osVersion=nilai,model=nilai. Kosongkan untuk menggunakan nilai perangkat ini; jika diisi, hanya nilai yang terdaftar yang dikirim.</string>
-    <string name="subscription_send_hwid">Kirim HWID</string>
-    <string name="subscription_send_hwid_summary">Kirim HWID, versi Android, dan model perangkat saat memperbarui langganan ini</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">Tema warna %1$d</string>
@@ -803,8 +796,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Uji URL grup ini</string>
 
-    <string name="group_is_load_balance">Penyeimbang beban (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Distribusikan koneksi ke semua node dalam grup ini</string>
 
     <string name="action_auto_lowest_latency">Pilih latensi terendah otomatis (URL-Test)</string>
     <string name="route_preset_title">Preset aturan perutean</string>
@@ -912,8 +903,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="speed_test_url_invalid">Masukkan URL HTTP atau HTTPS yang valid</string>
     <string name="mixed_auth_username_hint">Nama pengguna (biarkan keduanya kosong tanpa autentikasi)</string>
     <string name="mixed_auth_no_auth">Belum diatur (tanpa autentikasi)</string>
-    <string name="extra_subscription_links">Tautan langganan tambahan</string>
-    <string name="extra_subscription_links_hint">Masukkan tautan langganan, satu per baris</string>
     <string name="profile_requiring_plugin">Profil %1$s memerlukan plugin %2$s untuk diinstal, tetapi
         tidak ditemukan.</string>
     <string name="plugin_exists_but_on_shit_system">Profil %1$s memerlukan plugin %2$s, tetapi vendor peralatan berpemilik Anda (biasanya raksasa kapital pengawasan dan pembuat malware)
@@ -926,10 +915,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="speed_test_finished_summary">Selesai: %1$d, gagal: %2$d, dibatalkan: %3$d</string>
     <string name="spoof_user_agent">User-Agent bawaan</string>
     <string name="spoof_user_agent_summary">Digunakan untuk pembaruan langganan saat langganan tidak memiliki User-Agent sendiri</string>
-    <string name="spoof_device_os">OS perangkat yang dipalsukan</string>
-    <string name="spoof_device_os_summary">Menimpa header x-device-os HWID yang dikirim pada pembaruan langganan. Biarkan kosong untuk melaporkan OS asli (Android).</string>
-    <string name="spoof_device_os_version">Versi OS yang dipalsukan</string>
-    <string name="spoof_device_model">Model perangkat yang dipalsukan</string>
     <string name="stun_binding_test">Pengikatan cepat (hanya alamat eksternal)</string>
     <string name="hide_unavailable_profiles">Sembunyikan profil yang tidak tersedia</string>
     <string name="default_subscription_user_agent">User-Agent langganan bawaan</string>

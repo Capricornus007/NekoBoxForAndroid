@@ -613,8 +613,6 @@
     <string name="snell_reuse_summary">v4-v6만</string>
     <string name="connection_test_url_test">이 그룹 URL 테스트</string>
 
-    <string name="group_is_load_balance">로드 밸런스 (라운드 로빈)</string>
-    <string name="group_is_load_balance_sum">이 그룹의 모든 노드에 연결 분산</string>
 
     <string name="action_auto_lowest_latency">최저 지연 노드 자동 선택 (URL-Test)</string>
     <string name="route_preset_title">라우팅 규칙 프리셋</string>
@@ -657,10 +655,6 @@
     <string name="speed_test_finished_summary">완료: %1$d, 실패: %2$d, 취소: %3$d</string>
     <string name="spoof_user_agent">기본 User-Agent</string>
     <string name="spoof_user_agent_summary">구독에 자체 User-Agent가 없을 때 구독 업데이트에 사용됩니다</string>
-    <string name="spoof_device_os">스푸핑된 기기 OS</string>
-    <string name="spoof_device_os_summary">구독 업데이트 시 전송되는 x-device-os HWID 헤더를 대체합니다. 비워 두면 실제 OS(Android)를 보고합니다.</string>
-    <string name="spoof_device_os_version">스푸핑된 OS 버전</string>
-    <string name="spoof_device_model">스푸핑된 기기 모델</string>
     <string name="stun_binding_test">빠른 바인딩(외부 주소만)</string>
     <string name="wireguard_listen_port">수신 포트</string>
     <string name="wireguard_persistent_keepalive">지속 Keepalive 간격(초)</string>
@@ -697,7 +691,6 @@
     <string name="fastest_regex_error_invalid">잘못된 정규 표현식: %1$s</string>
     <string name="fastest_regex_error_source_missing">기존 소스 구독을 선택하세요</string>
     <string name="fastest_regex_error_source_not_subscription">선택한 그룹은 구독이 아닙니다</string>
-    <string name="extra_subscription_links_hint">구독 링크를 한 줄에 하나씩 입력하세요</string>
     <string name="dns_hosts_lines">hosts 항목 %d개</string>
     <string name="rule_domain">도메인</string>
     <string name="rule_dst_ip">대상 IP</string>

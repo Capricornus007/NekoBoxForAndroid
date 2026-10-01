@@ -10,23 +10,15 @@ import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.preference.*
 import com.github.shadowsocks.plugin.Empty
 import com.github.shadowsocks.plugin.fragment.AlertDialogFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
@@ -38,15 +30,12 @@ import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
-import io.nekohasekai.sagernet.ktx.dp2px
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
-import io.nekohasekai.sagernet.widget.LinkWithExtraPreference
 import io.nekohasekai.sagernet.widget.ListListener
 import io.nekohasekai.sagernet.widget.OutboundPreference
 import kotlinx.parcelize.Parcelize
 import moe.matsuri.nb4a.ui.SimpleMenuPreference
-import org.json.JSONArray
 
 @Suppress("UNCHECKED_CAST")
 class GroupSettingsActivity(
@@ -72,21 +61,15 @@ class GroupSettingsActivity(
 
         val subscription = subscription ?: SubscriptionBean().applyDefaultValues()
         DataStore.subscriptionLink = subscription.link
-        DataStore.subscriptionExtraLinks = subscription.extraLinks?.let {
-            JSONArray(it).toString()
-        } ?: ""
         DataStore.subscriptionForceResolve = subscription.forceResolve
         DataStore.subscriptionDeduplication = subscription.deduplication
         DataStore.subscriptionUpdateWhenConnectedOnly = subscription.updateWhenConnectedOnly
         DataStore.subscriptionUserAgent = subscription.customUserAgent
-        DataStore.subscriptionSendHwid = subscription.sendHwid
-        DataStore.subscriptionCustomHwidParams = subscription.customHwidParams
         DataStore.subscriptionAutoUpdate = subscription.autoUpdate
         DataStore.subscriptionAutoUpdateDelay = subscription.autoUpdateDelay
         DataStore.subscriptionFilterMode = subscription.filterMode
         DataStore.subscriptionFilterRegex = subscription.filterRegex
         DataStore.subscriptionServerDns = subscription.serverDnsResolver ?: ""
-        DataStore.subscriptionCustomDns = subscription.customDnsResolver ?: ""
     }
 
     fun ProxyGroup.serialize() {
@@ -123,28 +106,15 @@ class GroupSettingsActivity(
         if (isSubscription) {
             subscription = (subscription ?: SubscriptionBean().applyDefaultValues()).apply {
                 link = DataStore.subscriptionLink
-                extraLinks = try {
-                    val jsonArray = JSONArray(DataStore.subscriptionExtraLinks ?: "")
-                    val list = ArrayList<String>(jsonArray.length())
-                    for (i in 0 until jsonArray.length()) {
-                        list.add(jsonArray.getString(i))
-                    }
-                    list
-                } catch (e: Exception) {
-                    ArrayList()
-                }
                 forceResolve = DataStore.subscriptionForceResolve
                 deduplication = DataStore.subscriptionDeduplication
                 updateWhenConnectedOnly = DataStore.subscriptionUpdateWhenConnectedOnly
                 customUserAgent = DataStore.subscriptionUserAgent
-                sendHwid = DataStore.subscriptionSendHwid
-                customHwidParams = DataStore.subscriptionCustomHwidParams
                 autoUpdate = DataStore.subscriptionAutoUpdate
                 autoUpdateDelay = DataStore.subscriptionAutoUpdateDelay
                 filterMode = DataStore.subscriptionFilterMode
                 filterRegex = DataStore.subscriptionFilterRegex
                 serverDnsResolver = DataStore.subscriptionServerDns
-                customDnsResolver = DataStore.subscriptionCustomDns
             }
         }
     }
@@ -157,11 +127,6 @@ class GroupSettingsActivity(
 
     fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.group_preferences)
-
-        val subscriptionLink = findPreference<LinkWithExtraPreference>(Key.SUBSCRIPTION_LINK)!!
-        subscriptionLink.onExtraLinksClick = {
-            showExtraLinksDialog()
-        }
 
         frontProxyPreference = findPreference(Key.GROUP_FRONT_PROXY)!!
         frontProxyPreference.apply {
@@ -225,16 +190,6 @@ class GroupSettingsActivity(
             true
         }
 
-        val subscriptionSendHwid =
-            findPreference<SwitchPreferenceCompat>(Key.SUBSCRIPTION_SEND_HWID)!!
-        val subscriptionCustomHwidParams =
-            findPreference<EditTextPreference>(Key.SUBSCRIPTION_CUSTOM_HWID_PARAMS)!!
-        subscriptionCustomHwidParams.isEnabled = subscriptionSendHwid.isChecked
-        subscriptionSendHwid.setOnPreferenceChangeListener { _, newValue ->
-            subscriptionCustomHwidParams.isEnabled = (newValue as Boolean)
-            true
-        }
-
         val subscriptionAutoUpdate =
             findPreference<SwitchPreferenceCompat>(Key.SUBSCRIPTION_AUTO_UPDATE)!!
         val subscriptionAutoUpdateDelay =
@@ -289,27 +244,6 @@ class GroupSettingsActivity(
                 false
             }
         }
-        val subscriptionCustomDns =
-            findPreference<EditTextPreference>(Key.SUBSCRIPTION_CUSTOM_DNS)!!
-        subscriptionCustomDns.setOnPreferenceChangeListener { pref, newValue ->
-            val value = (newValue as String).trim()
-            if (isValidCustomDnsResolver(value)) {
-                // Persist the normalized (trimmed) value rather than the raw input.
-                if (value != newValue) {
-                    (pref as EditTextPreference).text = value
-                    false
-                } else {
-                    true
-                }
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    R.string.subscription_custom_dns_invalid,
-                    Toast.LENGTH_LONG,
-                ).show()
-                false
-            }
-        }
     }
 
     class UnsavedChangesDialogFragment : AlertDialogFragment<Empty, Empty>() {
@@ -347,133 +281,6 @@ class GroupSettingsActivity(
         const val EXTRA_FROM_CLIPBOARD = "fromClipboard"
         const val EXTRA_GROUP_SUBSCRIPTION_LINK = "subscription_link"
         const val EXTRA_GROUP_NAME = "group_name"
-    }
-
-    private fun extraLinksToList(): MutableList<String> {
-        val raw = DataStore.subscriptionExtraLinks ?: ""
-        return try {
-            val arr = JSONArray(raw)
-            val list = mutableListOf<String>()
-            for (i in 0 until arr.length()) {
-                list.add(arr.getString(i))
-            }
-            list
-        } catch (e: Exception) {
-            mutableListOf()
-        }
-    }
-
-    private fun saveExtraLinksList(list: List<String>) {
-        DataStore.subscriptionExtraLinks = JSONArray(list).toString()
-        DataStore.dirty = true
-    }
-
-    private fun showExtraLinksDialog() {
-        val links = extraLinksToList()
-        val context = this@GroupSettingsActivity
-        val hPad = dp2px(20)
-        val vPad = dp2px(12)
-
-        val scrollView = ScrollView(context).apply {
-            isFillViewport = true
-            setPadding(hPad, vPad, hPad, vPad)
-            clipToPadding = false
-        }
-        val container = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-            )
-        }
-        scrollView.addView(container)
-
-        if (links.isEmpty()) links.add("")
-        rebuildRows(container, links)
-
-        val dialog = MaterialAlertDialogBuilder(context)
-            .setTitle(R.string.extra_subscription_links)
-            .setView(scrollView)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                val nonEmpty = links.filter { it.isNotBlank() }
-                saveExtraLinksList(nonEmpty)
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .create()
-
-        dialog.show()
-    }
-
-    private fun rebuildRows(container: LinearLayout, links: MutableList<String>) {
-        container.removeAllViews()
-        // FilledBox (original style) merges visually without generous gaps + outline.
-        val rowGap = dp2px(10)
-        val btnSize = dp2px(48)
-        val btnMarginStart = dp2px(8)
-        for (i in links.indices) {
-            val row = LinearLayout(container.context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                ).apply { setMargins(0, rowGap, 0, rowGap) }
-            }
-
-            // Force outlined box so multi-row URLs don't glue together under original
-            // style (theme default is FilledBox there).
-            val inputLayout = TextInputLayout(row.context).apply {
-                boxBackgroundMode = TextInputLayout.BOX_BACKGROUND_OUTLINE
-                layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    1f,
-                )
-                hint = row.context.getString(R.string.extra_subscription_links_hint)
-            }
-
-            val editText = TextInputEditText(row.context).apply {
-                setText(links.getOrElse(i) { "" })
-                inputType = android.text.InputType.TYPE_CLASS_TEXT or
-                    android.text.InputType.TYPE_TEXT_VARIATION_URI
-                maxLines = 2
-                addTextChangedListener { editable ->
-                    if (i < links.size) {
-                        links[i] = editable?.toString() ?: ""
-                    }
-                }
-            }
-            inputLayout.addView(editText)
-
-            val btn = ImageButton(row.context).apply {
-                layoutParams = LinearLayout.LayoutParams(btnSize, btnSize).apply {
-                    marginStart = btnMarginStart
-                }
-                setBackgroundResource(row.context.resolveSelectableItemBackground())
-            }
-
-            if (i == links.size - 1) {
-                btn.setImageResource(R.drawable.ic_baseline_add_24)
-                btn.contentDescription = "Add"
-                btn.setOnClickListener {
-                    links.add("")
-                    rebuildRows(container, links)
-                }
-            } else {
-                btn.setImageResource(R.drawable.ic_baseline_remove_24)
-                btn.contentDescription = "Remove"
-                btn.setOnClickListener {
-                    if (i < links.size) {
-                        links.removeAt(i)
-                    }
-                    rebuildRows(container, links)
-                }
-            }
-
-            row.addView(inputLayout)
-            row.addView(btn)
-            container.addView(row)
-        }
     }
 
     private fun Context.resolveSelectableItemBackground(): Int {
@@ -692,33 +499,6 @@ class GroupSettingsActivity(
             }
         }
     }
-}
-
-/**
- * Validate a per-subscription custom resolver value.
- * Empty = unset (allowed). Otherwise must be one of:
- *  - a URL with scheme https/tls/quic and a non-empty host
- *  - a bare IPv4/IPv6 literal or host[:port]
- * No default is implied; sing-box performs final parsing at runtime.
- */
-private fun isValidCustomDnsResolver(raw: String): Boolean {
-    val value = raw.trim()
-    if (value.isEmpty()) return true
-    if (value.any { it.isISOControl() || it.isWhitespace() }) return false
-
-    if (value.contains("://")) {
-        val scheme = value.substringBefore("://").lowercase()
-        if (scheme !in setOf("https", "tls", "quic")) return false
-        val rest = value.substringAfter("://")
-        val host = rest.substringBefore("/").substringBefore("?")
-        // strip optional [ipv6] / host:port; require a non-empty host
-        val bare = host.substringBeforeLast(":").trim('[', ']')
-        return bare.isNotEmpty()
-    }
-
-    // bare host[:port] / ip[:port]
-    val host = value.substringBeforeLast(":").trim('[', ']')
-    return host.isNotEmpty()
 }
 
 private fun isValidServerDns(raw: String): Boolean {

@@ -744,13 +744,6 @@
     <string name="scan_torch_turn_on">Уключыць ліхтарык</string>
     <string name="shortcut_pin_not_supported">Лаўнчар не падтрымлівае замацаванне ярлыкоў</string>
     <string name="shortcut_pin_requested">Запыт на стварэнне ярлыка адпраўлены ў лаўнчар</string>
-    <string name="subscription_custom_dns">Карыстальніцкі рэзальвер</string>
-    <string name="subscription_custom_dns_invalid">Няправільны рэзальвер. Выкарыстоўвайце https://, tls://, quic:// ці host[:port], альбо пакіньце пустым.</string>
-    <string name="subscription_custom_dns_sum">Неабавязковы DNS, які выкарыстоўваецца толькі для вызначэння даменаў сервера гэтай падпіскі. Пакіньце пустым для выкарыстання глабальнага DNS. Дапушчаюцца https://, tls://, quic:// ці host[:port].</string>
-    <string name="subscription_custom_hwid_params">Карыстальніцкія параметры HWID</string>
-    <string name="subscription_custom_hwid_params_summary">Фармат: hwid=значэнне,os=значэнне,osVersion=значэнне,model=значэнне. Пакіньце пустым, каб выкарыстоўваць значэнні гэтай прылады; калі запоўнена, адпраўляюцца толькі пералічаныя значэнні.</string>
-    <string name="subscription_send_hwid">Адправіць HWID</string>
-    <string name="subscription_send_hwid_summary">Адпраўляць HWID, версію Android і мадэль прылады пры абнаўленні гэтай падпіскі</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">Каляровая тэма %1$d</string>
@@ -791,8 +784,6 @@
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Тэст URL для гэтай групы</string>
 
-    <string name="group_is_load_balance">Балансаванка нагрузкі (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Размеркаванне злучэнняў па ўсіх вузлах гэтай групы</string>
 
     <string name="action_auto_lowest_latency">Аўтавыбар вузла з найменшай затрымкай (URL-Test)</string>
     <string name="route_preset_title">Гатовыя шаблоны правілаў маршрутызацыі</string>
@@ -901,8 +892,6 @@
     <string name="profile_requiring_plugin">Профіль %s патрабуе ўсталёўкі плагіна %s, але ён не знойдзен.</string>
     <string name="mixed_auth_username_hint">Імя карыстальніка (пакіньце абодва поля пустымі, каб без аўтэнтыфікацыі)</string>
     <string name="mixed_auth_no_auth">Не зададзена (без аўтэнтыфікацыі)</string>
-    <string name="extra_subscription_links">Дадатковыя спасылкі на падпіскі</string>
-    <string name="extra_subscription_links_hint">Увядзіце спасылкі на падпіскі, па адной у радку</string>
     <string name="lan_sharing">Агульны доступ па LAN</string>
     <string name="lan_sharing_requires_root">Агульны доступ па LAN патрабуе root</string>
     <string name="lan_sharing_summary">Дазволіць падключэнне прылад лакальнай сеткі</string>
@@ -911,10 +900,6 @@
     <string name="speed_test_finished_summary">Завершана: %1$d, з правалам: %2$d, скасавана: %3$d</string>
     <string name="spoof_user_agent">User-Agent па змаўчанні</string>
     <string name="spoof_user_agent_summary">Выкарыстоўваецца для абнаўленняў падпіскі, калі ў падпіскі няма ўласнага User-Agent</string>
-    <string name="spoof_device_os">Падроблены OS прылады</string>
-    <string name="spoof_device_os_summary">Перавызначае загаловак x-device-os HWID, які адсылаецца пры абнаўленні падпіскі. Пакіньце пустым, каб паведамляць рэальны OS (Android).</string>
-    <string name="spoof_device_os_version">Падробленая версія OS</string>
-    <string name="spoof_device_model">Падробленая мадэль прылады</string>
     <string name="stun_binding_test">Хуткая привязка (толькі знешні адрас)</string>
     <string name="hide_unavailable_profiles">Схаваць недаступныя профілі</string>
     <string name="default_subscription_user_agent">User-Agent падпіскі па змаўчанні</string>

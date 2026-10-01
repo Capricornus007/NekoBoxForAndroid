@@ -389,9 +389,6 @@ Aanbeveling: Schakel dit alleen in als u alle geïnstalleerde apps vertrouwt.</s
     <string name="filter_include">Opnemen</string>
     <string name="filter_exclude">Uitsluiten</string>
     <string name="filter_regex">Filter (Regex)</string>
-    <string name="subscription_custom_dns">Aangepaste resolver</string>
-    <string name="subscription_custom_dns_sum">Optionele DNS die alleen wordt gebruikt om de serverdomeinen van dit abonnement op te lossen. Laat leeg om de globale DNS te gebruiken. Accepteert https://, tls://, quic:// of host[:port].</string>
-    <string name="subscription_custom_dns_invalid">Ongeldige resolver. Gebruik https://, tls://, quic:// of host[:port], of laat leeg.</string>
     <string name="raw">Raw</string>
     <string name="update_settings">Update-instellingen</string>
     <string name="auto_update">Automatische update</string>
@@ -399,10 +396,6 @@ Aanbeveling: Schakel dit alleen in als u alle geïnstalleerde apps vertrouwt.</s
     <string name="update_when_connected_only">Alleen updaten wanneer verbonden</string>
     <string name="update_when_connected_only_sum">Voorkom IP-adreslek</string>
     <string name="subscription_user_agent">UserAgent</string>
-    <string name="subscription_send_hwid">HWID verzenden</string>
-    <string name="subscription_send_hwid_summary">HWID, Android-versie en apparaatmodel verzenden bij het bijwerken van dit abonnement</string>
-    <string name="subscription_custom_hwid_params">Aangepaste HWID-parameters</string>
-    <string name="subscription_custom_hwid_params_summary">Formaat: hwid=waarde,os=waarde,osVersion=waarde,model=waarde. Laat leeg om de waarden van dit apparaat te gebruiken; ingevuld worden alleen de vermelde waarden verzonden.</string>
     <string name="confirm">Bevestigen</string>
     <string name="missing_plugin">Ontbrekende plugin</string>
     <string name="profile_requiring_plugin" formatted="false">Profiel %1$s vereist de %2$s-plug-in, maar
@@ -790,8 +783,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="connection_test_url">URL voor latentietest</string>
     <string name="connection_test_url_test">URL-test voor deze groep</string>
 
-    <string name="group_is_load_balance">Load balancing (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Verdeel verbindingen over alle nodes in deze groep</string>
 
     <string name="action_auto_lowest_latency">Laagste latentie automatisch kiezen (URL-Test)</string>
     <string name="route_preset_title">Routingregel-presets</string>
@@ -834,10 +825,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="speed_test_finished_summary">Voltooid: %1$d, mislukt: %2$d, geannuleerd: %3$d</string>
     <string name="spoof_user_agent">Standaard User-Agent</string>
     <string name="spoof_user_agent_summary">Wordt gebruikt voor abonnementsupdates wanneer het abonnement geen eigen User-Agent heeft</string>
-    <string name="spoof_device_os">Vervalst apparaat-OS</string>
-    <string name="spoof_device_os_summary">Overschrijft de x-device-os HWID-header die bij abonnementsupdates wordt verzonden. Laat leeg om het echte OS (Android) te melden.</string>
-    <string name="spoof_device_os_version">Vervalste OS-versie</string>
-    <string name="spoof_device_model">Vervalst apparaatmodel</string>
     <string name="stun_binding_test">Snelle binding (alleen extern adres)</string>
     <string name="wireguard_listen_port">Luisterpoort</string>
     <string name="wireguard_persistent_keepalive">Persistente keepalive-interval (seconden)</string>
@@ -874,7 +861,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="fastest_regex_error_invalid">Ongeldige reguliere expressie: %1$s</string>
     <string name="fastest_regex_error_source_missing">Selecteer een bestaand bronabonnement</string>
     <string name="fastest_regex_error_source_not_subscription">De geselecteerde groep is geen abonnement</string>
-    <string name="extra_subscription_links_hint">Voer abonnementslinks in, één per regel</string>
     <string name="dns_hosts_lines">%d hosts-regels</string>
     <string name="rule_domain">Domein</string>
     <string name="rule_dst_ip">Bestemmings-IP</string>

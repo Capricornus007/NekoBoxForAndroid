@@ -386,9 +386,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="filter_include">Includi</string>
     <string name="filter_exclude">Escludi</string>
     <string name="filter_regex">Filtro (Regex)</string>
-    <string name="subscription_custom_dns">Risolutore personalizzato</string>
-    <string name="subscription_custom_dns_sum">DNS opzionale usato solo per risolvere i domini del server di questa sottoscrizione. Lascia vuoto per usare il DNS globale. Accetta https://, tls://, quic:// o host[:port].</string>
-    <string name="subscription_custom_dns_invalid">Risolutore non valido. Usa https://, tls://, quic:// o host[:port], o lascia vuoto.</string>
     <string name="raw">Raw</string>
     <string name="update_settings">Impostazioni aggiornamento</string>
     <string name="auto_update">Aggiornamento automatico</string>
@@ -396,10 +393,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="update_when_connected_only">Aggiorna solo quando connesso</string>
     <string name="update_when_connected_only_sum">Previeni perdita indirizzo IP</string>
     <string name="subscription_user_agent">UserAgent</string>
-    <string name="subscription_send_hwid">Invia HWID</string>
-    <string name="subscription_send_hwid_summary">Invia HWID, versione Android e modello del dispositivo quando si aggiorna questo abbonamento</string>
-    <string name="subscription_custom_hwid_params">Parametri HWID personalizzati</string>
-    <string name="subscription_custom_hwid_params_summary">Formato: hwid=valore,os=valore,osVersion=valore,model=valore. Lascia vuoto per usare i valori di questo dispositivo; se compilato, vengono inviati solo i valori elencati.</string>
     <string name="confirm">Conferma</string>
     <string name="missing_plugin">Plugin mancante</string>
     <string name="profile_requiring_plugin" formatted="false">Il profilo %1$s richiede l\'installazione del plugin %2$s, ma
@@ -821,8 +814,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="connection_test_url">URL test latenza</string>
     <string name="connection_test_url_test">Test URL di questo gruppo</string>
 
-    <string name="group_is_load_balance">Bilanciamento del carico (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Distribuire le connessioni su tutti i nodi del gruppo</string>
 
     <string name="action_auto_lowest_latency">Selezione automatica della latenza più bassa (URL-Test)</string>
     <string name="route_preset_title">Modelli di regole di routing</string>
@@ -868,10 +859,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="speed_test_finished_summary">Completati: %1$d, falliti: %2$d, annullati: %3$d</string>
     <string name="spoof_user_agent">User-Agent predefinito</string>
     <string name="spoof_user_agent_summary">Usato per gli aggiornamenti dell\'abbonamento quando l\'abbonamento non ha un proprio User-Agent</string>
-    <string name="spoof_device_os">OS del dispositivo falsificato</string>
-    <string name="spoof_device_os_summary">Sostituisce l\'header x-device-os HWID inviato negli aggiornamenti dell\'abbonamento. Lascia vuoto per riportare il SO reale (Android).</string>
-    <string name="spoof_device_os_version">Versione del SO falsificata</string>
-    <string name="spoof_device_model">Modello del dispositivo falsificato</string>
     <string name="stun_binding_test">Binding rapido (solo indirizzo esterno)</string>
     <string name="wireguard_listen_port">Porta in ascolto</string>
     <string name="wireguard_persistent_keepalive">Intervallo keepalive persistente (secondi)</string>
@@ -908,7 +895,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="fastest_regex_error_invalid">Espressione regolare non valida: %1$s</string>
     <string name="fastest_regex_error_source_missing">Seleziona una sorgente abbonamento esistente</string>
     <string name="fastest_regex_error_source_not_subscription">Il gruppo selezionato non è un abbonamento</string>
-    <string name="extra_subscription_links_hint">Inserisci i link di abbonamento, uno per riga</string>
     <string name="dns_hosts_lines">%d righe hosts</string>
     <string name="rule_domain">Dominio</string>
     <string name="rule_dst_ip">IP di destinazione</string>

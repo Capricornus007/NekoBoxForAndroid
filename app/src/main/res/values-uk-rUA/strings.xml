@@ -683,7 +683,6 @@
     <string name="dynamic_colors_classic">Доступно з новим інтерфейсом</string>
     <string name="dynamic_colors_summary">Використовувати системну палітру Material You</string>
     <string name="dynamic_colors_unavailable">Доступно на Android 12 та новіших</string>
-    <string name="extra_subscription_links">Extra підписку Links</string>
     <string name="fastest_settings">Налаштування найшвидшого</string>
     <string name="http_proxy_bypass_sum">Хости, які оминають системний HTTP-проксі та підключаються безпосередньо, коли увімкнено «Додавати HTTP-проксі до VPN». Один шаблон на рядок, напр. 192.168.* або 10.*. Типово — приватні та зворотні діапазони.</string>
     <string name="hysteria2_ech_config_hint">Конфігурація ECH</string>
@@ -763,13 +762,6 @@
     <string name="scan_torch_turn_on">Увімкнути ліхтарик</string>
     <string name="shortcut_pin_not_supported">Лаунчер не підтримує закріплення ярликів</string>
     <string name="shortcut_pin_requested">Запит на ярлик надіслано до лаунчера</string>
-    <string name="subscription_custom_dns">Користувацький резолвер</string>
-    <string name="subscription_custom_dns_invalid">Недійсний резолвер. Використовуйте https://, tls://, quic:// або хост[:порт], або залиште порожнім.</string>
-    <string name="subscription_custom_dns_sum">Додатковий DNS, який використовується лише для розпізнавання доменів серверів цієї підписки. Залиште порожнім, щоб використовувати глобальний DNS. Приймає https://, tls://, quic:// або хост[:порт].</string>
-    <string name="subscription_custom_hwid_params">Користувацькі параметри HWID</string>
-    <string name="subscription_custom_hwid_params_summary">Формат: hwid=значення,os=значення,osVersion=значення,model=значення. Залиште порожнім, щоб використовувати значення цього пристрою; якщо заповнено, надсилаються лише вказані значення.</string>
-    <string name="subscription_send_hwid">Надсилати HWID</string>
-    <string name="subscription_send_hwid_summary">Надсилати HWID, версію Android та модель пристрою під час оновлення цієї підписки</string>
     <string name="theme_ayu">theme ayu</string>
     <string name="theme_catppuccin">theme catppuccin</string>
     <string name="theme_classic_color_swatch">Колірна тема %1$d</string>
@@ -785,7 +777,6 @@
     <string name="ui_style_expressive">Новий</string>
     <string name="waterfall_settings">Налаштування каскаду</string>
     <string name="webdav_insecure_url">Небезпечний URL сервера WebDAV. Використовуйте https:// адресу; звичайний http:// передаватиме ваші облікові дані та резервну копію (яка містить усі секрети профілів) у відкритому вигляді.</string>
-    <string name="extra_subscription_links_hint">Введіть підписку links, one per line</string>
     <string name="dns_hosts_lines">Рядків хостів: %d</string>
     <string name="app_name">NekoBox</string>
     <string name="app_name_long">NekoBox for Android</string>
@@ -811,8 +802,6 @@
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Перевірити URL цієї групи</string>
 
-    <string name="group_is_load_balance">Балансування навантаження (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Розподіляти з\'єднання між усіма вузлами групи</string>
 
     <string name="action_auto_lowest_latency">Автовибір вузла з найменшою затримкою (URL-Test)</string>
     <string name="route_preset_title">Готові шаблони правил маршрутизації</string>
@@ -924,10 +913,6 @@
     <string name="speed_test_finished_summary">Завершено: %1$d, з помилкою: %2$d, скасовано: %3$d</string>
     <string name="spoof_user_agent">User-Agent за замовчуванням</string>
     <string name="spoof_user_agent_summary">Використовується для оновлень підписки, якщо підписка не має власного User-Agent</string>
-    <string name="spoof_device_os">Підроблена ОС пристрою</string>
-    <string name="spoof_device_os_summary">Перевизначає заголовок x-device-os HWID, що надсилається під час оновлень підписки. Залиште порожнім, щоб повідомляти реальну ОС (Android).</string>
-    <string name="spoof_device_os_version">Підроблена версія ОС</string>
-    <string name="spoof_device_model">Підроблена модель пристрою</string>
     <string name="stun_binding_test">Швидка прив\'язка (лише зовнішня адреса)</string>
     <string name="hide_unavailable_profiles">Приховати недоступні профілі</string>
     <string name="default_subscription_user_agent">Типовий User-Agent підписки</string>

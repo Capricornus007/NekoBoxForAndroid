@@ -751,13 +751,6 @@
     <string name="scan_torch_turn_on">Taschenlampe einschalten</string>
     <string name="shortcut_pin_not_supported">Launcher unterstützt das Anheften von Verknüpfungen nicht</string>
     <string name="shortcut_pin_requested">Verknüpfungsanfrage an Launcher gesendet</string>
-    <string name="subscription_custom_dns">Benutzerdefinierter Resolver</string>
-    <string name="subscription_custom_dns_invalid">Ungültiger Resolver. Verwenden Sie https://, tls://, quic:// oder Host[:Port], oder lassen Sie das Feld leer.</string>
-    <string name="subscription_custom_dns_sum">Optionaler DNS, der nur zum Auflösen der Serverdomänen dieses Abonnements verwendet wird. Leer lassen, um das globale DNS zu verwenden. Akzeptiert https://, tls://, quic:// oder Host[:Port].</string>
-    <string name="subscription_custom_hwid_params">Benutzerdefinierte HWID-Parameter</string>
-    <string name="subscription_custom_hwid_params_summary">Format: hwid=Wert,os=Wert,osVersion=Wert,model=Wert. Leer lassen, um die Werte dieses Geräts zu verwenden; wenn ausgefüllt, werden nur die aufgelisteten Werte gesendet.</string>
-    <string name="subscription_send_hwid">HWID senden</string>
-    <string name="subscription_send_hwid_summary">HWID, Android-Version und Gerätemodell beim Aktualisieren dieses Abonnements senden</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">Farbthema %1$d</string>
@@ -798,8 +791,6 @@
     <string name="available">%dms</string>
     <string name="connection_test_url_test">URL-Test für diese Gruppe</string>
 
-    <string name="group_is_load_balance">Lastverteilung (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Verbindungen über alle Knoten dieser Gruppe verteilen</string>
 
     <string name="action_auto_lowest_latency">Automatisch niedrigste Latenz wählen (URL-Test)</string>
     <string name="route_preset_title">Routing-Regel-Vorlagen</string>
@@ -908,17 +899,11 @@
     <string name="profile_requiring_plugin">Für Profil %s ist das Plugin %s erforderlich, aber es wurde nicht gefunden.</string>
     <string name="mixed_auth_username_hint">Benutzername (beide leer lassen = keine Authentifizierung)</string>
     <string name="mixed_auth_no_auth">Nicht festgelegt (keine Authentifizierung)</string>
-    <string name="extra_subscription_links">Zusätzliche Abonnement-Links</string>
-    <string name="extra_subscription_links_hint">Abonnement-Links eingeben, einen pro Zeile</string>
     <string name="plugin_approval_conflict_message">Mehr als ein nicht vertrauenswürdiges Paket stellt dieses Plugin bereit: %1$s\n\nBeseitigen Sie den Konflikt, bevor Sie ein Paket genehmigen.</string>
     <string name="ws_max_early_data">Max. Early Data</string>
     <string name="speed_test_finished_summary">Abgeschlossen: %1$d, fehlgeschlagen: %2$d, abgebrochen: %3$d</string>
     <string name="spoof_user_agent">Standard-User-Agent</string>
     <string name="spoof_user_agent_summary">Wird für Abo-Aktualisierungen verwendet, wenn das Abo keinen eigenen User-Agent hat</string>
-    <string name="spoof_device_os">Gefälschtes Geräte-OS</string>
-    <string name="spoof_device_os_summary">Überschreibt den x-device-os-HWID-Header bei Abo-Aktualisierungen. Leer lassen, um das echte OS (Android) zu melden.</string>
-    <string name="spoof_device_os_version">Gefälschte OS-Version</string>
-    <string name="spoof_device_model">Gefälschtes Gerätemodell</string>
     <string name="stun_binding_test">Schnelle Bindung (nur externe Adresse)</string>
     <string name="hide_unavailable_profiles">Nicht verfügbare Profile ausblenden</string>
     <string name="default_subscription_user_agent">Standard-Abonnement-User-Agent</string>

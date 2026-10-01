@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.group
 
 import android.annotation.SuppressLint
-import android.os.Build
 import androidx.core.net.toUri
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SubscriptionFilterMode
@@ -122,50 +121,6 @@ object RawUpdater : GroupUpdater() {
         return ReconciliationResult(contentChanged, orderChanged)
     }
 
-    private fun buildHwidHeaders(customParams: String?): Map<String, String> {
-        val params = if (customParams.isNullOrBlank()) {
-            mapOf(
-                "hwid" to DataStore.subscriptionHwid,
-                "os" to (DataStore.spoofDeviceOs.takeIf { it.isNotBlank() } ?: "Android"),
-                "osversion" to (
-                    DataStore.spoofDeviceOsVersion.takeIf { it.isNotBlank() }
-                        ?: Build.VERSION.RELEASE.orEmpty()
-                    ),
-                "model" to (
-                    DataStore.spoofDeviceModel.takeIf { it.isNotBlank() }
-                        ?: listOf(Build.MANUFACTURER, Build.MODEL)
-                            .filter { it.isNotBlank() }
-                            .joinToString(" ")
-                    ),
-            )
-        } else {
-            buildMap {
-                customParams.split(',').forEach { pair ->
-                    val trimmed = pair.trim()
-                    val separator = trimmed.indexOf('=')
-                    if (separator <= 0) return@forEach
-                    val key = trimmed.substring(0, separator).trim().lowercase()
-                    val value = trimmed.substring(separator + 1).trim()
-                    if (key in allowedHwidParams && value.isValidHeaderValue()) {
-                        put(key, value)
-                    }
-                }
-            }
-        }
-        return buildMap {
-            params["hwid"]?.takeIf { it.isNotBlank() }?.let { put("x-hwid", it) }
-            params["os"]?.takeIf { it.isNotBlank() }?.let { put("x-device-os", it) }
-            params["osversion"]?.takeIf { it.isNotBlank() }?.let { put("x-ver-os", it) }
-            params["model"]?.takeIf { it.isNotBlank() }?.let { put("x-device-model", it) }
-        }
-    }
-
-    private val allowedHwidParams = setOf("hwid", "os", "osversion", "model")
-
-    private fun String.isValidHeaderValue(): Boolean {
-        return isNotEmpty() && length < 1000 && none { it == '\n' || it == '\r' }
-    }
-
     @SuppressLint("Recycle")
     override suspend fun doUpdate(
         proxyGroup: ProxyGroup,
@@ -207,12 +162,6 @@ object RawUpdater : GroupUpdater() {
                             ?: DataStore.spoofUserAgent.takeIf { it.isNotBlank() }
                             ?: USER_AGENT,
                     )
-                    if (subscription.sendHwid == true) {
-                        val hwidHeaders = buildHwidHeaders(subscription.customHwidParams)
-                        for ((key, value) in hwidHeaders) {
-                            setHeader(key, value)
-                        }
-                    }
                 }.execute()
             }
             // 訂閱流量走本地 mixed 入站，所以代理沒起來或壞掉時「更新訂閱」會整批失敗，

@@ -636,8 +636,6 @@
     <string name="wireguard_peer_allowed_ips">对端允许 IP</string>
     <string name="wireguard_extra_peers">额外对端</string>
     <string name="connection_test_url_test">URL 测试本组</string>
-    <string name="group_is_load_balance">负载均衡（轮询）</string>
-    <string name="group_is_load_balance_sum">将连接轮询分发到本组所有节点</string>
 
     <string name="action_auto_lowest_latency">自动优选最低延迟节点 (URL-Test)</string>
     <string name="route_preset_title">分流规则一键预设</string>
@@ -685,10 +683,6 @@
     <string name="mixed_auth_enabled_sum">使用者名称：%1$s</string>
     <string name="spoof_user_agent">预设 User-Agent</string>
     <string name="spoof_user_agent_summary">订阅本身没有 User-Agent 时，订阅更新会使用此值</string>
-    <string name="spoof_device_os">伪装装置 OS</string>
-    <string name="spoof_device_os_summary">覆写订阅更新时送出的 x-device-os HWID 标头。留空则不伪装</string>
-    <string name="spoof_device_os_version">伪装 OS 版本</string>
-    <string name="spoof_device_model">伪装装置型号</string>
     <string name="backup_not_throne_desktop">不是 Throne Desktop 备份：预期为 .thrbackup，实际为 %s</string>
     <string name="action_import_throne_desktop">从 Throne Desktop 汇入</string>
     <string name="backup_import_throne_desktop_summary">从 Throne Desktop 的 .thrbackup 档案汇入设定档、路由与设定。自订</string>
@@ -725,7 +719,6 @@
     <string name="dynamic_colors_classic">经典</string>
     <string name="dynamic_colors_summary">使用系统动态色彩</string>
     <string name="dynamic_colors_unavailable">无法使用动态色彩</string>
-    <string name="extra_subscription_links_hint">输入订阅连结，每行一条</string>
     <string name="fastest_settings">最快节点设定</string>
     <string name="http_proxy_bypass_sum">这些主机不经过代理</string>
     <string name="hysteria2_ech_config_hint">ECH 设定</string>
@@ -814,13 +807,6 @@
     <string name="scan_torch_turn_on">开启手电筒</string>
     <string name="shortcut_pin_not_supported">不支援钉选捷径</string>
     <string name="shortcut_pin_requested">已请求钉选捷径</string>
-    <string name="subscription_custom_dns">自订 DNS</string>
-    <string name="subscription_custom_dns_invalid">无效的自订 DNS</string>
-    <string name="subscription_custom_dns_sum">订阅使用自订 DNS</string>
-    <string name="subscription_custom_hwid_params">自订 HWID 参数</string>
-    <string name="subscription_custom_hwid_params_summary">自订硬体 ID 参数</string>
-    <string name="subscription_send_hwid">传送 HWID</string>
-    <string name="subscription_send_hwid_summary">订阅请求时一并传送硬体 ID</string>
     <string name="theme_fallback_summary">使用后备主题</string>
     <string name="ui_style">介面风格</string>
     <string name="ui_style_classic">经典</string>
@@ -893,7 +879,6 @@
     <string name="amneziawg_s2">S2</string>
     <string name="amneziawg_s3">S3</string>
     <string name="amneziawg_s4">S4</string>
-    <string name="extra_subscription_links">额外订阅连结</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">经典色板 %1$d</string>

@@ -265,8 +265,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="backup_import_throne_desktop_summary">從 Throne 電腦版 .thrbackup 匯入設定檔、路由與設定（忽略自訂圖示）。勾選的類別將覆蓋本機現有資料。</string>
     <string name="connection_test_url">延遲測試 URL</string>
     <string name="connection_test_url_test">URL 測試本組</string>
-    <string name="group_is_load_balance">負載均衡（輪詢）</string>
-    <string name="group_is_load_balance_sum">將連線輪詢分發到本組所有節點</string>
 
     <string name="action_auto_lowest_latency">自動優選最低延遲節點 (URL-Test)</string>
     <string name="route_preset_title">分流規則一鍵預設</string>
@@ -692,10 +690,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="mixed_auth_enabled_sum">使用者名稱：%1$s</string>
     <string name="spoof_user_agent">預設 User-Agent</string>
     <string name="spoof_user_agent_summary">訂閱本身沒有 User-Agent 時，訂閱更新會使用此值</string>
-    <string name="spoof_device_os">偽裝裝置 OS</string>
-    <string name="spoof_device_os_summary">覆寫訂閱更新時送出的 x-device-os HWID 標頭。留空則不偽裝</string>
-    <string name="spoof_device_os_version">偽裝 OS 版本</string>
-    <string name="spoof_device_model">偽裝裝置型號</string>
     <string name="not_set">未設定</string>
     <string name="invalid_naive_link">無效的 Naive 連結：%1$s</string>
     <string name="invalid_ss_android_link">無效的 ss-android 連結：%1$s</string>
@@ -729,7 +723,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dynamic_colors_classic">經典</string>
     <string name="dynamic_colors_summary">使用系統動態色彩</string>
     <string name="dynamic_colors_unavailable">無法使用動態色彩</string>
-    <string name="extra_subscription_links_hint">輸入訂閱連結，每行一條</string>
     <string name="fastest_settings">最快節點設定</string>
     <string name="http_proxy_bypass_sum">這些主機不經過代理</string>
     <string name="hysteria2_ech_config_hint">ECH 設定</string>
@@ -818,13 +811,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="scan_torch_turn_on">開啟手電筒</string>
     <string name="shortcut_pin_not_supported">不支援釘選捷徑</string>
     <string name="shortcut_pin_requested">已請求釘選捷徑</string>
-    <string name="subscription_custom_dns">自訂 DNS</string>
-    <string name="subscription_custom_dns_invalid">無效的自訂 DNS</string>
-    <string name="subscription_custom_dns_sum">訂閱使用自訂 DNS</string>
-    <string name="subscription_custom_hwid_params">自訂 HWID 參數</string>
-    <string name="subscription_custom_hwid_params_summary">自訂硬體 ID 參數</string>
-    <string name="subscription_send_hwid">傳送 HWID</string>
-    <string name="subscription_send_hwid_summary">訂閱請求時一併傳送硬體 ID</string>
     <string name="theme_fallback_summary">使用後備主題</string>
     <string name="ui_style">介面風格</string>
     <string name="ui_style_classic">經典</string>
@@ -898,7 +884,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="amneziawg_s2">S2</string>
     <string name="amneziawg_s3">S3</string>
     <string name="amneziawg_s4">S4</string>
-    <string name="extra_subscription_links">額外訂閱連結</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">經典色票 %1$d</string>

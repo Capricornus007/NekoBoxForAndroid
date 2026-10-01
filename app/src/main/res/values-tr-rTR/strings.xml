@@ -740,13 +740,6 @@
     <string name="scan_torch_turn_on">Feneri aç</string>
     <string name="shortcut_pin_not_supported">Başlatıcı kısayol sabitlemeyi desteklemiyor</string>
     <string name="shortcut_pin_requested">Başlatıcıya kısayol isteği gönderildi</string>
-    <string name="subscription_custom_dns">Özel çözümleyici</string>
-    <string name="subscription_custom_dns_invalid">Geçersiz çözümleyici. https://, tls://, quic:// veya host[:port] kullanın ya da boş bırakın.</string>
-    <string name="subscription_custom_dns_sum">Yalnızca bu aboneliğin sunucu alan adlarını çözmek için kullanılan isteğe bağlı DNS. Genel DNS\'i kullanmak için boş bırakın. https://, tls://, quic:// veya host[:port] kabul eder.</string>
-    <string name="subscription_custom_hwid_params">Özel HWID parametreleri</string>
-    <string name="subscription_custom_hwid_params_summary">Biçim: hwid=değer,os=değer,osVersion=değer,model=değer. Bu cihaz değerlerini kullanmak için boş bırakın; doldurulduğunda yalnızca listelenen değerler gönderilir.</string>
-    <string name="subscription_send_hwid">HWID Gönder</string>
-    <string name="subscription_send_hwid_summary">Bu aboneliği güncellerken HWID, Android sürümü ve cihaz modelini gönder</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">Renk Teması %1$d</string>
@@ -787,8 +780,6 @@
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Bu grubun URL\'sini test et</string>
 
-    <string name="group_is_load_balance">Yük dengeleme (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Bağlantıları bu gruptaki tüm düğümlere dağıt</string>
 
     <string name="action_auto_lowest_latency">En düşük gecikmeyi otomatik seç (URL-Test)</string>
     <string name="route_preset_title">Yönlendirme kuralı hazır ayarları</string>
@@ -899,8 +890,6 @@
     <string name="profile_requiring_plugin">%s profili, %s eklentisinin yüklü olmasını gerektiriyor, ancak bulunamadı.</string>
     <string name="mixed_auth_username_hint">Kullanıcı adı (kimlik doğrulaması yoksa ikisini de boş bırakın)</string>
     <string name="mixed_auth_no_auth">Ayarlanmadı (kimlik doğrulaması yok)</string>
-    <string name="extra_subscription_links">Ek abonelik bağlantıları</string>
-    <string name="extra_subscription_links_hint">Abonelik bağlantılarını satır başına bir tane olacak şekilde girin</string>
     <string name="obfs">Şaşırtmaca</string>
     <string name="alter_id">Alternatif ID</string>
     <string name="route_proxy">Vekil Sunucu</string>
@@ -916,10 +905,6 @@
     <string name="speed_test_finished_summary">Tamamlanan: %1$d, başarısız: %2$d, iptal: %3$d</string>
     <string name="spoof_user_agent">Varsayılan User-Agent</string>
     <string name="spoof_user_agent_summary">Aboneliğin kendi User-Agent\'ı olmadığında abonelik güncellemelerinde kullanılır</string>
-    <string name="spoof_device_os">Sahte cihaz işletim sistemi</string>
-    <string name="spoof_device_os_summary">Abonelik güncellemelerinde gönderilen x-device-os HWID başlığını geçersiz kılar. Gerçek işletim sistemini (Android) bildirmek için boş bırakın.</string>
-    <string name="spoof_device_os_version">Sahte işletim sistemi sürümü</string>
-    <string name="spoof_device_model">Sahte cihaz modeli</string>
     <string name="stun_binding_test">Hızlı bağlama (yalnızca harici adres)</string>
     <string name="hide_unavailable_profiles">Kullanılamayan profilleri gizle</string>
     <string name="default_subscription_user_agent">Varsayılan abonelik User-Agent\'ı</string>

@@ -112,8 +112,6 @@
     <string name="backup_import_throne_desktop_summary">Імпарт профіляў, маршрутаў і налад з .thrbackup Throne для ПК. Карыстальніцкія значкі ігнаруюцца. Існуючыя даныя выбраных катэгорый будуць перазапісаны.</string>
     <string name="connection_test_url_test">Тэст URL для гэтай групы</string>
 
-    <string name="group_is_load_balance">Балансаванка нагрузкі (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Размеркаванне злучэнняў па ўсіх вузлах гэтай групы</string>
 
     <string name="action_auto_lowest_latency">Аўтавыбар вузла з найменшай затрымкай (URL-Test)</string>
     <string name="route_preset_title">Гатовыя шаблоны правілаў маршрутызацыі</string>
@@ -155,10 +153,6 @@
     <string name="speed_test_finished_summary">Завершана: %1$d, з правалам: %2$d, скасавана: %3$d</string>
     <string name="spoof_user_agent">User-Agent па змаўчанні</string>
     <string name="spoof_user_agent_summary">Выкарыстоўваецца для абнаўленняў падпіскі, калі ў падпіскі няма ўласнага User-Agent</string>
-    <string name="spoof_device_os">Падроблены OS прылады</string>
-    <string name="spoof_device_os_summary">Перавызначае загаловак x-device-os HWID, які адсылаецца пры абнаўленні падпіскі. Пакіньце пустым, каб паведамляць рэальны OS (Android).</string>
-    <string name="spoof_device_os_version">Падробленая версія OS</string>
-    <string name="spoof_device_model">Падробленая мадэль прылады</string>
     <string name="stun_binding_test">Хуткая привязка (толькі знешні адрас)</string>
     <string name="use_system_theme">Выкарыстоўваць сістэмную тэму</string>
     <string name="use_system_theme_summary">Выкарыстоўваць сістэмныя колеры Monet (Android 12+)</string>
@@ -248,19 +242,11 @@
     <string name="scan_torch_turn_on">Уключыць ліхтарык</string>
     <string name="shortcut_pin_not_supported">Замацаванне ярлыка не падтрымліваецца</string>
     <string name="shortcut_pin_requested">Запытана замацаванне ярлыка</string>
-    <string name="subscription_custom_dns">Уласны DNS</string>
-    <string name="subscription_custom_dns_invalid">Недапушчальны ўласны DNS</string>
-    <string name="subscription_custom_dns_sum">Выкарыстоўваць уласны DNS для падпіскі</string>
-    <string name="subscription_custom_hwid_params">Уласныя параметры HWID</string>
-    <string name="subscription_custom_hwid_params_summary">Карыстальніцкія параметры апаратнага ID</string>
-    <string name="subscription_send_hwid">Адпраўляць HWID</string>
-    <string name="subscription_send_hwid_summary">Адпраўляць апаратны ID з запытам падпіскі</string>
     <string name="theme_fallback_summary">Выкарыстоўваць рэзервовую тэму</string>
     <string name="ui_style">Стыль інтэрфейсу</string>
     <string name="ui_style_classic">Класічны</string>
     <string name="ui_style_expressive">Экспрэсіўны</string>
     <string name="webdav_insecure_url">Небяспечная URL WebDAV</string>
-    <string name="extra_subscription_links_hint">Увядзіце спасылкі на падпіскі, па адной у радку</string>
     <string name="dns_hosts_lines">запісаў hosts: %d</string>
     <string name="append_http_proxy_security_title">Папярэджанне бяспекі</string>
     <string name="enable_anyway">Усё роўна ўключыць</string>
@@ -795,7 +781,6 @@
     <string name="logcat">Экспарт logcat</string>
     <string name="encryption">Шыфраванне</string>
     <string name="not_set">Не зададзена</string>
-    <string name="extra_subscription_links">Дадатковыя спасылкі на падпіскі</string>
     <string name="hysteria2_gecko_max_packet">Макс. пакет Gecko</string>
     <string name="lifetime_traffic">Усяго: %1$s↑ %2$s↓</string>
     <string name="mdv_advanced_json">Пашыраны JSON</string>

@@ -667,7 +667,6 @@
     <string name="dynamic_colors_classic">클래식</string>
     <string name="dynamic_colors_summary">사용 system 동적 색상</string>
     <string name="dynamic_colors_unavailable">동적 색상 unavailable</string>
-    <string name="extra_subscription_links">Extra 구독 Links</string>
     <string name="fastest_settings">Fastest 설정</string>
     <string name="http_proxy_bypass_sum">다음 호스트는 프록시 우회</string>
     <string name="hysteria2_ech_config_hint">ECH 구성</string>
@@ -747,13 +746,6 @@
     <string name="scan_torch_turn_on">scan torch turn on</string>
     <string name="shortcut_pin_not_supported">Shortcut pin 지원되지 않음 지원</string>
     <string name="shortcut_pin_requested">shortcut pin requested</string>
-    <string name="subscription_custom_dns">사용자 지정 DNS</string>
-    <string name="subscription_custom_dns_invalid">잘못된 사용자 지정 DNS</string>
-    <string name="subscription_custom_dns_sum">사용 사용자 지정 DNS for 구독</string>
-    <string name="subscription_custom_hwid_params">사용자 지정 HWID Params</string>
-    <string name="subscription_custom_hwid_params_summary">사용자 지정 하드웨어 ID parameters</string>
-    <string name="subscription_send_hwid">전송 HWID</string>
-    <string name="subscription_send_hwid_summary">구독 요청에 하드웨어 ID 전송</string>
     <string name="theme_ayu">theme ayu</string>
     <string name="theme_catppuccin">theme catppuccin</string>
     <string name="theme_classic_color_swatch">클래식 Color Swatch %1$d</string>
@@ -769,7 +761,6 @@
     <string name="ui_style_expressive">ui style expressive</string>
     <string name="waterfall_settings">Waterfall 설정</string>
     <string name="webdav_insecure_url">안전하지 않은 WebDAV 서버 주소입니다. https:// 주소를 사용하세요. http://를 사용하면 자격 증명과 백업(모든 프로필 비밀 포함)이 평문으로 전송됩니다.</string>
-    <string name="extra_subscription_links_hint">입력 구독 links, one per line</string>
     <string name="dns_hosts_lines">호스트 항목 %d줄</string>
     <string name="app_name">NekoBox</string>
     <string name="app_name_long">NekoBox for Android</string>
@@ -795,8 +786,6 @@
     <string name="available">%dms</string>
     <string name="connection_test_url_test">이 그룹 URL 테스트</string>
 
-    <string name="group_is_load_balance">로드 밸런스 (라운드 로빈)</string>
-    <string name="group_is_load_balance_sum">이 그룹의 모든 노드에 연결 분산</string>
 
     <string name="action_auto_lowest_latency">최저 지연 노드 자동 선택 (URL-Test)</string>
     <string name="route_preset_title">라우팅 규칙 프리셋</string>
@@ -906,10 +895,6 @@
     <string name="speed_test_finished_summary">완료: %1$d, 실패: %2$d, 취소: %3$d</string>
     <string name="spoof_user_agent">기본 User-Agent</string>
     <string name="spoof_user_agent_summary">구독에 자체 User-Agent가 없을 때 구독 업데이트에 사용됩니다</string>
-    <string name="spoof_device_os">스푸핑된 기기 OS</string>
-    <string name="spoof_device_os_summary">구독 업데이트 시 전송되는 x-device-os HWID 헤더를 대체합니다. 비워 두면 실제 OS(Android)를 보고합니다.</string>
-    <string name="spoof_device_os_version">스푸핑된 OS 버전</string>
-    <string name="spoof_device_model">스푸핑된 기기 모델</string>
     <string name="stun_binding_test">빠른 바인딩(외부 주소만)</string>
     <string name="hide_unavailable_profiles">사용 불가 프로필 숨기기</string>
     <string name="default_subscription_user_agent">기본 구독 User-Agent</string>

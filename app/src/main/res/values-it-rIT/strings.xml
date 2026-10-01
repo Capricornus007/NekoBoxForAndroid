@@ -755,13 +755,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="scan_torch_turn_on">Accendi torcia</string>
     <string name="shortcut_pin_not_supported">Il launcher non supporta l\'aggiunta di collegamenti</string>
     <string name="shortcut_pin_requested">Richiesta di collegamento inviata al launcher</string>
-    <string name="subscription_custom_dns">Risolutore personalizzato</string>
-    <string name="subscription_custom_dns_invalid">Risolutore non valido. Usa https://, tls://, quic:// o host[:port], o lascia vuoto.</string>
-    <string name="subscription_custom_dns_sum">DNS opzionale usato solo per risolvere i domini del server di questa sottoscrizione. Lascia vuoto per usare il DNS globale. Accetta https://, tls://, quic:// o host[:port].</string>
-    <string name="subscription_custom_hwid_params">Parametri HWID personalizzati</string>
-    <string name="subscription_custom_hwid_params_summary">Formato: hwid=valore,os=valore,osVersion=valore,model=valore. Lascia vuoto per usare i valori di questo dispositivo; se compilato, vengono inviati solo i valori elencati.</string>
-    <string name="subscription_send_hwid">Invia HWID</string>
-    <string name="subscription_send_hwid_summary">Invia HWID, versione Android e modello del dispositivo quando si aggiorna questo abbonamento</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">Tema colore %1$d</string>
@@ -802,8 +795,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Test URL di questo gruppo</string>
 
-    <string name="group_is_load_balance">Bilanciamento del carico (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Distribuire le connessioni su tutti i nodi del gruppo</string>
 
     <string name="action_auto_lowest_latency">Selezione automatica della latenza più bassa (URL-Test)</string>
     <string name="route_preset_title">Modelli di regole di routing</string>
@@ -911,8 +902,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="speed_test_url_invalid">Inserisci un URL HTTP o HTTPS valido</string>
     <string name="mixed_auth_username_hint">Nome utente (lascia entrambi vuoti per nessuna autenticazione)</string>
     <string name="mixed_auth_no_auth">Non impostato (nessuna autenticazione)</string>
-    <string name="extra_subscription_links">Link di abbonamento extra</string>
-    <string name="extra_subscription_links_hint">Inserisci i link di abbonamento, uno per riga</string>
     <string name="profile_requiring_plugin">Il profilo %1$s richiede l\'installazione del plugin %2$s, ma
         non è stato trovato.</string>
     <string name="plugin_exists_but_on_shit_system">Il profilo %1$s richiede il plugin %2$s, ma il tuo
@@ -926,10 +915,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="speed_test_finished_summary">Completati: %1$d, falliti: %2$d, annullati: %3$d</string>
     <string name="spoof_user_agent">User-Agent predefinito</string>
     <string name="spoof_user_agent_summary">Usato per gli aggiornamenti dell\'abbonamento quando l\'abbonamento non ha un proprio User-Agent</string>
-    <string name="spoof_device_os">OS del dispositivo falsificato</string>
-    <string name="spoof_device_os_summary">Sostituisce l\'header x-device-os HWID inviato negli aggiornamenti dell\'abbonamento. Lascia vuoto per riportare il SO reale (Android).</string>
-    <string name="spoof_device_os_version">Versione del SO falsificata</string>
-    <string name="spoof_device_model">Modello del dispositivo falsificato</string>
     <string name="stun_binding_test">Binding rapido (solo indirizzo esterno)</string>
     <string name="hide_unavailable_profiles">Nascondi profili non disponibili</string>
     <string name="default_subscription_user_agent">User-Agent di abbonamento predefinito</string>

@@ -755,13 +755,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="scan_torch_turn_on">Zaklamp inschakelen</string>
     <string name="shortcut_pin_not_supported">Launcher ondersteunt geen snelkoppelingen vastmaken</string>
     <string name="shortcut_pin_requested">Snelkoppelingsverzoek naar launcher gestuurd</string>
-    <string name="subscription_custom_dns">Aangepaste resolver</string>
-    <string name="subscription_custom_dns_invalid">Ongeldige resolver. Gebruik https://, tls://, quic:// of host[:port], of laat leeg.</string>
-    <string name="subscription_custom_dns_sum">Optionele DNS die alleen wordt gebruikt om de serverdomeinen van dit abonnement op te lossen. Laat leeg om de globale DNS te gebruiken. Accepteert https://, tls://, quic:// of host[:port].</string>
-    <string name="subscription_custom_hwid_params">Aangepaste HWID-parameters</string>
-    <string name="subscription_custom_hwid_params_summary">Formaat: hwid=waarde,os=waarde,osVersion=waarde,model=waarde. Laat leeg om de waarden van dit apparaat te gebruiken; ingevuld worden alleen de vermelde waarden verzonden.</string>
-    <string name="subscription_send_hwid">HWID verzenden</string>
-    <string name="subscription_send_hwid_summary">HWID, Android-versie en apparaatmodel verzenden bij het bijwerken van dit abonnement</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">Kleurenthema %1$d</string>
@@ -802,8 +795,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="available">%dms</string>
     <string name="connection_test_url_test">URL-test voor deze groep</string>
 
-    <string name="group_is_load_balance">Load balancing (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Verdeel verbindingen over alle nodes in deze groep</string>
 
     <string name="action_auto_lowest_latency">Laagste latentie automatisch kiezen (URL-Test)</string>
     <string name="route_preset_title">Routingregel-presets</string>
@@ -911,8 +902,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="speed_test_url_invalid">Voer een geldige HTTP- of HTTPS-URL in</string>
     <string name="mixed_auth_username_hint">Gebruikersnaam (laat beide leeg voor geen authenticatie)</string>
     <string name="mixed_auth_no_auth">Niet ingesteld (geen authenticatie)</string>
-    <string name="extra_subscription_links">Extra abonnementslinks</string>
-    <string name="extra_subscription_links_hint">Voer abonnementslinks in, één per regel</string>
     <string name="profile_requiring_plugin">Profiel %1$s vereist de %2$s-plug-in, maar
         deze is niet gevonden.</string>
     <string name="plugin_exists_but_on_shit_system">Profiel %1$s vereist de %2$s-plug-in, maar uw
@@ -926,10 +915,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="speed_test_finished_summary">Voltooid: %1$d, mislukt: %2$d, geannuleerd: %3$d</string>
     <string name="spoof_user_agent">Standaard User-Agent</string>
     <string name="spoof_user_agent_summary">Wordt gebruikt voor abonnementsupdates wanneer het abonnement geen eigen User-Agent heeft</string>
-    <string name="spoof_device_os">Vervalst apparaat-OS</string>
-    <string name="spoof_device_os_summary">Overschrijft de x-device-os HWID-header die bij abonnementsupdates wordt verzonden. Laat leeg om het echte OS (Android) te melden.</string>
-    <string name="spoof_device_os_version">Vervalste OS-versie</string>
-    <string name="spoof_device_model">Vervalst apparaatmodel</string>
     <string name="stun_binding_test">Snelle binding (alleen extern adres)</string>
     <string name="hide_unavailable_profiles">Niet-beschikbare profilen verbergen</string>
     <string name="default_subscription_user_agent">Standaard abonnements-User-Agent</string>

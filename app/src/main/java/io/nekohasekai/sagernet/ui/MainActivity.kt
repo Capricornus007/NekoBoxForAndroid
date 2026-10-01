@@ -270,7 +270,6 @@ class MainActivity :
         }
 
         val name = group.name.takeIf { !it.isNullOrBlank() } ?: group.subscription?.link
-            ?: group.subscription?.token
         if (name.isNullOrBlank()) return
 
         group.name = group.name.takeIf { !it.isNullOrBlank() }

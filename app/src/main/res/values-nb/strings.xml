@@ -383,9 +383,6 @@
     <string name="filter_include">Inkluder</string>
     <string name="filter_exclude">Ekskluder</string>
     <string name="filter_regex">Filter (regex)</string>
-    <string name="subscription_custom_dns">Tilpasset oppslagsverktøy</string>
-    <string name="subscription_custom_dns_sum">Valgfri DNS som bare brukes til å slå opp domenene for denne abonnementsserveren. La stå tomt for å bruke global DNS. Godtar https://, tls://, quic:// eller vert[:port].</string>
-    <string name="subscription_custom_dns_invalid">Ugyldig oppslagsverktøy. Bruk https://, tls://, quic:// eller vert[:port], eller la stå tomt.</string>
     <string name="raw">Rå</string>
     <string name="update_settings">Oppdateringsinnstillinger</string>
     <string name="auto_update">Automatisk oppdatering</string>
@@ -393,10 +390,6 @@
     <string name="update_when_connected_only">Oppdater kun når tilkoblet</string>
     <string name="update_when_connected_only_sum">Forhindre lekkasje av IP-adresse</string>
     <string name="subscription_user_agent">Bruker agent</string>
-    <string name="subscription_send_hwid">Send HWID</string>
-    <string name="subscription_send_hwid_summary">Send HWID, Android-versjon og enhetsmodell når du oppdaterer dette abonnementet</string>
-    <string name="subscription_custom_hwid_params">Tilpassede HWID-parametere</string>
-    <string name="subscription_custom_hwid_params_summary">Format: hwid=verdi,os=verdi,osVersion=verdi,model=verdi. La stå tomt for å bruke denne enhetens verdier; når fylt ut, sendes kun de oppførte verdiene.</string>
     <string name="confirm">Bekreft</string>
     <string name="missing_plugin">Manglende plugin</string>
     <string name="profile_requiring_plugin" formatted="false">Profil %1$s krever at %2$s-pluginen er installert, men den ble ikke funnet.</string>
@@ -796,8 +789,6 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Test URL for denne gruppen</string>
 
-    <string name="group_is_load_balance">Lastbalansering (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Fordel tilkoblinger over alle noder i denne gruppen</string>
 
     <string name="action_auto_lowest_latency">Velg laveste latens automatisk (URL-Test)</string>
     <string name="route_preset_title">Forhåndssatte rutingregler</string>
@@ -917,15 +908,9 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="lan_sharing_summary">Tillat LAN-enheter å koble til</string>
     <string name="lan_sharing_requires_root">LAN-deling krever root</string>
     <string name="ws_max_early_data">Maks early data</string>
-    <string name="extra_subscription_links">Ekstra abonnementslenker</string>
-    <string name="extra_subscription_links_hint">Skriv inn abonnementslenker, én per linje</string>
     <string name="speed_test_finished_summary">Fullført: %1$d, mislyktes: %2$d, avbrutt: %3$d</string>
     <string name="spoof_user_agent">Standard User-Agent</string>
     <string name="spoof_user_agent_summary">Brukes for abonnementsoppdateringer når abonnementet ikke har egen User-Agent</string>
-    <string name="spoof_device_os">Forfalsket enhets-OS</string>
-    <string name="spoof_device_os_summary">Overstyrer x-device-os HWID-headeren sendt i abonnementsoppdateringer. La stå tom for å rapportere ekte OS (Android).</string>
-    <string name="spoof_device_os_version">Forfalsket OS-versjon</string>
-    <string name="spoof_device_model">Forfalsket enhetsmodell</string>
     <string name="stun_binding_test">Hurtigbinding (kun ekstern adresse)</string>
     <string name="batch_update_summary" formatted="false">Batchoppdatering fullført: %1$d vellykket, %2$d mislykket</string>
     <string name="probe_tolerance">Toleranse for balanserbytte (ms)</string>

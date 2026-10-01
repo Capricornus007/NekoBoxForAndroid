@@ -116,15 +116,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var spoofUserAgent by configurationStore.string(Key.SPOOF_USER_AGENT) { "" }
     var autoSelectLowestLatency by configurationStore.boolean(Key.AUTO_SELECT_LOWEST_LATENCY)
 
-    // 負載平衡（round-robin）：per-group 開關，與 autoSelect 互斥使用
-    fun isGroupLoadBalance(groupId: Long): Boolean = profileCacheStore.getBoolean("groupIsLoadBalance_$groupId", false)
-
-    fun setGroupLoadBalance(groupId: Long, value: Boolean) {
-        profileCacheStore.putBoolean("groupIsLoadBalance_$groupId", value)
-    }
-    var spoofDeviceOs by configurationStore.string(Key.SPOOF_DEVICE_OS) { "" }
-    var spoofDeviceOsVersion by configurationStore.string(Key.SPOOF_DEVICE_OS_VERSION) { "" }
-    var spoofDeviceModel by configurationStore.string(Key.SPOOF_DEVICE_MODEL) { "" }
     var enableClashAPI by configurationStore.boolean(Key.ENABLE_CLASH_API)
     var showBottomBar by configurationStore.boolean(Key.SHOW_BOTTOM_BAR)
     var confirmProfileDelete by configurationStore.boolean(Key.CONFIRM_PROFILE_DELETE) { true }
@@ -213,16 +204,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
                 configurationStore.putString(Key.CLASH_API_SECRET, s)
             }
             return s
-        }
-
-    val subscriptionHwid: String
-        @Synchronized get() {
-            var value = configurationStore.getString(Key.SUBSCRIPTION_HWID)
-            if (value.isNullOrEmpty()) {
-                value = java.util.UUID.randomUUID().toString().replace("-", "")
-                configurationStore.putString(Key.SUBSCRIPTION_HWID, value)
-            }
-            return value
         }
 
     var mixedPort: Int
@@ -492,7 +473,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var groupIsSelector by profileCacheStore.boolean(Key.GROUP_IS_SELECTOR)
 
     var subscriptionLink by profileCacheStore.string(Key.SUBSCRIPTION_LINK)
-    var subscriptionExtraLinks by profileCacheStore.string(Key.SUBSCRIPTION_EXTRA_LINKS)
     var subscriptionForceResolve by profileCacheStore.boolean(Key.SUBSCRIPTION_FORCE_RESOLVE)
     var subscriptionDeduplication by profileCacheStore.boolean(Key.SUBSCRIPTION_DEDUPLICATION)
     var subscriptionUpdateWhenConnectedOnly by profileCacheStore.boolean(Key.SUBSCRIPTION_UPDATE_WHEN_CONNECTED_ONLY)
@@ -529,14 +509,11 @@ object DataStore : OnPreferenceDataStoreChangeListener {
             Logs.w(e)
         }
     }
-    var subscriptionSendHwid by profileCacheStore.boolean(Key.SUBSCRIPTION_SEND_HWID)
-    var subscriptionCustomHwidParams by profileCacheStore.string(Key.SUBSCRIPTION_CUSTOM_HWID_PARAMS)
     var subscriptionAutoUpdate by profileCacheStore.boolean(Key.SUBSCRIPTION_AUTO_UPDATE)
     var subscriptionAutoUpdateDelay by profileCacheStore.stringToInt(Key.SUBSCRIPTION_AUTO_UPDATE_DELAY) { 360 }
     var subscriptionFilterMode by profileCacheStore.stringToInt(Key.SUBSCRIPTION_FILTER_MODE) { 0 }
     var subscriptionFilterRegex by profileCacheStore.string(Key.SUBSCRIPTION_FILTER_REGEX)
     var subscriptionServerDns by profileCacheStore.string(Key.SUBSCRIPTION_SERVER_DNS)
-    var subscriptionCustomDns by profileCacheStore.string(Key.SUBSCRIPTION_CUSTOM_DNS)
 
     var rulesFirstCreate by profileCacheStore.boolean("rulesFirstCreate")
 

@@ -617,8 +617,6 @@
     <string name="snell_reuse_summary">v4-v6 のみ</string>
     <string name="connection_test_url_test">このグループの URL テスト</string>
 
-    <string name="group_is_load_balance">ロードバランス（ラウンドロビン）</string>
-    <string name="group_is_load_balance_sum">このグループの全ノードに接続を分散</string>
 
     <string name="action_auto_lowest_latency">最低遅延ノードを自動選択 (URL-Test)</string>
     <string name="route_preset_title">ルーティングルールのプリセット</string>
@@ -661,10 +659,6 @@
     <string name="speed_test_finished_summary">完了: %1$d、失敗: %2$d、キャンセル: %3$d</string>
     <string name="spoof_user_agent">既定の User-Agent</string>
     <string name="spoof_user_agent_summary">サブスクリプションが独自の User-Agent を持たない場合の更新に使用されます</string>
-    <string name="spoof_device_os">偽装デバイス OS</string>
-    <string name="spoof_device_os_summary">サブスクリプション更新時に送信される x-device-os HWID ヘッダーを上書きします。空のままにすると実際の OS (Android) を報告します。</string>
-    <string name="spoof_device_os_version">偽装 OS バージョン</string>
-    <string name="spoof_device_model">偽装デバイスモデル</string>
     <string name="stun_binding_test">クイックバインド（外部アドレスのみ）</string>
     <string name="wireguard_listen_port">リッスンポート</string>
     <string name="wireguard_persistent_keepalive">持続的キープアライブ間隔（秒）</string>
@@ -701,7 +695,6 @@
     <string name="fastest_regex_error_invalid">無効な正規表現: %1$s</string>
     <string name="fastest_regex_error_source_missing">既存のソースサブスクリプションを選択してください</string>
     <string name="fastest_regex_error_source_not_subscription">選択したグループはサブスクリプションではありません</string>
-    <string name="extra_subscription_links_hint">サブスクリプションリンクを 1 行に 1 つずつ入力してください</string>
     <string name="dns_hosts_lines">hosts エントリ %d 件</string>
     <string name="rule_domain">ドメイン</string>
     <string name="rule_dst_ip">宛先 IP</string>

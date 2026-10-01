@@ -684,7 +684,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dynamic_colors_classic">Доступно в новом интерфейсе</string>
     <string name="dynamic_colors_summary">Использовать системную палитру Material You</string>
     <string name="dynamic_colors_unavailable">Доступно на Android 12 и новее</string>
-    <string name="extra_subscription_links">Extra подписку Links</string>
     <string name="fastest_settings">Настройки самого быстрого</string>
     <string name="http_proxy_bypass_sum">Не использовать прокси для этих хостов</string>
     <string name="hysteria2_ech_config_hint">Конфигурация ECH</string>
@@ -764,13 +763,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="scan_torch_turn_on">scan torch turn on</string>
     <string name="shortcut_pin_not_supported">Shortcut pin Не поддерживается</string>
     <string name="shortcut_pin_requested">shortcut pin requested</string>
-    <string name="subscription_custom_dns">Пользовательский DNS</string>
-    <string name="subscription_custom_dns_invalid">Недопустимая Пользовательский DNS</string>
-    <string name="subscription_custom_dns_sum">Использовать Пользовательский DNS for подписку</string>
-    <string name="subscription_custom_hwid_params">Пользовательский HWID Params</string>
-    <string name="subscription_custom_hwid_params_summary">Пользовательский аппаратным ID parameters</string>
-    <string name="subscription_send_hwid">Отправлять HWID</string>
-    <string name="subscription_send_hwid_summary">Отправлять аппаратный ID с запросом подписки</string>
     <string name="theme_ayu">theme ayu</string>
     <string name="theme_catppuccin">theme catppuccin</string>
     <string name="theme_classic_color_swatch">Классический Color Swatch %1$d</string>
@@ -786,7 +778,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="ui_style_expressive">Новый</string>
     <string name="waterfall_settings">Настройки водопада</string>
     <string name="webdav_insecure_url">Небезопасный URL WebDAV-сервера. Используйте адрес https://; при использовании http:// учётные данные и резервная копия (содержащая все секреты профилей) передаются в открытом виде.</string>
-    <string name="extra_subscription_links_hint">Введите подписку links, one per line</string>
     <string name="dns_hosts_lines">Строк хостов: %d</string>
     <string name="service_mode_vpn">VPN</string>
     <string name="ws_max_early_data">Максимальный объём данных</string>
@@ -811,8 +802,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="available">%dms</string>
     <string name="connection_test_url_test">Проверить URL этой группы</string>
 
-    <string name="group_is_load_balance">Балансировка нагрузки (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Распределять соединения по всем узлам группы</string>
 
     <string name="action_auto_lowest_latency">Автовыбор узла с наименьшей задержкой (URL-Test)</string>
     <string name="route_preset_title">Готовые шаблоны правил маршрутизации</string>
@@ -974,10 +963,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="speed_test_finished_summary">Завершено: %1$d, с ошибкой: %2$d, отменено: %3$d</string>
     <string name="spoof_user_agent">User-Agent по умолчанию</string>
     <string name="spoof_user_agent_summary">Используется при обновлениях подписки, если у подписки нет своего User-Agent</string>
-    <string name="spoof_device_os">Поддельная ОС устройства</string>
-    <string name="spoof_device_os_summary">Переопределяет заголовок x-device-os HWID, отправляемый при обновлениях подписки. Оставьте пустым, чтобы сообщать реальную ОС (Android).</string>
-    <string name="spoof_device_os_version">Поддельная версия ОС</string>
-    <string name="spoof_device_model">Поддельная модель устройства</string>
     <string name="stun_binding_test">Быстрая привязка (только внешний адрес)</string>
     <string name="hide_unavailable_profiles">Скрыть недоступные профили</string>
     <string name="default_subscription_user_agent">User-Agent подписки по умолчанию</string>

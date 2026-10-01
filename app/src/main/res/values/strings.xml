@@ -395,8 +395,6 @@
     <string name="connection_test">Connection test</string>
     <string name="connection_test_clear_results">Clear test results</string>
     <string name="connection_test_url_test">URL test this group</string>
-    <string name="group_is_load_balance">Load Balance (Round-Robin)</string>
-    <string name="group_is_load_balance_sum">Distribute connections across all nodes in this group</string>
 
     <string name="action_auto_lowest_latency">Auto-select lowest latency (URL-Test)</string>
     <string name="route_preset_title">Routing rule presets</string>
@@ -444,10 +442,6 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="spoof_user_agent">Default User-Agent</string>
     <string name="spoof_user_agent_summary">Used for subscription updates when the subscription has no User-Agent of its own. Leave empty to use the real client identity.</string>
-    <string name="spoof_device_os">Spoofed Device OS</string>
-    <string name="spoof_device_os_summary">Overrides the x-device-os HWID header sent on subscription updates. Leave empty to report the real OS (Android).</string>
-    <string name="spoof_device_os_version">Spoofed OS Version</string>
-    <string name="spoof_device_model">Spoofed Device Model</string>
     <string name="confirm">Confirm</string>
     <string name="missing_plugin">Missing Plugin</string>
     <string name="profile_requiring_plugin" formatted="false">Profile %s requires the %s plugin to be installed, but
@@ -843,7 +837,6 @@
     <string name="dynamic_colors_classic">Classic</string>
     <string name="dynamic_colors_summary">Use system dynamic colors</string>
     <string name="dynamic_colors_unavailable">Dynamic colors unavailable</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Fastest Settings</string>
     <string name="http_proxy_bypass_sum">Bypass proxy for these hosts</string>
     <string name="append_http_proxy">Append HTTP proxy</string>
@@ -938,13 +931,6 @@
     <string name="scan_torch_turn_on">Turn torch on</string>
     <string name="shortcut_pin_not_supported">Shortcut pin not supported</string>
     <string name="shortcut_pin_requested">Shortcut pin requested</string>
-    <string name="subscription_custom_dns">Custom DNS</string>
-    <string name="subscription_custom_dns_invalid">Invalid custom DNS</string>
-    <string name="subscription_custom_dns_sum">Use custom DNS for subscription</string>
-    <string name="subscription_custom_hwid_params">Custom HWID Params</string>
-    <string name="subscription_custom_hwid_params_summary">Custom hardware ID parameters</string>
-    <string name="subscription_send_hwid">Send HWID</string>
-    <string name="subscription_send_hwid_summary">Send hardware ID with subscription request</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">Classic Color Swatch %1$d</string>
@@ -960,7 +946,6 @@
     <string name="ui_style_expressive">Expressive</string>
     <string name="waterfall_settings">Waterfall Settings</string>
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
-    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
     <string name="append_http_proxy_security_title">Security Warning</string>
     <string name="append_http_proxy_security_message">When enabled, other apps on this device can directly use the local proxy port.\n\nRecommendation: Only enable this if you trust all installed apps.</string>

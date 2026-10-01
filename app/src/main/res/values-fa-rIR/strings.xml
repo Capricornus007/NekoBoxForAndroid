@@ -676,7 +676,6 @@
     <string name="dynamic_colors_classic">Classic</string>
     <string name="dynamic_colors_summary">Use system dynamic colors</string>
     <string name="dynamic_colors_unavailable">Dynamic colors unavailable</string>
-    <string name="extra_subscription_links">Extra Subscription Links</string>
     <string name="fastest_settings">Fastest Settings</string>
     <string name="http_proxy_bypass_sum">Bypass proxy for these hosts</string>
     <string name="hysteria2_ech_config_hint">پیکربندی ECH</string>
@@ -752,13 +751,6 @@
     <string name="scan_torch_turn_on">Turn torch on</string>
     <string name="shortcut_pin_not_supported">Shortcut pin not supported</string>
     <string name="shortcut_pin_requested">Shortcut pin requested</string>
-    <string name="subscription_custom_dns">Custom DNS</string>
-    <string name="subscription_custom_dns_invalid">Invalid custom DNS</string>
-    <string name="subscription_custom_dns_sum">Use custom DNS for subscription</string>
-    <string name="subscription_custom_hwid_params">Custom HWID Params</string>
-    <string name="subscription_custom_hwid_params_summary">Custom hardware ID parameters</string>
-    <string name="subscription_send_hwid">Send HWID</string>
-    <string name="subscription_send_hwid_summary">Send hardware ID with subscription request</string>
     <string name="theme_ayu">Ayu</string>
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_color_swatch">Classic Color Swatch %1$d</string>
@@ -774,7 +766,6 @@
     <string name="ui_style_expressive">Expressive</string>
     <string name="waterfall_settings">Waterfall Settings</string>
     <string name="webdav_insecure_url">Insecure WebDAV URL</string>
-    <string name="extra_subscription_links_hint">Enter subscription links, one per line</string>
     <string name="dns_hosts_lines">%d hosts lines</string>
     <string name="app_name">NekoBox</string>
     <string name="app_name_long">NekoBox for Android</string>
@@ -800,8 +791,6 @@
     <string name="available">%dms</string>
     <string name="connection_test_url_test">آزمون URL این گروه</string>
 
-    <string name="group_is_load_balance">توزیع بار (چرخشی)</string>
-    <string name="group_is_load_balance_sum">توزیع اتصالات بین تمام گره‌های این گروه</string>
 
     <string name="action_auto_lowest_latency">انتخاب خودکار کم‌ترین تأخیر (URL-Test)</string>
     <string name="route_preset_title">قالب‌های آماده قواعد مسیریابی</string>
@@ -915,10 +904,6 @@
     <string name="speed_test_finished_summary">پایان‌یافته: %1$d، ناموفق: %2$d، لغوشده: %3$d</string>
     <string name="spoof_user_agent">User-Agent پیش‌فرض</string>
     <string name="spoof_user_agent_summary">برای به‌روزرسانی‌های اشتراک استفاده می‌شود وقتی اشتراک User-Agent خودش را ندارد</string>
-    <string name="spoof_device_os">جعل سیستم‌عامل دستگاه</string>
-    <string name="spoof_device_os_summary">هدر x-device-os HWID ارسالی در به‌روزرسانی‌های اشتراک را بازنویسی می‌کند. برای گزارش سیستم‌عامل واقعی (Android) خالی بگذارید.</string>
-    <string name="spoof_device_os_version">جعل نسخه سیستم‌عامل</string>
-    <string name="spoof_device_model">جعل مدل دستگاه</string>
     <string name="stun_binding_test">اتصال سریع (فقط آدرس خارجی)</string>
     <string name="hide_unavailable_profiles">پنهان کردن نمایه‌های در دسترس نیست</string>
     <string name="default_subscription_user_agent">User-Agent پیش‌فرض اشتراک</string>
