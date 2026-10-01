@@ -4,13 +4,149 @@ import (
 	"context"
 	"errors"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 )
+
+func TestSocksHandshakeFailureAndCancellationCloseSocket(t *testing.T) {
+	for _, cancelHandshake := range []bool{false, true} {
+		name := "rejected"
+		if cancelHandshake {
+			name = "cancelled"
+		}
+		t.Run(name, func(t *testing.T) {
+			listener, err := net.Listen("tcp", "127.0.0.1:0")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer listener.Close()
+			client := NewHttpClient().(*httpClient)
+			defer client.Close()
+			client.TrySocks5(int32(listener.Addr().(*net.TCPAddr).Port), "", "")
+			client.TryH3Direct()
+			ctx, cancel := context.WithTimeout(context.Background(), raceTestTimeout)
+			defer cancel()
+			result := make(chan error, 1)
+			go func() {
+				conn, err := client.h1h2Transport.DialContext(ctx, "tcp", "example.invalid:443")
+				if conn != nil {
+					conn.Close()
+				}
+				result <- err
+			}()
+			if err := listener.(*net.TCPListener).SetDeadline(time.Now().Add(raceTestTimeout)); err != nil {
+				t.Fatal(err)
+			}
+			conn, err := listener.Accept()
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer conn.Close()
+			if err := conn.SetDeadline(time.Now().Add(raceTestTimeout)); err != nil {
+				t.Fatal(err)
+			}
+			var request [3]byte
+			if _, err := io.ReadFull(conn, request[:]); err != nil {
+				t.Fatal(err)
+			}
+			wantErr := errFailConnectSocks5
+			if cancelHandshake {
+				cancel()
+				wantErr = context.Canceled
+			} else if _, err := conn.Write([]byte{5, 255}); err != nil {
+				t.Fatal(err)
+			}
+			select {
+			case err := <-result:
+				if !errors.Is(err, wantErr) {
+					t.Fatalf("dial error = %v, want %v", err, wantErr)
+				}
+			case <-time.After(raceTestTimeout):
+				t.Fatal("SOCKS handshake did not finish")
+			}
+			if _, err := conn.Read(request[:]); !errors.Is(err, io.EOF) {
+				t.Fatalf("failed handshake socket was not closed: %v", err)
+			}
+		})
+	}
+}
+
+func TestSocksHandshakeTimeoutDoesNotFallback(t *testing.T) {
+	for _, h3 := range []bool{false, true} {
+		t.Run("h3="+strconv.FormatBool(h3), func(t *testing.T) {
+			t.Parallel()
+			var directConnections atomic.Int32
+			target := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}))
+			target.Config.ConnState = func(_ net.Conn, state http.ConnState) {
+				if state == http.StateNew {
+					directConnections.Add(1)
+				}
+			}
+			target.Start()
+			defer target.Close()
+
+			listener, err := net.Listen("tcp", "127.0.0.1:0")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer listener.Close()
+			closed := make(chan error, 1)
+			go func() {
+				conn, err := listener.Accept()
+				if err != nil {
+					closed <- err
+					return
+				}
+				defer conn.Close()
+				if err = conn.SetDeadline(time.Now().Add(defaultHTTPDialTimeout + 5*time.Second)); err == nil {
+					_, err = io.Copy(io.Discard, conn)
+				}
+				closed <- err
+			}()
+
+			client := NewHttpClient().(*httpClient)
+			defer client.Close()
+			client.h1h2Client.Timeout = defaultHTTPDialTimeout + 5*time.Second
+			client.TrySocks5(int32(listener.Addr().(*net.TCPAddr).Port), "", "")
+			if h3 {
+				client.TryH3Direct()
+			}
+			request := client.NewRequest()
+			if err := request.SetURL(target.URL); err != nil {
+				t.Fatal(err)
+			}
+			response, err := request.Execute()
+			if response != nil {
+				_, _ = response.GetContentLimited(1024)
+				t.Error("handshake timeout returned a response")
+			}
+			if !errors.Is(err, os.ErrDeadlineExceeded) {
+				t.Errorf("request error = %v, want socket deadline exceeded", err)
+			}
+			if directConnections.Load() != 0 {
+				t.Error("handshake timeout dialed the destination directly")
+			}
+			select {
+			case err := <-closed:
+				if err != nil {
+					t.Errorf("SOCKS socket did not close cleanly: %v", err)
+				}
+			case <-time.After(raceTestTimeout):
+				t.Fatal("SOCKS socket was not closed")
+			}
+		})
+	}
+}
 
 const raceTestTimeout = 2 * time.Second
 

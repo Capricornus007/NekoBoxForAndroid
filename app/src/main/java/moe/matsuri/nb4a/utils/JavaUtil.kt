@@ -77,12 +77,6 @@ object JavaUtil {
         }
     }
 
-    @JvmStatic
-    fun isNullOrBlank(value: String?) = value.isNullOrBlank()
-
-    @JvmStatic
-    fun isNotBlank(value: String?) = !value.isNullOrBlank()
-
     @JvmField
     val gson = GsonBuilder()
         .setPrettyPrinting()

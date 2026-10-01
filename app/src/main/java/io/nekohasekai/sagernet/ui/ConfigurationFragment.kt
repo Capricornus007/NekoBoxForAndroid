@@ -477,9 +477,7 @@ class ConfigurationFragment @JvmOverloads constructor(
 
     suspend fun import(proxies: List<AbstractBean>) {
         val targetId = DataStore.selectedGroupForImport()
-        for (proxy in proxies) {
-            ProfileManager.createProfile(targetId, proxy)
-        }
+        ProfileManager.createProfiles(targetId, proxies)
         onMainDispatcher {
             DataStore.editingGroup = targetId
             snackbar(
@@ -735,12 +733,17 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
 
             R.id.action_update_subscription -> {
-                val group = DataStore.currentGroup()
-                if (group.type != GroupType.SUBSCRIPTION) {
-                    snackbar(R.string.group_not_subscription).show()
-                    Logs.e("onMenuItemClick: Group(${group.displayName()}) is not subscription")
-                } else {
-                    runOnLifecycleDispatcher {
+                // An unset selection uses the default group; never follow a later tab switch.
+                val groupId = DataStore.configurationStore.getLong(Key.PROFILE_GROUP)?.takeIf { it > 0L }
+                runOnLifecycleDispatcher {
+                    val group = if (groupId == null) {
+                        SagerDatabase.groupDao.allGroups().firstOrNull()
+                    } else {
+                        SagerDatabase.groupDao.getById(groupId)
+                    }
+                    if (group?.type != GroupType.SUBSCRIPTION) {
+                        onMainDispatcher { snackbar(R.string.group_not_subscription).show() }
+                    } else {
                         GroupUpdater.startUpdate(group, true)
                     }
                 }
@@ -1363,7 +1366,11 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
         }
 
-        override suspend fun groupUpdated(groupId: Long) = Unit
+        override suspend fun groupUpdated(groupId: Long) {
+            onMainDispatcher {
+                if (!disposed && groupList.none { it.id == groupId }) reload()
+            }
+        }
 
         override suspend fun onAdd(profile: ProxyEntity) {
             if (disposed) return

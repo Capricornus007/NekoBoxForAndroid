@@ -10,7 +10,6 @@ import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.fmt.Serializable
 import io.nekohasekai.sagernet.ktx.app
 import moe.matsuri.nb4a.proxy.config.ConfigBean
-import moe.matsuri.nb4a.utils.JavaUtil
 
 /**
  * Hops of [entity] in dial order: the first hop is dialed directly, the last hop reaches the
@@ -53,7 +52,7 @@ class ChainBean : InternalBean() {
     var proxies: List<Long>? = null
 
     override fun displayName(): String {
-        if (JavaUtil.isNotBlank(name)) {
+        if (!name.isNullOrBlank()) {
             return name!!
         } else {
             return ("Chain " + kotlin.math.abs(hashCode()))

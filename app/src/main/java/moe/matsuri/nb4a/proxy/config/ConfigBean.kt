@@ -37,7 +37,7 @@ class ConfigBean : InternalBean() {
     }
 
     override fun displayName(): String {
-        if (JavaUtil.isNotBlank(name)) {
+        if (!name.isNullOrBlank()) {
             return name!!
         } else {
             return ("Custom " + kotlin.math.abs(hashCode()))
@@ -45,7 +45,7 @@ class ConfigBean : InternalBean() {
     }
 
     fun displayType(): String {
-        if (((type != null) && (type!! == 1)) && JavaUtil.isNotBlank(config)) {
+        if (((type != null) && (type!! == 1)) && !config.isNullOrBlank()) {
             try {
                 val json = JavaUtil.gson.fromJson(config, JsonObject::class.java)
                 if ((json != null) && json!!.has("type")) {

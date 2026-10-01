@@ -6,7 +6,6 @@ import com.esotericsoftware.kryo.io.ByteBufferOutput
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.fmt.Serializable
-import moe.matsuri.nb4a.utils.JavaUtil
 
 class ShadowsocksRBean : AbstractBean() {
     @JvmField
@@ -29,15 +28,15 @@ class ShadowsocksRBean : AbstractBean() {
 
     override fun initializeDefaultValues() {
         super.initializeDefaultValues()
-        if (JavaUtil.isNullOrBlank(method)) {
+        if (method.isNullOrBlank()) {
             method = "none"
         }
         password = password ?: ""
-        if (JavaUtil.isNullOrBlank(protocol)) {
+        if (protocol.isNullOrBlank()) {
             protocol = "origin"
         }
         protocolParam = protocolParam ?: ""
-        if (JavaUtil.isNullOrBlank(obfs)) {
+        if (obfs.isNullOrBlank()) {
             obfs = "plain"
         }
         obfsParam = obfsParam ?: ""

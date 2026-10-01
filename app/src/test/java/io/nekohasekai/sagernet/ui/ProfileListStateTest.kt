@@ -77,6 +77,27 @@ class ProfileListStateTest {
         assertNull(findItemById(listOf(3L, 2L), items, 1L))
     }
 
+    @Test
+    fun partialStampUpdate_onlyVisitsAffectedRowAndKeepsPairing() {
+        val ids = (1L..10_000L).toList()
+        val visited = mutableSetOf<Long>()
+        val partial = buildProfileRowStamps(
+            ids,
+            mapOf(3L to 3, 4L to 4),
+            spanCount = 2,
+            positions = profileRowRange(3, ids.size, 2),
+        ) { id ->
+            visited += id
+            id == 4L
+        }
+
+        assertEquals(setOf(3L, 4L), partial.keys)
+        assertEquals(setOf(3L, 4L), visited)
+        assertTrue(partial.getValue(3L).reserveMiddleRow)
+        assertFalse(partial.getValue(4L).reserveMiddleRow)
+        assertTrue(buildProfileRowStamps(ids, emptyMap(), 2, emptyList()) { error("No rows should be visited") }.isEmpty())
+    }
+
     private fun stamps(ids: List<Long>, middleRows: Map<Long, Boolean>, spanCount: Int) = buildProfileRowStamps(
         ids = ids,
         baseStamps = ids.associateWith { it.hashCode() },

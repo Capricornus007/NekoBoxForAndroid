@@ -16,10 +16,12 @@ internal fun buildProfileRowStamps(
     ids: List<Long>,
     baseStamps: Map<Long, Int>,
     spanCount: Int,
+    positions: Iterable<Int> = ids.indices,
     hasMiddleRow: (Long) -> Boolean,
 ): Map<Long, ProfileRowStamp> {
     val doubleColumn = spanCount > 1
-    return ids.mapIndexed { position, id ->
+    return positions.associate { position ->
+        val id = ids[position]
         val ownHasMiddleRow = hasMiddleRow(id)
         val rowHasMiddleRow = if (doubleColumn) {
             profileRowRange(position, ids.size, spanCount).any { hasMiddleRow(ids[it]) }
@@ -31,7 +33,7 @@ internal fun buildProfileRowStamps(
             reserveMiddleRow = !ownHasMiddleRow && rowHasMiddleRow,
             doubleColumn = doubleColumn,
         )
-    }.toMap()
+    }
 }
 
 internal fun <T> findItemById(ids: List<Long>, items: Map<Long, T>, id: Long): Pair<Int, T>? {

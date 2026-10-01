@@ -44,6 +44,7 @@ import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.alert
 import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.ktx.getColour
+import io.nekohasekai.sagernet.ktx.itemMoveIndices
 import io.nekohasekai.sagernet.ktx.onDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.readableMessage
@@ -609,14 +610,21 @@ class ConfigurationGroupFragment : Fragment() {
 
         private fun displaySpanCount() = (layoutManager as? FixedGridLayoutManager)?.spanCount ?: 1
 
-        private fun buildDisplayStamps(ids: List<Long>, profiles: Map<Long, ProxyEntity>): Map<Long, ProfileRowStamp> {
-            val baseStamps = ids.associateWith { id ->
-                profiles[id]?.let(::profileStateStamp)
-                    ?: configurationStamps[id]?.content
-                    ?: masterStamps[id]
-                    ?: 0
+        private fun buildDisplayStamps(
+            ids: List<Long>,
+            profiles: Map<Long, ProxyEntity>,
+            positions: Iterable<Int> = ids.indices,
+        ): Map<Long, ProfileRowStamp> {
+            val baseStamps = positions.associate { position ->
+                val id = ids[position]
+                id to (
+                    profiles[id]?.let(::profileStateStamp)
+                        ?: configurationStamps[id]?.content
+                        ?: masterStamps[id]
+                        ?: 0
+                    )
             }
-            return buildProfileRowStamps(ids, baseStamps, displaySpanCount()) { id ->
+            return buildProfileRowStamps(ids, baseStamps, displaySpanCount(), positions) { id ->
                 profiles[id]?.let(::hasMiddleRow) == true
             }
         }
@@ -702,15 +710,8 @@ class ConfigurationGroupFragment : Fragment() {
         private fun moveLinear(from: Int, to: Int) {
             val first = getItemAt(from)
             var previousOrder = first.userOrder
-            val (step, range) = if (from < to) {
-                Pair(1, from until to)
-            } else {
-                Pair(
-                    -1,
-                    to + 1 downTo from,
-                )
-            }
-            for (i in range) {
+            val step = if (from < to) 1 else -1
+            for (i in itemMoveIndices(from, to)) {
                 val next = getItemAt(i + step)
                 val order = next.userOrder
                 next.userOrder = previousOrder
@@ -871,12 +872,19 @@ class ConfigurationGroupFragment : Fragment() {
         }
 
         private fun applyTrafficUpdates(updates: List<TrafficData>) {
-            val oldStamps = configurationStamps.toMap()
             val changedIds = HashSet<Long>()
             updates.forEach { data ->
+                val master = masterProfiles[data.id]
+                val displayed = configurationList[data.id]
+                if ((master == null || (master.rx == data.rx && master.tx == data.tx)) &&
+                    (displayed == null || (displayed.rx == data.rx && displayed.tx == data.tx))
+                ) {
+                    return@forEach
+                }
                 applyTraffic(data)
-                if (data.id in displayPositions) changedIds.add(data.id)
+                changedIds.add(data.id)
             }
+            if (changedIds.isEmpty()) return
 
             if (diffJob?.isActive == true) {
                 ++displayGeneration
@@ -886,12 +894,16 @@ class ConfigurationGroupFragment : Fragment() {
                 return
             }
 
-            val newStamps = buildDisplayStamps(configurationIdList, configurationList)
-            configurationStamps.clear()
-            configurationStamps.putAll(newStamps)
-            configurationIdList.forEachIndexed { position, id ->
-                if (id in changedIds || oldStamps[id] != newStamps[id]) {
-                    rebindVisible(position)
+            val positions = HashSet<Int>()
+            for (id in changedIds) {
+                val position = displayPositions[id] ?: continue
+                positions.addAll(profileRowRange(position, configurationIdList.size, displaySpanCount()))
+            }
+            val newStamps = buildDisplayStamps(configurationIdList, configurationList, positions)
+            for ((id, stamp) in newStamps) {
+                val oldStamp = configurationStamps.put(id, stamp)
+                if (id in changedIds || oldStamp != stamp) {
+                    rebindVisible(displayPositions.getValue(id))
                 }
             }
         }

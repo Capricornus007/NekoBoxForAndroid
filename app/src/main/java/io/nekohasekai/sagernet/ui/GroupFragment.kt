@@ -115,11 +115,11 @@ class GroupFragment :
                 MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.confirm)
                     .setMessage(R.string.update_all_subscription)
                     .setPositiveButton(R.string.yes) { _, _ ->
-                        SagerDatabase.groupDao.allGroups()
-                            .filter { it.type == GroupType.SUBSCRIPTION }
-                            .forEach {
-                                GroupUpdater.startUpdate(it, true)
-                            }
+                        runOnDefaultDispatcher {
+                            SagerDatabase.groupDao.allGroups()
+                                .filter { it.type == GroupType.SUBSCRIPTION }
+                                .forEach { GroupUpdater.startUpdate(it, true) }
+                        }
                     }
                     .setNegativeButton(R.string.no, null)
                     .show()
@@ -200,15 +200,8 @@ class GroupFragment :
         fun move(from: Int, to: Int) {
             val first = groupList[from]
             var previousOrder = first.userOrder
-            val (step, range) = if (from < to) {
-                Pair(1, from until to)
-            } else {
-                Pair(
-                    -1,
-                    to + 1 downTo from,
-                )
-            }
-            for (i in range) {
+            val step = if (from < to) 1 else -1
+            for (i in itemMoveIndices(from, to)) {
                 val next = groupList[i + step]
                 val order = next.userOrder
                 next.userOrder = previousOrder
@@ -288,6 +281,12 @@ class GroupFragment :
                 undoManager.flush()
 
                 notifyItemChanged(index)
+            }
+        }
+
+        override suspend fun groupProgressUpdated(groupId: Long) {
+            onMainDispatcher {
+                (groupListView.findViewHolderForItemId(groupId) as? GroupHolder)?.bindProgress()
             }
         }
 
@@ -394,6 +393,22 @@ class GroupFragment :
             return true
         }
 
+        fun bindProgress() {
+            val updating = proxyGroup.id in GroupUpdater.updating
+            (groupName.parent as LinearLayout).apply {
+                setPadding(paddingLeft, dp2px(if (updating) 11 else 15), paddingRight, paddingBottom)
+            }
+            subscriptionUpdateProgress.isVisible = updating
+            val progress = GroupUpdater.progress[proxyGroup.id]
+            subscriptionUpdateProgress.isIndeterminate = progress == null
+            if (progress != null) {
+                subscriptionUpdateProgress.max = progress.max
+                subscriptionUpdateProgress.progress = progress.progress
+            }
+            updateButton.isInvisible = updating || proxyGroup.type != GroupType.SUBSCRIPTION
+            editButton.isGone = updating || proxyGroup.ungrouped
+        }
+
         fun bind(group: ProxyGroup) {
             proxyGroup = group
 
@@ -433,34 +448,7 @@ class GroupFragment :
                 popup.show()
             }
 
-            if (proxyGroup.id in GroupUpdater.updating) {
-                (groupName.parent as LinearLayout).apply {
-                    setPadding(paddingLeft, dp2px(11), paddingRight, paddingBottom)
-                }
-
-                subscriptionUpdateProgress.isVisible = true
-
-                if (!GroupUpdater.progress.containsKey(proxyGroup.id)) {
-                    subscriptionUpdateProgress.isIndeterminate = true
-                } else {
-                    subscriptionUpdateProgress.isIndeterminate = false
-                    GroupUpdater.progress[proxyGroup.id]?.let {
-                        subscriptionUpdateProgress.max = it.max
-                        subscriptionUpdateProgress.progress = it.progress
-                    }
-                }
-
-                updateButton.isInvisible = true
-                editButton.isGone = true
-            } else {
-                (groupName.parent as LinearLayout).apply {
-                    setPadding(paddingLeft, dp2px(15), paddingRight, paddingBottom)
-                }
-
-                subscriptionUpdateProgress.isVisible = false
-                updateButton.isInvisible = proxyGroup.type != GroupType.SUBSCRIPTION
-                editButton.isGone = proxyGroup.ungrouped
-            }
+            bindProgress()
 
             val subscription = proxyGroup.subscription
             if (subscription != null && subscription.bytesUsed!! > 0L) { // SIP008 & Open Online Config

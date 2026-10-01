@@ -44,7 +44,7 @@ abstract class GroupUpdater {
         val progress = Progress(profiles.size)
         if (groupId != null) {
             GroupUpdater.progress[groupId] = progress
-            GroupManager.postReload(groupId)
+            GroupManager.postProgress(groupId)
         }
         val ipv6First = ipv6Mode >= IPv6Mode.PREFER
 
@@ -83,7 +83,7 @@ abstract class GroupUpdater {
                         }
                         if (groupId != null) {
                             progress.increment()
-                            GroupManager.postReload(groupId)
+                            GroupManager.postProgress(groupId)
                         }
                     }
                 }

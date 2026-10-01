@@ -534,13 +534,15 @@ class BaseService {
                         ipcProfileId > 0L && SagerDatabase.proxyDao.getById(ipcProfileId) != null ->
                             DataStore.selectedProxy = ipcProfileId
                     }
-                    val profile = SagerDatabase.proxyDao.getById(DataStore.selectedProxy)
+                    val proxy = SagerDatabase.proxyDao.getById(DataStore.selectedProxy)?.let {
+                        ProxyInstance(it, this@Interface)
+                    }
                     onMainDispatcher {
                         // Assign connectingJob to the inner connect job from HERE (after
                         // onStartConnect returns it), not from inside onStartConnect, so a
                         // racing stopRunner() never sees this outer setup coroutine as the
                         // tracked job once the inner connect job exists.
-                        data.connectingJob = onStartConnect(profile)
+                        data.connectingJob = onStartConnect(proxy)
                     }
                 } catch (e: CancellationException) {
                     throw e
@@ -587,16 +589,15 @@ class BaseService {
             data.closeReceiverRegistered = true
         }
 
-        private fun onStartConnect(profile: ProxyEntity?): Job? {
+        private fun onStartConnect(proxy: ProxyInstance?): Job? {
             this as Context
             val data = data
-            if (profile == null) { // gracefully shutdown: https://stackoverflow.com/q/47337857/2245107
+            if (proxy == null) { // gracefully shutdown: https://stackoverflow.com/q/47337857/2245107
                 data.notification = createNotification("")
                 stopRunner(false, getString(R.string.profile_empty))
                 return null
             }
 
-            val proxy = ProxyInstance(profile, this)
             data.proxy = proxy
             BootReceiver.enabled = DataStore.persistAcrossReboot
 
@@ -614,7 +615,7 @@ class BaseService {
                     // run it off the main thread so it works with the main-thread-DB allowance
                     // removed (Plan 027). init() is suspend and does not touch the UI.
                     onDefaultDispatcher { proxy.init() }
-                    DataStore.currentProfile = profile.id
+                    DataStore.currentProfile = proxy.profile.id
 
                     proxy.processes = GuardedProcessPool {
                         Logs.w(it)

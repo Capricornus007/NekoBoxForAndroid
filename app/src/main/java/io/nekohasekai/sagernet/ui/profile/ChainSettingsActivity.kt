@@ -200,9 +200,7 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         }
 
         fun move(from: Int, to: Int) {
-            val toMove = proxyList[to - 1]
-            proxyList[to - 1] = proxyList[from - 1]
-            proxyList[from - 1] = toMove
+            proxyList.add(to - 1, proxyList.removeAt(from - 1))
             notifyItemMoved(from, to)
             DataStore.dirty = true
             updateHint()

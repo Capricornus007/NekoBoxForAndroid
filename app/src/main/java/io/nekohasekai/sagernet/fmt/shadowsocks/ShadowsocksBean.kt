@@ -6,7 +6,6 @@ import com.esotericsoftware.kryo.io.ByteBufferOutput
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.fmt.Serializable
-import moe.matsuri.nb4a.utils.JavaUtil
 
 class ShadowsocksBean : AbstractBean() {
     @JvmField
@@ -53,7 +52,7 @@ class ShadowsocksBean : AbstractBean() {
 
     override fun initializeDefaultValues() {
         super.initializeDefaultValues()
-        if (JavaUtil.isNullOrBlank(method)) {
+        if (method.isNullOrBlank()) {
             method = "aes-256-gcm"
         }
         method = method ?: ""

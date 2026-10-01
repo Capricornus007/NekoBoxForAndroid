@@ -284,6 +284,78 @@ class RawUpdaterParseTest {
         }
     }
 
+    @Test
+    fun clashPluginTlsUsesTlsFlagNotTransportMode() = runTest {
+        for (tls in listOf(false, true)) {
+            val bean = RawUpdater.parseRaw(
+                """
+                proxies:
+                  - type: ss
+                    server: node.example
+                    port: 443
+                    cipher: aes-128-gcm
+                    password: example
+                    plugin: v2ray-plugin
+                    plugin-opts:
+                      mode: websocket
+                      tls: $tls
+                """.trimIndent(),
+            )!!.single() as ShadowsocksBean
+            assertEquals(tls, "tls" in bean.plugin!!.split(';'))
+            assertTrue(bean.plugin!!.contains("mode=websocket"))
+        }
+    }
+
+    @Test
+    fun clashXhttpOptionsDoNotDependOnNetworkKeyOrder() = runTest {
+        val options = """
+                    xhttp-opts:
+                      host: front.example
+                      path: /tunnel
+                      mode: packet-up
+                      no-grpc-header: true
+        """.trimIndent().prependIndent("    ")
+        for (transport in listOf("    network: xhttp\n$options", "$options\n    network: xhttp")) {
+            val bean = RawUpdater.parseRaw(
+                "proxies:\n  - type: vless\n    server: node.example\n    port: 443\n" +
+                    "    uuid: 00000000-0000-4000-8000-000000000001\n$transport",
+            )!!.single() as VMessBean
+            assertEquals("xhttp", bean.type)
+            assertEquals("front.example", bean.host)
+            assertEquals("/tunnel", bean.path)
+            assertEquals("packet-up", bean.xhttpMode)
+            assertTrue(JSONObject(bean.xhttpExtra).getBoolean("no_grpc_header"))
+        }
+    }
+
+    @Test
+    fun uniqueNamesPreserveLegacySuffixesAndHandleLargeDuplicateLists() {
+        val inputs = listOf(
+            List(1000) { "same" },
+            listOf("same", "same (1)", "same", "same (1)", "same (1)", "same", "same (0)", "same (0)"),
+        )
+        for (names in inputs) {
+            val used = linkedSetOf<String>()
+            val expected = names.map { original ->
+                var name = original
+                var index = 0
+                while (!used.add(name)) {
+                    index++
+                    name = name.replace(" (${index - 1})", "") + " ($index)"
+                }
+                name
+            }
+            val beans = names.map { name ->
+                SOCKSBean().apply {
+                    this.name = name
+                    initializeDefaultValues()
+                }
+            }
+            RawUpdater.ensureUniqueNames(beans)
+            assertEquals(expected, beans.map { it.displayName() })
+        }
+    }
+
     private fun encode(text: String) = Base64.getEncoder().encodeToString(text.toByteArray())
 
     private fun fixture(name: String) = requireNotNull(javaClass.getResource("/subscriptions/$name")).readText()

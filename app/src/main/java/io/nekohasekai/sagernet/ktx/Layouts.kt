@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.nekohasekai.sagernet.database.DataStore
 
+internal fun itemMoveIndices(from: Int, to: Int) = if (from < to) from until to else from downTo (to + 1)
+
 class FixedLinearLayoutManager(val recyclerView: RecyclerView) : LinearLayoutManager(recyclerView.context, RecyclerView.VERTICAL, false) {
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {

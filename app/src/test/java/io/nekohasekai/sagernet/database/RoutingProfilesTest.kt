@@ -118,8 +118,10 @@ class RoutingProfilesTest {
         assertEquals(1, other.ruleCount)
 
         // A subscription only refreshes the profile it delivered, never a user's profile of that name.
-        val source = RoutingProfiles.subscriptionSource(7L)
+        // Allocate IDs so earlier group-deletion tests cannot tombstone these sources.
+        val source = RoutingProfiles.subscriptionSource(SagerDatabase.groupDao.createGroup(ProxyGroup()))
         val provided = RoutingProfiles.import(RoutingProfiles.Profile(0L, "Provider", active.content).toLink(), source)!!
+        assertTrue("Subscription source was already deleted: $source", provided.id > 0L)
         assertEquals(3, RoutingProfiles.list().size)
         assertEquals(source, RoutingProfiles.list().first { it.id == provided.id }.source)
         assertEquals(2, RoutingProfiles.list().first { it.id == active.id }.ruleCount)
@@ -129,7 +131,8 @@ class RoutingProfilesTest {
         // A renamed delivery still refreshes the same profile; another subscription gets its own.
         assertEquals(provided.id, RoutingProfiles.import(RoutingProfiles.Profile(0L, "Renamed", active.content).toLink(), source)!!.id)
         assertEquals("Renamed", RoutingProfiles.list().first { it.id == provided.id }.name)
-        RoutingProfiles.import(RoutingProfiles.Profile(0L, "Renamed", active.content).toLink(), RoutingProfiles.subscriptionSource(8L))
+        val otherSource = RoutingProfiles.subscriptionSource(SagerDatabase.groupDao.createGroup(ProxyGroup()))
+        RoutingProfiles.import(RoutingProfiles.Profile(0L, "Renamed", active.content).toLink(), otherSource)
         assertEquals(4, RoutingProfiles.list().size)
         // Replacement lookup mirrors store: user imports by name, subscriptions by source.
         assertEquals(active.id, RoutingProfiles.replacementFor(RoutingProfiles.Profile(0L, "Provider", newer))!!.id)

@@ -160,19 +160,7 @@ object RawUpdater : GroupUpdater() {
         val userinfo = httpUserinfo?.trim()?.takeIf { it.isNotEmpty() }
             ?: content.userinfo ?: httpUserinfo ?: subscription.subscriptionUserinfo
 
-        val proxiesMap = LinkedHashMap<String, AbstractBean>()
-        for (proxy in proxies) {
-            var index = 0
-            var name = proxy.displayName()
-            while (proxiesMap.containsKey(name)) {
-                index++
-                name = name.replace(" (${index - 1})", "")
-                name = "$name ($index)"
-                proxy.name = name
-            }
-            proxiesMap[proxy.displayName()] = proxy
-        }
-        proxies = proxiesMap.values.toList()
+        ensureUniqueNames(proxies)
 
         if (subscription.forceResolve!!) forceResolve(proxies, proxyGroup.id)
 
@@ -379,6 +367,22 @@ object RawUpdater : GroupUpdater() {
         )
     }
 
+    internal fun ensureUniqueNames(profiles: List<AbstractBean>) {
+        val used = HashSet<String>()
+        val suffixes = HashMap<String, Pair<Int, String>>()
+        for (profile in profiles) {
+            val original = profile.displayName()
+            if (used.add(original)) continue
+            var (index, name) = suffixes[original] ?: (0 to original)
+            do {
+                index++
+                name = name.replace(" (${index - 1})", "") + " ($index)"
+            } while (!used.add(name))
+            profile.name = name
+            suffixes[original] = index to name
+        }
+    }
+
     internal data class SubscriptionContent(
         val body: String,
         val title: String?,
@@ -549,7 +553,7 @@ object RawUpdater : GroupUpdater() {
                                             ssPlugin.apply {
                                                 add("v2ray-plugin")
                                                 add("mode=" + (opts["mode"]?.toString() ?: ""))
-                                                if (opts["mode"]?.toString() == "true") add("tls")
+                                                if (opts["tls"]?.toString() == "true") add("tls")
                                                 add("host=" + (opts["host"]?.toString() ?: ""))
                                                 add("path=" + (opts["path"]?.toString() ?: ""))
                                                 if (opts["mux"]?.toString() == "true") add("mux=8")
@@ -608,6 +612,12 @@ object RawUpdater : GroupUpdater() {
 
                                 bean.serverAddress = proxy["server"]?.toString() ?: continue
                                 bean.serverPort = proxy["port"]?.toString()?.toIntOrNull() ?: continue
+                                bean.type = when (val network = proxy["network"]) {
+                                    "h2", "http" -> "http"
+                                    "ws", "grpc" -> network.toString()
+                                    "xhttp" -> if (bean.isVLESS) "xhttp" else null
+                                    else -> null
+                                }
 
                                 for (opt in proxy) {
                                     when (opt.key) {
@@ -685,14 +695,6 @@ object RawUpdater : GroupUpdater() {
                                                         bean.realityShortId =
                                                             realityOpt.value?.toString()
                                                 }
-                                            }
-                                        }
-
-                                        "network" -> {
-                                            when (opt.value) {
-                                                "h2", "http" -> bean.type = "http"
-                                                "ws", "grpc" -> bean.type = opt.value as String
-                                                "xhttp" -> if (bean.isVLESS) bean.type = "xhttp"
                                             }
                                         }
 

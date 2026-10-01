@@ -182,8 +182,8 @@ class RouteFragment :
         fun move(from: Int, to: Int) {
             val first = ruleList[from - 1]
             var previousOrder = first.userOrder
-            val (step, range) = if (from < to) Pair(1, from - 1 until to - 1) else Pair(-1, to downTo from - 1)
-            for (i in range) {
+            val step = if (from < to) 1 else -1
+            for (i in itemMoveIndices(from - 1, to - 1)) {
                 val next = ruleList[i + step]
                 val order = next.userOrder
                 next.userOrder = previousOrder

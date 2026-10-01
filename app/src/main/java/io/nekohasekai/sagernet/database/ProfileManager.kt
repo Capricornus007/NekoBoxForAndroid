@@ -87,6 +87,20 @@ object ProfileManager {
         return profile
     }
 
+    suspend fun createProfiles(groupId: Long, beans: List<AbstractBean>) {
+        if (beans.isEmpty()) return
+        SagerDatabase.instance.runInTransaction {
+            val firstOrder = SagerDatabase.proxyDao.nextOrder(groupId) ?: 1L
+            SagerDatabase.proxyDao.insert(
+                beans.mapIndexed { index, bean ->
+                    ProxyEntity(groupId = groupId, userOrder = firstOrder + index)
+                        .putBean(bean.applyDefaultValues())
+                },
+            )
+        }
+        GroupManager.postReload(groupId)
+    }
+
     suspend fun updateProfile(profile: ProxyEntity) {
         SagerDatabase.proxyDao.updateProxy(profile)
         iterator { onUpdated(profile, false) }
