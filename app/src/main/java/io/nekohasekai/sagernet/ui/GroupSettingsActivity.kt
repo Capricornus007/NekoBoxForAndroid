@@ -30,7 +30,6 @@ import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
-import io.nekohasekai.sagernet.ktx.isIpAddress
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.widget.ListListener
@@ -507,10 +506,7 @@ private fun isValidServerDns(raw: String): Boolean {
     if (value.isEmpty()) return true
     if (value.any { it.isISOControl() || it.isWhitespace() }) return false
 
-    // 同一欄可以用 `#IP` 附帶這台解析器自己的位址，省掉 sing-box 起動時「先解析域名」這一步。
-    val pin = value.substringAfter('#', "")
-    if (pin.isNotEmpty() && !pin.isIpAddress()) return false
-    val address = value.substringBefore('#')
+    val address = value
 
     if (address.contains("://")) {
         val scheme = address.substringBefore("://").lowercase()
