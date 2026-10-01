@@ -130,7 +130,7 @@
         <item>2</item>
     </string-array>
 
-    <string-array name="tun_implementation">
+    <string-array name="tun_implementation" translatable="false">
         <item>gVisor</item>
         <item>System</item>
         <item>Mixed</item>

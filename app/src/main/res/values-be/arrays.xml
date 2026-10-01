@@ -294,12 +294,6 @@
         <item>quic</item>
     </string-array>
 
-    <string-array name="tun_implementation">
-        <item>gVisor</item>
-        <item>Сістэмны</item>
-        <item>Змешаны</item>
-    </string-array>
-
     <string-array name="utls_fingerprint_entry">
         <item></item>
         <item>chrome</item>
