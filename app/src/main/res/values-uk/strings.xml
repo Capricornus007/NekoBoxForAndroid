@@ -879,4 +879,38 @@
     <string name="subscription_direct_fallback_summary">Повторити підписку напряму, якщо локальний проксі не зміг. Не вмикати, якщо URL з token.</string>
     <string name="adaptive_traffic_polling">Адаптивне опитування трафіку</string>
     <string name="adaptive_traffic_polling_summary">Опитувати рідше за вимкненого екрана або у фоновому режимі.</string>
+    <string name="service_mode_vpn" translatable="false">VPN</string>
+    <string name="ws_max_early_data" translatable="false">Max early data</string>
+    <string name="traffic" translatable="false">%1$s↑ %2$s↓</string>
+    <string name="action_socks" translatable="false">SOCKS</string>
+    <string name="action_http" translatable="false">HTTP</string>
+    <string name="action_shadowsocks" translatable="false">Shadowsocks</string>
+    <string name="action_shadowsocksr" translatable="false">ShadowsocksR</string>
+    <string name="action_vmess" translatable="false">VMess</string>
+    <string name="action_trojan" translatable="false">Trojan</string>
+    <string name="action_trojan_go" translatable="false">Trojan Go</string>
+    <string name="action_mieru" translatable="false">Mieru</string>
+    <string name="action_naive" translatable="false">Naïve</string>
+    <string name="action_anytls" translatable="false">AnyTLS</string>
+    <string name="action_hysteria" translatable="false">Hysteria</string>
+    <string name="action_ssh" translatable="false">SSH</string>
+    <string name="action_wireguard" translatable="false">WireGuard</string>
+    <string name="action_tuic" translatable="false">TUIC</string>
+    <string name="leastPing" translatable="false">Ping</string>
+    <string name="v2rayn" translatable="false">V2RayN</string>
+    <string name="available" translatable="false">%dмс</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing недоступний</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing недоступний</string>
+    <string name="ooc_subscription_token" translatable="false">OOCv1 API Token</string>
+    <string name="traffic_uplink" translatable="false">%s | %s/с ↑</string>
+    <string name="traffic_downlink" translatable="false">%s | %s/с ↓</string>
+    <string name="traffic_uplink_total" translatable="false">Всього %s ↑</string>
+    <string name="traffic_downlink_total" translatable="false">Всього %s ↓</string>
+    <string name="cloudflare_wrap" translatable="false">Cloudflare Warp</string>
+    <string name="pcap" translatable="false">Pcap</string>
+    <string name="mtu" translatable="false">MTU</string>
+    <string name="release_wake_lock">Відпускати WakeLock</string>
+    <string name="action_shadowtls" translatable="false">ShadowTLS</string>
 </resources>

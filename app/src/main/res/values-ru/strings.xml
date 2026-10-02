@@ -882,4 +882,24 @@
     <string name="subscription_direct_fallback_summary">Повторить подписку напрямую, если локальный прокси не смог. Не включать, если URL с token.</string>
     <string name="adaptive_traffic_polling">Адаптивный опрос трафика</string>
     <string name="adaptive_traffic_polling_summary">Опрашивать реже при выключенном экране или в фоновом режиме.</string>
+<string name="append_http_proxy_security_message">При включении другие приложения на этом устройстве смогут напрямую использовать локальный прокси-порт.\n\nРекомендация: Включайте эту функцию только если доверяете всем установленным приложениям.</string>
+<string name="check_update_no">Обновления не найдены.</string>
+<string name="check_update_preview">Проверить наличие обновлений предварительной версии</string>
+<string name="check_update_release">Проверить наличие обновлений релизнойной версии</string>
+<string name="connection_test_icmp_ping_unavailable">ICMPing недоступен</string>
+<string name="connection_test_tcp_ping">TCP Пинг</string>
+<string name="connection_test_tcp_ping_unavailable">TCPing недоступен</string>
+<string name="local_proxy_settings">Настройки локального прокси</string>
+<string name="proxy_username">Имя пользователя прокси</string>
+<string name="proxy_password">Пароль прокси</string>
+<string name="port_out_of_range">Порт должен быть в диапазоне 1–65535</string>
+<string name="release_wake_lock">Отключить WakeLock</string>
+<string name="update_dialog_message">Текущая версия: %1$s\nДоступная версия: %2$s\nХотите загрузить её?</string>
+<string name="update_dialog_title">Доступна новая версия</string>
+<string name="ws_max_early_data">Максимальный объём данных</string>
+    <string name="card_style">Карточка</string>
+    <string name="card_style_classic">Классический</string>
+    <string name="card_style_stroke">Обводка</string>
+    <string name="snell_quic_proxy">Режим QUIC Proxy</string>
+    <string name="snell_quic_proxy_summary">Только v6: совместимость со старым QUIC Proxy v5</string>
 </resources>

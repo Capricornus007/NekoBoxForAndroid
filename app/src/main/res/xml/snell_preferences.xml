@@ -77,6 +77,13 @@
 
         <SwitchPreferenceCompat
             app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_speed_24"
+            app:key="quicProxyMode"
+            app:summary="@string/snell_quic_proxy_summary"
+            app:title="@string/snell_quic_proxy" />
+
+        <SwitchPreference
+            app:defaultValue="false"
             app:icon="@drawable/ic_baseline_refresh_24"
             app:key="reuse"
             app:summary="@string/snell_reuse_summary"

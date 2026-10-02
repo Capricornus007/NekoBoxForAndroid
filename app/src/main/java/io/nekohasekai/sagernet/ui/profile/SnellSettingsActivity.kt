@@ -29,6 +29,7 @@ class SnellSettingsActivity : ProfileSettingsActivity<SnellBean>() {
     private val obfsMode = pbm.add(PreferenceBinding(Type.Text, "obfsMode"))
     private val obfsHost = pbm.add(PreferenceBinding(Type.Text, "obfsHost"))
     private val mode = pbm.add(PreferenceBinding(Type.Text, "mode"))
+    private val quicProxyMode = pbm.add(PreferenceBinding(Type.Bool, "quicProxyMode"))
     private val reuse = pbm.add(PreferenceBinding(Type.Bool, "reuse"))
 
     override fun SnellBean.init() {
@@ -60,19 +61,20 @@ class SnellSettingsActivity : ProfileSettingsActivity<SnellBean>() {
         val obfsModePref = findPreference<SimpleMenuPreference>("obfsMode")!!
         val obfsHostPref = findPreference<EditTextPreference>("obfsHost")!!
         val modePref = findPreference<SimpleMenuPreference>("mode")!!
+        val quicProxyModePref = findPreference<Preference>("quicProxyMode")!!
 
         val initialVersion = versionPref.value?.toIntOrNull() ?: 4
         updateNetworkOptions(initialVersion, networkPref)
         updateReuseEnabled(initialVersion, reusePref)
         updateObfsModeOptions(initialVersion, obfsModePref)
-        updateVersionFields(initialVersion, userKeyPref, obfsModePref, obfsHostPref, modePref)
+        updateVersionFields(initialVersion, userKeyPref, obfsModePref, obfsHostPref, modePref, quicProxyModePref)
 
         versionPref.setOnPreferenceChangeListener { _, newValue ->
             val newVersion = (newValue as? String)?.toIntOrNull() ?: 4
             updateNetworkOptions(newVersion, networkPref)
             updateReuseEnabled(newVersion, reusePref)
             updateObfsModeOptions(newVersion, obfsModePref)
-            updateVersionFields(newVersion, userKeyPref, obfsModePref, obfsHostPref, modePref)
+            updateVersionFields(newVersion, userKeyPref, obfsModePref, obfsHostPref, modePref, quicProxyModePref)
             true
         }
     }
@@ -113,13 +115,16 @@ class SnellSettingsActivity : ProfileSettingsActivity<SnellBean>() {
         obfsModePref: SimpleMenuPreference,
         obfsHostPref: EditTextPreference,
         modePref: SimpleMenuPreference,
+        quicProxyModePref: Preference,
     ) {
-        // userKey was introduced in v4
-        userKeyPref.isEnabled = version >= 4
-        // obfs was introduced in v3
-        obfsModePref.isEnabled = version >= 3
-        obfsHostPref.isEnabled = version >= 3
-        // mode was introduced in v6
-        modePref.isEnabled = version >= 6
+        userKeyPref.isVisible = version >= 4
+        val isV6 = version == 6
+        obfsModePref.isVisible = !isV6
+        obfsHostPref.isVisible = !isV6
+        modePref.isVisible = isV6
+        quicProxyModePref.isVisible = isV6
+        if (isV6 && modePref.value.isNullOrBlank()) {
+            modePref.value = "default"
+        }
     }
 }

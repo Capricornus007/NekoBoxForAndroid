@@ -851,4 +851,56 @@
     <string name="subscription_direct_fallback_summary">اگر پروکسی محلی اشتراک را نگرفت، مستقیم امتحان کنید. اگر نشانی token دارد روشن نکنید.</string>
     <string name="adaptive_traffic_polling">نمونه‌برداری سازگار از ترافیک</string>
     <string name="adaptive_traffic_polling_summary">هنگام خاموش بودن صفحه یا بودن برنامه در پس‌زمینه، کمتر پرس‌وجو می‌کند.</string>
+    <string name="service_mode_vpn" translatable="false">VPN</string>
+    <string name="local_proxy_settings">تنظیمات پراکسی محلی</string>
+    <string name="proxy_username">نام کاربری پراکسی</string>
+    <string name="proxy_password">رمز عبور پراکسی</string>
+    <string name="port_out_of_range">محدوده پورت باید 1 تا 65535 باشد</string>
+    <string name="ws_max_early_data" translatable="false">Max early data</string>
+    <string name="traffic" translatable="false">%1$s↑ %2$s↓</string>
+    <string name="action_socks" translatable="false">SOCKS</string>
+    <string name="action_http" translatable="false">HTTP</string>
+    <string name="action_shadowsocks" translatable="false">Shadowsocks</string>
+    <string name="action_shadowsocksr" translatable="false">ShadowsocksR</string>
+    <string name="action_vmess" translatable="false">VMess</string>
+    <string name="action_trojan" translatable="false">Trojan</string>
+    <string name="action_trojan_go" translatable="false">Trojan Go</string>
+    <string name="action_mieru" translatable="false">Mieru</string>
+    <string name="action_naive" translatable="false">Naïve</string>
+    <string name="action_hysteria" translatable="false">Hysteria</string>
+    <string name="action_ssh" translatable="false">SSH</string>
+    <string name="action_wireguard" translatable="false">WireGuard</string>
+    <string name="action_tuic" translatable="false">TUIC</string>
+    <string name="leastPing" translatable="false">Ping</string>
+    <string name="v2rayn" translatable="false">V2RayN</string>
+    <string name="available" translatable="false">%dms</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing در دسترس نیست</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing در دسترس نیست</string>
+    <string name="append_http_proxy">پراکسی HTTP را به VPN اضافه کنید</string>
+    <string name="append_http_proxy_sum">پروکسی HTTP مستقیماً از (مرورگر/برخی برنامه‌های پشتیبانی‌شده) بدون استفاده از دستگاه NIC مجازی (نسخه اندروید بالاتر از 10) استفاده می‌شود.</string>
+    <string name="append_http_proxy_security_title">اطلاعیه امنیتی</string>
+    <string name="append_http_proxy_security_message">پس از فعال‌سازی، برنامه‌های دیگر در این دستگاه می‌توانند مستقیماً از پورت پروکسی محلی استفاده کنند.\n\nتوصیه: تنها در صورتی که به تمام برنامه‌های نصب‌شده اعتماد دارید، این گزینه را فعال کنید.</string>
+    <string name="enable_anyway">همچنان فعال کن</string>
+    <string name="ooc_subscription_token">مشخصه OOCv1 API</string>
+    <string name="traffic_uplink" translatable="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" translatable="false">%s | %s/s ↓</string>
+    <string name="traffic_uplink_total" translatable="false">%s ↑</string>
+    <string name="traffic_downlink_total" translatable="false">%s ↓</string>
+    <string name="cloudflare_wrap" translatable="false">Cloudflare Warp</string>
+    <string name="pcap" translatable="false">Pcap</string>
+    <string name="mtu" translatable="false">MTU</string>
+    <string name="release_wake_lock">رها کردن WakeLock</string>
+    <string name="action_shadowtls" translatable="false">ShadowTLS</string>
+    <string name="card_style">کارت</string>
+    <string name="card_style_classic">کلاسیک</string>
+    <string name="card_style_stroke">حاشیه</string>
+    <string name="check_update_preview">بررسی به‌روزرسانی نسخهٔ پیش‌نمایش</string>
+    <string name="check_update_release">بررسی به‌روزرسانی نسخهٔ Release</string>
+    <string name="update_dialog_title">نسخهٔ جدید در دسترس است</string>
+    <string name="update_dialog_message">نسخهٔ فعلی: %1$s\nنسخهٔ موجود: %2$s\nآیا می‌خواهید آن را دانلود کنید؟</string>
+    <string name="check_update_no">بررسی موفق بود، اما به‌روزرسانی‌ای نیست.</string>
+    <string name="snell_quic_proxy">حالت QUIC Proxy</string>
+    <string name="snell_quic_proxy_summary">فقط v6: سازگاری با QUIC Proxy قدیمی v5</string>
 </resources>
