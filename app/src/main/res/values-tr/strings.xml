@@ -874,4 +874,16 @@
     <string name="subscription_direct_fallback_summary">Yerel vekil başarısız olursa aboneliği doğrudan dene. URL token içeriyorsa açma.</string>
     <string name="adaptive_traffic_polling">Duyarlı trafik yoklaması</string>
     <string name="adaptive_traffic_polling_summary">Ekran kapalıyken veya uygulama arka plandayken daha seyrek sorgular.</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing kullanılamaz</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing kullanılamaz</string>
+    <string name="release_wake_lock">WakeLock bırak</string>
+    <string name="check_update_preview">Önizleme sürümü güncellemelerini denetle</string>
+    <string name="check_update_release">Yayın sürümü güncellemelerini denetle</string>
+    <string name="update_dialog_title">Yeni sürüm mevcut</string>
+    <string name="update_dialog_message">Geçerli sürüm: %1$s\nKullanılabilir sürüm: %2$s\nİndirmek istiyor musunuz?</string>
+    <string name="check_update_no">Kontrol başarılı, ancak güncelleme yok.</string>
+    <string name="snell_quic_proxy">QUIC Proxy Modu</string>
+    <string name="snell_quic_proxy_summary">Yalnızca v6: eski v5 QUIC Proxy uyumluluğu</string>
 </resources>

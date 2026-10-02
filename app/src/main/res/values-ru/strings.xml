@@ -902,4 +902,5 @@
     <string name="card_style_stroke">Обводка</string>
     <string name="snell_quic_proxy">Режим QUIC Proxy</string>
     <string name="snell_quic_proxy_summary">Только v6: совместимость со старым QUIC Proxy v5</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
 </resources>

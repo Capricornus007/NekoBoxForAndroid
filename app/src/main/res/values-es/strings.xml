@@ -1076,4 +1076,16 @@
     <string name="subscription_direct_fallback_summary">Reintentar la suscripción en directo si el proxy local falla. No la actives si la URL lleva token.</string>
     <string name="adaptive_traffic_polling">Sondeo adaptativo de tráfico</string>
     <string name="adaptive_traffic_polling_summary">Consulta con menos frecuencia con la pantalla apagada o la app en segundo plano.</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing no disponible</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing no disponible</string>
+    <string name="release_wake_lock">Liberar WakeLock</string>
+    <string name="check_update_preview">Buscar actualizaciones de la versión preliminar</string>
+    <string name="check_update_release">Buscar actualizaciones de la versión estable</string>
+    <string name="update_dialog_title">Nueva versión disponible</string>
+    <string name="update_dialog_message">Versión actual: %1$s\nVersión disponible: %2$s\n¿Quieres descargarla?</string>
+    <string name="check_update_no">Comprobación correcta, pero no hay actualizaciones.</string>
+    <string name="snell_quic_proxy">Modo QUIC Proxy</string>
+    <string name="snell_quic_proxy_summary">Solo v6: compatibilidad con el antiguo QUIC Proxy de v5</string>
 </resources>

@@ -746,4 +746,6 @@
     <string name="check_update_no">確認に成功しましたが、更新はありません。</string>
     <string name="snell_quic_proxy">QUIC プロキシモード</string>
     <string name="snell_quic_proxy_summary">v6 のみ：旧 v5 QUIC プロキシ互換</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
 </resources>

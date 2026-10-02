@@ -927,4 +927,16 @@
     <string name="card_style">بطاقة</string>
     <string name="card_style_classic">كلاسيكي</string>
     <string name="card_style_stroke">إطار</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing غير متاح</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing غير متاح</string>
+    <string name="release_wake_lock">تحرير WakeLock</string>
+    <string name="check_update_preview">التحقق من تحديثات الإصدار التجريبي</string>
+    <string name="check_update_release">التحقق من تحديثات الإصدار الرسمي</string>
+    <string name="update_dialog_title">إصدار جديد متاح</string>
+    <string name="update_dialog_message">الإصدار الحالي: %1$s\nالإصدار المتاح: %2$s\nهل تريد تحميله؟</string>
+    <string name="check_update_no">تم التحقق بنجاح، لكن لا توجد تحديثات.</string>
+    <string name="snell_quic_proxy">وضع QUIC Proxy</string>
+    <string name="snell_quic_proxy_summary">v6 فقط: توافق مع QUIC Proxy القديمة v5</string>
 </resources>

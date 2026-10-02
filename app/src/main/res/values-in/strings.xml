@@ -896,4 +896,16 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="subscription_direct_fallback_summary">Coba langganan langsung saat proksi lokal gagal. Jangan aktifkan jika URL memuat token.</string>
     <string name="adaptive_traffic_polling">Polling trafik adaptif</string>
     <string name="adaptive_traffic_polling_summary">Lebih jarang mengambil data saat layar mati atau aplikasi di latar belakang.</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing tidak tersedia</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing tidak tersedia</string>
+    <string name="release_wake_lock">Lepaskan WakeLock</string>
+    <string name="check_update_preview">Periksa pembaruan versi pratinjau</string>
+    <string name="check_update_release">Periksa pembaruan versi Rilis</string>
+    <string name="update_dialog_title">Versi baru tersedia</string>
+    <string name="update_dialog_message">Versi saat ini: %1$s\nVersi tersedia: %2$s\nIngin mengunduhnya?</string>
+    <string name="check_update_no">Pemeriksaan berhasil, tetapi tidak ada pembaruan.</string>
+    <string name="snell_quic_proxy">Mode QUIC Proxy</string>
+    <string name="snell_quic_proxy_summary">Khusus v6: kompatibilitas dengan QUIC Proxy lawas v5</string>
 </resources>

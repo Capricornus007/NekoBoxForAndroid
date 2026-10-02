@@ -921,4 +921,16 @@
     <string name="card_style">Kart</string>
     <string name="card_style_classic">Klasik</string>
     <string name="card_style_stroke">Kenar çizgisi</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing kullanılamaz</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing kullanılamaz</string>
+    <string name="release_wake_lock">WakeLock Bırak</string>
+    <string name="check_update_preview">Önizleme sürümü güncellemelerini denetle</string>
+    <string name="check_update_release">Yayın sürümü güncellemelerini denetle</string>
+    <string name="update_dialog_title">Yeni sürüm mevcut</string>
+    <string name="update_dialog_message">Geçerli sürüm: %1$s\nKullanılabilir sürüm: %2$s\nİndirmek istiyor musunuz?</string>
+    <string name="check_update_no">Kontrol başarılı, ancak güncelleme yok.</string>
+    <string name="snell_quic_proxy">QUIC Proxy Modu</string>
+    <string name="snell_quic_proxy_summary">Yalnızca v6: eski v5 QUIC Proxy uyumluluğu</string>
 </resources>

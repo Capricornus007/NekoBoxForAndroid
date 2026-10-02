@@ -936,4 +936,16 @@
     <string name="card_style">Carte</string>
     <string name="card_style_classic">Classique</string>
     <string name="card_style_stroke">Contour</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing indisponible</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing indisponible</string>
+    <string name="release_wake_lock">Libérer WakeLock</string>
+    <string name="check_update_preview">Vérifier les mises à jour de la version preview</string>
+    <string name="check_update_release">Vérifier les mises à jour de la version Release</string>
+    <string name="update_dialog_title">Nouvelle version disponible</string>
+    <string name="update_dialog_message">Version actuelle : %1$s\nVersion disponible : %2$s\nVoulez-vous la télécharger ?</string>
+    <string name="check_update_no">Vérification réussie, mais aucune mise à jour.</string>
+    <string name="snell_quic_proxy">Mode QUIC Proxy</string>
+    <string name="snell_quic_proxy_summary">v6 uniquement : compatibilité avec le QUIC Proxy hérité v5</string>
 </resources>

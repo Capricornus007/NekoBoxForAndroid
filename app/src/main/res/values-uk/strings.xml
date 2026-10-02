@@ -913,4 +913,11 @@
     <string name="mtu" translatable="false">MTU</string>
     <string name="release_wake_lock">Відпускати WakeLock</string>
     <string name="action_shadowtls" translatable="false">ShadowTLS</string>
+    <string name="check_update_preview">Перевіряти оновлення попередньої версії</string>
+    <string name="check_update_release">Перевіряти оновлення стабільної версії</string>
+    <string name="update_dialog_title">Доступна нова версія</string>
+    <string name="update_dialog_message">Поточна версія: %1$s\nДоступна версія: %2$s\nЗавантажити її?</string>
+    <string name="check_update_no">Перевірку виконано, але оновлень немає.</string>
+    <string name="snell_quic_proxy">Режим QUIC Proxy</string>
+    <string name="snell_quic_proxy_summary">Лише v6: сумісність із застарілим QUIC Proxy v5</string>
 </resources>

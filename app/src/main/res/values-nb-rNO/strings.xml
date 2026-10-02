@@ -858,4 +858,16 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="card_style">Kort</string>
     <string name="card_style_classic">Klassisk</string>
     <string name="card_style_stroke">Kontur</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing utilgjengelig</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing utilgjengelig</string>
+    <string name="release_wake_lock">Frigjør WakeLock</string>
+    <string name="check_update_preview">Se etter oppdateringer for forhåndsvisningsversjon</string>
+    <string name="check_update_release">Se etter oppdateringer for Release-versjon</string>
+    <string name="update_dialog_title">Ny versjon tilgjengelig</string>
+    <string name="update_dialog_message">Nåværende versjon: %1$s\nTilgjengelig versjon: %2$s\nVil du laste den ned?</string>
+    <string name="check_update_no">Kontroll vellykket, men ingen oppdateringer.</string>
+    <string name="snell_quic_proxy">QUIC Proxy-modus</string>
+    <string name="snell_quic_proxy_summary">Kun v6: kompatibilitet med gammel QUIC Proxy v5</string>
 </resources>

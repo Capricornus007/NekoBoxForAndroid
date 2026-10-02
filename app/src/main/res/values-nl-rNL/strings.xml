@@ -931,4 +931,16 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="card_style">Kaart</string>
     <string name="card_style_classic">Klassiek</string>
     <string name="card_style_stroke">Omtrek</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing niet beschikbaar</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing niet beschikbaar</string>
+    <string name="release_wake_lock">WakeLock vrijgeven</string>
+    <string name="check_update_preview">Controleren op updates van de previewversie</string>
+    <string name="check_update_release">Controleren op updates van de Release-versie</string>
+    <string name="update_dialog_title">Nieuwe versie beschikbaar</string>
+    <string name="update_dialog_message">Huidige versie: %1$s\nBeschikbare versie: %2$s\nWilt u deze downloaden?</string>
+    <string name="check_update_no">Controle geslaagd, maar geen updates.</string>
+    <string name="snell_quic_proxy">QUIC Proxy-modus</string>
+    <string name="snell_quic_proxy_summary">Alleen v6: compatibiliteit met verouderde QUIC Proxy v5</string>
 </resources>

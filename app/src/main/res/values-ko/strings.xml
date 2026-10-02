@@ -741,4 +741,6 @@
     <string name="check_update_no">확인에 성공했지만 업데이트가 없습니다.</string>
     <string name="snell_quic_proxy">QUIC 프록시 모드</string>
     <string name="snell_quic_proxy_summary">v6 전용: 레거시 v5 QUIC 프록시 호환</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
 </resources>

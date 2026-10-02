@@ -919,4 +919,16 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="card_style">カード</string>
     <string name="card_style_classic">クラシック</string>
     <string name="card_style_stroke">枠線</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing 利用不可</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing 利用不可</string>
+    <string name="release_wake_lock">WakeLock を解放</string>
+    <string name="check_update_preview">プレビュー版の更新を確認</string>
+    <string name="check_update_release">リリース版の更新を確認</string>
+    <string name="update_dialog_title">新しいバージョンが利用可能です</string>
+    <string name="update_dialog_message">現在のバージョン: %1$s\n利用可能なバージョン: %2$s\nダウンロードしますか？</string>
+    <string name="check_update_no">確認に成功しましたが、更新はありません。</string>
+    <string name="snell_quic_proxy">QUIC プロキシモード</string>
+    <string name="snell_quic_proxy_summary">v6 のみ：旧 v5 QUIC プロキシ互換</string>
 </resources>

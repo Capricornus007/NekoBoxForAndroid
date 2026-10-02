@@ -929,4 +929,16 @@
     <string name="card_style">Картка</string>
     <string name="card_style_classic">Класичний</string>
     <string name="card_style_stroke">Контур</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_tcp_ping_unavailable">TCPing недоступний</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
+    <string name="connection_test_icmp_ping_unavailable">ICMPing недоступний</string>
+    <string name="release_wake_lock">Звільнити WakeLock</string>
+    <string name="check_update_preview">Перевіряти оновлення попередньої версії</string>
+    <string name="check_update_release">Перевіряти оновлення стабільної версії</string>
+    <string name="update_dialog_title">Доступна нова версія</string>
+    <string name="update_dialog_message">Поточна версія: %1$s\nДоступна версія: %2$s\nЗавантажити її?</string>
+    <string name="check_update_no">Перевірку виконано, але оновлень немає.</string>
+    <string name="snell_quic_proxy">Режим QUIC Proxy</string>
+    <string name="snell_quic_proxy_summary">Лише v6: сумісність із застарілим QUIC Proxy v5</string>
 </resources>

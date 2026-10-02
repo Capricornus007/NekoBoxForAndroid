@@ -910,4 +910,6 @@
     <string name="check_update_no">檢查成功，但沒有更新。</string>
     <string name="snell_quic_proxy">QUIC Proxy 模式</string>
     <string name="snell_quic_proxy_summary">僅 v6：舊版 v5 QUIC Proxy 相容</string>
+    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
+    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
 </resources>
