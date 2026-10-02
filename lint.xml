@@ -17,6 +17,10 @@
   The remaining ignores are intentional cosmetic/i18n noise suppression.
 -->
 <lint>
+    <!-- NewerVersionAvailable asks Maven Central at lint time, so it fails whenever any
+         dependency gets a release, independent of the code. GradleDependency still
+         reports SDK/AndroidX updates offline. -->
+    <issue id="NewerVersionAvailable" severity="ignore" />
     <issue id="UnusedAttribute" severity="ignore" />
     <issue id="UnknownNullness" severity="ignore" />
     <issue id="DiscouragedPrivateApi" severity="ignore" />
