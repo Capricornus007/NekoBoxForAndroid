@@ -25,6 +25,7 @@ import io.nekohasekai.sagernet.fmt.snell.toUri
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.socks.toUri
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
+import io.nekohasekai.sagernet.fmt.tailscale.TailscaleBean
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.fmt.tuic.TuicBean
 import io.nekohasekai.sagernet.fmt.tuic.toUri
@@ -277,6 +278,16 @@ object ProtocolRegistry {
             setBean = { e, b -> e.awgBean = b as AmneziaWGBean? },
             displayType = { "AmneziaWG" },
             settingsActivityClass = AmneziaWGSettingsActivity::class.java,
+            hasStandardLink = false,
+        ),
+        ProtocolDescriptor(
+            type = ProxyEntity.TYPE_TAILSCALE,
+            deserialize = { KryoConverters.tailscaleDeserialize(it) },
+            beanClass = TailscaleBean::class.java,
+            getBean = { it.tailscaleBean },
+            setBean = { e, b -> e.tailscaleBean = b as TailscaleBean? },
+            displayType = { "Tailscale" },
+            settingsActivityClass = TailscaleSettingsActivity::class.java,
             hasStandardLink = false,
         ),
     )

@@ -124,6 +124,8 @@ class SingBoxOptions {
 
         @JvmField var outbounds: List<SingBoxOption>? = null
 
+        @JvmField var endpoints: List<SingBoxOption>? = null
+
         @JvmField var route: RouteOptions? = null
 
         @JvmField var experimental: ExperimentalOptions? = null
@@ -1071,6 +1073,29 @@ class SingBoxOptions {
         @JvmField var i4: String? = null
 
         @JvmField var i5: String? = null
+    }
+
+    // Endpoints share the outbound tag/type shape but live in the top-level "endpoints" array.
+    open class Endpoint : Outbound()
+
+    class Endpoint_TailscaleOptions : Endpoint() {
+        @JvmField var detour: String? = null
+
+        @JvmField var state_directory: String? = null
+
+        @JvmField var auth_key: String? = null
+
+        @JvmField var control_url: String? = null
+
+        @JvmField var hostname: String? = null
+
+        @JvmField var accept_routes: Boolean? = null
+
+        @JvmField var exit_node: String? = null
+
+        @JvmField var exit_node_allow_lan_access: Boolean? = null
+
+        @JvmField var only_tcp_443: Boolean? = null
     }
 
     class Outbound_HysteriaOptions : Outbound() {

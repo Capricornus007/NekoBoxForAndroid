@@ -45,7 +45,9 @@ The Hysteria 2 client supports Salamander and Gecko obfuscation.
 
 ### 🛡️ WireGuard family
 
-`WireGuard` · `AmneziaWG`
+`WireGuard` · `AmneziaWG` · `Tailscale`
+
+Tailscale joins a tailnet with an auth key and can use an exit node and subnet routes. It works as the last hop of a chain; turn on "Always use DERP" there so peer traffic stays behind the chain.
 
 ### 🌐 Obfuscated transports
 

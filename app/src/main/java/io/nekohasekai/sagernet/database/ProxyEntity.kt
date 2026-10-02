@@ -21,6 +21,7 @@ import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
 import io.nekohasekai.sagernet.fmt.snell.SnellBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
+import io.nekohasekai.sagernet.fmt.tailscale.TailscaleBean
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.fmt.tuic.TuicBean
 import io.nekohasekai.sagernet.fmt.v2ray.*
@@ -75,6 +76,7 @@ data class ProxyEntity(
     var configBean: ConfigBean? = null,
     var snellBean: SnellBean? = null,
     var awgBean: AmneziaWGBean? = null,
+    var tailscaleBean: TailscaleBean? = null,
     var archivedData: ByteArray? = null,
 ) : Serializable() {
 
@@ -98,6 +100,7 @@ data class ProxyEntity(
         const val TYPE_JUICITY = 23
         const val TYPE_SNELL = 24
         const val TYPE_AWG = 26
+        const val TYPE_TAILSCALE = 28
 
         const val TYPE_CONFIG = 998
 

@@ -14,6 +14,7 @@ import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
 import io.nekohasekai.sagernet.fmt.snell.SnellBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
+import io.nekohasekai.sagernet.fmt.tailscale.TailscaleBean
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.fmt.tuic.TuicBean
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
@@ -115,6 +116,10 @@ object KryoConverters {
     @TypeConverter
     @JvmStatic
     fun amneziaWGDeserialize(bytes: ByteArray?): AmneziaWGBean? = if (bytes.isNullOrEmpty()) null else deserialize(AmneziaWGBean(), bytes)
+
+    @TypeConverter
+    @JvmStatic
+    fun tailscaleDeserialize(bytes: ByteArray?): TailscaleBean? = if (bytes.isNullOrEmpty()) null else deserialize(TailscaleBean(), bytes)
 
     @TypeConverter
     @JvmStatic

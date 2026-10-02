@@ -99,14 +99,16 @@ func init() {
 EOF
 fi
 
-PRODUCTION_TAGS='with_conntrack,with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api'
+# ts_omit_* drops Tailscale features the endpoint does not use (same set as upstream libbox).
+PRODUCTION_TAGS='with_conntrack,with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api,ts_omit_logtail,ts_omit_ssh,ts_omit_drive,ts_omit_taildrop,ts_omit_webclient,ts_omit_doctor,ts_omit_capture,ts_omit_kube,ts_omit_aws,ts_omit_synology,ts_omit_bird'
 echo ">> go test libcore (production tags)"
 go test -tags="$PRODUCTION_TAGS" ./... || exit 1
 
 # 16 KB page alignment (issue #1125): Android 15+ may use 16 KB memory pages, which
 # requires native .so LOAD segments aligned to 16384. Force the external linker to use a
 # 16 KB max/common page size so libgojni.so is aligned regardless of the gomobile/Go default.
-"$tool_dir/gomobile" bind -v -androidapi 21 -trimpath -ldflags='-s -w -extldflags=-Wl,-z,max-page-size=16384,-z,common-page-size=16384' -tags="$PRODUCTION_TAGS" . || exit 1
+# -checklinkname=0: pidfd_android.go overrides an unexported os symbol.
+"$tool_dir/gomobile" bind -v -androidapi 21 -trimpath -ldflags='-s -w -checklinkname=0 -extldflags=-Wl,-z,max-page-size=16384,-z,common-page-size=16384' -tags="$PRODUCTION_TAGS" . || exit 1
 rm -r libcore-sources.jar
 
 proj=../app/libs

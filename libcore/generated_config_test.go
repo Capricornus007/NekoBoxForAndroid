@@ -22,8 +22,12 @@ func TestGeneratedApplicationConfigs(t *testing.T) {
 	if root == "" {
 		t.Skip("NEKOBOX_CONFIG_TEST_DIR is not set")
 	}
+	root, err := filepath.Abs(root)
+	if err != nil {
+		t.Fatal(err)
+	}
 	count := 0
-	err := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
+	err = filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -32,6 +36,8 @@ func TestGeneratedApplicationConfigs(t *testing.T) {
 		}
 		count++
 		t.Run(filepath.Base(path), func(t *testing.T) {
+			// Endpoints create their state directories relative to the working directory.
+			t.Chdir(t.TempDir())
 			content, err := os.ReadFile(path)
 			if err != nil {
 				t.Fatal(err)

@@ -82,6 +82,7 @@ import io.nekohasekai.sagernet.ui.profile.ShadowsocksRSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ShadowsocksSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.SnellSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.SocksSettingsActivity
+import io.nekohasekai.sagernet.ui.profile.TailscaleSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TrojanSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.TuicSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.VMessSettingsActivity
@@ -701,6 +702,10 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             R.id.action_new_awg -> {
                 startActivity(Intent(requireActivity(), AmneziaWGSettingsActivity::class.java))
+            }
+
+            R.id.action_new_tailscale -> {
+                startActivity(Intent(requireActivity(), TailscaleSettingsActivity::class.java))
             }
 
             R.id.action_new_shadowtls -> {
