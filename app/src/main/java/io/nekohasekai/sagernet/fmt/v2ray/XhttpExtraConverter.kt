@@ -176,8 +176,11 @@ object XhttpExtraConverter {
     fun xrayToSingBox(xrayExtra: String): String {
         if (xrayExtra.isBlank()) return ""
         return try {
-            val xray = JSONObject(xrayExtra)
-            if (isSingBoxFormat(xray)) return xrayExtra
+            val normalizedExtra = normalizeSingBoxXhttpRanges(xrayExtra)
+            val xray = JSONObject(normalizedExtra)
+            if (isSingBoxFormat(xray)) {
+                return normalizedExtra
+            }
             val singBox = JSONObject()
 
             convertFields(xray, singBox, FIELD_MAPPINGS)
@@ -256,7 +259,7 @@ object XhttpExtraConverter {
                 if (singBoxDown.length() > 0) singBox.put("download", singBoxDown)
             }
 
-            singBox.toString(2).replace("\\/", "/")
+            normalizeSingBoxXhttpRanges(singBox.toString(2).replace("\\/", "/"))
         } catch (e: Exception) {
             e.printStackTrace()
             xrayExtra
