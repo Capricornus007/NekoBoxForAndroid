@@ -920,9 +920,7 @@
     <string name="card_style">کارت</string>
     <string name="card_style_classic">کلاسیک</string>
     <string name="card_style_stroke">حاشیه</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
     <string name="connection_test_tcp_ping_unavailable">TCPing در دسترس نیست</string>
-    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing در دسترس نیست</string>
     <string name="release_wake_lock">رها کردن WakeLock</string>
     <string name="check_update_preview">بررسی به‌روزرسانی نسخهٔ پیش‌نمایش</string>

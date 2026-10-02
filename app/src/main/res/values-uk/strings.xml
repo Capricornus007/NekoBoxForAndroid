@@ -899,9 +899,7 @@
     <string name="leastPing" translatable="false">Ping</string>
     <string name="v2rayn" translatable="false">V2RayN</string>
     <string name="available" translatable="false">%dмс</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
     <string name="connection_test_tcp_ping_unavailable">TCPing недоступний</string>
-    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing недоступний</string>
     <string name="ooc_subscription_token" translatable="false">OOCv1 API Token</string>
     <string name="traffic_uplink" translatable="false">%s | %s/с ↑</string>

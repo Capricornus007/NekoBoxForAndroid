@@ -885,9 +885,7 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="subscription_direct_fallback_summary">Probeer het abonnement direct als de lokale proxy faalt. Niet inschakelen als de URL een token bevat.</string>
     <string name="adaptive_traffic_polling">Aanpasbare verkeerspolling</string>
     <string name="adaptive_traffic_polling_summary">Minder vaak opvragen bij uitgeschakeld scherm of op de achtergrond.</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
     <string name="connection_test_tcp_ping_unavailable">TCPing niet beschikbaar</string>
-    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing niet beschikbaar</string>
     <string name="release_wake_lock">WakeLock vrijgeven</string>
     <string name="check_update_preview">Controleren op updates van de previewversie</string>

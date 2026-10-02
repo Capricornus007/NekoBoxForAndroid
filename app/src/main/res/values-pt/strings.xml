@@ -922,9 +922,7 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="subscription_direct_fallback_summary">Tenta a assinatura em direto se o proxy local falhar. Evite se o URL contiver um token.</string>
     <string name="adaptive_traffic_polling">Sondagem adaptativa de tráfego</string>
     <string name="adaptive_traffic_polling_summary">Consulta menos vezes com o ecrã desligado ou a aplicação em segundo plano.</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
     <string name="connection_test_tcp_ping_unavailable">TCPing indisponível</string>
-    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing indisponível</string>
     <string name="release_wake_lock">Liberar WakeLock</string>
     <string name="check_update_preview">Verificar atualizações da versão de pré-visualização</string>

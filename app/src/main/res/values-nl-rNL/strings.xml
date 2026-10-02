@@ -931,9 +931,7 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="card_style">Kaart</string>
     <string name="card_style_classic">Klassiek</string>
     <string name="card_style_stroke">Omtrek</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
     <string name="connection_test_tcp_ping_unavailable">TCPing niet beschikbaar</string>
-    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing niet beschikbaar</string>
     <string name="release_wake_lock">WakeLock vrijgeven</string>
     <string name="check_update_preview">Controleren op updates van de previewversie</string>

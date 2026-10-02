@@ -919,9 +919,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="card_style">カード</string>
     <string name="card_style_classic">クラシック</string>
     <string name="card_style_stroke">枠線</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
     <string name="connection_test_tcp_ping_unavailable">TCPing 利用不可</string>
-    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing 利用不可</string>
     <string name="release_wake_lock">WakeLock を解放</string>
     <string name="check_update_preview">プレビュー版の更新を確認</string>

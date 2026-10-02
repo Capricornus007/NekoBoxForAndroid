@@ -919,9 +919,7 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="subscription_direct_fallback_summary">Riprova l’abbonamento in diretto se il proxy locale fallisce. Evita se l’URL contiene un token.</string>
     <string name="adaptive_traffic_polling">Interrogazione adattiva del traffico</string>
     <string name="adaptive_traffic_polling_summary">Interroga meno spesso con schermo spento o app in background.</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
     <string name="connection_test_tcp_ping_unavailable">TCPing non disponibile</string>
-    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing non disponibile</string>
     <string name="release_wake_lock">Rilascia WakeLock</string>
     <string name="check_update_preview">Controlla aggiornamenti della versione di anteprima</string>

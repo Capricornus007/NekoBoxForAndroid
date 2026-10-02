@@ -921,9 +921,7 @@
     <string name="card_style">Kart</string>
     <string name="card_style_classic">Klasik</string>
     <string name="card_style_stroke">Kenar çizgisi</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
     <string name="connection_test_tcp_ping_unavailable">TCPing kullanılamaz</string>
-    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing kullanılamaz</string>
     <string name="release_wake_lock">WakeLock Bırak</string>
     <string name="check_update_preview">Önizleme sürümü güncellemelerini denetle</string>

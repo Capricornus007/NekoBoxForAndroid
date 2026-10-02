@@ -889,9 +889,7 @@
     <string name="subscription_direct_fallback_summary">أعد محاولة الاشتراك مباشرة إذا فشل الوكيل المحلي. تجنّب ذلك إن كان الرابط يحوي token.</string>
     <string name="adaptive_traffic_polling">استطلاع تكيفي للحركة</string>
     <string name="adaptive_traffic_polling_summary">يقلّل تكرار الاستعلام عند إطفاء الشاشة أو وجود التطبيق في الخلفية.</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
     <string name="connection_test_tcp_ping_unavailable">TCPing غير متاح</string>
-    <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing غير متاح</string>
     <string name="release_wake_lock">تحرير WakeLock</string>
     <string name="check_update_preview">التحقق من تحديثات الإصدار التجريبي</string>
