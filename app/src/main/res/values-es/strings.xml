@@ -1099,7 +1099,7 @@
     <string name="tailscale_reset_identity_failed">No se pudo eliminar la identidad de Tailscale</string>
     <string name="tailscale_single_use">El perfil de Tailscale %s solo se puede usar una vez por configuración</string>
     <string name="tailscale_selector_landing">Un perfil de Tailscale no puede ser el proxy de aterrizaje de un grupo selector</string>
-    <string name="tailscale_routing">Enrutado</string>
+    <string name="tailscale_routing">Enrutamiento</string>
     <string name="tailscale_exit_node">Nodo de salida</string>
     <string name="tailscale_exit_node_pick">Elegir nodo de salida</string>
     <string name="tailscale_exit_node_pick_sum">Nombre de máquina o IP de Tailscale de un nodo que ofrece salida; vacío deja accesibles solo las direcciones del tailnet. La lista proviene del perfil guardado, así que guarda primero tras cambiar la clave de autenticación o la URL de control.</string>

@@ -393,7 +393,10 @@ class ProtocolRegistryDispatchTest {
         val blockRule = routeRules.single { it.optString("action") == "reject" && it.has("domain") }
         assertTrue("block rule after tailnet rule", routeRules.indexOf(blockRule) < routeRules.indexOf(tailnetRule))
         val dnsRuleList = (0 until dnsRules.length()).map { dnsRules.getJSONObject(it) }
-        val dnsBlock = dnsRuleList.single { it.optString("action") == "predefined" && it.has("domain") }
+        // 封鎖在 DNS 層的本倉做法是把規則指到 `dns-block`（rcode://success）那顆伺服器，
+        // 不是上游 fork 的 `action: "predefined"`；這裡只認「使用者封鎖列排在 tailnet
+        // 自動生成的 MagicDNS 列之前」這個語意，換實作表示法不該讓這條斷言跟著改。
+        val dnsBlock = dnsRuleList.single { it.optString("server") == "dns-block" && it.has("domain") }
         assertTrue("DNS block rule after MagicDNS rule", dnsRuleList.indexOf(dnsBlock) < dnsRuleList.indexOf(magicRule))
 
         ConfigBuilderTestEnv.io {

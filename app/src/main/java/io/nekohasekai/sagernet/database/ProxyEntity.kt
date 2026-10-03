@@ -630,6 +630,11 @@ data class ProxyEntity(
                 byedpiBean = bean
             }
 
+            is TailscaleBean -> {
+                type = TYPE_TAILSCALE
+                tailscaleBean = bean
+            }
+
             is BalancerBean -> {
                 type = TYPE_BALANCER
                 balancerBean = bean

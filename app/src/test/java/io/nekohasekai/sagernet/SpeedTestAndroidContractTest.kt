@@ -208,7 +208,9 @@ class SpeedTestAndroidContractTest {
             .substringBefore("R.id.action_remove_duplicate")
 
         assertTrue(urlTest.contains("repeat(DataStore.connectionTestConcurrent)"))
-        assertTrue(urlTest.contains("val urlTest = UrlTest()"))
+        // UrlTest 必須拿到 service 引用：Tailscale 節點的測速要先等 exit node 起來才撥。
+        // 退回無參數構造等於對 tailscale 節點永遠拿不到服務，URL 測試會直接空轉。
+        assertTrue(urlTest.contains("val urlTest = UrlTest(service)"))
         assertTrue(urlTest.contains("profile.ping = result"))
         // 「有沒有在測」只能從 Job 推導。那個被三處共用的全域布林就是快速連點卡死的根：
         // 取消掐不斷原生呼叫 → 復位的 finally 走不到 → 之後所有測速變靜默空轉。
