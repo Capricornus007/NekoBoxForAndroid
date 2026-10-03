@@ -19,7 +19,6 @@
     <string name="quick_toggle">切換</string>
     <string name="quick_enable">啟用</string>
     <string name="quick_disable">停用</string>
-    <string name="tile_title">開關</string>
     <string name="menu_traffic">流量</string>
     <string name="menu_dashboard">sing-box 儀表板</string>
     <string name="action_copy">複製</string>

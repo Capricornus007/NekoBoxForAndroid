@@ -128,7 +128,6 @@
     <string name="group_duplicate">重複：
 \n%s</string>
     <string name="group_diff">差異（%s）</string>
-    <string name="tile_title">切換器</string>
     <string name="group_default">未分組</string>
     <string name="version_x">版本 (%s)</string>
     <string name="extra_headers">額外標頭</string>

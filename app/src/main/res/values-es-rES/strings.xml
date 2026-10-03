@@ -19,7 +19,6 @@
     <string name="quick_toggle">Alternar</string>
     <string name="quick_enable">Habilitar</string>
     <string name="quick_disable">Deshabilitar</string>
-    <string name="tile_title">Conmutador</string>
     <string name="menu_traffic">Tráfico</string>
     <string name="menu_dashboard">Panel de control de sing-box</string>
     <string name="action_copy">Copiar</string>

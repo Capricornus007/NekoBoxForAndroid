@@ -19,7 +19,6 @@
     <string name="quick_toggle">전환</string>
     <string name="quick_enable">활성화</string>
     <string name="quick_disable">비활성화</string>
-    <string name="tile_title">스위처</string>
     <string name="menu_traffic">트래픽</string>
     <string name="menu_dashboard">sing-box 대시보드</string>
     <string name="action_copy">복사</string>
