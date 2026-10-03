@@ -195,18 +195,18 @@ func (w *boxPlatformInterfaceWrapper) FindConnectionOwner(request *adapter.FindC
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformNotification() bool {
-	return false
+	return intfBox != nil
 }
 
 func (w *boxPlatformInterfaceWrapper) SendNotification(notification *adapter.Notification) error {
-	return nil
+	return intfBox.SendNotification(notification.Identifier, notification.TypeID, notification.Title, notification.Body, notification.OpenURL)
 }
 
 func (w *boxPlatformInterfaceWrapper) ProcessPlatformOptions(options option.TunPlatformOptions) error {
 	return nil
 }
 func (w *boxPlatformInterfaceWrapper) CancelNotification(identifier string, typeID int32) error {
-	return nil
+	return intfBox.CancelNotification(identifier, typeID)
 }
 func (w *boxPlatformInterfaceWrapper) UsePlatformNeighborResolver() bool { return false }
 func (w *boxPlatformInterfaceWrapper) StartNeighborMonitor(listener adapter.NeighborUpdateListener) error {

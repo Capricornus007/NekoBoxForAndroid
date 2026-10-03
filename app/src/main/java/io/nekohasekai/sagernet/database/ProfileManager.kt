@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteCantOpenDatabaseException
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.fmt.AbstractBean
+import io.nekohasekai.sagernet.fmt.tailscale.pruneTailscaleState
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
@@ -142,6 +143,7 @@ object ProfileManager {
         if (deleted > 0 && DataStore.selectedProxy in ids) {
             DataStore.selectedProxy = 0L
         }
+        pruneTailscaleState()
     }
 
     suspend fun deleteProfile(groupId: Long, profileId: Long) {
@@ -153,6 +155,7 @@ object ProfileManager {
         if (SagerDatabase.proxyDao.countByGroup(groupId) > 1) {
             GroupManager.rearrange(groupId)
         }
+        pruneTailscaleState()
     }
 
     fun getProfile(profileId: Long): ProxyEntity? {

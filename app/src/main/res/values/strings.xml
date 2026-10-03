@@ -671,6 +671,12 @@
     <string name="tailscale_exit_node_pick_offline">offline</string>
     <string name="tailscale_save_first">Save the profile first</string>
     <string name="tailscale_service_starting">The service is starting; try again in a moment</string>
+    <string name="core_notifications">Login requests</string>
+    <string name="tailscale_login_required">Tailscale login required</string>
+    <string name="tailscale_login_tap">Tap to sign in to the tailnet in your browser</string>
+    <string name="tailscale_login_message">This node has no auth key. Sign in to the tailnet in your browser; the node joins as soon as the login completes.</string>
+    <string name="tailscale_login_open">Open login page</string>
+    <string name="tailscale_login_waiting">Waiting for the login to complete…</string>
     <string name="tailscale_node_in_use">This Tailscale node is in use by the running service</string>
     <string name="tailscale_exit_node_allow_lan_access">Allow LAN access with exit node</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">Keep local network addresses reachable while the exit node is in use</string>

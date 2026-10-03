@@ -19,4 +19,7 @@ type BoxPlatformInterface interface {
 	PackageNameByUid(uid int32) (string, error)
 	UIDByPackageName(packageName string) (int32, error)
 	WIFIState() string
+	// Notifications the core asks for, e.g. a Tailscale login URL; openURL may be empty.
+	SendNotification(identifier string, typeID int32, title string, body string, openURL string) error
+	CancelNotification(identifier string, typeID int32) error
 }

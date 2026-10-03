@@ -2,6 +2,7 @@ package io.nekohasekai.sagernet.database
 
 import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.bg.SubscriptionUpdater
+import io.nekohasekai.sagernet.fmt.tailscale.pruneTailscaleState
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
 
 object GroupManager {
@@ -117,6 +118,7 @@ object GroupManager {
         }
         clearDeletedSelection(selected, clearSelected)
         RoutingProfiles.deleteBySource(RoutingProfiles.subscriptionSource(groupId))
+        pruneTailscaleState()
         iterator { groupRemoved(groupId) }
         reconfigureUpdater()
     }
@@ -134,6 +136,7 @@ object GroupManager {
         }
         clearDeletedSelection(selected, clearSelected)
         for (id in ids) RoutingProfiles.deleteBySource(RoutingProfiles.subscriptionSource(id))
+        pruneTailscaleState()
         for (proxyGroup in group) iterator { groupRemoved(proxyGroup.id) }
         reconfigureUpdater()
     }
