@@ -3,7 +3,7 @@
 <p align="center">
   <img src="docs/logo.png" width="128" height="128" alt="OwnBox Logo">
   <br>
-  <b>A modern, versatile proxy toolchain and network debugging client based on Sing-box 1.15.0 Alpha 9 for Android</b>
+  <b>A modern, versatile proxy toolchain and network debugging client based on Sing-box 1.15.0 Alpha 10 for Android</b>
   <br>
   <b>A Modern Universal Proxy Toolchain & Network Debugging Client for Android</b>
 </p>

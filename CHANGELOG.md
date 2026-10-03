@@ -1,5 +1,16 @@
 # OwnBox for Android 更新日志 (Changelog)
 
+# OwnBox for Android v2.9.3 预览版 (v2.9.3-preview)
+
+### 1. 内核升级
+* 升级 sing-box 核心至官方 v1.15.0-alpha.10
+* 同步官方底层生命周期与网络接口调度
+
+### 2. 优化与修复
+* 优化策略组与出站生命周期管理
+* 优化网络切换与空闲连接维护
+* 递增版本号至 2.9.3 预览版（versionCode 322）
+
 # OwnBox for Android v2.9.2 预览版 (v2.9.2-preview)
 
 ### 1. 新增功能

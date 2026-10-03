@@ -3,6 +3,8 @@
 source ./env_java.sh || true
 source ../buildScript/init/env_ndk.sh
 
+export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8"
+
 BUILD=".build"
 
 rm -rf $BUILD/android \

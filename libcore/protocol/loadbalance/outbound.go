@@ -354,30 +354,31 @@ func (s *LoadBalance) loopCheck(ticker *time.Ticker, closeChan <-chan struct{}) 
 	}
 }
 
-func (s *LoadBalance) Start() error {
-	s.outbounds = make([]adapter.Outbound, 0, len(s.tags))
-	s.activeConns = make([]*atomic.Int64, len(s.tags))
-	s.stats = make([]*nodeStats, len(s.tags))
-	for i, tag := range s.tags {
-		detour, loaded := s.outbound.Outbound(tag)
-		if !loaded {
-			return E.New("outbound ", i, " not found: ", tag)
+func (s *LoadBalance) Start(stage adapter.StartStage, scope *adapter.Scope) error {
+	switch stage {
+	case adapter.StartStateStart:
+		s.outbounds = make([]adapter.Outbound, 0, len(s.tags))
+		s.activeConns = make([]*atomic.Int64, len(s.tags))
+		s.stats = make([]*nodeStats, len(s.tags))
+		for i, tag := range s.tags {
+			detour, loaded := s.outbound.Outbound(tag)
+			if !loaded {
+				return E.New("outbound ", i, " not found: ", tag)
+			}
+			s.outbounds = append(s.outbounds, detour)
+			s.activeConns[i] = new(atomic.Int64)
+			s.stats[i] = new(nodeStats)
 		}
-		s.outbounds = append(s.outbounds, detour)
-		s.activeConns[i] = new(atomic.Int64)
-		s.stats[i] = new(nodeStats)
-	}
-	s.ring = newConsistentHashRing(s.tags)
-	return nil
-}
-
-func (s *LoadBalance) PostStart() error {
-	s.access.Lock()
-	defer s.access.Unlock()
-	s.started = true
-	s.lastActive.Store(time.Now())
-	if s.interval > 0 && s.isLeastPing() {
-		go s.CheckOutbounds()
+		s.ring = newConsistentHashRing(s.tags)
+	case adapter.StartStateStarted:
+		s.access.Lock()
+		s.started = true
+		s.lastActive.Store(time.Now())
+		if s.interval > 0 && s.isLeastPing() {
+			go s.CheckOutbounds()
+		}
+		s.access.Unlock()
+		scope.Add(s.Close)
 	}
 	return nil
 }
