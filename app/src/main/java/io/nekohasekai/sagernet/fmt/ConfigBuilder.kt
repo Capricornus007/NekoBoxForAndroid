@@ -951,9 +951,26 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
         val mainProxyTag = (if (buildSelector) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
 
+        // Tailnet destinations (peer addresses, advertised subnets, MagicDNS names) go to the
+        // node that knows them, even when another outbound is the final one. The exit node's
+        // default route is not a preferred route, so ordinary traffic is unaffected. Added after
+        // the user's rules so an explicit block or detour of a tailnet address still wins.
+        val tailscaleTags = endpointList.map { it._hack_config_map["tag"] as String }
+        fun addTailnetRouteRules() {
+            tailscaleTags.forEach { tag ->
+                routeRules.add(
+                    Rule_DefaultOptions().apply {
+                        _hack_config_map["preferred_by"] = listOf(tag)
+                        outbound = tag
+                    },
+                )
+            }
+        }
+
         // check global mode before applying user rules
         if (!forTest && DataStore.globalMode) {
             // rule handling in global mode
+            addTailnetRouteRules()
 
             // bypass internal networks (if enabled)
             if (DataStore.bypassLan) {
@@ -1143,6 +1160,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     }
                 }
             }
+            addTailnetRouteRules()
         }
 
         // deduplicate rule_set tags
@@ -1271,6 +1289,27 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     action = "reject"
                 },
             )
+            // MagicDNS: one resolver per Tailscale node answering its MagicDNS hosts, the
+            // tailnet's split-DNS suffixes and single-label machine names. Appended after the
+            // user DNS rules so an explicit block or rewrite still wins, and ahead of FakeDNS
+            // so tailnet names get real addresses.
+            tailscaleTags.forEachIndexed { index, tag ->
+                val serverTag = "dns-tailscale-$index"
+                dnsServers.add(
+                    DNSServerOptions().apply {
+                        type = "tailscale"
+                        this.tag = serverTag
+                        _hack_config_map["endpoint"] = tag
+                        _hack_config_map["accept_search_domain"] = true
+                    },
+                )
+                dnsRules.add(
+                    DNSRule_DefaultOptions().apply {
+                        _hack_config_map["preferred_by"] = listOf(serverTag)
+                        server = serverTag
+                    },
+                )
+            }
             // FakeDNS obj
             if (useFakeDns) {
                 dnsServers.add(
