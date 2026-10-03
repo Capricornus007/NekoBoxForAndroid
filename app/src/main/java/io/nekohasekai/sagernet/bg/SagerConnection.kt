@@ -34,6 +34,8 @@ class SagerConnection(
         const val CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND = 2
         const val CONNECTION_ID_MAIN_ACTIVITY_BACKGROUND = 3
         const val CONNECTION_ID_RESTART_BG = 4
+        const val CONNECTION_ID_SHARE_CONNECTION = 5
+        const val CONNECTION_ID_TAILSCALE_SETTINGS = 6
 
         var restartingApp = false
     }

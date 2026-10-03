@@ -301,8 +301,7 @@ class ProtocolRegistryDispatchTest {
             }
             val profile = ProxyEntity(id = index + 1L).putBean(bean)
             if (profile.needExternal()) continue
-            // Tailscale refuses test builds (a URL test would start a second node); build it as a
-            // service config so the core still checks the generated endpoint.
+            // Tailscale is built as a service config so the core also checks the MagicDNS wiring.
             val config = ConfigBuilderTestEnv.io { buildConfig(profile, forTest = bean !is TailscaleBean).config }
             directory.resolve("$index-${bean.javaClass.simpleName}.json").writeText(config)
         }
@@ -334,10 +333,12 @@ class ProtocolRegistryDispatchTest {
             order = -1,
         )
 
-        val urlTest = assertThrows(IllegalArgumentException::class.java) {
-            ConfigBuilderTestEnv.io { buildConfig(node, forTest = true) }
-        }
-        assertTrue(urlTest.message!!, urlTest.message!!.contains("cannot be tested"))
+        // A test build (URL test) exposes the endpoint so the caller can wait for the node.
+        val test = ConfigBuilderTestEnv.io { buildConfig(node, forTest = true) }
+        val endpoint = test.tailscaleEndpoints.getValue(node.id)
+        assertEquals("Tailscale via 100.64.0.1", endpoint.tag)
+        assertTrue(endpoint.waitForExitNode)
+        assertEquals(setOf(node.id), test.profileTailscaleNodes[node.id])
 
         val duplicate = assertThrows(IllegalArgumentException::class.java) {
             ConfigBuilderTestEnv.io { buildConfig(twice, forExport = true) }

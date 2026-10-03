@@ -1260,6 +1260,8 @@ class ConfigurationFragment @JvmOverloads constructor(
             adapter.groupFragments[group.id]?.adapter?.applyProfileState(profiles)
         }
 
+        // Tailscale 節點的測速要走已在跑的服務（UrlTest 用它做 readiness 等待）。
+        val service = { (activity as? MainActivity)?.connection?.service }
         urlTestJob = runOnDefaultDispatcher {
             try {
                 val profilesList = SagerDatabase.proxyDao.getByGroup(group.id)
@@ -1278,7 +1280,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 repeat(DataStore.connectionTestConcurrent) {
                     testJobs.add(
                         launch(Dispatchers.IO) {
-                            val urlTest = UrlTest() // note: this is NOT in bg process
+                            val urlTest = UrlTest(service) // note: this is NOT in bg process
                             while (isActive) {
                                 val profile = profiles.poll() ?: break
                                 try {

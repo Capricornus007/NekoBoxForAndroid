@@ -15,6 +15,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+// Login over DERP plus exit node selection; a phone on a slow network needs several seconds.
+const val TAILSCALE_READY_TIMEOUT_MS = 20_000
+
 class TestInstance(profile: ProxyEntity, val link: String, private val timeout: Int) :
     BoxInstance(profile) {
 
@@ -66,6 +69,11 @@ class TestInstance(profile: ProxyEntity, val link: String, private val timeout: 
                     Logs.d(
                         "URLTest ${profile.displayName()}: calling Libcore.urlTest(box, link=$link, timeout=${timeout}ms)",
                     )
+                    // A Tailscale node has to log in and pick its exit node before a request can
+                    // succeed; this is separate from the HTTP timeout.
+                    for (endpoint in config.tailscaleEndpoints.values) {
+                        Libcore.tailscaleWaitReady(box, endpoint.tag, endpoint.waitForExitNode, TAILSCALE_READY_TIMEOUT_MS)
+                    }
                     val result = Libcore.urlTest(box, link, timeout)
                     Logs.d("URLTest ${profile.displayName()}: result latency=${result}ms")
                     if (c.isActive) c.resume(result)

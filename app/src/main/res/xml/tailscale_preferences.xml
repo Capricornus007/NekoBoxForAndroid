@@ -34,8 +34,12 @@
         <EditTextPreference
             app:icon="@drawable/baseline_public_24"
             app:key="exitNode"
-            app:summary="@string/tailscale_exit_node_sum"
-            app:title="@string/tailscale_exit_node" />
+            app:title="@string/tailscale_exit_node"
+            app:useSimpleSummaryProvider="true" />
+        <Preference
+            app:key="exitNodePicker"
+            app:summary="@string/tailscale_exit_node_pick_sum"
+            app:title="@string/tailscale_exit_node_pick" />
         <SwitchPreference
             app:icon="@drawable/ic_hardware_router"
             app:key="exitNodeAllowLanAccess"
