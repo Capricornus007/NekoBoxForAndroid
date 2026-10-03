@@ -11,8 +11,11 @@ import android.os.Build.VERSION_CODES
 import android.os.SystemClock
 import androidx.annotation.RequiresApi
 import io.nekohasekai.sagernet.SagerNet
+import io.nekohasekai.sagernet.bg.ActiveOutboundTracker
 import io.nekohasekai.sagernet.bg.ServiceNotification
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.ProfileManager
+import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
@@ -300,12 +303,37 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
                 val id = data.proxy!!.config.profileTagMap
                     .filterValues { it == tag }.keys.firstOrNull() ?: -1
                 val ent = SagerDatabase.proxyDao.getById(id) ?: return@runOnDefaultDispatcher
+
+                val activeProfile = data.proxy?.profile
+                val isBalancer = activeProfile?.type == ProxyEntity.TYPE_BALANCER
+                val group = if (activeProfile != null) runCatching { SagerDatabase.groupDao.getById(activeProfile.groupId) }.getOrNull() else null
+                val isGroupStrategy = group != null && (
+                    runCatching { DataStore.isGroupUrlTest(group.id) }.getOrDefault(false) ||
+                    runCatching { DataStore.isGroupLoadBalance(group.id) }.getOrDefault(false)
+                )
+
+                if (isBalancer || isGroupStrategy) {
+                    val memberMap = runCatching { data.proxy?.config?.balancerMemberMap?.get(activeProfile?.id) }.getOrNull()
+                        ?: if (isGroupStrategy) runCatching { SagerDatabase.proxyDao.getByGroup(group!!.id).map { it.id } }.getOrNull() else null
+                    if (memberMap != null && id in memberMap) {
+                        ActiveOutboundTracker.updateActiveLeaf(id, ent.displayName())
+                        val newTitle = ActiveOutboundTracker.formatNotificationTitle(activeProfile!!)
+                        data.proxy?.displayProfileName = newTitle
+                        data.notification?.postNotificationTitle(newTitle)
+                        ProfileManager.postUpdate(id, true)
+                        activeProfile.let { ProfileManager.postUpdate(it.id, true) }
+                    }
+                    return@runOnDefaultDispatcher
+                }
+
                 // traffic & title
                 data.proxy?.apply {
+                    profile = ent
                     looper?.selectMain(id)
-                    displayProfileName = ServiceNotification.genTitle(ent)
+                    displayProfileName = ActiveOutboundTracker.formatNotificationTitle(ent)
                     data.notification?.postNotificationTitle(displayProfileName)
                 }
+                DataStore.currentProfile = id
                 // post binder
                 data.binder.broadcast { b ->
                     b.cbSelectorUpdate(id)

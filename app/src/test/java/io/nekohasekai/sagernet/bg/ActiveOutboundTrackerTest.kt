@@ -46,13 +46,8 @@ class ActiveOutboundTrackerTest {
                 name = "香港 01"
             })
         }
-        val ruleTitle = ActiveOutboundTracker.formatNotificationTitle(singleNode, isGlobalMode = false)
-        assertTrue(ruleTitle.contains("[规则]"))
-        assertTrue(ruleTitle.contains("香港 01"))
-
-        val globalTitle = ActiveOutboundTracker.formatNotificationTitle(singleNode, isGlobalMode = true)
-        assertTrue(globalTitle.contains("[全局]"))
-        assertTrue(globalTitle.contains("香港 01"))
+        val title = ActiveOutboundTracker.formatNotificationTitle(singleNode)
+        assertEquals("香港 01", title)
     }
 
     @Test
@@ -65,19 +60,13 @@ class ActiveOutboundTrackerTest {
                 strategy = BalancerBean.STRATEGY_LEAST_PING
             })
         }
-        val leafNode = ProxyEntity().apply {
-            id = 101L
-            type = 0
-            putBean(ShadowsocksBean().apply {
-                name = "日本 02"
-            })
-        }
 
-        val titleWithLeaf = ActiveOutboundTracker.formatNotificationTitle(balancer, leafNode)
-        assertEquals("自动选择 ➔ 日本 02", titleWithLeaf)
+        val title = ActiveOutboundTracker.formatNotificationTitle(balancer)
+        assertEquals("自动选择（策略组：最低延迟）", title)
 
-        val titleWithoutLeaf = ActiveOutboundTracker.formatNotificationTitle(balancer, null)
-        assertEquals("自动选择 · 最低延迟", titleWithoutLeaf)
+        ActiveOutboundTracker.updateActiveLeaf(101L, "日本 02")
+        val leafDisplay = ActiveOutboundTracker.getActiveLeafNodeDisplay(balancer)
+        assertEquals("日本 02", leafDisplay)
     }
 
     @Test

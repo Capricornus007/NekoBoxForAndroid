@@ -56,21 +56,51 @@ object ActiveOutboundTracker {
         return if (isGlobal) "全局模式" else "规则分流"
     }
 
+    fun onProfileSwitched(newProfile: ProxyEntity) {
+        val oldId = activeLeafProfileId
+        reset()
+        if (oldId > 0L) {
+            runOnDefaultDispatcher {
+                ProfileManager.postUpdate(oldId, true)
+                ProfileManager.postUpdate(newProfile.id, true)
+            }
+        }
+    }
+
+    fun updateActiveLeaf(candidateId: Long, candidateName: String) {
+        activeLeafProfileId = candidateId
+        activeLeafProfileName = candidateName
+    }
+
+    fun getActiveLeafNodeDisplay(profile: ProxyEntity): String? {
+        val isBalancer = profile.type == ProxyEntity.TYPE_BALANCER
+        val group = runCatching { SagerDatabase.groupDao.getById(profile.groupId) }.getOrNull()
+        val isGroupStrategy = group != null && (
+            runCatching { DataStore.isGroupUrlTest(group.id) }.getOrDefault(false) ||
+            runCatching { DataStore.isGroupLoadBalance(group.id) }.getOrDefault(false)
+        )
+        if (!isBalancer && !isGroupStrategy) return null
+
+        val leafId = activeLeafProfileId
+        if (leafId > 0L && leafId != profile.id) {
+            val name = activeLeafProfileName.takeIf { it.isNotBlank() }
+                ?: runCatching { SagerDatabase.proxyDao.getById(leafId)?.displayName() }.getOrNull()
+            return name?.takeIf { it.isNotBlank() }
+        }
+        return null
+    }
+
     fun formatNotificationTitle(
         profile: ProxyEntity,
-        activeLeaf: ProxyEntity? = null,
         isGlobalMode: Boolean? = null
     ): String {
         val baseTitle = runCatching { ServiceNotification.genTitle(profile) }.getOrDefault(profile.displayName())
         if (profile.type == ProxyEntity.TYPE_BALANCER) {
-            val target = activeLeaf ?: runCatching {
-                if (activeLeafProfileId > 0) SagerDatabase.proxyDao.getById(activeLeafProfileId) else null
-            }.getOrNull()
-            return if (target != null && target.id != profile.id) {
-                "${profile.displayName()} ➔ ${target.displayName()}"
+            val strat = getStrategyDisplayName(profile)
+            return if (baseTitle.contains(strat) || baseTitle.contains("策略")) {
+                baseTitle
             } else {
-                val strat = getStrategyDisplayName(profile)
-                "${profile.displayName()} · $strat"
+                "$baseTitle（策略组：$strat）"
             }
         }
         val group = runCatching { SagerDatabase.groupDao.getById(profile.groupId) }.getOrNull()
@@ -79,18 +109,18 @@ object ActiveOutboundTracker {
             runCatching { DataStore.isGroupLoadBalance(group.id) }.getOrDefault(false)
         )
         if (isGroupStrategy) {
-            val target = activeLeaf ?: runCatching {
-                if (activeLeafProfileId > 0) SagerDatabase.proxyDao.getById(activeLeafProfileId) else null
-            }.getOrNull()
-            return if (target != null && target.id != profile.id) {
-                "${group!!.displayName()} ➔ ${target.displayName()}"
+            val groupTitle = group?.displayName() ?: profile.displayName()
+            val groupPrefix = if (DataStore.showGroupInNotification && !groupTitle.startsWith("[")) {
+                "[${group.displayName()}] "
+            } else ""
+            val strat = getStrategyDisplayName(profile)
+            return if (groupTitle.contains("策略") || groupTitle.contains(strat)) {
+                "$groupPrefix$groupTitle"
             } else {
-                val strat = getStrategyDisplayName(profile)
-                "${group!!.displayName()} · $strat"
+                "$groupPrefix$groupTitle（策略组：$strat）"
             }
         }
-        val mode = if (isGlobalMode ?: runCatching { DataStore.globalMode }.getOrDefault(false)) "全局" else "规则"
-        return "[$mode] $baseTitle"
+        return baseTitle
     }
 
     fun formatNotificationSubText(
@@ -158,42 +188,54 @@ object ActiveOutboundTracker {
         val memberMap = balancerMembers
             ?: if (isGroupStrategy) runCatching { SagerDatabase.proxyDao.getByGroup(group!!.id).map { it.id } }.getOrNull() else null
 
-        if (memberMap.isNullOrEmpty()) return false
-
-        var candidateTag = queryClashNowTag("proxy")
-        if (candidateTag.isNullOrBlank() && isBalancer) {
-            val balancerTag = runCatching { proxy.config.profileTagMap[profile.id] }.getOrNull()
-            if (!balancerTag.isNullOrBlank()) {
-                candidateTag = queryClashNowTag(balancerTag)
+        if (memberMap.isNullOrEmpty()) {
+            if (activeLeafProfileId != 0L) {
+                reset()
+                return true
             }
+            return false
+        }
+
+        // Target tag for this specific strategy group (do not blindly query "proxy")
+        val balancerTag = runCatching { proxy.config.profileTagMap[profile.id] }.getOrNull()
+            ?.takeIf { it.isNotBlank() } ?: profile.displayName()
+        var candidateTag = queryClashNowTag(balancerTag)
+        if (candidateTag.isNullOrBlank() && balancerTag != "proxy" && isGroupStrategy) {
+            candidateTag = queryClashNowTag("proxy")
         }
 
         var candidateId: Long? = null
         if (!candidateTag.isNullOrBlank()) {
-            candidateId = runCatching {
+            val resolved = runCatching {
                 proxy.config.profileTagMap.entries
                     .firstOrNull { it.value == candidateTag }
                     ?.key
                     ?.let { abs(it) }
             }.getOrNull()
+            // Strict member whitelist check: candidate MUST belong to this strategy group's members!
+            if (resolved != null && resolved in memberMap) {
+                candidateId = resolved
+            }
         }
 
         if (candidateId == null || candidateId <= 0L) {
             // Check traffic deltas in TrafficLooper
             val activeItem = proxy.looper?.getActiveTransmittingMember(memberMap)
-            if (activeItem != null && activeItem > 0L) {
+            if (activeItem != null && activeItem > 0L && activeItem in memberMap) {
                 candidateId = activeItem
             }
         }
 
         if (candidateId == null || candidateId <= 0L) {
-            // Initial fallback: first member
-            if (activeLeafProfileId <= 0L) {
+            // If current leaf is already valid for this group, keep it
+            if (activeLeafProfileId in memberMap) {
+                candidateId = activeLeafProfileId
+            } else {
                 candidateId = memberMap.firstOrNull()
             }
         }
 
-        if (candidateId != null && candidateId > 0L && candidateId != activeLeafProfileId) {
+        if (candidateId != null && candidateId in memberMap && candidateId != activeLeafProfileId) {
             val oldId = activeLeafProfileId
             activeLeafProfileId = candidateId
             val ent = runCatching { SagerDatabase.proxyDao.getById(candidateId) }.getOrNull()

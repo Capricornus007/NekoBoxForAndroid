@@ -25,7 +25,7 @@ import moe.matsuri.nb4a.net.LocalResolverImpl
 import java.io.File
 
 abstract class BoxInstance(
-    val profile: ProxyEntity
+    var profile: ProxyEntity
 ) : AbstractInstance {
 
     private val diagnosticId = Integer.toHexString(System.identityHashCode(this))

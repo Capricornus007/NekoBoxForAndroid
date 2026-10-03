@@ -65,33 +65,43 @@ class ServiceNotification(
                 Formatter.formatFileSize(ctx, stats.rxTotal)
             )
 
-            val speedDetail = if (showDirectSpeed) {
-                ctx.getString(
-                    R.string.speed_detail,
-                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateProxy)),
-                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateProxy)),
-                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateDirect)),
-                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateDirect))
-                )
+            val proxySpeed = ctx.getString(
+                R.string.traffic,
+                ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateProxy)),
+                ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateProxy))
+            )
+            val directSpeed = ctx.getString(
+                R.string.traffic,
+                ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateDirect)),
+                ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateDirect))
+            )
+
+            val leafNode = if (currentProfile != null) {
+                ActiveOutboundTracker.getActiveLeafNodeDisplay(currentProfile)
+            } else null
+
+            val collapsedText = if (!leafNode.isNullOrBlank()) {
+                "当前节点: $leafNode"
             } else {
-                ctx.getString(
-                    R.string.traffic,
-                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateProxy)),
-                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateProxy))
-                )
+                "代理: $proxySpeed"
             }
 
             val bigContent = buildString {
-                if (currentProfile != null) {
-                    val strat = ActiveOutboundTracker.getStrategyDisplayName(currentProfile)
-                    val mode = if (DataStore.globalMode) "全局模式" else "规则分流"
-                    append("当前策略: ").append(strat).append(" · ").append(mode).append("\n")
+                if (!leafNode.isNullOrBlank()) {
+                    append("当前节点: ").append(leafNode).append("\n")
                 }
-                append(speedDetail)
+                append("代理: ").append(proxySpeed)
+                if (showDirectSpeed) {
+                    append("\n").append("直连: ").append(directSpeed)
+                }
                 append("\n").append("累计流量: ").append(totalTrafficStr)
             }
+
+            if (currentProfile != null) {
+                it.setContentTitle(ActiveOutboundTracker.formatNotificationTitle(currentProfile))
+            }
             it.setStyle(NotificationCompat.BigTextStyle().bigText(bigContent))
-            it.setContentText(speedDetail)
+            it.setContentText(collapsedText)
             it.setSubText(null)
         }
         update()
@@ -157,21 +167,21 @@ class ServiceNotification(
             it.clearActions()
 
             val closeAction = NotificationCompat.Action.Builder(
-                0, service.getText(R.string.stop), PendingIntent.getBroadcast(
+                R.drawable.ic_service_stopped, service.getText(R.string.stop), PendingIntent.getBroadcast(
                     service, 0, Intent(Action.CLOSE).setPackage(service.packageName), flags
                 )
             ).setShowsUserInterface(false).build()
             it.addAction(closeAction)
 
             val switchAction = NotificationCompat.Action.Builder(
-                0, service.getString(R.string.action_switch), PendingIntent.getActivity(
+                R.drawable.ic_baseline_compare_arrows_24, service.getString(R.string.action_switch), PendingIntent.getActivity(
                     service, 1, Intent(service, SwitchActivity::class.java), flags
                 )
             ).setShowsUserInterface(false).build()
             it.addAction(switchAction)
 
             val resetUpstreamAction = NotificationCompat.Action.Builder(
-                0, service.getString(R.string.reset_connections),
+                R.drawable.ic_baseline_refresh_24, service.getString(R.string.reset_connections),
                 PendingIntent.getBroadcast(
                     service, 2, Intent(Action.RESET_UPSTREAM_CONNECTIONS).setPackage(service.packageName), flags
                 )

@@ -269,12 +269,29 @@ class BaseService {
                 return
             }
             if (canReloadSelector()) {
-                val proxy = data.proxy
-                val box = runCatching { proxy?.box }.getOrNull()
-                val tag = proxy?.config?.profileTagMap?.get(DataStore.selectedProxy) ?: ""
+                val proxy = data.proxy ?: return
+                val box = runCatching { proxy.box }.getOrNull()
+                val tag = proxy.config.profileTagMap[DataStore.selectedProxy] ?: ""
                 if (box != null && tag.isNotBlank()) {
                     try {
                         box.selectOutbound(tag)
+                        val newProfileId = DataStore.selectedProxy
+                        val newProfile = SagerDatabase.proxyDao.getById(newProfileId)
+                        if (newProfile != null) {
+                            proxy.profile = newProfile
+                            proxy.config.mainEntId = newProfileId
+                            DataStore.currentProfile = newProfileId
+                            ActiveOutboundTracker.onProfileSwitched(newProfile)
+                            val newTitle = ActiveOutboundTracker.formatNotificationTitle(newProfile)
+                            proxy.displayProfileName = newTitle
+                            runOnDefaultDispatcher {
+                                proxy.looper?.selectMain(newProfileId)
+                                data.notification?.postNotificationTitle(newTitle)
+                                data.binder.broadcast { cb ->
+                                    cb.cbSelectorUpdate(newProfileId)
+                                }
+                            }
+                        }
                         return
                     } catch (e: Exception) {
                         Logs.w("Failed to selectOutbound($tag): ${e.message}, restarting service")
