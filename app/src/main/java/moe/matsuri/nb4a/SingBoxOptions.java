@@ -441,6 +441,7 @@ public class SingBoxOptions {
     }
 
     public static class DNSServerOptions extends SingBoxOption {
+        public String type;
 
         public String tag;
 
