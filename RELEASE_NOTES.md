@@ -1,3 +1,21 @@
+# OwnBox for Android v2.9.8 预览版 (v2.9.8-preview)
+
+### 1. 修复 Google Play 与分应用代理、路由规则冲突
+* **路由条件 OR 语义重构**：重构内核路由规则构建链路，将同一规则内的域名（Domain/Ruleset）、IP（CIDR/GeoIP）与应用（Package/UID）条件拆分为独立子规则，严格实现标准的“或 (OR)”逻辑，彻底解决此前规则内多维度条件因 sing-box 内核 AND 逻辑死锁导致的匹配失效问题。
+* **分应用代理与系统下载联动**：在分应用代理白名单模式下，当勾选 Google Play 商店（com.android.vending）时，自动关联放行系统下载管理器（com.android.providers.downloads / ui）及 Google 基础服务组件（com.google.android.gsf / gms），杜绝应用下载/更新流量越过 VPN 发生直连泄漏或阻断。
+* **内置 Google Play 规则全面补齐**：自动补齐 Google Play 下载 CDN 域名群（gvt1/2/3/5/6/7/9.com、play.googleapis.com、googleusercontent.com、playstoregatewayadapter-pa.googleapis.com 等）及关联组件包名，老用户升级后自动平滑无损丰富规则，无需重置数据库。
+* **DNS 规则隔离优化**：针对包含域名与应用包名的复合规则，DNS 解析规则分别独立挂载，杜绝由 system/netd 发起解析时因应用包名不匹配而降级回直连 DNS 导致污染或分流偏离。
+
+### 2. Sing-box 自定义仪表盘管理与智能测试
+* **多仪表盘集成管理**：全面升级单 URL 模式为多仪表盘列表管理，支持内置预设（Zashboard、内置 YACD、MetaCubeXD）与任意自定义外部仪表盘共存。
+* **自定义仪表盘增删改查**：用户可自主添加、编辑、设置默认及删除第三方 Web 仪表盘，支持自动迁移历史已配置的自定义 URL，保证用户数据零丢失。
+* **智能连接测试（Test Connection）**：提供实时的面板连接诊断工具，一键检测远程 Web 页面网络可达性并测量延迟（ms），同时深度检测本地 127.0.0.1:9090 Clash API 运行态、服务连接状态与密钥鉴权就绪度，并给出针对性排查指引。
+* **URL 深度规范化与安全防护**：自动补全协议头（自动前缀 http:// / https://），过滤非法换行与首尾空白，拦截 javascript: / file: 等高危协议伪装，杜绝因格式瑕疵导致的 WebView 加载失败。
+* **混合内容穿透与零配置体验**：保持 Mixed Content 协议放行，HTTPS 面板可安全对接本地 HTTP API；Zashboard 鉴权注入逻辑扩展支持私有化部署，实现开箱即用。
+
+### 3. 系统版本与稳定性
+* 递增版本号至 2.9.8 预览版（versionCode 327）。
+
 # OwnBox for Android v2.9.7 预览版 (v2.9.7-preview)
 
 ### 1. 修复活跃策略组显示错误与状态双向同步

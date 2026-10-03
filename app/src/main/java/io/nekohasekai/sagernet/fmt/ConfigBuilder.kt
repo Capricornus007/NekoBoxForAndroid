@@ -1389,18 +1389,28 @@ fun buildConfig(
                 val usesDnsOutbound = routingAction in setOf("route", "reject") && scopedMatch.none { extendedMatch.has(it) }
                 val shouldAddDnsRule = usesDnsOutbound && (hasDomainCriteria || isAppOnlyDns)
 
-                fun makeDnsRuleObj(): DNSRule_DefaultOptions {
+                fun makeDomainDnsRuleObj(): DNSRule_DefaultOptions? {
+                    if (!hasDomainCriteria) return null
+                    return DNSRule_DefaultOptions().apply {
+                        domainList?.let { makeSingBoxRule(it) }
+                    }
+                }
+
+                fun makeAppDnsRuleObj(): DNSRule_DefaultOptions? {
+                    if (uidList.isEmpty() && rule.packages.isEmpty()) return null
                     return DNSRule_DefaultOptions().apply {
                         if (uidList.isNotEmpty()) user_id = uidList
                         if (rule.packages.isNotEmpty()) package_name = rule.packages.toList()
-                        domainList?.let { makeSingBoxRule(it) }
                     }
                 }
 
                 when (if (routingAction == "reject") -2L else rule.outbound) {
                     -1L -> {
-                        if (shouldAddDnsRule) {
-                            userDNSRuleList += makeDnsRuleObj().apply { server = "dns-direct" }
+                        if (usesDnsOutbound) {
+                            makeDomainDnsRuleObj()?.let { userDNSRuleList += it.apply { server = "dns-direct" } }
+                            if (isAppOnlyDns) {
+                                makeAppDnsRuleObj()?.let { userDNSRuleList += it.apply { server = "dns-direct" } }
+                            }
                         }
                         for ((tag, isIP) in rulesetTags.filter { usesDnsOutbound }) {
                             if (!isIP) {
@@ -1413,8 +1423,11 @@ fun buildConfig(
                     }
 
                     -2L -> {
-                        if (shouldAddDnsRule) {
-                            userDNSRuleList += makeDnsRuleObj().apply { action = "reject" }
+                        if (usesDnsOutbound) {
+                            makeDomainDnsRuleObj()?.let { userDNSRuleList += it.apply { action = "reject" } }
+                            if (isAppOnlyDns) {
+                                makeAppDnsRuleObj()?.let { userDNSRuleList += it.apply { action = "reject" } }
+                            }
                         }
                         for ((tag, isIP) in rulesetTags.filter { usesDnsOutbound }) {
                             if (!isIP) {
@@ -1427,15 +1440,30 @@ fun buildConfig(
                     }
 
                     else -> {
-                        if (shouldAddDnsRule) {
-                            if (useFakeDns) {
-                                userDNSRuleList += makeDnsRuleObj().apply {
-                                    server = "dns-fake"
-                                    inbound = listOf("tun-in")
-                                    query_type = listOf("A", "AAAA")
+                        if (usesDnsOutbound) {
+                            makeDomainDnsRuleObj()?.let {
+                                if (useFakeDns) {
+                                    userDNSRuleList += it.apply {
+                                        server = "dns-fake"
+                                        inbound = listOf("tun-in")
+                                        query_type = listOf("A", "AAAA")
+                                    }
+                                } else {
+                                    userDNSRuleList += it.apply { server = "dns-remote" }
                                 }
-                            } else {
-                                userDNSRuleList += makeDnsRuleObj().apply { server = "dns-remote" }
+                            }
+                            if (isAppOnlyDns) {
+                                makeAppDnsRuleObj()?.let {
+                                    if (useFakeDns) {
+                                        userDNSRuleList += it.apply {
+                                            server = "dns-fake"
+                                            inbound = listOf("tun-in")
+                                            query_type = listOf("A", "AAAA")
+                                        }
+                                    } else {
+                                        userDNSRuleList += it.apply { server = "dns-remote" }
+                                    }
+                                }
                             }
                         }
                         for ((tag, isIP) in rulesetTags.filter { usesDnsOutbound }) {
@@ -1466,12 +1494,6 @@ fun buildConfig(
                 }
 
                 fun applyCommonFilters(ruleObj: Rule_DefaultOptions) {
-                    if (uidList.isNotEmpty()) {
-                        ruleObj.user_id = uidList
-                    }
-                    if (rule.packages.isNotEmpty()) {
-                        ruleObj.package_name = rule.packages.toList()
-                    }
                     if (rule.port.isNotBlank()) {
                         ruleObj.port = mutableListOf<Int>()
                         ruleObj.port_range = mutableListOf<String>()
@@ -1515,9 +1537,12 @@ fun buildConfig(
                 val generatedSubRules = mutableListOf<Rule_DefaultOptions>()
                 val hasDomain = hasDomainCriteria || hasDomainRuleset
                 val hasIp = hasIpCriteria
+                val hasApp = uidList.isNotEmpty() || rule.packages.isNotEmpty()
 
-                if (hasDomain && hasIp) {
-                    // Split into two sub-rules (Domain and IP) to ensure OR semantics in sing-box
+                // Generate independent sub-rules to achieve true OR semantics in sing-box:
+                // Traffic matching Domain OR IP OR App will route to targetOutbound independently,
+                // without AND criteria deadlocks between package and domain.
+                if (hasDomain) {
                     val domainSubRule = Rule_DefaultOptions().apply {
                         domainList?.let { makeSingBoxRule(it, false) }
                         val domainRulesetTags = rulesetTags.filter { !it.second }.map { it.first }
@@ -1528,7 +1553,9 @@ fun buildConfig(
                         applyCommonFilters(this)
                     }
                     if (!domainSubRule.checkEmpty()) generatedSubRules.add(domainSubRule)
+                }
 
+                if (hasIp) {
                     val ipSubRule = Rule_DefaultOptions().apply {
                         ipList?.let { makeSingBoxRule(it, true) }
                         val ipRulesetTags = rulesetTags.filter { it.second }.map { it.first }
@@ -1539,26 +1566,26 @@ fun buildConfig(
                         applyCommonFilters(this)
                     }
                     if (!ipSubRule.checkEmpty()) generatedSubRules.add(ipSubRule)
-                } else {
-                    val singleRule = Rule_DefaultOptions().apply {
-                        if (hasDomain) {
-                            domainList?.let { makeSingBoxRule(it, false) }
-                            val domainRulesetTags = rulesetTags.filter { !it.second }.map { it.first }
-                            if (domainRulesetTags.isNotEmpty()) {
-                                rule_set = (rule_set ?: mutableListOf()).apply { addAll(domainRulesetTags) }
-                            }
+                }
+
+                if (hasApp) {
+                    val appSubRule = Rule_DefaultOptions().apply {
+                        if (uidList.isNotEmpty()) {
+                            user_id = uidList
                         }
-                        if (hasIp) {
-                            ipList?.let { makeSingBoxRule(it, true) }
-                            val ipRulesetTags = rulesetTags.filter { it.second }.map { it.first }
-                            if (ipRulesetTags.isNotEmpty()) {
-                                rule_set = (rule_set ?: mutableListOf()).apply { addAll(ipRulesetTags) }
-                            }
+                        if (rule.packages.isNotEmpty()) {
+                            package_name = rule.packages.toList()
                         }
-                        if (rule_set != null) generateRuleSet(rule_set, ruleSets)
                         applyCommonFilters(this)
                     }
-                    if (!singleRule.checkEmpty()) generatedSubRules.add(singleRule)
+                    if (!appSubRule.checkEmpty()) generatedSubRules.add(appSubRule)
+                }
+
+                if (!hasDomain && !hasIp && !hasApp) {
+                    val fallbackRule = Rule_DefaultOptions().apply {
+                        applyCommonFilters(this)
+                    }
+                    if (!fallbackRule.checkEmpty()) generatedSubRules.add(fallbackRule)
                 }
 
                 val invertedGroup = RouteRuleEditor.invertedGroup(generatedSubRules)

@@ -7,18 +7,26 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import androidx.appcompat.widget.AppCompatSpinner
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.databinding.LayoutWebviewBinding
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ui.dashboard.DashboardItem
+import io.nekohasekai.sagernet.ui.dashboard.DashboardManager
+import kotlinx.coroutines.launch
 import moe.matsuri.nb4a.utils.WebViewUtil
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
@@ -40,13 +48,8 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
     }
 
     private fun updateToolbarSubtitle() {
-        val currentUrl = DataStore.yacdURL
-        val subtitle = when {
-            currentUrl.contains("zash.run.place") -> "Zashboard"
-            currentUrl == DEFAULT_YACD_URL || currentUrl.contains("127.0.0.1:9090") -> "YACD"
-            else -> "Custom"
-        }
-        toolbar.subtitle = subtitle
+        val active = DashboardManager.getActiveDashboard()
+        toolbar.subtitle = active.name
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -55,7 +58,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
 
         // 规范化旧版本遗留的 setup 路由，使其直接访问根路径
         if (DataStore.yacdURL.startsWith("https://board.zash.run.place/#/setup")) {
-            DataStore.yacdURL = PRESET_ZASHBOARD_URL
+            DataStore.yacdURL = DashboardManager.PRESET_ZASHBOARD_URL
         }
 
         // layout
@@ -116,7 +119,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                if (url != null && url.contains("zash.run.place")) {
+                if (url != null && (url.contains("zash") || url.contains("run.place") || url.contains("board"))) {
                     injectZashboardAutoConnect(view)
                 }
             }
@@ -264,8 +267,8 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
 
     private fun loadDashboard(url: String) {
         val targetUrl = when {
-            url.startsWith("https://board.zash.run.place/#/setup") -> PRESET_ZASHBOARD_URL
-            else -> url
+            url.startsWith("https://board.zash.run.place/#/setup") -> DashboardManager.PRESET_ZASHBOARD_URL
+            else -> runCatching { DashboardManager.normalizeUrl(url) }.getOrDefault(url)
         }
         mWebView.loadUrl(targetUrl)
         updateToolbarSubtitle()
@@ -315,65 +318,185 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
 
     private fun showDashboardPresetDialog() {
         val dialogContext = requireContext()
-        val view = LayoutInflater.from(dialogContext).inflate(R.layout.layout_dialog_dashboard_url, null)
-        val spinner = view.findViewById<AppCompatSpinner>(R.id.spinner_dashboard_presets)
-        val editUrl = view.findViewById<EditText>(R.id.edit_dashboard_url)
+        val dialogView = LayoutInflater.from(dialogContext).inflate(R.layout.layout_dialog_dashboard_url, null)
+        val container = dialogView.findViewById<LinearLayout>(R.id.ll_dashboard_items)
+        val btnAdd = dialogView.findViewById<MaterialButton>(R.id.btn_add_dashboard)
 
-        val presetNames = listOf(
-            getString(R.string.dashboard_preset_zashboard),
-            getString(R.string.dashboard_preset_yacd),
-            getString(R.string.dashboard_preset_custom)
-        )
-        val presetUrls = listOf(
-            PRESET_ZASHBOARD_URL,
-            DEFAULT_YACD_URL,
-            ""
-        )
+        var dialog: androidx.appcompat.app.AlertDialog? = null
 
-        val currentUrl = DataStore.yacdURL
-        editUrl.setText(currentUrl)
-        editUrl.setSelection(currentUrl.length)
+        fun renderList() {
+            container.removeAllViews()
+            val list = DashboardManager.getDashboards()
+            val currentUrl = DataStore.yacdURL.trim()
 
-        val adapter = ArrayAdapter(dialogContext, android.R.layout.simple_spinner_dropdown_item, presetNames)
-        spinner.adapter = adapter
+            for (item in list) {
+                val itemView = LayoutInflater.from(dialogContext).inflate(R.layout.item_dashboard, container, false)
+                val textName = itemView.findViewById<TextView>(R.id.text_dashboard_name)
+                val textUrl = itemView.findViewById<TextView>(R.id.text_dashboard_url)
+                val badgePreset = itemView.findViewById<TextView>(R.id.badge_dashboard_preset)
+                val badgeDefault = itemView.findViewById<TextView>(R.id.badge_dashboard_default)
+                val textDiag = itemView.findViewById<TextView>(R.id.text_dashboard_diag)
+                val btnTest = itemView.findViewById<MaterialButton>(R.id.btn_test_connection)
+                val btnEdit = itemView.findViewById<MaterialButton>(R.id.btn_edit_dashboard)
+                val btnDelete = itemView.findViewById<MaterialButton>(R.id.btn_delete_dashboard)
+                val btnSelect = itemView.findViewById<MaterialButton>(R.id.btn_select_dashboard)
 
-        val initialIndex = when {
-            currentUrl.contains("zash.run.place") -> 0
-            currentUrl == DEFAULT_YACD_URL || currentUrl.contains("127.0.0.1:9090") -> 1
-            else -> 2
-        }
-        spinner.setSelection(initialIndex)
+                textName.text = item.name
+                textUrl.text = item.url
+                badgePreset.isVisible = item.isPreset
+                badgeDefault.isVisible = item.isDefault
 
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            private var isFirst = true
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (isFirst) {
-                    isFirst = false
-                    return
+                val isActive = item.url.trim() == currentUrl
+                if (isActive) {
+                    btnSelect.text = getString(R.string.dashboard_tab_active)
+                    btnSelect.isEnabled = false
+                } else {
+                    btnSelect.text = getString(R.string.apply)
+                    btnSelect.isEnabled = true
                 }
-                if (position in 0..1) {
-                    val chosenUrl = presetUrls[position]
-                    editUrl.setText(chosenUrl)
-                    editUrl.setSelection(chosenUrl.length)
+
+                btnEdit.isVisible = !item.isPreset
+                btnDelete.isVisible = !item.isPreset
+
+                btnTest.setOnClickListener {
+                    textDiag.isVisible = true
+                    textDiag.text = getString(R.string.dashboard_testing)
+                    textDiag.setTextColor(0xFF888888.toInt())
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val result = DashboardManager.testConnection(item.url, dashboardClient, dialogContext)
+                        textDiag.text = buildString {
+                            append(result.summary)
+                            if (result.detail.isNotBlank()) {
+                                append("\n").append(result.detail)
+                            }
+                        }
+                        textDiag.setTextColor(if (result.success) 0xFF4CAF50.toInt() else 0xFFF44336.toInt())
+                    }
                 }
+
+                btnEdit.setOnClickListener {
+                    showEditDashboardDialog(item) {
+                        renderList()
+                    }
+                }
+
+                btnDelete.setOnClickListener {
+                    MaterialAlertDialogBuilder(dialogContext)
+                        .setTitle(R.string.delete)
+                        .setMessage(getString(R.string.dashboard_delete_confirm))
+                        .setPositiveButton(R.string.delete) { _, _ ->
+                            DashboardManager.deleteDashboard(item.id)
+                            renderList()
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+                }
+
+                btnSelect.setOnClickListener {
+                    DataStore.yacdURL = item.url
+                    loadDashboard(item.url)
+                    dialog?.dismiss()
+                    this@WebviewFragment.view?.let { v ->
+                        Snackbar.make(v, R.string.dashboard_switched_toast, Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+
+                container.addView(itemView)
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        btnAdd.setOnClickListener {
+            showEditDashboardDialog(null) {
+                renderList()
+            }
+        }
+
+        renderList()
+
+        dialog = MaterialAlertDialogBuilder(dialogContext)
+            .setTitle(R.string.dashboard_manage_title)
+            .setView(dialogView)
+            .setNeutralButton(R.string.dashboard_reset_default) { _, _ ->
+                DashboardManager.setDefault(DashboardManager.PRESET_ZASHBOARD_ID)
+                DataStore.yacdURL = DashboardManager.PRESET_ZASHBOARD_URL
+                loadDashboard(DashboardManager.PRESET_ZASHBOARD_URL)
+                this.view?.let { Snackbar.make(it, R.string.dashboard_switched_toast, Snackbar.LENGTH_SHORT).show() }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun showEditDashboardDialog(editingItem: DashboardItem?, onSaved: () -> Unit) {
+        val dialogContext = requireContext()
+        val editView = LayoutInflater.from(dialogContext).inflate(R.layout.dialog_dashboard_edit, null)
+        val editName = editView.findViewById<TextInputEditText>(R.id.edit_dashboard_name)
+        val editUrl = editView.findViewById<TextInputEditText>(R.id.edit_dashboard_url)
+        val btnTest = editView.findViewById<MaterialButton>(R.id.btn_edit_dialog_test)
+        val progressTest = editView.findViewById<ProgressBar>(R.id.progress_edit_test)
+        val textTestResult = editView.findViewById<TextView>(R.id.text_edit_test_result)
+        val checkDefault = editView.findViewById<MaterialCheckBox>(R.id.checkbox_set_default)
+
+        if (editingItem != null) {
+            editName.setText(editingItem.name)
+            editUrl.setText(editingItem.url)
+            checkDefault.isChecked = editingItem.isDefault
+        } else {
+            checkDefault.isChecked = false
+        }
+
+        btnTest.setOnClickListener {
+            val rawUrl = editUrl.text?.toString().orEmpty()
+            if (rawUrl.isBlank()) {
+                textTestResult.isVisible = true
+                textTestResult.text = getString(R.string.dashboard_test_url_invalid)
+                textTestResult.setTextColor(0xFFF44336.toInt())
+                return@setOnClickListener
+            }
+            progressTest.isVisible = true
+            btnTest.isEnabled = false
+            textTestResult.isVisible = true
+            textTestResult.text = getString(R.string.dashboard_testing)
+            textTestResult.setTextColor(0xFF888888.toInt())
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                val result = DashboardManager.testConnection(rawUrl, dashboardClient, dialogContext)
+                progressTest.isVisible = false
+                btnTest.isEnabled = true
+                textTestResult.text = buildString {
+                    append(result.summary)
+                    if (result.detail.isNotBlank()) {
+                        append("\n").append(result.detail)
+                    }
+                }
+                textTestResult.setTextColor(if (result.success) 0xFF4CAF50.toInt() else 0xFFF44336.toInt())
+            }
         }
 
         MaterialAlertDialogBuilder(dialogContext)
-            .setTitle(R.string.set_panel_url)
-            .setView(view)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                val enteredUrl = editUrl.text?.toString()?.trim()?.takeIf { it.isNotBlank() }
-                    ?: DEFAULT_YACD_URL
-                DataStore.yacdURL = enteredUrl
-                loadDashboard(enteredUrl)
-                this.view?.let { Snackbar.make(it, R.string.dashboard_switched_toast, Snackbar.LENGTH_SHORT).show() }
-            }
-            .setNeutralButton(R.string.dashboard_reset_default) { _, _ ->
-                DataStore.yacdURL = DEFAULT_YACD_URL
-                loadDashboard(DEFAULT_YACD_URL)
-                this.view?.let { Snackbar.make(it, R.string.dashboard_switched_toast, Snackbar.LENGTH_SHORT).show() }
+            .setTitle(if (editingItem != null) R.string.dashboard_edit_title else R.string.dashboard_add_title)
+            .setView(editView)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val name = editName.text?.toString().orEmpty()
+                val url = editUrl.text?.toString().orEmpty()
+                val isDefault = checkDefault.isChecked
+
+                try {
+                    val normalized = DashboardManager.normalizeUrl(url)
+                    if (editingItem != null) {
+                        DashboardManager.updateDashboard(editingItem.id, name, normalized, isDefault)
+                    } else {
+                        DashboardManager.addDashboard(name, normalized, isDefault)
+                    }
+                    if (isDefault) {
+                        DataStore.yacdURL = normalized
+                        loadDashboard(normalized)
+                    }
+                    onSaved()
+                } catch (e: Exception) {
+                    this@WebviewFragment.view?.let { v ->
+                        Snackbar.make(v, e.message ?: getString(R.string.dashboard_test_url_invalid), Snackbar.LENGTH_LONG).show()
+                    }
+                }
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()

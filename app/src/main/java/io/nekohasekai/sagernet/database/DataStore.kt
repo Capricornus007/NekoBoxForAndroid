@@ -281,6 +281,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var profileTrafficStatistics by configurationStore.boolean(Key.PROFILE_TRAFFIC_STATISTICS) { true }
 
     var yacdURL by configurationStore.string("yacdURL") { "http://127.0.0.1:9090/ui" }
+    var customDashboardListJson by configurationStore.string("customDashboardListJson") { "" }
 
     val clashApiSecret: String
         get() = PublicDatabase.instance.runInTransaction(java.util.concurrent.Callable {

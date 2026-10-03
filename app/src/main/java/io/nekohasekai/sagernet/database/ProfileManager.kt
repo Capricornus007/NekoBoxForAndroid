@@ -240,10 +240,19 @@ object ProfileManager {
                             "domain:googleusercontent.com",
                             "domain:play.googleapis.com",
                             "domain:android.clients.google.com",
+                            "domain:playstoregatewayadapter-pa.googleapis.com",
+                            "domain:firebaselogging-pa.googleapis.com",
+                            "domain:ggpht.com",
                             "domain:xn--ngstr-lra8j.com",
                             "domain:xn--ngstr-cn-8za9o.com"
                         ).joinToString("\n"),
-                        packages = setOf("com.android.vending", "com.google.android.gms")
+                        packages = setOf(
+                            "com.android.vending",
+                            "com.google.android.gms",
+                            "com.google.android.gsf",
+                            "com.android.providers.downloads",
+                            "com.android.providers.downloads.ui"
+                        )
                     ), false
                 )
                 createRule(
@@ -266,7 +275,8 @@ object ProfileManager {
             // Auto-enrich existing Play Store rules for existing users without resetting DB
             var needReload = false
             rules.forEach { rule ->
-                if (rule.domains.contains("googleapis.cn") && !rule.domains.contains("gvt1.com")) {
+                val isPlayStoreRule = rule.domains.contains("googleapis.cn") || rule.packages.contains("com.android.vending")
+                if (isPlayStoreRule && (!rule.packages.contains("com.android.providers.downloads") || !rule.domains.contains("playstoregatewayadapter-pa.googleapis.com"))) {
                     val currentDomains = rule.domains.split("\n").map { it.trim() }.filter { it.isNotBlank() }
                     val newDomains = listOf(
                         "geosite:google-play",
@@ -284,11 +294,20 @@ object ProfileManager {
                         "domain:googleusercontent.com",
                         "domain:play.googleapis.com",
                         "domain:android.clients.google.com",
+                        "domain:playstoregatewayadapter-pa.googleapis.com",
+                        "domain:firebaselogging-pa.googleapis.com",
+                        "domain:ggpht.com",
                         "domain:xn--ngstr-lra8j.com",
                         "domain:xn--ngstr-cn-8za9o.com"
                     )
                     rule.domains = (currentDomains + newDomains).distinct().joinToString("\n")
-                    rule.packages = rule.packages + setOf("com.android.vending", "com.google.android.gms")
+                    rule.packages = rule.packages + setOf(
+                        "com.android.vending",
+                        "com.google.android.gms",
+                        "com.google.android.gsf",
+                        "com.android.providers.downloads",
+                        "com.android.providers.downloads.ui"
+                    )
                     SagerDatabase.rulesDao.updateRule(rule)
                     needReload = true
                 }
