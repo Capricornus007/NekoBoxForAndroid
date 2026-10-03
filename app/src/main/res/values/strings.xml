@@ -276,6 +276,7 @@
     <string name="action_hysteria" translatable="false">Hysteria</string>
     <string name="action_ssh" translatable="false">SSH</string>
     <string name="action_wireguard" translatable="false">WireGuard</string>
+    <string name="action_tailscale" translatable="false">Tailscale</string>
     <string name="action_tuic" translatable="false">TUIC</string>
     <string name="action_juicity" translatable="false">Juicity</string>
     <string name="action_shadowquic" translatable="false">ShadowQUIC</string>
@@ -544,6 +545,30 @@
     <string name="wireguard_persistent_keepalive">Persistent Keepalive Interval (seconds)</string>
     <string name="wireguard_peer_allowed_ips">Peer Allowed IPs</string>
     <string name="wireguard_extra_peers">Extra Peers</string>
+    <string name="tailscale" translatable="false">Tailscale</string>
+    <string name="tailscale_auth_key">Auth key</string>
+    <string name="tailscale_auth_key_sum">Pre-authentication key from the admin console. Without it the login URL only appears in the log.</string>
+    <string name="tailscale_control_url">Control URL</string>
+    <string name="tailscale_control_url_sum">Leave empty for Tailscale; set for Headscale or another coordination server.</string>
+    <string name="tailscale_hostname">Machine name</string>
+    <string name="tailscale_hostname_sum">Name of this device in the tailnet</string>
+    <string name="tailscale_reset_identity">Reset identity</string>
+    <string name="tailscale_reset_identity_sum">Delete the node key and login state. The next start registers a new machine. Stop the service first.</string>
+    <string name="tailscale_reset_identity_done">Tailscale identity removed</string>
+    <string name="tailscale_reset_identity_running">Stop the service before resetting the identity</string>
+    <string name="tailscale_reset_identity_failed">Could not remove the Tailscale identity</string>
+    <string name="tailscale_no_test">Tailscale profiles cannot be tested</string>
+    <string name="tailscale_single_use">Tailscale profile %s can only be used once per configuration</string>
+    <string name="tailscale_selector_landing">A Tailscale profile cannot be the landing proxy of a selector group</string>
+    <string name="tailscale_routing">Routing</string>
+    <string name="tailscale_exit_node">Exit node</string>
+    <string name="tailscale_exit_node_sum">Tailscale IP or machine name of a node that advertises itself as an exit node. Empty: only tailnet addresses are reachable.</string>
+    <string name="tailscale_exit_node_allow_lan_access">Allow LAN access with exit node</string>
+    <string name="tailscale_exit_node_allow_lan_access_sum">Keep local network addresses reachable while the exit node is in use</string>
+    <string name="tailscale_accept_routes">Use tailnet subnet routes</string>
+    <string name="tailscale_accept_routes_sum">Reach subnets advertised by other nodes</string>
+    <string name="tailscale_only_tcp_443">Always use DERP</string>
+    <string name="tailscale_only_tcp_443_sum">Relay all peer traffic over TCP 443 and send no UDP. Required for a chain in front of Tailscale, otherwise direct peer connections leave from this device.</string>
 
     <string name="cloudflare_wrap" translatable="false">Cloudflare Warp</string>
     <string name="warp_license">CloudFlare Warp is a free WireGuard VPN provider. By using it, you

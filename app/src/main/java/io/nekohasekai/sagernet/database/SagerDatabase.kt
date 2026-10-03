@@ -17,7 +17,7 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 18,
+    version = 19,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
@@ -179,6 +179,17 @@ abstract class SagerDatabase : RoomDatabase() {
         }
     }
 
+    /**
+     * Version 19: additive `tailscaleBean` column on proxy_entities for the Tailscale
+     * endpoint profile（hawkff #175 移植）. Matches the @ColumnInfo(defaultValue = "NULL")
+     * on the entity field, same as Migration14To15/Migration17To18.
+     */
+    object Migration18To19 : Migration(18, 19) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `proxy_entities` ADD COLUMN `tailscaleBean` BLOB DEFAULT NULL")
+        }
+    }
+
     companion object {
         val instance by lazy {
             SagerNet.application.getDatabasePath(Key.DB_PROFILE).parentFile?.mkdirs()
@@ -192,7 +203,7 @@ abstract class SagerDatabase : RoomDatabase() {
             )
             Room.databaseBuilder(SagerNet.application, SagerDatabase::class.java, Key.DB_PROFILE)
                 .setJournalMode(JournalMode.TRUNCATE)
-                .addMigrations(Migration13To14, Migration14To15, Migration16To17, Migration17To18)
+                .addMigrations(Migration13To14, Migration14To15, Migration16To17, Migration17To18, Migration18To19)
                 // Plan 027 Stage 3: the main-thread-DB allowance is behind a build flag so it can
                 // be removed once the app runs StrictMode-clean (debug already ships with it off).
                 .apply { if (BuildConfig.ALLOW_MAIN_THREAD_DB) allowMainThreadQueries() }

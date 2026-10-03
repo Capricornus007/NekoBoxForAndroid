@@ -3036,6 +3036,28 @@ public class SingBoxOptions {
 
     }
 
+    public static class Endpoint_TailscaleOptions extends Endpoint {
+
+        public String detour;
+
+        public String state_directory;
+
+        public String auth_key;
+
+        public String control_url;
+
+        public String hostname;
+
+        public Boolean accept_routes;
+
+        public String exit_node;
+
+        public Boolean exit_node_allow_lan_access;
+
+        public Boolean only_tcp_443;
+
+    }
+
     public static class Endpoint_AwgPeer extends SingBoxOption {
 
         public String address;

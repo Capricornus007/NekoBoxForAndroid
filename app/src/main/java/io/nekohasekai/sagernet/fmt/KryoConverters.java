@@ -24,6 +24,7 @@ import io.nekohasekai.sagernet.fmt.masterdnsvpn.MasterDnsVpnBean;
 import io.nekohasekai.sagernet.fmt.olcrtc.OlcrtcBean;
 import io.nekohasekai.sagernet.fmt.byedpi.ByeDPIBean;
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean;
+import io.nekohasekai.sagernet.fmt.tailscale.TailscaleBean;
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean;
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean;
 import io.nekohasekai.sagernet.fmt.trojan_go.TrojanGoBean;
@@ -239,6 +240,12 @@ public class KryoConverters {
     public static ChainBean chainDeserialize(byte[] bytes) {
         if (JavaUtil.isEmpty(bytes)) return null;
         return deserialize(new ChainBean(), bytes);
+    }
+
+    @TypeConverter
+    public static TailscaleBean tailscaleDeserialize(byte[] bytes) {
+        if (JavaUtil.isEmpty(bytes)) return null;
+        return deserialize(new TailscaleBean(), bytes);
     }
 
     @TypeConverter

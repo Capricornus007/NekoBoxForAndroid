@@ -1,0 +1,56 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        app:icon="@drawable/ic_social_emoji_symbols"
+        app:key="name"
+        app:title="@string/profile_name"
+        app:useSimpleSummaryProvider="true" />
+
+    <PreferenceCategory app:title="@string/tailscale">
+        <EditTextPreference
+            app:dialogLayout="@layout/layout_password_dialog"
+            app:icon="@drawable/ic_baseline_vpn_key_24"
+            app:key="authKey"
+            app:summary="@string/tailscale_auth_key_sum"
+            app:title="@string/tailscale_auth_key" />
+        <EditTextPreference
+            app:icon="@drawable/ic_file_cloud_queue"
+            app:key="controlUrl"
+            app:summary="@string/tailscale_control_url_sum"
+            app:title="@string/tailscale_control_url" />
+        <EditTextPreference
+            app:icon="@drawable/ic_communication_phonelink_ring"
+            app:key="hostname"
+            app:summary="@string/tailscale_hostname_sum"
+            app:title="@string/tailscale_hostname" />
+        <Preference
+            app:icon="@drawable/ic_baseline_refresh_24"
+            app:key="resetIdentity"
+            app:summary="@string/tailscale_reset_identity_sum"
+            app:title="@string/tailscale_reset_identity" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/tailscale_routing">
+        <EditTextPreference
+            app:icon="@drawable/baseline_public_24"
+            app:key="exitNode"
+            app:summary="@string/tailscale_exit_node_sum"
+            app:title="@string/tailscale_exit_node" />
+        <SwitchPreference
+            app:icon="@drawable/ic_hardware_router"
+            app:key="exitNodeAllowLanAccess"
+            app:summary="@string/tailscale_exit_node_allow_lan_access_sum"
+            app:title="@string/tailscale_exit_node_allow_lan_access" />
+        <SwitchPreference
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="acceptRoutes"
+            app:summary="@string/tailscale_accept_routes_sum"
+            app:title="@string/tailscale_accept_routes" />
+        <SwitchPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="onlyTcp443"
+            app:summary="@string/tailscale_only_tcp_443_sum"
+            app:title="@string/tailscale_only_tcp_443" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -26,6 +26,7 @@ import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
 import io.nekohasekai.sagernet.fmt.snell.SnellBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
+import io.nekohasekai.sagernet.fmt.tailscale.TailscaleBean
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.fmt.trojan_go.TrojanGoBean
 import io.nekohasekai.sagernet.fmt.trojan_go.buildTrojanGoConfig
@@ -112,6 +113,7 @@ data class ProxyEntity(
     var awgBean: AmneziaWGBean? = null,
     var olcrtcBean: OlcrtcBean? = null,
     @ColumnInfo(defaultValue = "NULL") var byedpiBean: ByeDPIBean? = null,
+    @ColumnInfo(defaultValue = "NULL") var tailscaleBean: TailscaleBean? = null,
 ) : Serializable() {
 
     companion object {
@@ -152,6 +154,9 @@ data class ProxyEntity(
 
         // byeDPI 深度包检测规避层：不是代理节点，而是链路最末一跳（出口层）。
         const val TYPE_BYEDPI = 33
+
+        // Tailscale endpoint profile（hawkff #175 移植；本地 28 已被 TYPE_WATERFALL 佔用，改用 34）
+        const val TYPE_TAILSCALE = 34
 
         const val TYPE_CONFIG = 998
 

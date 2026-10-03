@@ -37,6 +37,8 @@ import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.socks.buildSingBoxOutboundSocksBean
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
 import io.nekohasekai.sagernet.fmt.ssh.buildSingBoxOutboundSSHBean
+import io.nekohasekai.sagernet.fmt.tailscale.TailscaleBean
+import io.nekohasekai.sagernet.fmt.tailscale.buildSingBoxEndpointTailscaleBean
 import io.nekohasekai.sagernet.fmt.trusttunnel.TrustTunnelBean
 import io.nekohasekai.sagernet.fmt.trusttunnel.buildSingBoxOutboundTrustTunnelBean
 import io.nekohasekai.sagernet.fmt.tuic.TuicBean
@@ -88,7 +90,7 @@ internal fun SingBoxOption.applyDomainStrategyIfSupported(domainStrategy: String
     }
 }
 
-private val ENDPOINT_TYPES = setOf("wireguard", "awg")
+private val ENDPOINT_TYPES = setOf("wireguard", "awg", "tailscale")
 
 private fun SingBoxOption.isGeneratedEndpoint(): Boolean = this is Endpoint && type in ENDPOINT_TYPES
 
@@ -468,6 +470,15 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             ).associateBy { it.id }
         }
     val buildSelector = !forTest && group?.isSelector == true && !forExport
+    // A Tailscale node has one saved identity, so one config can run one instance of a profile.
+    // Every selector member would get its own copy of a Tailscale landing proxy (each with a
+    // different detour), and a URL test would start a second node next to the running service.
+    val tailscaleProfiles = hashSetOf<Long>()
+    if (buildSelector) {
+        require(group.landingProxy?.let(lookupCache::proxy)?.requireBean() !is TailscaleBean) {
+            SagerNet.application.getString(R.string.tailscale_selector_landing)
+        }
+    }
     val userDNSRuleList = mutableListOf<DNSRule_DefaultOptions>()
     val domainListDNSDirectForce = mutableListOf<String>()
     val bypassDNSBeans = hashSetOf<AbstractBean>()
@@ -750,6 +761,19 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         "${hop.id}:${hop.displayType()}@$endpoint"
                     },
             )
+            // Validate before touching the shared lists: a chain skipped halfway would leave
+            // outbounds with a detour to a tag that is never created. The first dialed hop is
+            // shared through globalOutbounds, so a Tailscale profile already built there is reused.
+            val chainTailscaleProfiles = mutableListOf<Long>()
+            profileList.forEachIndexed { index, hop ->
+                if (hop.requireBean() !is TailscaleBean) return@forEachIndexed
+                require(!forTest) { SagerNet.application.getString(R.string.tailscale_no_test) }
+                if (index == profileList.lastIndex && globalOutbounds.containsKey(hop.id)) return@forEachIndexed
+                require(hop.id !in tailscaleProfiles && hop.id !in chainTailscaleProfiles) {
+                    SagerNet.application.getString(R.string.tailscale_single_use, hop.displayName())
+                }
+                chainTailscaleProfiles += hop.id
+            }
             val chainTrafficSet = HashSet<ProxyEntity>().apply {
                 plusAssign(profileList)
                 add(entity)
@@ -922,6 +946,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
                         is ByeDPIBean ->
                             buildSingBoxOutboundByeDPIBean(bean)
+                        is TailscaleBean ->
+                            buildSingBoxEndpointTailscaleBean(bean, proxyEntity.id)
 
                         else -> throw IllegalStateException("can't reach")
                     }
@@ -1031,7 +1057,28 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
 
             trafficMap[chainTagOut] = chainTrafficSet.toList()
+            // Reserve only for a chain that built completely; a hop that fails later releases them.
+            tailscaleProfiles += chainTailscaleProfiles
             return chainTagOut
+        }
+
+        // A broken chain fails the build when it is the selected profile. As a group member or a
+        // rule outbound it is left out with a warning, so the service still starts.
+        fun buildChainOrSkip(chainId: Long, entity: ProxyEntity): String? {
+            // buildChain appends to these as it goes; a hop that fails halfway must not leave an
+            // outbound whose detour points at a tag that is never created, or a global tag for it.
+            val appended = listOf(outbounds, inbounds, routeRules, externalIndexMap).map { it to it.size }
+            val globalBefore = HashMap(globalOutbounds)
+            return try {
+                buildChain(chainId, entity)
+            } catch (e: IllegalArgumentException) {
+                if (entity.id == proxy.id) throw e
+                for ((list, size) in appended) list.subList(size, list.size).clear()
+                globalOutbounds.clear()
+                globalOutbounds.putAll(globalBefore)
+                runOnMainDispatcher { Toast.makeText(SagerNet.application, e.readableMessage, Toast.LENGTH_LONG).show() }
+                null
+            }
         }
 
         // 构建动态分组（最快 / 瀑布）的 urltest outbound。
@@ -1101,7 +1148,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         if (buildSelector || useAutoSelect) {
             val list = group?.id?.let { SagerDatabase.proxyDao.getByGroup(it) } ?: listOf(proxy)
             list.forEach {
-                tagMap[it.id] = buildChain(it.id, it)
+                // 成員建置失敗只跳過該成員（buildChainOrSkip 會回滾半成品），主 profile 失敗才拋錯。
+                buildChainOrSkip(it.id, it)?.let { tag -> tagMap[it.id] = tag }
             }
             outbounds.add(
                 0,

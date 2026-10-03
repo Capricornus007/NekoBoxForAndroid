@@ -2,6 +2,8 @@ package io.nekohasekai.sagernet.fmt
 
 import io.nekohasekai.sagernet.database.ProtocolRegistry
 import io.nekohasekai.sagernet.database.ProxyEntity
+import io.nekohasekai.sagernet.database.ProxyGroup
+import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
 import io.nekohasekai.sagernet.fmt.byedpi.ByeDPIBean
 import io.nekohasekai.sagernet.fmt.http.HttpBean
@@ -21,6 +23,7 @@ import io.nekohasekai.sagernet.fmt.snell.SnellBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.socks.toUri
 import io.nekohasekai.sagernet.fmt.ssh.SSHBean
+import io.nekohasekai.sagernet.fmt.tailscale.TailscaleBean
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
 import io.nekohasekai.sagernet.fmt.trojan_go.TrojanGoBean
 import io.nekohasekai.sagernet.fmt.trusttunnel.TrustTunnelBean
@@ -29,14 +32,18 @@ import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
 import io.nekohasekai.sagernet.fmt.v2ray.toUriVMessVLESSTrojan
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.ui.profile.*
+import java.io.File
+import java.util.Base64
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSBean
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSSettingsActivity
 import moe.matsuri.nb4a.proxy.config.ConfigBean
 import moe.matsuri.nb4a.proxy.config.ConfigSettingActivity
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSBean
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSSettingsActivity
+import org.json.JSONObject
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -168,6 +175,11 @@ class ProtocolRegistryDispatchTest {
         serverAddress = "192.0.2.13"
         serverPort = 51820
     }
+    private fun tailscale() = TailscaleBean().apply {
+        authKey = "tskey-auth-test"
+        exitNode = "100.64.0.1"
+        onlyTcp443 = true
+    }
     private fun tuic() = TuicBean().apply {
         serverAddress = "192.0.2.14"
         serverPort = 443
@@ -234,6 +246,7 @@ class ProtocolRegistryDispatchTest {
         ssh() to ProxyEntity.TYPE_SSH,
         wg() to ProxyEntity.TYPE_WG,
         awg() to ProxyEntity.TYPE_AWG,
+        tailscale() to ProxyEntity.TYPE_TAILSCALE,
         tuic() to ProxyEntity.TYPE_TUIC,
         juicity() to ProxyEntity.TYPE_JUICITY,
         shadowQuic() to ProxyEntity.TYPE_SHADOWQUIC,
@@ -247,6 +260,113 @@ class ProtocolRegistryDispatchTest {
         chain() to ProxyEntity.TYPE_CHAIN,
         config() to ProxyEntity.TYPE_CONFIG,
     )
+
+    @Test
+    fun nativeProtocolConfigurationsUseTheApplicationBuilder() {
+        ConfigBuilderTestEnv.reset()
+        val directory = File("build/generated-core-configs/protocols").apply { mkdirs() }
+        val key = Base64.getEncoder().encodeToString(ByteArray(32) { 1 })
+        val beans = allBeans.map { it.first }.filterNot { it is ChainBean || it is ConfigBean }.toMutableList()
+        beans += (1..5).map { version -> snell().apply { this.version = version } }
+        beans += snell().apply {
+            version = 5
+            network = "udp"
+        }
+        beans += hysteria().apply { protocolVersion = 1 }
+        beans += hysteria().apply { protocolVersion = 2 }
+        beans += listOf("tcp", "ws", "http", "grpc", "xhttp").map { transport ->
+            vmess().apply {
+                alterId = -1
+                type = transport
+                security = "tls"
+                sni = "example.invalid"
+            }
+        }
+        for ((index, bean) in beans.withIndex()) {
+            bean.initializeDefaultValues()
+            when (bean) {
+                is WireGuardBean -> {
+                    bean.localAddress = "192.0.2.100/32"
+                    bean.privateKey = key
+                    bean.peerPublicKey = key
+                }
+
+                is AmneziaWGBean -> {
+                    bean.localAddress = "192.0.2.100/32"
+                    bean.privateKey = key
+                    bean.peerPublicKey = key
+                }
+            }
+            val profile = ProxyEntity(id = index + 1L).putBean(bean)
+            if (profile.needExternal()) continue
+            // Tailscale refuses test builds (a URL test would start a second node); build it as a
+            // service config so the core still checks the generated endpoint.
+            val config = ConfigBuilderTestEnv.io { buildConfig(profile, forTest = bean !is TailscaleBean).config }
+            directory.resolve("$index-${bean.javaClass.simpleName}.json").writeText(config)
+        }
+    }
+
+    @Test
+    fun tailscaleRunsOneInstancePerConfig() {
+        ConfigBuilderTestEnv.reset()
+        val groupId = ConfigBuilderTestEnv.io { SagerDatabase.groupDao.createGroup(ProxyGroup(isSelector = true)) }
+        fun add(bean: AbstractBean, order: Long = 0L) = ProxyEntity(groupId = groupId, userOrder = order).putBean(bean.apply { initializeDefaultValues() })
+            .also { it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) } }
+        val node = add(tailscale())
+        val server = add(socks())
+        // Both Tailscale hops are the same node, so this chain would start it twice.
+        val twice = add(
+            ChainBean().apply {
+                name = "twice"
+                proxies = listOf(node.id, server.id, node.id)
+            },
+        )
+        // Built first as a group member: its Tailscale exit hop is appended before the broken
+        // Hysteria hop fails, so the skipped chain must be rolled back and must not block the node.
+        val broken = add(hysteria().apply { enableECH = true }, order = -2)
+        add(
+            ChainBean().apply {
+                name = "broken-first"
+                proxies = listOf(broken.id, node.id)
+            },
+            order = -1,
+        )
+
+        val urlTest = assertThrows(IllegalArgumentException::class.java) {
+            ConfigBuilderTestEnv.io { buildConfig(node, forTest = true) }
+        }
+        assertTrue(urlTest.message!!, urlTest.message!!.contains("cannot be tested"))
+
+        val duplicate = assertThrows(IllegalArgumentException::class.java) {
+            ConfigBuilderTestEnv.io { buildConfig(twice, forExport = true) }
+        }
+        assertTrue(duplicate.message!!, duplicate.message!!.contains("once per configuration"))
+
+        // As a selector member the broken chain is skipped before it touches the shared lists:
+        // the group still builds and every detour points at an existing tag.
+        val selector = JSONObject(ConfigBuilderTestEnv.io { buildConfig(server).config })
+        val tags = mutableSetOf<String>()
+        val detours = mutableSetOf<String>()
+        for (key in listOf("outbounds", "endpoints")) {
+            val array = selector.optJSONArray(key) ?: continue
+            for (i in 0 until array.length()) {
+                val item = array.getJSONObject(i)
+                tags += item.getString("tag")
+                item.optString("detour").takeIf { it.isNotEmpty() }?.let { detours += it }
+            }
+        }
+        assertTrue("$detours not in $tags", tags.containsAll(detours))
+        assertTrue(tags.toString(), tags.count { it.startsWith("Tailscale") } == 1)
+        val endpoints = selector.getJSONArray("endpoints")
+        assertEquals(1, endpoints.length())
+        assertEquals("tailscale/${node.id}", endpoints.getJSONObject(0).getString("state_directory"))
+
+        ConfigBuilderTestEnv.io { SagerDatabase.groupDao.updateGroup(ProxyGroup(id = groupId, isSelector = true, landingProxy = node.id)) }
+        val landing = assertThrows(IllegalArgumentException::class.java) {
+            ConfigBuilderTestEnv.io { buildConfig(server) }
+        }
+        assertTrue(landing.message!!, landing.message!!.contains("landing proxy"))
+    }
 
     @Test
     fun everyBean_roundTripIsByteStable() {
@@ -289,6 +409,7 @@ class ProtocolRegistryDispatchTest {
             ProxyEntity.TYPE_SSH to SSHSettingsActivity::class.java,
             ProxyEntity.TYPE_WG to WireGuardSettingsActivity::class.java,
             ProxyEntity.TYPE_AWG to AmneziaWGSettingsActivity::class.java,
+            ProxyEntity.TYPE_TAILSCALE to TailscaleSettingsActivity::class.java,
             ProxyEntity.TYPE_TUIC to TuicSettingsActivity::class.java,
             ProxyEntity.TYPE_JUICITY to JuicitySettingsActivity::class.java,
             ProxyEntity.TYPE_SHADOWQUIC to ShadowQUICSettingsActivity::class.java,
@@ -306,6 +427,7 @@ class ProtocolRegistryDispatchTest {
             ProxyEntity.TYPE_SSH,
             ProxyEntity.TYPE_WG,
             ProxyEntity.TYPE_AWG,
+            ProxyEntity.TYPE_TAILSCALE,
             ProxyEntity.TYPE_SHADOWTLS,
             ProxyEntity.TYPE_CONFIG,
         )
@@ -330,7 +452,7 @@ class ProtocolRegistryDispatchTest {
             ProxyEntity.TYPE_BYEDPI,
         )
 
-        assertEquals(25, allBeans.size)
+        assertEquals(26, allBeans.size)
         assertEquals(allBeans.map { it.second }.toSet(), settingsActivities.keys)
         for ((_, type) in allBeans) {
             val descriptor = ProtocolRegistry.forType(type)!!
