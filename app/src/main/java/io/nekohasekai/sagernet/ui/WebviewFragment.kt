@@ -145,35 +145,115 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
     }
 
     private fun injectZashboardAutoConnect(view: WebView?) {
+        val secret = DataStore.clashApiSecret
         val js = """
             (function() {
+                var secret = "$secret";
+                var listKey = "setup/api-list";
+                var activeKey = "setup/active-uuid";
+
+                // 1. 同步注入 / 更新 localStorage 的后端列表与密钥凭证
+                try {
+                    var list = JSON.parse(localStorage.getItem(listKey) || "[]");
+                    if (!Array.isArray(list)) list = [];
+                    var targetUuid = "ownbox-local";
+                    var found = false;
+                    for (var i = 0; i < list.length; i++) {
+                        var item = list[i];
+                        if (item && (item.host === "127.0.0.1" || item.host === "localhost") && String(item.port) === "9090") {
+                            item.password = secret;
+                            item.protocol = "http";
+                            item.type = "clash";
+                            targetUuid = item.uuid || targetUuid;
+                            item.uuid = targetUuid;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        list.unshift({
+                            type: "clash",
+                            protocol: "http",
+                            host: "127.0.0.1",
+                            port: "9090",
+                            secondaryPath: "",
+                            password: secret,
+                            uuid: targetUuid,
+                            label: "OwnBox 本地内核",
+                            disableUpgradeCore: true,
+                            disableTunMode: false
+                        });
+                    }
+                    localStorage.setItem(listKey, JSON.stringify(list));
+                    localStorage.setItem(activeKey, targetUuid);
+                    try { window.dispatchEvent(new Event('storage')); } catch (_) {}
+                } catch (_) {}
+
+                // 2. 轮询侦听并自愈 DOM 状态（处理修改后端配置弹窗、连接失败弹窗与 setup 提交）
                 var checkCount = 0;
-                var maxChecks = 30;
+                var maxChecks = 40;
                 var checkInterval = setInterval(function() {
                     checkCount++;
                     if (checkCount > maxChecks) {
                         clearInterval(checkInterval);
                         return;
                     }
-                    if (window.location.hash.indexOf('setup') !== -1) {
-                        var bodyText = document.body ? document.body.innerText : '';
-                        if (bodyText.indexOf('连接正常') !== -1) {
-                            var alerts = document.querySelectorAll('.el-notification, .el-message, [role="alert"], div[class*="toast"], div[class*="alert"]');
-                            alerts.forEach(function(el) {
-                                if (el.innerText && el.innerText.indexOf('后端连不上') !== -1) {
-                                    el.style.display = 'none';
-                                }
-                            });
-                            var buttons = Array.from(document.querySelectorAll('button'));
-                            var submitBtn = buttons.find(function(b) {
-                                return b.textContent && b.textContent.trim() === '提交';
-                            });
-                            if (submitBtn && !submitBtn.disabled) {
-                                clearInterval(checkInterval);
-                                submitBtn.click();
-                            }
+
+                    // 自动填充任何密码输入框（图二“修改后端配置”弹窗）
+                    var pwInputs = document.querySelectorAll('input[type="password"], input[placeholder*="密码"], input[placeholder*="password"], input[placeholder*="Secret"]');
+                    var filled = false;
+                    pwInputs.forEach(function(inp) {
+                        if (inp && inp.value !== secret) {
+                            inp.value = secret;
+                            try {
+                                inp.dispatchEvent(new Event('input', { bubbles: true }));
+                                inp.dispatchEvent(new Event('change', { bubbles: true }));
+                            } catch (_) {}
+                            filled = true;
                         }
-                    } else {
+                    });
+
+                    // 静默清理“未授权，请重新登录”、“密码不对”等过渡报错气泡
+                    var alerts = document.querySelectorAll('.el-notification, .el-message, [role="alert"], div[class*="toast"], div[class*="alert"]');
+                    alerts.forEach(function(el) {
+                        var text = el.innerText || '';
+                        if (text.indexOf('后端连不上') !== -1 || text.indexOf('未授权') !== -1 || text.indexOf('密码不对') !== -1) {
+                            el.style.display = 'none';
+                        }
+                    });
+
+                    var buttons = Array.from(document.querySelectorAll('button, a'));
+
+                    // 如果检测到“连接失败 / Unauthorized”弹窗（图三），自动触发“重试”
+                    var retryBtn = buttons.find(function(b) {
+                        var t = b.textContent ? b.textContent.trim() : '';
+                        return t === '重试' || t === 'Retry';
+                    });
+                    if (retryBtn && !retryBtn.disabled) {
+                        retryBtn.click();
+                    }
+
+                    // 如果在 setup 或修改后端配置弹窗，且密码已填充或显示连接正常，自动点击“提交”
+                    var submitBtn = buttons.find(function(b) {
+                        var t = b.textContent ? b.textContent.trim() : '';
+                        return t === '提交' || t === 'Submit' || t === '保存' || t === 'Save';
+                    });
+                    if (submitBtn && !submitBtn.disabled) {
+                        submitBtn.click();
+                        // 若位于 #setup 路由，提交后尝试切换到根路径
+                        if (window.location.hash.indexOf('setup') !== -1) {
+                            setTimeout(function() {
+                                if (window.location.hash.indexOf('setup') !== -1) {
+                                    window.location.hash = '#/';
+                                }
+                            }, 500);
+                        }
+                        clearInterval(checkInterval);
+                        return;
+                    }
+
+                    // 若已处于主界面且无报错弹窗，终止轮询
+                    if (window.location.hash.indexOf('setup') === -1 && !document.querySelector('.modal, [role="dialog"]')) {
                         clearInterval(checkInterval);
                     }
                 }, 200);

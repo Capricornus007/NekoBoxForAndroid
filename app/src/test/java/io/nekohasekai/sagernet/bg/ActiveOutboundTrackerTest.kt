@@ -74,7 +74,7 @@ class ActiveOutboundTrackerTest {
         }
 
         val titleWithLeaf = ActiveOutboundTracker.formatNotificationTitle(balancer, leafNode)
-        assertEquals("自动选择(最低延迟) ➔ 日本 02", titleWithLeaf)
+        assertEquals("自动选择 ➔ 日本 02", titleWithLeaf)
 
         val titleWithoutLeaf = ActiveOutboundTracker.formatNotificationTitle(balancer, null)
         assertEquals("自动选择 · 最低延迟", titleWithoutLeaf)

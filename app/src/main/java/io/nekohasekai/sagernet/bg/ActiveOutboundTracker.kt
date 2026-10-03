@@ -66,10 +66,10 @@ object ActiveOutboundTracker {
             val target = activeLeaf ?: runCatching {
                 if (activeLeafProfileId > 0) SagerDatabase.proxyDao.getById(activeLeafProfileId) else null
             }.getOrNull()
-            val strat = getStrategyDisplayName(profile)
             return if (target != null && target.id != profile.id) {
-                "${profile.displayName()}($strat) ➔ ${target.displayName()}"
+                "${profile.displayName()} ➔ ${target.displayName()}"
             } else {
+                val strat = getStrategyDisplayName(profile)
                 "${profile.displayName()} · $strat"
             }
         }
@@ -82,10 +82,10 @@ object ActiveOutboundTracker {
             val target = activeLeaf ?: runCatching {
                 if (activeLeafProfileId > 0) SagerDatabase.proxyDao.getById(activeLeafProfileId) else null
             }.getOrNull()
-            val strat = getStrategyDisplayName(profile)
             return if (target != null && target.id != profile.id) {
-                "${group!!.displayName()}($strat) ➔ ${target.displayName()}"
+                "${group!!.displayName()} ➔ ${target.displayName()}"
             } else {
+                val strat = getStrategyDisplayName(profile)
                 "${group!!.displayName()} · $strat"
             }
         }
@@ -135,10 +135,14 @@ object ActiveOutboundTracker {
 
     fun checkAndUpdate(data: BaseService.Data): Boolean {
         val proxy = data.proxy ?: return false
+        if (!proxy.isInitialized()) return false
         val profile = proxy.profile
         val isBalancer = profile.type == ProxyEntity.TYPE_BALANCER
-        val group = SagerDatabase.groupDao.getById(profile.groupId)
-        val isGroupStrategy = group != null && (DataStore.isGroupUrlTest(group.id) || DataStore.isGroupLoadBalance(group.id))
+        val group = runCatching { SagerDatabase.groupDao.getById(profile.groupId) }.getOrNull()
+        val isGroupStrategy = group != null && (
+            runCatching { DataStore.isGroupUrlTest(group.id) }.getOrDefault(false) ||
+            runCatching { DataStore.isGroupLoadBalance(group.id) }.getOrDefault(false)
+        )
 
         if (!isBalancer && !isGroupStrategy) {
             if (activeLeafProfileId != profile.id) {
@@ -150,14 +154,15 @@ object ActiveOutboundTracker {
         }
 
         // Strategy group: resolve active member
-        val memberMap = proxy.config.balancerMemberMap[profile.id]
-            ?: if (isGroupStrategy) SagerDatabase.proxyDao.getByGroup(group!!.id).map { it.id } else null
+        val balancerMembers = runCatching { proxy.config.balancerMemberMap[profile.id] }.getOrNull()
+        val memberMap = balancerMembers
+            ?: if (isGroupStrategy) runCatching { SagerDatabase.proxyDao.getByGroup(group!!.id).map { it.id } }.getOrNull() else null
 
         if (memberMap.isNullOrEmpty()) return false
 
         var candidateTag = queryClashNowTag("proxy")
         if (candidateTag.isNullOrBlank() && isBalancer) {
-            val balancerTag = proxy.config.profileTagMap[profile.id]
+            val balancerTag = runCatching { proxy.config.profileTagMap[profile.id] }.getOrNull()
             if (!balancerTag.isNullOrBlank()) {
                 candidateTag = queryClashNowTag(balancerTag)
             }
@@ -165,10 +170,12 @@ object ActiveOutboundTracker {
 
         var candidateId: Long? = null
         if (!candidateTag.isNullOrBlank()) {
-            candidateId = proxy.config.profileTagMap.entries
-                .firstOrNull { it.value == candidateTag }
-                ?.key
-                ?.let { abs(it) }
+            candidateId = runCatching {
+                proxy.config.profileTagMap.entries
+                    .firstOrNull { it.value == candidateTag }
+                    ?.key
+                    ?.let { abs(it) }
+            }.getOrNull()
         }
 
         if (candidateId == null || candidateId <= 0L) {
@@ -189,7 +196,7 @@ object ActiveOutboundTracker {
         if (candidateId != null && candidateId > 0L && candidateId != activeLeafProfileId) {
             val oldId = activeLeafProfileId
             activeLeafProfileId = candidateId
-            val ent = SagerDatabase.proxyDao.getById(candidateId)
+            val ent = runCatching { SagerDatabase.proxyDao.getById(candidateId) }.getOrNull()
             activeLeafProfileName = ent?.displayName() ?: ""
             Logs.i("ActiveOutboundTracker: active node changed $oldId -> $candidateId ($activeLeafProfileName)")
 

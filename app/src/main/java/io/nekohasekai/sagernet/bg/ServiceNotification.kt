@@ -57,43 +57,42 @@ class ServiceNotification(
 
     suspend fun postNotificationSpeedUpdate(stats: SpeedDisplayData) {
         useBuilder {
-            if (showDirectSpeed) {
-                val speedDetail = (service as Context).getString(
-                    R.string.speed_detail, service.getString(
-                        R.string.speed, Formatter.formatFileSize(service, stats.txRateProxy)
-                    ), service.getString(
-                        R.string.speed, Formatter.formatFileSize(service, stats.rxRateProxy)
-                    ), service.getString(
-                        R.string.speed,
-                        Formatter.formatFileSize(service, stats.txRateDirect)
-                    ), service.getString(
-                        R.string.speed,
-                        Formatter.formatFileSize(service, stats.rxRateDirect)
-                    )
-                )
-                it.setStyle(NotificationCompat.BigTextStyle().bigText(speedDetail))
-                it.setContentText(speedDetail)
-            } else {
-                val speedSimple = (service as Context).getString(
-                    R.string.traffic, service.getString(
-                        R.string.speed, Formatter.formatFileSize(service, stats.txRateProxy)
-                    ), service.getString(
-                        R.string.speed, Formatter.formatFileSize(service, stats.rxRateProxy)
-                    )
-                )
-                it.setContentText(speedSimple)
-            }
+            val ctx = service as Context
             val currentProfile = service.data.proxy?.profile
-            val subText = if (currentProfile != null) {
-                ActiveOutboundTracker.formatNotificationSubText(service as Context, stats, currentProfile)
+            val totalTrafficStr = ctx.getString(
+                R.string.traffic,
+                Formatter.formatFileSize(ctx, stats.txTotal),
+                Formatter.formatFileSize(ctx, stats.rxTotal)
+            )
+
+            val speedDetail = if (showDirectSpeed) {
+                ctx.getString(
+                    R.string.speed_detail,
+                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateProxy)),
+                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateProxy)),
+                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateDirect)),
+                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateDirect))
+                )
             } else {
-                service.getString(
+                ctx.getString(
                     R.string.traffic,
-                    Formatter.formatFileSize(service as Context, stats.txTotal),
-                    Formatter.formatFileSize(service, stats.rxTotal)
+                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateProxy)),
+                    ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateProxy))
                 )
             }
-            it.setSubText(subText)
+
+            val bigContent = buildString {
+                if (currentProfile != null) {
+                    val strat = ActiveOutboundTracker.getStrategyDisplayName(currentProfile)
+                    val mode = if (DataStore.globalMode) "全局模式" else "规则分流"
+                    append("当前策略: ").append(strat).append(" · ").append(mode).append("\n")
+                }
+                append(speedDetail)
+                append("\n").append("累计流量: ").append(totalTrafficStr)
+            }
+            it.setStyle(NotificationCompat.BigTextStyle().bigText(bigContent))
+            it.setContentText(speedDetail)
+            it.setSubText(null)
         }
         update()
     }

@@ -647,7 +647,6 @@ class BaseService {
             data.changeState(State.Connecting)
             runOnMainDispatcher {
                 try {
-                    ActiveOutboundTracker.checkAndUpdate(data)
                     data.notification = createNotification(ActiveOutboundTracker.formatNotificationTitle(profile))
 
                     Executable.killAll()    // clean up old processes
