@@ -50,6 +50,7 @@ func RegisterLoadBalance(registry *outbound.Registry) {
 
 var (
 	_ adapter.Outbound                = (*LoadBalance)(nil)
+	_ adapter.OutboundGroup           = (*LoadBalance)(nil)
 	_ adapter.ConnectionHandler       = (*LoadBalance)(nil)
 	_ adapter.PacketConnectionHandler = (*LoadBalance)(nil)
 	_ adapter.Referrer                = (*LoadBalance)(nil)
@@ -268,6 +269,19 @@ func (s *LoadBalance) Now() string {
 		return s.tags[0]
 	}
 	return ""
+}
+
+func (s *LoadBalance) Selected(network string) adapter.Outbound {
+	tag := s.Now()
+	for i, t := range s.tags {
+		if t == tag && i < len(s.outbounds) {
+			return s.outbounds[i]
+		}
+	}
+	if len(s.outbounds) > 0 {
+		return s.outbounds[0]
+	}
+	return nil
 }
 
 func (s *LoadBalance) AttachConnection(closer io.Closer) func() {

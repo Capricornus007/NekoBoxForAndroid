@@ -436,6 +436,51 @@ func (b *BoxInstance) SelectOutbound(tag string) bool {
 	return false
 }
 
+func (b *BoxInstance) GetActiveOutboundTag(groupTag string) string {
+	if b == nil || b.Box == nil {
+		return ""
+	}
+	var detour adapter.Outbound
+	if groupTag != "" {
+		var ok bool
+		detour, ok = b.Outbound().Outbound(groupTag)
+		if !ok {
+			return ""
+		}
+	} else {
+		var ok bool
+		detour, ok = b.Outbound().Outbound("proxy")
+		if !ok {
+			detour = b.Outbound().Default()
+		}
+	}
+	if detour == nil {
+		return ""
+	}
+	return resolveRealTag(detour, "tcp")
+}
+
+func resolveRealTag(detour adapter.Outbound, network string) string {
+	visited := make(map[string]bool)
+	for detour != nil {
+		tag := detour.Tag()
+		if visited[tag] {
+			return tag
+		}
+		visited[tag] = true
+		group, isGroup := detour.(adapter.OutboundGroup)
+		if !isGroup {
+			return tag
+		}
+		selected := group.Selected(network)
+		if selected == nil {
+			return tag
+		}
+		detour = selected
+	}
+	return ""
+}
+
 const (
 	defaultFallbackURL = "https://www.gstatic.com/generate_204"
 	defaultCFURL       = "https://cp.cloudflare.com/generate_204"

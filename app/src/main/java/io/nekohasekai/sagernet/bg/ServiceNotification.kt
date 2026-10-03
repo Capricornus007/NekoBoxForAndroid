@@ -83,13 +83,17 @@ class ServiceNotification(
                 )
                 it.setContentText(speedSimple)
             }
-            it.setSubText(
+            val currentProfile = service.data.proxy?.profile
+            val subText = if (currentProfile != null) {
+                ActiveOutboundTracker.formatNotificationSubText(service as Context, stats, currentProfile)
+            } else {
                 service.getString(
                     R.string.traffic,
-                    Formatter.formatFileSize(service, stats.txTotal),
+                    Formatter.formatFileSize(service as Context, stats.txTotal),
                     Formatter.formatFileSize(service, stats.rxTotal)
                 )
-            )
+            }
+            it.setSubText(subText)
         }
         update()
     }

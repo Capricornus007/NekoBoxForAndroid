@@ -463,6 +463,7 @@ class BaseService {
                 }
 
                 try {
+                    ActiveOutboundTracker.reset()
                     data.notification?.destroy()
                 } catch (error: Throwable) {
                     recordCleanupFailure("notification-destroy", error)
@@ -646,7 +647,8 @@ class BaseService {
             data.changeState(State.Connecting)
             runOnMainDispatcher {
                 try {
-                    data.notification = createNotification(ServiceNotification.genTitle(profile))
+                    ActiveOutboundTracker.checkAndUpdate(data)
+                    data.notification = createNotification(ActiveOutboundTracker.formatNotificationTitle(profile))
 
                     Executable.killAll()    // clean up old processes
                     preInit()

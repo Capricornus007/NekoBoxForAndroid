@@ -66,6 +66,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.SpeedTestDirection
 import io.nekohasekai.sagernet.SpeedTestOutcome
 import io.nekohasekai.sagernet.aidl.TrafficData
+import io.nekohasekai.sagernet.bg.ActiveOutboundTracker
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.proto.AndroidSpeedTestSession
 import io.nekohasekai.sagernet.bg.proto.SpeedTestQueueRunner
@@ -3849,10 +3850,41 @@ class ConfigurationFragment @JvmOverloads constructor(
                     )
                 }
 
-                var address = if (pf.alwaysShowAddress && bean.name.isNotBlank()) {
-                    bean.displayAddress()
-                } else ""
+                var isDynamicActive = false
+                var address = ""
+                if (proxyEntity.type == ProxyEntity.TYPE_BALANCER) {
+                    val isConnected = DataStore.serviceState.started && pf.isCurrentProfile(proxyEntity.id)
+                    if (isConnected) {
+                        val stratName = io.nekohasekai.sagernet.bg.ActiveOutboundTracker.getStrategyDisplayName(proxyEntity)
+                        val activeName = io.nekohasekai.sagernet.bg.ActiveOutboundTracker.activeLeafProfileName.takeIf { it.isNotBlank() }
+                            ?: (if (io.nekohasekai.sagernet.bg.ActiveOutboundTracker.activeLeafProfileId > 0) {
+                                SagerDatabase.proxyDao.getById(io.nekohasekai.sagernet.bg.ActiveOutboundTracker.activeLeafProfileId)?.displayName()
+                            } else null)
+                        address = if (!activeName.isNullOrBlank()) {
+                            "🟢 当前连接: $activeName · 策略: $stratName"
+                        } else {
+                            "🟢 活跃中 · 策略: $stratName"
+                        }
+                        isDynamicActive = true
+                    } else if (pf.alwaysShowAddress && bean.name.isNotBlank()) {
+                        address = bean.displayAddress()
+                    }
+                } else if (DataStore.serviceState.started &&
+                    proxyEntity.id == io.nekohasekai.sagernet.bg.ActiveOutboundTracker.activeLeafProfileId &&
+                    DataStore.currentProfile != proxyEntity.id
+                ) {
+                    val baseAddr = if (pf.alwaysShowAddress && bean.name.isNotBlank()) bean.displayAddress() else ""
+                    address = if (baseAddr.isNotBlank()) "$baseAddr · 🟢 策略活跃中" else "🟢 策略活跃中"
+                    isDynamicActive = true
+                } else if (pf.alwaysShowAddress && bean.name.isNotBlank()) {
+                    address = bean.displayAddress()
+                }
                 profileAddress.text = address
+                if (isDynamicActive) {
+                    profileAddress.setTextColor(requireContext().getColorAttr(R.attr.colorPrimary))
+                } else {
+                    profileAddress.setTextColor(requireContext().getColorAttr(android.R.attr.textColorSecondary))
+                }
                 profileAddress.isSelected = true
                 val trafficRowEmpty =
                     (!showTraffic || proxyEntity.status <= 0) && address.isBlank()

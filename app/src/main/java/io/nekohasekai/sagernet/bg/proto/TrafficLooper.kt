@@ -4,6 +4,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.aidl.SpeedDisplayData
 import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.aidl.TrafficDataBatch
+import io.nekohasekai.sagernet.bg.ActiveOutboundTracker
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.SagerConnection
 import io.nekohasekai.sagernet.database.DataStore
@@ -90,6 +91,13 @@ class TrafficLooper
 
     var selectorNowId = -114514L
     var selectorNowFakeTag = ""
+
+    fun getActiveTransmittingMember(memberIds: List<Long>): Long? {
+        return memberIds.firstOrNull { id ->
+            val item = idMap[id]
+            item != null && (item.hasTrafficDelta || item.rxRate > 0 || item.txRate > 0)
+        }
+    }
 
     suspend fun selectMain(id: Long) = withStateLock {
         selectMainLocked(id)
@@ -327,6 +335,11 @@ class TrafficLooper
                             }
                         }
                     }
+                }
+                if (ActiveOutboundTracker.checkAndUpdate(data)) {
+                    val newTitle = ActiveOutboundTracker.formatNotificationTitle(proxy.profile)
+                    proxy.displayProfileName = newTitle
+                    data.notification?.postNotificationTitle(newTitle)
                 }
                 snapshot
             }
