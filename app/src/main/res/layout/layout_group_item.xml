@@ -43,10 +43,11 @@
                 android:paddingEnd="8dp"
                 android:paddingBottom="12dp">
 
-                <TextView
+                <io.nekohasekai.sagernet.widget.MarqueeTextView
                     android:id="@+id/group_name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="?attr/colorOnSurface"
