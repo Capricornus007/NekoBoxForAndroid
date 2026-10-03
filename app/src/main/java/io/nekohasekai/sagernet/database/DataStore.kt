@@ -282,6 +282,17 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     var yacdURL by configurationStore.string("yacdURL") { "http://127.0.0.1:9090/ui" }
 
+    val clashApiSecret: String
+        get() = PublicDatabase.instance.runInTransaction(java.util.concurrent.Callable {
+            val key = "clashApiSecret"
+            PublicDatabase.kvPairDao[key]?.string?.takeIf { it.length == 64 } ?: run {
+                val bytes = ByteArray(32).also { java.security.SecureRandom().nextBytes(it) }
+                val value = bytes.joinToString("") { "%02x".format(it.toInt() and 255) }
+                PublicDatabase.kvPairDao.put(io.nekohasekai.sagernet.database.preference.KeyValuePair(key).put(value))
+                value
+            }
+        })
+
     // protocol
 
     var globalAllowInsecure by configurationStore.boolean(Key.GLOBAL_ALLOW_INSECURE) { false }

@@ -995,4 +995,59 @@
     <string name="select_multi_profile">选择节点</string>
     <string name="batch_add_nodes">批量添加节点</string>
 
+    <!-- Dashboard & Route Rule Advanced -->
+    <string name="dashboard_connect_service">请先连接代理服务，再重新加载仪表盘。</string>
+    <string name="dashboard_enable_api">请在“高级设置”开启 Clash API，重新连接服务后再加载仪表盘。</string>
+    <string name="dashboard_auth_failed">本地 Clash API 认证失败。请重新连接服务以同步密钥，再重新加载仪表盘。</string>
+    <string name="dashboard_api_unavailable">本地 Clash API 不可用或响应无效。请检查服务连接和“高级设置”的 Clash API 开关，再重新加载。</string>
+    <string name="dashboard_html_unavailable">API 已可用，但内置 YACD 页面加载失败。请重新连接服务，再重新加载。</string>
+    <string name="dashboard_storage_unavailable">无法保存 YACD 设置。请重新加载，并检查 WebView 存储是否可用。</string>
+
+    <string name="rr_basic">规则与动作</string>
+    <string name="rr_common">常用匹配</string>
+    <string name="rr_advanced">高级匹配与选项</string>
+    <string name="rr_show_advanced">展开高级选项</string>
+    <string name="rr_hide_advanced">收起高级选项</string>
+    <string name="rr_action">动作</string>
+    <string name="rr_inherit">使用出站目标决定动作</string>
+    <string name="rr_outbound">出站目标</string>
+    <string name="rr_default">默认 / 未设置</string>
+    <string name="rr_method">拒绝方式</string>
+    <string name="rr_strategy">域名解析策略</string>
+    <string name="rr_sniffer">嗅探协议</string>
+    <string name="rr_domain">精确域名</string>
+    <string name="rr_domain_suffix">域名后缀</string>
+    <string name="rr_domain_keyword">域名关键字</string>
+    <string name="rr_domain_regex">域名正则（Go RE2）</string>
+    <string name="rr_ip_cidr">目标 IP / CIDR</string>
+    <string name="rr_source_ip_cidr">源 IP / CIDR</string>
+    <string name="rr_port">目标端口 / 范围</string>
+    <string name="rr_source_port">源端口 / 范围</string>
+    <string name="rr_network">网络类型</string>
+    <string name="rr_protocol">协议</string>
+    <string name="rr_inbound">入站标签</string>
+    <string name="rr_ip_version">IP 版本</string>
+    <string name="rr_ip_is_private">目标为私有 IP</string>
+    <string name="rr_source_ip_is_private">源为私有 IP</string>
+    <string name="rr_invert">反转匹配</string>
+    <string name="rr_override_address">覆写目标地址</string>
+    <string name="rr_override_port">覆写目标端口</string>
+    <string name="rr_no_drop">不自动丢弃重复拒绝请求</string>
+    <string name="rr_rule_set">远程规则集地址</string>
+    <string name="rr_picker">选择规则集</string>
+    <string name="rr_lines">每行一个值。端口可填写 80、443 或 1000:2000。远程规则集使用 rssite:https://…/file.srs 或 rsip:https://…/file.srs。</string>
+    <string name="rr_legacy_domain">域名（兼容旧前缀）</string>
+    <string name="rr_apps_modes">应用规则用于 VPN 流量；Root TUN 依赖 UID/套接字归属，效果受 Android/内核影响；普通混合代理流量无法可靠识别来源应用。</string>
+    <string name="rr_limits">未启用 Wi-Fi 和桌面进程匹配。本内核已移除 sniff 目标覆写。旧自定义 JSON 原值保留；不支持的字段需在保存前检查处理。</string>
+    <string name="rr_invalid">无法保存规则</string>
+    <string name="rr_problem">%1$s：%2$s</string>
+    <string name="rr_value_error">值、地址、端口、范围或规则集地址无效。</string>
+    <string name="rr_json_error">自定义配置必须是 JSON 对象。</string>
+    <string name="rr_unsupported_error">当前 Android/内核适配不支持此字段，原值已保留，请检查自定义 JSON。</string>
+    <string name="rr_action_error">选项与动作不兼容，或缺少必要选项。</string>
+    <string name="rr_empty">该规则没有匹配条件，会匹配全部流量。确认这是你的预期后再保存。</string>
+    <string name="rr_core_error">内核校验失败：%1$s</string>
+    <string name="rr_save_error">规则保存失败，编辑内容仍保留。</string>
+    <string name="rr_reload_error">规则已保存，但运行中的服务重载失败，请重新连接。</string>
+
 </resources>
