@@ -952,6 +952,12 @@
     <string name="tailscale_exit_node_pick_offline">آفلاین</string>
     <string name="tailscale_save_first">ابتدا پروفایل را ذخیره کنید</string>
     <string name="tailscale_service_starting">سرویس در حال شروع است؛ لحظه‌ای دیگر دوباره امتحان کنید</string>
+    <string name="core_notifications">درخواست‌های ورود</string>
+    <string name="tailscale_login_required">ورود به Tailscale لازم است</string>
+    <string name="tailscale_login_tap">برای ورود به tailnet در مرورگر خود لمس کنید</string>
+    <string name="tailscale_login_message">این گره کلید احراز هویت ندارد. در مرورگر خود وارد tailnet شوید؛ به‌محض تکمیل ورود، گره ملحق می‌شود.</string>
+    <string name="tailscale_login_open">باز کردن صفحه ورود</string>
+    <string name="tailscale_login_waiting">در انتظار تکمیل ورود…</string>
     <string name="tailscale_node_in_use">این گره Tailscale توسط سرویس در حال اجرا در استفاده است</string>
     <string name="tailscale_exit_node_allow_lan_access">اجازه دسترسی LAN با گره خروج</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">در دسترس نگه‌داشتن نشانی‌های شبکه محلی هنگام استفاده از گره خروج</string>

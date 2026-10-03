@@ -953,6 +953,12 @@
     <string name="tailscale_exit_node_pick_offline">çevrimdışı</string>
     <string name="tailscale_save_first">Önce profili kaydedin</string>
     <string name="tailscale_service_starting">Hizmet başlatılıyor; birazdan tekrar deneyin</string>
+    <string name="core_notifications">Giriş istekleri</string>
+    <string name="tailscale_login_required">Tailscale girişi gerekiyor</string>
+    <string name="tailscale_login_tap">Tarayıcıda tailnet\'e giriş yapmak için dokunun</string>
+    <string name="tailscale_login_message">Bu düğümün kimlik doğrulama anahtarı yok. Tarayıcıda tailnet\'e giriş yapın; giriş tamamlanır tamamlanmaz düğüm katılır.</string>
+    <string name="tailscale_login_open">Giriş sayfasını aç</string>
+    <string name="tailscale_login_waiting">Girişin tamamlanması bekleniyor…</string>
     <string name="tailscale_node_in_use">Bu Tailscale düğümü çalışan hizmet tarafından kullanılıyor</string>
     <string name="tailscale_exit_node_allow_lan_access">Çıkış düğümüyle LAN erişimine izin ver</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">Çıkış düğümü kullanılırken yerel ağ adreslerine erişilebilir kalsın</string>

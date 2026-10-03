@@ -18,6 +18,7 @@ import io.nekohasekai.sagernet.bg.proto.TAILSCALE_READY_TIMEOUT_MS
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
+import io.nekohasekai.sagernet.fmt.tailscale.pruneTailscaleState
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.plugin.PluginManager
 import io.nekohasekai.sagernet.root.RootLanSharing
@@ -588,6 +589,8 @@ class BaseService {
 
                 // change the state
                 data.changeState(State.Stopped, msg)
+                // The core is gone: identities of profiles deleted while it ran can go now.
+                runOnDefaultDispatcher { pruneTailscaleState() }
                 // stop the service if nothing has bound to it. Re-read pendingRestart: an explicit
                 // CLOSE that raced this teardown may have cleared it.
                 if (data.stopGate.consumeRestart()) {

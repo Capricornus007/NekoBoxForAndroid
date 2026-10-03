@@ -852,6 +852,12 @@
     <string name="tailscale_exit_node_pick_offline">не ў сетцы</string>
     <string name="tailscale_save_first">Спачатку захавайце профіль</string>
     <string name="tailscale_service_starting">Служба запускаецца; паспрабуйце яшчэ раз праз момант</string>
+    <string name="core_notifications">Запыты ўваходу</string>
+    <string name="tailscale_login_required">Патрабуецца ўваход у Tailscale</string>
+    <string name="tailscale_login_tap">Дакраніцеся, каб увайсці ў tailnet у браўзеры</string>
+    <string name="tailscale_login_message">Гэты вузел не мае ключа аўтэнтыфікацыі. Увайдзіце ў tailnet у браўзеры; вузел далучыцца адразу пасля ўваходу.</string>
+    <string name="tailscale_login_open">Адкрыць старонку ўваходу</string>
+    <string name="tailscale_login_waiting">Чаканне завяршэння ўваходу…</string>
     <string name="tailscale_node_in_use">Гэты вузел Tailscale выкарыстоўваецца запушчанай службай</string>
     <string name="tailscale_exit_node_allow_lan_access">Дазволіць доступ да LAN з вузлом выхаду</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">Захоўваць даступнасць адрасоў лакальнай сеткі, пакуль выкарыстоўваецца вузел выхаду</string>

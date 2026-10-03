@@ -114,6 +114,22 @@ func TailscaleWaitReady(i *BoxInstance, tag string, exitNodeWanted bool, timeout
 	}
 }
 
+// TailscaleAuthURL returns the pending interactive login URL, or an empty string when the node
+// is not waiting for a login.
+func TailscaleAuthURL(i *BoxInstance, tag string) (result string, err error) {
+	defer deferPanicToError("box.TailscaleAuthURL", func(err_ error) { err = err_ })
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	status, err := tailscaleStatus(ctx, i, tag)
+	if err != nil {
+		return "", err
+	}
+	if status.BackendState != ipn.NeedsLogin.String() {
+		return "", nil
+	}
+	return status.AuthURL, nil
+}
+
 type tailscalePeer struct {
 	ID       string   `json:"id"`
 	Name     string   `json:"name"`

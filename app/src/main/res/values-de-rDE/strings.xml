@@ -952,6 +952,12 @@
     <string name="tailscale_exit_node_pick_offline">offline</string>
     <string name="tailscale_save_first">Bitte zuerst das Profil speichern</string>
     <string name="tailscale_service_starting">Der Dienst wird gestartet; versuchen Sie es gleich noch einmal</string>
+    <string name="core_notifications">Anmeldungsanfragen</string>
+    <string name="tailscale_login_required">Tailscale-Anmeldung erforderlich</string>
+    <string name="tailscale_login_tap">Tippen, um sich im Browser beim tailnet anzumelden</string>
+    <string name="tailscale_login_message">Dieser Knoten hat keinen Authentifizierungsschlüssel. Melden Sie sich im Browser beim tailnet an; der Knoten tritt bei, sobald die Anmeldung abgeschlossen ist.</string>
+    <string name="tailscale_login_open">Anmeldeseite öffnen</string>
+    <string name="tailscale_login_waiting">Warten auf Abschluss der Anmeldung…</string>
     <string name="tailscale_node_in_use">Dieser Tailscale-Knoten wird vom laufenden Dienst verwendet</string>
     <string name="tailscale_exit_node_allow_lan_access">LAN-Zugriff mit Exit-Knoten erlauben</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">Adressen des lokalen Netzwerks erreichbar halten, während der Exit-Knoten verwendet wird</string>

@@ -921,6 +921,12 @@
     <string name="tailscale_exit_node_pick_offline">غير متصل</string>
     <string name="tailscale_save_first">احفظ الملف الشخصي أولًا</string>
     <string name="tailscale_service_starting">الخدمة قيد التشغيل؛ أعد المحاولة بعد لحظة</string>
+    <string name="core_notifications">طلبات تسجيل الدخول</string>
+    <string name="tailscale_login_required">يلزم تسجيل الدخول إلى Tailscale</string>
+    <string name="tailscale_login_tap">اضغط لتسجيل الدخول إلى tailnet في متصفحك</string>
+    <string name="tailscale_login_message">لا تملك هذه العقدة مفتاح مصادقة. سجّل الدخول إلى tailnet في متصفحك؛ تنضم العقدة بمجرد اكتمال الدخول.</string>
+    <string name="tailscale_login_open">فتح صفحة الدخول</string>
+    <string name="tailscale_login_waiting">بانتظار اكتمال تسجيل الدخول…</string>
     <string name="tailscale_node_in_use">عقدة Tailscale هذه قيد الاستخدام من الخدمة العاملة</string>
     <string name="tailscale_exit_node_allow_lan_access">السماح بالوصول إلى LAN مع عقدة الخروج</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">إبقاء عناوين الشبكة المحلية قابلة للوصول أثناء استخدام عقدة الخروج</string>

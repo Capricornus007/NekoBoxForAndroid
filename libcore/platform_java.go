@@ -24,4 +24,7 @@ type BoxPlatformInterface interface {
 	CloseDefaultInterfaceMonitor(listener InterfaceUpdateListener) error
 	// 平台网络接口枚举（官方内核拨号路径强制要求，见 platform_box.go NetworkInterfaces）
 	GetInterfaces() (NetworkInterfaceIterator, error)
+	// Notifications the core asks for, e.g. a Tailscale login URL; openURL may be empty.
+	SendNotification(identifier string, typeID int32, title string, body string, openURL string) error
+	CancelNotification(identifier string, typeID int32) error
 }

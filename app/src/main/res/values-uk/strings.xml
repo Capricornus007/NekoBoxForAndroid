@@ -940,6 +940,12 @@
     <string name="tailscale_exit_node_pick_offline">офлайн</string>
     <string name="tailscale_save_first">Спершу збережіть профіль</string>
     <string name="tailscale_service_starting">Служба запускається; спробуйте за мить</string>
+    <string name="core_notifications">Запити на вхід</string>
+    <string name="tailscale_login_required">Потрібен вхід у Tailscale</string>
+    <string name="tailscale_login_tap">Натисніть, щоб увійти в tailnet у браузері</string>
+    <string name="tailscale_login_message">У цього вузла немає ключа автентифікації. Увійдіть у tailnet у браузері; вузол долучиться щойно вхід завершиться.</string>
+    <string name="tailscale_login_open">Відкрити сторінку входу</string>
+    <string name="tailscale_login_waiting">Очікування завершення входу…</string>
     <string name="tailscale_node_in_use">Цей вузол Tailscale використовується запущеною службою</string>
     <string name="tailscale_exit_node_allow_lan_access">Дозволити доступ до LAN із вузлом виходу</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">Зберігати доступність адрес локальної мережі, поки використовується вузол виходу</string>

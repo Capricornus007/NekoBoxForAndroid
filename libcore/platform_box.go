@@ -282,15 +282,15 @@ func (w *boxPlatformInterfaceWrapper) CreateAutoRedirect(options adapter.AutoRed
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformNotification() bool {
-	return false
+	return intfBox != nil
 }
 
 func (w *boxPlatformInterfaceWrapper) SendNotification(notification *adapter.Notification) error {
-	return nil
+	return intfBox.SendNotification(notification.Identifier, notification.TypeID, notification.Title, notification.Body, notification.OpenURL)
 }
 
 func (w *boxPlatformInterfaceWrapper) CancelNotification(identifier string, typeID int32) error {
-	return nil
+	return intfBox.CancelNotification(identifier, typeID)
 }
 
 // io.Writer

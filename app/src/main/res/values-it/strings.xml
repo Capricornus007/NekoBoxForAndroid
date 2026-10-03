@@ -951,6 +951,12 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="tailscale_exit_node_pick_offline">offline</string>
     <string name="tailscale_save_first">Salva prima il profilo</string>
     <string name="tailscale_service_starting">Il servizio si sta avviando; riprova tra un momento</string>
+    <string name="core_notifications">Richieste di accesso</string>
+    <string name="tailscale_login_required">È richiesto l\'accesso a Tailscale</string>
+    <string name="tailscale_login_tap">Tocca per accedere al tailnet nel browser</string>
+    <string name="tailscale_login_message">Questo nodo non ha una chiave di autenticazione. Accedi al tailnet nel browser; il nodo si unirà non appena l\'accesso sarà completato.</string>
+    <string name="tailscale_login_open">Apri pagina di accesso</string>
+    <string name="tailscale_login_waiting">In attesa del completamento dell\'accesso…</string>
     <string name="tailscale_node_in_use">Questo nodo Tailscale è in uso da parte del servizio in esecuzione</string>
     <string name="tailscale_exit_node_allow_lan_access">Consenti accesso LAN con il nodo di uscita</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">Mantieni raggiungibili gli indirizzi della rete locale mentre il nodo di uscita è in uso</string>

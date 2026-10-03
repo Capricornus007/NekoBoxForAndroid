@@ -763,6 +763,12 @@
     <string name="tailscale_exit_node_pick_offline">오프라인</string>
     <string name="tailscale_save_first">먼저 프로필을 저장하세요</string>
     <string name="tailscale_service_starting">서비스를 시작하는 중입니다. 잠시 후 다시 시도하세요</string>
+    <string name="core_notifications">로그인 요청</string>
+    <string name="tailscale_login_required">Tailscale 로그인이 필요합니다</string>
+    <string name="tailscale_login_tap">탭하면 브라우저에서 tailnet에 로그인합니다</string>
+    <string name="tailscale_login_message">이 노드에는 인증 키가 없습니다. 브라우저에서 tailnet에 로그인하면 로그인이 끝나는 즉시 노드가 참여합니다.</string>
+    <string name="tailscale_login_open">로그인 페이지 열기</string>
+    <string name="tailscale_login_waiting">로그인 완료를 기다리는 중…</string>
     <string name="tailscale_node_in_use">이 Tailscale 노드는 실행 중인 서비스가 사용 중입니다</string>
     <string name="tailscale_exit_node_allow_lan_access">종료 노드 사용 시 LAN 접근 허용</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">종료 노드를 사용하는 동안에도 로컬 네트워크 주소에 연결할 수 있게 합니다</string>

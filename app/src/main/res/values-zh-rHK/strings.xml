@@ -934,6 +934,12 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="tailscale_exit_node_pick_offline">離線</string>
     <string name="tailscale_save_first">請先儲存設定檔</string>
     <string name="tailscale_service_starting">服務正在啟動，請稍後再試</string>
+    <string name="core_notifications">登入請求</string>
+    <string name="tailscale_login_required">需要登入 Tailscale</string>
+    <string name="tailscale_login_tap">點一下即可在瀏覽器登入 tailnet</string>
+    <string name="tailscale_login_message">此節點沒有驗證金鑰。請在瀏覽器登入 tailnet，登入完成後節點即加入。</string>
+    <string name="tailscale_login_open">開啟登入頁面</string>
+    <string name="tailscale_login_waiting">正在等待登入完成…</string>
     <string name="tailscale_node_in_use">此 Tailscale 節點正由執行中的服務使用</string>
     <string name="tailscale_exit_node_allow_lan_access">允許在出口節點下存取 LAN</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">使用出口節點時仍可連線區域網路位址</string>

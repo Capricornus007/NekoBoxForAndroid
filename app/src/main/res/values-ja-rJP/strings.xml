@@ -951,6 +951,12 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="tailscale_exit_node_pick_offline">オフライン</string>
     <string name="tailscale_save_first">先にプロファイルを保存してください</string>
     <string name="tailscale_service_starting">サービスを起動しています。しばらくしてからもう一度お試しください</string>
+    <string name="core_notifications">ログイン要求</string>
+    <string name="tailscale_login_required">Tailscale へのログインが必要です</string>
+    <string name="tailscale_login_tap">タップするとブラウザで tailnet にログインできます</string>
+    <string name="tailscale_login_message">このノードには認証キーがありません。ブラウザで tailnet にログインすると、完了と同時にノードが参加します。</string>
+    <string name="tailscale_login_open">ログインページを開く</string>
+    <string name="tailscale_login_waiting">ログインの完了を待っています…</string>
     <string name="tailscale_node_in_use">この Tailscale ノードは実行中のサービスが使用しています</string>
     <string name="tailscale_exit_node_allow_lan_access">出口ノード使用時に LAN アクセスを許可</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">出口ノードの使用中もローカルネットワークのアドレスに到達できるようにします</string>

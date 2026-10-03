@@ -963,6 +963,12 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="tailscale_exit_node_pick_offline">offline</string>
     <string name="tailscale_save_first">Simpan profil terlebih dahulu</string>
     <string name="tailscale_service_starting">Layanan sedang dimulai; coba lagi sebentar</string>
+    <string name="core_notifications">Permintaan login</string>
+    <string name="tailscale_login_required">Perlu login Tailscale</string>
+    <string name="tailscale_login_tap">Ketuk untuk login ke tailnet di peramban</string>
+    <string name="tailscale_login_message">Node ini tidak punya kunci autentikasi. Login ke tailnet di peramban; node ikut serta begitu login selesai.</string>
+    <string name="tailscale_login_open">Buka halaman login</string>
+    <string name="tailscale_login_waiting">Menunggu login selesai…</string>
     <string name="tailscale_node_in_use">Node Tailscale ini sedang digunakan oleh layanan yang berjalan</string>
     <string name="tailscale_exit_node_allow_lan_access">Izinkan akses LAN dengan node keluar</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">Jaga alamat jaringan lokal tetap dapat dijangkau saat node keluar digunakan</string>

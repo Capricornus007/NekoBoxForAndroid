@@ -2,6 +2,7 @@ package io.nekohasekai.sagernet.database
 
 import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.bg.SubscriptionUpdater
+import io.nekohasekai.sagernet.fmt.tailscale.pruneTailscaleState
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
 
 object GroupManager {
@@ -111,6 +112,7 @@ object GroupManager {
             SagerDatabase.groupDao.deleteById(groupId)
         }
         clearDeletedSelection(selected, clearSelected)
+        pruneTailscaleState()
         iterator { groupRemoved(groupId) }
         reconfigureUpdater()
     }
@@ -127,6 +129,7 @@ object GroupManager {
             SagerDatabase.groupDao.deleteGroup(group)
         }
         clearDeletedSelection(selected, clearSelected)
+        pruneTailscaleState()
         for (proxyGroup in group) iterator { groupRemoved(proxyGroup.id) }
         reconfigureUpdater()
     }

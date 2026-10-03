@@ -1,6 +1,10 @@
 package moe.matsuri.nb4a
 
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
@@ -9,6 +13,11 @@ import android.os.Build.VERSION_CODES
 import android.os.SystemClock
 import android.system.OsConstants
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
+import io.nekohasekai.sagernet.CORE_NOTIFICATION_CHANNEL
+import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.bg.ServiceNotification
 import io.nekohasekai.sagernet.database.DataStore
@@ -30,6 +39,10 @@ import java.net.InetSocketAddress
 import java.net.InterfaceAddress
 import java.net.NetworkInterface
 import libcore.NetworkInterface as LibcoreNetworkInterface
+
+// Identifier prefix of the core's Tailscale login notification, followed by the endpoint tag
+// (protocol/tailscale/endpoint.go).
+const val TAILSCALE_LOGIN_NOTIFICATION = "tailscale-authentication"
 
 class NativeInterface : BoxPlatformInterface, NB4AInterface {
 
@@ -217,6 +230,40 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         override fun hasNext(): Boolean = iterator.hasNext()
         override fun next(): LibcoreNetworkInterface = iterator.next()
         override fun length(): Int = size
+    }
+
+    // The core asks for a notification; today that is the Tailscale interactive login URL.
+    // The app's own wording replaces the core's, and the tap opens the URL in the browser.
+    override fun sendNotification(identifier: String, typeID: Int, title: String, body: String, openURL: String) {
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(app, POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Logs.w("notification permission missing; $identifier: $openURL")
+            return
+        }
+        val login = identifier.startsWith(TAILSCALE_LOGIN_NOTIFICATION)
+        val builder = NotificationCompat.Builder(app, CORE_NOTIFICATION_CHANNEL)
+            .setSmallIcon(R.drawable.ic_service_active)
+            .setContentTitle(if (login) app.getString(R.string.tailscale_login_required) else title)
+            .setContentText(if (login) app.getString(R.string.tailscale_login_tap) else body)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+        if (openURL.isNotEmpty()) {
+            val open = Intent(Intent.ACTION_VIEW, openURL.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            builder.setContentIntent(
+                PendingIntent.getActivity(
+                    app,
+                    typeID,
+                    open,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                ),
+            )
+        }
+        SagerNet.notification.notify(identifier, typeID, builder.build())
+    }
+
+    override fun cancelNotification(identifier: String, typeID: Int) {
+        SagerNet.notification.cancel(identifier, typeID)
     }
 
     // nb4a interface

@@ -38,6 +38,9 @@ import java.io.File
 import java.security.KeyStore
 import androidx.work.Configuration as WorkConfiguration
 
+// Channel for notifications the core asks the platform to post.
+const val CORE_NOTIFICATION_CHANNEL = "core"
+
 class SagerNet :
     Application(),
     AndroidCAStore,
@@ -201,6 +204,12 @@ class SagerNet :
                         "connection-test",
                         application.getText(R.string.connection_test),
                         NotificationManager.IMPORTANCE_DEFAULT,
+                    ),
+                    // Login prompts the core asks for (Tailscale interactive login).
+                    NotificationChannel(
+                        CORE_NOTIFICATION_CHANNEL,
+                        application.getText(R.string.core_notifications),
+                        NotificationManager.IMPORTANCE_HIGH,
                     ),
                 ),
             )

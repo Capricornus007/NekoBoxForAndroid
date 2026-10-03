@@ -957,6 +957,12 @@
     <string name="tailscale_exit_node_pick_offline">hors ligne</string>
     <string name="tailscale_save_first">Enregistrez d\'abord le profil</string>
     <string name="tailscale_service_starting">Le service démarre ; réessayez dans un instant</string>
+    <string name="core_notifications">Demandes de connexion</string>
+    <string name="tailscale_login_required">Connexion à Tailscale requise</string>
+    <string name="tailscale_login_tap">Touchez pour vous connecter au tailnet dans votre navigateur</string>
+    <string name="tailscale_login_message">Ce nœud n\'a pas de clé d\'authentification. Connectez-vous au tailnet dans votre navigateur ; le nœud rejoindra le réseau dès la fin de la connexion.</string>
+    <string name="tailscale_login_open">Ouvrir la page de connexion</string>
+    <string name="tailscale_login_waiting">En attente de la fin de la connexion…</string>
     <string name="tailscale_node_in_use">Ce nœud Tailscale est utilisé par le service en cours d\'exécution</string>
     <string name="tailscale_exit_node_allow_lan_access">Autoriser l\'accès LAN avec le nœud de sortie</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">Garder les adresses du réseau local accessibles pendant l\'utilisation du nœud de sortie</string>

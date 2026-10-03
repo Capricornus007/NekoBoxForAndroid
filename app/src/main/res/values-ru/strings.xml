@@ -924,6 +924,12 @@
     <string name="tailscale_exit_node_pick_offline">офлайн</string>
     <string name="tailscale_save_first">Сначала сохраните профиль</string>
     <string name="tailscale_service_starting">Служба запускается; повторите попытку через мгновение</string>
+    <string name="core_notifications">Запросы на вход</string>
+    <string name="tailscale_login_required">Требуется вход в Tailscale</string>
+    <string name="tailscale_login_tap">Нажмите, чтобы войти в tailnet в браузере</string>
+    <string name="tailscale_login_message">У этого узла нет ключа авторизации. Войдите в tailnet в браузере; узел присоединится сразу после завершения входа.</string>
+    <string name="tailscale_login_open">Открыть страницу входа</string>
+    <string name="tailscale_login_waiting">Ожидание завершения входа…</string>
     <string name="tailscale_node_in_use">Этот узел Tailscale используется запущенной службой</string>
     <string name="tailscale_exit_node_allow_lan_access">Разрешить доступ к LAN через выходной узел</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">Сохранять доступность адресов локальной сети при использовании выходного узла</string>

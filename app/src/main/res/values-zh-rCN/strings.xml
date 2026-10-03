@@ -933,6 +933,12 @@
     <string name="tailscale_exit_node_pick_offline">离线</string>
     <string name="tailscale_save_first">请先保存配置</string>
     <string name="tailscale_service_starting">服务正在启动，请稍后重试</string>
+    <string name="core_notifications">登录请求</string>
+    <string name="tailscale_login_required">需要登录 Tailscale</string>
+    <string name="tailscale_login_tap">点击即可在浏览器登录 tailnet</string>
+    <string name="tailscale_login_message">此节点没有认证密钥。请在浏览器登录 tailnet，登录完成后节点即加入。</string>
+    <string name="tailscale_login_open">打开登录页面</string>
+    <string name="tailscale_login_waiting">正在等待登录完成…</string>
     <string name="tailscale_node_in_use">此 Tailscale 节点正被运行中的服务使用</string>
     <string name="tailscale_exit_node_allow_lan_access">允许在出口节点下访问 LAN</string>
     <string name="tailscale_exit_node_allow_lan_access_sum">使用出口节点时仍可访问局域网地址</string>
