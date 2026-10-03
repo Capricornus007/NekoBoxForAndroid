@@ -118,7 +118,13 @@ class TailscaleSettingsActivity :
                 loadPeers(profileId)
             } catch (e: Exception) {
                 Logs.w(e)
-                onMainDispatcher { Toast.makeText(this@TailscaleSettingsActivity, e.readableMessage, Toast.LENGTH_LONG).show() }
+                onMainDispatcher {
+                    Toast.makeText(
+                        this@TailscaleSettingsActivity,
+                        e.readableMessage,
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
                 return@launch
             } finally {
                 pickingExitNode = false
@@ -133,7 +139,11 @@ class TailscaleSettingsActivity :
     private suspend fun loadPeers(profileId: Long): List<TailscalePeer> {
         val entity = proxyEntity ?: error(getString(R.string.tailscale_save_first))
         val nodes = buildConfig(entity, forTest = true).tailscaleEndpoints.keys
-        return TailscaleAccess.run({ connection.service }, nodes, { parseTailscalePeers(it.tailscalePeers(profileId)) }) {
+        return TailscaleAccess.run(
+            { connection.service },
+            nodes,
+            { parseTailscalePeers(it.tailscalePeers(profileId)) },
+        ) {
             TailscaleAccess.probeLock.withLock { TailscalePeersInstance(entity).listPeers() }
         }
     }
@@ -172,7 +182,10 @@ class TailscaleSettingsActivity :
         val profileId = DataStore.editingId
         runOnIoDispatcher {
             // The core runs with no_backup as its working directory (libcore InitCore).
-            val removed = File(SagerNet.application.noBackupFilesDir, tailscaleStateDirectory(profileId)).deleteRecursively()
+            val removed = File(
+                SagerNet.application.noBackupFilesDir,
+                tailscaleStateDirectory(profileId),
+            ).deleteRecursively()
             onMainDispatcher {
                 val message = if (removed) R.string.tailscale_reset_identity_done else R.string.tailscale_reset_identity_failed
                 Toast.makeText(this@TailscaleSettingsActivity, message, Toast.LENGTH_SHORT).show()

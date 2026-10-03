@@ -72,10 +72,6 @@ class TailscaleBean : AbstractBean() {
         onlyTcp443 = input.readBoolean()
     }
 
-    override fun canICMPing(): Boolean = false
-
-    override fun canTCPing(): Boolean = false
-
     override fun canMapping(): Boolean = false
 
     override fun clone(): TailscaleBean = KryoConverters.deserialize(TailscaleBean(), KryoConverters.serialize(this))

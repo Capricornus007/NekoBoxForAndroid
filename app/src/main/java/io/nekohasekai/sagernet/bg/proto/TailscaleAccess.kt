@@ -37,7 +37,12 @@ object TailscaleAccess {
     // Runs [viaService] when the service is up, retrying while its core is still initializing.
     // PROFILE_NOT_RUNNING means the profile is not part of its configuration, and the probe may
     // go ahead as long as none of [nodes] is.
-    suspend fun <T> run(binder: () -> ISagerNetService?, nodes: Collection<Long>, viaService: (ISagerNetService) -> T, probe: suspend () -> T): T {
+    suspend fun <T> run(
+        binder: () -> ISagerNetService?,
+        nodes: Collection<Long>,
+        viaService: (ISagerNetService) -> T,
+        probe: suspend () -> T,
+    ): T {
         val service = service(binder)
         if (service != null) {
             try {

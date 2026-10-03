@@ -182,7 +182,7 @@ require (
 
 replace github.com/matsuridayo/libneko => github.com/Capricornus007/libneko v0.0.0-20260902104842-d5ae8b4d046a
 
-replace github.com/amnezia-vpn/amneziawg-go/v3 => github.com/Capricornus007/amneziawg-go/v3 v3.1.20260829-0.20261001054305-7e57ca7a5cee
+replace github.com/amnezia-vpn/amneziawg-go/v3 => github.com/Capricornus007/amneziawg-go/v3 v3.1.20260828-mod.2
 
 replace github.com/sagernet/sing-box => ../../sing-box
 

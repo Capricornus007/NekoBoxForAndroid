@@ -123,6 +123,7 @@ type BoxInstance struct {
 	startErr error
 
 	v2api        *boxapi.SbV2rayServer
+	connections  *connectionTracker
 	selector     *group.Selector
 	urlTest      *group.URLTest
 	pauseManager pause.Manager
@@ -209,8 +210,10 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 		cancel:       cancel,
 		startBox:     instance.Start,
 		closeBox:     instance.Close,
+		connections:  newConnectionTracker(),
 		pauseManager: service.FromContext[pause.Manager](ctx),
 	}
+	b.Box.Router().AppendTracker(b.connections)
 
 	// selector / urlTest
 	if proxy, ok := b.Outbound().Outbound("proxy"); ok {

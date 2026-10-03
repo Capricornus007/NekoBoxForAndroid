@@ -34,8 +34,6 @@ import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
 import io.nekohasekai.sagernet.fmt.v2ray.toUriVMessVLESSTrojan
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.ui.profile.*
-import java.io.File
-import java.util.Base64
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSBean
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSSettingsActivity
 import moe.matsuri.nb4a.proxy.config.ConfigBean
@@ -51,6 +49,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.io.File
+import java.util.Base64
 
 /**
  * Wire-format safety net for the protocol descriptor registry (Plan 029, Option C).
@@ -311,8 +311,9 @@ class ProtocolRegistryDispatchTest {
     fun tailscaleRunsOneInstancePerConfig() {
         ConfigBuilderTestEnv.reset()
         val groupId = ConfigBuilderTestEnv.io { SagerDatabase.groupDao.createGroup(ProxyGroup(isSelector = true)) }
-        fun add(bean: AbstractBean, order: Long = 0L) = ProxyEntity(groupId = groupId, userOrder = order).putBean(bean.apply { initializeDefaultValues() })
-            .also { it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) } }
+        fun add(bean: AbstractBean, order: Long = 0L) =
+            ProxyEntity(groupId = groupId, userOrder = order).putBean(bean.apply { initializeDefaultValues() })
+                .also { it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) } }
         val node = add(tailscale())
         val server = add(socks())
         // Both Tailscale hops are the same node, so this chain would start it twice.
@@ -347,7 +348,11 @@ class ProtocolRegistryDispatchTest {
 
         // A user block rule must stay ahead of the automatic tailnet rules (route and DNS).
         DataStore.enableDnsRouting = true
-        ConfigBuilderTestEnv.io { SagerDatabase.rulesDao.createRule(RuleEntity(enabled = true, domains = "full:blocked.ts.test", outbound = -2)) }
+        ConfigBuilderTestEnv.io {
+            SagerDatabase.rulesDao.createRule(
+                RuleEntity(enabled = true, domains = "full:blocked.ts.test", outbound = -2),
+            )
+        }
 
         // As a selector member the broken chain is skipped before it touches the shared lists:
         // the group still builds and every detour points at an existing tag.
@@ -371,7 +376,9 @@ class ProtocolRegistryDispatchTest {
         // MagicDNS resolver bound to the node, and tailnet destinations routed to it.
         val tsTag = endpoints.getJSONObject(0).getString("tag")
         val dnsServers = selector.getJSONObject("dns").getJSONArray("servers")
-        val magic = (0 until dnsServers.length()).map { dnsServers.getJSONObject(it) }.single { it.optString("type") == "tailscale" }
+        val magic = (0 until dnsServers.length()).map {
+            dnsServers.getJSONObject(it)
+        }.single { it.optString("type") == "tailscale" }
         assertEquals(tsTag, magic.getString("endpoint"))
         assertTrue(magic.getBoolean("accept_search_domain"))
         val dnsRules = selector.getJSONObject("dns").getJSONArray("rules")
@@ -389,7 +396,9 @@ class ProtocolRegistryDispatchTest {
         val dnsBlock = dnsRuleList.single { it.optString("action") == "predefined" && it.has("domain") }
         assertTrue("DNS block rule after MagicDNS rule", dnsRuleList.indexOf(dnsBlock) < dnsRuleList.indexOf(magicRule))
 
-        ConfigBuilderTestEnv.io { SagerDatabase.groupDao.updateGroup(ProxyGroup(id = groupId, isSelector = true, landingProxy = node.id)) }
+        ConfigBuilderTestEnv.io {
+            SagerDatabase.groupDao.updateGroup(ProxyGroup(id = groupId, isSelector = true, landingProxy = node.id))
+        }
         val landing = assertThrows(IllegalArgumentException::class.java) {
             ConfigBuilderTestEnv.io { buildConfig(server) }
         }

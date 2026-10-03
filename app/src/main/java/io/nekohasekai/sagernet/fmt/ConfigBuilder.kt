@@ -346,7 +346,6 @@ private fun serverHostOf(bean: AbstractBean): String? {
     return fallback
 }
 
-
 fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean = false): ConfigBuildResult {
     if (proxy.type == TYPE_CONFIG) {
         val bean = proxy.requireBean() as ConfigBean
@@ -484,7 +483,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     val tailscaleEndpoints = HashMap<Long, ConfigBuildResult.TailscaleEndpoint>()
     val profileTailscaleNodes = HashMap<Long, Set<Long>>()
     if (buildSelector) {
-        require(group.landingProxy?.let(lookupCache::proxy)?.requireBean() !is TailscaleBean) {
+        require(group.landingProxy?.let { SagerDatabase.proxyDao.getById(it) }?.requireBean() !is TailscaleBean) {
             SagerNet.application.getString(R.string.tailscale_selector_landing)
         }
     }
@@ -1082,7 +1081,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         fun buildChainOrSkip(chainId: Long, entity: ProxyEntity): String? {
             // buildChain appends to these as it goes; a hop that fails halfway must not leave an
             // outbound whose detour points at a tag that is never created, or a global tag for it.
-            val appended = listOf(outbounds, inbounds, routeRules, externalIndexMap).map { it to it.size }
+            val appended = listOf<MutableList<*>>(
+                outbounds,
+                inbounds,
+                route.rules,
+                externalIndexMap,
+            ).map { it to it.size }
             val globalBefore = HashMap(globalOutbounds)
             return try {
                 buildChain(chainId, entity)
@@ -1091,7 +1095,13 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 for ((list, size) in appended) list.subList(size, list.size).clear()
                 globalOutbounds.clear()
                 globalOutbounds.putAll(globalBefore)
-                runOnMainDispatcher { Toast.makeText(SagerNet.application, e.readableMessage, Toast.LENGTH_LONG).show() }
+                runOnMainDispatcher {
+                    Toast.makeText(
+                        SagerNet.application,
+                        e.readableMessage,
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
                 null
             }
         }
@@ -1220,7 +1230,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             .map { it._hack_config_map["tag"] as String }
         fun addTailnetRouteRules() {
             tailscaleTags.forEach { tag ->
-                routeRules.add(
+                route.rules.add(
                     Rule_DefaultOptions().apply {
                         _hack_config_map["preferred_by"] = listOf(tag)
                         outbound = tag

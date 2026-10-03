@@ -239,7 +239,12 @@ class BaseService {
         private fun awaitTailscaleNodes(proxy: ProxyInstance, profileId: Long) {
             val nodes = proxy.config.profileTailscaleNodes[profileId] ?: setOf(profileId)
             for (endpoint in nodes.mapNotNull { proxy.config.tailscaleEndpoints[it] }) {
-                Libcore.tailscaleWaitReady(proxy.box, endpoint.tag, endpoint.waitForExitNode, TAILSCALE_READY_TIMEOUT_MS)
+                Libcore.tailscaleWaitReady(
+                    proxy.box,
+                    endpoint.tag,
+                    endpoint.waitForExitNode,
+                    TAILSCALE_READY_TIMEOUT_MS,
+                )
             }
         }
 
@@ -264,9 +269,12 @@ class BaseService {
             return Libcore.tailscalePeers(proxy.box, endpoint.tag)
         }
 
-        override fun runningTailscaleProfiles(): String = JSONArray(runningProxy().config.tailscaleEndpoints.keys.toList()).toString()
+        override fun runningTailscaleProfiles(): String =
+            JSONArray(runningProxy().config.tailscaleEndpoints.keys.toList()).toString()
 
-        override fun connections(includeClosed: Boolean): String = data?.proxy?.takeIf { it.isInitialized() }?.box?.connections(includeClosed) ?: "[]"
+        override fun connections(includeClosed: Boolean): String = data?.proxy?.takeIf {
+            it.isInitialized()
+        }?.box?.connections(includeClosed) ?: "[]"
         fun stateChanged(s: State, msg: String?) = launch {
             val profileName = profileName
             broadcast { it.stateChanged(s.ordinal, profileName, msg) }

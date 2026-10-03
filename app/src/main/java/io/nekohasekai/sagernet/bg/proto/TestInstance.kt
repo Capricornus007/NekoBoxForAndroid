@@ -72,7 +72,12 @@ class TestInstance(profile: ProxyEntity, val link: String, private val timeout: 
                     // A Tailscale node has to log in and pick its exit node before a request can
                     // succeed; this is separate from the HTTP timeout.
                     for (endpoint in config.tailscaleEndpoints.values) {
-                        Libcore.tailscaleWaitReady(box, endpoint.tag, endpoint.waitForExitNode, TAILSCALE_READY_TIMEOUT_MS)
+                        Libcore.tailscaleWaitReady(
+                            box,
+                            endpoint.tag,
+                            endpoint.waitForExitNode,
+                            TAILSCALE_READY_TIMEOUT_MS,
+                        )
                     }
                     val result = Libcore.urlTest(box, link, timeout)
                     Logs.d("URLTest ${profile.displayName()}: result latency=${result}ms")
