@@ -568,7 +568,6 @@
     <string name="use_system_theme">Sistem temasını kullan</string>
     <string name="use_system_theme_summary">Sistem dinamik renklerini kullan (Android 12+)</string>
     <string name="quick_clear_cache_restart">Temizledikten sonra yeniden başlat</string>
-    <string name="tile_title">NekoBox</string>
     <string name="disable_mixed_inbound">Karışık girişi devre dışı bırak</string>
     <string name="disable_mixed_inbound_sum">Yalnızca TUN girişi; yerel proxy portunu dinleme</string>
     <string name="mixed_inbound_disabled">Devre dışı</string>

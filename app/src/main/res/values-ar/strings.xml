@@ -27,7 +27,6 @@
     <string name="quick_enable">تمكين</string>
     <string name="quick_disable">تعطيل</string>
     <string name="quick_clear_cache_restart">مسح ذاكرة التخزين المؤقت وإعادة التشغيل</string>
-    <string name="tile_title">المبدل</string>
     <string name="menu_dashboard">لوحة تحكم sing-box</string>
     <string name="action_copy">نسخ</string>
     <string name="action_open">فتح</string>

@@ -27,7 +27,6 @@
     <string name="quick_enable">Ativar</string>
     <string name="quick_disable">Desativar</string>
     <string name="quick_clear_cache_restart">Limpar Cache e Reiniciar</string>
-    <string name="tile_title">Alternador</string>
     <string name="menu_traffic">Tráfego</string>
     <string name="menu_dashboard">Painel do sing-box</string>
     <string name="action_copy">Copiar</string>

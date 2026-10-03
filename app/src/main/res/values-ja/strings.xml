@@ -37,7 +37,6 @@
     <string name="group_subscription_link">サブスクリプションリンク</string>
     <string name="group_update">アップデート</string>
     <string name="group_name">グループ名</string>
-    <string name="tile_title">スイッチャー</string>
     <string name="quick_toggle">トグル</string>
     <string name="quick_enable">有効化</string>
     <string name="quick_disable">無効化</string>

@@ -19,7 +19,6 @@
     <string name="quick_toggle">Переключить</string>
     <string name="quick_enable">Включить</string>
     <string name="quick_disable">Выключить</string>
-    <string name="tile_title">Переключатель</string>
     <string name="menu_traffic">Трафик</string>
     <string name="menu_dashboard">Панель управления sing-box</string>
     <string name="action_copy">Копировать</string>

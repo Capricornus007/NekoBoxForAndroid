@@ -27,7 +27,6 @@
     <string name="quick_enable">Aktivieren</string>
     <string name="quick_disable">Deaktivieren</string>
     <string name="quick_clear_cache_restart">Cache leeren &amp; Neustart</string>
-    <string name="tile_title">Schalter</string>
     <string name="menu_traffic">Verkehr</string>
     <string name="menu_dashboard">sing-box Dashboard</string>
     <string name="action_copy">Kopieren</string>
