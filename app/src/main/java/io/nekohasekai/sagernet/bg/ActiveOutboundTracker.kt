@@ -94,33 +94,26 @@ object ActiveOutboundTracker {
         profile: ProxyEntity,
         isGlobalMode: Boolean? = null
     ): String {
-        val baseTitle = runCatching { ServiceNotification.genTitle(profile) }.getOrDefault(profile.displayName())
-        if (profile.type == ProxyEntity.TYPE_BALANCER) {
-            val strat = getStrategyDisplayName(profile)
-            return if (baseTitle.contains(strat) || baseTitle.contains("策略")) {
-                baseTitle
-            } else {
-                "$baseTitle（策略组：$strat）"
-            }
-        }
+        val isBalancer = profile.type == ProxyEntity.TYPE_BALANCER
         val group = runCatching { SagerDatabase.groupDao.getById(profile.groupId) }.getOrNull()
         val isGroupStrategy = group != null && (
             runCatching { DataStore.isGroupUrlTest(group.id) }.getOrDefault(false) ||
             runCatching { DataStore.isGroupLoadBalance(group.id) }.getOrDefault(false)
         )
-        if (isGroupStrategy) {
-            val groupTitle = group?.displayName() ?: profile.displayName()
-            val groupPrefix = if (DataStore.showGroupInNotification && !groupTitle.startsWith("[")) {
-                "[${group.displayName()}] "
-            } else ""
-            val strat = getStrategyDisplayName(profile)
-            return if (groupTitle.contains("策略") || groupTitle.contains(strat)) {
-                "$groupPrefix$groupTitle"
-            } else {
-                "$groupPrefix$groupTitle（策略组：$strat）"
+        val isStrategy = isBalancer || isGroupStrategy
+
+        if (isStrategy) {
+            val leafNode = getActiveLeafNodeDisplay(profile)
+            val showGroup = runCatching { DataStore.showGroupInNotification }.getOrDefault(true)
+            if (!showGroup && !leafNode.isNullOrBlank()) {
+                // 用户关闭了“显示分组”：策略组下直接以当前连上的节点名作为主标题
+                return leafNode
             }
+            // 用户开启了“显示分组”（或尚未检测到叶子节点）：主标题为策略组自身的名字
+            return if (isBalancer) profile.displayName() else (group?.displayName() ?: profile.displayName())
         }
-        return baseTitle
+
+        return runCatching { ServiceNotification.genTitle(profile) }.getOrDefault(profile.displayName())
     }
 
     fun formatNotificationSubText(

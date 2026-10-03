@@ -55,50 +55,86 @@ class ServiceNotification(
 
     var listenPostSpeed = true
 
+    private var lastTitle: String? = null
+    private var lastText: String? = null
+    private var lastBigText: String? = null
+
     suspend fun postNotificationSpeedUpdate(stats: SpeedDisplayData) {
-        useBuilder {
-            val ctx = service as Context
-            val currentProfile = service.data.proxy?.profile
-            val totalTrafficStr = ctx.getString(
-                R.string.traffic,
-                Formatter.formatFileSize(ctx, stats.txTotal),
-                Formatter.formatFileSize(ctx, stats.rxTotal)
-            )
+        val ctx = service as Context
+        val currentProfile = service.data.proxy?.profile
 
-            val proxySpeed = ctx.getString(
-                R.string.traffic,
-                ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateProxy)),
-                ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateProxy))
-            )
-            val directSpeed = ctx.getString(
-                R.string.traffic,
-                ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateDirect)),
-                ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateDirect))
-            )
+        val proxySpeed = ctx.getString(
+            R.string.traffic,
+            ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateProxy)),
+            ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateProxy))
+        )
+        val directSpeed = ctx.getString(
+            R.string.traffic,
+            ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateDirect)),
+            ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateDirect))
+        )
 
-            val leafNode = if (currentProfile != null) {
-                ActiveOutboundTracker.getActiveLeafNodeDisplay(currentProfile)
-            } else null
+        val showGroup = DataStore.showGroupInNotification
+        val isBalancer = currentProfile?.type == ProxyEntity.TYPE_BALANCER
+        val group = if (currentProfile != null) {
+            runCatching { SagerDatabase.groupDao.getById(currentProfile.groupId) }.getOrNull()
+        } else null
+        val isGroupStrategy = group != null && (
+            runCatching { DataStore.isGroupUrlTest(group.id) }.getOrDefault(false) ||
+            runCatching { DataStore.isGroupLoadBalance(group.id) }.getOrDefault(false)
+        )
+        val isStrategy = isBalancer || isGroupStrategy
 
-            val collapsedText = if (!leafNode.isNullOrBlank()) {
-                "当前节点: $leafNode"
-            } else {
-                "代理: $proxySpeed"
-            }
+        val leafNode = if (currentProfile != null) {
+            ActiveOutboundTracker.getActiveLeafNodeDisplay(currentProfile)
+        } else null
 
-            val bigContent = buildString {
+        val notificationTitle = if (currentProfile != null) {
+            ActiveOutboundTracker.formatNotificationTitle(currentProfile)
+        } else null
+
+        val collapsedText = if (isStrategy && showGroup && !leafNode.isNullOrBlank()) {
+            "当前节点: $leafNode · 代理: $proxySpeed"
+        } else {
+            "代理: $proxySpeed"
+        }
+
+        val bigContent = buildString {
+            if (isStrategy) {
+                if (showGroup) {
+                    val strategyName = if (isBalancer) currentProfile?.displayName().orEmpty() else (group?.displayName() ?: currentProfile?.displayName().orEmpty())
+                    append("策略组: ").append(strategyName).append("\n")
+                }
                 if (!leafNode.isNullOrBlank()) {
                     append("当前节点: ").append(leafNode).append("\n")
                 }
-                append("代理: ").append(proxySpeed)
-                if (showDirectSpeed) {
-                    append("\n").append("直连: ").append(directSpeed)
+            } else if (currentProfile != null) {
+                append("当前节点: ").append(currentProfile.displayName()).append("\n")
+                if (showGroup) {
+                    val groupName = group?.displayName()
+                    if (!groupName.isNullOrBlank()) {
+                        append("所属分组: ").append(groupName).append("\n")
+                    }
                 }
-                append("\n").append("累计流量: ").append(totalTrafficStr)
             }
+            append("代理: ").append(proxySpeed)
+            if (showDirectSpeed) {
+                append("\n直连: ").append(directSpeed)
+            }
+        }
 
-            if (currentProfile != null) {
-                it.setContentTitle(ActiveOutboundTracker.formatNotificationTitle(currentProfile))
+        val isChanged = (notificationTitle != null && notificationTitle != lastTitle) ||
+                        (collapsedText != lastText) ||
+                        (bigContent != lastBigText)
+        if (!isChanged) return
+
+        lastTitle = notificationTitle ?: lastTitle
+        lastText = collapsedText
+        lastBigText = bigContent
+
+        useBuilder {
+            if (notificationTitle != null) {
+                it.setContentTitle(notificationTitle)
             }
             it.setStyle(NotificationCompat.BigTextStyle().bigText(bigContent))
             it.setContentText(collapsedText)
@@ -108,6 +144,8 @@ class ServiceNotification(
     }
 
     suspend fun postNotificationTitle(newTitle: String) {
+        if (newTitle == lastTitle) return
+        lastTitle = newTitle
         useBuilder {
             it.setContentTitle(newTitle)
         }
@@ -123,7 +161,7 @@ class ServiceNotification(
         update()
     }
 
-    private val showDirectSpeed = DataStore.showDirectSpeed
+    private val showDirectSpeed get() = DataStore.showDirectSpeed
 
     private val builder = NotificationCompat.Builder(service as Context, channel)
         .setWhen(0)

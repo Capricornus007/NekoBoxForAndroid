@@ -62,7 +62,7 @@ class ActiveOutboundTrackerTest {
         }
 
         val title = ActiveOutboundTracker.formatNotificationTitle(balancer)
-        assertEquals("自动选择（策略组：最低延迟）", title)
+        assertEquals("自动选择", title)
 
         ActiveOutboundTracker.updateActiveLeaf(101L, "日本 02")
         val leafDisplay = ActiveOutboundTracker.getActiveLeafNodeDisplay(balancer)

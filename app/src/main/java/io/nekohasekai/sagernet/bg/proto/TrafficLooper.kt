@@ -340,7 +340,6 @@ class TrafficLooper
                     val newTitle = ActiveOutboundTracker.formatNotificationTitle(proxy.profile)
                     proxy.displayProfileName = newTitle
                     data.notification?.postNotificationTitle(newTitle)
-                    data.notification?.postNotificationSpeedUpdate(snapshot.speed)
                 }
                 snapshot
             }
