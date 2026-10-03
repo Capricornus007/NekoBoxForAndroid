@@ -188,8 +188,14 @@ class ConfigBuildResult(
     val localProxyCredentials: Map<Int, Pair<String, String>> = emptyMap(),
     // True when the selector group is driven by sing-box urltest instead of the user.
     val autoSelect: Boolean = false,
+    // Tailscale profile id -> its endpoint in this config, for readiness waits and peer queries.
+    val tailscaleEndpoints: Map<Long, TailscaleEndpoint> = emptyMap(),
+    // Profile id -> the Tailscale profiles among its hops (group front/landing included).
+    val profileTailscaleNodes: Map<Long, Set<Long>> = emptyMap(),
 ) {
     data class IndexEntity(var chain: LinkedHashMap<Int, ProxyEntity>)
+
+    data class TailscaleEndpoint(val tag: String, val waitForExitNode: Boolean)
 }
 
 // Extracted from buildConfig as pure, capture-free helpers (Plan 028 seams).
@@ -303,8 +309,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     val buildSelector = !forTest && group?.isSelector == true && !forExport
     // A Tailscale node has one saved identity, so one config can run one instance of a profile.
     // Every selector member would get its own copy of a Tailscale landing proxy (each with a
-    // different detour), and a URL test would start a second node next to the running service.
+    // different detour).
     val tailscaleProfiles = hashSetOf<Long>()
+    val tailscaleEndpoints = HashMap<Long, ConfigBuildResult.TailscaleEndpoint>()
+    val profileTailscaleNodes = HashMap<Long, Set<Long>>()
     if (buildSelector) {
         require(group.landingProxy?.let(lookupCache::proxy)?.requireBean() !is TailscaleBean) {
             SagerNet.application.getString(R.string.tailscale_selector_landing)
@@ -567,9 +575,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             // outbounds with a detour to a tag that is never created. The first dialed hop is
             // shared through globalOutbounds, so a Tailscale profile already built there is reused.
             val chainTailscaleProfiles = mutableListOf<Long>()
+            val chainTailscaleEndpoints = HashMap<Long, ConfigBuildResult.TailscaleEndpoint>()
             profileList.forEachIndexed { index, hop ->
                 if (hop.requireBean() !is TailscaleBean) return@forEachIndexed
-                require(!forTest) { SagerNet.application.getString(R.string.tailscale_no_test) }
                 if (index == profileList.lastIndex && globalOutbounds.containsKey(hop.id)) return@forEachIndexed
                 require(hop.id !in tailscaleProfiles && hop.id !in chainTailscaleProfiles) {
                     SagerNet.application.getString(R.string.tailscale_single_use, hop.displayName())
@@ -759,8 +767,11 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         is SnellBean ->
                             buildSingBoxOutboundSnellBean(bean)
 
-                        is TailscaleBean ->
+                        is TailscaleBean -> {
+                            chainTailscaleEndpoints[proxyEntity.id] =
+                                ConfigBuildResult.TailscaleEndpoint(tagOut, bean.exitNode!!.isNotBlank())
                             buildSingBoxEndpointTailscaleBean(bean, proxyEntity.id)
+                        }
 
                         else -> throw IllegalStateException("can't reach")
                     }
@@ -890,6 +901,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             trafficMap[chainTagOut] = chainTrafficSet.toList()
             // Reserve only for a chain that built completely; a hop that fails later releases them.
             tailscaleProfiles += chainTailscaleProfiles
+            tailscaleEndpoints += chainTailscaleEndpoints
+            profileList.filter { it.requireBean() is TailscaleBean }.map { it.id }.toSet()
+                .takeIf { it.isNotEmpty() }?.let { profileTailscaleNodes[entity.id] = it }
             return chainTagOut
         }
 
@@ -1437,6 +1451,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             if (buildSelector) group.id else -1L,
             localProxyCredentials,
             buildSelector && group.autoSelect,
+            tailscaleEndpoints,
+            profileTailscaleNodes,
         )
     }
 }

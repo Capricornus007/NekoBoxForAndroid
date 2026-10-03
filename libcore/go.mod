@@ -12,6 +12,7 @@ require (
 	github.com/sagernet/sing v0.9.6-0.20260922013354-87c33f17688f
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-tun v0.9.6-0.20260924001923-ddaa4ca25e3b
+	github.com/sagernet/tailscale v1.102.1-sing-box-1.14-mod.5
 	github.com/ulikunitz/xz v0.5.17
 	golang.org/x/mobile v0.0.0-20260908204917-8b95e45f8d3e
 	golang.org/x/net v0.59.0
@@ -97,7 +98,6 @@ require (
 	github.com/sagernet/sing-usbip v0.0.0-20260817040617-28bd42667eca // indirect
 	github.com/sagernet/sing-vmess v0.2.8 // indirect
 	github.com/sagernet/smux v1.5.50-sing-box-mod.1 // indirect
-	github.com/sagernet/tailscale v1.102.1-sing-box-1.14-mod.5 // indirect
 	github.com/sagernet/wireguard-go v0.0.7 // indirect
 	github.com/sagernet/ws v0.0.0-20231204124109-acfe8907c854 // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect

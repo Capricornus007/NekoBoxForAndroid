@@ -1169,6 +1169,8 @@ class ConfigurationFragment @JvmOverloads constructor(
         // See pingTest(): cache the group name off-thread for the minimize callback.
         var groupName = ""
 
+        // Profiles whose Tailscale node the running service drives are measured through it.
+        val service = { (activity as? MainActivity)?.connection?.service }
         val mainJob = runOnDefaultDispatcher {
             val group = DataStore.currentGroup()
             groupName = group.displayName()
@@ -1178,7 +1180,7 @@ class ConfigurationFragment @JvmOverloads constructor(
             repeat(DataStore.connectionTestConcurrent) {
                 testJobs.add(
                     launch(Dispatchers.IO) {
-                        val urlTest = UrlTest() // note: this is NOT in bg process
+                        val urlTest = UrlTest(service) // note: this is NOT in bg process
                         while (isActive) {
                             val profile = profiles.poll() ?: break
                             profile.status = 0

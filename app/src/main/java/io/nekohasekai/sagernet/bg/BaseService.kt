@@ -14,6 +14,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.aidl.ISagerNetService
 import io.nekohasekai.sagernet.aidl.ISagerNetServiceCallback
 import io.nekohasekai.sagernet.bg.proto.ProxyInstance
+import io.nekohasekai.sagernet.bg.proto.TAILSCALE_READY_TIMEOUT_MS
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
@@ -27,12 +28,17 @@ import libcore.Libcore
 import moe.matsuri.nb4a.Protocols
 import moe.matsuri.nb4a.proxy.config.ConfigBean
 import moe.matsuri.nb4a.utils.Util
+import org.json.JSONArray
 import java.net.UnknownHostException
 import java.util.concurrent.ConcurrentHashMap
 
 // Kill switch reconnect backoff while the VPN interface is held with no core behind it.
 private const val KILL_SWITCH_RETRY_INITIAL_MS = 5_000L
 private const val KILL_SWITCH_RETRY_MAX_MS = 60_000L
+
+// Binder error for a profile that is not part of the running configuration; callers fall
+// back to a test instance of their own.
+const val PROFILE_NOT_RUNNING = "profile not in running configuration"
 
 class BaseService {
 
@@ -183,6 +189,41 @@ class BaseService {
                 error(Protocols.genFriendlyMsg(e.readableMessage))
             }
         }
+
+        private fun runningProxy() = data?.proxy?.takeIf { it.isInitialized() } ?: error("core not started")
+
+        // Right after Connected a node may still be logging in or selecting its exit node. Only
+        // the nodes on the tested profile's path are awaited, so another member's broken node
+        // does not block the test.
+        private fun awaitTailscaleNodes(proxy: ProxyInstance, profileId: Long) {
+            val nodes = proxy.config.profileTailscaleNodes[profileId] ?: setOf(profileId)
+            for (endpoint in nodes.mapNotNull { proxy.config.tailscaleEndpoints[it] }) {
+                Libcore.tailscaleWaitReady(proxy.box, endpoint.tag, endpoint.waitForExitNode, TAILSCALE_READY_TIMEOUT_MS)
+            }
+        }
+
+        override fun urlTestProfile(profileId: Long): Int {
+            val proxy = runningProxy()
+            val tag = proxy.config.profileTagMap[profileId]
+                ?: proxy.config.tailscaleEndpoints[profileId]?.tag
+                ?: error(PROFILE_NOT_RUNNING)
+            return try {
+                awaitTailscaleNodes(proxy, profileId)
+                Libcore.urlTestOutbound(proxy.box, tag, DataStore.connectionTestURL, DataStore.connectionTestTimeout)
+            } catch (e: Exception) {
+                error(Protocols.genFriendlyMsg(e.readableMessage))
+            }
+        }
+
+        override fun tailscalePeers(profileId: Long): String {
+            val proxy = runningProxy()
+            val endpoint = proxy.config.tailscaleEndpoints[profileId] ?: error(PROFILE_NOT_RUNNING)
+            // Only the login matters for listing peers; the exit node may be the one being replaced.
+            Libcore.tailscaleWaitReady(proxy.box, endpoint.tag, false, TAILSCALE_READY_TIMEOUT_MS)
+            return Libcore.tailscalePeers(proxy.box, endpoint.tag)
+        }
+
+        override fun runningTailscaleProfiles(): String = JSONArray(runningProxy().config.tailscaleEndpoints.keys.toList()).toString()
 
         override fun connections(includeClosed: Boolean): String = data?.proxy?.takeIf { it.isInitialized() }?.box?.connections(includeClosed) ?: "[]"
 
