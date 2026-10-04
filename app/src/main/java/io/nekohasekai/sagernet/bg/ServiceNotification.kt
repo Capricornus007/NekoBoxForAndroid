@@ -23,6 +23,8 @@ import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.ui.SwitchActivity
+import io.nekohasekai.sagernet.utils.LandingIpManager
+import io.nekohasekai.sagernet.utils.RegionExtractor
 import io.nekohasekai.sagernet.utils.Theme
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -63,6 +65,55 @@ class ServiceNotification(
     private var lastTitle: String? = null
     private var lastText: String? = null
     private var lastBigText: String? = null
+    private var lastRegion: String? = null
+
+    private fun applyLiveUpdateCapsule(
+        builder: NotificationCompat.Builder,
+        state: BaseService.State,
+        region: String? = null,
+    ) {
+        val color = when (state) {
+            BaseService.State.Connected -> 0xFF4CAF50.toInt() // 绿色 (Green #4CAF50)
+            BaseService.State.Connecting -> 0xFFFFB300.toInt() // 黄色 (Yellow #FFB300)
+            else -> 0xFF9E9E9E.toInt() // 灰色 (Gray #9E9E9E)
+        }
+        builder.color = color
+
+        val resolvedRegion = if (!region.isNullOrBlank()) {
+            region
+        } else {
+            val cachedGeo = LandingIpManager.getCachedInfo()?.country
+            val profile = service.data.proxy?.profile
+            val leafNode = if (profile != null) ActiveOutboundTracker.getActiveLeafNodeDisplay(profile) else null
+            val nodeName = leafNode ?: profile?.displayName() ?: service.data.proxy?.displayProfileName
+            RegionExtractor.extractRegion(nodeName, cachedGeo).ifBlank { "已连接" }
+        }
+
+        val displayChipText = if (state == BaseService.State.Connected) {
+            resolvedRegion
+        } else if (state == BaseService.State.Connecting) {
+            "连接中"
+        } else {
+            "未连接"
+        }
+
+        // 谷歌原生 Android 16 实况岛 / Rich Ongoing Notifications (Live Updates) 规范
+        builder.extras.apply {
+            putBoolean("android.requestPromotedOngoing", true)
+            putCharSequence("android.shortCriticalText", displayChipText)
+            putString("capsule_text", displayChipText)
+            putInt("capsule_color", color)
+            putString("live_activity_status", if (state == BaseService.State.Connected) "active" else "pending")
+        }
+        builder.setSubText(displayChipText)
+    }
+
+    suspend fun postStateUpdate(state: BaseService.State) {
+        useBuilder {
+            applyLiveUpdateCapsule(it, state)
+        }
+        update()
+    }
 
     suspend fun postNotificationSpeedUpdate(stats: SpeedDisplayData) {
         val ctx = service as Context
@@ -94,14 +145,20 @@ class ServiceNotification(
             directSpeed = directSpeed,
         )
 
+        val cachedGeo = LandingIpManager.getCachedInfo()?.country
+        val nodeName = leafNode ?: currentProfile?.displayName() ?: service.data.proxy?.displayProfileName
+        val currentRegion = RegionExtractor.extractRegion(nodeName, cachedGeo).ifBlank { "已连接" }
+
         val isChanged = (texts.title != lastTitle) ||
                         (texts.collapsedText != lastText) ||
-                        (texts.bigText != lastBigText)
+                        (texts.bigText != lastBigText) ||
+                        (currentRegion != lastRegion)
         if (!isChanged) return
 
         lastTitle = texts.title
         lastText = texts.collapsedText
         lastBigText = texts.bigText
+        lastRegion = currentRegion
 
         useBuilder {
             if (texts.title.isNotBlank()) {
@@ -109,7 +166,7 @@ class ServiceNotification(
             }
             it.setStyle(NotificationCompat.BigTextStyle().bigText(texts.bigText))
             it.setContentText(texts.collapsedText)
-            it.setSubText(null)
+            applyLiveUpdateCapsule(it, service.data.state, currentRegion)
         }
         update()
     }
@@ -159,7 +216,7 @@ class ServiceNotification(
 
         Theme.apply(app)
         Theme.apply(service)
-        builder.color = service.getColorAttr(R.attr.colorPrimary)
+        applyLiveUpdateCapsule(builder, service.data.state)
 
         service.registerReceiver(this, IntentFilter().apply {
             addAction(Intent.ACTION_SCREEN_ON)

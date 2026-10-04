@@ -146,6 +146,9 @@ class BaseService {
             DataStore.serviceState = s
             binder.stateChanged(s, msg)
             runCatching { io.nekohasekai.sagernet.widget.OwnBoxWidgetProvider.updateWidgets(SagerNet.application) }
+            runOnDefaultDispatcher {
+                notification?.postStateUpdate(s)
+            }
         }
     }
 
