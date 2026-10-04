@@ -24,7 +24,10 @@ data class ProtonNode(
 
 sealed class ProtonOutcome {
     class Success(val json: String) : ProtonOutcome()
-    class Failed(val message: String, val exitCode: Int = -1) : ProtonOutcome()
+
+    // The sidecar reports failures as JSON on stdout with a non-zero exit, so the
+    // stdout is carried here too; stderr alone only has the process message.
+    class Failed(val message: String, val exitCode: Int = -1, val stdout: String = "") : ProtonOutcome()
 }
 
 class ProtonLoginState(
@@ -45,6 +48,10 @@ class ProtonNodesState(
 // Parsing is kept free of process and Android types so it can be covered by JVM
 // tests; the sidecar's stdout is the only input.
 object ProtonJson {
+
+    // A non-zero exit still carries a machine-readable report on stdout, so callers
+    // need to know whether that is parseable before falling back to stderr text.
+    fun looksLikeJson(text: String): Boolean = text.trim().startsWith("{")
 
     fun parseLogin(text: String): ProtonLoginState {
         val obj = runCatching { JSONObject(text) }.getOrNull()
@@ -150,7 +157,11 @@ object ProtonSidecar {
             // Never log the stdin payload: it carries the account password.
             when (val result = runSidecar(listOf("login", "--state", sessionFile.absolutePath), body.toString())) {
                 is ProtonOutcome.Success -> ProtonJson.parseLogin(result.json)
-                is ProtonOutcome.Failed -> ProtonLoginState(false, error = result.message)
+                is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
+                    ProtonJson.parseLogin(result.stdout)
+                } else {
+                    ProtonLoginState(false, error = result.message)
+                }
             }
         }
 
@@ -163,7 +174,11 @@ object ProtonSidecar {
         if (limit > 0) args += listOf("--limit", limit.toString())
         when (val result = runSidecar(args, null)) {
             is ProtonOutcome.Success -> ProtonJson.parseNodes(result.json)
-            is ProtonOutcome.Failed -> ProtonNodesState(false, error = result.message)
+            is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
+                ProtonJson.parseNodes(result.stdout)
+            } else {
+                ProtonNodesState(false, error = result.message)
+            }
         }
     }
 
@@ -242,6 +257,7 @@ object ProtonSidecar {
                 ProtonOutcome.Failed(
                     errorText.toString().trim().ifEmpty { "sidecar exited with $code" },
                     code,
+                    output.toString().trim(),
                 )
             }
         } catch (e: Exception) {

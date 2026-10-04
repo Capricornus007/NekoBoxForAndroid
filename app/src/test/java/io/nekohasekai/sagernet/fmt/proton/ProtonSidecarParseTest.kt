@@ -115,6 +115,19 @@ class ProtonSidecarParseTest {
     }
 
     @Test
+    fun readsAReportFromStdoutWhenTheProcessExitedNonZero() {
+        // The sidecar exits 1 for "needs 2FA", and that verdict only exists in the
+        // stdout JSON; if the caller falls back to stderr the 2FA branch is dead.
+        val stdout = """{"ok":false,"twoFactorRequired":true,"reason":"two-factor-required"}"""
+        assertTrue(ProtonJson.looksLikeJson(stdout))
+        assertTrue(ProtonJson.parseLogin(stdout).twoFactorRequired)
+
+        assertFalse(ProtonJson.looksLikeJson("sidecar exited with 1"))
+        assertFalse(ProtonJson.looksLikeJson(""))
+        assertFalse(ProtonJson.looksLikeJson("   "))
+    }
+
+    @Test
     fun generatesAWireGuardConfigTheImporterCanRead() {
         val node = ProtonNode(
             id = "11", name = "JP#2", penalty = 0.2, tier = 2, supportsIPv6 = true,
