@@ -41,27 +41,27 @@ object LandingIpBottomSheet {
         tvAsn.text = if (info.asn.isNotBlank()) info.asn else activity.getString(R.string.unknown)
         tvDuration.text = "${info.durationMs} ms"
 
-        val isWhite = io.nekohasekai.sagernet.utils.Theme.isWhiteTheme()
         val isNight = io.nekohasekai.sagernet.utils.Theme.usingNightMode()
+        val isWhite = io.nekohasekai.sagernet.utils.Theme.isWhiteTheme()
 
         val cardBgColor = when {
-            isWhite -> android.graphics.Color.parseColor("#F5F6F8")
             isNight -> android.graphics.Color.parseColor("#1E1E1E")
+            isWhite -> android.graphics.Color.parseColor("#F5F6F8")
             else -> null
         }
         val strokeColor = when {
-            isWhite -> android.graphics.Color.parseColor("#E0E0E0")
             isNight -> android.graphics.Color.parseColor("#333333")
+            isWhite -> android.graphics.Color.parseColor("#E0E0E0")
             else -> null
         }
         val primaryTextColor = when {
-            isWhite -> android.graphics.Color.parseColor("#1A1A1A")
             isNight -> android.graphics.Color.parseColor("#F5F5F5")
+            isWhite -> android.graphics.Color.parseColor("#1A1A1A")
             else -> null
         }
         val secondaryTextColor = when {
-            isWhite -> android.graphics.Color.parseColor("#5A5A5A")
             isNight -> android.graphics.Color.parseColor("#B0B0B0")
+            isWhite -> android.graphics.Color.parseColor("#5A5A5A")
             else -> null
         }
 

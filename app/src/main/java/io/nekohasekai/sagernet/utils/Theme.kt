@@ -76,22 +76,25 @@ object Theme {
     }
 
     fun apply(context: Context) {
-        context.setTheme(getTheme())
+        context.setTheme(getTheme(context))
         if (!isWhiteTheme() && !isLightGrayTheme() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.useSystemTheme && context is android.app.Activity) {
             com.google.android.material.color.DynamicColors.applyIfAvailable(context)
         }
     }
 
     fun applyDialog(context: Context) {
-        context.setTheme(getDialogTheme())
+        context.setTheme(getDialogTheme(context))
         if (!isWhiteTheme() && !isLightGrayTheme() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.useSystemTheme && context is android.app.Activity) {
             com.google.android.material.color.DynamicColors.applyIfAvailable(context)
         }
     }
 
-    fun getTheme(): Int {
+    fun getTheme(context: Context = app): Int {
+        if (usingNightMode(context)) {
+            return R.style.Theme_SagerNet_Black
+        }
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.useSystemTheme) {
-            val wallpaperColor = getSystemWallpaperColor(app)
+            val wallpaperColor = getSystemWallpaperColor(context)
             if (wallpaperColor != null) {
                 val closest = getClosestThemeForColor(wallpaperColor)
                 if (closest == WHITE) R.style.Theme_SagerNet_White else getTheme(closest)
@@ -103,9 +106,12 @@ object Theme {
         }
     }
 
-    fun getDialogTheme(): Int {
+    fun getDialogTheme(context: Context = app): Int {
+        if (usingNightMode(context)) {
+            return R.style.Theme_SagerNet_Dialog_Black
+        }
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.useSystemTheme) {
-            val wallpaperColor = getSystemWallpaperColor(app)
+            val wallpaperColor = getSystemWallpaperColor(context)
             if (wallpaperColor != null) {
                 val closest = getClosestThemeForColor(wallpaperColor)
                 if (closest == WHITE) R.style.Theme_SagerNet_Dialog_White else getDialogTheme(closest)
@@ -150,14 +156,14 @@ object Theme {
     fun isBlackTheme(): Boolean = DataStore.appTheme == BLACK
 
     fun getPrimaryColor(context: Context): Int {
+        if (usingNightMode(context) || isBlackTheme()) {
+            return Color.WHITE
+        }
         if (isWhiteTheme()) {
             return Color.parseColor("#212121")
         }
         if (isLightGrayTheme()) {
             return Color.parseColor("#1F2937")
-        }
-        if (isBlackTheme()) {
-            return Color.WHITE
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.useSystemTheme) {
             val wallpaperColor = getSystemWallpaperColor(context)
@@ -185,21 +191,19 @@ object Theme {
         }
     }
 
-    fun usingNightMode(): Boolean {
-        if (isWhiteTheme() || isLightGrayTheme()) return false
+    fun usingNightMode(context: Context = app): Boolean {
         if (isBlackTheme()) return true
         return when (DataStore.nightTheme) {
             1 -> true
             2 -> false
-            else -> (app.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+            else -> {
+                val res = (context as? android.app.Activity)?.resources ?: context.resources ?: app.resources
+                (res.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+            }
         }
     }
 
     fun applyNightTheme() {
-        if (isWhiteTheme() || isLightGrayTheme()) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            return
-        }
         if (isBlackTheme()) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             return

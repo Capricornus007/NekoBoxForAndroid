@@ -32,18 +32,22 @@ abstract class ThemedActivity : AppCompatActivity {
     private var lastUseSystemTheme: Boolean = false
     private var lastWallpaperColor: Int? = null
     private var lastAppTheme: Int = 0
+    private var lastNightTheme: Int = 0
+    private var lastUsingNight: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         lastUseSystemTheme = DataStore.useSystemTheme
         lastWallpaperColor = if (DataStore.useSystemTheme) Theme.getSystemWallpaperColor(this) else null
         lastAppTheme = DataStore.appTheme
+        lastNightTheme = DataStore.nightTheme
+        lastUsingNight = Theme.usingNightMode(this)
 
+        Theme.applyNightTheme()
         if (!isDialog) {
             Theme.apply(this)
         } else {
             Theme.applyDialog(this)
         }
-        Theme.applyNightTheme()
 
         super.onCreate(savedInstanceState)
 
@@ -107,9 +111,12 @@ abstract class ThemedActivity : AppCompatActivity {
     override fun onResume() {
         super.onResume()
         val currentWallpaperColor = if (DataStore.useSystemTheme) Theme.getSystemWallpaperColor(this) else null
+        val currentUsingNight = Theme.usingNightMode(this)
         if (lastUseSystemTheme != DataStore.useSystemTheme ||
             (DataStore.useSystemTheme && lastWallpaperColor != currentWallpaperColor) ||
-            (!DataStore.useSystemTheme && lastAppTheme != DataStore.appTheme)) {
+            (!DataStore.useSystemTheme && lastAppTheme != DataStore.appTheme) ||
+            lastNightTheme != DataStore.nightTheme ||
+            lastUsingNight != currentUsingNight) {
             ActivityCompat.recreate(this)
         }
     }
