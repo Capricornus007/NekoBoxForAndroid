@@ -206,6 +206,16 @@ class VpnService :
                     bypass = false
                 }
 
+                // 分應用「代理模式」勾了 Google Play 商店時，必須把實際建立下載連線的系統元件一起納進
+                // 隧道：Play 只負責介面與派工，APK 是下載管理器（com.android.providers.downloads*）
+                // 與 GMS/GSF 拉的。漏掉它們 → 安裝進度卡在 0%（那條連線從物理網卡直連，根本進不了 TUN）。
+                if (proxyApps && !bypass && individual.contains("com.android.vending")) {
+                    individual.add("com.android.providers.downloads")
+                    individual.add("com.android.providers.downloads.ui")
+                    individual.add("com.google.android.gsf")
+                    individual.add("com.google.android.gms")
+                }
+
                 val added = mutableListOf<String>()
 
                 individual.apply {

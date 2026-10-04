@@ -91,8 +91,8 @@ public class SubscriptionBean extends Serializable {
             filterMode = input.readInt();
             filterRegex = input.readString();
         }
-        // v3、v4 的舊資料在 filterRegex 之後帶一對 HWID 欄位；HWID 功能已整個移除，
-        // 但讀舊列時仍要把這兩格吃掉，否則後面的欄位會全部錯位。
+        // v3、v4 的舊資料在 filterRegex 之後多寫了一對欄位（布林＋字串，該功能已整個移除）。
+        // 功能代碼不存在，但讀舊列時仍要把這兩格吃掉，否則後面所有欄位會錯位、舊訂閱直接讀壞。
         if (version == 3 || version == 4) {
             input.readBoolean();
             input.readString();
@@ -112,7 +112,7 @@ public class SubscriptionBean extends Serializable {
         deduplication = input.readBoolean();
         updateWhenConnectedOnly = input.readBoolean();
         customUserAgent = input.readString();
-        // 舊版分享格式（v1）尾端帶一對已移除的 HWID 欄位，吃掉以對齊結尾。
+        // 舊版分享格式（v1）尾端帶一對已移除功能的欄位，照吃掉以對齊結尾。
         if (version == 1) {
             input.readBoolean();
             input.readString();

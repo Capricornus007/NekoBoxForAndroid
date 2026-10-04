@@ -60,6 +60,11 @@ abstract class BoxInstance(
         return ::config.isInitialized && ::box.isInitialized
     }
 
+    // config 是 lateinit：核心還沒起就讀它會拋 UninitializedPropertyAccessException。
+    // 硬關機路徑（persistStats）與選節點回調都可能落在這個時機，呼叫端一律走這個 nullable 版。
+    val safeConfig: ConfigBuildResult?
+        get() = if (::config.isInitialized) config else null
+
     protected fun initPlugin(name: String): PluginManager.InitResult {
         return pluginPath.getOrPut(name) { PluginManager.init(name)!! }
     }

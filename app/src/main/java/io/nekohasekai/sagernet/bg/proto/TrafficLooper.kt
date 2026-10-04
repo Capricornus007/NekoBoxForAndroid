@@ -70,7 +70,7 @@ class TrafficLooper(
         if (!DataStore.profileTrafficStatistics) return
         withStateLock {
             val traffic = mutableMapOf<Long, TrafficData>()
-            data.proxy?.config?.trafficMap?.forEach { (_, ents) ->
+            data.proxy?.safeConfig?.trafficMap?.forEach { (_, ents) ->
                 for (ent in ents) {
                     // Skip just this entity if its live data isn't in the map yet (e.g. on the
                     // hard-shutdown path before the loop has populated it); continue with the
@@ -146,7 +146,7 @@ class TrafficLooper(
             // post traffic when switch
             if (DataStore.profileTrafficStatistics) {
                 val switchedFrom = this
-                data.proxy?.config?.trafficMap?.get(tag)?.firstOrNull()?.let {
+                data.proxy?.safeConfig?.trafficMap?.get(tag)?.firstOrNull()?.let {
                     it.rx = rx
                     it.tx = tx
                     runOnDefaultDispatcher {
@@ -177,7 +177,7 @@ class TrafficLooper(
                 }
             }
 
-            data.proxy?.config?.trafficMap?.values?.forEach { entities ->
+            data.proxy?.safeConfig?.trafficMap?.values?.forEach { entities ->
                 entities.forEach { entity ->
                     if (entity.id in targetIds) {
                         entity.tx = 0L
@@ -237,7 +237,12 @@ class TrafficLooper(
                 delay(delayMs)
                 continue
             }
-            if (!proxy.isInitialized()) continue
+            // 核心還沒起（config/box 的 lateinit 未就緒）時必須睡著再回頭看：直接 continue
+            // 等於零間隔空轉，:bg 會被這圈滿速 CPU 喚醒（正是發熱來源之一）。
+            if (!proxy.isInitialized()) {
+                delay(delayMs)
+                continue
+            }
 
             if (trafficUpdater == null) {
                 if (!proxy.isInitialized()) {
