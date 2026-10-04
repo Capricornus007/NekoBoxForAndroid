@@ -1,0 +1,220 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        app:icon="@drawable/ic_social_emoji_symbols"
+        app:key="name"
+        app:title="@string/profile_name"
+        app:useSimpleSummaryProvider="true" />
+
+    <PreferenceCategory app:title="@string/proxy_cat">
+
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:defaultValue="auto"
+            app:entries="@array/masque_transport_value"
+            app:entryValues="@array/masque_transport_value"
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="transport"
+            app:title="@string/masque_transport"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="useIPv6"
+            app:title="@string/masque_use_ipv6" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="system"
+            app:title="@string/masque_system" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_layers_24"
+            app:key="interfaceName"
+            app:title="@string/masque_interface_name"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:dialogMessage="@string/masque_one_per_line"
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="allowedIPs"
+            app:title="@string/masque_allowed_ips"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/baseline_public_24"
+            app:key="mtu"
+            app:title="@string/mtu"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="masqueProfileCategory"
+        app:title="@string/masque_cat_profile">
+
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_person_24"
+            app:key="profileId"
+            app:title="@string/masque_profile_id"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:dialogLayout="@layout/layout_password_dialog"
+            app:icon="@drawable/ic_settings_password"
+            app:key="profileAuthToken"
+            app:title="@string/masque_profile_auth_token" />
+        <EditTextPreference
+            app:dialogLayout="@layout/layout_password_dialog"
+            app:icon="@drawable/ic_baseline_vpn_key_24"
+            app:key="profilePrivateKey"
+            app:title="@string/masque_profile_private_key" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_file_cloud_queue"
+            app:key="profileRecreate"
+            app:title="@string/masque_profile_recreate" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="profileDetour"
+            app:title="@string/masque_profile_detour"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="masqueConfigCategory"
+        app:title="@string/masque_cat_config">
+
+        <EditTextPreference
+            app:dialogLayout="@layout/layout_password_dialog"
+            app:icon="@drawable/ic_baseline_vpn_key_24"
+            app:key="configPrivateKey"
+            app:title="@string/masque_config_private_key" />
+        <EditTextPreference
+            app:icon="@drawable/ic_hardware_router"
+            app:key="configEndpointV4"
+            app:title="@string/masque_endpoint_v4"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_hardware_router"
+            app:key="configEndpointV6"
+            app:title="@string/masque_endpoint_v6"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_hardware_router"
+            app:key="configEndpointH2V4"
+            app:title="@string/masque_endpoint_h2_v4"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_hardware_router"
+            app:key="configEndpointH2V6"
+            app:title="@string/masque_endpoint_h2_v6"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_action_copyright"
+            app:key="configEndpointPubKey"
+            app:title="@string/masque_endpoint_pub_key"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_action_copyright"
+            app:key="configLicense"
+            app:title="@string/license"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_person_24"
+            app:key="configId"
+            app:title="@string/masque_config_id"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:dialogLayout="@layout/layout_password_dialog"
+            app:icon="@drawable/ic_settings_password"
+            app:key="configAccessToken"
+            app:title="@string/masque_access_token" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="configIPv4"
+            app:title="@string/masque_ipv4_address"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="configIPv6"
+            app:title="@string/masque_ipv6_address"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="masqueUdpCategory"
+        app:title="@string/masque_cat_udp">
+
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_timelapse_24"
+            app:key="udpTimeout"
+            app:title="@string/masque_udp_timeout"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_timelapse_24"
+            app:key="udpKeepalivePeriod"
+            app:title="@string/masque_udp_keepalive"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_layers_24"
+            app:key="udpInitialPacketSize"
+            app:title="@string/masque_initial_packet_size"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_notification_enhanced_encryption"
+            app:key="disablePathMTUDiscovery"
+            app:title="@string/hysteria_disable_mtu_discovery" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_timelapse_24"
+            app:key="h3FallbackTimeout"
+            app:title="@string/masque_h3_fallback_timeout"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_timelapse_24"
+            app:key="reconnectDelay"
+            app:title="@string/masque_reconnect_delay"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="masqueTlsCategory"
+        app:title="@string/security_settings">
+
+        <EditTextPreference
+            app:icon="@drawable/ic_action_copyright"
+            app:key="tlsSNI"
+            app:title="@string/sni"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_notification_enhanced_encryption"
+            app:key="tlsInsecure"
+            app:summary="@string/allow_insecure_sum"
+            app:title="@string/allow_insecure" />
+        <EditTextPreference
+            app:dialogMessage="@string/masque_one_per_line"
+            app:icon="@drawable/ic_baseline_shuffle_24"
+            app:key="tlsCipherSuites"
+            app:title="@string/masque_cipher_suites"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:dialogMessage="@string/masque_one_per_line"
+            app:icon="@drawable/ic_baseline_shuffle_24"
+            app:key="tlsCurvePreferences"
+            app:title="@string/masque_curve_preferences"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_shuffle_24"
+            app:key="tlsFragment"
+            app:title="@string/masque_fragment" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_timelapse_24"
+            app:key="tlsFragmentFallbackDelay"
+            app:title="@string/masque_fragment_fallback_delay"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_shuffle_24"
+            app:key="tlsRecordFragment"
+            app:title="@string/masque_record_fragment" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_action_settings"
+            app:key="tlsKernelTx"
+            app:title="@string/masque_kernel_tx" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_action_settings"
+            app:key="tlsKernelRx"
+            app:title="@string/masque_kernel_rx" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

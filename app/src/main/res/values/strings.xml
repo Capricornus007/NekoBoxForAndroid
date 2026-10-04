@@ -279,6 +279,7 @@
     <string name="action_juicity" translatable="false">Juicity</string>
     <string name="action_shadowquic" translatable="false">ShadowQUIC</string>
     <string name="action_trusttunnel" translatable="false">TrustTunnel</string>
+    <string name="action_masque" translatable="false">MASQUE</string>
     <string name="proxy_chain">Proxy Chain</string>
     <string name="custom_config">Custom Config</string>
     <string name="balancer">Balancer</string>
@@ -665,6 +666,42 @@
     <string name="trusttunnel_quic">QUIC (HTTP/3)</string>
     <string name="trusttunnel_health_check">Health Check</string>
     <string name="trusttunnel_congestion_control">QUIC Congestion Control</string>
+    <string name="masque_transport">Transport</string>
+    <string name="masque_interface_name">Interface Name</string>
+    <string name="masque_system">System Interface</string>
+    <string name="masque_use_ipv6">Use IPv6 Endpoint</string>
+    <string name="masque_allowed_ips">Allowed IPs</string>
+    <string name="masque_one_per_line">One per line.</string>
+    <string name="masque_cat_profile">Cloudflare Profile</string>
+    <string name="masque_profile_id">Profile ID</string>
+    <string name="masque_profile_auth_token">Auth Token</string>
+    <string name="masque_profile_private_key">Profile Private Key</string>
+    <string name="masque_profile_recreate">Recreate Profile</string>
+    <string name="masque_profile_detour">Registration Detour</string>
+    <string name="masque_cat_config">Endpoint Config</string>
+    <string name="masque_config_private_key">Config Private Key</string>
+    <string name="masque_endpoint_v4">Endpoint IPv4</string>
+    <string name="masque_endpoint_v6">Endpoint IPv6</string>
+    <string name="masque_endpoint_h2_v4">HTTP/2 Endpoint IPv4</string>
+    <string name="masque_endpoint_h2_v6">HTTP/2 Endpoint IPv6</string>
+    <string name="masque_endpoint_pub_key">Endpoint Public Key</string>
+    <string name="masque_config_id">Config ID</string>
+    <string name="masque_access_token">Access Token</string>
+    <string name="masque_ipv4_address">IPv4 Address</string>
+    <string name="masque_ipv6_address">IPv6 Address</string>
+    <string name="masque_cat_udp">UDP</string>
+    <string name="masque_udp_timeout">UDP Timeout</string>
+    <string name="masque_udp_keepalive">UDP Keepalive Period</string>
+    <string name="masque_initial_packet_size">Initial Packet Size</string>
+    <string name="masque_h3_fallback_timeout">HTTP/3 Fallback Timeout</string>
+    <string name="masque_reconnect_delay">Reconnect Delay</string>
+    <string name="masque_cipher_suites">Cipher Suites</string>
+    <string name="masque_curve_preferences">Curve Preferences</string>
+    <string name="masque_fragment">Fragment</string>
+    <string name="masque_fragment_fallback_delay">Fragment Fallback Delay</string>
+    <string name="masque_record_fragment">Record Fragment</string>
+    <string name="masque_kernel_tx" translatable="false">Kernel TX</string>
+    <string name="masque_kernel_rx" translatable="false">Kernel RX</string>
     <string name="tuic_disable_sni">Disable SNI</string>
     <string name="tuic_reduce_rtt">Enable 0-RTT QUIC handshake</string>
 

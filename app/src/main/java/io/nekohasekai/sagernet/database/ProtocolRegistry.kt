@@ -14,6 +14,7 @@ import io.nekohasekai.sagernet.fmt.internal.BalancerBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.juicity.toUri
+import io.nekohasekai.sagernet.fmt.masque.MasqueBean
 import io.nekohasekai.sagernet.fmt.masterdnsvpn.MasterDnsVpnBean
 import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.naive.NaiveBean
@@ -49,6 +50,7 @@ import moe.matsuri.nb4a.proxy.config.ConfigSettingActivity
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSBean
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSSettingsActivity
 import io.nekohasekai.sagernet.fmt.byedpi.toUri as toByeDpiUri
+import io.nekohasekai.sagernet.fmt.masque.toUri as toMasqueUri
 import io.nekohasekai.sagernet.fmt.masterdnsvpn.toUri as toMasterDnsVpnUri
 import io.nekohasekai.sagernet.fmt.olcrtc.toUri as toOlcrtcUri
 import io.nekohasekai.sagernet.fmt.shadowquic.toUri as toShadowQuicUri
@@ -261,6 +263,16 @@ object ProtocolRegistry {
             displayType = { "TrustTunnel" },
             settingsActivityClass = TrustTunnelSettingsActivity::class.java,
             toStandardLink = { (it as TrustTunnelBean).toTrustTunnelUri() },
+        ),
+        ProtocolDescriptor(
+            type = ProxyEntity.TYPE_MASQUE,
+            deserialize = { KryoConverters.masqueDeserialize(it) },
+            beanClass = MasqueBean::class.java,
+            getBean = { it.masqueBean },
+            setBean = { e, b -> e.masqueBean = b as MasqueBean? },
+            displayType = { "MASQUE" },
+            settingsActivityClass = MasqueSettingsActivity::class.java,
+            toStandardLink = { (it as MasqueBean).toMasqueUri() },
         ),
         ProtocolDescriptor(
             type = ProxyEntity.TYPE_SHADOWTLS,

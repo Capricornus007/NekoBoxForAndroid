@@ -14,6 +14,7 @@ import io.nekohasekai.sagernet.fmt.hysteria.*
 import io.nekohasekai.sagernet.fmt.internal.BalancerBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
+import io.nekohasekai.sagernet.fmt.masque.MasqueBean
 import io.nekohasekai.sagernet.fmt.masterdnsvpn.MasterDnsVpnBean
 import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.mieru.buildMieruConfig
@@ -101,6 +102,7 @@ data class ProxyEntity(
     var juicityBean: JuicityBean? = null,
     var shadowQuicBean: ShadowQUICBean? = null,
     var trustTunnelBean: TrustTunnelBean? = null,
+    @ColumnInfo(defaultValue = "NULL") var masqueBean: MasqueBean? = null,
     var sshBean: SSHBean? = null,
     var wgBean: WireGuardBean? = null,
     var shadowTLSBean: ShadowTLSBean? = null,
@@ -157,6 +159,9 @@ data class ProxyEntity(
 
         // Tailscale endpoint profile（hawkff #175 移植；本地 28 已被 TYPE_WATERFALL 佔用，改用 34）
         const val TYPE_TAILSCALE = 34
+
+        // MASQUE / Cloudflare WARP endpoint（option/masque.go）。35 為目前最後一個未佔用的 id。
+        const val TYPE_MASQUE = 35
 
         const val TYPE_CONFIG = 998
 
@@ -262,6 +267,7 @@ data class ProxyEntity(
                 TYPE_JUICITY -> juicityBean = KryoConverters.juicityDeserialize(byteArray)
                 TYPE_SHADOWQUIC -> shadowQuicBean = KryoConverters.shadowQuicDeserialize(byteArray)
                 TYPE_TRUSTTUNNEL -> trustTunnelBean = KryoConverters.trustTunnelDeserialize(byteArray)
+                TYPE_MASQUE -> masqueBean = KryoConverters.masqueDeserialize(byteArray)
                 TYPE_SHADOWTLS -> shadowTLSBean = KryoConverters.shadowTLSDeserialize(byteArray)
                 TYPE_ANYTLS -> anyTLSBean = KryoConverters.anyTLSDeserialize(byteArray)
                 TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST -> chainBean = KryoConverters.chainDeserialize(byteArray)
@@ -289,6 +295,7 @@ data class ProxyEntity(
             TYPE_JUICITY -> "Juicity"
             TYPE_SHADOWQUIC -> "ShadowQUIC"
             TYPE_TRUSTTUNNEL -> "TrustTunnel"
+            TYPE_MASQUE -> "MASQUE"
             TYPE_SHADOWTLS -> "ShadowTLS"
             TYPE_ANYTLS -> "AnyTLS"
             TYPE_CHAIN -> chainName
@@ -325,6 +332,7 @@ data class ProxyEntity(
             TYPE_JUICITY -> juicityBean
             TYPE_SHADOWQUIC -> shadowQuicBean
             TYPE_TRUSTTUNNEL -> trustTunnelBean
+            TYPE_MASQUE -> masqueBean
             TYPE_SHADOWTLS -> shadowTLSBean
             TYPE_ANYTLS -> anyTLSBean
             TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST -> chainBean
@@ -499,6 +507,7 @@ data class ProxyEntity(
         juicityBean = null
         shadowQuicBean = null
         trustTunnelBean = null
+        masqueBean = null
         shadowTLSBean = null
         anyTLSBean = null
         chainBean = null
@@ -618,6 +627,11 @@ data class ProxyEntity(
             is TrustTunnelBean -> {
                 type = TYPE_TRUSTTUNNEL
                 trustTunnelBean = bean
+            }
+
+            is MasqueBean -> {
+                type = TYPE_MASQUE
+                masqueBean = bean
             }
 
             is OlcrtcBean -> {

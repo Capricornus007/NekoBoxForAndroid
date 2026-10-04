@@ -6,6 +6,7 @@ import io.nekohasekai.sagernet.database.ProxyGroup
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
+import io.nekohasekai.sagernet.fmt.masque.MasqueBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
@@ -352,6 +353,104 @@ class ConfigBuilderGoldenTest {
         val directRuleIndex = rules.indexOfFirst { it.optString("server") == "dns-direct" }
         assertTrue(directRuleIndex >= 0)
         assertTrue(rules.indexOf(hostsRule) > directRuleIndex)
+    }
+
+    @Test
+    fun masqueForTest_emitsSingBoxJsonTags() {
+        val profile = addProfile(
+            addGroup(),
+            MasqueBean().apply {
+                initializeDefaultValues()
+                name = "golden-masque"
+                transport = "h2"
+                useIPv6 = true
+                system = true
+                interfaceName = "warp0"
+                allowedIPs = "0.0.0.0/0, ::/0"
+                profileId = "cf-id"
+                profileAuthToken = "cf-token"
+                profilePrivateKey = "cf-pk"
+                profileRecreate = false
+                configPrivateKey = "cfgpk"
+                configEndpointV4 = "162.159.193.10"
+                configEndpointV6 = "2603:2e0::1"
+                configEndpointH2V4 = "188.114.96.0"
+                configEndpointH2V6 = "2a06:98c0:3000::"
+                configEndpointPubKey = "PUBKEYPEM"
+                configLicense = "lic"
+                configId = "dev"
+                configAccessToken = "at"
+                configIPv4 = "10.0.0.2"
+                configIPv6 = "fd00::2"
+                udpTimeout = "3m0s"
+                udpKeepalivePeriod = "25s"
+                udpInitialPacketSize = 1252
+                disablePathMTUDiscovery = true
+                h3FallbackTimeout = "7s"
+                mtu = 1420
+                reconnectDelay = "8s"
+                tlsSNI = "custom.example"
+                tlsInsecure = true
+                tlsCipherSuites = "TLS_AES_128_GCM_SHA256,TLS_CHACHA20_POLY1305_SHA256"
+                tlsCurvePreferences = "X25519,P256"
+                tlsFragment = true
+                tlsFragmentFallbackDelay = "2s"
+                tlsRecordFragment = true
+                tlsKernelTx = true
+                tlsKernelRx = true
+            },
+        )
+
+        val outbound = outbound(JSONObject(build(profile, forTest = true).config), "masque")
+
+        // Top-level outbound keys must match option/masque.go json tags.
+        for (key in listOf(
+            "system", "name", "allowed_ips", "use_http2", "transport", "use_ipv6",
+            "profile", "config", "udp_timeout", "udp_keepalive_period",
+            "udp_initial_packet_size", "disable_path_mtu_discovery", "h3_fallback_timeout",
+            "mtu", "reconnect_delay", "tls",
+        )) {
+            assertTrue("missing outbound key: $key", outbound.has(key))
+        }
+        assertEquals("h2", outbound.getString("transport"))
+        assertTrue(outbound.getBoolean("use_http2"))
+        assertTrue(outbound.getBoolean("use_ipv6"))
+        assertTrue(outbound.getBoolean("system"))
+        assertEquals("warp0", outbound.getString("name"))
+        assertEquals(1420, outbound.getInt("mtu"))
+        assertEquals(1252, outbound.getInt("udp_initial_packet_size"))
+        assertEquals(
+            setOf("0.0.0.0/0", "::/0"),
+            (0 until outbound.getJSONArray("allowed_ips").length())
+                .map { outbound.getJSONArray("allowed_ips").getString(it) }.toSet(),
+        )
+
+        val cloudflareProfile = outbound.getJSONObject("profile")
+        for (key in listOf("id", "auth_token", "private_key", "recreate")) {
+            assertTrue("missing profile key: $key", cloudflareProfile.has(key))
+        }
+        assertEquals("cf-id", cloudflareProfile.getString("id"))
+
+        val config = outbound.getJSONObject("config")
+        for (key in listOf(
+            "private_key", "endpoint_v4", "endpoint_v6", "endpoint_h2_v4", "endpoint_h2_v6",
+            "endpoint_pub_key", "license", "id", "access_token", "ipv4", "ipv6",
+        )) {
+            assertTrue("missing config key: $key", config.has(key))
+        }
+        assertEquals("162.159.193.10", config.getString("endpoint_v4"))
+
+        val tls = outbound.getJSONObject("tls")
+        for (key in listOf(
+            "insecure", "cipher_suites", "curve_preferences", "fragment",
+            "fragment_fallback_delay", "record_fragment", "kernel_tx", "kernel_rx", "sni",
+        )) {
+            assertTrue("missing tls key: $key", tls.has(key))
+        }
+        assertEquals("custom.example", tls.getString("sni"))
+        assertTrue(tls.getBoolean("insecure"))
+
+        assertResultMaps(result = build(profile, forTest = true), profile = profile)
     }
 
     private fun addGroup(isSelector: Boolean = false) = ConfigBuilderTestEnv.io {

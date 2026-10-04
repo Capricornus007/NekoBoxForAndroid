@@ -8,6 +8,7 @@ import io.nekohasekai.sagernet.fmt.http.parseHttp
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria1
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria2
 import io.nekohasekai.sagernet.fmt.juicity.parseJuicity
+import io.nekohasekai.sagernet.fmt.masque.parseMasque
 import io.nekohasekai.sagernet.fmt.masterdnsvpn.parseMasterDnsVpn
 import io.nekohasekai.sagernet.fmt.naive.parseNaive
 import io.nekohasekai.sagernet.fmt.olcrtc.parseOlcrtc
@@ -327,6 +328,13 @@ suspend fun parseProxies(text: String, subscription: Boolean = false): List<Abst
                 entities.addAll(parseTrustTunnel(this))
             }.onFailure {
                 Logs.w("TrustTunnel parser rejected input")
+            }
+        } else if (startsWith("masque://")) {
+            Logs.d("Trying MASQUE parser")
+            runCatching {
+                entities.add(parseMasque(this))
+            }.onFailure {
+                Logs.w("MASQUE parser rejected input")
             }
         } else if (startsWith("snell://")) {
             Logs.d("Trying Snell parser")

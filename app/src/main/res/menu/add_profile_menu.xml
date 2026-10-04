@@ -70,6 +70,9 @@
                         android:id="@+id/action_new_trusttunnel"
                         android:title="@string/action_trusttunnel" />
                     <item
+                        android:id="@+id/action_new_masque"
+                        android:title="@string/action_masque" />
+                    <item
                         android:id="@+id/action_new_shadowtls"
                         android:title="@string/action_shadowtls" />
                     <item

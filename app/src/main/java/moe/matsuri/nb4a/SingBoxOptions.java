@@ -4856,6 +4856,133 @@ public class SingBoxOptions {
 
     }
 
+    public static class CloudflareProfile extends SingBoxOption {
+
+        public String id;
+
+        public String auth_token;
+
+        public String private_key;
+
+        public Boolean recreate;
+
+        public String detour;
+
+    }
+
+    public static class MASQUEConfig extends SingBoxOption {
+
+        public String private_key;
+
+        public String endpoint_v4;
+
+        public String endpoint_v6;
+
+        public String endpoint_h2_v4;
+
+        public String endpoint_h2_v6;
+
+        public String endpoint_pub_key;
+
+        public String license;
+
+        public String id;
+
+        public String access_token;
+
+        public String ipv4;
+
+        public String ipv6;
+
+    }
+
+    public static class MASQUEOutboundTLSOptions extends SingBoxOption {
+
+        public Boolean insecure;
+
+        public java.util.List<String> cipher_suites;
+
+        public java.util.List<String> curve_preferences;
+
+        public Boolean fragment;
+
+        public String fragment_fallback_delay;
+
+        public Boolean record_fragment;
+
+        public Boolean kernel_tx;
+
+        public Boolean kernel_rx;
+
+        public String sni;
+
+    }
+
+    public static class Outbound_MASQUEOptions extends Outbound {
+
+        // Generate note: nested type DialerOptions
+        public String detour;
+
+        public String bind_interface;
+
+        public String inet4_bind_address;
+
+        public String inet6_bind_address;
+
+        public String protect_path;
+
+        public Integer routing_mark;
+
+        public Boolean reuse_addr;
+
+        public Long connect_timeout;
+
+        public Boolean tcp_fast_open;
+
+        public Boolean tcp_multi_path;
+
+        public Boolean udp_fragment;
+
+        public String domain_strategy;
+
+        public Long fallback_delay;
+
+        // End of public DialerOptions ;
+
+        public Boolean system;
+
+        public String name;
+
+        public java.util.List<String> allowed_ips;
+
+        public Boolean use_http2;
+
+        public String transport;
+
+        public Boolean use_ipv6;
+
+        public CloudflareProfile profile;
+
+        public MASQUEConfig config;
+
+        public String udp_timeout;
+
+        public String udp_keepalive_period;
+
+        public Integer udp_initial_packet_size;
+
+        public Boolean disable_path_mtu_discovery;
+
+        public String h3_fallback_timeout;
+
+        public Integer mtu;
+
+        public String reconnect_delay;
+
+        public MASQUEOutboundTLSOptions tls;
+
+    }
+
     public static class Outbound_TrustTunnelOptions extends Outbound {
 
         // Generate note: nested type DialerOptions

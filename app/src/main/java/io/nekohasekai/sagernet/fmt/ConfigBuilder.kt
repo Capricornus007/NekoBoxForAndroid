@@ -25,6 +25,8 @@ import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.internal.FastestCandidateResolver
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.juicity.buildSingBoxOutboundJuicityBean
+import io.nekohasekai.sagernet.fmt.masque.MasqueBean
+import io.nekohasekai.sagernet.fmt.masque.buildSingBoxOutboundMasqueBean
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowquic.buildSingBoxOutboundShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
@@ -927,6 +929,17 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
                         is TrustTunnelBean ->
                             buildSingBoxOutboundTrustTunnelBean(bean)
+
+                        is MasqueBean -> {
+                            // profile.detour routes the Cloudflare registration call through an
+                            // already-built outbound. Reuse its tag if this chain/group has one;
+                            // otherwise leave it unset (direct registration). No recursive build:
+                            // the referenced profile is only reachable when already present.
+                            val detourTag = bean.profileDetour?.toLongOrNull()
+                                ?.takeIf { it > 0L && it != proxyEntity.id }
+                                ?.let { id -> tagMap[id] ?: globalOutbounds[id] }
+                            buildSingBoxOutboundMasqueBean(bean, detourTag)
+                        }
 
                         is SOCKSBean ->
                             buildSingBoxOutboundSocksBean(bean)

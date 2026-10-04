@@ -853,5 +853,10 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+    <string-array name="masque_transport_value" translatable="false">
+        <item>auto</item>
+        <item>h3</item>
+        <item>h2</item>
+    </string-array>
 
 </resources>

@@ -17,7 +17,7 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 19,
+    version = 20,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
@@ -190,6 +190,17 @@ abstract class SagerDatabase : RoomDatabase() {
         }
     }
 
+    /**
+     * Version 20: additive `masqueBean` column on proxy_entities for the MASQUE / Cloudflare WARP
+     * endpoint profile (option/masque.go). Matches the @ColumnInfo(defaultValue = "NULL") on the
+     * entity field, same as Migration17To18/Migration18To19.
+     */
+    object Migration19To20 : Migration(19, 20) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `proxy_entities` ADD COLUMN `masqueBean` BLOB DEFAULT NULL")
+        }
+    }
+
     companion object {
         val instance by lazy {
             SagerNet.application.getDatabasePath(Key.DB_PROFILE).parentFile?.mkdirs()
@@ -203,7 +214,14 @@ abstract class SagerDatabase : RoomDatabase() {
             )
             Room.databaseBuilder(SagerNet.application, SagerDatabase::class.java, Key.DB_PROFILE)
                 .setJournalMode(JournalMode.TRUNCATE)
-                .addMigrations(Migration13To14, Migration14To15, Migration16To17, Migration17To18, Migration18To19)
+                .addMigrations(
+                    Migration13To14,
+                    Migration14To15,
+                    Migration16To17,
+                    Migration17To18,
+                    Migration18To19,
+                    Migration19To20,
+                )
                 // Plan 027 Stage 3: the main-thread-DB allowance is behind a build flag so it can
                 // be removed once the app runs StrictMode-clean (debug already ships with it off).
                 .apply { if (BuildConfig.ALLOW_MAIN_THREAD_DB) allowMainThreadQueries() }
