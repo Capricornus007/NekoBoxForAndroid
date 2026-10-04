@@ -214,14 +214,14 @@ class SagerNet : Application(),
 
         fun updateNotificationChannels() {
             if (Build.VERSION.SDK_INT >= 26) @RequiresApi(26) {
+                runCatching { notification.deleteNotificationChannel("service-vpn") }
                 notification.createNotificationChannels(
                     listOf(
                         NotificationChannel(
-                            "service-vpn",
+                            "service-vpn-v2",
                             application.getText(R.string.service_vpn),
-                            if (Build.VERSION.SDK_INT >= 28) NotificationManager.IMPORTANCE_MIN
-                            else NotificationManager.IMPORTANCE_LOW
-                        ),   // #1355
+                            NotificationManager.IMPORTANCE_LOW
+                        ),
                         NotificationChannel(
                             "service-proxy",
                             application.getText(R.string.service_proxy),

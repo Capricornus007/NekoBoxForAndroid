@@ -143,6 +143,8 @@ class ServiceNotification(
         .setSmallIcon(R.drawable.ic_throne_tile)
         .setCategory(NotificationCompat.CATEGORY_SERVICE)
         .setPriority(if (visible) NotificationCompat.PRIORITY_LOW else NotificationCompat.PRIORITY_MIN)
+        .setOngoing(true)
+        .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
 
     private val buildLock = Mutex()
 
