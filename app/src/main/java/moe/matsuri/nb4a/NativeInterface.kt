@@ -63,18 +63,28 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
     }
 
+    // own f1ac98919：部分 ROM（MIUI 等）在連線已結束／無權限查證時會直接從這個 binder 回調拋
+    // SecurityException／IllegalState，原本會一路頂進核心的路由層。查不到就回 -1（未知擁有者），
+    // 由呼叫端優雅降級，不把「查不到」升級成崩潰。
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun findConnectionOwner(ipProto: Int, srcIp: String, srcPort: Int, destIp: String, destPort: Int): Int {
-        return SagerNet.connectivity.getConnectionOwnerUid(
-            ipProto,
-            InetSocketAddress(srcIp, srcPort),
-            InetSocketAddress(destIp, destPort),
-        )
+        return try {
+            SagerNet.connectivity.getConnectionOwnerUid(
+                ipProto,
+                InetSocketAddress(srcIp, srcPort),
+                InetSocketAddress(destIp, destPort),
+            )
+        } catch (_: Throwable) {
+            -1
+        }
     }
 
     override fun packageNameByUid(uid: Int): String {
         PackageCache.awaitLoadSync()
 
+        if (uid < 0) {
+            return ""
+        }
         if (uid <= 1000L) {
             return "android"
         }
@@ -86,12 +96,27 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
             }
         }
 
-        error("unknown uid $uid")
+        return try {
+            SagerNet.application.packageManager.getPackagesForUid(uid)?.firstOrNull() ?: ""
+        } catch (e: Throwable) {
+            ""
+        }
     }
 
     override fun uidByPackageName(packageName: String): Int {
         PackageCache.awaitLoadSync()
-        return PackageCache[packageName] ?: 0
+        val cached = PackageCache[packageName]
+        if (cached != null) return cached
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                SagerNet.application.packageManager.getPackageUid(packageName, 0)
+            } else {
+                @Suppress("DEPRECATION")
+                SagerNet.application.packageManager.getApplicationInfo(packageName, 0).uid
+            }
+        } catch (e: Throwable) {
+            -1
+        }
     }
 
     // TODO: 'getter for connectionInfo: WifiInfo!' is deprecated

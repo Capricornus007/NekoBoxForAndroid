@@ -468,6 +468,7 @@
     <string name="hide_from_recent_apps">從最近任務中隱藏</string>
     <string name="hide_from_recent_apps_summary">在背景運行時從最近任務中隱藏應用</string>
     <string name="action_switch">切換</string>
+    <string name="action_reset">重設</string>
     <string name="custom_rules_provider">自訂</string>
     <string name="rules_geosite_url">geosite 網址</string>
     <string name="rules_geoip_url">geoip 網址</string>

@@ -1306,9 +1306,19 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         ).show()
                     }
                 }
-                val uidList = rule.packages.map {
+                // own f1ac98919：分應用規則勾了 Google Play 商店時，實際拉封包的是系統下載管理器與
+                // GMS，一併納進套件清單，否則 Play 的下載連線進不了這條規則的隧道（卡在 0%）。
+                // 與 VpnService 白名單那側補的同一組套件對齊。
+                val effectivePackages = rule.packages.toMutableSet()
+                if (effectivePackages.contains("com.android.vending")) {
+                    effectivePackages.add("com.android.providers.downloads")
+                    effectivePackages.add("com.android.providers.downloads.ui")
+                    effectivePackages.add("com.xiaomi.providers.downloads")
+                    effectivePackages.add("com.google.android.gms")
+                }
+                val uidList = effectivePackages.mapNotNull {
                     PackageCache[it]?.takeIf { uid -> uid >= 1000 }
-                }.toHashSet().filterNotNull()
+                }.toHashSet().toList()
                 val ruleSets = mutableListOf<RuleSet>()
 
                 val ruleObj = Rule_DefaultOptions().apply {

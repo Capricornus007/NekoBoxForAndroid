@@ -27,6 +27,8 @@ import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.ui.SwitchActivity
+import io.nekohasekai.sagernet.utils.LandingIpManager
+import io.nekohasekai.sagernet.utils.RegionExtractor
 import io.nekohasekai.sagernet.utils.Theme
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -158,7 +160,7 @@ class ServiceNotification(
 
         Theme.apply(app)
         Theme.apply(service)
-        builder.color = service.getColorAttr(R.attr.colorPrimary)
+        applyLiveUpdateCapsule(builder, service.data.state)
 
         // startForegroundService() has a strict deadline. Promote synchronously before receiver
         // registration, coroutine scheduling, database refreshes, or proxy initialization.
@@ -209,7 +211,8 @@ class ServiceNotification(
 
             val resetUpstreamAction = NotificationCompat.Action.Builder(
                 0,
-                service.getString(R.string.reset_connections),
+                // own 0690f1333：通知欄按鈕只有一格寬，「重設上游連線」會被截斷，改短詞（規則 37）。
+                service.getString(R.string.action_reset),
                 PendingIntent.getBroadcast(
                     service,
                     2,
@@ -265,6 +268,13 @@ class ServiceNotification(
         } else {
             (service as Service).stopForeground(true)
         }
-        service.unregisterReceiver(this)
+        // own 618f7b169 在這裡還多補了兩刀 NotificationManager.cancel(notificationId)，我方不收：
+        // 那是要清掉 Android 16 promoted 實況膠囊（我方沒有），而 stopForeground(REMOVE) 本來就移除了
+        // 前台通知；多那一刀會在「舊執行緒延後跑 destroy、新連線已貼上通知」時誤殺新通知。
+        // 收到的只有守衛：teardown 路徑可能重入 destroy()，未註冊／重複註銷廣播會拋 IllegalArgumentException。
+        try {
+            (service as Context).unregisterReceiver(this)
+        } catch (_: Throwable) {
+        }
     }
 }

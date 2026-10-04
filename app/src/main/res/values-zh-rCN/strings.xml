@@ -464,6 +464,7 @@
     <string name="backup_import">导入</string>
     <string name="backup_import_summary">导入将覆盖现有数据。</string>
     <string name="backup_importing">正在导入…</string>
+    <string name="action_reset">重置</string>
     <string name="packet_encoding">数据包编码</string>
     <string name="acquire_wake_lock">获取 WakeLock</string>
     <string name="acquire_wake_lock_summary">保持 CPU 唤醒</string>
