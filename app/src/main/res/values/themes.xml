@@ -259,6 +259,13 @@
         <item name="android:colorBackground">@color/md3_surface</item>
     </style>
 
+    <style name="ThemeOverlay.SagerNet.Toolbar.Black" parent="ThemeOverlay.MaterialComponents.Toolbar.Surface">
+        <item name="colorControlNormal">@color/white</item>
+        <item name="actionMenuTextColor">@color/white</item>
+        <item name="colorSurface">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+    </style>
+
     <style name="Widget.SagerNet.TabLayout" parent="Widget.MaterialComponents.TabLayout">
         <item name="tabTextAppearance">@style/Widget.SagerNet.TabLayout.TextAppearance</item>
         <item name="tabTextColor">?attr/tabTextColor</item>
@@ -716,6 +723,7 @@
         <item name="accentOrTextPrimary">@color/white</item>
         <item name="accentOrTextSecondary">@color/color_black_theme_text_secondary</item>
         <item name="whiteOrTextPrimary">@color/white</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.SagerNet.Toolbar.Black</item>
         <item name="appBarLayoutStyle">@style/Widget.SagerNet.AppBarLayout.Black</item>
     </style>
 

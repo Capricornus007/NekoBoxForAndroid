@@ -125,6 +125,7 @@ class ColorPickerPreference @JvmOverloads constructor(
         fun applyTheme(themeId: Int) {
             persistInt(themeId)
             DataStore.appTheme = themeId
+            Theme.applyNightTheme()
             dialog.dismiss()
             callChangeListener(themeId)
             (context as? Activity)?.let {

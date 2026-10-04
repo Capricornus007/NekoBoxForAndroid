@@ -63,8 +63,8 @@ abstract class ThemedActivity : AppCompatActivity {
             WindowCompat.setDecorFitsSystemWindows(window, false)
 
             val insetController = WindowCompat.getInsetsController(window, window.decorView)
-            val surfaceColor = getColorAttr(R.attr.colorSurface)
-            val isLightSurface = ColorUtils.calculateLuminance(surfaceColor) > 0.45
+            val isDark = Theme.isBlackTheme(this)
+            val isLightSurface = !isDark && ColorUtils.calculateLuminance(getColorAttr(R.attr.colorSurface)) > 0.45
 
             insetController.isAppearanceLightStatusBars = isLightSurface
             insetController.isAppearanceLightNavigationBars = isLightSurface

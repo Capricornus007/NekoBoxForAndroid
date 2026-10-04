@@ -151,18 +151,23 @@ object Theme {
         }
     }
 
-    fun isWhiteTheme(): Boolean = DataStore.appTheme == WHITE
-    fun isLightGrayTheme(): Boolean = DataStore.appTheme == LIGHT_GRAY
-    fun isBlackTheme(): Boolean = DataStore.appTheme == BLACK
+    fun isSystemNight(context: Context = app): Boolean {
+        val res = (context as? android.app.Activity)?.resources ?: context.resources ?: app.resources
+        return (res.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+    }
+
+    fun isWhiteTheme(context: Context = app): Boolean = !usingNightMode(context) && DataStore.appTheme == WHITE
+    fun isLightGrayTheme(context: Context = app): Boolean = !usingNightMode(context) && DataStore.appTheme == LIGHT_GRAY
+    fun isBlackTheme(context: Context = app): Boolean = usingNightMode(context) || DataStore.appTheme == BLACK
 
     fun getPrimaryColor(context: Context): Int {
-        if (usingNightMode(context) || isBlackTheme()) {
+        if (usingNightMode(context) || isBlackTheme(context)) {
             return Color.WHITE
         }
-        if (isWhiteTheme()) {
+        if (isWhiteTheme(context)) {
             return Color.parseColor("#212121")
         }
-        if (isLightGrayTheme()) {
+        if (isLightGrayTheme(context)) {
             return Color.parseColor("#1F2937")
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.useSystemTheme) {
@@ -192,23 +197,23 @@ object Theme {
     }
 
     fun usingNightMode(context: Context = app): Boolean {
-        if (isBlackTheme()) return true
         return when (DataStore.nightTheme) {
             1 -> true
             2 -> false
-            else -> {
-                val res = (context as? android.app.Activity)?.resources ?: context.resources ?: app.resources
-                (res.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-            }
+            else -> isSystemNight(context)
         }
     }
 
     fun applyNightTheme() {
-        if (isBlackTheme()) {
+        if (DataStore.nightTheme == 0) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        } else if (DataStore.nightTheme == 1 || isBlackTheme()) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            return
+        } else if (DataStore.nightTheme == 2) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
-        AppCompatDelegate.setDefaultNightMode(getNightMode())
     }
 
 }

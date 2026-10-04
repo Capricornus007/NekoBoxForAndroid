@@ -86,18 +86,13 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat(), OnPreferenceDataS
 
         val iconColor = Theme.getPrimaryColor(requireContext())
         tintPreferenceIcons(preferenceScreen, iconColor)
-
-        findPreference<Preference>("changeIcon")?.setOnPreferenceClickListener {
-            AppIconDialog.show(requireContext())
-            true
-        }
-
         val categoryUI = findPreference<ExpandablePreferenceCategory>("categoryUI")
         val appTheme = findPreference<ColorPickerPreference>(Key.APP_THEME)!!
         appTheme.isEnabled = true
 
         appTheme.setOnPreferenceChangeListener { _, newValue ->
             DataStore.appTheme = (newValue as Number).toInt()
+            Theme.applyNightTheme()
             activity?.recreate()
             true
         }
