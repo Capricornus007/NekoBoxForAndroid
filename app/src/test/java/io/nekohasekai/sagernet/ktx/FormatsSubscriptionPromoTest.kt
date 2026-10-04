@@ -142,13 +142,86 @@ class FormatsSubscriptionPromoTest {
         assertNull(promoNamePattern(""))
     }
 
+    // 名稱關鍵字過濾最大的誤傷風險是「不限流量」這種真節點標籤：舊的寬鬆規則（流量即算用量行）
+    // 會把它刪掉。收紧後 `流量` 一定要搭配 `剩余／已用／重置／套餐` 才判，這裡釘住邊界。
     @Test
-    fun promoNamedNodeIsObservedButNotDropped() = runTest {
-        // remark 帶 promo 文字的連結仍是合法節點：只能記一筆觀測，不能刪。
+    fun promoNamePatternDoesNotDropUnlimitedTrafficNode() {
+        assertNull("不限流量是真節點標籤，不得誤判成用量行", promoNamePattern("🇯🇵日本01 不限流量"))
+        assertNull(promoNamePattern("流量不限量 高速"))
+        // 但要擋掉真正的用量狀態行。
+        assertEquals("quota-info", promoNamePattern("剩余流量：20 GB"))
+        assertEquals("quota-info", promoNamePattern("已用流量 300G"))
+    }
+
+    // fakeSubscriptionNode 的另一條腿：解析成功卻沒有端點。必須在 initializeDefaultValues
+    // （會補 127.0.0.1:1080）之前判，所以這裡直接對純函式斷言，不經過 parseProxies。
+    @Test
+    fun fakeNodePredicateFlagsMissingEndpointAndName() {
+        val noEndpoint = SOCKSBean().apply {
+            serverAddress = ""
+            name = "正常名字"
+        }
+        assertEquals("no-endpoint", fakeSubscriptionNode(noEndpoint))
+
+        val promoNamed = SOCKSBean().apply {
+            serverAddress = "192.0.2.8"
+            serverPort = 1080
+            name = "客服👉 官网入口"
+        }
+        assertEquals("support-site", fakeSubscriptionNode(promoNamed))
+
+        val realNode = SOCKSBean().apply {
+            serverAddress = "192.0.2.8"
+            serverPort = 1080
+            name = "🇯🇵日本01 不限流量"
+        }
+        assertNull(fakeSubscriptionNode(realNode))
+    }
+
+    @Test
+    fun promoNamedNodeIsFilteredOutInSubscription() = runTest {
+        // 呆帳本體：面板把官網／客服文字塞進 remark，它仍是「能解析」的連結，之前的證據閘門
+        // 擋不到。現在訂閱路徑要把它剔掉，不得入庫。
         val link = "socks://reader:password@192.0.2.8:1080#客服👉 官网入口"
         val beans = parseProxies(link, subscription = true)
 
+        assertTrue("客服／官網資訊行不得入庫", beans.isEmpty())
+        // 攔截要留下可計數的痕跡（原因×次數），且不得把名稱寫進日誌。
+        val output = capturedLogs.joinToString("\n")
+        assertTrue(output.contains("promo guard: skipped"))
+        assertTrue(output.contains("support-site"))
+        assertFalse("節點名稱不得進日誌", output.contains("客服"))
+        assertFalse(output.contains("192.0.2.8"))
+    }
+
+    @Test
+    fun realNodeSurvivesAlongsidePromoRow() = runTest {
+        val real = "socks://reader:password@192.0.2.8:1080#🇯🇵日本01 不限流量"
+        val promo = "socks://reader:password@192.0.2.9:1080#套餐到期：2026-10-27"
+        val beans = parseProxies("$real\n$promo", subscription = true)
+
         assertEquals(1, beans.size)
-        assertTrue(capturedLogs.joinToString("\n").contains("look like panel info text"))
+        assertEquals("🇯🇵日本01 不限流量", beans.single().displayName())
+        assertTrue(capturedLogs.joinToString("\n").contains("quota-info"))
+    }
+
+    @Test
+    fun manualPasteStillKeepsPromoNamedNode() = runTest {
+        // 回歸鎖：閘門只准裝在訂閱解析路徑，手動貼連結時那顆「客服」節點照舊全收。
+        val link = "socks://reader:password@192.0.2.8:1080#客服👉 官网入口"
+        val beans = parseProxies(link)
+
+        assertEquals(1, beans.size)
+        assertTrue(beans.single() is SOCKSBean)
+    }
+
+    @Test
+    fun urlInNameRowIsFilteredOut() = runTest {
+        // 名稱裡直接夹了完整網址（無空格，兩份掃描都拿得到整段）→ url-in-name。
+        val beans = parseProxies(
+            "socks://reader:password@192.0.2.8:1080#进群https://t.me/xxx",
+            subscription = true,
+        )
+        assertTrue("名稱夹了網址的促銷行不得入庫", beans.isEmpty())
     }
 }

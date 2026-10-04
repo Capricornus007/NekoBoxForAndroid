@@ -153,21 +153,63 @@ internal fun hasHttpProxyEvidence(link: String): Boolean {
     return !httpUrl.encodedQuery.isNullOrEmpty()
 }
 
-// 只觀測、不刪。面板還有另一種做法：把官網／客服文字塞進節點 remark（`客服👉 - https://…`
-// 那種），它不是 http 連結，上面的證據閘門擋不到。留一行可計數的痕跡，下次真出現時能拿到
-// 實際形狀而不是靠回憶猜。名稱本身不寫進日誌——訂閱內容不得入日誌。
+/**
+ * 一行文字是不是「面板塞進訂閱的狀態／宣傳行」而非真節點名稱。只在訂閱解析用作過濾依據，
+ * 所以走**高precision**：每個類別都要有明確的結構特徵，實測真節點名稱不得命中。
+ *
+ * 關鍵取捨：良心云這種面板會把 `套餐到期：…`／`剩余流量：… GB`／`客服👉 官网入口`
+ * 做成**能解析、甚至會回應**的条目（用戶實測延遲 1024–1640ms），結構欄位查不出問題，只能靠名稱。
+ * 為不误傷 `日本01 不限流量` 這種真節點，`流量` 一律要求再帶 `剩余／已用／重置／套餐`
+ * 才算資訊行；`到期／过期／剩余／重置／套餐` 本身幾乎不會出現在真節點名裡，可獨立判定。
+ *
+ * 回傳原因字串（供計數回報），非資訊行回傳 null。名稱本身不寫進日誌——訂閱內容不得入日誌。
+ */
 internal fun promoNamePattern(name: String): String? {
     if (name.isEmpty()) return null
-    return when {
-        name.contains("://") -> "url-in-name"
-        name.contains("客服") || name.contains("官網") || name.contains("官网") -> "support-site"
-        name.contains("到期") || name.contains("流量") -> "quota-info"
-        name.contains(
-            "訂閱",
-        ) || name.contains("订阅") || name.contains("subscription", ignoreCase = true) -> "subscription-info"
-        name.contains("t.me", ignoreCase = true) -> "telegram-link"
-        else -> null
+    // 名稱裡夹了完整網址（`客服👉 - https://…` 那種）——真節點名稱不會带 scheme。
+    if (name.contains("://")) return "url-in-name"
+    // 客服／官網／加群：這些是面板的對外入口，永遠不是節點。
+    if (name.contains("客服") || name.contains("官網") || name.contains(
+            "官网",
+        )
+    ) {
+        return "support-site"
     }
+    // 流量／到期／重置等用量行：`流量` 需搭配用量語境才判，避免 `不限流量` 節點被誤殺。
+    val quotaWord = name.contains("到期") || name.contains("过期") ||
+        name.contains("expire", ignoreCase = true) || name.contains("剩余") ||
+        name.contains("已用") || name.contains("重置") || name.contains("套餐") ||
+        name.contains("quota", ignoreCase = true) || name.contains("reset", ignoreCase = true) ||
+        (
+            name.contains("流量") && (
+                name.contains("剩余") || name.contains(
+                    "已用",
+                ) || name.contains("重置") || name.contains("套餐")
+                )
+            )
+    if (quotaWord) return "quota-info"
+    if (name.contains(
+            "訂閱",
+        ) || name.contains("订阅") || name.contains("续费") || name.contains("subscription", ignoreCase = true)
+    ) {
+        return "subscription-info"
+    }
+    if (name.contains("t.me", ignoreCase = true)) return "telegram-link"
+    return null
+}
+
+/**
+ * 判定一顆已解析的節點是不是「訂閱資訊行／促銷条目」，回傳可計數的原因，否則 null。
+ *
+ * 兩類獨立原因（任一成立即入庫前剔除）：
+ * 1. `no-endpoint`：協定解析雖然成功、但根本沒有可連線的位址（`serverAddress` 仍空）。
+ *    必須在 [AbstractBean.initializeDefaultValues] 之前查——它會把空位址補成 `127.0.0.1:1080`。
+ * 2. 名稱命中 [promoNamePattern]：用量／到期／官網／客服／訂閱等資訊行特徵。
+ * 手動貼連結不經此閘門（呼叫端只在 `subscription == true` 時套用）。
+ */
+internal fun fakeSubscriptionNode(bean: AbstractBean): String? {
+    if (bean.serverAddress.isNullOrEmpty()) return "no-endpoint"
+    return promoNamePattern(bean.displayName())
 }
 
 suspend fun parseProxies(text: String, subscription: Boolean = false): List<AbstractBean> {
@@ -395,6 +437,29 @@ suspend fun parseProxies(text: String, subscription: Boolean = false): List<Abst
     for (link in linksByLine) {
         link.parseLink(entitiesByLine)
     }
+    // 訂閱路徑在入庫前剔除「資訊行／促銷行／沒有端點的假節點」（見 fakeSubscriptionNode）。
+    // 這裡必須在 initializeDefaultValues()（下方對每顆都會跑）之前做：它會把空位址補成
+    // 127.0.0.1:1080，之後就查不出 `no-endpoint` 了。手動貼連結（subscription=false）不過閘門。
+    if (subscription) {
+        val fakeReasons = LinkedHashMap<String, Int>()
+        fun ArrayList<AbstractBean>.removeFakes() {
+            val iterator = iterator()
+            while (iterator.hasNext()) {
+                val reason = fakeSubscriptionNode(iterator.next()) ?: continue
+                fakeReasons[reason] = (fakeReasons[reason] ?: 0) + 1
+                iterator.remove()
+            }
+        }
+        // 逐空格與逐行兩份清單都要清，否則較長那份會把假節點帶進最終 result。
+        entities.removeFakes()
+        entitiesByLine.removeFakes()
+        if (fakeReasons.isNotEmpty()) {
+            // 只報「原因×次數」，名稱本身可能正是訂閱內容，不得進日誌。
+            val total = fakeReasons.values.sum()
+            val detail = fakeReasons.entries.joinToString(", ") { "${it.key}×${it.value}" }
+            Logs.w("promo guard: skipped $total subscription info/promo row(s): $detail")
+        }
+    }
     // No profile links parsed but we saw an unparsable http(s) URL: treat the whole
     // input as a subscription link (single-URL paste / file). When profiles WERE found,
     // the stray URL is ignored so the profiles still import (issue #1128).
@@ -421,13 +486,6 @@ suspend fun parseProxies(text: String, subscription: Boolean = false): List<Abst
         Logs.w("promo guard: $promoSkipped http(s) link(s) rejected for lacking proxy evidence")
     }
     val result = if (entities.size > entitiesByLine.size) entities else entitiesByLine
-    if (subscription) {
-        val named = result.count { promoNamePattern(it.displayName()) != null }
-        if (named > 0) {
-            // 只報數量：名稱可能就是訂閱內容本身，不得進日誌。
-            Logs.w("promo guard: $named node name(s) look like panel info text (observed, not filtered)")
-        }
-    }
     return result
 }
 
