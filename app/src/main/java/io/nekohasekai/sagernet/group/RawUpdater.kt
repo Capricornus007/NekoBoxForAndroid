@@ -1350,15 +1350,9 @@ object RawUpdater : GroupUpdater() {
                 if (proxies.isNotEmpty()) return proxies
             }
         } else if (text.contains("[Interface]")) {
-            // amneziawg (wireguard with obfuscation params) or plain wireguard
             try {
-                val parsed = if (isAmneziaWGConf(text)) {
-                    parseAmneziaWG(text)
-                } else {
-                    parseWireGuard(text)
-                }
                 proxies.addAll(
-                    parsed.map {
+                    parseWireGuardConf(text).onEach {
                         if (fileName.isNotBlank()) {
                             it.name = if (fileName.endsWith(".conf", ignoreCase = true)) {
                                 fileName.dropLast(".conf".length)
@@ -1366,7 +1360,6 @@ object RawUpdater : GroupUpdater() {
                                 fileName
                             }
                         }
-                        it
                     },
                 )
                 return proxies
@@ -1410,6 +1403,19 @@ object RawUpdater : GroupUpdater() {
             "dummy" -> "none"
             else -> cipher
         }
+    }
+
+    /**
+     * A WireGuard `.conf`, or an AmneziaWG one when the `[Interface]` section carries obfuscation
+     * keys. With a single peer, a `# comment` line directly above `[Peer]` names the profile, as in
+     * 3x-ui's AmneziaWG exports.
+     */
+    fun parseWireGuardConf(conf: String): List<AbstractBean> {
+        val beans = if (isAmneziaWGConf(conf)) parseAmneziaWG(conf) else parseWireGuard(conf)
+        val remark = conf.lines().zipWithNext().singleOrNull { (_, section) -> section.trim() == "[Peer]" }
+            ?.first?.takeIf { it.trimStart().startsWith("#") }?.trimStart('#', ' ')?.trim()
+        if (!remark.isNullOrEmpty()) beans.singleOrNull()?.name = remark
+        return beans
     }
 
     fun parseWireGuard(conf: String): List<WireGuardBean> {

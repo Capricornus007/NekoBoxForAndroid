@@ -59,9 +59,27 @@ data class VmessQRCode(
     var sni: String = "",
     var alpn: String = "",
     var fp: String = "",
+    var ech: String = "",
     var mode: String? = null,
     var extra: JsonElement? = null,
 )
+
+// Xray 的 `echConfigList`：一段 base64 的 ECH 設定清單，或一個 DoH URL（可写成 `域名+URL`、
+// 由客戶端連線時自己去查）。兩種都原樣保存，連結才能不減地匯出；URL 形式如何生效見
+// buildSingBoxOutboundTLS。
+private fun StandardV2RayBean.applyECHParam(value: String) {
+    if (value.isBlank()) return
+    enableECH = true
+    echConfig = value
+}
+
+/** Xray 的動態形式：DoH URL 而不是內嵌設定清單。 */
+private fun StandardV2RayBean.echConfigIsURL() = echConfig.contains("://")
+
+/** 分享連結帶的那種緊湊 base64 ECH 設定（去掉 PEM 殼）。 */
+private fun StandardV2RayBean.echParam() = echConfig.lines().filterNot {
+    it.startsWith("-----")
+}.joinToString("").trim()
 
 fun StandardV2RayBean.isTLS(): Boolean {
     return security == "tls"
@@ -302,14 +320,20 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
             url.queryParameter("sid")?.let {
                 realityShortId = it
             }
-            // 社区格式: ech=<ECH查询域名>+<DoH地址>（Xray echConfigList 风格），或 ech=true/1
-            url.queryParameter("ech")?.let {
-                if (it.isNotBlank() && !it.equals("none", true) && it != "0" && !it.equals("false", true)) {
-                    enableECH = true
-                    // sing-box 不支持为 ECH 查询单独指定 DoH（走自身 DNS 路由），仅保留域名部分
-                    val queryDomain = it.substringBefore('+')
-                    if (queryDomain.isNotBlank() && !queryDomain.equals("true", true) && queryDomain != "1") {
-                        echQueryServerName = queryDomain
+            // 社群格式：ech=<查詢域名>+<DoH 位址> 或 ech=true/1；Xray 原生：ech=<base64 設定清單>。
+            // 用「有沒有 ://」區分兩者：base64 字母表本身含 '+'，所以不能拿 '+' 當判準。
+            url.queryParameterPreservingPlus("ech")?.let { value ->
+                if (value.isNotBlank() && !value.equals("none", true) && value != "0" && !value.equals("false", true)) {
+                    if (value.contains("://")) {
+                        enableECH = true
+                        if (value.contains("+")) {
+                            val queryDomain = value.substringBefore("+")
+                            if (queryDomain.isNotBlank() && !queryDomain.equals("true", true) && queryDomain != "1") {
+                                echQueryServerName = queryDomain
+                            }
+                        }
+                    } else {
+                        applyECHParam(value)
                     }
                 }
             }
@@ -516,8 +540,10 @@ fun parseV2RayN(link: String): VMessBean {
     bean.type = if (vmessQRCode.net == "splithttp") "xhttp" else vmessQRCode.net
     if (bean.type == "xhttp") {
         bean.xhttpMode = normalizeXhttpMode(vmessQRCode.mode)
-        vmessQRCode.extra?.takeUnless { it.isJsonNull }?.let {
-            val extra = if (it.isJsonPrimitive && it.asJsonPrimitive.isString) it.asString else it.toString()
+        val extra = vmessQRCode.extra?.takeUnless { it.isJsonNull }?.let {
+            if (it.isJsonPrimitive && it.asJsonPrimitive.isString) it.asString else it.toString()
+        } ?: XhttpExtraConverter.flattenedExtra(JSONObject(result))?.toString()
+        if (extra != null) {
             bean.xhttpExtra = runCatching { XhttpExtraConverter.xrayToSingBox(extra) }.getOrDefault(extra)
         }
     }
@@ -539,6 +565,7 @@ fun parseV2RayN(link: String): VMessBean {
             if (bean.sni.isNullOrBlank()) bean.sni = bean.host
             if (vmessQRCode.alpn != "none") bean.alpn = vmessQRCode.alpn
             bean.utlsFingerprint = vmessQRCode.fp
+            bean.applyECHParam(vmessQRCode.ech)
         }
     }
 
@@ -607,6 +634,7 @@ fun VMessBean.toV2rayN(): String {
         sni = bean.sni
         alpn = bean.alpn.replace("\n", ",")
         fp = bean.utlsFingerprint
+        if (bean.enableECH) ech = bean.echParam()
 
         if (bean.type == "xhttp") {
             mode = bean.xhttpMode
@@ -725,6 +753,9 @@ fun StandardV2RayBean.toUriVMessVLESSTrojan(isTrojan: Boolean): String {
                 }
                 if (utlsFingerprint.isNotBlank()) {
                     builder.addQueryParameter("fp", utlsFingerprint)
+                }
+                if (enableECH) {
+                    echParam().takeIf { it.isNotBlank() }?.let { builder.addQueryParameter("ech", it) }
                 }
                 if (realityPubKey.isNotBlank()) {
                     builder.setQueryParameter("security", "reality")
@@ -960,7 +991,8 @@ fun buildSingBoxOutboundTLS(bean: StandardV2RayBean): OutboundTLSOptions? {
                 if (bean.echQueryServerName.isNotBlank()) {
                     query_server_name = bean.echQueryServerName
                 }
-                if (bean.echConfig.isNotBlank()) {
+                // 沒有內嵌 config 時 sing-box 會自己去查 HTTPS 記錄，這正是 DoH URL 形式要的行為。
+                if (bean.echConfig.isNotBlank() && !bean.echConfigIsURL()) {
                     config = if (bean.echConfig.contains("BEGIN ECH CONFIGS")) {
                         bean.echConfig.lines()
                     } else {

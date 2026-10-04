@@ -529,11 +529,13 @@ class GroupFragment :
                             getString(R.string.subscription_used, used.toBytesString())
                         }
                     }
-                    get("expire=([0-9]+)")?.apply {
+                    // expire=0 是 3x-ui 這類面板對「沒有到期日」的訂閱回的值：照字面換算會顯示
+                    // 1970/1/1，所以 0 一律當「不過期」處理。
+                    get("expire=([0-9]+)")?.toLongOrNull()?.takeIf { it > 0L }?.let { expire ->
                         text += "\n"
                         text += getString(
                             R.string.subscription_expire,
-                            Util.timeStamp2Text(this.toLong() * 1000),
+                            Util.timeStamp2Text(expire * 1000),
                         )
                     }
                 } catch (_: NumberFormatException) {

@@ -22,6 +22,8 @@ import io.nekohasekai.sagernet.fmt.trojan_go.parseTrojanGo
 import io.nekohasekai.sagernet.fmt.trusttunnel.parseTrustTunnel
 import io.nekohasekai.sagernet.fmt.tuic.parseTuic
 import io.nekohasekai.sagernet.fmt.v2ray.parseV2Ray
+import io.nekohasekai.sagernet.fmt.wireguard.parseWireGuardLink
+import io.nekohasekai.sagernet.group.RawUpdater
 import moe.matsuri.nb4a.proxy.anytls.parseAnytls
 import moe.matsuri.nb4a.utils.JavaUtil.gson
 import moe.matsuri.nb4a.utils.Util
@@ -360,6 +362,21 @@ suspend fun parseProxies(text: String, subscription: Boolean = false): List<Abst
                 entities.add(parseByeDPI(this))
             }.onFailure {
                 Logs.w("byeDPI parser rejected input")
+            }
+        } else if (startsWith("wireguard://") || startsWith("wg://")) {
+            Logs.d("Trying WireGuard parser")
+            runCatching {
+                entities.add(parseWireGuardLink(this))
+            }.onFailure {
+                Logs.w("WireGuard parser rejected input")
+            }
+        } else if (startsWith("vpn://")) {
+            // AmneziaVPN share link: base64url of a WireGuard or AmneziaWG .conf text.
+            Logs.d("Trying AmneziaVPN parser")
+            runCatching {
+                entities.addAll(RawUpdater.parseWireGuardConf(substringAfter("vpn://").decodeBase64UrlSafe()))
+            }.onFailure {
+                Logs.w("AmneziaVPN parser rejected input")
             }
         }
     }

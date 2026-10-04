@@ -4,8 +4,33 @@ import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.ktx.*
 import moe.matsuri.nb4a.SingBoxOptions
 import moe.matsuri.nb4a.utils.Util
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONObject
+
+// Xray 原生連結（3x-ui）把傳輸層寫在 type/path/host/security。sing-box 沒有 Shadowsocks
+// 傳輸層：WebSocket 對應到內建的 v2ray-plugin，其餘無法表達，寧可拒絕匯入也不要
+// 悄悄退化成一個連不上的 TCP 設定檔。
+private fun ShadowsocksBean.applyTransportParams(link: HttpUrl) {
+    val tls = link.queryParameter("security") == "tls"
+    when (val network = link.queryParameter("type") ?: "tcp") {
+        "tcp" -> if (tls) error("unsupported shadowsocks transport: tcp with tls")
+
+        "ws" -> if (plugin!!.isBlank()) {
+            val host = link.queryParameter("host")?.takeIf { it.isNotBlank() } ?: link.queryParameter("sni")
+            plugin = listOfNotNull(
+                "v2ray-plugin",
+                "mode=websocket",
+                host?.takeIf { it.isNotBlank() }?.let { "host=$it" },
+                link.queryParameter("path")?.takeIf { it.isNotBlank() }?.let { "path=$it" },
+                "tls".takeIf { tls },
+                "mux=0",
+            ).joinToString(";")
+        }
+
+        else -> error("unsupported shadowsocks transport: $network")
+    }
+}
 
 fun ShadowsocksBean.fixPluginName() {
     if (plugin.startsWith("simple-obfs")) {
@@ -40,6 +65,7 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
                 password = link.password
                 plugin = link.queryParameter("plugin") ?: ""
                 name = link.fragment
+                applyTransportParams(link)
                 fixPluginName()
             }
         }
@@ -53,6 +79,7 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
             password = methodAndPswd.substringAfter(":")
             plugin = link.queryParameter("plugin") ?: ""
             name = link.fragment
+            applyTransportParams(link)
             fixPluginName()
         }
     } else {

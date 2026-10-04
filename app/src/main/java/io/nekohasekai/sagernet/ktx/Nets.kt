@@ -9,6 +9,7 @@ import moe.matsuri.nb4a.utils.NGUtil
 import okhttp3.HttpUrl
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.URLDecoder
 
 /**
  * 内部 HTTP（订阅/资产/版本检查）经 box 默认 outbound 拨号
@@ -16,6 +17,16 @@ import java.net.Socket
  */
 fun HTTPClient.tryProxyOutbound() {
     tryBoxOutbound()
+}
+
+/** Decode an encoded query value without treating an unescaped base64 '+' as a space. */
+fun HttpUrl.queryParameterPreservingPlus(name: String): String? {
+    val pair = encodedQuery
+        ?.split('&')
+        ?.firstOrNull { it.substringBefore('=') == name }
+        ?: return null
+    val encodedValue = pair.substringAfter('=', "")
+    return URLDecoder.decode(encodedValue.replace("+", "%2B"), Charsets.UTF_8.name())
 }
 
 fun linkBuilder() = HttpUrl.Builder().scheme("https")

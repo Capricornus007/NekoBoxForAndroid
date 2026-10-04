@@ -344,6 +344,19 @@ object XhttpExtraConverter {
             json.has("download")
     }
 
+    /**
+     * 3x-ui 把 VMess XHTTP 的 extra 欄位直接攤在分享物件上、不嵌一層 extra。
+     * 用本檔 FIELD_MAPPINGS 認得的那批 Xray 欄位名把它們收回來，否則 padding、
+     * xmux、downloadSettings 會在匯入時整組遺失。
+     */
+    fun flattenedExtra(vmess: JSONObject): JSONObject? {
+        val out = JSONObject()
+        for ((xrayKey, _) in FIELD_MAPPINGS) convertField(vmess, out, xrayKey, xrayKey)
+        convertField(vmess, out, "xmux", "xmux")
+        convertField(vmess, out, "downloadSettings", "downloadSettings")
+        return out.takeIf { it.length() > 0 }
+    }
+
     private fun isXrayFormat(json: JSONObject): Boolean {
         return json.has("xPaddingBytes") || json.has("scMaxEachPostBytes") ||
             json.has("scMinPostsIntervalMs") || json.has("scStreamUpServerSecs") ||
