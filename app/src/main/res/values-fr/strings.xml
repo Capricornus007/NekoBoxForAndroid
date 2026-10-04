@@ -1015,4 +1015,5 @@
     <string name="proton_warning_message">Ce n\'est pas une application Proton. Elle parle à l\'API Proton comme les clients officiels, donc Proton peut modifier cette API à tout moment et casser cette fonction sans que nous puissions anticiper.\n\nVotre mot de passe et votre session restent sur cet appareil, dans le stockage privé de NB4A, et ne sont envoyés qu\'à Proton pour la connexion. Utiliser un abonnement en dehors des applications Proton peut ne pas être couvert par leurs conditions.</string>
     <string name="proton_warning_accept">J\'ai compris</string>
 
+    <string name="action_reset">Réinitialiser</string>
 </resources>

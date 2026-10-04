@@ -986,4 +986,5 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_warning_message">Ini bukan aplikasi Proton. Aplikasi ini berbicara ke API Proton seperti klien resmi Proton, jadi Proton bisa mengubah API kapan saja dan membuat fitur ini berhenti, dan kami tak bisa mengantisipasinya.\n\nKata sandi dan sesi Anda hanya disimpan di perangkat ini, di penyimpanan privat NB4A, dan tidak dikirim ke mana pun selain untuk masuk ke Proton. Menggunakan langganan di luar aplikasi Proton mungkin tidak tercakup dalam ketentuan mereka.</string>
     <string name="proton_warning_accept">Saya mengerti</string>
 
+    <string name="action_reset">Atur ulang</string>
 </resources>

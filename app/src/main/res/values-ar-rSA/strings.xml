@@ -1017,4 +1017,5 @@
     <string name="proton_warning_message">هذا ليس تطبيقًا من Proton. إنه يخاطب واجهة Proton بنفس طريقة عملاء Proton الرسميين، لذا قد تغيّر Proton الواجهة في أي وقت ويتوقف هذه الميزة دون أن نستطيع الاستباق.\n\nتُحفظ كلمة المرور والجلسة على هذا الجهاز فقط، في التخزين الخاص بتطبيق NB4A، ولا تُرسل إلى أي مكان سوى لتسجيل الدخول إلى Proton. استخدام الاشتراك خارج تطبيقات Proton قد لا تغطيه شروطهم.</string>
     <string name="proton_warning_accept">فهمت</string>
 
+    <string name="action_reset">إعادة تعيين</string>
 </resources>

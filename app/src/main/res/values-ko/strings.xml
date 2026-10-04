@@ -823,4 +823,5 @@
     <string name="proton_warning_message">이 앱은 Proton 공식 앱이 아닙니다. Proton 자체 클라이언트와 같은 방식으로 Proton API와 통신하므로, Proton이 API를 바꾸면 이 기능이 중단될 수 있고 미리 대비할 수 없습니다.\n\n비밀번호와 세션은 이 기기의 NB4A 전용 저장 공간에만 보관되며 Proton 로그인 외에는 전송되지 않습니다. Proton 자체 앱 외에서 구독을 사용하는 것은 약관 범위에 들지 않을 수 있습니다.</string>
     <string name="proton_warning_accept">이해했습니다</string>
 
+    <string name="action_reset">초기화</string>
 </resources>

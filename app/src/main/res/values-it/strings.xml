@@ -1009,4 +1009,5 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_warning_message">Non è un\'app di Proton. Parla con l\'API di Proton come i client ufficiali, quindi Proton può modificarla in qualsiasi momento e rompere questa funzione senza che possiamo anticiparlo.\n\nPassword e sessione restano solo su questo telefono, nell\'archivio privato di NB4A, e non vengono inviate da nessuna parte se non per l\'accesso a Proton. Usare un abbonamento al di fuori delle app Proton potrebbe non essere coperto dai loro termini.</string>
     <string name="proton_warning_accept">Ho capito</string>
 
+    <string name="action_reset">Ripristina</string>
 </resources>

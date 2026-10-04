@@ -1013,4 +1013,5 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="proton_warning_message">Este não é um app da Proton. Ele fala com a API da Proton do mesmo jeito que os clientes oficiais, então a Proton pode mudar essa API a qualquer momento e quebrar este recurso sem que possamos nos antecipar.\n\nSua senha e sua sessão ficam apenas neste aparelho, no armazenamento privado do NB4A, e não são enviadas a lugar algum além do login na Proton. Usar uma assinatura fora dos apps da Proton pode não estar coberto pelos termos deles.</string>
     <string name="proton_warning_accept">Entendi</string>
 
+    <string name="action_reset">Repor</string>
 </resources>

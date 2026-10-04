@@ -1012,4 +1012,5 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="proton_warning_message">Dette er ikke en Proton-app. Den snakker med Proton-API-et på samme måte som Protons egne klienter, så Proton kan endre API-et når som helst og ødelegge denne funksjonen uten at vi kan forberede oss.\n\nPassordet og økten din lagres bare på denne enheten, i NB4As private lagring, og sendes ikke noe sted bortsett for å logge inn hos Proton. Å bruke et abonnement utenfor Protons egne apper er kanskje dekket av vilkårene deres.</string>
     <string name="proton_warning_accept">Jeg forstår</string>
 
+    <string name="action_reset">Tilbakestill</string>
 </resources>

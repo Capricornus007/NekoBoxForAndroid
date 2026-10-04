@@ -965,4 +965,5 @@
     <string name="proton_warning_message">Bu bir Proton uygulaması değil. Proton API\'sine Proton\'un kendi istemcileri gibi bağlanıyor; Proton bu API\'yi istediği an değiştirebilir ve bu özellik bozulabilir, biz de önceden hazırlanamayız.\n\nParolanız ve oturumunuz yalnızca bu cihazda, NB4A\'nın özel deposunda saklanır ve Proton\'a giriş dışında hiçbir yere gönderilmez. Aboneliği Proton\'un kendi uygulamaları dışında kullanmak şartları kapsamına girmeyebilir.</string>
     <string name="proton_warning_accept">Anladım</string>
 
+    <string name="action_reset">Sıfırla</string>
 </resources>

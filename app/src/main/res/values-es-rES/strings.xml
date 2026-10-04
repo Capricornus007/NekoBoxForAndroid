@@ -1020,4 +1020,5 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="proton_warning_message">Esta no es una aplicación de Proton. Habla con la API de Proton igual que los clientes oficiales, así que Proton puede cambiar esa API en cualquier momento y romper esta función sin que podamos anticiparlo.\n\nTu contraseña y tu sesión se guardan solo en este teléfono, en el almacenamiento privado de NB4A, y no se envían a ningún sitio salvo para iniciar sesión en Proton. Usar una suscripción fuera de las aplicaciones de Proton puede no estar cubierto por sus condiciones.</string>
     <string name="proton_warning_accept">Entendido</string>
 
+    <string name="action_reset">Restablecer</string>
 </resources>

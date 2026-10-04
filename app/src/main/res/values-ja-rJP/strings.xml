@@ -1010,4 +1010,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_warning_message">これは Proton 公式アプリではありません。Proton 純正クライアントと同じ方法で Proton API と通信するため、Proton が API を変更するとこの機能は動作停止し、事前に対応できません。\n\nパスワードとセッションはこの端末の NB4A 専用領域にのみ保存され、Proton へのサインイン以外には送信されません。Proton 公式アプリ以外でのサブスクライブ利用は利用規約の範囲外となる場合があります。</string>
     <string name="proton_warning_accept">了解しました</string>
 
+    <string name="action_reset">リセット</string>
 </resources>
