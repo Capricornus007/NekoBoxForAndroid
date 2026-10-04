@@ -1342,7 +1342,14 @@ fun buildConfig(
                 if (rule.packages.isNotEmpty()) {
                     PackageCache.awaitLoadSync()
                 }
-                val uidList = rule.packages.map {
+                val effectivePackages = rule.packages.toMutableSet()
+                if (effectivePackages.contains("com.android.vending")) {
+                    effectivePackages.add("com.android.providers.downloads")
+                    effectivePackages.add("com.android.providers.downloads.ui")
+                    effectivePackages.add("com.xiaomi.providers.downloads")
+                    effectivePackages.add("com.google.android.gms")
+                }
+                val uidList = effectivePackages.mapNotNull {
                     if (!isVPN) {
                         Toast.makeText(
                             SagerNet.application,
@@ -1351,7 +1358,7 @@ fun buildConfig(
                         ).show()
                     }
                     PackageCache[it]?.takeIf { uid -> uid >= 1000 }
-                }.toHashSet().filterNotNull()
+                }.toHashSet().toList()
                 val ruleSets = mutableListOf<RuleSet>()
 
                 val domainList = if (rule.domains.isNotBlank()) rule.domains.listByLineOrComma() else null
@@ -1372,7 +1379,7 @@ fun buildConfig(
                 val hasIpCriteria = !ipList.isNullOrEmpty() || rulesetTags.any { it.second }
                 val hasDomainRuleset = rulesetTags.any { !it.second }
                 val isAppOnlyDns =
-                    (uidList.isNotEmpty() || rule.packages.isNotEmpty()) &&
+                    (uidList.isNotEmpty() || effectivePackages.isNotEmpty()) &&
                         !hasDomainCriteria &&
                         !hasIpCriteria &&
                         !hasDomainRuleset &&
@@ -1396,12 +1403,19 @@ fun buildConfig(
                     }
                 }
 
-                fun makeAppDnsRuleObj(): DNSRule_DefaultOptions? {
-                    if (uidList.isEmpty() && rule.packages.isEmpty()) return null
-                    return DNSRule_DefaultOptions().apply {
-                        if (uidList.isNotEmpty()) user_id = uidList
-                        if (rule.packages.isNotEmpty()) package_name = rule.packages.toList()
+                fun makeAppDnsRuleObj(): List<DNSRule_DefaultOptions> {
+                    val list = mutableListOf<DNSRule_DefaultOptions>()
+                    if (effectivePackages.isNotEmpty()) {
+                        list.add(DNSRule_DefaultOptions().apply {
+                            package_name = effectivePackages.toList()
+                        })
                     }
+                    if (uidList.isNotEmpty()) {
+                        list.add(DNSRule_DefaultOptions().apply {
+                            user_id = uidList
+                        })
+                    }
+                    return list
                 }
 
                 when (if (routingAction == "reject") -2L else rule.outbound) {
@@ -1409,7 +1423,7 @@ fun buildConfig(
                         if (usesDnsOutbound) {
                             makeDomainDnsRuleObj()?.let { userDNSRuleList += it.apply { server = "dns-direct" } }
                             if (isAppOnlyDns) {
-                                makeAppDnsRuleObj()?.let { userDNSRuleList += it.apply { server = "dns-direct" } }
+                                makeAppDnsRuleObj().forEach { userDNSRuleList += it.apply { server = "dns-direct" } }
                             }
                         }
                         for ((tag, isIP) in rulesetTags.filter { usesDnsOutbound }) {
@@ -1426,7 +1440,7 @@ fun buildConfig(
                         if (usesDnsOutbound) {
                             makeDomainDnsRuleObj()?.let { userDNSRuleList += it.apply { action = "reject" } }
                             if (isAppOnlyDns) {
-                                makeAppDnsRuleObj()?.let { userDNSRuleList += it.apply { action = "reject" } }
+                                makeAppDnsRuleObj().forEach { userDNSRuleList += it.apply { action = "reject" } }
                             }
                         }
                         for ((tag, isIP) in rulesetTags.filter { usesDnsOutbound }) {
@@ -1453,7 +1467,7 @@ fun buildConfig(
                                 }
                             }
                             if (isAppOnlyDns) {
-                                makeAppDnsRuleObj()?.let {
+                                makeAppDnsRuleObj().forEach {
                                     if (useFakeDns) {
                                         userDNSRuleList += it.apply {
                                             server = "dns-fake"
@@ -1573,12 +1587,17 @@ fun buildConfig(
                         if (uidList.isNotEmpty()) {
                             user_id = uidList
                         }
-                        if (rule.packages.isNotEmpty()) {
-                            package_name = rule.packages.toList()
-                        }
                         applyCommonFilters(this)
                     }
                     if (!appSubRule.checkEmpty()) generatedSubRules.add(appSubRule)
+
+                    if (effectivePackages.isNotEmpty()) {
+                        val pkgSubRule = Rule_DefaultOptions().apply {
+                            package_name = effectivePackages.toList()
+                            applyCommonFilters(this)
+                        }
+                        if (!pkgSubRule.checkEmpty()) generatedSubRules.add(pkgSubRule)
+                    }
                 }
 
                 if (!hasDomain && !hasIp && !hasApp) {

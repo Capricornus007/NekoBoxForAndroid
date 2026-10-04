@@ -75,29 +75,51 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
     override fun findConnectionOwner(
         ipProto: Int, srcIp: String, srcPort: Int, destIp: String, destPort: Int
     ): Int {
-        return SagerNet.connectivity.getConnectionOwnerUid(
-            ipProto, InetSocketAddress(srcIp, srcPort), InetSocketAddress(destIp, destPort)
-        )
+        return try {
+            SagerNet.connectivity.getConnectionOwnerUid(
+                ipProto, InetSocketAddress(srcIp, srcPort), InetSocketAddress(destIp, destPort)
+            )
+        } catch (e: Throwable) {
+            -1
+        }
     }
 
     override fun packageNameByUid(uid: Int): String {
         PackageCache.awaitLoadSync()
 
+        if (uid < 0) {
+            return ""
+        }
         if (uid <= 1000L) {
             return "android"
         }
 
         val packageNames = PackageCache.uidMap[uid]
-        if (!packageNames.isNullOrEmpty()) for (packageName in packageNames) {
-            return packageName
+        if (!packageNames.isNullOrEmpty()) {
+            return packageNames.first()
         }
 
-        error("unknown uid $uid")
+        return try {
+            SagerNet.application.packageManager.getPackagesForUid(uid)?.firstOrNull() ?: ""
+        } catch (e: Throwable) {
+            ""
+        }
     }
 
     override fun uidByPackageName(packageName: String): Int {
         PackageCache.awaitLoadSync()
-        return PackageCache[packageName] ?: 0
+        val cached = PackageCache[packageName]
+        if (cached != null) return cached
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                SagerNet.application.packageManager.getPackageUid(packageName, 0)
+            } else {
+                @Suppress("DEPRECATION")
+                SagerNet.application.packageManager.getApplicationInfo(packageName, 0).uid
+            }
+        } catch (e: Throwable) {
+            -1
+        }
     }
 
     // TODO: 'getter for connectionInfo: WifiInfo!' is deprecated
