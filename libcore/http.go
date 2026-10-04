@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -50,6 +51,7 @@ type HTTPClient interface {
 type HTTPRequest interface {
 	SetURL(link string) error
 	SetUserAgent(userAgent string)
+	SetHeader(key string, value string)
 	AllowInsecure()
 	Execute() (HTTPResponse, error)
 }
@@ -171,7 +173,8 @@ func (c *httpClient) Close() {
 
 type httpRequest struct {
 	*httpClient
-	request http.Request
+	request       http.Request
+	customHeaders []string
 }
 
 func (r *httpRequest) AllowInsecure() {
@@ -195,13 +198,53 @@ func (r *httpRequest) SetUserAgent(userAgent string) {
 	r.request.Header.Set("User-Agent", userAgent)
 }
 
+func (r *httpRequest) SetHeader(key string, value string) {
+	r.request.Header.Set(key, value)
+	r.customHeaders = append(r.customHeaders, key)
+}
+
+// checkRedirect keeps Go's ten-hop limit and drops the headers set through SetHeader when a
+// redirect leaves the original origin or downgrades from HTTPS, so a device identifier meant for
+// the subscription server reaches neither third parties nor the network in the clear.
+func (r *httpRequest) checkRedirect(req *http.Request, via []*http.Request) error {
+	if len(via) >= 10 {
+		return errors.New("stopped after 10 redirects")
+	}
+	first := via[0].URL
+	if !strings.EqualFold(req.URL.Hostname(), first.Hostname()) || effectivePort(req.URL) != effectivePort(first) ||
+		(first.Scheme == "https" && req.URL.Scheme != "https") {
+		for _, key := range r.customHeaders {
+			req.Header.Del(key)
+		}
+	}
+	return nil
+}
+
+// effectivePort is the explicit port or the scheme default, so https://h and https://h:443 match.
+func effectivePort(u *url.URL) string {
+	if port := u.Port(); port != "" {
+		return port
+	}
+	switch u.Scheme {
+	case "https":
+		return "443"
+	case "http":
+		return "80"
+	}
+	return ""
+}
+
 func (r *httpRequest) Execute() (HTTPResponse, error) {
 	defer deferPanicToError("http execute", func(err error) { log.Println(err) })
 	// full direct
 	if r.tryH3Direct && !r.trySocks5 {
 		return r.doH3Direct()
 	}
-	response, err := r.h1h2Client.Do(&r.request)
+	// A per-request copy shares the transport but carries this request's redirect policy, so
+	// concurrent requests on one client do not overwrite each other's.
+	client := r.h1h2Client
+	client.CheckRedirect = r.checkRedirect
+	response, err := client.Do(&r.request)
 	if err != nil {
 		// trySocks5 && tryH3Direct
 		if r.tryH3Direct && errors.Is(err, errFailConnectSocks5) {
@@ -368,7 +411,8 @@ func (r *httpRequest) doH3Direct() (HTTPResponse, error) {
 			request: func(ctx context.Context) (response *http.Response, err error) {
 				request := r.request.Clone(ctx)
 				echClient := &http.Client{
-					Timeout: defaultHTTPRequestTimeout,
+					Timeout:       defaultHTTPRequestTimeout,
+					CheckRedirect: r.checkRedirect,
 					Transport: &http.Transport{
 						DialTLSContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 							var d net.Dialer
@@ -394,7 +438,8 @@ func (r *httpRequest) doH3Direct() (HTTPResponse, error) {
 			request: func(ctx context.Context) (response *http.Response, err error) {
 				request := r.request.Clone(ctx)
 				h3Client := &http.Client{
-					Timeout: defaultHTTPRequestTimeout,
+					Timeout:       defaultHTTPRequestTimeout,
+					CheckRedirect: r.checkRedirect,
 					Transport: &http3.Transport{
 						TLSClientConfig: r.tls.Clone(),
 						QUICConfig: &quic.Config{

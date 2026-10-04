@@ -499,3 +499,40 @@ func TestRaceHTTPRequestsRejectsNonOKAndClosesBody(t *testing.T) {
 	}
 	assertBodyClosed(t, body)
 }
+
+func TestCheckRedirectKeepsCustomHeadersOnlyOnTheSameHTTPSHost(t *testing.T) {
+	request := &httpRequest{request: http.Request{Header: http.Header{}}}
+	request.SetHeader("X-HWID", "device")
+	first, _ := http.NewRequest(http.MethodGet, "https://sub.example/path", nil)
+
+	cases := map[string]bool{
+		"https://sub.example/next":      true,
+		"https://SUB.example:443/next":  true,
+		"https://sub.example:8443/next": false,
+		"https://other.example/next":    false,
+		"https://sub.example.net/next":  false,
+		"http://sub.example/next":       false,
+	}
+	for target, kept := range cases {
+		redirect, _ := http.NewRequest(http.MethodGet, target, nil)
+		redirect.Header.Set("X-HWID", "device")
+		redirect.Header.Set("User-Agent", "ua")
+		if err := request.checkRedirect(redirect, []*http.Request{first}); err != nil {
+			t.Fatalf("%s: %v", target, err)
+		}
+		if got := redirect.Header.Get("X-HWID") != ""; got != kept {
+			t.Fatalf("%s: X-HWID kept = %v, want %v", target, got, kept)
+		}
+		if redirect.Header.Get("User-Agent") != "ua" {
+			t.Fatalf("%s: User-Agent was dropped", target)
+		}
+	}
+
+	via := make([]*http.Request, 10)
+	for i := range via {
+		via[i] = first
+	}
+	if err := request.checkRedirect(first, via); err == nil {
+		t.Fatal("ten redirects did not stop the chain")
+	}
+}

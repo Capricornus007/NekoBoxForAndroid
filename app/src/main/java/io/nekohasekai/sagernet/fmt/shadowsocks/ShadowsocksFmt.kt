@@ -3,12 +3,37 @@ package io.nekohasekai.sagernet.fmt.shadowsocks
 import io.nekohasekai.sagernet.ktx.*
 import moe.matsuri.nb4a.SingBoxOptions
 import moe.matsuri.nb4a.utils.Util
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONObject
 
 fun ShadowsocksBean.fixPluginName() {
     if (plugin!!.startsWith("simple-obfs")) {
         plugin = plugin!!.replaceFirst("simple-obfs", "obfs-local")
+    }
+}
+
+// Xray-native links (3x-ui) carry the stream transport as type/path/host/security. sing-box has no
+// Shadowsocks transport: WebSocket maps onto the built-in v2ray-plugin, the others cannot be
+// expressed and are rejected instead of being imported as a plain TCP profile.
+private fun ShadowsocksBean.applyTransportParams(link: HttpUrl) {
+    val tls = link.queryParameter("security") == "tls"
+    when (val network = link.queryParameter("type") ?: "tcp") {
+        "tcp" -> if (tls) error("unsupported shadowsocks transport: tcp with tls")
+
+        "ws" -> if (plugin!!.isBlank()) {
+            val host = link.queryParameter("host")?.takeIf { it.isNotBlank() } ?: link.queryParameter("sni")
+            plugin = listOfNotNull(
+                "v2ray-plugin",
+                "mode=websocket",
+                host?.takeIf { it.isNotBlank() }?.let { "host=$it" },
+                link.queryParameter("path")?.takeIf { it.isNotBlank() }?.let { "path=$it" },
+                "tls".takeIf { tls },
+                "mux=0",
+            ).joinToString(";")
+        }
+
+        else -> error("unsupported shadowsocks transport: $network")
     }
 }
 
@@ -39,6 +64,7 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
                 password = link.password
                 plugin = link.queryParameter("plugin") ?: ""
                 name = link.fragment
+                applyTransportParams(link)
                 fixPluginName()
             }
         }
@@ -52,6 +78,7 @@ fun parseShadowsocks(url: String): ShadowsocksBean {
             password = methodAndPswd.substringAfter(":")
             plugin = link.queryParameter("plugin") ?: ""
             name = link.fragment
+            applyTransportParams(link)
             fixPluginName()
         }
     } else {

@@ -190,6 +190,15 @@ object XhttpExtraConverter {
         return result
     }
 
+    /**
+     * 3x-ui places the VMess XHTTP `extra` keys directly on the share object instead of nesting
+     * them. Collect the known ones so padding, xmux and download settings survive the import.
+     */
+    fun flattenedExtra(vmess: JSONObject): JSONObject? {
+        val keys = fields.keys + fields.values + shareOnlyFields.keys + legacyAliases.keys + listOf("xmux", "downloadSettings")
+        return select(vmess, keys).takeIf { it.length() > 0 }
+    }
+
     internal fun forCore(source: JSONObject): JSONObject {
         val normalized = try {
             toSingBox(source)

@@ -226,6 +226,10 @@ Tailscale joins a tailnet with an auth key and can use an exit node and subnet r
 Imports the common formats: Shadowsocks, ClashMeta, v2rayN, and sing-box outbounds.
 Only nodes are parsed; routing rules and other non-node fields are ignored.
 
+Share links from Xray panels such as 3x-ui import as they are generated: `wireguard://` and `vpn://` (AmneziaWG) links, the `ech` parameter, flattened VMess XHTTP settings, and Shadowsocks over WebSocket through the built-in `v2ray-plugin`. Shadowsocks over other transports cannot be expressed by sing-box and is skipped.
+
+A per-subscription **Send device ID** switch, off by default, adds `X-HWID` (a random per-install ID), `X-Device-OS`, `X-Ver-OS` and `X-Device-Model` to every fetch. Panels with a device limit reject clients without them.
+
 ### Provider metadata
 
 The app reads these keys from response headers or from `#key: value` lines at the top of the body. Headers win, and a fetch that omits a key clears it.
@@ -233,7 +237,7 @@ The app reads these keys from response headers or from `#key: value` lines at th
 | Key | Effect |
 | --- | --- |
 | `profile-title` | Group name (plain or `base64:` prefixed) |
-| `subscription-userinfo` | Traffic and `expire=` shown on the group; a reminder is posted daily during the last three days and once after expiry |
+| `subscription-userinfo` | Traffic and `expire=` shown on the group (`expire=0` means no expiry); a reminder is posted daily during the last three days and once after expiry |
 | `support-url`, `profile-web-page-url` | Menu entries on the group (`http` and `https` links only) |
 | `announce` | Text shown on the group, up to 200 characters, plain or `base64:` prefixed |
 | `profile-update-interval` | Auto-update interval in hours, applied when the provider changes it; your own edits stay in between |

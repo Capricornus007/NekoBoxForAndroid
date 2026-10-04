@@ -64,6 +64,7 @@ class GroupSettingsActivity(
         DataStore.subscriptionDeduplication = subscription.deduplication!!
         DataStore.subscriptionUpdateWhenConnectedOnly = subscription.updateWhenConnectedOnly!!
         DataStore.subscriptionUserAgent = subscription.customUserAgent!!
+        DataStore.subscriptionSendDeviceId = subscription.sendDeviceId!!
         DataStore.subscriptionAutoUpdate = subscription.autoUpdate!!
         DataStore.subscriptionAutoUpdateDelay = subscription.autoUpdateDelay!!
         DataStore.subscriptionFilterMode = subscription.filterMode!!
@@ -100,6 +101,7 @@ class GroupSettingsActivity(
                 deduplication = DataStore.subscriptionDeduplication
                 updateWhenConnectedOnly = DataStore.subscriptionUpdateWhenConnectedOnly
                 customUserAgent = DataStore.subscriptionUserAgent
+                sendDeviceId = DataStore.subscriptionSendDeviceId
                 autoUpdate = DataStore.subscriptionAutoUpdate
                 autoUpdateDelay = DataStore.subscriptionAutoUpdateDelay
                 filterMode = DataStore.subscriptionFilterMode

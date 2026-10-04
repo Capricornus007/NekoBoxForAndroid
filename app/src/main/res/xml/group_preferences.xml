@@ -108,6 +108,11 @@
             app:title="@string/subscription_user_agent"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreference
+            app:icon="@drawable/ic_baseline_fingerprint_24"
+            app:key="subscriptionSendDeviceId"
+            app:summary="@string/subscription_send_device_id_sum"
+            app:title="@string/subscription_send_device_id" />
+        <SwitchPreference
             app:icon="@drawable/ic_baseline_flip_camera_android_24"
             app:key="subscriptionAutoUpdate"
             app:title="@string/auto_update" />

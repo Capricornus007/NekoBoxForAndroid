@@ -544,6 +544,8 @@
     <string name="update_when_connected_only">Update only when connected</string>
     <string name="update_when_connected_only_sum">Prevent IP address leakage</string>
     <string name="subscription_user_agent">UserAgent</string>
+    <string name="subscription_send_device_id">Send device ID</string>
+    <string name="subscription_send_device_id_sum">Identify this installation to the provider with a random ID plus the Android version and device model. Panels with a device limit, such as 3x-ui, reject updates without it.</string>
     <string name="confirm">Confirm</string>
     <string name="missing_plugin">Missing Plugin</string>
     <string name="profile_requiring_plugin">Profile %s requires the %s plugin to be installed, but

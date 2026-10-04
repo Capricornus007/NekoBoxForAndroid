@@ -503,11 +503,11 @@ class GroupFragment :
                             getString(R.string.subscription_used, used.toBytesString())
                         }
                     }
-                    get("expire=([0-9]+)")?.apply {
+                    subscription.expiry()?.let {
                         text += "\n"
                         text += getString(
                             R.string.subscription_expire,
-                            Util.timeStamp2Text(this.toLong() * 1000),
+                            Util.timeStamp2Text(it * 1000),
                         )
                     }
                 } catch (_: NumberFormatException) {
@@ -518,6 +518,9 @@ class GroupFragment :
                     groupTraffic.isVisible = true
                     groupTraffic.text = text
                     groupStatus.setPadding(0)
+                } else {
+                    groupTraffic.isVisible = false
+                    groupStatus.setPadding(0, 0, 0, dp2px(4))
                 }
             } else {
                 groupTraffic.isVisible = false

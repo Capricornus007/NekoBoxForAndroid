@@ -5,11 +5,9 @@ import io.nekohasekai.sagernet.fmt.LOCALHOST
 import io.nekohasekai.sagernet.ktx.*
 import moe.matsuri.nb4a.SingBoxOptions
 import moe.matsuri.nb4a.utils.listByLineOrComma
-import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONObject
 import java.io.File
-import java.net.URLDecoder
 import java.nio.ByteBuffer
 import java.util.Base64
 
@@ -136,16 +134,6 @@ private fun singBoxHysteria2ECHConfig(config: String?) = listOf(
     ECH_CONFIGS_END,
 )
 
-/** Decode an encoded query value without treating an unescaped base64 '+' as a space. */
-private fun HttpUrl.queryParameterPreservingPlus(name: String): String? {
-    val pair = encodedQuery
-        ?.split('&')
-        ?.firstOrNull { it.substringBefore('=') == name }
-        ?: return null
-    val encodedValue = pair.substringAfter('=', "")
-    return URLDecoder.decode(encodedValue.replace("+", "%2B"), Charsets.UTF_8.name())
-}
-
 // hysteria://host:port?auth=123456&peer=sni.domain&insecure=1|0&upmbps=100&downmbps=100&alpn=hysteria&obfs=xplus&obfsParam=123456#remarks
 fun parseHysteria1(url: String): HysteriaBean {
     val link = url.replace("hysteria://", "https://").toHttpUrlOrNull() ?: error(
@@ -243,10 +231,11 @@ fun parseHysteria2(url: String): HysteriaBean {
                 else -> HysteriaBean.OBFS_NONE
             }
         }
-        link.queryParameter("obfs-min-packet-size")?.toIntOrNull()?.also {
+        // v2rayN and 3x-ui spell the gecko bounds minPacketSize/maxPacketSize.
+        (link.queryParameter("obfs-min-packet-size") ?: link.queryParameter("minPacketSize"))?.toIntOrNull()?.also {
             geckoMinPacketSize = it
         }
-        link.queryParameter("obfs-max-packet-size")?.toIntOrNull()?.also {
+        (link.queryParameter("obfs-max-packet-size") ?: link.queryParameter("maxPacketSize"))?.toIntOrNull()?.also {
             geckoMaxPacketSize = it
         }
 //        link.queryParameter("pinSHA256")?.also {

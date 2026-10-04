@@ -25,7 +25,8 @@
       "webPageUrl": null,
       "announce": null,
       "expiryNotifiedAt": null,
-      "providerUpdateInterval": null
+      "providerUpdateInterval": null,
+      "sendDeviceId": null
     },
     "defaults": {
       "type": 0,
@@ -51,7 +52,8 @@
       "webPageUrl": "",
       "announce": "",
       "expiryNotifiedAt": 0,
-      "providerUpdateInterval": 0
+      "providerUpdateInterval": 0,
+      "sendDeviceId": false
     },
     "fields": {
       "type": "java.lang.Integer",
@@ -77,7 +79,8 @@
       "webPageUrl": "java.lang.String",
       "announce": "java.lang.String",
       "expiryNotifiedAt": "java.lang.Integer",
-      "providerUpdateInterval": "java.lang.Integer"
+      "providerUpdateInterval": "java.lang.Integer",
+      "sendDeviceId": "java.lang.Boolean"
     }
   },
   {

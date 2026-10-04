@@ -367,6 +367,16 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var subscriptionDeduplication by profileCacheStore.boolean(Key.SUBSCRIPTION_DEDUPLICATION)
     var subscriptionUpdateWhenConnectedOnly by profileCacheStore.boolean(Key.SUBSCRIPTION_UPDATE_WHEN_CONNECTED_ONLY)
     var subscriptionUserAgent by profileCacheStore.string(Key.SUBSCRIPTION_USER_AGENT)
+    var subscriptionSendDeviceId by profileCacheStore.boolean(Key.SUBSCRIPTION_SEND_DEVICE_ID)
+
+    var subscriptionDeviceId by configurationStore.string(Key.SUBSCRIPTION_DEVICE_ID)
+
+    /** Random per-install identifier sent as X-HWID by subscriptions that opt in. Not derived from hardware. */
+    @Synchronized
+    fun subscriptionDeviceId(): String = subscriptionDeviceId.ifBlank {
+        java.util.UUID.randomUUID().toString().also { subscriptionDeviceId = it }
+    }
+
     var subscriptionAutoUpdate by profileCacheStore.boolean(Key.SUBSCRIPTION_AUTO_UPDATE)
     var subscriptionAutoUpdateDelay by profileCacheStore.stringToInt(Key.SUBSCRIPTION_AUTO_UPDATE_DELAY) { 360 }
     var subscriptionFilterMode by profileCacheStore.stringToInt(Key.SUBSCRIPTION_FILTER_MODE) { 0 }

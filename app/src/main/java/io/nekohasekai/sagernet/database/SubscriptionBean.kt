@@ -83,8 +83,13 @@ class SubscriptionBean : Serializable() {
     @JvmField
     var providerUpdateInterval: Int? = null
 
+    // Send the per-install device identifier headers (X-HWID and friends) with every fetch, for
+    // panels that count devices per subscription.
+    @JvmField
+    var sendDeviceId: Boolean? = null
+
     override fun serializeToBuffer(output: ByteBufferOutput) {
-        output.writeInt(4)
+        output.writeInt(5)
         output.writeInt(type!!)
         output.writeString(link)
         output.writeBoolean(forceResolve!!)
@@ -103,6 +108,7 @@ class SubscriptionBean : Serializable() {
         output.writeString(announce)
         output.writeInt(expiryNotifiedAt!!)
         output.writeInt(providerUpdateInterval!!)
+        output.writeBoolean(sendDeviceId!!)
     }
 
     fun serializeForShare(output: ByteBufferOutput) {
@@ -141,6 +147,9 @@ class SubscriptionBean : Serializable() {
             expiryNotifiedAt = input.readInt()
             providerUpdateInterval = input.readInt()
         }
+        if (version >= 5) {
+            sendDeviceId = input.readBoolean()
+        }
     }
 
     fun deserializeFromShare(input: ByteBufferInput) {
@@ -177,10 +186,14 @@ class SubscriptionBean : Serializable() {
         announce = announce ?: ""
         expiryNotifiedAt = expiryNotifiedAt ?: 0
         providerUpdateInterval = providerUpdateInterval ?: 0
+        sendDeviceId = sendDeviceId ?: false
     }
 
-    /** Expiry from `subscription-userinfo` (`expire=` epoch seconds), or null when absent. */
-    fun expiry(): Long? = subscriptionUserinfo?.let { EXPIRE.find(it)?.groupValues?.get(1)?.toLongOrNull() }
+    /**
+     * Expiry from `subscription-userinfo` (`expire=` epoch seconds). Null when absent or `0`,
+     * which panels such as 3x-ui send for subscriptions without an expiry.
+     */
+    fun expiry(): Long? = subscriptionUserinfo?.let { EXPIRE.find(it)?.groupValues?.get(1)?.toLongOrNull() }?.takeIf { it > 0 }
 
     companion object {
         private val EXPIRE = "expire=([0-9]+)".toRegex()
