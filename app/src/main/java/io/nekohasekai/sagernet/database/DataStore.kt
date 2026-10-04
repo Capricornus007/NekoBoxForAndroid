@@ -327,6 +327,10 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var adaptiveTrafficPolling by configurationStore.boolean(Key.ADAPTIVE_TRAFFIC_POLLING) { false }
     var profileTrafficStatistics by configurationStore.boolean(Key.PROFILE_TRAFFIC_STATISTICS) { true }
 
+    // 選應用／應用管理清單要不要連系統應用一起列。兩個畫面共用這一個值，而且會記住：
+    // 之前是各自一個記憶體 var（一邊預設顯示、一邊預設隱藏），退出再進來就回到預設。
+    var showSystemApps by configurationStore.boolean(Key.SHOW_SYSTEM_APPS) { false }
+
     // Auto-switch timeout settings
     var enableAutoSwitchTimeout by configurationStore.boolean(Key.ENABLE_AUTO_SWITCH_TIMEOUT) { false }
     var autoSwitchTimeoutDuration by configurationStore.stringToInt(Key.AUTO_SWITCH_TIMEOUT_DURATION) { 10 }

@@ -261,9 +261,11 @@ class AppManagerActivity : ThemedActivity() {
             applyFilter(it?.toString() ?: "", debounceMs = 250)
         }
 
+        sysApps = DataStore.showSystemApps
         binding.showSystemApps.isChecked = sysApps
         binding.showSystemApps.setOnCheckedChangeListener { _, isChecked ->
             sysApps = isChecked
+            DataStore.showSystemApps = isChecked
             applyFilter()
         }
 
@@ -272,7 +274,7 @@ class AppManagerActivity : ThemedActivity() {
     }
 
     @Volatile
-    private var sysApps = true
+    private var sysApps = false
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.per_app_proxy_menu, menu)

@@ -120,6 +120,7 @@ object Key {
     const val SUBSCRIPTION_DIRECT_FALLBACK = "subscriptionDirectFallback"
     const val ADAPTIVE_TRAFFIC_POLLING = "adaptiveTrafficPolling"
     const val PROFILE_TRAFFIC_STATISTICS = "profileTrafficStatistics"
+    const val SHOW_SYSTEM_APPS = "showSystemApps"
 
     const val PROFILE_DIRTY = "profileDirty"
     const val PROFILE_ID = "profileId"

@@ -228,9 +228,11 @@ class AppListActivity : ThemedActivity() {
             applyFilter(it?.toString() ?: "", debounceMs = 250)
         }
 
+        sysApps = DataStore.showSystemApps
         binding.showSystemApps.isChecked = sysApps
         binding.showSystemApps.setOnCheckedChangeListener { _, isChecked ->
             sysApps = isChecked
+            DataStore.showSystemApps = isChecked
             applyFilter()
         }
 

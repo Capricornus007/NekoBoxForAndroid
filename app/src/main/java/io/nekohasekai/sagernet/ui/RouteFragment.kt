@@ -28,22 +28,51 @@ import me.zhanghai.android.fastscroll.FastScrollerBuilder
 class RouteFragment : ToolbarFragment(R.layout.layout_route), Toolbar.OnMenuItemClickListener {
 
     companion object {
-        // 常用应用分流预设（OwnBox F03）：国内直连白名单 / 海外走代理。
-        // 与 AppListActivity 的批量勾选共用同一份清单。
+        // 常用应用分流预设：国内直连白名单 / 海外走代理。与 AppListActivity 的批量勾選共用同一份清單。
+        // 這只是「預設勾選」用的清單，不是分類表：清單裡沒裝的套件會被直接略過，所以寧全勿缺，
+        // 漏掉的應用使用者自己勾。2026-10-04 按現況補齊（原清單是 2019 年那批，缺了短影音、
+        // 長影音、辦公與錢包那一票現在的主力）。
         val CN_APPS = setOf(
-            "com.tencent.mm", "com.tencent.mobileqq", "com.eg.android.AlipayGphone",
-            "com.taobao.taobao", "com.jingdong.app.mall", "tv.danmaku.bili",
-            "com.ss.android.ugc.aweme", "com.netease.cloudmusic", "com.autonavi.minimap",
-            "com.baidu.BaiduMap", "com.xunmeng.pinduoduo", "com.sankuai.meituan",
-            "com.zhihu.android", "com.sina.weibo", "com.coolapk.market",
+            // 通訊與社交
+            "com.tencent.mm", "com.tencent.mobileqq", "com.sina.weibo", "com.zhihu.android",
+            "com.xingin.xhs", "com.douban.frodo", "com.tencent.wework",
+            // 電商與本地生活
+            "com.eg.android.AlipayGphone", "com.taobao.taobao", "com.jingdong.app.mall",
+            "com.xunmeng.pinduoduo", "com.sankuai.meituan", "com.sankuai.meituan.takeoutnew",
+            "me.ele", "com.taobao.idlefish", "com.shizhuang.duapp", "com.dianping.v1",
+            "com.coolapk.market",
+            // 影音與閱讀
+            "tv.danmaku.bili", "com.ss.android.ugc.aweme", "com.ss.android.ugc.aweme.lite",
+            "com.smile.gifmaker", "com.kuaishou.nebula", "com.tencent.qqlive", "com.qiyi.video",
+            "com.youku.phone", "com.netease.cloudmusic", "com.tencent.qqmusic", "com.kugou.android",
+            "com.dragon.read", "com.tencent.weread", "com.lemon.lv", "air.tv.douyu.android",
+            "com.hy.clone",
+            // 出行、辦公與工具
+            "com.autonavi.minimap", "com.baidu.BaiduMap", "com.sdu.didi.psnger",
+            "com.MobileTicket", "ctrip.android.view", "com.qunar", "com.unionpay",
+            "com.alibaba.android.rimet", "cn.wps.moffice_eng", "com.baidu.netdisk",
+            "com.baidu.tieba", "com.quark.browser", "com.netease.newsreader.activity",
+            "com.greenpoint.android.mc10086.activity",
         )
 
         val FOREIGN_APPS = setOf(
-            "org.telegram.messenger", "org.thunderdog.challegram", "com.google.android.youtube",
-            "com.twitter.android", "com.android.chrome", "com.google.android.gms",
-            "com.android.vending", "com.discord", "com.whatsapp", "com.instagram.android",
-            "com.zhiliaoapp.musically", "com.openai.chatgpt", "com.netflix.mediaclient",
-            "com.spotify.music",
+            // Google 系
+            "com.google.android.gms", "com.android.vending", "com.google.android.youtube",
+            "com.google.android.apps.youtube.music", "com.google.android.apps.maps",
+            "com.google.android.gm", "com.google.android.apps.photos",
+            "com.google.android.apps.docs", "com.google.android.translate",
+            "com.google.android.apps.bard",
+            // 通訊與社群
+            "org.telegram.messenger", "org.thunderdog.challegram", "com.whatsapp",
+            "com.whatsapp.w4b", "com.discord", "com.twitter.android", "com.instagram.android",
+            "com.facebook.katana", "com.facebook.orca", "jp.naver.line.android",
+            "com.reddit.frontpage", "org.thoughtcrime.securesms", "com.zhiliaoapp.musically",
+            // AI 與娛樂
+            "com.openai.chatgpt", "com.anthropic.claude", "com.microsoft.copilot",
+            "com.netflix.mediaclient", "com.spotify.music",
+            // 瀏覽器與辦公、錢包
+            "com.android.chrome", "com.microsoft.emmx", "com.microsoft.office.outlook",
+            "com.microsoft.skydrive", "com.paypal.android.p2pmobile",
         )
     }
 
