@@ -542,10 +542,16 @@ class GroupFragment :
                     // ignore
                 }
 
+                // 訂閱的 userinfo 可能有那串頭、但每個欄位都是 0 或缺，算出來的 text 就是空的。
+                // 這種情況下要主動把流量那行收起來並補回內距，否則卡片會留一條空白行、
+                // 或是掛著上一個組的舊文字（hawkff 6e575687a #180 的第二段修）。
                 if (text.isNotEmpty()) {
                     groupTraffic.isVisible = true
                     groupTraffic.text = text
                     groupStatus.setPadding(0)
+                } else {
+                    groupTraffic.isVisible = false
+                    groupStatus.setPadding(0, 0, 0, dp2px(4))
                 }
             } else {
                 groupTraffic.isVisible = false

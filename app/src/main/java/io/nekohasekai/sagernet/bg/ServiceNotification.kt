@@ -129,7 +129,9 @@ class ServiceNotification(
         update()
     }
 
-    private val showDirectSpeed = DataStore.showDirectSpeed
+    // 讀 value 而不是 val：通知物件在服務啟動時就建好了，用 val 會把「顯示直連速率」
+    // 固定在啟動那一刻，使用者事後在設定裡打開也必須重連才生效（own 9117a0d87 的修）。
+    private val showDirectSpeed get() = DataStore.showDirectSpeed
 
     private val builder = NotificationCompat.Builder(service as Context, channel)
         .setWhen(0)
