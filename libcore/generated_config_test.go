@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/miekg/dns"
@@ -64,6 +65,25 @@ func TestGeneratedApplicationConfigs(t *testing.T) {
 			// Android TUN interface or any application listeners.
 			if err := instance.PreStart(); err != nil {
 				t.Fatal(err)
+			}
+			if filepath.Base(filepath.Dir(path)) == "tailscale-routing" {
+				// Expected tags are supplied independently by the fixture, never copied
+				// from route.final: implicit direct fallback must not pass this check.
+				expected, err := os.ReadFile(path + ".expected-tag")
+				if err != nil {
+					t.Fatal(err)
+				}
+				expectedTag := strings.TrimSpace(string(expected))
+				if expectedTag == "" {
+					t.Fatal("empty expected default outbound tag")
+				}
+				defaultOutbound := instance.Outbound().Default()
+				if defaultOutbound == nil {
+					t.Fatal("missing default outbound")
+				}
+				if actual := defaultOutbound.Tag(); actual != expectedTag {
+					t.Fatalf("default outbound = %q, want %q", actual, expectedTag)
+				}
 			}
 			if filepath.Base(filepath.Dir(path)) != "dns" || filepath.Base(path) == "probe.json" {
 				return

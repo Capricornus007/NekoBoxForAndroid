@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"golang.org/x/mobile/asset"
+	"github.com/sagernet/gomobile/asset"
 )
 
 func extractAssets() {

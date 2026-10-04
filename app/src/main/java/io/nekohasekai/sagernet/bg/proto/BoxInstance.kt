@@ -5,6 +5,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.bg.GuardedProcessPool
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
+import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.ConfigBuildResult
 import io.nekohasekai.sagernet.fmt.LOCALHOST
 import io.nekohasekai.sagernet.fmt.buildConfig
@@ -14,9 +15,12 @@ import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.mieru.buildMieruConfig
 import io.nekohasekai.sagernet.fmt.naive.NaiveBean
 import io.nekohasekai.sagernet.fmt.naive.buildNaiveConfig
+import io.nekohasekai.sagernet.fmt.tailscale.acquireTailscaleState
+import io.nekohasekai.sagernet.fmt.tailscale.pruneTailscaleState
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.plugin.PluginManager
 import kotlinx.coroutines.*
+import kotlinx.coroutines.selects.select
 import libcore.BoxInstance
 import libcore.Libcore
 import moe.matsuri.nb4a.net.LocalResolverImpl
@@ -33,6 +37,7 @@ abstract class BoxInstance(val profile: ProxyEntity) : Closeable {
     val pluginConfigs = hashMapOf<Int, String>()
     open lateinit var processes: GuardedProcessPool
     private val cacheFiles = ArrayList<File>()
+    private var stateLease: Closeable? = null
 
     fun isInitialized() = ::config.isInitialized && ::box.isInitialized
 
@@ -49,6 +54,21 @@ abstract class BoxInstance(val profile: ProxyEntity) : Closeable {
 
     open suspend fun init() {
         buildConfig()
+        val nodes = config.tailscaleEndpoints.keys
+        if (nodes.isNotEmpty()) {
+            stateLease = acquireTailscaleState(nodes)
+            // Config construction may precede queued probe serialization or a restore/reset.
+            // Never run its old JSON against a newly assigned identity at the same numeric ID.
+            val snapshots = config.trafficMap.values.flatten().associateBy { it.id }
+            for (id in nodes) {
+                val snapshot = snapshots[id] ?: error("Missing Tailscale profile snapshot")
+                val current = SagerDatabase.proxyDao.getById(id)
+                check(current?.type == ProxyEntity.TYPE_TAILSCALE && current.uuid == snapshot.uuid && current.requireBean() == snapshot.requireBean()) {
+                    "Tailscale profile changed. Retry with the saved profile."
+                }
+            }
+        }
+        currentCoroutineContext().ensureActive()
         for ((chain) in config.externalIndex) {
             for ((port, profile) in chain) {
                 when (val bean = profile.requireBean()) {
@@ -162,6 +182,7 @@ abstract class BoxInstance(val profile: ProxyEntity) : Closeable {
         val pending = pendingExternalPorts(ports, if (strict) minOf(2_000L, timeout) else timeout)
         if (pending.isEmpty()) return
         if (!processes.isActive) {
+            if (strict) throw IOException("sidecar process pool stopped before listener readiness")
             Logs.w("sidecar listener not ready on port(s): ${pending.joinToString()}; process pool already stopped")
             return
         }
@@ -170,13 +191,71 @@ abstract class BoxInstance(val profile: ProxyEntity) : Closeable {
         Logs.w("$message; continuing (sing-box will retry the connection)")
     }
 
+    // The child owns initialization and JNI calls. Cancellation joins it before close, so a
+    // native object published late cannot escape cleanup or outlive its state lease.
+    internal suspend fun <T> runProbe(query: suspend () -> T): T = withContext(Dispatchers.IO) {
+        supervisorScope {
+            val failure = CompletableDeferred<Nothing>()
+            processes = GuardedProcessPool { failure.completeExceptionally(it) }
+            val worker = async {
+                init()
+                ensureActive()
+                this@BoxInstance.launch()
+                ensureActive()
+                awaitExternalProcessesReady(strict = true)
+                ensureActive()
+                if (failure.isCompleted) failure.await()
+                query()
+            }
+            var ended: Throwable? = null
+            try {
+                select {
+                    failure.onAwait { it }
+                    worker.onAwait { it }
+                }
+            } catch (e: Throwable) {
+                ended = e
+                throw e
+            } finally {
+                withContext(NonCancellable) {
+                    worker.cancelAndJoin()
+                    try {
+                        close()
+                    } catch (e: Exception) {
+                        // A cleanup error is the outcome of a successful query, but it must not
+                        // replace the failure that ended the probe.
+                        ended?.addSuppressed(e) ?: throw e
+                    } finally {
+                        processes.coroutineContext[Job]?.join()
+                    }
+                }
+            }
+        }
+    }
+
     @Suppress("EXPERIMENTAL_API_USAGE")
     override fun close() {
-        cacheFiles.removeAll {
-            it.delete()
-            true
+        try {
+            try {
+                if (::processes.isInitialized) processes.close(GlobalScope + Dispatchers.IO)
+            } finally {
+                if (::box.isInitialized) box.close()
+            }
+        } finally {
+            cacheFiles.removeAll {
+                it.delete()
+                true
+            }
+            stateLease?.close()
+            stateLease = null
         }
-        if (::processes.isInitialized) processes.close(GlobalScope + Dispatchers.IO)
-        if (::box.isInitialized) box.close()
+        if (::config.isInitialized && config.tailscaleEndpoints.isNotEmpty()) {
+            try {
+                pruneTailscaleState(profileIds = config.tailscaleEndpoints.keys)
+            } catch (_: Exception) {
+                // Best-effort housekeeping must not replace the probe result or its failure.
+                Logs.w("Tailscale state cleanup deferred")
+            }
+        }
     }
 }

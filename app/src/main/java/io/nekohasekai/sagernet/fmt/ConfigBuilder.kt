@@ -673,6 +673,11 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     tagOut = readableTag(bean.displayName())
                 }
 
+                // Resolve reuse before linking the previous hop: a standalone profile may
+                // already own a readable tag rather than the provisional global tag.
+                val reusedGlobalTag = if (needGlobal) globalOutbounds[proxyEntity.id] else null
+                if (reusedGlobalTag != null) tagOut = reusedGlobalTag
+
                 // chain rules
                 if (index > 0) {
                     // chain route/proxy rules
@@ -693,10 +698,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
                 // now tagOut is determined
                 if (needGlobal) {
-                    globalOutbounds[proxyEntity.id]?.let {
-                        if (index == 0) chainTagOut = it // single, duplicate chain
-                        return@forEachIndexed
-                    }
+                    if (reusedGlobalTag != null) return@forEachIndexed
                     globalOutbounds[proxyEntity.id] = tagOut
                 }
 
@@ -964,6 +966,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         }
 
         val mainProxyTag = (if (buildSelector) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
+        // Endpoints are not candidates for the core's implicit first-outbound default.
+        route.final_ = mainProxyTag
 
         // Tailnet destinations (peer addresses, advertised subnets, MagicDNS names) go to the
         // node that knows them, even when another outbound is the final one. The exit node's
@@ -1021,8 +1025,6 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     },
                 )
             }
-
-            route.final_ = mainProxyTag
         } else {
             // apply user rules
             for (rule in extraRules) {
@@ -1269,9 +1271,27 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
         }
 
-        if (forTest) {
-            dnsRules.clear()
-        } else {
+        // MagicDNS is also needed by standalone probes. Keep public-name fallback on
+        // dns-direct for tests, and service user rules ahead of the preferred rules.
+        tailscaleTags.forEachIndexed { index, tag ->
+            val serverTag = "dns-tailscale-$index"
+            dnsServers.add(
+                DNSServerOptions().apply {
+                    type = "tailscale"
+                    this.tag = serverTag
+                    _hack_config_map["endpoint"] = tag
+                    _hack_config_map["accept_search_domain"] = true
+                },
+            )
+            dnsRules.add(
+                DNSRule_DefaultOptions().apply {
+                    _hack_config_map["preferred_by"] = listOf(serverTag)
+                    server = serverTag
+                },
+            )
+        }
+
+        if (!forTest) {
             // built-in DNS rules
             routeRules.add(
                 0,
@@ -1303,27 +1323,6 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     action = "reject"
                 },
             )
-            // MagicDNS: one resolver per Tailscale node answering its MagicDNS hosts, the
-            // tailnet's split-DNS suffixes and single-label machine names. Appended after the
-            // user DNS rules so an explicit block or rewrite still wins, and ahead of FakeDNS
-            // so tailnet names get real addresses.
-            tailscaleTags.forEachIndexed { index, tag ->
-                val serverTag = "dns-tailscale-$index"
-                dnsServers.add(
-                    DNSServerOptions().apply {
-                        type = "tailscale"
-                        this.tag = serverTag
-                        _hack_config_map["endpoint"] = tag
-                        _hack_config_map["accept_search_domain"] = true
-                    },
-                )
-                dnsRules.add(
-                    DNSRule_DefaultOptions().apply {
-                        _hack_config_map["preferred_by"] = listOf(serverTag)
-                        server = serverTag
-                    },
-                )
-            }
             // FakeDNS obj
             if (useFakeDns) {
                 dnsServers.add(

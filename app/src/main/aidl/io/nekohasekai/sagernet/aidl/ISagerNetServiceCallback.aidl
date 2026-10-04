@@ -10,4 +10,6 @@ oneway interface ISagerNetServiceCallback {
   void cbTrafficUpdate(in TrafficData stats);
   void cbTrafficUpdateList(in List<TrafficData> stats);
   void cbSelectorUpdate(long id);
+  void cbTailscaleStatus(long sessionId, long sequence, String json);
+  void cbTailscaleResult(long sessionId, long requestId, String json);
 }

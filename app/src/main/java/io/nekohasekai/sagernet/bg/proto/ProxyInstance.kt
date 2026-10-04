@@ -12,6 +12,8 @@ import kotlinx.coroutines.runBlocking
 
 class ProxyInstance(profile: ProxyEntity, var service: BaseService.Interface? = null) : BoxInstance(profile) {
 
+    internal val tailscaleReadiness = TailscaleReadinessIntent()
+
     var lastSelectorGroupId = -1L
     var lastAutoSelect = false
     var displayProfileName = ServiceNotification.genTitle(profile)
@@ -49,6 +51,7 @@ class ProxyInstance(profile: ProxyEntity, var service: BaseService.Interface? = 
                 looper?.stop()
             } finally {
                 looper = null
+                tailscaleReadiness.clear()
             }
         },
     ) {
