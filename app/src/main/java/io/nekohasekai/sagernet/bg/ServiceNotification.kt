@@ -74,12 +74,8 @@ class ServiceNotification(
         region: String? = null,
         directSpeed: String? = null,
     ) {
-        val color = when (state) {
-            BaseService.State.Connected -> 0xFF4CAF50.toInt() // 绿色 (Green #4CAF50)
-            BaseService.State.Connecting -> 0xFFFFB300.toInt() // 黄色 (Yellow #FFB300)
-            else -> 0xFF9E9E9E.toInt() // 灰色 (Gray #9E9E9E)
-        }
-        builder.color = color
+        // 取消绿色/黄色强调色，移除展开卡片彩色大圆盘，与收起态统一为通透原生 Logo
+        builder.color = NotificationCompat.COLOR_DEFAULT
 
         val resolvedRegion = if (!region.isNullOrBlank()) {
             region
@@ -100,12 +96,12 @@ class ServiceNotification(
         }
 
         // 谷歌原生 Android 16 实况岛 / Rich Ongoing Notifications (Live Updates) 规范
-        // 收起状态：挖孔屏旁保持显示状态颜色和地区汉字（如“日本”）
+        // 收起状态：挖孔屏旁展示原生纯净 Logo 与地区汉字（如“日本”）
         builder.extras.apply {
             putBoolean("android.requestPromotedOngoing", true)
             putCharSequence("android.shortCriticalText", displayChipText)
             putString("capsule_text", displayChipText)
-            putInt("capsule_color", color)
+            remove("capsule_color")
             putString("live_activity_status", if (state == BaseService.State.Connected) "active" else "pending")
         }
 

@@ -62,7 +62,7 @@ class ActiveOutboundTrackerTest {
         }
 
         val title = ActiveOutboundTracker.formatNotificationTitle(balancer)
-        assertEquals("自动选择 · 最低延迟", title)
+        assertEquals("自动选择", title)
 
         ActiveOutboundTracker.updateActiveLeaf(101L, "日本 02")
         val leafDisplay = ActiveOutboundTracker.getActiveLeafNodeDisplay(balancer)
@@ -89,7 +89,7 @@ class ActiveOutboundTrackerTest {
             proxySpeed = "↑1.2 KB/s ↓5.4 KB/s",
             directSpeed = "↑0 B/s ↓120 B/s"
         )
-        assertEquals("🇯🇵日本 · 最低延迟", bundle.title)
+        assertEquals("🇯🇵日本", bundle.title)
         assertEquals("当前: 🇯🇵Japan 01 · 代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.collapsedText)
         assertEquals("当前: 🇯🇵Japan 01\n代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.bigText)
         assertTrue(!bundle.collapsedText.contains("当前节点"))
@@ -117,8 +117,8 @@ class ActiveOutboundTrackerTest {
             directSpeed = "↑0 B/s ↓120 B/s"
         )
         assertEquals("🇯🇵Japan 01", bundle.title)
-        assertEquals("策略: 最低延迟 · 代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.collapsedText)
-        assertEquals("策略: 最低延迟\n代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.bigText)
+        assertEquals("代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.collapsedText)
+        assertEquals("代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.bigText)
         assertTrue(!bundle.bigText.contains("🇯🇵Japan 01")) // Leaf name not repeated in body
     }
 

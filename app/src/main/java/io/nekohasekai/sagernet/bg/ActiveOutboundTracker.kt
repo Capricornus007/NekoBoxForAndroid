@@ -116,14 +116,7 @@ object ActiveOutboundTracker {
                 return leafNode
             }
             // 用户开启了“显示分组”（或尚未检测到叶子节点）：主标题为策略组自身的名字
-            val baseName = if (isBalancer) profile.displayName() else (group?.displayName() ?: profile.displayName())
-            val strategyName = getStrategyDisplayName(profile)
-            val cleanStrategy = if (strategyName == "策略组") "" else strategyName
-            return if (cleanStrategy.isNotBlank() && !baseName.contains(cleanStrategy)) {
-                "$baseName · $cleanStrategy"
-            } else {
-                baseName
-            }
+            return if (isBalancer) profile.displayName() else (group?.displayName() ?: profile.displayName())
         }
 
         return runCatching { ServiceNotification.genTitle(profile) }.getOrDefault(profile.displayName())
@@ -159,15 +152,9 @@ object ActiveOutboundTracker {
         val bigContent: String
 
         if (isStrategy) {
-            val cleanStrategy = if (strategyName == "策略组") "" else strategyName
             if (showGroup) {
                 // Template 1: 策略组 + 显示组名开启
-                val baseName = if (isBalancer) profile.displayName() else (groupName ?: profile.displayName())
-                title = if (cleanStrategy.isNotBlank() && !baseName.contains(cleanStrategy)) {
-                    "$baseName · $cleanStrategy"
-                } else {
-                    baseName
-                }
+                title = if (isBalancer) profile.displayName() else (groupName ?: profile.displayName())
                 collapsedText = if (!leafNode.isNullOrBlank()) {
                     "当前: $leafNode · 代理: $proxySpeed"
                 } else {
@@ -182,17 +169,8 @@ object ActiveOutboundTracker {
             } else {
                 // Template 2: 策略组 + 显示组名关闭
                 title = if (!leafNode.isNullOrBlank()) leafNode else profile.displayName()
-                collapsedText = if (cleanStrategy.isNotBlank()) {
-                    "策略: $cleanStrategy · 代理: $proxySpeed"
-                } else {
-                    "代理: $proxySpeed"
-                }
-                bigContent = buildString {
-                    if (cleanStrategy.isNotBlank()) {
-                        append("策略: ").append(cleanStrategy).append("\n")
-                    }
-                    append("代理: ").append(proxySpeed)
-                }
+                collapsedText = "代理: $proxySpeed"
+                bigContent = "代理: $proxySpeed"
             }
         } else {
             val profileName = profile.displayName()
