@@ -385,6 +385,7 @@ commands:
   selftest    run the offline dependency checks, print JSON, exit 1 on failure
   login       exchange credentials on stdin for a stored session, print JSON
   nodes       list usable Proton servers from a stored session, print JSON
+  keypair     print a fresh X25519 key pair as JSON, for a WireGuard tunnel
 `)
 }
 
@@ -412,6 +413,9 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 
 	case "nodes":
 		return runNodes(args[1:], stdout, stderr)
+
+	case "keypair":
+		return runKeyPair(stdout, stderr)
 
 	case "selftest":
 		command := flag.NewFlagSet("selftest", flag.ContinueOnError)
