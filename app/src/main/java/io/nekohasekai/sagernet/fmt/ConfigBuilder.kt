@@ -541,13 +541,11 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     store_fakeip = true
                 }
 
-                // clash_api 常开：实时流量图（TrafficChartActivity）依赖 /traffic 与
-                // /connections 端点；enableClashAPI 只控制 yacd 面板文件的下载。
+                // clash_api 常开：app 內建即時流量圖（TrafficChartActivity）與連線列表依賴
+                // /traffic 與 /connections 端點。面板（yacd／dashboard）已整個移除，
+                // 所以不再設定 external_ui。
                 clash_api = ClashAPIOptions().apply {
                     external_controller = "127.0.0.1:9090"
-                    if (DataStore.enableClashAPI) {
-                        external_ui = "../files/yacd"
-                    }
                 }
             }
         }

@@ -274,7 +274,6 @@ class ConfigBuilderGoldenTest {
 
     @Test
     fun forExport_omitsClashApiSecret() {
-        DataStore.enableClashAPI = true
         assertEquals("export-secret", DataStore.clashApiSecret)
         val profile = addSocks(addGroup(), "192.0.2.50", 1080, "export-socks")
 

@@ -237,7 +237,7 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 // 新起的 goroutine 由 Go runtime 管理堆疊，可以正常增長。
 //
 // panic 必須在這裡就轉成 error 傳出去：fn 已經不在呼叫端那些 defer 的覆蓋範圍內了。
-// assetsReady 在 :bg 行程把 APK 內的 geoip / geosite / yacd 資產解壓結束後關閉。
+// assetsReady 在 :bg 行程把 APK 內的 geoip / geosite 資產解壓結束後關閉。
 // InitCore 把解壓丟在一條分離的 goroutine 裡，而 BoxInstance.Start() 有可能先跑完，
 // 這時核心讀不到 geo 檔並不會報錯，只是讓 geo 規則靜默失效——使用者看到的是
 // 「規則沒作用」，而且重啟就好，極難歸因。
@@ -399,8 +399,8 @@ func (b *BoxInstance) SelectOutbound(tag string) bool {
 	if b.selector != nil {
 		if b.selector.SelectOutbound(tag) {
 			// 替代 fork 的 nekoutils.Selector_OnProxySelected 钩子。
-			// 注意：仅覆盖 app 内的切换路径；通过 Clash API（yacd 面板）
-			// 切换不会触发该回调（官方内核无此钩子，待有具体案例再修）。
+			// 注意：仅覆盖 app 内的切换路径；外部程序直接打 Clash API 切换不会触发该回调。
+			// 官方内核无此钩子，待有具体案例再修。
 			if intfNB4A != nil {
 				intfNB4A.Selector_OnProxySelected(b.selector.Tag(), tag)
 			}

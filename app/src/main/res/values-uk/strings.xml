@@ -28,7 +28,6 @@
     <string name="quick_disable">Вимкнути</string>
     <string name="quick_clear_cache_restart">Очистити кеш &amp; Перезапустити</string>
     <string name="menu_traffic">Трафік</string>
-    <string name="menu_dashboard">Панель керування sing-box</string>
     <string name="action_copy">Копіювати</string>
     <string name="action_open">Відкрити</string>
     <string name="group_name">Назва групи</string>
@@ -629,12 +628,8 @@
     <string name="custom_config_json">Користувацький конфігураційний JSON</string>
     <string name="is_outbound_only">Набір JSON є outbound</string>
     <string name="save">Зберегти</string>
-    <string name="set_panel_url">Встановити URL панелі</string>
     <string name="action_close">Закрити</string>
-    <string name="invalid_panel_url">Недійсний URL панелі. Використовуйте лише HTTPS або localhost HTTP.</string>
-    <string name="enable_clash_api">Увімкнути Clash API</string>
     <string name="log_level">Рівень журналювання</string>
-    <string name="enable_clash_api_summary">Надати API Clash та панель керування YACD на 127.0.0.1:9090</string>
     <string name="xtls_flow">Flow (підпротокол VLESS)</string>
     <string name="ads">Реклама</string>
     <string name="bypass_lan_in_core">Обхід LAN в ядрі</string>

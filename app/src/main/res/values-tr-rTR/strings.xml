@@ -20,7 +20,6 @@
     <string name="quick_enable">Etkinleştir</string>
     <string name="quick_disable">Devre dışı bırak</string>
     <string name="menu_traffic">Trafik</string>
-    <string name="menu_dashboard">sing-box Kontrol Paneli</string>
     <string name="action_copy">Kopyala</string>
     <string name="action_open">Aç</string>
     <string name="group_name">Grup adı</string>
@@ -496,10 +495,7 @@
     <string name="custom_config_json">Özel yapılandırma JSON</string>
     <string name="is_outbound_only">JSON seti giden yönlüdür</string>
     <string name="save">Kaydet</string>
-    <string name="set_panel_url">Panel URL\'sini ayarla</string>
-    <string name="enable_clash_api">Clash API\'yi etkinleştir</string>
     <string name="log_level">Günlük Seviyesi</string>
-    <string name="enable_clash_api_summary">127.0.0.1:9090 adresinde clash api ve yacd panosu sağla</string>
     <string name="xtls_flow">Akış (VLESS Alt Protokolü)</string>
     <string name="ads">Reklamlar</string>
     <string name="bypass_lan_in_core">Çekirdekte LAN\'ı atla</string>
@@ -671,7 +667,6 @@
     <string name="hysteria2_obfs_type">Gizleme Türü</string>
     <string name="interface_settings">Arayüz</string>
     <string name="invalid_amnezia_config">Geçersiz veya bozuk Amnezia yapılandırması</string>
-    <string name="invalid_panel_url">Geçersiz panel URL\'si. Yalnızca HTTPS veya localhost HTTP kullanın.</string>
     <string name="lan_sharing">LAN / Hotspot (Root)</string>
     <string name="lan_sharing_requires_root">Root gerekli, kullanilamiyor</string>
     <string name="lan_sharing_summary">Wi-Fi ve USB VPN uzerinden yonlendir</string>

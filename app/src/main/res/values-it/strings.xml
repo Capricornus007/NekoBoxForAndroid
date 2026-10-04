@@ -28,7 +28,6 @@
     <string name="quick_disable">Disabilita</string>
     <string name="quick_clear_cache_restart">Svuota cache e riavvia</string>
     <string name="menu_traffic">Traffico</string>
-    <string name="menu_dashboard">Dashboard sing-box</string>
     <string name="action_copy">Copia</string>
     <string name="action_open">Apri</string>
     <string name="group_name">Nome gruppo</string>
@@ -624,12 +623,8 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="custom_config_json">JSON di configurazione personalizzato</string>
     <string name="is_outbound_only">Il JSON impostato è outbound</string>
     <string name="save">Salva</string>
-    <string name="set_panel_url">Imposta URL del pannello</string>
     <string name="action_close">Chiudi</string>
-    <string name="invalid_panel_url">URL pannello non valido. Utilizza solo HTTPS o localhost HTTP.</string>
-    <string name="enable_clash_api">Abilita Clash API</string>
     <string name="log_level">Livello di log</string>
-    <string name="enable_clash_api_summary">Fornisce Clash API e dashboard yacd su 127.0.0.1:9090</string>
     <string name="xtls_flow">Flow (sottoprotocollo VLESS)</string>
     <string name="ads">Annunci</string>
     <string name="bypass_lan_in_core">Ignora LAN nel Core</string>

@@ -207,7 +207,6 @@
     <string name="hysteria2_obfs_type">Тып абфускацыі</string>
     <string name="interface_settings">Налады інтэрфейсу</string>
     <string name="invalid_amnezia_config">Недапушчальная канфігурацыя AmneziaWG</string>
-    <string name="invalid_panel_url">Недапушчальная URL панэлі</string>
     <string name="mal_close">Закрыць</string>
     <string name="mdv_domains">Дамены</string>
     <string name="more_options">Больш опцый</string>
@@ -263,7 +262,6 @@
     <string name="toast_create_preferences_failed">Не ўдалося стварыць налады. Паспрабуйце зноў.</string>
     <string name="dialog_log_buffer_size">Памер буфера журнала (КБ)</string>
     <string name="quick_clear_cache_restart">Перазапуск пасля ачысткі</string>
-    <string name="menu_dashboard">Панэль sing-box</string>
     <string name="action_copy">Капіраваць</string>
     <string name="action_open">Адкрыць</string>
     <string name="update_all_subscription">Абнавіць усе падпіскі</string>
@@ -630,10 +628,7 @@
     <string name="custom_config_json">Уласная канфігурацыя JSON</string>
     <string name="is_outbound_only">Уведзеная JSON — толькі outbound</string>
     <string name="save">Захаваць</string>
-    <string name="set_panel_url">Задаць URL панэлі</string>
-    <string name="enable_clash_api">Уключыць Clash API</string>
     <string name="log_level">Узровень журнала</string>
-    <string name="enable_clash_api_summary">Clash api і панэль yacd на 127.0.0.1:9090</string>
     <string name="xtls_flow">Flow (падпратакол VLESS)</string>
     <string name="ads">Рэклама</string>
     <string name="bypass_lan_in_core">Абыход LAN у ядры</string>

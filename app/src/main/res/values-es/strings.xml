@@ -719,7 +719,6 @@
     <string name="use_system_theme">Usar tema del sistema</string>
     <string name="use_system_theme_summary">Usar colores dinámicos del sistema (Android 12+)</string>
     <string name="quick_clear_cache_restart">Reiniciar tras limpiar</string>
-    <string name="menu_dashboard">Panel de sing-box</string>
     <string name="update_all_subscription">Actualizar todas las suscripciones</string>
     <string name="layout">Disposición</string>
     <string name="layout_single_column">Una columna</string>
@@ -851,10 +850,7 @@
     <string name="custom_config_json">JSON de configuración personalizado</string>
     <string name="is_outbound_only">El JSON introducido es de salida</string>
     <string name="save">Guardar</string>
-    <string name="set_panel_url">Establecer URL del panel</string>
-    <string name="enable_clash_api">Activar Clash API</string>
     <string name="log_level">Nivel de registro</string>
-    <string name="enable_clash_api_summary">Ofrece clash api y panel yacd en 127.0.0.1:9090</string>
     <string name="xtls_flow">Flow (subprotocolo VLESS)</string>
     <string name="ads">Anuncios</string>
     <string name="bypass_lan_in_core">Omitir LAN en el núcleo</string>
@@ -1001,7 +997,6 @@
     <string name="hysteria2_obfs_type">Tipo de ofuscación</string>
     <string name="interface_settings">Ajustes de interfaz</string>
     <string name="invalid_amnezia_config">Configuración de AmneziaWG no válida</string>
-    <string name="invalid_panel_url">URL del panel no válida</string>
     <string name="lifetime_traffic">Total: %1$s↑ %2$s↓</string>
     <string name="mdv_advanced_json">JSON avanzado</string>
     <string name="mdv_auto_disable_timeout">Tiempo de desactivación automática</string>

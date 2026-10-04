@@ -262,12 +262,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val resolveDestination = findPreference<SwitchPreferenceCompat>(Key.RESOLVE_DESTINATION)!!
         val acquireWakeLock = findPreference<SwitchPreferenceCompat>(Key.ACQUIRE_WAKE_LOCK)!!
         val hideFromRecentApps = findPreference<SwitchPreferenceCompat>(Key.HIDE_FROM_RECENT_APPS)!!
-        val enableClashAPI = findPreference<SwitchPreferenceCompat>(Key.ENABLE_CLASH_API)!!
-        enableClashAPI.setOnPreferenceChangeListener { _, newValue ->
-            (activity as MainActivity?)?.refreshNavMenu(newValue as Boolean)
-            needReload()
-            true
-        }
 
         val rulesProvider = findPreference<SimpleMenuPreference>(Key.RULES_PROVIDER)!!
         val rulesGeositeUrl = findPreference<EditTextPreference>(Key.RULES_GEOSITE_URL)!!

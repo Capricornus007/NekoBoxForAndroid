@@ -23,7 +23,6 @@
     <string name="quick_disable">Disable</string>
     <string name="quick_clear_cache_restart">Restart After Clear</string>
     <string name="menu_traffic">Traffic</string>
-    <string name="menu_dashboard">sing-box Dashboard</string>
     <!-- externel -->
     <string name="action_copy">Copy</string>
     <string name="action_open">Open</string>
@@ -690,10 +689,7 @@
     <string name="custom_config_json">Custom config JSON</string>
     <string name="is_outbound_only">The JSON set is outbound</string>
     <string name="save">Save</string>
-    <string name="set_panel_url">Set panel URL</string>
-    <string name="enable_clash_api">Enable Clash API</string>
     <string name="log_level">Log Level</string>
-    <string name="enable_clash_api_summary">Provide clash api and yacd dashboard at 127.0.0.1:9090</string>
     <string name="xtls_flow">Flow (VLESS Sub-protocol)</string>
     <string name="ads">Ads</string>
     <string name="bypass_lan_in_core">Bypass LAN in Core</string>
@@ -885,7 +881,6 @@
     <string name="hysteria2_obfs_type">Obfuscation Type</string>
     <string name="interface_settings">Interface Settings</string>
     <string name="invalid_amnezia_config">Invalid AmneziaWG config</string>
-    <string name="invalid_panel_url">Invalid panel URL</string>
     <string name="lan_sharing">LAN Sharing</string>
     <string name="lan_sharing_requires_root">LAN sharing requires root</string>
     <string name="lan_sharing_summary">Allow LAN devices to connect</string>

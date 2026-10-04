@@ -27,7 +27,6 @@
     <string name="menu_configuration">Yapılandırma</string>
     <string name="logcat">Hata ayıklama bilgisini dışa aktar</string>
     <string name="menu_traffic">Trafik</string>
-    <string name="menu_dashboard">sing-box Kontrol Paneli</string>
     <string name="action_copy">Kopyala</string>
     <string name="action_open">Aç</string>
     <string name="group_name">Grup adı</string>
@@ -663,10 +662,7 @@
     <string name="custom_config_json">Özel yapılandırma JSON</string>
     <string name="is_outbound_only">Girilen JSON yalnızca outbound</string>
     <string name="save">Kaydet</string>
-    <string name="set_panel_url">Panel URL\'sini ayarla</string>
-    <string name="enable_clash_api">Clash API\'yi etkinleştir</string>
     <string name="log_level">Günlük seviyesi</string>
-    <string name="enable_clash_api_summary">127.0.0.1:9090 adresinde clash api ve yacd panosu sunar</string>
     <string name="xtls_flow">Akış (VLESS alt protokolü)</string>
     <string name="ads">Reklamlar</string>
     <string name="bypass_lan_in_core">Çekirdekte LAN\'ı atla</string>
@@ -813,7 +809,6 @@
     <string name="dynamic_colors_unavailable">Dinamik renkler kullanılamıyor</string>
     <string name="fastest_settings">En hızlı ayarları</string>
     <string name="interface_settings">Arayüz ayarları</string>
-    <string name="invalid_panel_url">Geçersiz panel URL\'si</string>
     <string name="mal_close">Kapat</string>
     <string name="more_options">Daha fazla seçenek</string>
     <string name="profile_reference_not_allowed">Profile referansına izin verilmiyor</string>

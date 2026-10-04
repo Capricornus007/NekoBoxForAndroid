@@ -18,7 +18,6 @@
     <string name="quick_enable">فعال‌سازی</string>
     <string name="quick_disable">غیرفعال‌سازی</string>
     <string name="menu_traffic">ترافیک</string>
-    <string name="menu_dashboard">sing-box تنظیمات</string>
     
     <string name="action_copy">کپی</string>
     <string name="action_open">باز کردن</string>
@@ -499,10 +498,7 @@
     <string name="custom_config_json">پراکسی سفارشی JSON</string>
     <string name="is_outbound_only">مجموعه JSON برای خروجی است</string>
     <string name="save">ذخیره</string>
-    <string name="set_panel_url">تعیین لینک صفحه</string>
-    <string name="enable_clash_api">فعال کردن Clash API</string>
     <string name="log_level">سطح ثبت آمار</string>
-    <string name="enable_clash_api_summary">ارائه Clash api و صفحه yacd را در 127.0.0.1: 9090</string>
     <string name="xtls_flow">Flow (VLESS دستورالعمل فرعی)</string>
     <string name="ads">تبلیغات</string>
     <string name="bypass_lan_in_core">دورزدن شبکه محلی در هسته برنامه</string>
@@ -736,7 +732,6 @@
     <string name="hysteria2_obfs_type">نوع مبهم‌سازی</string>
     <string name="interface_settings">تنظیمات رابط کاربری</string>
     <string name="invalid_amnezia_config">پیکربندی AmneziaWG نامعتبر است</string>
-    <string name="invalid_panel_url">آدرس پنل نامعتبر است</string>
     <string name="lifetime_traffic">تجمعی: %1$s↑ %2$s↓</string>
     <string name="mdv_advanced_json">JSON پیشرفته</string>
     <string name="mdv_auto_disable_timeout">زمان انقطاع خودکار</string>

@@ -32,7 +32,6 @@ import libcore.Libcore
 import moe.matsuri.nb4a.NativeInterface
 import moe.matsuri.nb4a.net.LocalResolverImpl
 import moe.matsuri.nb4a.utils.JavaUtil
-import moe.matsuri.nb4a.utils.cleanWebview
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.security.KeyStore
@@ -111,12 +110,8 @@ class SagerNet :
                 nativeInterface, nativeInterface, LocalResolverImpl,
             )
 
-            // fix multi process issue in Android 9+
-            JavaUtil.handleWebviewDir(this)
-
             runOnDefaultDispatcher {
                 PackageCache.register()
-                cleanWebview()
             }
         }
 

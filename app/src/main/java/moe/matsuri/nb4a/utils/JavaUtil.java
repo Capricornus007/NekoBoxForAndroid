@@ -1,165 +1,19 @@
 package moe.matsuri.nb4a.utils;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Application;
-import android.content.Context;
 import android.os.Build;
-import android.text.TextUtils;
-import android.webkit.WebView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.ToNumberPolicy;
 
-import java.io.File;
-import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import io.nekohasekai.sagernet.BuildConfig;
-import io.nekohasekai.sagernet.ktx.Logs;
 import kotlin.text.StringsKt;
 
 public class JavaUtil {
-
-    // The encoded character of each character escape.
-    // This array functions as the keys of a sorted map, from encoded characters to decoded characters.
-    static final char[] ENCODED_ESCAPES = {'\"', '\'', '\\', 'b', 'f', 'n', 'r', 't'};
-
-    // The decoded character of each character escape.
-    // This array functions as the values of a sorted map, from encoded characters to decoded characters.
-    static final char[] DECODED_ESCAPES = {'\"', '\'', '\\', '\b', '\f', '\n', '\r', '\t'};
-
-    // A pattern that matches an escape.
-    // What follows the escape indicator is captured by group 1=character 2=octal 3=Unicode.
-    static final Pattern PATTERN = Pattern.compile("\\\\(?:(b|t|n|f|r|\\\"|\\\'|\\\\)|((?:[0-3]?[0-7])?[0-7])|u+(\\p{XDigit}{4}))");
-
-    // Process the return of webView.evaluateJavascript
-    public static String unescapeString(CharSequence encodedString) {
-        Matcher matcher = PATTERN.matcher(encodedString);
-        StringBuffer decodedString = new StringBuffer();
-        // Find each escape of the encoded string in succession.
-        while (matcher.find()) {
-            char ch;
-            if (matcher.start(1) >= 0) {
-                // Decode a character escape.
-                ch = DECODED_ESCAPES[Arrays.binarySearch(ENCODED_ESCAPES, matcher.group(1).charAt(0))];
-            } else if (matcher.start(2) >= 0) {
-                // Decode an octal escape.
-                ch = (char) (Integer.parseInt(matcher.group(2), 8));
-            } else /* if (matcher.start(3) >= 0) */ {
-                // Decode a Unicode escape.
-                ch = (char) (Integer.parseInt(matcher.group(3), 16));
-            }
-            // Replace the escape with the decoded character.
-            matcher.appendReplacement(decodedString, Matcher.quoteReplacement(String.valueOf(ch)));
-        }
-        // Append the remainder of the encoded string to the decoded string.
-        // The remainder is the longest suffix of the encoded string such that the suffix contains no escapes.
-        matcher.appendTail(decodedString);
-        return new String(decodedString);
-    }
-
-    // Webview Utils
-
-    public static void handleWebviewDir(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            return;
-        }
-        try {
-            Set<String> pathSet = new HashSet<>();
-            String suffix;
-            String dataPath = context.getDataDir().getAbsolutePath();
-            String webViewDir = "/app_webview";
-            String huaweiWebViewDir = "/app_hws_webview";
-            String lockFile = "/webview_data.lock";
-            String processName = Application.getProcessName();
-            if (!BuildConfig.APPLICATION_ID.equals(processName)) {//check if not equal to the default process name
-                suffix = TextUtils.isEmpty(processName) ? context.getPackageName() : processName;
-                WebView.setDataDirectorySuffix(suffix);
-                suffix = "_" + suffix;
-                pathSet.add(dataPath + webViewDir + suffix + lockFile);
-                if (checkIsHuaweiRom()) {
-                    pathSet.add(dataPath + huaweiWebViewDir + suffix + lockFile);
-                }
-            } else {
-                //main process
-                suffix = "_" + processName;
-                pathSet.add(dataPath + webViewDir + lockFile);// path variant without the process-name suffix
-                pathSet.add(dataPath + webViewDir + suffix + lockFile);// path variant with the process-name suffix (device-dependent)
-                if (checkIsHuaweiRom()) {//some Huawei phones changed the webview directory name
-                    pathSet.add(dataPath + huaweiWebViewDir + lockFile);
-                    pathSet.add(dataPath + huaweiWebViewDir + suffix + lockFile);
-                }
-            }
-            for (String path : pathSet) {
-                File file = new File(path);
-                if (file.exists()) {
-                    tryLockOrRecreateFile(file);
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            Logs.INSTANCE.e(e);
-        }
-    }
-
-    @androidx.annotation.RequiresApi(Build.VERSION_CODES.P)
-    private static void tryLockOrRecreateFile(File file) {
-        // 探測性上鎖一定要把 channel 跟檔案關掉：只 close lock 的話每呼叫一次就漏一個 FD，
-        // 而這個函式在外層重試迴圈裡會被反覆呼叫，漏掉的 channel 還可能讓鎖一直被本行程
-        // 持有，於是「拿不到鎖就重建檔案」那條分支永遠走不到。
-        RandomAccessFile lockFile = null;
-        FileChannel channel = null;
-        try {
-            lockFile = new RandomAccessFile(file, "rw");
-            channel = lockFile.getChannel();
-            FileLock tryLock = channel.tryLock();
-            if (tryLock != null) {
-                tryLock.close();
-            } else {
-                createFile(file, file.delete());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            boolean deleted = false;
-            if (file.exists()) {
-                deleted = file.delete();
-            }
-            createFile(file, deleted);
-        } finally {
-            try {
-                if (channel != null) {
-                    channel.close();
-                }
-                if (lockFile != null) {
-                    lockFile.close();
-                }
-            } catch (Exception ignored) {
-            }
-        }
-    }
-
-    private static void createFile(File file, boolean deleted) {
-        try {
-            if (deleted && !file.exists()) {
-                file.createNewFile();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static boolean checkIsHuaweiRom() {
-        return Build.MANUFACTURER.contains("HUAWEI");
-    }
 
     @SuppressLint("PrivateApi")
     public static String getProcessName() {

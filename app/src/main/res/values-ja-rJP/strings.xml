@@ -20,7 +20,6 @@
     <string name="quick_enable">有効</string>
     <string name="quick_disable">無効</string>
     <string name="menu_traffic">トラフィック</string>
-    <string name="menu_dashboard">sing-box ダッシュボード</string>
     <string name="action_copy">コピー</string>
     <string name="action_open">開く</string>
     <string name="group_name">グループ名</string>
@@ -503,10 +502,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="custom_config_json">カスタム設定JSON</string>
     <string name="is_outbound_only">JSONセットはアウトバウンド</string>
     <string name="save">保存</string>
-    <string name="set_panel_url">パネルURLを設定</string>
-    <string name="enable_clash_api">Clash APIを有効にする</string>
     <string name="log_level">ログレベル</string>
-    <string name="enable_clash_api_summary">127.0.0.1:9090でClash APIとyacdダッシュボードを提供</string>
     <string name="xtls_flow">Flow (VLESSサブプロトコル)</string>
     <string name="ads">広告</string>
     <string name="bypass_lan_in_core">コア内でLANをバイパス</string>
@@ -676,7 +672,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="hysteria2_obfs_type">難読化タイプ</string>
     <string name="interface_settings">インターフェース設定</string>
     <string name="invalid_amnezia_config">無効な AmneziaWG 設定</string>
-    <string name="invalid_panel_url">無効なパネル URL</string>
     <string name="lan_sharing">LAN 共有</string>
     <string name="lan_sharing_requires_root">LAN 共有には root が必要</string>
     <string name="lan_sharing_summary">LAN デバイスの接続を許可</string>

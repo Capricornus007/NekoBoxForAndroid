@@ -100,8 +100,8 @@ class MainActivity :
                 supportFragmentManager.findFragmentById(R.id.fragment_holder) as? ToolbarFragment
         }
         onBackPressedDispatcher.addCallback {
-            // Let the visible fragment consume the key first (e.g. the dashboard walks its
-            // WebView history instead of leaving the page). OwnBox 28213adc3.
+            // Let the visible fragment consume the key first (some screens have their own
+            // back handling, e.g. ConfigurationFragment's search/edit mode).
             val fragment = supportFragmentManager.findFragmentById(R.id.fragment_holder) as? ToolbarFragment
             if (fragment?.onBackPressed() == true) return@addCallback
             if (fragment is ConfigurationFragment) {
@@ -147,7 +147,6 @@ class MainActivity :
             }
         }
 
-        refreshNavMenu(DataStore.enableClashAPI)
         publishClearCacheShortcut(this)
 
         // sdk 33 notification
@@ -195,12 +194,6 @@ class MainActivity :
             }
         } catch (e: Exception) {
             Logs.w("Failed to set excludeFromRecents: ${e.message}")
-        }
-    }
-
-    fun refreshNavMenu(clashApi: Boolean) {
-        if (::navigation.isInitialized) {
-            navigation.menu.findItem(R.id.nav_traffic)?.isVisible = clashApi
         }
     }
 
@@ -487,8 +480,7 @@ class MainActivity :
      * Which screen is actually on show. The drawer menu must not be trusted for this: the
      * navigation menu is made of three separate single-checkable groups, so checking an entry
      * in one of them leaves the previously checked entry in another group checked. Relying on
-     * item.isChecked then closes the drawer instead of re-opening the screen the user tapped
-     * (OwnBox 28213adc3: "can't enter the dashboard a second time after leaving it").
+     * item.isChecked then closes the drawer instead of re-opening the screen the user tapped.
      */
     fun isCurrentFragment(@IdRes id: Int): Boolean {
         val current = currentMainFragment
@@ -498,7 +490,6 @@ class MainActivity :
             R.id.nav_group -> current is GroupFragment
             R.id.nav_route -> current is RouteFragment
             R.id.nav_settings -> current is SettingsFragment
-            R.id.nav_traffic -> current is WebviewFragment
             R.id.nav_tools -> current is ToolsFragment
             R.id.nav_logcat -> current is LogcatFragment
             R.id.nav_about -> current is AboutFragment
@@ -587,7 +578,6 @@ class MainActivity :
             R.id.nav_group -> displayFragment(GroupFragment())
             R.id.nav_route -> displayFragment(RouteFragment())
             R.id.nav_settings -> displayFragment(SettingsFragment())
-            R.id.nav_traffic -> displayFragment(WebviewFragment())
             R.id.nav_tools -> displayFragment(ToolsFragment())
             R.id.nav_logcat -> displayFragment(LogcatFragment())
             R.id.nav_about -> displayFragment(AboutFragment())

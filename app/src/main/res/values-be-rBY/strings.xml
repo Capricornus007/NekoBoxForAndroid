@@ -20,7 +20,6 @@
     <string name="quick_enable">Уключыць</string>
     <string name="quick_disable">Выключыць</string>
     <string name="menu_traffic">Трафік</string>
-    <string name="menu_dashboard">Панэль кіравання sing-box</string>
     <string name="action_copy">Капіраваць</string>
     <string name="action_open">Адкрыць</string>
     <string name="group_name">Назва групы</string>
@@ -501,10 +500,7 @@
     <string name="custom_config_json">Уласны канфігурацыйны JSON</string>
     <string name="is_outbound_only">JSON-набор з\'яўляецца выходным</string>
     <string name="save">Захаваць</string>
-    <string name="set_panel_url">Усталяваць URL панэлі</string>
-    <string name="enable_clash_api">Уключыць Clash API</string>
     <string name="log_level">Узровень лагавання</string>
-    <string name="enable_clash_api_summary">Прадастаўленне clash API і yacd dashboard на 127.0.0.1:9090</string>
     <string name="xtls_flow">Flow (падпратакол VLESS)</string>
     <string name="ads">Рэклама</string>
     <string name="bypass_lan_in_core">Абыход LAN у ядры</string>
@@ -678,7 +674,6 @@
     <string name="hysteria2_obfs_type">Тып абфускацыі</string>
     <string name="interface_settings">Інтэрфейс</string>
     <string name="invalid_amnezia_config">Несапраўдная або пашкоджаная канфігурацыя Amnezia</string>
-    <string name="invalid_panel_url">Несапраўдны URL панэлі. Выкарыстоўвайце толькі HTTPS або лакальны HTTP.</string>
     <string name="lifetime_traffic">За ўвесь час: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>
     <string name="mdv_advanced_json">Пашыранае пераазначэнне JSON</string>

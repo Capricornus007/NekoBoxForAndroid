@@ -264,10 +264,6 @@ Core:
 - [shadowsocks/shadowsocks-android](https://github.com/shadowsocks/shadowsocks-android)
 - [SagerNet/SagerNet](https://github.com/SagerNet/SagerNet)
 
-### Web Dashboard
-
-- [Yacd-meta](https://github.com/MetaCubeX/Yacd-meta)
-
 ## Contributors
 
 ![Contributors](https://contrib.rocks/image?repo=starifly/NekoBoxForAndroid)

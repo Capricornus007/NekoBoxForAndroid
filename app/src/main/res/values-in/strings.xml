@@ -5,7 +5,6 @@
     <string name="quick_disable">Nonaktifkan</string>
     <string name="quick_clear_cache_restart">Hapus Cache &amp; Mulai Ulang</string>
     <string name="menu_traffic">Lalu lintas</string>
-    <string name="menu_dashboard">Dasbor sing-box</string>
     <string name="action_copy">Salin</string>
     <string name="action_open">Buka</string>
     <string name="group_name">Nama grup</string>
@@ -601,12 +600,8 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="custom_config_json">JSON konfigurasi kustom</string>
     <string name="is_outbound_only">Set JSON adalah outbound</string>
     <string name="save">Simpan</string>
-    <string name="set_panel_url">Atur URL panel</string>
     <string name="action_close">Tutup</string>
-    <string name="invalid_panel_url">URL panel tidak valid. Gunakan HTTPS atau HTTP localhost saja.</string>
-    <string name="enable_clash_api">Aktifkan Clash API</string>
     <string name="log_level">Level Log</string>
-    <string name="enable_clash_api_summary">Menyediakan clash api dan dashboard yacd di 127.0.0.1:9090</string>
     <string name="xtls_flow">Flow (Sub-protokol VLESS)</string>
     <string name="ads">Iklan</string>
     <string name="bypass_lan_in_core">Bypass LAN di Core</string>

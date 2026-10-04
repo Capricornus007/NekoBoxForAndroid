@@ -106,7 +106,6 @@
     <string name="key_opt">キー（オプション）</string>
     <string name="network">ネットワーク</string>
     <string name="speed_interval">速度通知のアップデート間隔</string>
-    <string name="menu_dashboard">sing-box ダッシュボード</string>
     <string name="action_copy">コピー</string>
     <string name="action_open">開く</string>
     <string name="update_all_subscription">すべてのサブスクリプションを更新</string>
@@ -490,10 +489,7 @@
     <string name="custom_config_json">カスタム設定 JSON</string>
     <string name="is_outbound_only">設定した JSON はアウトバウンドです</string>
     <string name="save">保存</string>
-    <string name="set_panel_url">パネル URL を設定</string>
-    <string name="enable_clash_api">Clash API を有効化</string>
     <string name="log_level">ログレベル</string>
-    <string name="enable_clash_api_summary">127.0.0.1:9090 で Clash API と yacd ダッシュボードを提供</string>
     <string name="xtls_flow">Flow (VLESS サブプロトコル)</string>
     <string name="ads">広告</string>
     <string name="bypass_lan_in_core">コアで LAN をバイパス</string>

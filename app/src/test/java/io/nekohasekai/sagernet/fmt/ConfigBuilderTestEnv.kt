@@ -37,7 +37,6 @@ internal object ConfigBuilderTestEnv {
                         KeyValuePair(Key.TRAFFIC_SNIFFING).put("0"),
                         KeyValuePair(Key.RESOLVE_DESTINATION).put(false),
                         KeyValuePair(Key.ALLOW_ACCESS).put(false),
-                        KeyValuePair(Key.ENABLE_CLASH_API).put(false),
                         KeyValuePair(Key.CLASH_API_SECRET).put("export-secret"),
                         KeyValuePair(Key.GLOBAL_CUSTOM_CONFIG).put(""),
                         KeyValuePair(Key.GLOBAL_MODE).put(false),

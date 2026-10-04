@@ -20,7 +20,6 @@
     <string name="quick_enable">تمكين</string>
     <string name="quick_disable">تعطيل</string>
     <string name="menu_traffic">حركة المرور</string>
-    <string name="menu_dashboard">لوحة تحكم sing-box</string>
     <string name="action_copy">نسخ</string>
     <string name="action_open">فتح</string>
     <string name="group_name">اسم المجموعة</string>
@@ -510,10 +509,7 @@
     <string name="custom_config_json">JSON مخصص للإعدادات</string>
     <string name="is_outbound_only">مجموعة JSON هي للاتصال الخارجي</string>
     <string name="save">حفظ</string>
-    <string name="set_panel_url">تعيين رابط اللوحة</string>
-    <string name="enable_clash_api">تفعيل Clash API</string>
     <string name="log_level">مستوى السجل</string>
-    <string name="enable_clash_api_summary">توفير Clash API ولوحة yacd على 127.0.0.1:9090</string>
     <string name="xtls_flow">Flow (بروتوكول VLESS الفرعي)</string>
     <string name="ads">الإعلانات</string>
     <string name="bypass_lan_in_core">تجاوز الشبكة المحلية في النواة</string>
@@ -690,7 +686,6 @@
     <string name="hysteria2_obfs_type">نوع التشويش</string>
     <string name="interface_settings">الواجهة</string>
     <string name="invalid_amnezia_config">تكوين Amnezia غير صالح أو تالف</string>
-    <string name="invalid_panel_url">عنوان URL للوحة غير صالح. استخدم HTTPS أو HTTP للمضيف المحلي فقط.</string>
     <string name="lan_sharing">مشاركة LAN (Root فقط)</string>
     <string name="lan_sharing_requires_root">صلاحية Root غير متوفرة</string>
     <string name="lan_sharing_summary">توجيه Wi-Fi و USB عبر VPN</string>

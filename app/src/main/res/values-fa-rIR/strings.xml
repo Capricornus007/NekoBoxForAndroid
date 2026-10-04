@@ -20,7 +20,6 @@
     <string name="quick_enable">فعال</string>
     <string name="quick_disable">غیرفعال</string>
     <string name="menu_traffic">ترافیک</string>
-    <string name="menu_dashboard">داشبورد sing-box</string>
     <string name="action_copy">کپی</string>
     <string name="action_open">باز کردن</string>
     <string name="group_name">نام گروه</string>
@@ -504,10 +503,7 @@
     <string name="custom_config_json">JSON پیکربندی سفارشی</string>
     <string name="is_outbound_only">مجموعه JSON خروجی است</string>
     <string name="save">ذخیره</string>
-    <string name="set_panel_url">تنظیم URL پنل</string>
-    <string name="enable_clash_api">فعالسازی Clash API</string>
     <string name="log_level">سطح لاگ</string>
-    <string name="enable_clash_api_summary">ارائه clash api و داشبورد yacd در 127.0.0.1:9090</string>
     <string name="xtls_flow">Flow (زیر پروتکل VLESS)</string>
     <string name="ads">تبلیغات</string>
     <string name="bypass_lan_in_core">دور زدن LAN در Core</string>
@@ -685,7 +681,6 @@
     <string name="hysteria2_obfs_type">Obfuscation Type</string>
     <string name="interface_settings">Interface Settings</string>
     <string name="invalid_amnezia_config">Invalid AmneziaWG config</string>
-    <string name="invalid_panel_url">Invalid panel URL</string>
     <string name="lifetime_traffic">Lifetime: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>
     <string name="mdv_advanced_json">Advanced JSON</string>

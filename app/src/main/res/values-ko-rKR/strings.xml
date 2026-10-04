@@ -20,7 +20,6 @@
     <string name="quick_enable">활성화</string>
     <string name="quick_disable">비활성화</string>
     <string name="menu_traffic">트래픽</string>
-    <string name="menu_dashboard">sing-box 대시보드</string>
     <string name="action_copy">복사</string>
     <string name="action_open">열기</string>
     <string name="group_name">그룹 이름</string>
@@ -497,10 +496,7 @@
     <string name="custom_config_json">커스텀 설정 JSON</string>
     <string name="is_outbound_only">아웃바운드 전용 JSON</string>
     <string name="save">저장</string>
-    <string name="set_panel_url">패널 URL 설정</string>
-    <string name="enable_clash_api">Clash API 활성화</string>
     <string name="log_level">로그 레벨</string>
-    <string name="enable_clash_api_summary">127.0.0.1:9090에서 Clash API 및 yacd 대시보드 제공</string>
     <string name="xtls_flow">Flow (VLESS 하위 프로토콜)</string>
     <string name="ads">광고</string>
     <string name="bypass_lan_in_core">코어에서 LAN 우회</string>
@@ -676,7 +672,6 @@
     <string name="hysteria2_obfs_type">hysteria2 obfs type</string>
     <string name="interface_settings">인터페이스 설정</string>
     <string name="invalid_amnezia_config">잘못된 AmneziaWG config</string>
-    <string name="invalid_panel_url">잘못된 panel URL</string>
     <string name="lan_sharing">LAN 공유</string>
     <string name="lan_sharing_requires_root">LAN 공유 필요 root</string>
     <string name="lan_sharing_summary">LAN 기기의 연결 허용</string>

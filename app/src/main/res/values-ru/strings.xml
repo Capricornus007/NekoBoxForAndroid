@@ -157,8 +157,6 @@
     <string name="empty_route">Пустой маршрут</string>
     <string name="empty_route_notice">Установите какие-либо правила перед сохранением</string>
     <string name="enable">Включить</string>
-    <string name="enable_clash_api">Включить Clash API</string>
-    <string name="enable_clash_api_summary">Предоставлять панель управления Clash API и YACD по адресу 127.0.0.1:9090</string>
     <string name="enable_dns_routing">Включить маршрутизацию DNS</string>
     <string name="enable_ech">Включить ECH</string>
     <string name="enable_ech_sum">Включить зашифрованный клиент Hello</string>
@@ -261,7 +259,6 @@
     <string name="material_timepicker_pm">PM</string>
     <string name="menu_about">О приложении</string>
     <string name="menu_configuration">Конфигурация</string>
-    <string name="menu_dashboard">Панель sing-box</string>
     <string name="menu_group">Группы</string>
     <string name="menu_log">Журналы</string>
     <string name="menu_route">Маршруты</string>
@@ -445,7 +442,6 @@
     <string name="service_proxy">Прокси-сервис</string>
     <string name="service_subscription">Служба обновления подписки</string>
     <string name="service_vpn">VPN-сервис</string>
-    <string name="set_panel_url">Установить URL панель</string>
     <string name="settings">Настройки</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (плагин Shadowsocks для Android)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (плагин Shadowsocks для Android)</string>
@@ -787,7 +783,6 @@
     <string name="hysteria2_obfs_type">Тип обфускации</string>
     <string name="interface_settings">Настройки интерфейса</string>
     <string name="invalid_amnezia_config">Недействительная конфигурация AmneziaWG</string>
-    <string name="invalid_panel_url">Недействительный URL панели</string>
     <string name="lifetime_traffic">Всего: %1$s↑ %2$s↓</string>
     <string name="mdv_advanced_json">Расширенный JSON</string>
     <string name="mdv_auto_disable_timeout">Таймаут автоотключения</string>

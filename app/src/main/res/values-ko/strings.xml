@@ -18,7 +18,6 @@
     <string name="menu_group">그룹</string>
     <string name="menu_configuration">구성</string>
     <string name="menu_traffic">트래픽</string>
-    <string name="menu_dashboard">sing-box 대시보드</string>
     <string name="action_copy">복사</string>
     <string name="action_open">열기</string>
     <string name="group_name">그룹 이름</string>
@@ -486,10 +485,7 @@
     <string name="custom_config_json">사용자 지정 구성 JSON</string>
     <string name="is_outbound_only">설정한 JSON은 아웃바운드입니다</string>
     <string name="save">저장</string>
-    <string name="set_panel_url">패널 URL 설정</string>
-    <string name="enable_clash_api">Clash API 활성화</string>
     <string name="log_level">로그 레벨</string>
-    <string name="enable_clash_api_summary">127.0.0.1:9090에서 Clash API와 yacd 대시보드 제공</string>
     <string name="xtls_flow">Flow (VLESS 하위 프로토콜)</string>
     <string name="ads">광고</string>
     <string name="bypass_lan_in_core">코어에서 LAN 바이패스</string>

@@ -116,7 +116,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var spoofUserAgent by configurationStore.string(Key.SPOOF_USER_AGENT) { "" }
     var autoSelectLowestLatency by configurationStore.boolean(Key.AUTO_SELECT_LOWEST_LATENCY)
 
-    var enableClashAPI by configurationStore.boolean(Key.ENABLE_CLASH_API)
     var showBottomBar by configurationStore.boolean(Key.SHOW_BOTTOM_BAR)
     var confirmProfileDelete by configurationStore.boolean(Key.CONFIRM_PROFILE_DELETE) { true }
     var groupLayoutMode by configurationStore.stringToInt(Key.GROUP_LAYOUT_MODE) { 0 }
@@ -324,8 +323,6 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     // 滅屏／後台時降低流量計數輪詢頻率（預設關＝維持固定間隔）
     var adaptiveTrafficPolling by configurationStore.boolean(Key.ADAPTIVE_TRAFFIC_POLLING) { false }
     var profileTrafficStatistics by configurationStore.boolean(Key.PROFILE_TRAFFIC_STATISTICS) { true }
-
-    var yacdURL by configurationStore.string("yacdURL") { "http://127.0.0.1:9090/ui" }
 
     // Auto-switch timeout settings
     var enableAutoSwitchTimeout by configurationStore.boolean(Key.ENABLE_AUTO_SWITCH_TIMEOUT) { false }

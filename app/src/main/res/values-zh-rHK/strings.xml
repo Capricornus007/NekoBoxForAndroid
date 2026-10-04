@@ -20,7 +20,6 @@
     <string name="quick_enable">啟用</string>
     <string name="quick_disable">停用</string>
     <string name="menu_traffic">流量</string>
-    <string name="menu_dashboard">sing-box 儀表板</string>
     <string name="action_copy">複製</string>
     <string name="action_open">開啟</string>
     <string name="group_name">群組名稱</string>
@@ -551,10 +550,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="custom_config_json">自訂設定 JSON</string>
     <string name="is_outbound_only">JSON 設定為出站</string>
     <string name="save">儲存</string>
-    <string name="set_panel_url">設定面板 URL</string>
-    <string name="enable_clash_api">啟用 Clash API</string>
     <string name="log_level">日誌級別</string>
-    <string name="enable_clash_api_summary">在 127.0.0.1:9090 提供 Clash API 和 yacd 面板</string>
     <string name="xtls_flow">Flow (VLESS 子協定)</string>
     <string name="ads">廣告</string>
     <string name="bypass_lan_in_core">在核心中繞過區域網路</string>
@@ -732,7 +728,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="hysteria2_obfs_type">混淆類型</string>
     <string name="interface_settings">介面設定</string>
     <string name="invalid_amnezia_config">無效的 AmneziaWG 設定</string>
-    <string name="invalid_panel_url">無效的面板 URL</string>
     <string name="lifetime_traffic">累計：%1$s↑ %2$s↓</string>
     <string name="mdv_advanced_json">進階 JSON</string>
     <string name="mdv_auto_disable_timeout">自動停用逾時</string>
