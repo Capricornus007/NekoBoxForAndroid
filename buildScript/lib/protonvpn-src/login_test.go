@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	srp "github.com/ProtonMail/go-srp"
 	proton "github.com/ProtonMail/go-proton-api"
+	srp "github.com/ProtonMail/go-srp"
 )
 
 type mockAuthServer struct {

@@ -101,7 +101,7 @@ fi
 BUILD="$(pwd)/.protonvpn-wrapper"
 rm -rf "$BUILD"
 mkdir -p "$BUILD"
-cp "$SRC/main.go" "$SRC/main_test.go" "$SRC/login.go" "$SRC/login_test.go" "$SRC/go.mod" "$BUILD/"
+cp "$SRC/main.go" "$SRC/main_test.go" "$SRC/login.go" "$SRC/login_test.go" "$SRC/nodes.go" "$SRC/nodes_test.go" "$SRC/go.mod" "$BUILD/"
 ( cd "$BUILD" && go mod edit -replace "github.com/ProtonVPN/go-vpn-lib=$WORK" && go mod tidy )
 
 # Host-side gate: the pinned Proton stack must build and its offline selftest must

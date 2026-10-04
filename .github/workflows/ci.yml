@@ -163,6 +163,8 @@ jobs:
             buildScript/lib/protonvpn.sh \
             buildScript/lib/protonvpn-src/login.go \
             buildScript/lib/protonvpn-src/login_test.go \
+            buildScript/lib/protonvpn-src/nodes.go \
+            buildScript/lib/protonvpn-src/nodes_test.go \
             buildScript/lib/protonvpn-src/main.go \
             buildScript/lib/protonvpn-src/main_test.go \
             buildScript/lib/protonvpn-src/go.mod \

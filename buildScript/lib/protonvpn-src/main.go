@@ -45,6 +45,11 @@
 // stdin and never in argv. The node-list and connect commands build on the same
 // stored session.
 //
+// `nodes` reads that session and lists the servers that can actually be dialed.
+// It reports a server as dropped rather than emitting it when no WireGuard key
+// came back, because a node the UI offers but cannot connect to is worse than a
+// shorter list.
+//
 // Usage:
 //
 //	libprotonvpn.so version     - print pinned library provenance as JSON
@@ -379,6 +384,7 @@ commands:
   version     print the pinned Proton library provenance as JSON
   selftest    run the offline dependency checks, print JSON, exit 1 on failure
   login       exchange credentials on stdin for a stored session, print JSON
+  nodes       list usable Proton servers from a stored session, print JSON
 `)
 }
 
@@ -403,6 +409,9 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 
 	case "login":
 		return runLogin(args[1:], stdin, stdout, stderr)
+
+	case "nodes":
+		return runNodes(args[1:], stdout, stderr)
 
 	case "selftest":
 		command := flag.NewFlagSet("selftest", flag.ContinueOnError)
