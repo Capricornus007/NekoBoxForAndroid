@@ -998,4 +998,27 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="masque_fragment">Fragmentasi</string>
     <string name="masque_fragment_fallback_delay">Jeda fallback fragmentasi</string>
     <string name="masque_record_fragment">Fragmentasi rekaman</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Server Proton VPN</string>
+    <string name="proton_summary">Memuat server dari akun Proton VPN Anda dan menambahkannya sebagai profil.</string>
+    <string name="proton_open">Buka</string>
+    <string name="proton_account">Email atau nama pengguna</string>
+    <string name="proton_password">Kata sandi</string>
+    <string name="proton_2fa">Kode 2FA</string>
+    <string name="proton_sign_in">Masuk</string>
+    <string name="proton_sign_out">Keluar</string>
+    <string name="proton_signed_in">Sudah masuk</string>
+    <string name="proton_not_signed_in">Belum masuk</string>
+    <string name="proton_refresh">Segarkan server</string>
+    <string name="proton_add">Tambah</string>
+    <string name="proton_added">%s ditambahkan</string>
+    <string name="proton_no_nodes">Tidak ada server yang bisa dipakai</string>
+    <string name="proton_node_count">%1$d server, %2$d dilewati</string>
+    <string name="proton_sidecar_missing">Build ini tidak menyertakan pembantu Proton.</string>
+    <string name="proton_2fa_required">Akun ini memerlukan kode 2FA.</string>
+    <string name="proton_warning_title">Anda sudah diperingatkan</string>
+    <string name="proton_warning_message">Ini bukan aplikasi Proton. Aplikasi ini berbicara ke API Proton seperti klien resmi Proton, jadi Proton bisa mengubah API kapan saja dan membuat fitur ini berhenti, dan kami tak bisa mengantisipasinya.\n\nKata sandi dan sesi Anda hanya disimpan di perangkat ini, di penyimpanan privat NB4A, dan tidak dikirim ke mana pun selain untuk masuk ke Proton. Menggunakan langganan di luar aplikasi Proton mungkin tidak tercakup dalam ketentuan mereka.</string>
+    <string name="proton_warning_accept">Saya mengerti</string>
+
 </resources>

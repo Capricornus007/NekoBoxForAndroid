@@ -805,4 +805,27 @@
     <string name="masque_fragment">フラグメント</string>
     <string name="masque_fragment_fallback_delay">フラグメントフォールバック遅延</string>
     <string name="masque_record_fragment">レコードフラグメント</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Proton VPN サーバー</string>
+    <string name="proton_summary">Proton VPN アカウントからサーバーを読み込み、設定として追加します。</string>
+    <string name="proton_open">開く</string>
+    <string name="proton_account">メールまたはユーザー名</string>
+    <string name="proton_password">パスワード</string>
+    <string name="proton_2fa">2FA コード</string>
+    <string name="proton_sign_in">サインイン</string>
+    <string name="proton_sign_out">サインアウト</string>
+    <string name="proton_signed_in">サインイン済み</string>
+    <string name="proton_not_signed_in">未サインイン</string>
+    <string name="proton_refresh">サーバーを更新</string>
+    <string name="proton_add">追加</string>
+    <string name="proton_added">%s を追加しました</string>
+    <string name="proton_no_nodes">利用可能なサーバーがありません</string>
+    <string name="proton_node_count">サーバー %1$d 件、スキップ %2$d 件</string>
+    <string name="proton_sidecar_missing">このビルドには Proton ヘルパーが含まれていません。</string>
+    <string name="proton_2fa_required">このアカウントは 2FA コードが必要です。</string>
+    <string name="proton_warning_title">念のためお知らせ</string>
+    <string name="proton_warning_message">これは Proton 公式アプリではありません。Proton 純正クライアントと同じ方法で Proton API と通信するため、Proton が API を変更するとこの機能は動作停止し、事前に対応できません。\n\nパスワードとセッションはこの端末の NB4A 専用領域にのみ保存され、Proton へのサインイン以外には送信されません。Proton 公式アプリ以外でのサブスクライブ利用は利用規約の範囲外となる場合があります。</string>
+    <string name="proton_warning_accept">了解しました</string>
+
 </resources>

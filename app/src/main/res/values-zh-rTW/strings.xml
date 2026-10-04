@@ -968,4 +968,27 @@
     <string name="masque_fragment">分片</string>
     <string name="masque_fragment_fallback_delay">分片回退延遲</string>
     <string name="masque_record_fragment">記錄分片</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Proton VPN 伺服器</string>
+    <string name="proton_summary">用你的 Proton VPN 帳號載入伺服器，並加入為配置。</string>
+    <string name="proton_open">開啟</string>
+    <string name="proton_account">Email 或使用者名稱</string>
+    <string name="proton_password">密碼</string>
+    <string name="proton_2fa">2FA 代碼</string>
+    <string name="proton_sign_in">登入</string>
+    <string name="proton_sign_out">登出</string>
+    <string name="proton_signed_in">已登入</string>
+    <string name="proton_not_signed_in">未登入</string>
+    <string name="proton_refresh">重新整理伺服器</string>
+    <string name="proton_add">加入</string>
+    <string name="proton_added">已加入 %s</string>
+    <string name="proton_no_nodes">沒有可用的伺服器</string>
+    <string name="proton_node_count">%1$d 個伺服器，略過 %2$d 個</string>
+    <string name="proton_sidecar_missing">此版本未內含 Proton 協助元件。</string>
+    <string name="proton_2fa_required">此帳號需要 2FA 代碼。</string>
+    <string name="proton_warning_title">先提醒你一句</string>
+    <string name="proton_warning_message">這不是 Proton 官方的 App。它照 Proton 自己客戶端的方式跟 Proton API 溝通，所以 Proton 隨時可能改動 API，讓這個功能失效，而我們無法提前因應。\n\n你的密碼與工作階段只存放在這支手機上 NB4A 的私有儲存區，除了向 Proton 登入之外不會送到任何地方。在 Proton 自己的 App 之外使用訂閱，可能不在他們的條款保障範圍內。</string>
+    <string name="proton_warning_accept">我明白了</string>
+
 </resources>

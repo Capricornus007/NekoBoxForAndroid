@@ -800,4 +800,27 @@
     <string name="masque_fragment">조각</string>
     <string name="masque_fragment_fallback_delay">조각 폴백 지연</string>
     <string name="masque_record_fragment">레코드 조각</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Proton VPN 서버</string>
+    <string name="proton_summary">Proton VPN 계정에서 서버를 불러와 구성으로 추가합니다.</string>
+    <string name="proton_open">열기</string>
+    <string name="proton_account">이메일 또는 사용자 이름</string>
+    <string name="proton_password">비밀번호</string>
+    <string name="proton_2fa">2FA 코드</string>
+    <string name="proton_sign_in">로그인</string>
+    <string name="proton_sign_out">로그아웃</string>
+    <string name="proton_signed_in">로그인됨</string>
+    <string name="proton_not_signed_in">로그인되지 않음</string>
+    <string name="proton_refresh">서버 새로고침</string>
+    <string name="proton_add">추가</string>
+    <string name="proton_added">%s 추가됨</string>
+    <string name="proton_no_nodes">사용 가능한 서버가 없습니다</string>
+    <string name="proton_node_count">서버 %1$d개, 건너뛴 %2$d개</string>
+    <string name="proton_sidecar_missing">이 빌드에는 Proton 도우미가 포함되어 있지 않습니다.</string>
+    <string name="proton_2fa_required">이 계정은 2FA 코드가 필요합니다.</string>
+    <string name="proton_warning_title">미리 알려드립니다</string>
+    <string name="proton_warning_message">이 앱은 Proton 공식 앱이 아닙니다. Proton 자체 클라이언트와 같은 방식으로 Proton API와 통신하므로, Proton이 API를 바꾸면 이 기능이 중단될 수 있고 미리 대비할 수 없습니다.\n\n비밀번호와 세션은 이 기기의 NB4A 전용 저장 공간에만 보관되며 Proton 로그인 외에는 전송되지 않습니다. Proton 자체 앱 외에서 구독을 사용하는 것은 약관 범위에 들지 않을 수 있습니다.</string>
+    <string name="proton_warning_accept">이해했습니다</string>
+
 </resources>

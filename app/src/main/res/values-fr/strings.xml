@@ -992,4 +992,27 @@
     <string name="masque_fragment">Fragmentation</string>
     <string name="masque_fragment_fallback_delay">Délai de repli de la fragmentation</string>
     <string name="masque_record_fragment">Fragmentation des enregistrements</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Serveurs Proton VPN</string>
+    <string name="proton_summary">Charge les serveurs de votre compte Proton VPN et les ajoute comme profils.</string>
+    <string name="proton_open">Ouvrir</string>
+    <string name="proton_account">E-mail ou nom d\'utilisateur</string>
+    <string name="proton_password">Mot de passe</string>
+    <string name="proton_2fa">Code 2FA</string>
+    <string name="proton_sign_in">Connecter</string>
+    <string name="proton_sign_out">Déconnecter</string>
+    <string name="proton_signed_in">Connecté</string>
+    <string name="proton_not_signed_in">Non connecté</string>
+    <string name="proton_refresh">Actualiser les serveurs</string>
+    <string name="proton_add">Ajouter</string>
+    <string name="proton_added">%s ajouté</string>
+    <string name="proton_no_nodes">Aucun serveur utilisable</string>
+    <string name="proton_node_count">%1$d serveurs, %2$d ignorés</string>
+    <string name="proton_sidecar_missing">Cette version n\'inclut pas l\'assistant Proton.</string>
+    <string name="proton_2fa_required">Ce compte exige un code 2FA.</string>
+    <string name="proton_warning_title">Avertissement préalable</string>
+    <string name="proton_warning_message">Ce n\'est pas une application Proton. Elle parle à l\'API Proton comme les clients officiels, donc Proton peut modifier cette API à tout moment et casser cette fonction sans que nous puissions anticiper.\n\nVotre mot de passe et votre session restent sur cet appareil, dans le stockage privé de NB4A, et ne sont envoyés qu\'à Proton pour la connexion. Utiliser un abonnement en dehors des applications Proton peut ne pas être couvert par leurs conditions.</string>
+    <string name="proton_warning_accept">J\'ai compris</string>
+
 </resources>

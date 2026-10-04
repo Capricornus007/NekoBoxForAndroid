@@ -888,4 +888,27 @@
     <string name="masque_fragment">Фрагментацыя</string>
     <string name="masque_fragment_fallback_delay">Затрымка адкату фрагментацыі</string>
     <string name="masque_record_fragment">Фрагментацыя запісу</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Серверы Proton VPN</string>
+    <string name="proton_summary">Загружае серверы з вашага акаўнта Proton VPN і дадае іх як профілі.</string>
+    <string name="proton_open">Адкрыць</string>
+    <string name="proton_account">Пошта або імя карыстальніка</string>
+    <string name="proton_password">Пароль</string>
+    <string name="proton_2fa">Код 2FA</string>
+    <string name="proton_sign_in">Увайсці</string>
+    <string name="proton_sign_out">Выйсці</string>
+    <string name="proton_signed_in">Уваход выкананы</string>
+    <string name="proton_not_signed_in">Уваход не выкананы</string>
+    <string name="proton_refresh">Абнавіць серверы</string>
+    <string name="proton_add">Дадаць</string>
+    <string name="proton_added">Дададзена: %s</string>
+    <string name="proton_no_nodes">Няма прыдатных сервераў</string>
+    <string name="proton_node_count">Сервераў: %1$d, прапушчана: %2$d</string>
+    <string name="proton_sidecar_missing">Гэтая зборка не змяшчае дапаможны модуль Proton.</string>
+    <string name="proton_2fa_required">Гэтаму акаўнту патрэбны код 2FA.</string>
+    <string name="proton_warning_title">Папярэджваем загадзя</string>
+    <string name="proton_warning_message">Гэта не праграма Proton. Яна звяртаецца да API Proton так жа, як уласныя кліенты Proton, таму Proton можа змяніць API ў любы момант — і функцыя перастане працаваць, а мы не зможам падрыхтавацца загадзя.\n\nПароль і сесія захоўваюцца толькі на гэтай прыладзе, у прыватным сховішчы NB4A, і не адпраўляюцца нікуды, акрамя ўваходу ў Proton. Выкарыстанне падпіскі па-за праграмамі Proton можа не покрывацца іхнямі ўмовамі.</string>
+    <string name="proton_warning_accept">Зразумела</string>
+
 </resources>

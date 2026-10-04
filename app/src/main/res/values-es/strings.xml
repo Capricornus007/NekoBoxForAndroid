@@ -1144,4 +1144,27 @@
     <string name="masque_fragment">Fragmentación</string>
     <string name="masque_fragment_fallback_delay">Retardo de alternativa de fragmentación</string>
     <string name="masque_record_fragment">Fragmentación de registro</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Servidores de Proton VPN</string>
+    <string name="proton_summary">Carga servidores de tu cuenta de Proton VPN y los añade como perfiles.</string>
+    <string name="proton_open">Abrir</string>
+    <string name="proton_account">Correo o nombre de usuario</string>
+    <string name="proton_password">Contraseña</string>
+    <string name="proton_2fa">Código 2FA</string>
+    <string name="proton_sign_in">Iniciar sesión</string>
+    <string name="proton_sign_out">Cerrar sesión</string>
+    <string name="proton_signed_in">Conectado</string>
+    <string name="proton_not_signed_in">Sin conectar</string>
+    <string name="proton_refresh">Actualizar servidores</string>
+    <string name="proton_add">Añadir</string>
+    <string name="proton_added">%s añadido</string>
+    <string name="proton_no_nodes">No hay servidores utilizables</string>
+    <string name="proton_node_count">%1$d servidores, %2$d omitidos</string>
+    <string name="proton_sidecar_missing">Esta compilación no incluye el ayudante de Proton.</string>
+    <string name="proton_2fa_required">Esta cuenta necesita un código 2FA.</string>
+    <string name="proton_warning_title">Advertido estás</string>
+    <string name="proton_warning_message">Esta no es una aplicación de Proton. Habla con la API de Proton igual que los clientes oficiales, así que Proton puede cambiar esa API en cualquier momento y romper esta función sin que podamos anticiparlo.\n\nTu contraseña y tu sesión se guardan solo en este teléfono, en el almacenamiento privado de NB4A, y no se envían a ningún sitio salvo para iniciar sesión en Proton. Usar una suscripción fuera de las aplicaciones de Proton puede no estar cubierto por sus condiciones.</string>
+    <string name="proton_warning_accept">Entendido</string>
+
 </resources>

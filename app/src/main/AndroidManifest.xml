@@ -256,6 +256,11 @@
             android:label="@string/traffic_chart_title"
             android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
         <activity
+            android:name="io.nekohasekai.sagernet.ui.ProtonActivity"
+            android:configChanges="uiMode"
+            android:label="@string/proton_title"
+            android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
+        <activity
             android:name="io.nekohasekai.sagernet.ui.AppListActivity"
             android:configChanges="uiMode" />
         <activity

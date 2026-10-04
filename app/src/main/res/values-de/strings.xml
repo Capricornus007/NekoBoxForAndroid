@@ -902,4 +902,27 @@
     <string name="masque_fragment">Fragmentierung</string>
     <string name="masque_fragment_fallback_delay">Fragment-Fallback-Verzögerung</string>
     <string name="masque_record_fragment">Datensatzfragmentierung</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Proton-VPN-Server</string>
+    <string name="proton_summary">Lädt Server aus deinem Proton-VPN-Konto und fügt sie als Profile hinzu.</string>
+    <string name="proton_open">Öffnen</string>
+    <string name="proton_account">E-Mail oder Benutzername</string>
+    <string name="proton_password">Passwort</string>
+    <string name="proton_2fa">2FA-Code</string>
+    <string name="proton_sign_in">Anmelden</string>
+    <string name="proton_sign_out">Abmelden</string>
+    <string name="proton_signed_in">Angemeldet</string>
+    <string name="proton_not_signed_in">Nicht angemeldet</string>
+    <string name="proton_refresh">Server aktualisieren</string>
+    <string name="proton_add">Hinzufügen</string>
+    <string name="proton_added">%s hinzugefügt</string>
+    <string name="proton_no_nodes">Keine nutzbaren Server</string>
+    <string name="proton_node_count">%1$d Server, %2$d übersprungen</string>
+    <string name="proton_sidecar_missing">Dieser Build enthält keinen Proton-Helfer.</string>
+    <string name="proton_2fa_required">Dieses Konto benötigt einen 2FA-Code.</string>
+    <string name="proton_warning_title">Vorab gewarnt</string>
+    <string name="proton_warning_message">Dies ist keine Proton-App. Sie spricht das Proton-API so an wie Protons eigene Clients, daher kann Proton das API jederzeit ändern und diese Funktion ausfallen lassen, ohne dass wir vorher reagieren können.\n\nPasswort und Sitzung werden nur auf diesem Gerät im privaten Speicher von NB4A gehalten und außer zum Anmelden bei Proton nirgendwohin gesendet. Die Nutzung eines Abos außerhalb der Proton-Apps ist möglicherweise nicht durch deren Bedingungen gedeckt.</string>
+    <string name="proton_warning_accept">Verstanden</string>
+
 </resources>

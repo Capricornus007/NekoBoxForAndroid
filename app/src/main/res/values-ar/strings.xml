@@ -956,4 +956,27 @@
     <string name="masque_fragment">التجزئة</string>
     <string name="masque_fragment_fallback_delay">تأخير تراجع التجزئة</string>
     <string name="masque_record_fragment">تجزئة السجل</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">خوادم Proton VPN</string>
+    <string name="proton_summary">يحمّل الخوادم من حساب Proton VPN لديك ويضيفها كملفات تعريف.</string>
+    <string name="proton_open">فتح</string>
+    <string name="proton_account">البريد أو اسم المستخدم</string>
+    <string name="proton_password">كلمة المرور</string>
+    <string name="proton_2fa">رمز 2FA</string>
+    <string name="proton_sign_in">تسجيل الدخول</string>
+    <string name="proton_sign_out">تسجيل الخروج</string>
+    <string name="proton_signed_in">تم تسجيل الدخول</string>
+    <string name="proton_not_signed_in">غير مسجّل الدخول</string>
+    <string name="proton_refresh">تحديث الخوادم</string>
+    <string name="proton_add">إضافة</string>
+    <string name="proton_added">تمت إضافة %s</string>
+    <string name="proton_no_nodes">لا توجد خوادم قابلة للاستخدام</string>
+    <string name="proton_node_count">%1$d خوادم، تم تخطي %2$d</string>
+    <string name="proton_sidecar_missing">لا يتضمن هذا الإصدار مساعد Proton.</string>
+    <string name="proton_2fa_required">هذا الحساب يتطلب رمز 2FA.</string>
+    <string name="proton_warning_title">لقد حذّرناك مسبقًا</string>
+    <string name="proton_warning_message">هذا ليس تطبيقًا من Proton. إنه يخاطب واجهة Proton بنفس طريقة عملاء Proton الرسميين، لذا قد تغيّر Proton الواجهة في أي وقت ويتوقف هذه الميزة دون أن نستطيع الاستباق.\n\nتُحفظ كلمة المرور والجلسة على هذا الجهاز فقط، في التخزين الخاص بتطبيق NB4A، ولا تُرسل إلى أي مكان سوى لتسجيل الدخول إلى Proton. استخدام الاشتراك خارج تطبيقات Proton قد لا تغطيه شروطهم.</string>
+    <string name="proton_warning_accept">فهمت</string>
+
 </resources>

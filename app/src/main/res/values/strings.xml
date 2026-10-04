@@ -1068,4 +1068,26 @@
     <string name="check_update_no">Check successful, but no updates.</string>
     <string name="snell_quic_proxy">QUIC Proxy Mode</string>
     <string name="snell_quic_proxy_summary">v6 only: legacy v5 QUIC Proxy compatibility</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Proton VPN servers</string>
+    <string name="proton_summary">Load servers from your Proton VPN account and add them as profiles.</string>
+    <string name="proton_open">Open</string>
+    <string name="proton_account">Email or username</string>
+    <string name="proton_password">Password</string>
+    <string name="proton_2fa">2FA code</string>
+    <string name="proton_sign_in">Sign in</string>
+    <string name="proton_sign_out">Sign out</string>
+    <string name="proton_signed_in">Signed in</string>
+    <string name="proton_not_signed_in">Not signed in</string>
+    <string name="proton_refresh">Refresh servers</string>
+    <string name="proton_add">Add</string>
+    <string name="proton_added">Added %s</string>
+    <string name="proton_no_nodes">No usable servers</string>
+    <string name="proton_node_count">%1$d servers, %2$d skipped</string>
+    <string name="proton_sidecar_missing">This build does not include the Proton helper.</string>
+    <string name="proton_2fa_required">This account needs a 2FA code.</string>
+    <string name="proton_warning_title">You have been warned</string>
+    <string name="proton_warning_message">This is not a Proton app. It talks to Proton\'s API the way Proton\'s own clients do, so Proton can change that API at any time and this stops working with no way for us to fix it in advance.\n\nYour password and session are kept only on this phone, in NB4A\'s private storage, and are sent nowhere except Proton\'s sign-in endpoint. Using a subscription outside Proton\'s own apps may not be covered by their terms.</string>
+    <string name="proton_warning_accept">I understand</string>
 </resources>

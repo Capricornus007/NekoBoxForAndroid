@@ -988,4 +988,27 @@
     <string name="masque_fragment">قطعه‌قطعه‌سازی</string>
     <string name="masque_fragment_fallback_delay">تأخیر بازگشت قطعه‌بندی</string>
     <string name="masque_record_fragment">قطعه‌بندی رکورد</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">سرورهای Proton VPN</string>
+    <string name="proton_summary">سرورها را از حساب Proton VPN شما بارگیری و به‌عنوان پروفایل اضافه می‌کند.</string>
+    <string name="proton_open">باز کردن</string>
+    <string name="proton_account">ایمیل یا نام کاربری</string>
+    <string name="proton_password">گذرواژه</string>
+    <string name="proton_2fa">کد 2FA</string>
+    <string name="proton_sign_in">ورود</string>
+    <string name="proton_sign_out">خروج</string>
+    <string name="proton_signed_in">وارد شدید</string>
+    <string name="proton_not_signed_in">وارد نشده‌اید</string>
+    <string name="proton_refresh">نوسازی سرورها</string>
+    <string name="proton_add">افزودن</string>
+    <string name="proton_added">%s اضافه شد</string>
+    <string name="proton_no_nodes">هیچ سرور قابل استفاده‌ای نیست</string>
+    <string name="proton_node_count">%1$d سرور، %2$d نادیده گرفته شد</string>
+    <string name="proton_sidecar_missing">این نسخه شامل کمک‌برنامه Proton نیست.</string>
+    <string name="proton_2fa_required">این حساب به کد 2FA نیاز دارد.</string>
+    <string name="proton_warning_title">از پیش هشدار داده شده‌اید</string>
+    <string name="proton_warning_message">این برنامه رسمی Proton نیست. همان‌طور که کلاینت‌های خود Proton عمل می‌کنند با API آن ارتباط برقرار می‌کند، بنابراین Proton ممکن است هر زمان API را تغییر دهد و این قابلیت از کار بیفتد و ما نتوانیم پیش‌بینی کنیم.\n\nگذرواژه و نشست شما فقط روی این دستگاه و در حافظه خصوصی NB4A نگه‌داری می‌شود و جز برای ورود به Proton به هیچ‌جا فرستاده نمی‌شود. استفاده از اشتراک خارج از برنامه‌های Proton ممکن است مشمول شرایط آن‌ها نباشد.</string>
+    <string name="proton_warning_accept">فهمیدم</string>
+
 </resources>

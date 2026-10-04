@@ -997,4 +997,27 @@
     <string name="masque_fragment">Фрагментація</string>
     <string name="masque_fragment_fallback_delay">Затримка резерву фрагментації</string>
     <string name="masque_record_fragment">Фрагментація запису</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Сервери Proton VPN</string>
+    <string name="proton_summary">Завантажує сервери з вашого облікового запису Proton VPN і додає їх як профілі.</string>
+    <string name="proton_open">Відкрити</string>
+    <string name="proton_account">Пошта або ім\'я користувача</string>
+    <string name="proton_password">Пароль</string>
+    <string name="proton_2fa">Код 2FA</string>
+    <string name="proton_sign_in">Увійти</string>
+    <string name="proton_sign_out">Вийти</string>
+    <string name="proton_signed_in">Вхід виконано</string>
+    <string name="proton_not_signed_in">Вхід не виконано</string>
+    <string name="proton_refresh">Оновити сервери</string>
+    <string name="proton_add">Додати</string>
+    <string name="proton_added">Додано: %s</string>
+    <string name="proton_no_nodes">Немає придатних серверів</string>
+    <string name="proton_node_count">Серверів: %1$d, пропущено: %2$d</string>
+    <string name="proton_sidecar_missing">Ця збірка не містить допоміжного модуля Proton.</string>
+    <string name="proton_2fa_required">Для цього облікового запису потрібен код 2FA.</string>
+    <string name="proton_warning_title">Попереджаємо заздалегідь</string>
+    <string name="proton_warning_message">Це не застосунок Proton. Він звертається до API Proton так само, як власні клієнти Proton, тому Proton може змінити API будь-коли — і функція перестане працювати, а ми не зможемо підготуватися наперед.\n\nПароль і сесію збережено лише на цьому пристрої, у приватному сховищі NB4A, і вони не надсилаються нікуди, окрім входу до Proton. Використання підписки поза застосунками Proton може не покриватися їхніми умовами.</string>
+    <string name="proton_warning_accept">Зрозуміло</string>
+
 </resources>

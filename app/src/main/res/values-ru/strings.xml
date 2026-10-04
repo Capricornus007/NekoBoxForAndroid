@@ -959,4 +959,27 @@
     <string name="masque_fragment">Фрагментация</string>
     <string name="masque_fragment_fallback_delay">Задержка отката фрагментации</string>
     <string name="masque_record_fragment">Фрагментация записи</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Серверы Proton VPN</string>
+    <string name="proton_summary">Загружает серверы из вашего аккаунта Proton VPN и добавляет их как профили.</string>
+    <string name="proton_open">Открыть</string>
+    <string name="proton_account">Эл. почта или имя пользователя</string>
+    <string name="proton_password">Пароль</string>
+    <string name="proton_2fa">Код 2FA</string>
+    <string name="proton_sign_in">Войти</string>
+    <string name="proton_sign_out">Выйти</string>
+    <string name="proton_signed_in">Выполнен вход</string>
+    <string name="proton_not_signed_in">Вход не выполнен</string>
+    <string name="proton_refresh">Обновить серверы</string>
+    <string name="proton_add">Добавить</string>
+    <string name="proton_added">Добавлено: %s</string>
+    <string name="proton_no_nodes">Нет доступных серверов</string>
+    <string name="proton_node_count">Серверов: %1$d, пропущено: %2$d</string>
+    <string name="proton_sidecar_missing">В этой сборке нет вспомогательного модуля Proton.</string>
+    <string name="proton_2fa_required">Для этого аккаунта нужен код 2FA.</string>
+    <string name="proton_warning_title">Предупреждаем заранее</string>
+    <string name="proton_warning_message">Это не официальное приложение Proton. Оно обращается к API Proton так же, как собственные клиенты Proton, поэтому Proton может изменить API в любой момент — и функция перестанет работать, а мы не сможем подготовиться заранее.\n\nПароль и сессия хранятся только на этом устройстве, в закрытом хранилище NB4A, и отправляются лишь на вход в Proton. Использование подписки вне приложений Proton может не покрываться их условиями.</string>
+    <string name="proton_warning_accept">Понятно</string>
+
 </resources>

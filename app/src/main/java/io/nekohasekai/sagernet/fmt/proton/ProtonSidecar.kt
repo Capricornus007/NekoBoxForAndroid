@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 data class ProtonNode(
@@ -64,7 +65,9 @@ object ProtonJson {
             return ProtonNodesState(false, error = obj.optString("error", "unknown error"))
         }
         val array = obj.optJSONArray("servers") ?: return ProtonNodesState(
-            false, dropped = obj.optInt("dropped"), error = "no servers in response"
+            false,
+            dropped = obj.optInt("dropped"),
+            error = "no servers in response",
         )
         val nodes = ArrayList<ProtonNode>(array.length())
         for (i in 0 until array.length()) {
@@ -151,19 +154,18 @@ object ProtonSidecar {
             }
         }
 
-    suspend fun nodes(country: String = "", limit: Int = 0): ProtonNodesState =
-        withContext(Dispatchers.IO) {
-            if (!sessionFile.exists()) {
-                return@withContext ProtonNodesState(false, error = "not logged in")
-            }
-            val args = ArrayList(listOf("nodes", "--state", sessionFile.absolutePath))
-            if (country.isNotEmpty()) args += listOf("--country", country)
-            if (limit > 0) args += listOf("--limit", limit.toString())
-            when (val result = runSidecar(args, null)) {
-                is ProtonOutcome.Success -> ProtonJson.parseNodes(result.json)
-                is ProtonOutcome.Failed -> ProtonNodesState(false, error = result.message)
-            }
+    suspend fun nodes(country: String = "", limit: Int = 0): ProtonNodesState = withContext(Dispatchers.IO) {
+        if (!sessionFile.exists()) {
+            return@withContext ProtonNodesState(false, error = "not logged in")
         }
+        val args = ArrayList(listOf("nodes", "--state", sessionFile.absolutePath))
+        if (country.isNotEmpty()) args += listOf("--country", country)
+        if (limit > 0) args += listOf("--limit", limit.toString())
+        when (val result = runSidecar(args, null)) {
+            is ProtonOutcome.Success -> ProtonJson.parseNodes(result.json)
+            is ProtonOutcome.Failed -> ProtonNodesState(false, error = result.message)
+        }
+    }
 
     fun logout() {
         if (!sessionFile.delete() && sessionFile.exists()) {
@@ -172,6 +174,29 @@ object ProtonSidecar {
     }
 
     fun hasSession(): Boolean = sessionFile.exists()
+
+    suspend fun keyPair(): ProtonKeyPair = withContext(Dispatchers.IO) {
+        when (val result = runSidecar(listOf("keypair"), null)) {
+            is ProtonOutcome.Success -> {
+                val obj = runCatching { JSONObject(result.json) }.getOrNull()
+                if (obj?.optBoolean("ok") == true && obj.optString("privateKey").isNotEmpty()) {
+                    ProtonKeyPair(obj.getString("privateKey"), obj.getString("publicKey"))
+                } else {
+                    null
+                }
+            }
+
+            is ProtonOutcome.Failed -> {
+                Logs.w("proton keypair failed: ${result.message}")
+                null
+            }
+        } ?: ProtonKeyPair("", "")
+    }
+
+    // An empty pair means "could not generate", which the caller must not import.
+    data class ProtonKeyPair(val privateKey: String, val publicKey: String) {
+        val valid: Boolean get() = privateKey.isNotEmpty() && publicKey.isNotEmpty()
+    }
 
     private fun runSidecar(args: List<String>, stdin: String?): ProtonOutcome {
         val exe = executable() ?: return ProtonOutcome.Failed("$EXECUTABLE_NAME is not installed")
@@ -193,8 +218,19 @@ object ProtonSidecar {
             val errThread = Thread {
                 process.errorStream.bufferedReader().use { errorText.append(it.readText()) }
             }.also { it.start() }
-            if (!process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                process.destroyForcibly()
+            // Process.waitFor(timeout) and destroyForcibly() need API 24/26 while this
+            // app supports 23, so the deadline is enforced with a latch and the plain
+            // destroy() instead.
+            val finished = CountDownLatch(1)
+            Thread {
+                process.waitFor()
+                finished.countDown()
+            }.apply {
+                isDaemon = true
+                start()
+            }
+            if (!finished.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                process.destroy()
                 return ProtonOutcome.Failed("sidecar timed out after ${TIMEOUT_SECONDS}s")
             }
             outThread.join(TIMEOUT_MILLIS)
@@ -204,7 +240,8 @@ object ProtonSidecar {
                 ProtonOutcome.Success(output.toString().trim())
             } else {
                 ProtonOutcome.Failed(
-                    errorText.toString().trim().ifEmpty { "sidecar exited with $code" }, code
+                    errorText.toString().trim().ifEmpty { "sidecar exited with $code" },
+                    code,
                 )
             }
         } catch (e: Exception) {

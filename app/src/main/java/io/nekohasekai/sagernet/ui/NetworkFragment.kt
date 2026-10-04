@@ -21,5 +21,11 @@ class NetworkFragment : NamedFragment(R.layout.layout_network) {
         }
         binding.trafficChartCard.setOnClickListener(openTrafficChart)
         binding.trafficChartBtn.setOnClickListener(openTrafficChart)
+
+        val openProton = View.OnClickListener {
+            startActivity(Intent(requireContext(), ProtonActivity::class.java))
+        }
+        binding.protonCard.setOnClickListener(openProton)
+        binding.protonBtn.setOnClickListener(openProton)
     }
 }

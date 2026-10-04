@@ -998,4 +998,27 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="masque_fragment">Frammentazione</string>
     <string name="masque_fragment_fallback_delay">Ritardo fallback frammentazione</string>
     <string name="masque_record_fragment">Frammentazione record</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Server Proton VPN</string>
+    <string name="proton_summary">Carica i server dal tuo account Proton VPN e li aggiunge come profili.</string>
+    <string name="proton_open">Apri</string>
+    <string name="proton_account">Email o nome utente</string>
+    <string name="proton_password">Password</string>
+    <string name="proton_2fa">Codice 2FA</string>
+    <string name="proton_sign_in">Accedi</string>
+    <string name="proton_sign_out">Esci</string>
+    <string name="proton_signed_in">Connesso</string>
+    <string name="proton_not_signed_in">Non connesso</string>
+    <string name="proton_refresh">Aggiorna server</string>
+    <string name="proton_add">Aggiungi</string>
+    <string name="proton_added">%s aggiunto</string>
+    <string name="proton_no_nodes">Nessun server utilizzabile</string>
+    <string name="proton_node_count">%1$d server, %2$d ignorati</string>
+    <string name="proton_sidecar_missing">Questa versione non include l\'assistente Proton.</string>
+    <string name="proton_2fa_required">Questo account richiede un codice 2FA.</string>
+    <string name="proton_warning_title">Avvertito prima</string>
+    <string name="proton_warning_message">Non è un\'app di Proton. Parla con l\'API di Proton come i client ufficiali, quindi Proton può modificarla in qualsiasi momento e rompere questa funzione senza che possiamo anticiparlo.\n\nPassword e sessione restano solo su questo telefono, nell\'archivio privato di NB4A, e non vengono inviate da nessuna parte se non per l\'accesso a Proton. Usare un abbonamento al di fuori delle app Proton potrebbe non essere coperto dai loro termini.</string>
+    <string name="proton_warning_accept">Ho capito</string>
+
 </resources>

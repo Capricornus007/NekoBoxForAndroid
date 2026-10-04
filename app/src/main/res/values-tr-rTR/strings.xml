@@ -989,4 +989,27 @@
     <string name="masque_fragment">Parçalama</string>
     <string name="masque_fragment_fallback_delay">Parçalama geri dönüş gecikmesi</string>
     <string name="masque_record_fragment">Kayıt parçalama</string>
+
+    <!-- Proton VPN node fetching (replaces the removed STUN/NAT screen) -->
+    <string name="proton_title">Proton VPN sunucuları</string>
+    <string name="proton_summary">Sunucuları Proton VPN hesabınızdan yükler ve profil olarak ekler.</string>
+    <string name="proton_open">Aç</string>
+    <string name="proton_account">E-posta veya kullanıcı adı</string>
+    <string name="proton_password">Parola</string>
+    <string name="proton_2fa">2FA kodu</string>
+    <string name="proton_sign_in">Giriş yap</string>
+    <string name="proton_sign_out">Çıkış yap</string>
+    <string name="proton_signed_in">Giriş yapıldı</string>
+    <string name="proton_not_signed_in">Giriş yapılmadı</string>
+    <string name="proton_refresh">Sunucuları yenile</string>
+    <string name="proton_add">Ekle</string>
+    <string name="proton_added">%s eklendi</string>
+    <string name="proton_no_nodes">Kullanılabilir sunucu yok</string>
+    <string name="proton_node_count">%1$d sunucu, %2$d atlandı</string>
+    <string name="proton_sidecar_missing">Bu derleme Proton yardımcısını içermiyor.</string>
+    <string name="proton_2fa_required">Bu hesap 2FA kodu gerektiriyor.</string>
+    <string name="proton_warning_title">Önceden uyarıldınız</string>
+    <string name="proton_warning_message">Bu bir Proton uygulaması değil. Proton API\'sine Proton\'un kendi istemcileri gibi bağlanıyor; Proton bu API\'yi istediği an değiştirebilir ve bu özellik bozulabilir, biz de önceden hazırlanamayız.\n\nParolanız ve oturumunuz yalnızca bu cihazda, NB4A\'nın özel deposunda saklanır ve Proton\'a giriş dışında hiçbir yere gönderilmez. Aboneliği Proton\'un kendi uygulamaları dışında kullanmak şartları kapsamına girmeyebilir.</string>
+    <string name="proton_warning_accept">Anladım</string>
+
 </resources>
