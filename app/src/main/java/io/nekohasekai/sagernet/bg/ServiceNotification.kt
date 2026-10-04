@@ -295,11 +295,20 @@ class ServiceNotification(
 
     fun destroy() {
         listenPostSpeed = false
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            (service as Service).stopForeground(Service.STOP_FOREGROUND_REMOVE)
-        } else {
-            (service as Service).stopForeground(true)
+        val s = service as? Service
+        if (s != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                s.stopForeground(Service.STOP_FOREGROUND_REMOVE)
+            } else {
+                @Suppress("DEPRECATION")
+                s.stopForeground(true)
+            }
+            NotificationManagerCompat.from(s).cancel(notificationId)
         }
-        service.unregisterReceiver(this)
+        SagerNet.notification.cancel(notificationId)
+        try {
+            (service as Context).unregisterReceiver(this)
+        } catch (_: Throwable) {
+        }
     }
 }

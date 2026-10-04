@@ -115,8 +115,15 @@ object ActiveOutboundTracker {
                 // 用户关闭了“显示分组”：策略组下直接以当前连上的节点名作为主标题
                 return leafNode
             }
-            // 用户开启了“显示分组”（或尚未检测到叶子节点）：主标题为策略组自身的名字
-            return if (isBalancer) profile.displayName() else (group?.displayName() ?: profile.displayName())
+            val baseName = if (isBalancer) profile.displayName() else (group?.displayName() ?: profile.displayName())
+            if (!leafNode.isNullOrBlank()) {
+                return if (baseName.isNotBlank() && !baseName.contains(leafNode)) {
+                    "$baseName · $leafNode"
+                } else {
+                    leafNode
+                }
+            }
+            return baseName
         }
 
         return runCatching { ServiceNotification.genTitle(profile) }.getOrDefault(profile.displayName())
@@ -154,16 +161,18 @@ object ActiveOutboundTracker {
         if (isStrategy) {
             if (showGroup) {
                 // Template 1: 策略组 + 显示组名开启
-                title = if (isBalancer) profile.displayName() else (groupName ?: profile.displayName())
-                collapsedText = if (!leafNode.isNullOrBlank()) {
-                    "当前: $leafNode · 代理: $proxySpeed"
-                } else {
-                    "代理: $proxySpeed"
-                }
-                bigContent = buildString {
-                    if (!leafNode.isNullOrBlank()) {
-                        append("当前: ").append(leafNode).append("\n")
+                val baseGroupName = if (isBalancer) profile.displayName() else (groupName ?: profile.displayName())
+                title = if (!leafNode.isNullOrBlank()) {
+                    if (baseGroupName.isNotBlank() && !baseGroupName.contains(leafNode)) {
+                        "$baseGroupName · $leafNode"
+                    } else {
+                        leafNode
                     }
+                } else {
+                    baseGroupName
+                }
+                collapsedText = "代理: $proxySpeed"
+                bigContent = buildString {
                     append("代理: ").append(proxySpeed)
                     if (showDirectSpeed) {
                         append("\n直连: ").append(directSpeed)

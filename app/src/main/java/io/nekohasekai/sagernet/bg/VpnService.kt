@@ -289,5 +289,6 @@ class VpnService : BaseVpnService(),
         DataStore.vpnService = null
         super.onDestroy()
         data.binder.close()
+        SagerNet.notification.cancel(ServiceNotification.notificationId)
     }
 }

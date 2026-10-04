@@ -89,9 +89,9 @@ class ActiveOutboundTrackerTest {
             proxySpeed = "↑1.2 KB/s ↓5.4 KB/s",
             directSpeed = "↑0 B/s ↓120 B/s"
         )
-        assertEquals("🇯🇵日本", bundle.title)
-        assertEquals("当前: 🇯🇵Japan 01 · 代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.collapsedText)
-        assertEquals("当前: 🇯🇵Japan 01\n代理: ↑1.2 KB/s ↓5.4 KB/s\n直连: ↑0 B/s ↓120 B/s", bundle.bigText)
+        assertEquals("🇯🇵日本 · 🇯🇵Japan 01", bundle.title)
+        assertEquals("代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.collapsedText)
+        assertEquals("代理: ↑1.2 KB/s ↓5.4 KB/s\n直连: ↑0 B/s ↓120 B/s", bundle.bigText)
         assertTrue(!bundle.collapsedText.contains("当前节点"))
         assertTrue(!bundle.bigText.contains("当前节点"))
     }

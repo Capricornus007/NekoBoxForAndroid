@@ -17,6 +17,7 @@ import io.nekohasekai.sagernet.bg.proto.ProxyInstance
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.ktx.*
+import androidx.core.app.NotificationManagerCompat
 import io.nekohasekai.sagernet.plugin.PluginManager
 import io.nekohasekai.sagernet.utils.DefaultNetworkListener
 import io.nekohasekai.sagernet.utils.LandingIpManager
@@ -146,8 +147,16 @@ class BaseService {
             DataStore.serviceState = s
             binder.stateChanged(s, msg)
             runCatching { io.nekohasekai.sagernet.widget.OwnBoxWidgetProvider.updateWidgets(SagerNet.application) }
-            runOnDefaultDispatcher {
-                notification?.postStateUpdate(s)
+            if (s == State.Stopping || s == State.Stopped || s == State.Idle) {
+                notification?.listenPostSpeed = false
+                if (s == State.Stopped || s == State.Idle) {
+                    NotificationManagerCompat.from(SagerNet.application).cancel(ServiceNotification.notificationId)
+                    SagerNet.notification.cancel(ServiceNotification.notificationId)
+                }
+            } else {
+                runOnDefaultDispatcher {
+                    notification?.postStateUpdate(s)
+                }
             }
         }
     }
@@ -489,6 +498,8 @@ class BaseService {
                     recordCleanupFailure("notification-destroy", error)
                 } finally {
                     data.notification = null
+                    NotificationManagerCompat.from(SagerNet.application).cancel(ServiceNotification.notificationId)
+                    SagerNet.notification.cancel(ServiceNotification.notificationId)
                 }
 
                 try {
