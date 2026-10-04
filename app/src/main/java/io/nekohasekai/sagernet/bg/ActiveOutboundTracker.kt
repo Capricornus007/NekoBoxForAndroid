@@ -165,12 +165,20 @@ object ActiveOutboundTracker {
                         append("当前: ").append(leafNode).append("\n")
                     }
                     append("代理: ").append(proxySpeed)
+                    if (showDirectSpeed) {
+                        append("\n直连: ").append(directSpeed)
+                    }
                 }
             } else {
                 // Template 2: 策略组 + 显示组名关闭
                 title = if (!leafNode.isNullOrBlank()) leafNode else profile.displayName()
                 collapsedText = "代理: $proxySpeed"
-                bigContent = "代理: $proxySpeed"
+                bigContent = buildString {
+                    append("代理: ").append(proxySpeed)
+                    if (showDirectSpeed) {
+                        append("\n直连: ").append(directSpeed)
+                    }
+                }
             }
         } else {
             val profileName = profile.displayName()
@@ -186,7 +194,12 @@ object ActiveOutboundTracker {
                 title = profileName
             }
             collapsedText = "代理: $proxySpeed"
-            bigContent = "代理: $proxySpeed"
+            bigContent = buildString {
+                append("代理: ").append(proxySpeed)
+                if (showDirectSpeed) {
+                    append("\n直连: ").append(directSpeed)
+                }
+            }
         }
 
         return NotificationTextBundle(

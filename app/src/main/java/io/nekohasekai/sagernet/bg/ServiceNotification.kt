@@ -105,12 +105,8 @@ class ServiceNotification(
             putString("live_activity_status", if (state == BaseService.State.Connected) "active" else "pending")
         }
 
-        // 展开卡片状态：将原“日本”位置（subText）替换为直连速度
-        if (showDirectSpeed && state == BaseService.State.Connected && !directSpeed.isNullOrBlank()) {
-            builder.setSubText("直连: $directSpeed")
-        } else {
-            builder.setSubText(displayChipText)
-        }
+        // 彻底清空 subText，避免系统在标题右侧强行并排追加网速文本
+        builder.setSubText(null)
     }
 
     suspend fun postStateUpdate(state: BaseService.State) {
