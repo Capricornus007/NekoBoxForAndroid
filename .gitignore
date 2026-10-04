@@ -33,7 +33,10 @@ local.properties
 /.olcrtc-build/
 /.olcrtc-gomobile/
 /.olcrtc-wrapper/
+/.protonvpn-build/
+/.protonvpn-wrapper/
 /buildScript/lib/olcrtc-src/go.sum
+/buildScript/lib/protonvpn-src/go.sum
 
 # Local config / generated app artifacts
 local.properties

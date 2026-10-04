@@ -15,6 +15,8 @@ env:
   NAIVE_VERSION: v149.0.7827.114-1
   OLCRTC_REPO: https://github.com/hawkff/olcrtc.git
   OLCRTC_COMMIT: ad5cc1e3d60b657b15ccd26f8db91395bf9630d0
+  PROTON_REPO: https://github.com/ProtonVPN/go-vpn-lib.git
+  PROTON_COMMIT: 9440653831b00dbc4711f59e8a23a06af1999405
 jobs:
   build-apk:
     name: Build OSS Debug APK
@@ -66,6 +68,10 @@ jobs:
             buildScript/lib/olcrtc-src/main.go \
             buildScript/lib/olcrtc-src/main_test.go \
             buildScript/lib/olcrtc-src/go.mod \
+            buildScript/lib/protonvpn.sh \
+            buildScript/lib/protonvpn-src/main.go \
+            buildScript/lib/protonvpn-src/main_test.go \
+            buildScript/lib/protonvpn-src/go.mod \
             buildScript/init/env.sh \
             buildScript/init/env_ndk.sh \
             | sha256sum \
@@ -76,7 +82,7 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: app/executableSo
-          key: depot-sidecars-${{ env.GO_VERSION }}-${{ env.NDK_VERSION }}-${{ env.MIERU_VERSION }}-${{ env.MDVPN_COMMIT }}-${{ env.NAIVE_VERSION }}-${{ env.OLCRTC_COMMIT }}-${{ hashFiles('sidecars_status') }}
+          key: depot-sidecars-${{ env.GO_VERSION }}-${{ env.NDK_VERSION }}-${{ env.MIERU_VERSION }}-${{ env.MDVPN_COMMIT }}-${{ env.NAIVE_VERSION }}-${{ env.OLCRTC_COMMIT }}-${{ env.PROTON_COMMIT }}-${{ hashFiles('sidecars_status') }}
 
       - name: Install Go
         if: steps.libcore-cache.outputs.cache-hit != 'true' || steps.sidecars-cache.outputs.cache-hit != 'true'
@@ -96,11 +102,12 @@ jobs:
           ./run lib masterdnsvpn
           ./run lib naive
           ./run lib olcrtc
+          ./run lib protonvpn
 
       - name: Verify sidecar artifacts
         run: |
           for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-            for so in libmieru.so libmasterdnsvpn.so libnaive.so libolcrtc.so; do
+            for so in libmieru.so libmasterdnsvpn.so libnaive.so libolcrtc.so libprotonvpn.so; do
               if [ ! -f "app/executableSo/$abi/$so" ]; then
                 echo "Error: missing app/executableSo/$abi/$so" >&2
                 exit 1
