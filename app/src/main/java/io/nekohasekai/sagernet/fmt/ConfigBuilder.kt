@@ -1283,8 +1283,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             for (rule in extraRules) {
                 if (rule.packages.isNotEmpty()) {
                     PackageCache.awaitLoadSync()
-                }
-                val uidList = rule.packages.map {
+                    // 這句讲的是「這條規則要 VPN 模式」，跟規則裡有幾個套件無關。放在 map 裡會
+                    // 按套件數重覆彈窗（一條預設的 Google Play 規則就有五個套件 → 彈五次）。
                     if (!isVPN) {
                         Toast.makeText(
                             SagerNet.application,
@@ -1292,6 +1292,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                             Toast.LENGTH_SHORT,
                         ).show()
                     }
+                }
+                val uidList = rule.packages.map {
                     PackageCache[it]?.takeIf { uid -> uid >= 1000 }
                 }.toHashSet().filterNotNull()
                 val ruleSets = mutableListOf<RuleSet>()

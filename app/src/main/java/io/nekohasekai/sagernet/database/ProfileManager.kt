@@ -34,6 +34,37 @@ object ProfileManager {
     private val listeners = ArrayList<Listener>()
     private val ruleListeners = ArrayList<RuleListener>()
 
+    // 首次建庫時自動加的「Google Play」規則內容。Play 客戶端只畫介面與派工，真正拉 APK 的是
+    // 下載管理器與 GMS/GSF，CDN 也不是 googleapis.cn 那條域名，所以兩邊都要列齊：
+    // 缺 domains 那半 → 安裝卡在 0%；缺 packages 那半 → 規則對全機生效、白吃代理流量。
+    private val PLAY_STORE_DOMAINS = listOf(
+        "domain:googleapis.cn",
+        "domain:xn--ngstr-lra8j.com",
+        "domain:xn--ngstr-cn-8za9o.com",
+        "domain:gvt1.com",
+        "domain:gvt2.com",
+        "domain:gvt3.com",
+        "domain:gvt5.com",
+        "domain:gvt6.com",
+        "domain:gvt7.com",
+        "domain:gvt9.com",
+        "domain:gvt1-cn.com",
+        "domain:gvt2-cn.com",
+        "domain:googleusercontent.com",
+        "domain:play.googleapis.com",
+        "domain:android.clients.google.com",
+        "domain:playstoregatewayadapter-pa.googleapis.com",
+        "domain:firebaselogging-pa.googleapis.com",
+        "domain:ggpht.com",
+    ).joinToString("\n")
+    private val PLAY_STORE_PACKAGES = setOf(
+        "com.android.vending",
+        "com.google.android.gms",
+        "com.google.android.gsf",
+        "com.android.providers.downloads",
+        "com.android.providers.downloads.ui",
+    )
+
     suspend fun iterator(what: suspend Listener.() -> Unit) {
         synchronized(listeners) {
             listeners.toList()
@@ -256,7 +287,8 @@ object ProfileManager {
                     createRule(
                         RuleEntity(
                             name = app.getString(R.string.route_play_store, displayCountry),
-                            domains = "domain:googleapis.cn\ndomain:xn--ngstr-lra8j.com\ndomain:xn--ngstr-cn-8za9o.com",
+                            domains = PLAY_STORE_DOMAINS,
+                            packages = PLAY_STORE_PACKAGES,
                         ),
                         false,
                     )
