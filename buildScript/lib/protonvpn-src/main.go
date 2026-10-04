@@ -35,12 +35,15 @@
 //
 // CURRENT SCOPE (this file)
 //
-// The build chain plus a self-contained `selftest`: it exercises every linked
-// Proton component offline (SRP handshake against Proton's real signed modulus,
-// OpenPGP sign/verify, Ed25519 key pair, localAgent feature/state constants) so
-// that a broken or mis-pinned dependency fails at build time instead of on the
-// device. The account/API commands (login, fetch nodes, connect) are added by
-// the follow-up tickets on top of this same entry point.
+// `selftest` exercises every linked Proton component offline (SRP handshake
+// against Proton's real signed modulus, OpenPGP sign/verify, Ed25519 key pair,
+// localAgent feature/state constants) so a broken or mis-pinned dependency fails
+// at build time instead of on the device.
+//
+// `login` exchanges credentials for a stored session through go-proton-api, which
+// owns the SRP proof chain and the signed request headers. Credentials arrive on
+// stdin and never in argv. The node-list and connect commands build on the same
+// stored session.
 //
 // Usage:
 //
@@ -375,10 +378,11 @@ func usage(w io.Writer) {
 commands:
   version     print the pinned Proton library provenance as JSON
   selftest    run the offline dependency checks, print JSON, exit 1 on failure
+  login       exchange credentials on stdin for a stored session, print JSON
 `)
 }
 
-func run(args []string, stdout, stderr io.Writer) int {
+func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 	if len(args) == 0 {
 		usage(stderr)
 		return 2
@@ -396,6 +400,9 @@ func run(args []string, stdout, stderr io.Writer) int {
 			return 1
 		}
 		return 0
+
+	case "login":
+		return runLogin(args[1:], stdin, stdout, stderr)
 
 	case "selftest":
 		command := flag.NewFlagSet("selftest", flag.ContinueOnError)
@@ -425,5 +432,5 @@ func run(args []string, stdout, stderr io.Writer) int {
 }
 
 func main() {
-	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
+	os.Exit(run(os.Args[1:], os.Stdin, os.Stdout, os.Stderr))
 }

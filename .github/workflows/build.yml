@@ -67,6 +67,8 @@ jobs:
             buildScript/lib/olcrtc-src/main_test.go \
             buildScript/lib/olcrtc-src/go.mod \
             buildScript/lib/protonvpn.sh \
+            buildScript/lib/protonvpn-src/login.go \
+            buildScript/lib/protonvpn-src/login_test.go \
             buildScript/lib/protonvpn-src/main.go \
             buildScript/lib/protonvpn-src/main_test.go \
             buildScript/lib/protonvpn-src/go.mod \

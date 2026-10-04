@@ -87,7 +87,7 @@ func TestRunSelftestChecksMarksReportFailed(t *testing.T) {
 func TestSelftestCommandExitCodeFollowsReport(t *testing.T) {
 	var stdout, stderr bytes.Buffer
 
-	if code := run([]string{"selftest"}, &stdout, &stderr); code != 0 {
+	if code := run([]string{"selftest"}, nil, &stdout, &stderr); code != 0 {
 		t.Fatalf("selftest exited with %d, stderr: %q", code, stderr.String())
 	}
 	if stderr.Len() != 0 {
@@ -98,7 +98,7 @@ func TestSelftestCommandExitCodeFollowsReport(t *testing.T) {
 func TestVersionCommandPrintsJSON(t *testing.T) {
 	var stdout, stderr bytes.Buffer
 
-	if code := run([]string{"version"}, &stdout, &stderr); code != 0 {
+	if code := run([]string{"version"}, nil, &stdout, &stderr); code != 0 {
 		t.Fatalf("version exited with %d, stderr: %q", code, stderr.String())
 	}
 
@@ -117,7 +117,7 @@ func TestVersionCommandPrintsJSON(t *testing.T) {
 func TestRunRejectsUnknownCommand(t *testing.T) {
 	var stdout, stderr bytes.Buffer
 
-	if code := run([]string{"definitely-not-a-command"}, &stdout, &stderr); code != 2 {
+	if code := run([]string{"definitely-not-a-command"}, nil, &stdout, &stderr); code != 2 {
 		t.Fatalf("unknown command exited with %d, want 2 (stderr %q)", code, stderr.String())
 	}
 	if !bytes.Contains(stderr.Bytes(), []byte("unknown command")) {
@@ -128,7 +128,7 @@ func TestRunRejectsUnknownCommand(t *testing.T) {
 func TestRunWithoutArgumentsShowsUsage(t *testing.T) {
 	var stdout, stderr bytes.Buffer
 
-	if code := run(nil, &stdout, &stderr); code != 2 {
+	if code := run(nil, nil, &stdout, &stderr); code != 2 {
 		t.Fatalf("empty argv exited with %d, want 2", code)
 	}
 	if !bytes.Contains(stderr.Bytes(), []byte("usage:")) {
