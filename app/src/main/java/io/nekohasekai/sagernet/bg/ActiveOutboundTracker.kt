@@ -178,9 +178,6 @@ object ActiveOutboundTracker {
                         append("当前: ").append(leafNode).append("\n")
                     }
                     append("代理: ").append(proxySpeed)
-                    if (showDirectSpeed) {
-                        append("\n直连: ").append(directSpeed)
-                    }
                 }
             } else {
                 // Template 2: 策略组 + 显示组名关闭
@@ -195,9 +192,6 @@ object ActiveOutboundTracker {
                         append("策略: ").append(cleanStrategy).append("\n")
                     }
                     append("代理: ").append(proxySpeed)
-                    if (showDirectSpeed) {
-                        append("\n直连: ").append(directSpeed)
-                    }
                 }
             }
         } else {
@@ -214,12 +208,7 @@ object ActiveOutboundTracker {
                 title = profileName
             }
             collapsedText = "代理: $proxySpeed"
-            bigContent = buildString {
-                append("代理: ").append(proxySpeed)
-                if (showDirectSpeed) {
-                    append("\n直连: ").append(directSpeed)
-                }
-            }
+            bigContent = "代理: $proxySpeed"
         }
 
         return NotificationTextBundle(

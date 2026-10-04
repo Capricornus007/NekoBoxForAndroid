@@ -91,7 +91,7 @@ class ActiveOutboundTrackerTest {
         )
         assertEquals("🇯🇵日本 · 最低延迟", bundle.title)
         assertEquals("当前: 🇯🇵Japan 01 · 代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.collapsedText)
-        assertEquals("当前: 🇯🇵Japan 01\n代理: ↑1.2 KB/s ↓5.4 KB/s\n直连: ↑0 B/s ↓120 B/s", bundle.bigText)
+        assertEquals("当前: 🇯🇵Japan 01\n代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.bigText)
         assertTrue(!bundle.collapsedText.contains("当前节点"))
         assertTrue(!bundle.bigText.contains("当前节点"))
     }
@@ -118,7 +118,7 @@ class ActiveOutboundTrackerTest {
         )
         assertEquals("🇯🇵Japan 01", bundle.title)
         assertEquals("策略: 最低延迟 · 代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.collapsedText)
-        assertEquals("策略: 最低延迟\n代理: ↑1.2 KB/s ↓5.4 KB/s\n直连: ↑0 B/s ↓120 B/s", bundle.bigText)
+        assertEquals("策略: 最低延迟\n代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.bigText)
         assertTrue(!bundle.bigText.contains("🇯🇵Japan 01")) // Leaf name not repeated in body
     }
 
@@ -143,7 +143,7 @@ class ActiveOutboundTrackerTest {
         )
         assertEquals("吹雪云 · 🇸🇬新加坡·移联02", bundle.title)
         assertEquals("代理: ↑0 B/s ↓0 B/s", bundle.collapsedText)
-        assertEquals("代理: ↑0 B/s ↓0 B/s\n直连: ↑10 B/s ↓20 B/s", bundle.bigText)
+        assertEquals("代理: ↑0 B/s ↓0 B/s", bundle.bigText)
     }
 
     @Test

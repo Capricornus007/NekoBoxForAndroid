@@ -532,6 +532,7 @@
     <string name="hide_unavailable_profiles_sum">延迟测试失败或超时的节点将在列表中自动软隐藏，重新测试联通后自动恢复</string>
     <string name="packet_encoding">包编码</string>
     <string name="action_switch">切换</string>
+    <string name="action_reset">重置</string>
     <string name="acquire_wake_lock">获取唤醒锁</string>
     <string name="release_wake_lock">释放唤醒锁</string>
     <string name="acquire_wake_lock_summary">保持 CPU 开启</string>

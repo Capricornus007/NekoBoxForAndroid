@@ -657,6 +657,7 @@
     <string name="hide_from_recent_apps">Hide from recent tasks</string>
     <string name="hide_from_recent_apps_summary">Hide the app from recent tasks when running in background</string>
     <string name="action_switch">Switch</string>
+    <string name="action_reset">Reset</string>
     <string name="custom_rules_provider">Custom</string>
     <string name="rules_geosite_url">geosite URL</string>
     <string name="rules_geoip_url">geoip URL</string>

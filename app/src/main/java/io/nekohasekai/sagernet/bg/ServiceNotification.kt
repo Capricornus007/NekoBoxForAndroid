@@ -66,11 +66,13 @@ class ServiceNotification(
     private var lastText: String? = null
     private var lastBigText: String? = null
     private var lastRegion: String? = null
+    private var lastDirectSpeed: String? = null
 
     private fun applyLiveUpdateCapsule(
         builder: NotificationCompat.Builder,
         state: BaseService.State,
         region: String? = null,
+        directSpeed: String? = null,
     ) {
         val color = when (state) {
             BaseService.State.Connected -> 0xFF4CAF50.toInt() // 绿色 (Green #4CAF50)
@@ -98,6 +100,7 @@ class ServiceNotification(
         }
 
         // 谷歌原生 Android 16 实况岛 / Rich Ongoing Notifications (Live Updates) 规范
+        // 收起状态：挖孔屏旁保持显示状态颜色和地区汉字（如“日本”）
         builder.extras.apply {
             putBoolean("android.requestPromotedOngoing", true)
             putCharSequence("android.shortCriticalText", displayChipText)
@@ -105,12 +108,18 @@ class ServiceNotification(
             putInt("capsule_color", color)
             putString("live_activity_status", if (state == BaseService.State.Connected) "active" else "pending")
         }
-        builder.setSubText(displayChipText)
+
+        // 展开卡片状态：将原“日本”位置（subText）替换为直连速度
+        if (showDirectSpeed && state == BaseService.State.Connected && !directSpeed.isNullOrBlank()) {
+            builder.setSubText("直连: $directSpeed")
+        } else {
+            builder.setSubText(displayChipText)
+        }
     }
 
     suspend fun postStateUpdate(state: BaseService.State) {
         useBuilder {
-            applyLiveUpdateCapsule(it, state)
+            applyLiveUpdateCapsule(it, state, lastRegion, lastDirectSpeed)
         }
         update()
     }
@@ -152,13 +161,15 @@ class ServiceNotification(
         val isChanged = (texts.title != lastTitle) ||
                         (texts.collapsedText != lastText) ||
                         (texts.bigText != lastBigText) ||
-                        (currentRegion != lastRegion)
+                        (currentRegion != lastRegion) ||
+                        (directSpeed != lastDirectSpeed)
         if (!isChanged) return
 
         lastTitle = texts.title
         lastText = texts.collapsedText
         lastBigText = texts.bigText
         lastRegion = currentRegion
+        lastDirectSpeed = directSpeed
 
         useBuilder {
             if (texts.title.isNotBlank()) {
@@ -166,7 +177,7 @@ class ServiceNotification(
             }
             it.setStyle(NotificationCompat.BigTextStyle().bigText(texts.bigText))
             it.setContentText(texts.collapsedText)
-            applyLiveUpdateCapsule(it, service.data.state, currentRegion)
+            applyLiveUpdateCapsule(it, service.data.state, currentRegion, directSpeed)
         }
         update()
     }
@@ -249,7 +260,7 @@ class ServiceNotification(
             it.addAction(switchAction)
 
             val resetUpstreamAction = NotificationCompat.Action.Builder(
-                R.drawable.ic_baseline_refresh_24, service.getString(R.string.reset_connections),
+                R.drawable.ic_baseline_refresh_24, service.getString(R.string.action_reset),
                 PendingIntent.getBroadcast(
                     service, 2, Intent(Action.RESET_UPSTREAM_CONNECTIONS).setPackage(service.packageName), flags
                 )

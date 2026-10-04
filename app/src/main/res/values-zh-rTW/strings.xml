@@ -478,6 +478,7 @@
     <string name="hide_from_recent_apps">從最近任務中隱藏</string>
     <string name="hide_from_recent_apps_summary">應用在後臺執行時，在最近任務中隱藏</string>
     <string name="action_switch">切換</string>
+    <string name="action_reset">重置</string>
     <string name="custom_rules_provider">自定義</string>
     <string name="tuic_udp_relay_mode">UDP 轉發模式</string>
     <string name="tuic_congestion_controller">擁塞控制</string>
