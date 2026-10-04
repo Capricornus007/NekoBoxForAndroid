@@ -10,9 +10,9 @@ import (
 	"testing"
 )
 
-func writeTestSession(t *testing.T) string {
+func writeTestSession(t *testing.T, dir string) string {
 	t.Helper()
-	path := filepath.Join(t.TempDir(), "session.json")
+	path := filepath.Join(dir, "session.json")
 	payload, err := json.Marshal(storedCredential{
 		UID:          "uid-test",
 		UserID:       "user-test",
@@ -28,8 +28,6 @@ func writeTestSession(t *testing.T) string {
 	return path
 }
 
-// apiURLForSession is how the test points the client at the mock: nodes reads the
-// URL from a flag rather than the environment so the production default stays put.
 func runNodesWith(t *testing.T, apiURL, statePath string, extra ...string) (nodesOutput, int) {
 	t.Helper()
 	var stdout, stderr bytes.Buffer
@@ -42,92 +40,136 @@ func runNodesWith(t *testing.T, apiURL, statePath string, extra ...string) (node
 	return out, code
 }
 
-func TestNodesSelectsUsableServersAndDropsKeylessOnes(t *testing.T) {
-	var gotAuth, gotUID, gotAPIVersion string
+// serverList mirrors the wire format Proton's own client models declare: ID is a
+// string, the key lives on the connecting domain as X25519PublicKey, and there is
+// no load field on a logical server.
+const serverListFixture = `{"LogicalServers":[
+ {"ID":"11","Name":"JP#2 空閒","Tier":2,"State":"up","ExitCountry":"jp","City":"Tokyo","Features":16,
+  "StatusReference":{"Index":11,"Penalty":0.2,"Cost":1},
+  "Servers":[{"Domain":"jp2.protonvpn.net","EntryIP":"1.2.3.5","Status":1,"X25519PublicKey":"BBBBAl==",
+    "EntryPerProtocol":{"wireguard":{"IPv4":"1.2.3.55","Ports":[51820,443]}}}]},
+ {"ID":"10","Name":"JP#1 拥挤","Tier":2,"State":"up","ExitCountry":"jp","City":"Osaka","Features":0,
+  "StatusReference":{"Index":10,"Penalty":0.9,"Cost":3},
+  "Servers":[{"Domain":"jp1.protonvpn.net","EntryIP":"1.2.3.4","Status":1,"X25519PublicKey":"AAAAAl=="}]},
+ {"ID":"12","Name":"無公鑰","Tier":0,"State":"up","ExitCountry":"jp",
+  "StatusReference":{"Index":12,"Penalty":0.1,"Cost":0},
+  "Servers":[{"Domain":"jp4.protonvpn.net","EntryIP":"1.2.3.6","Status":1}]},
+ {"ID":"13","Name":"離線群組","Tier":0,"State":"down","ExitCountry":"jp",
+  "StatusReference":{"Index":13,"Penalty":0.1,"Cost":0},
+  "Servers":[{"Domain":"jp5.protonvpn.net","X25519PublicKey":"DDDDCl==","Status":1}]},
+ {"ID":"14","Name":"域離線","Tier":2,"State":"up","ExitCountry":"jp",
+  "StatusReference":{"Index":14,"Penalty":0.05,"Cost":0},
+  "Servers":[{"Domain":"jp6.protonvpn.net","X25519PublicKey":"EEEECl==","Status":0}]}
+]}`
+
+func mockServer(t *testing.T, body string, status int) (*httptest.Server, func() *int) {
+	t.Helper()
+	var hits int
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		gotAuth = r.Header.Get("Authorization")
-		gotUID = r.Header.Get("x-pm-uid")
-		gotAPIVersion = r.Header.Get("x-pm-apiversion")
+		hits++
 		if r.URL.Path != "/vpn/logicals" {
 			t.Errorf("path = %q, want /vpn/logicals", r.URL.Path)
 		}
+		if got := r.Header.Get("Authorization"); got != "Bearer token-test" {
+			t.Errorf("Authorization = %q, want the bearer form of the stored token", got)
+		}
+		if got := r.Header.Get("x-pm-uid"); got != "uid-test" {
+			t.Errorf("x-pm-uid = %q, want uid-test", got)
+		}
+		if got := r.Header.Get("x-pm-apiversion"); got != protonAPIVersion {
+			t.Errorf("x-pm-apiversion = %q, want %q", got, protonAPIVersion)
+		}
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(logicalServersResp{LogicalServers: []logicalServer{
-			{ID: 10, Name: "JP#1 拥挤", Load: 70, Tier: 2, Country: "jp", State: "up", Servers: []physic{
-				{EntryIP: "1.2.3.4:51820", Domain: "jp1.protonvpn.net", WgPublicKey: "AAAACl=="},
-			}},
-			{ID: 11, Name: "JP#2 空閒", Load: 15, Tier: 2, Country: "jp", State: "up", Servers: []physic{
-				{EntryIP: "1.2.3.5:51820", Domain: "jp2.protonvpn.net", WgPublicKey: "BBBBAl=="},
-			}},
-			// No WireGuard key at all: must be dropped, never surfaced as a node.
-			{ID: 12, Name: "無公鑰", Load: 1, Tier: 2, Country: "jp", State: "up", Servers: []physic{
-				{EntryIP: "1.2.3.6:51820", Domain: "jp3.protonvpn.net"},
-			}},
-			{ID: 13, Name: "離線", Load: 2, Tier: 0, Country: "jp", State: "down", Servers: []physic{
-				{EntryIP: "1.2.3.7:51820", WgPublicKey: "DDDDCl=="},
-			}},
-		}})
+		w.WriteHeader(status)
+		_, _ = w.Write([]byte(body))
 	}))
+	return srv, func() *int { return &hits }
+}
+
+func TestNodesReadsProtonsRealFieldNames(t *testing.T) {
+	srv, _ := mockServer(t, serverListFixture, http.StatusOK)
 	defer srv.Close()
 
-	out, code := runNodesWith(t, srv.URL, writeTestSession(t))
+	out, code := runNodesWith(t, srv.URL, writeTestSession(t, t.TempDir()))
 	if code != 0 || !out.OK {
 		t.Fatalf("nodes failed: code=%d out=%+v", code, out)
 	}
+	// 12 has no key, 13 is down, 14's domain says Status:0 -> three dropped.
 	if len(out.Servers) != 2 {
 		t.Fatalf("got %d servers, want 2 usable: %+v", len(out.Servers), out.Servers)
 	}
-	if out.Dropped != 2 {
-		t.Errorf("dropped = %d, want 2 (one keyless, one down)", out.Dropped)
+	if out.Dropped != 3 {
+		t.Errorf("dropped = %d, want 3: %+v", out.Dropped, out.Servers)
 	}
-	if out.Servers[0].ID != 11 || out.Servers[1].ID != 10 {
-		t.Errorf("order = %d,%d; want load-ascending 11,10", out.Servers[0].ID, out.Servers[1].ID)
+	// 11 carries penalty 0.2 and 10 carries 0.9, so the balancer order is 11 first.
+	if out.Servers[0].ID != "11" || out.Servers[1].ID != "10" {
+		t.Errorf("order = %s,%s; want penalty-ascending 11,10", out.Servers[0].ID, out.Servers[1].ID)
 	}
 	if out.Servers[0].PublicKey != "BBBBAl==" {
-		t.Errorf("public key = %q, want the one the API returned", out.Servers[0].PublicKey)
+		t.Errorf("public key = %q, want the X25519PublicKey the API returned", out.Servers[0].PublicKey)
 	}
-	for _, s := range out.Servers {
-		if s.PublicKey == "" {
-			t.Errorf("server %d was emitted without a WireGuard key", s.ID)
-		}
+	if !out.Servers[0].IPv6 {
+		t.Error("Features bit 16 should surface as ipv6=true")
 	}
-	if gotAuth != "Bearer token-test" {
-		t.Errorf("Authorization = %q, want the bearer form of the stored token", gotAuth)
-	}
-	if gotUID != "uid-test" {
-		t.Errorf("x-pm-uid = %q, want uid-test", gotUID)
-	}
-	if gotAPIVersion != protonAPIVersion {
-		t.Errorf("x-pm-apiversion = %q, want %q", gotAPIVersion, protonAPIVersion)
+	if out.Servers[1].IPv6 {
+		t.Error("Features 0 should surface as ipv6=false")
 	}
 }
 
-func TestNodesAcceptsEveryObservedKeySpelling(t *testing.T) {
-	cases := []struct {
-		name string
-		p    physic
-		want string
-	}{
-		{"WgPublicKey", physic{WgPublicKey: "A1=="}, "A1=="},
-		{"WrGwPublicKey", physic{WrGwPublicKey: "A2=="}, "A2=="},
-		{"wg_public_key", physic{WgPublicKeyLow: "A3=="}, "A3=="},
-		{"none", physic{}, ""},
-	}
-	for _, tc := range cases {
-		if got := tc.p.publicKey(); got != tc.want {
-			t.Errorf("%s: publicKey() = %q, want %q", tc.name, got, tc.want)
+func TestNodesPrefersTheWireGuardEntryAndItsFirstPort(t *testing.T) {
+	srv, _ := mockServer(t, serverListFixture, http.StatusOK)
+	defer srv.Close()
+
+	out, _ := runNodesWith(t, srv.URL, writeTestSession(t, t.TempDir()))
+	var jp2 *nodeView
+	for i := range out.Servers {
+		if out.Servers[i].ID == "11" {
+			jp2 = &out.Servers[i]
 		}
+	}
+	if jp2 == nil {
+		t.Fatalf("server 11 missing from %+v", out.Servers)
+	}
+	if jp2.Endpoint != "1.2.3.55" {
+		t.Errorf("endpoint = %q, want the EntryPerProtocol wireguard IPv4", jp2.Endpoint)
+	}
+	if jp2.Port != 51820 {
+		t.Errorf("port = %d, want the first wireguard port", jp2.Port)
+	}
+
+	// Without a per-protocol record it falls back to EntryIP, then the default port.
+	if jp1 := out.Servers[1]; jp1.ID != "10" || jp1.Endpoint != "1.2.3.4" || jp1.Port != defaultWireGuardPort {
+		t.Errorf("fallback gave id=%s endpoint=%q port=%d, want 10 / 1.2.3.4 / %d",
+			jp1.ID, jp1.Endpoint, jp1.Port, defaultWireGuardPort)
+	}
+}
+
+func TestNodesCountryFilterAndLimit(t *testing.T) {
+	srv, _ := mockServer(t, serverListFixture, http.StatusOK)
+	defer srv.Close()
+	statePath := writeTestSession(t, t.TempDir())
+
+	out, _ := runNodesWith(t, srv.URL, statePath, "--country", "JP")
+	if len(out.Servers) != 2 {
+		t.Fatalf("country filter gave %d servers, want 2: %+v", len(out.Servers), out.Servers)
+	}
+	out, _ = runNodesWith(t, srv.URL, statePath, "--country", "us")
+	if len(out.Servers) != 0 {
+		t.Fatalf("US filter gave %d servers, want none: %+v", len(out.Servers), out.Servers)
+	}
+	out, _ = runNodesWith(t, srv.URL, statePath, "--limit", "1")
+	if len(out.Servers) != 1 || out.Servers[0].ID != "11" {
+		t.Fatalf("limit 1 gave %+v, want only the lowest-penalty 11", out.Servers)
 	}
 }
 
 func TestNodesReportsAnExpiredSessionInsteadOfFakeNodes(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusUnauthorized)
-		_, _ = w.Write([]byte(`{"Code":10013,"Error":"Invalid access token"}`))
-	}))
+	srv, _ := mockServer(t, `{"Code":10013,"Error":"Invalid access token"}`, http.StatusUnauthorized)
 	defer srv.Close()
 
-	out, code := runNodesWith(t, srv.URL, writeTestSession(t))
+	dir := t.TempDir()
+	statePath := writeTestSession(t, dir)
+	out, code := runNodesWith(t, srv.URL, statePath)
 	if code == 0 || out.OK {
 		t.Fatalf("nodes reported success against a rejected token: %+v", out)
 	}
@@ -140,13 +182,10 @@ func TestNodesReportsAnExpiredSessionInsteadOfFakeNodes(t *testing.T) {
 }
 
 func TestNodesRefusesToInventNodesFromAnEmptyList(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"LogicalServers":[]}`))
-	}))
+	srv, _ := mockServer(t, `{"LogicalServers":[]}`, http.StatusOK)
 	defer srv.Close()
 
-	out, code := runNodesWith(t, srv.URL, writeTestSession(t))
+	out, code := runNodesWith(t, srv.URL, writeTestSession(t, t.TempDir()))
 	if code == 0 || out.OK {
 		t.Fatalf("empty list reported success: %+v", out)
 	}
@@ -155,32 +194,27 @@ func TestNodesRefusesToInventNodesFromAnEmptyList(t *testing.T) {
 	}
 }
 
-func TestNodesCountryFilterAndLimit(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(logicalServersResp{LogicalServers: []logicalServer{
-			{ID: 1, Name: "JP", Load: 10, Country: "jp", State: "up", Servers: []physic{{WgPublicKey: "a=="}}},
-			{ID: 2, Name: "US", Load: 20, Country: "us", State: "up", Servers: []physic{{WgPublicKey: "b=="}}},
-			{ID: 3, Name: "JP2", Load: 30, Country: "JP", State: "up", Servers: []physic{{WgPublicKey: "c=="}}},
-		}})
-	}))
+func TestNodesFailsLoudlyWhenNothingIsUsable(t *testing.T) {
+	srv, _ := mockServer(t, `{"LogicalServers":[
+	  {"ID":"1","Name":"no key","State":"up","Servers":[{"Domain":"a.example"}]}]}`, http.StatusOK)
 	defer srv.Close()
 
-	out, _ := runNodesWith(t, srv.URL, writeTestSession(t), "--country", "JP")
-	if len(out.Servers) != 2 {
-		t.Fatalf("country filter gave %d servers, want 2: %+v", len(out.Servers), out.Servers)
+	out, code := runNodesWith(t, srv.URL, writeTestSession(t, t.TempDir()))
+	if code == 0 || out.OK {
+		t.Fatalf("an all-unusable list reported success: %+v", out)
 	}
-	for _, s := range out.Servers {
-		if s.Country != "jp" && s.Country != "JP" {
-			t.Errorf("server %d has country %q inside a JP filter", s.ID, s.Country)
-		}
+	if out.Dropped != 1 {
+		t.Errorf("dropped = %d, want 1", out.Dropped)
 	}
+}
 
-	out, _ = runNodesWith(t, srv.URL, writeTestSession(t), "--limit", "1")
-	if len(out.Servers) != 1 {
-		t.Fatalf("limit 1 gave %d servers: %+v", len(out.Servers), out.Servers)
+func TestNodesRejectsAMissingSession(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	code := runNodes([]string{"--state", filepath.Join(t.TempDir(), "absent.json")}, &stdout, &stderr)
+	if code == 0 {
+		t.Fatalf("missing session reported success: %s", stdout.String())
 	}
-	if out.Servers[0].ID != 1 {
-		t.Errorf("limit kept ID %d, want the lowest-load 1", out.Servers[0].ID)
+	if !bytes.Contains(stdout.Bytes(), []byte("session")) {
+		t.Errorf("output %q should explain the session problem", stdout.String())
 	}
 }

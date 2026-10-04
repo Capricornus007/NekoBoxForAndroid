@@ -25,57 +25,64 @@ const (
 // re-running SRP, which belongs to login, not to every read command.
 var errSessionExpired = errors.New("stored session was rejected, please log in again")
 
+// Field names and types follow Proton's own client models
+// (ProtonVPN/android-app servers/api/{LogicalServer,ConnectingDomain}.kt), whose
+// @SerialName annotations are the wire format of /vpn/logicals.
 type logicalServer struct {
-	ID      int      `json:"ID"`
-	Name    string   `json:"Name"`
-	Label   string   `json:"Label"`
-	State   string   `json:"State"`
-	Status  int      `json:"Status"`
-	Load    int      `json:"Load"`
-	Tier    int      `json:"Tier"`
-	Country string   `json:"ExitCountry"`
-	City    string   `json:"ExitCity"`
-	Servers []physic `json:"Servers"`
+	ID              string `json:"ID"`
+	Name            string `json:"Name"`
+	State           string `json:"State"`
+	Tier            int    `json:"Tier"`
+	Features        int    `json:"Features"`
+	Country         string `json:"ExitCountry"`
+	City            string `json:"City"`
+	Servers         []connectingDomain
+	StatusReference struct {
+		Penalty float64 `json:"Penalty"`
+		Cost    int     `json:"Cost"`
+	} `json:"StatusReference"`
 }
 
-type physic struct {
-	EntryIP string `json:"EntryIP"`
-	Domain  string `json:"Domain"`
+// Server features, from the same constants file: bit 4 marks IPv6 support.
+const featureIPv6 = 16
 
-	// The WireGuard key is the one field Proton's clients disagree about in
-	// casing, so all observed spellings are accepted rather than guessing one.
-	WgPublicKey    string `json:"WgPublicKey"`
-	WrGwPublicKey  string `json:"WrGwPublicKey"`
-	WgPublicKeyLow string `json:"wg_public_key"`
-
-	TCPPorts []int `json:"TCPPorts"`
-	UDPPorts []int `json:"UDPPorts"`
+type connectingDomain struct {
+	EntryIP          string                     `json:"EntryIP"`
+	Domain           string                     `json:"Domain"`
+	Status           *int                       `json:"Status"`
+	X25519PublicKey  string                     `json:"X25519PublicKey"`
+	EntryPerProtocol map[string]serverEntryInfo `json:"EntryPerProtocol"`
 }
 
-func (p physic) publicKey() string {
-	for _, k := range []string{p.WgPublicKey, p.WrGwPublicKey, p.WgPublicKeyLow} {
-		if k != "" {
-			return k
-		}
-	}
-	return ""
+type serverEntryInfo struct {
+	IPv4  string `json:"IPv4"`
+	Ports []int  `json:"Ports"`
 }
+
+// wireGuardEntry is the per-protocol record Proton keys "wireguard".
+func (d connectingDomain) wireGuardEntry() (serverEntryInfo, bool) {
+	e, ok := d.EntryPerProtocol[protocolWireGuardName]
+	return e, ok
+}
+
+const protocolWireGuardName = "wireguard"
 
 type logicalServersResp struct {
 	LogicalServers []logicalServer `json:"LogicalServers"`
 }
 
 type nodeView struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name"`
-	Load      int    `json:"load"`
-	Tier      int    `json:"tier"`
-	Country   string `json:"country,omitempty"`
-	City      string `json:"city,omitempty"`
-	Endpoint  string `json:"endpoint,omitempty"`
-	Domain    string `json:"domain,omitempty"`
-	PublicKey string `json:"wgPublicKey,omitempty"`
-	Port      int    `json:"port,omitempty"`
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	Penalty   float64 `json:"penalty"`
+	Tier      int     `json:"tier"`
+	IPv6      bool    `json:"ipv6,omitempty"`
+	Country   string  `json:"country,omitempty"`
+	City      string  `json:"city,omitempty"`
+	Endpoint  string  `json:"endpoint,omitempty"`
+	Domain    string  `json:"domain,omitempty"`
+	PublicKey string  `json:"wgPublicKey,omitempty"`
+	Port      int     `json:"port,omitempty"`
 }
 
 type nodesOutput struct {
@@ -117,6 +124,14 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 	}
 
 	servers, dropped := selectNodes(resp, *country, *limit)
+	if len(servers) == 0 {
+		// Reporting an empty success would let the UI say "this account has no
+		// servers", which is a different claim from "nothing in the list was usable".
+		return emitNodes(stdout, nodesOutput{
+			Dropped: dropped,
+			Error:   fmt.Sprintf("no usable servers in the response (%d dropped)", dropped),
+		})
+	}
 	return emitNodes(stdout, nodesOutput{OK: true, Servers: servers, Dropped: dropped})
 }
 
@@ -155,7 +170,7 @@ func fetchLogicalServers(ctx context.Context, apiURL string, cred storedCredenti
 }
 
 // selectNodes keeps only entries that can actually be dialed: a load-balancing
-// group whose physical server carries no WireGuard key is worse than no entry,
+// group whose connecting domain carries no X25519 key is worse than no entry,
 // because the UI would offer a node that cannot connect.
 func selectNodes(resp *logicalServersResp, country string, limit int) ([]nodeView, int) {
 	var usable []nodeView
@@ -169,48 +184,71 @@ func selectNodes(resp *logicalServersResp, country string, limit int) ([]nodeVie
 		if country != "" && !strings.EqualFold(ls.Country, country) {
 			continue
 		}
-		var chosen *physic
+		var chosen *connectingDomain
 		for i := range ls.Servers {
-			if ls.Servers[i].publicKey() != "" {
-				chosen = &ls.Servers[i]
-				break
+			d := &ls.Servers[i]
+			if d.X25519PublicKey == "" {
+				continue
 			}
+			// A missing Status must not hide a node, so only an explicit 0 rejects it.
+			if d.Status != nil && *d.Status == 0 {
+				continue
+			}
+			chosen = d
+			break
 		}
 		if chosen == nil {
 			dropped++
 			continue
 		}
+		entry, hasEntry := chosen.wireGuardEntry()
 		usable = append(usable, nodeView{
 			ID:        ls.ID,
 			Name:      ls.Name,
-			Load:      ls.Load,
+			Penalty:   ls.StatusReference.Penalty,
 			Tier:      ls.Tier,
+			IPv6:      ls.Features&featureIPv6 != 0,
 			Country:   ls.Country,
 			City:      ls.City,
-			Endpoint:  chosen.EntryIP,
+			Endpoint:  chosen.entry(entry, hasEntry),
 			Domain:    chosen.Domain,
-			PublicKey: chosen.publicKey(),
-			Port:      pickPort(chosen),
+			PublicKey: chosen.X25519PublicKey,
+			Port:      chosen.port(entry, hasEntry),
 		})
 	}
 
-	sort.SliceStable(usable, func(i, j int) bool { return usable[i].Load < usable[j].Load })
+	// Proton ranks servers by the penalty its own balancer computes; the list has
+	// no load field, so that is the only ordering available here.
+	sort.SliceStable(usable, func(i, j int) bool { return usable[i].Penalty < usable[j].Penalty })
 	if limit > 0 && len(usable) > limit {
 		usable = usable[:limit]
 	}
 	return usable, dropped
 }
 
-func pickPort(p *physic) int {
-	for _, ports := range [][]int{p.UDPPorts, p.TCPPorts} {
-		for _, port := range ports {
+// entry prefers the per-protocol IPv4, then the plain EntryIP, then the domain.
+func (d connectingDomain) entry(entry serverEntryInfo, hasEntry bool) string {
+	if hasEntry && entry.IPv4 != "" {
+		return entry.IPv4
+	}
+	if d.EntryIP != "" {
+		return d.EntryIP
+	}
+	return d.Domain
+}
+
+func (d connectingDomain) port(entry serverEntryInfo, hasEntry bool) int {
+	if hasEntry {
+		for _, port := range entry.Ports {
 			if port > 0 && port <= 65535 {
 				return port
 			}
 		}
 	}
-	return 51820
+	return defaultWireGuardPort
 }
+
+const defaultWireGuardPort = 51820
 
 func readCredentialFile(path string) (storedCredential, error) {
 	payload, err := os.ReadFile(path)
