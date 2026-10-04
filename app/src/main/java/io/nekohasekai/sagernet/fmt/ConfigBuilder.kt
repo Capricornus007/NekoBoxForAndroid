@@ -756,7 +756,6 @@ fun buildConfig(
                 mtu = DataStore.mtu
                 auto_route = true
                 strict_route = DataStore.strictRoute
-                gso = true
                 udp_timeout = 300L
                 // sing-box 1.13 移除了入站 sniff/domain_strategy 字段，
                 // 改由路由规则动作实现（见下方 route.rules 构建处）；

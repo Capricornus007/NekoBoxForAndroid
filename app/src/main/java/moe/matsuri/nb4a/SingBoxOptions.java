@@ -3023,8 +3023,6 @@ public class SingBoxOptions {
 
         public String domain_strategy;
 
-        public Boolean gso;
-
         // End of public InboundOptions ;
 
     }
