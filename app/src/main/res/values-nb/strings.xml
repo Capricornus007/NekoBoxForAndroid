@@ -917,7 +917,6 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="subscription_direct_fallback_summary">Prøv abonnementet direkte når lokalproxyen feiler. Unngå det om nettadressen inneholder token.</string>
     <string name="adaptive_traffic_polling">Adaptiv trafikkavlesing</string>
     <string name="adaptive_traffic_polling_summary">Spør sjeldnere når skjermen er av eller appen er i bakgrunnen.</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing utilgjengelig</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing utilgjengelig</string>
     <string name="release_wake_lock">Frigjør WakeLock</string>
     <string name="check_update_preview">Se etter oppdateringer for forhåndsvisningsversjon</string>

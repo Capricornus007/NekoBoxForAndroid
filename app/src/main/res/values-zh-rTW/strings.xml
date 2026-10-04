@@ -896,7 +896,6 @@
     <string name="adaptive_traffic_polling">自適應流量輪詢</string>
     <string name="adaptive_traffic_polling_summary">螢幕關閉或 App 在背景時降低輪詢頻率以省電，回到前台立即恢復。</string>
     <string name="traffic">%1$s↑ %2$s↓</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing 無法使用</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing 無法使用</string>
     <string name="release_wake_lock">釋放喚醒鎖</string>
     <string name="check_update_preview">檢查預覽版更新</string>

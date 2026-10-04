@@ -926,7 +926,6 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="card_style">Tarjeta</string>
     <string name="card_style_classic">Clásico</string>
     <string name="card_style_stroke">Contorno</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing no disponible</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing no disponible</string>
     <string name="release_wake_lock">Liberar WakeLock</string>
     <string name="check_update_preview">Buscar actualizaciones de la versión preliminar</string>

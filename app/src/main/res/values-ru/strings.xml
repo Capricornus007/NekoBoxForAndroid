@@ -883,8 +883,6 @@
 <string name="check_update_preview">Проверить наличие обновлений предварительной версии</string>
 <string name="check_update_release">Проверить наличие обновлений релизнойной версии</string>
 <string name="connection_test_icmp_ping_unavailable">ICMPing недоступен</string>
-<string name="connection_test_tcp_ping">TCP Пинг</string>
-<string name="connection_test_tcp_ping_unavailable">TCPing недоступен</string>
 <string name="local_proxy_settings">Настройки локального прокси</string>
 <string name="proxy_username">Имя пользователя прокси</string>
 <string name="proxy_password">Пароль прокси</string>

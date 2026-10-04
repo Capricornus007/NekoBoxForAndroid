@@ -923,7 +923,6 @@
     <string name="card_style">بطاقة</string>
     <string name="card_style_classic">كلاسيكي</string>
     <string name="card_style_stroke">إطار</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing غير متاح</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing غير متاح</string>
     <string name="release_wake_lock">تحرير WakeLock</string>
     <string name="check_update_preview">التحقق من تحديثات الإصدار التجريبي</string>

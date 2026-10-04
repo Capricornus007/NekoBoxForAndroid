@@ -932,7 +932,6 @@
     <string name="card_style">Carte</string>
     <string name="card_style_classic">Classique</string>
     <string name="card_style_stroke">Contour</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing indisponible</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing indisponible</string>
     <string name="release_wake_lock">Libérer WakeLock</string>
     <string name="check_update_preview">Vérifier les mises à jour de la version preview</string>

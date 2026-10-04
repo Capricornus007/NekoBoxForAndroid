@@ -927,7 +927,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="card_style">Scheda</string>
     <string name="card_style_classic">Classico</string>
     <string name="card_style_stroke">Contorno</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing non disponibile</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing non disponibile</string>
     <string name="release_wake_lock">Rilascia WakeLock</string>
     <string name="check_update_preview">Controlla aggiornamenti della versione di anteprima</string>

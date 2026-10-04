@@ -975,7 +975,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="card_style">Карточка</string>
     <string name="card_style_classic">Классический</string>
     <string name="card_style_stroke">Контур</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing недоступен</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing недоступен</string>
     <string name="release_wake_lock">Освободить WakeLock</string>
     <string name="check_update_preview">Проверять обновления предварительной версии</string>

@@ -830,7 +830,6 @@
     <string name="subscription_direct_fallback_summary">Abonnement bei Fehler des lokalen Proxys direkt erneut abrufen. Nicht bei URLs mit Token aktivieren.</string>
     <string name="adaptive_traffic_polling">Adaptive Verkehrsabfrage</string>
     <string name="adaptive_traffic_polling_summary">Seltener abfragen bei ausgeschaltetem Bildschirm oder im Hintergrund.</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing nicht verfügbar</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing nicht verfügbar</string>
     <string name="release_wake_lock">WakeLock freigeben</string>
     <string name="check_update_preview">Nach Updates der Vorschauversion suchen</string>

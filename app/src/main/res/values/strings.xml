@@ -1028,8 +1028,6 @@
     <string name="card_style">Card</string>
     <string name="card_style_classic">Classic</string>
     <string name="card_style_stroke">Outline</string>
-    <string name="connection_test_tcp_ping" translatable="false">TCPing</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing unavailable</string>
     <string name="connection_test_icmp_ping" translatable="false">ICMPing</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing unavailable</string>
     <string name="release_wake_lock">Release WakeLock</string>

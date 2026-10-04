@@ -916,7 +916,6 @@
     <string name="card_style">Karte</string>
     <string name="card_style_classic">Klassisch</string>
     <string name="card_style_stroke">Kontur</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing nicht verfügbar</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing nicht verfügbar</string>
     <string name="release_wake_lock">WakeLock freigeben</string>
     <string name="check_update_preview">Nach Updates der Vorschauversion suchen</string>

@@ -726,7 +726,6 @@
     <string name="card_style_stroke">枠線</string>
     <string name="donate">寄付</string>
     <string name="donate_info">お金が大好きです</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing 利用不可</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing 利用不可</string>
     <string name="append_http_proxy">VPN に HTTP プロキシを追加</string>
     <string name="append_http_proxy_sum">HTTP プロキシは仮想 NIC デバイスを経由せず、(ブラウザ/一部の対応アプリ) から直接使用されます (Android 10+)</string>

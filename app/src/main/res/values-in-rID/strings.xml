@@ -927,7 +927,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="card_style">Kartu</string>
     <string name="card_style_classic">Klasik</string>
     <string name="card_style_stroke">Garis tepi</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing tidak tersedia</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing tidak tersedia</string>
     <string name="release_wake_lock">Lepaskan WakeLock</string>
     <string name="check_update_preview">Periksa pembaruan versi pratinjau</string>

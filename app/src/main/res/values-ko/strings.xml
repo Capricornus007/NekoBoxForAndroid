@@ -721,7 +721,6 @@
     <string name="port_out_of_range">포트 범위는 1~65535여야 합니다</string>
     <string name="donate">기부</string>
     <string name="donate_info">저는 돈을 사랑합니다</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing 사용 불가</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing 사용 불가</string>
     <string name="append_http_proxy">VPN에 HTTP 프록시 추가</string>
     <string name="append_http_proxy_sum">HTTP 프록시는 가상 NIC 장치를 거치지 않고 (브라우저/일부 지원 앱)에서 직접 사용됩니다 (Android 10+)</string>

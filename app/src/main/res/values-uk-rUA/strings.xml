@@ -925,7 +925,6 @@
     <string name="card_style">Картка</string>
     <string name="card_style_classic">Класичний</string>
     <string name="card_style_stroke">Контур</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing недоступний</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing недоступний</string>
     <string name="release_wake_lock">Звільнити WakeLock</string>
     <string name="check_update_preview">Перевіряти оновлення попередньої версії</string>

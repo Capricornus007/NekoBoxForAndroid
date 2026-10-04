@@ -870,7 +870,6 @@
     <string name="leastPing" translatable="false">Ping</string>
     <string name="v2rayn" translatable="false">V2RayN</string>
     <string name="available" translatable="false">%dms</string>
-    <string name="connection_test_tcp_ping_unavailable">TCPing در دسترس نیست</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing در دسترس نیست</string>
     <string name="append_http_proxy">پراکسی HTTP را به VPN اضافه کنید</string>
     <string name="append_http_proxy_sum">پروکسی HTTP مستقیماً از (مرورگر/برخی برنامه‌های پشتیبانی‌شده) بدون استفاده از دستگاه NIC مجازی (نسخه اندروید بالاتر از 10) استفاده می‌شود.</string>
