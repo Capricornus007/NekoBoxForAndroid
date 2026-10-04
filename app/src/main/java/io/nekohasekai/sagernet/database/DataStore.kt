@@ -193,6 +193,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         "0"
     } // defaults to 0, no automatic update
 
+    // 本地 geoip.db / geosite.db 的背景自動更新（預設關，用戶自己開；排程見 bg/RuleAssetUpdater）
+    var autoUpdateRuleAssets by configurationStore.boolean(Key.AUTO_UPDATE_RULE_ASSETS) { false }
+
     private val userIndex by lazy { Binder.getCallingUserHandle().hashCode() }
 
     val clashApiSecret: String

@@ -602,6 +602,8 @@
     <string name="restore_cancelled">Операцію відновлення скасовано</string>
     <string name="ruleset_update_interval">Інтервал оновлення RuleSet</string>
     <string name="ruleset_update_interval_summary">Час між оновленнями віддалених RuleSet. Приклади: 1h, 30m, 3600s. Встановіть 0, щоб вимкнути автоматичні оновлення</string>
+    <string name="auto_update_rule_assets">Автоматичне оновлення файлів правил</string>
+    <string name="auto_update_rule_assets_summary">Щодня перевіряти вибране джерело й завантажувати geoip.db / geosite.db, коли з\'являється нова версія (приблизно по 10 МБ, лише в мережах без ліміту)</string>
     <string name="ruleset_prefix_error">Помилка формату Ruleset: має починатися з rsip: або rssite:</string>
     <string name="clear_cache">Очистити кеш</string>
     <string name="clear_cache_summary">Очистити файли кешу програми для виправлення деяких аномальних проблем</string>

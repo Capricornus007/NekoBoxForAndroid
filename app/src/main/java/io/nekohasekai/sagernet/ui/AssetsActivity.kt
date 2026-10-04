@@ -2,7 +2,6 @@ package io.nekohasekai.sagernet.ui
 
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.system.Os
 import android.text.format.DateFormat
 import android.view.Menu
 import android.view.MenuItem
@@ -14,14 +13,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import io.nekohasekai.sagernet.R
-import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.bg.RuleAssets
 import io.nekohasekai.sagernet.databinding.LayoutAssetItemBinding
 import io.nekohasekai.sagernet.databinding.LayoutAssetsBinding
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.widget.UndoSnackbarManager
-import libcore.Libcore
-import moe.matsuri.nb4a.utils.Util
-import org.json.JSONObject
 import java.io.File
 import java.io.FileWriter
 import java.util.*
@@ -108,7 +104,7 @@ class AssetsActivity : ThemedActivity() {
         return Snackbar.make(layout.coordinator, text, Snackbar.LENGTH_LONG)
     }
 
-    val assetNames = arrayOf("geoip.db", "geosite.db")
+    val assetNames = RuleAssets.MANAGED
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.import_asset_menu, menu)
@@ -286,7 +282,14 @@ class AssetsActivity : ThemedActivity() {
                 binding.rulesUpdate.isInvisible = true
                 runOnDefaultDispatcher {
                     runCatching {
-                        updateAsset(file, versionFile, localVersion)
+                        RuleAssets.updateAsset(file, versionFile, localVersion)
+                    }.onSuccess { outcome ->
+                        val message = if (outcome == RuleAssets.Outcome.UPDATED) {
+                            R.string.route_asset_updated
+                        } else {
+                            R.string.route_asset_no_update
+                        }
+                        onMainDispatcher { snackbar(message).show() }
                     }.onFailure {
                         onMainDispatcher {
                             alert(it.readableMessage).tryToShow()
@@ -294,6 +297,7 @@ class AssetsActivity : ThemedActivity() {
                     }
 
                     onMainDispatcher {
+                        adapter.reloadAssets()
                         binding.rulesUpdate.isInvisible = false
                         binding.subscriptionUpdateProgress.isInvisible = true
                         if (updating.decrementAndGet() == 0) {
@@ -302,157 +306,6 @@ class AssetsActivity : ThemedActivity() {
                     }
                 }
             }
-        }
-    }
-
-    private fun replaceAssetFile(tempFile: File, targetFile: File) {
-        try {
-            Os.rename(tempFile.absolutePath, targetFile.absolutePath)
-        } catch (e: Exception) {
-            error("Unable to save the route asset: ${e.readableMessage}")
-        }
-    }
-
-    private val rulesProviders = listOf(
-        RuleAssetsProvider(
-            "SagerNet/sing-geoip",
-            "SagerNet/sing-geosite",
-        ),
-        RuleAssetsProvider(
-            "soffchen/sing-geoip",
-            "soffchen/sing-geosite",
-        ),
-        RuleAssetsProvider(
-            "Chocolate4U/Iran-sing-box-rules",
-        ),
-        RuleAssetsProvider(
-            "L11R/antizapret-sing-box-geo",
-        ),
-    )
-
-    suspend fun updateAsset(file: File, versionFile: File, localVersion: String) {
-        if (DataStore.rulesProvider == 4) {
-            return updateCustomAsset(file, versionFile)
-        }
-        val fileName = file.name
-        val repo = rulesProviders[DataStore.rulesProvider].repoByFileName[fileName]
-
-        val client = Libcore.newHttpClient().apply {
-            modernTLS()
-            keepAlive()
-            trySocks5(
-                DataStore.mixedPort,
-                DataStore.mixedInboundUser,
-                DataStore.mixedInboundPass,
-            )
-        }
-
-        try {
-            var response = client.newRequest().apply {
-                setURL("https://api.github.com/repos/$repo/releases/latest")
-            }.execute()
-
-            val release = JSONObject(Util.getStringBox(response.getContentStringLimited(MAX_HTTP_JSON_BYTES)))
-            val tagName = release.optString("tag_name")
-
-            if (tagName == localVersion) {
-                onMainDispatcher {
-                    snackbar(R.string.route_asset_no_update).show()
-                }
-                return
-            }
-
-            val releaseAssets = release.getJSONArray("assets").filterIsInstance<JSONObject>()
-            val assetToDownload = releaseAssets.find {
-                val assetName = it.getStr("name")
-                assetName == fileName || assetName == "$fileName.xz"
-            } ?: error("File $fileName not found in release ${release["url"]}")
-            val downloadName = assetToDownload.getStr("name") ?: error("Release asset is missing a name")
-            val browserDownloadUrl = assetToDownload.getStr("browser_download_url")
-                ?: error("Release asset $downloadName is missing a download URL")
-
-            response = client.newRequest().apply {
-                setURL(browserDownloadUrl)
-            }.execute()
-
-            val cacheFile = File(file.parentFile, fileName + ".tmp")
-            cacheFile.parentFile?.mkdirs()
-
-            try {
-                response.writeToLimited(cacheFile.canonicalPath, MAX_RULE_ASSET_BYTES)
-
-                if (downloadName.endsWith(".xz")) {
-                    val unpackedFile = File(file.parentFile, file.nameWithoutExtension + ".unxz.tmp")
-                    try {
-                        // Libcore.unxz enforces the same 256 MB cap (defaultUnxzFileLimit)
-                        // and fails before writing if exceeded, so no extra size check here.
-                        Libcore.unxz(cacheFile.absolutePath, unpackedFile.absolutePath)
-                        replaceAssetFile(unpackedFile, file)
-                    } finally {
-                        if (unpackedFile.exists()) unpackedFile.delete()
-                    }
-                } else {
-                    replaceAssetFile(cacheFile, file)
-                }
-
-                versionFile.writeText(tagName)
-            } finally {
-                if (cacheFile.exists()) cacheFile.delete()
-            }
-
-            adapter.reloadAssets()
-
-            onMainDispatcher {
-                snackbar(R.string.route_asset_updated).show()
-            }
-        } finally {
-            client.close()
-        }
-    }
-
-    suspend fun updateCustomAsset(file: File, versionFile: File) {
-        val fileName = file.name
-        val url: String = if (fileName == "geoip.db") {
-            DataStore.rulesGeoipUrl
-        } else if (fileName == "geosite.db") {
-            DataStore.rulesGeositeUrl
-        } else {
-            return
-        }
-        val client = Libcore.newHttpClient().apply {
-            modernTLS()
-            keepAlive()
-            trySocks5(
-                DataStore.mixedPort,
-                DataStore.mixedInboundUser,
-                DataStore.mixedInboundPass,
-            )
-        }
-        try {
-            val response = client.newRequest().apply {
-                setURL(url)
-            }.execute()
-            val cacheFile = File(file.parentFile, fileName + ".tmp")
-            cacheFile.parentFile?.mkdirs()
-            try {
-                response.writeToLimited(cacheFile.canonicalPath, MAX_RULE_ASSET_BYTES)
-                replaceAssetFile(cacheFile, file)
-
-                val currentDate = java.text.SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
-                versionFile.writeText(currentDate)
-            } finally {
-                if (cacheFile.exists()) cacheFile.delete()
-            }
-
-            adapter.reloadAssets()
-            onMainDispatcher {
-                snackbar(R.string.route_asset_updated).show()
-            }
-        } finally {
-            client.close()
-            // if (versionFile.isFile) {
-            //     versionFile.delete()
-            // }
         }
     }
 
@@ -467,19 +320,5 @@ class AssetsActivity : ThemedActivity() {
         if (::adapter.isInitialized) {
             adapter.reloadAssets()
         }
-    }
-
-    private data class RuleAssetsProvider(
-        val repoByFileName: Map<String, String>,
-    ) {
-        constructor(
-            geoipRepo: String,
-            geositeRepo: String = geoipRepo,
-        ) : this(
-            mapOf(
-                "geoip.db" to geoipRepo,
-                "geosite.db" to geositeRepo,
-            ),
-        )
     }
 }

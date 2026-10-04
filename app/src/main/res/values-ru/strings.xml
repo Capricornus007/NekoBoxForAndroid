@@ -668,6 +668,8 @@
     <string name="restore_cancelled">Операция восстановления отменена</string>
     <string name="ruleset_update_interval">Интервал обновления набора правил</string>
     <string name="ruleset_update_interval_summary">Время между обновлениями удалённых наборов правил. Примеры: 1h, 30m, 3600s. Установите 0, чтобы отключить автоматическое обновление</string>
+    <string name="auto_update_rule_assets">Автообновление файлов правил</string>
+    <string name="auto_update_rule_assets_summary">Ежедневно проверять выбранный источник и загружать geoip.db / geosite.db при выходе новой версии (примерно по 10 МБ, только в сетях без лимита)</string>
     <string name="ruleset_prefix_error">Ошибка формата набора правил: должен начинаться с rsip: или rssite:</string>
     <string name="clear_cache">Очистить кэш</string>
     <string name="clear_cache_summary">Очистить файлы кэша приложения для устранения некоторых неполадок</string>

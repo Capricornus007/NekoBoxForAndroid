@@ -591,6 +591,8 @@
     <string name="restore_cancelled">عملیات بازیابی لغو شد</string>
     <string name="ruleset_update_interval">فاصله به‌روزرسانی RuleSet</string>
     <string name="ruleset_update_interval_summary">زمان بین به‌روزرسانی RuleSetهای راه دور. مثال‌ها: 1h، 30m، 3600s. برای غیرفعال کردن به‌روزرسانی خودکار، 0 را تنظیم کنید</string>
+    <string name="auto_update_rule_assets">به‌روزرسانی خودکار فایل‌های قانون</string>
+    <string name="auto_update_rule_assets_summary">منبع انتخاب‌شده را روزانه بررسی می‌کند و در صورت انتشار نسخه جدید، geoip.db و geosite.db را بارگیری می‌کند (هر کدام حدود ۱۰ مگابایت، فقط شبکه‌های بدون محدودیت حجم)</string>
     <string name="ruleset_prefix_error">خطای فرمت RuleSet: باید با rsip: یا rssite: شروع شود</string>
     <string name="clear_cache">پاک کردن حافظه نهان</string>
     <string name="clear_cache_summary">پاک کردن فایل‌های حافظه نهان برنامه برای رفع برخی مشکلات غیرعادی</string>

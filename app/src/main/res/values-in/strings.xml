@@ -692,6 +692,8 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="restore_cancelled">Operasi pemulihan dibatalkan</string>
     <string name="ruleset_update_interval">Interval Pembaruan RuleSet</string>
     <string name="ruleset_update_interval_summary">Waktu antara pembaruan RuleSet jarak jauh. Contoh: 1h, 30m, 3600s. Atur ke 0 untuk menonaktifkan pembaruan otomatis</string>
+    <string name="auto_update_rule_assets">Perbarui berkas aturan secara otomatis</string>
+    <string name="auto_update_rule_assets_summary">Periksa sumber yang dipilih setiap hari dan unduh geoip.db / geosite.db saat ada rilis baru (masing-masing sekitar 10 MB, hanya di jaringan tanpa kuota)</string>
     <string name="ruleset_prefix_error">Kesalahan format RuleSet: harus dimulai dengan rsip: atau rssite:</string>
     <string name="clear_cache">Bersihkan Cache</string>
     <string name="clear_cache_summary">Bersihkan file cache aplikasi untuk memperbaiki beberapa masalah abnormal</string>

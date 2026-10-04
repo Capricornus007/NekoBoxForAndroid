@@ -617,6 +617,8 @@
     <string name="restore_cancelled">عملیات بازیابی لغو شد</string>
     <string name="ruleset_update_interval">بازهٔ به‌روزرسانی مجموعه‌قواعد</string>
     <string name="ruleset_update_interval_summary">فاصلهٔ زمانی بین به‌روزرسانی مجموعه‌قواعد راه دور. مثال‌ها: 1h، 30m، 3600s. برای غیرفعال‌کردن به‌روزرسانی خودکار روی 0 بگذارید</string>
+    <string name="auto_update_rule_assets">به‌روزرسانی خودکار فایل‌های قانون</string>
+    <string name="auto_update_rule_assets_summary">منبع انتخاب‌شده را روزانه بررسی می‌کند و در صورت انتشار نسخه جدید، geoip.db و geosite.db را بارگیری می‌کند (هر کدام حدود ۱۰ مگابایت، فقط شبکه‌های بدون محدودیت حجم)</string>
     <string name="ruleset_prefix_error">خطای قالب مجموعه‌قواعد: باید با rsip: یا rssite: شروع شود</string>
     <string name="clear_cache">پاک‌سازی حافظهٔ پنهان</string>
     <string name="clear_cache_summary">پاک‌سازی فایل‌های حافظهٔ پنهان برنامه برای رفع برخی مشکلات غیرعادی</string>

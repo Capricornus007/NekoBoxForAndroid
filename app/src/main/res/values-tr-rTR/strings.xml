@@ -583,6 +583,8 @@
     <string name="restore_cancelled">Geri yükleme işlemi iptal edildi</string>
     <string name="ruleset_update_interval">Kural Kümesi Güncelleme Aralığı</string>
     <string name="ruleset_update_interval_summary">Uzaktaki Kural Kümelerinin güncellemeleri arasındaki süre. Örnekler: 1h, 30m, 3600s. Otomatik güncellemeleri devre dışı bırakmak için 0 ayarlayın</string>
+    <string name="auto_update_rule_assets">Kural dosyalarını otomatik güncelle</string>
+    <string name="auto_update_rule_assets_summary">Seçilen kaynağı her gün kontrol eder ve yeni sürüm çıkarsa geoip.db / geosite.db indirir (her biri yaklaşık 10 MB, yalnızca kota olmayan ağlarda)</string>
     <string name="ruleset_prefix_error">Kural kümesi biçim hatası: rsip: veya rssite: ile başlamalıdır</string>
     <string name="clear_cache">Önbelleği Temizle</string>
     <string name="clear_cache_summary">Uygulama önbellek dosyalarını temizleyerek bazı anormal sorunları giderir</string>

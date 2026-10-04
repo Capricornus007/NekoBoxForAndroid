@@ -598,6 +598,8 @@
     <string name="restore_cancelled">تم إلغاء عملية الاستعادة</string>
     <string name="ruleset_update_interval">فاصل تحديث مجموعة القواعد</string>
     <string name="ruleset_update_interval_summary">الوقت بين تحديثات مجموعات القواعد البعيدة. أمثلة: 1h، 30m، 3600s. اضبط على 0 لتعطيل التحديثات التلقائية</string>
+    <string name="auto_update_rule_assets">تحديث ملفات القواعد تلقائيًا</string>
+    <string name="auto_update_rule_assets_summary">يفحص المصدر المختار يوميًا وينزل geoip.db وgeosite.db عند صدور نسخة جديدة (نحو 10 ميغابايت لكل منهما، عبر الشبكات غير المحددة بالاستهلاك فقط)</string>
     <string name="ruleset_prefix_error">خطأ في تنسيق مجموعة القواعد: يجب أن تبدأ بـ rsip: أو rssite:</string>
     <string name="clear_cache">مسح ذاكرة التخزين المؤقت</string>
     <string name="clear_cache_summary">مسح ملفات ذاكرة التخزين المؤقت للتطبيق لإصلاح بعض المشكلات غير الطبيعية</string>

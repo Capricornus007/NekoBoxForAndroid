@@ -592,6 +592,8 @@
     <string name="restore_cancelled">Wiederherstellungsvorgang abgebrochen</string>
     <string name="ruleset_update_interval">RuleSet-Aktualisierungsintervall</string>
     <string name="ruleset_update_interval_summary">Zeit zwischen Aktualisierungen von entfernten RuleSets. Beispiele: 1h, 30m, 3600s. Auf 0 setzen, um automatische Aktualisierungen zu deaktivieren</string>
+    <string name="auto_update_rule_assets">Regel-Dateien automatisch aktualisieren</string>
+    <string name="auto_update_rule_assets_summary">Prüft die gewählte Quelle täglich und lädt geoip.db / geosite.db bei einer neuen Version herunter (je ca. 10 MB, nur Netze ohne Datenvolumen-Begrenzung)</string>
     <string name="ruleset_prefix_error">Ruleset-Formatfehler: muss mit rsip: oder rssite: beginnen</string>
     <string name="clear_cache">Cache leeren</string>
     <string name="clear_cache_summary">App-Cache-Dateien löschen, um einige abnormale Probleme zu beheben</string>

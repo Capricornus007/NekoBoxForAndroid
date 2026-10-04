@@ -724,6 +724,8 @@
     <string name="restore_cancelled">Opération de restauration annulée</string>
     <string name="ruleset_update_interval">Intervalle de mise à jour du RuleSet</string>
     <string name="ruleset_update_interval_summary">Temps entre les mises à jour des RuleSets distants. Exemples : 1h, 30m, 3600s. Définir à 0 pour désactiver les mises à jour automatiques</string>
+    <string name="auto_update_rule_assets">Mettre à jour automatiquement les ressources de règles</string>
+    <string name="auto_update_rule_assets_summary">Vérifie chaque jour la source choisie et télécharge geoip.db / geosite.db dès qu\'une nouvelle version sort (environ 10 Mo chacun, réseaux hors forfait uniquement)</string>
     <string name="ruleset_prefix_error">Erreur de format du RuleSet : doit commencer par rsip: ou rssite:</string>
     <string name="clear_cache">Vider le cache</string>
     <string name="clear_cache_summary">Vider les fichiers de cache de l\'application pour résoudre certains problèmes anormaux</string>

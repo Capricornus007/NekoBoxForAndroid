@@ -593,6 +593,8 @@
     <string name="restore_cancelled">恢复操作已取消</string>
     <string name="ruleset_update_interval">规则集更新间隔</string>
     <string name="ruleset_update_interval_summary">远程规则集更新间隔。例如：1h、30m、3600s。设置为0以禁用自动更新</string>
+    <string name="auto_update_rule_assets">自动更新路由资源</string>
+    <string name="auto_update_rule_assets_summary">每日检查所选来源，出现新版本时下载 geoip.db 和 geosite.db（各约 10 MB，仅限非计费网络）</string>
     <string name="ruleset_prefix_error">规则集格式错误：必须以 rsip: 或 rssite: 开头</string>
     <string name="clear_cache">清除缓存</string>
     <string name="clear_cache_summary">清除应用缓存文件以修复一些异常问题</string>

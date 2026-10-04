@@ -584,6 +584,8 @@
     <string name="restore_cancelled">복원 작업이 취소되었습니다</string>
     <string name="ruleset_update_interval">RuleSet 업데이트 간격</string>
     <string name="ruleset_update_interval_summary">원격 RuleSet 업데이트 간격 시간입니다. 예: 1h, 30m, 3600s. 자동 업데이트를 비활성화하려면 0으로 설정하세요</string>
+    <string name="auto_update_rule_assets">규칙 리소스 자동 업데이트</string>
+    <string name="auto_update_rule_assets_summary">선택한 소스를 매일 확인하고 새 릴리스가 있으면 geoip.db와 geosite.db를 다운로드합니다(각 약 10MB, 데이터 제한이 없는 네트워크에서만)</string>
     <string name="ruleset_prefix_error">Ruleset 형식 오류: rsip: 또는 rssite:로 시작해야 합니다</string>
     <string name="clear_cache">캐시 지우기</string>
     <string name="clear_cache_summary">일부 비정상 문제를 해결하기 위해 애플리케이션 캐시 파일을 지웁니다</string>

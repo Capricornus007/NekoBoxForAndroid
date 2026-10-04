@@ -589,6 +589,8 @@
     <string name="restore_cancelled">還原操作已取消</string>
     <string name="ruleset_update_interval">規則集更新間隔</string>
     <string name="ruleset_update_interval_summary">遠端規則集的更新間隔。範例：1 小時、30 分鐘、3600 秒。設為 0 以停用自動更新</string>
+    <string name="auto_update_rule_assets">自動更新路由資源</string>
+    <string name="auto_update_rule_assets_summary">每日檢查所選來源，出現新版就下載 geoip.db 與 geosite.db（各約 10 MB，僅限非計費網路）</string>
     <string name="ruleset_prefix_error">規則集格式錯誤：必須以 rsip: 或 rssite: 開頭</string>
     <string name="clear_cache">清除快取</string>
     <string name="clear_cache_summary">清除應用程式快取檔案以修復一些異常問題</string>

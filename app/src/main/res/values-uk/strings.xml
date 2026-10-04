@@ -791,6 +791,8 @@
     <string name="restore_cancelled">Відновлення скасовано</string>
     <string name="ruleset_update_interval">Інтервал оновлення наборів правил</string>
     <string name="ruleset_update_interval_summary">Як часто оновлювати набори правил</string>
+    <string name="auto_update_rule_assets">Автоматичне оновлення файлів правил</string>
+    <string name="auto_update_rule_assets_summary">Щодня перевіряти вибране джерело й завантажувати geoip.db / geosite.db, коли з\'являється нова версія (приблизно по 10 МБ, лише в мережах без ліміту)</string>
     <string name="ruleset_prefix_error">Помилка префікса набору правил</string>
     <string name="clear_cache">Очистити кеш</string>
     <string name="clear_cache_summary">Видалити кешовані дані</string>

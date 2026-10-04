@@ -16,6 +16,7 @@ import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.SpeedTestSettings
+import io.nekohasekai.sagernet.bg.RuleAssetUpdater
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.ktx.*
@@ -274,6 +275,11 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             rulesGeoipUrl.isVisible = provider == 4
             true
         }
+        findPreference<SwitchPreferenceCompat>(Key.AUTO_UPDATE_RULE_ASSETS)!!
+            .setOnPreferenceChangeListener { _, _ ->
+                RuleAssetUpdater.reconfigure()
+                true
+            }
         localProxySettings.summary = localProxySummary()
         localProxySettings.setOnPreferenceClickListener {
             showLocalProxyDialog(localProxySettings)

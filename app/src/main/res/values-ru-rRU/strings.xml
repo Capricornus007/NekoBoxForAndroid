@@ -599,6 +599,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="restore_cancelled">Операция восстановления отменена</string>
     <string name="ruleset_update_interval">Интервал обновления RuleSet</string>
     <string name="ruleset_update_interval_summary">Время между обновлениями удаленных RuleSet. Примеры: 1ч, 30м, 3600с. Установите 0 для отключения автоматических обновлений</string>
+    <string name="auto_update_rule_assets">Автообновление файлов правил</string>
+    <string name="auto_update_rule_assets_summary">Ежедневно проверять выбранный источник и загружать geoip.db / geosite.db при выходе новой версии (примерно по 10 МБ, только в сетях без лимита)</string>
     <string name="ruleset_prefix_error">Ошибка формата RuleSet: должен начинаться с rsip: или rssite:</string>
     <string name="clear_cache">Очистить кэш</string>
     <string name="clear_cache_summary">Очистить файлы кэша приложения для исправления некоторых аномальных проблем</string>

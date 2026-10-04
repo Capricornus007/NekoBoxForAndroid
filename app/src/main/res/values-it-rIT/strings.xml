@@ -599,6 +599,8 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="restore_cancelled">Operazione di ripristino annullata</string>
     <string name="ruleset_update_interval">Intervallo di aggiornamento del set di regole</string>
     <string name="ruleset_update_interval_summary">Tempo tra gli aggiornamenti dei set di regole remoti. Esempi: 1h, 30m, 3600s. Imposta a 0 per disabilitare gli aggiornamenti automatici</string>
+    <string name="auto_update_rule_assets">Aggiorna automaticamente i file delle regole</string>
+    <string name="auto_update_rule_assets_summary">Controlla ogni giorno la fonte scelta e scarica geoip.db / geosite.db quando esce una nuova versione (circa 10 MB ciascuno, solo reti senza traffico a consumo)</string>
     <string name="ruleset_prefix_error">Errore formato set di regole: deve iniziare con rsip: o rssite:</string>
     <string name="clear_cache">Svuota cache</string>
     <string name="clear_cache_summary">Svuota i file della cache dell\'app per risolvere problemi anomali</string>

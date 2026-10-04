@@ -207,6 +207,10 @@
             app:icon="@drawable/ic_baseline_shutter_speed_24"
             app:title="@string/ruleset_update_interval"
             app:summary="@string/ruleset_update_interval_summary" />
+        <SwitchPreferenceCompat
+            app:key="autoUpdateRuleAssets"
+            app:summary="@string/auto_update_rule_assets_summary"
+            app:title="@string/auto_update_rule_assets" />
     </io.nekohasekai.sagernet.widget.CollapsibleCategory>
 
     <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/fragment_settings">

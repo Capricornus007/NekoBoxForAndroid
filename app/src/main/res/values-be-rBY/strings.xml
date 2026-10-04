@@ -588,6 +588,8 @@
     <string name="restore_cancelled">Аперацыя аднаўлення адменена</string>
     <string name="ruleset_update_interval">Інтэрвал абнаўлення RuleSet</string>
     <string name="ruleset_update_interval_summary">Час паміж абнаўленнямі аддаленых RuleSet. Прыклады: 1h, 30m, 3600s. Усталюйце 0 для адключэння аўтаматычных абнаўленняў</string>
+    <string name="auto_update_rule_assets">Аўтаматычнае абнаўленне файлаў правілаў</string>
+    <string name="auto_update_rule_assets_summary">Штодня правяраць выбраную крыніцу і спампоўваць geoip.db / geosite.db пры выхаду новай версіі (каля 10 МБ кожны, толькі ў сетках без ліміту)</string>
     <string name="ruleset_prefix_error">Памылка фармату Ruleset: павінен пачынацца з rsip: або rssite:</string>
     <string name="clear_cache">Ачысціць кэш</string>
     <string name="clear_cache_summary">Ачысціце файлы кэша праграмы, каб выправіць некаторыя ненармальныя праблемы</string>

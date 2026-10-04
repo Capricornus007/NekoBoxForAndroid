@@ -96,6 +96,7 @@ object Key {
     const val RULES_GEOSITE_URL = "rulesGeositeUrl"
     const val RULES_GEOIP_URL = "rulesGeoipUrl"
     const val RULES_UPDATE_INTERVAL = "rulesUpdateInterval"
+    const val AUTO_UPDATE_RULE_ASSETS = "autoUpdateRuleAssets"
 
     // Auto-switch timeout settings
     const val ENABLE_AUTO_SWITCH_TIMEOUT = "enableAutoSwitchTimeout"

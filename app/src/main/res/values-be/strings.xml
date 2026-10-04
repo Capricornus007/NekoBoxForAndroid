@@ -717,6 +717,8 @@
     <string name="restore_cancelled">Аднаўленне скасавана</string>
     <string name="ruleset_update_interval">Інтэрвал абнаўлення набораў правілаў</string>
     <string name="ruleset_update_interval_summary">Час паміж абнаўленнямі аддаленых набораў. Прыклады: 1h, 30m, 3600s</string>
+    <string name="auto_update_rule_assets">Аўтаматычнае абнаўленне файлаў правілаў</string>
+    <string name="auto_update_rule_assets_summary">Штодня правяраць выбраную крыніцу і спампоўваць geoip.db / geosite.db пры выхаду новай версіі (каля 10 МБ кожны, толькі ў сетках без ліміту)</string>
     <string name="ruleset_prefix_error">Памылка фармату набора: павінен пачынацца з rsip: або rssite:</string>
     <string name="clear_cache">Ачысціць кеш</string>
     <string name="clear_cache_summary">Ачысціць кеш для выпраўлення праблем</string>

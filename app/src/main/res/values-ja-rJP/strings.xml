@@ -592,6 +592,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="restore_cancelled">復元操作がキャンセルされました</string>
     <string name="ruleset_update_interval">ルールセット更新間隔</string>
     <string name="ruleset_update_interval_summary">リモートルールセットの更新間隔。例：1h、30m、3600s。自動更新を無効にするには0に設定します</string>
+    <string name="auto_update_rule_assets">ルールアセットを自動更新</string>
+    <string name="auto_update_rule_assets_summary">選択したソースを毎日確認し、新しいリリースが出たら geoip.db と geosite.db をダウンロードします（各約 10 MB、従量課金以外のネットワークのみ）</string>
     <string name="ruleset_prefix_error">ルールセット形式エラー：rsip: または rssite: で始まる必要があります</string>
     <string name="clear_cache">キャッシュをクリア</string>
     <string name="clear_cache_summary">アプリケーションのキャッシュファイルをクリアして、異常な問題を修正します</string>
