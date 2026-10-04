@@ -512,6 +512,11 @@
     <string name="dashboard_url_tips">支援輸入任何相容 Clash API 的 Web 儀表板。已放行混合通訊協定與跨域，開啟即自動連線本地核心。</string>
     <string name="dashboard_reset_default">重設預設</string>
     <string name="dashboard_switched_toast">已切換儀表板並重新載入</string>
+    <string name="dashboard_save_and_apply">儲存並套用</string>
+    <string name="dashboard_copy_secret">複製金鑰</string>
+    <string name="dashboard_secret_copied">已複製 Clash API 金鑰至剪貼簿</string>
+    <string name="dashboard_api_info_title">本地核心 Clash API</string>
+    <string name="dashboard_api_secret_label">核心金鑰: %1$s</string>
     <string name="enable_clash_api">啟用 Clash API</string>
     <string name="log_level">日誌級別</string>
     <string name="enable_clash_api_summary">在 127.0.0.1:9090 提供 clash api 和 yacd 儀表板</string>

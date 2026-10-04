@@ -717,6 +717,11 @@
     <string name="dashboard_item_default_tag">Default</string>
     <string name="dashboard_action_add">Add Custom</string>
     <string name="dashboard_set_as_default">Set as default</string>
+    <string name="dashboard_save_and_apply">Save &amp; Apply</string>
+    <string name="dashboard_copy_secret">Copy Secret</string>
+    <string name="dashboard_secret_copied">Clash API secret copied to clipboard</string>
+    <string name="dashboard_api_info_title">Local Kernel Clash API</string>
+    <string name="dashboard_api_secret_label">Kernel Secret: %1$s</string>
     <string name="enable_clash_api">Enable Clash API</string>
     <string name="log_level">Log Level</string>
     <string name="enable_clash_api_summary">Provide clash api and yacd dashboard at 127.0.0.1:9090</string>

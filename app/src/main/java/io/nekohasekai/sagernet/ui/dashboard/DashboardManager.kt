@@ -260,11 +260,20 @@ object DashboardManager {
         foundUrl?.let { DataStore.yacdURL = it }
     }
 
+    fun isUrlMatching(url1: String, url2: String): Boolean {
+        val u1 = url1.trim().trimEnd('/')
+        val u2 = url2.trim().trimEnd('/')
+        if (u1.equals(u2, ignoreCase = true)) return true
+        val base1 = u1.substringBefore('#').substringBefore('?').trimEnd('/')
+        val base2 = u2.substringBefore('#').substringBefore('?').trimEnd('/')
+        return base1.isNotBlank() && base1.equals(base2, ignoreCase = true)
+    }
+
     @Synchronized
     fun getActiveDashboard(): DashboardItem {
         val list = getDashboards()
         val currentUrl = DataStore.yacdURL.trim()
-        val byUrl = list.firstOrNull { it.url.trim() == currentUrl }
+        val byUrl = list.firstOrNull { isUrlMatching(it.url, currentUrl) }
         if (byUrl != null) return byUrl
         val byDefault = list.firstOrNull { it.isDefault }
         if (byDefault != null) return byDefault

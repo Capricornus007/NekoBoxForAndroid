@@ -1,6 +1,9 @@
 package io.nekohasekai.sagernet.ui
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -10,6 +13,7 @@ import android.webkit.*
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
@@ -119,8 +123,12 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                if (url != null && (url.contains("zash") || url.contains("run.place") || url.contains("board"))) {
-                    injectZashboardAutoConnect(view)
+                if (url != null) {
+                    if (url.contains("zash") || url.contains("run.place") || url.contains("board")) {
+                        injectZashboardAutoConnect(view)
+                    } else if (url.contains("metacubex") || url.contains("metacubexd")) {
+                        injectMetaCubeXDAutoConnect(view)
+                    }
                 }
             }
         }
@@ -265,11 +273,126 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
         view?.evaluateJavascript(js, null)
     }
 
-    private fun loadDashboard(url: String) {
-        val targetUrl = when {
-            url.startsWith("https://board.zash.run.place/#/setup") -> DashboardManager.PRESET_ZASHBOARD_URL
-            else -> runCatching { DashboardManager.normalizeUrl(url) }.getOrDefault(url)
+    private fun injectMetaCubeXDAutoConnect(view: WebView?) {
+        val secret = DataStore.clashApiSecret
+        val js = """
+            (function() {
+                var secret = "$secret";
+                var localUrl = "http://127.0.0.1:9090";
+
+                // 1. 同步注入与自愈 Pinia / useLocalStorage 状态
+                try {
+                    var endpointList = JSON.parse(localStorage.getItem("endpointList") || "[]");
+                    if (!Array.isArray(endpointList)) endpointList = [];
+                    var found = false;
+                    for (var i = 0; i < endpointList.length; i++) {
+                        var ep = endpointList[i];
+                        if (ep && (ep.url === localUrl || ep.url === "http://localhost:9090" || ep.url === "http://127.0.0.1:9090/")) {
+                            ep.secret = secret;
+                            ep.url = localUrl;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        endpointList.unshift({
+                            id: "ownbox-local",
+                            url: localUrl,
+                            secret: secret
+                        });
+                    }
+                    localStorage.setItem("endpointList", JSON.stringify(endpointList));
+                    localStorage.setItem("selectedEndpoint", JSON.stringify("ownbox-local"));
+                    try { window.dispatchEvent(new Event('storage')); } catch (_) {}
+                } catch (_) {}
+
+                // 2. 轮询侦听并自愈 DOM 表单输入框（解决 vue 响应式状态与 setup 页面输入）
+                function setNativeValue(element, value) {
+                    var valueSetter = Object.getOwnPropertyDescriptor(element.__proto__, 'value') ||
+                                      Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');
+                    if (valueSetter && valueSetter.set) {
+                        valueSetter.set.call(element, value);
+                    } else {
+                        element.value = value;
+                    }
+                    element.dispatchEvent(new Event('input', { bubbles: true }));
+                    element.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+
+                var checkCount = 0;
+                var maxChecks = 35;
+                var interval = setInterval(function() {
+                    checkCount++;
+                    if (checkCount > maxChecks) {
+                        clearInterval(interval);
+                        return;
+                    }
+
+                    // 查找密码/密钥输入框
+                    var pwInputs = document.querySelectorAll('input[type="password"], input[placeholder*="secret" i], input[placeholder*="密钥"], input[placeholder*="Secret"]');
+                    var needSubmit = false;
+                    pwInputs.forEach(function(inp) {
+                        if (inp && inp.value !== secret) {
+                            setNativeValue(inp, secret);
+                            needSubmit = true;
+                        }
+                    });
+
+                    // 查找后端地址输入框
+                    var urlInputs = document.querySelectorAll('input[placeholder*="http" i], input[placeholder*="后端"], input[placeholder*="Endpoint" i]');
+                    urlInputs.forEach(function(inp) {
+                        if (inp && (!inp.value || inp.value === '')) {
+                            setNativeValue(inp, localUrl);
+                            needSubmit = true;
+                        }
+                    });
+
+                    // 清理过渡报错气泡提示
+                    var alerts = document.querySelectorAll('.alert, [role="alert"], div[class*="error"]');
+                    alerts.forEach(function(el) {
+                        var text = el.innerText || '';
+                        if (text.indexOf('secret 被拒绝') !== -1 || text.indexOf('401') !== -1) {
+                            el.style.display = 'none';
+                        }
+                    });
+
+                    // 如果密码已填充，寻找“连接”或“Connect”按钮自动提交
+                    if (needSubmit || pwInputs.length > 0) {
+                        var buttons = Array.from(document.querySelectorAll('button, a'));
+                        var connectBtn = buttons.find(function(b) {
+                            var text = (b.textContent || '').trim();
+                            return text === '连接' || text === 'Connect' || text === '保存' || text === '确定';
+                        });
+                        if (connectBtn && !connectBtn.disabled) {
+                            connectBtn.click();
+                        }
+                    }
+
+                    // 如果已经成功进入仪表盘概览主页（离开 setup 路由），停止轮询
+                    if (window.location.hash.indexOf('setup') === -1 && window.location.hash.length > 2) {
+                        clearInterval(interval);
+                    }
+                }, 200);
+            })();
+        """.trimIndent()
+        view?.evaluateJavascript(js, null)
+    }
+
+    private fun buildEffectiveDashboardUrl(url: String): String {
+        val secret = DataStore.clashApiSecret
+        val normalized = runCatching { DashboardManager.normalizeUrl(url) }.getOrDefault(url)
+        return when {
+            normalized.startsWith("https://board.zash.run.place/#/setup") -> DashboardManager.PRESET_ZASHBOARD_URL
+            (normalized.contains("metacubex") || normalized.contains("metacubexd")) && !normalized.contains("hostname=") -> {
+                val clean = normalized.trimEnd('/')
+                "$clean/#/setup?hostname=127.0.0.1&port=9090&secret=$secret&http=true"
+            }
+            else -> normalized
         }
+    }
+
+    private fun loadDashboard(url: String) {
+        val targetUrl = buildEffectiveDashboardUrl(url)
         mWebView.loadUrl(targetUrl)
         updateToolbarSubtitle()
     }
@@ -321,8 +444,23 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
         val dialogView = LayoutInflater.from(dialogContext).inflate(R.layout.layout_dialog_dashboard_url, null)
         val container = dialogView.findViewById<LinearLayout>(R.id.ll_dashboard_items)
         val btnAdd = dialogView.findViewById<MaterialButton>(R.id.btn_add_dashboard)
+        val textApiSecret = dialogView.findViewById<TextView>(R.id.text_api_secret_masked)
+        val btnCopySecret = dialogView.findViewById<MaterialButton>(R.id.btn_copy_secret)
 
         var dialog: androidx.appcompat.app.AlertDialog? = null
+
+        val secret = DataStore.clashApiSecret
+        if (secret.isNotBlank()) {
+            val masked = if (secret.length > 14) "${secret.take(6)}...${secret.takeLast(6)}" else secret
+            textApiSecret.text = getString(R.string.dashboard_api_secret_label, masked)
+        } else {
+            textApiSecret.text = getString(R.string.dashboard_api_secret_label, "(none)")
+        }
+        btnCopySecret.setOnClickListener {
+            val cm = dialogContext.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+            cm?.setPrimaryClip(ClipData.newPlainText("Clash API Secret", secret))
+            Toast.makeText(dialogContext, R.string.dashboard_secret_copied, Toast.LENGTH_SHORT).show()
+        }
 
         fun renderList() {
             container.removeAllViews()
@@ -346,7 +484,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
                 badgePreset.isVisible = item.isPreset
                 badgeDefault.isVisible = item.isDefault
 
-                val isActive = item.url.trim() == currentUrl
+                val isActive = DashboardManager.isUrlMatching(item.url, currentUrl)
                 if (isActive) {
                     btnSelect.text = getString(R.string.dashboard_tab_active)
                     btnSelect.isEnabled = false
@@ -375,7 +513,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
                 }
 
                 btnEdit.setOnClickListener {
-                    showEditDashboardDialog(item) {
+                    showEditDashboardDialog(item, dialog) {
                         renderList()
                     }
                 }
@@ -406,7 +544,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
         }
 
         btnAdd.setOnClickListener {
-            showEditDashboardDialog(null) {
+            showEditDashboardDialog(null, dialog) {
                 renderList()
             }
         }
@@ -426,7 +564,11 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
             .show()
     }
 
-    private fun showEditDashboardDialog(editingItem: DashboardItem?, onSaved: () -> Unit) {
+    private fun showEditDashboardDialog(
+        editingItem: DashboardItem?,
+        parentDialog: androidx.appcompat.app.AlertDialog?,
+        onSaved: () -> Unit
+    ) {
         val dialogContext = requireContext()
         val editView = LayoutInflater.from(dialogContext).inflate(R.layout.dialog_dashboard_edit, null)
         val editName = editView.findViewById<TextInputEditText>(R.id.edit_dashboard_name)
@@ -475,7 +617,7 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
         MaterialAlertDialogBuilder(dialogContext)
             .setTitle(if (editingItem != null) R.string.dashboard_edit_title else R.string.dashboard_add_title)
             .setView(editView)
-            .setPositiveButton(R.string.save) { _, _ ->
+            .setPositiveButton(R.string.dashboard_save_and_apply) { _, _ ->
                 val name = editName.text?.toString().orEmpty()
                 val url = editUrl.text?.toString().orEmpty()
                 val isDefault = checkDefault.isChecked
@@ -487,11 +629,13 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
                     } else {
                         DashboardManager.addDashboard(name, normalized, isDefault)
                     }
-                    if (isDefault) {
-                        DataStore.yacdURL = normalized
-                        loadDashboard(normalized)
-                    }
+                    DataStore.yacdURL = normalized
+                    loadDashboard(normalized)
+                    parentDialog?.dismiss()
                     onSaved()
+                    this@WebviewFragment.view?.let { v ->
+                        Snackbar.make(v, R.string.dashboard_switched_toast, Snackbar.LENGTH_SHORT).show()
+                    }
                 } catch (e: Exception) {
                     this@WebviewFragment.view?.let { v ->
                         Snackbar.make(v, e.message ?: getString(R.string.dashboard_test_url_invalid), Snackbar.LENGTH_LONG).show()

@@ -585,6 +585,11 @@
     <string name="dashboard_item_default_tag">默认</string>
     <string name="dashboard_action_add">添加自定义</string>
     <string name="dashboard_set_as_default">设为默认</string>
+    <string name="dashboard_save_and_apply">保存并应用</string>
+    <string name="dashboard_copy_secret">复制密钥</string>
+    <string name="dashboard_secret_copied">已复制 Clash API 密钥至剪贴板</string>
+    <string name="dashboard_api_info_title">本地内核 Clash API</string>
+    <string name="dashboard_api_secret_label">内核密钥: %1$s</string>
     <string name="enable_clash_api">启用 Clash API</string>
     <string name="enable_clash_api_summary">在 127.0.0.1:9090 提供 clash api 和 yacd 仪表板</string>
     <string name="xtls_flow">Flow（VLESS 子协议）</string>

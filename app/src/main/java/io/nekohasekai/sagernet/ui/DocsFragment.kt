@@ -911,10 +911,10 @@ class DocsFragment : ToolbarFragment(R.layout.layout_docs) {
                 category = "Sing-box 仪表盘",
                 title = "轻量经典：内置 Yacd 与 MetaCubeXD 面板对比 (yacdAndMetaGuide)",
                 badge = "多样选择",
-                desc = "除了 Zashboard，OwnBox 还提供了多种面板选择：\n1. 【内置 Yacd 面板】：完全离线打包在 APK 本地资产中，零外部网络请求，加载速度极快，内存占用极低，经典复古的四栏卡片布局，适合网络极差或只想极速查个延迟的场景；\n2. 【MetaCubeXD 进阶面板】：面向资深极客用户，具备最强大的路由规则诊断树状图、支持深度连接属性（DNS 响应、真实对端 IP、链式代理跳数）多重筛选，是排查网络分流疑难的利器。",
-                prosCons = "【利】按需选择，离线有 Yacd，极客有 MetaCubeXD，日常有 Zashboard；【弊】不同面板的操作习惯略有差异。",
+                desc = "除了 Zashboard，OwnBox 还提供了多种面板选择：\n1. 【内置 Yacd 面板】：完全离线打包在 APK 本地资产中，零外部网络请求，加载速度极快，内存占用极低，经典复古的四栏卡片布局，适合网络极差或只想极速查个延迟的场景；\n2. 【MetaCubeXD 进阶面板】：面向资深极客用户，具备最强大的路由规则诊断树状图、支持深度连接属性（DNS 响应、真实对端 IP、链式代理跳数）多重筛选。OwnBox 已对 MetaCubeXD 实现零配置鉴权适配，打开即自动注入本地 Clash API 与密钥并自动连接，无需手动输入复杂的 Secret；\n3. 【一键复制密钥】：仪表盘管理弹窗顶部直观展示当前本地 API 地址与密钥，支持一键复制到剪贴板，便于各类面板快速授权。",
+                prosCons = "【利】按需选择，离线有 Yacd，极客有 MetaCubeXD，日常有 Zashboard；全部预设均享零配置免密直连；【弊】不同面板的操作习惯略有差异。",
                 recommendation = "【建议】日常使用 Zashboard；排查复杂路由规则判定使用 MetaCubeXD；网络极弱离线使用 Yacd。",
-                keywords = "yacd metacubexd 离线 极客 面板 规则诊断 连接排查 比较 选型",
+                keywords = "yacd metacubexd 离线 极客 面板 规则诊断 连接排查 比较 选型 免密 复制密钥",
             )
         )
         allItems.add(
@@ -922,10 +922,10 @@ class DocsFragment : ToolbarFragment(R.layout.layout_docs) {
                 category = "Sing-box 仪表盘",
                 title = "自定义 Dashboard URL 导入规范与混合内容安全放行 (customDashboardUrl)",
                 badge = "高级功能",
-                desc = "OwnBox 支持用户在「仪表盘设置」中添加任意外部部署的 Dashboard Web 地址（如内网 NAS 部署的 http://192.168.1.100:8080 或公网部署的 https 面板）。针对 Android WebView 普遍存在的“在 HTTPS 网页中请求本地 HTTP 127.0.0.1:9090 会被系统拦截（混合内容 Mixed Content 阻断）”问题，OwnBox 在底层 WebView 客户端中对仪表盘页面放行了安全的混合内容策略并开启跨域支持，确保无论是自建面板还是云端面板均能无缝直连本地 Clash API。",
-                prosCons = "【利】自由度极高，支持私有化部署看板与多端统一管理；【弊】导入未经审查的第三方外部不可信网址可能存在前端脚本钓鱼风险。",
+                desc = "OwnBox 支持用户在「仪表盘管理」中添加任意外部部署的 Dashboard Web 地址（如内网 NAS 部署的 http://192.168.1.100:8080 或公网部署的 https 面板）。全新优化的「保存并应用」机制支持在输入自定义 URL 后立即生效并加载面板，无需额外手动切换。\n针对 Android WebView 普遍存在的“在 HTTPS 网页中请求本地 HTTP 127.0.0.1:9090 会被系统拦截（混合内容 Mixed Content 阻断）”问题，OwnBox 在底层 WebView 客户端中对仪表盘页面放行了安全的混合内容策略并开启跨域支持，确保无论是自建面板还是云端面板均能无缝直连本地 Clash API。",
+                prosCons = "【利】自由度极高，支持私有化部署看板与多端统一管理，保存并应用一步到位；【弊】导入未经审查的第三方外部不可信网址可能存在前端脚本钓鱼风险。",
                 recommendation = "【安全提示】仅添加可信的官方开源仪表盘项目（如 GitHub 开源仓库托管的 Pages 页面或本地自建容器）。",
-                keywords = "自定义 url 仪表盘 混合内容 mixed content https http 跨域 webview 放行",
+                keywords = "自定义 url 仪表盘 保存并应用 混合内容 mixed content https http 跨域 webview 放行",
             )
         )
         allItems.add(
