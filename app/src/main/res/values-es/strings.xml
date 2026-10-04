@@ -609,7 +609,6 @@
     <string name="naive_insecure_concurrency_summary">Usa N conexiones de túnel concurrentes para ser más robusto en malas condiciones de red. Más conexiones hacen que la tunelización sea más fácil de detectar y menos segura. Este proyecto se esfuerza por lograr la mayor seguridad contra el análisis del tráfico. Usarlo de manera insegura anula su propósito. \n\nSi debe usar esto, pruebe N=2 primero para ver si resuelve sus problemas. Se recomienda enfáticamente no usar más de 4 conexiones aquí.</string>
  
  
-    <string name="stun_test">Descubrimiento de comportamiento NAT</string>
 
     <string name="traffic_chart_title">Tráfico y conexiones en tiempo real</string>
     <string name="traffic_chart_summary">Ver gráfico de velocidad en tiempo real y gestionar conexiones activas</string>
@@ -630,15 +629,11 @@
     <string name="traffic_connecting_api">Conectando a Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Total subido: %1$s  |  Total descargado: %2$s</string>
  
-    <string name="stun_test_summary">Determine el comportamiento de asignación de NAT del cliente y el comportamiento de filtrado de NAT definido en RFC 3478 mediante STUN.</string>
  
     <string name="start">Iniciar</string>
  
-    <string name="stun_attest_loading">Esto puede tomar unos pocos minutos…</string>
  
-    <string name="nat_stun_server_hint">Servidor Stun</string>
  
-    <string name="nat_result_hint">Resultado de la comprobación de NAT</string>
  
     <string name="tools_network">Red</string>
  
@@ -715,7 +710,6 @@
     <string name="speed_test_finished_summary">Finalizado: %1$d, fallidos: %2$d, cancelados: %3$d</string>
     <string name="spoof_user_agent">User-Agent predeterminado</string>
     <string name="spoof_user_agent_summary">Se usa en las actualizaciones de suscripción cuando la suscripción no tiene User-Agent propio</string>
-    <string name="stun_binding_test">Vinculación rápida (solo dirección externa)</string>
     <string name="use_system_theme">Usar tema del sistema</string>
     <string name="use_system_theme_summary">Usar colores dinámicos del sistema (Android 12+)</string>
     <string name="quick_clear_cache_restart">Reiniciar tras limpiar</string>

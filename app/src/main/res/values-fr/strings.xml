@@ -557,7 +557,6 @@
         et moins sécurisé. Ce projet vise la sécurité la plus forte contre l\'analyse du trafic.
         L\'utiliser de manière non sécurisée va à l\'encontre de son but. \n\nSi vous devez l\'utiliser, essayez d\'abord N=2 pour
         voir si cela résout vos problèmes. Il est fortement déconseillé d\'utiliser plus de 4 connexions ici.</string>
-    <string name="stun_test">Découverte du comportement NAT</string>
 
     <string name="traffic_chart_title">Trafic et connexions en temps réel</string>
     <string name="traffic_chart_summary">Voir le graphique de vitesse en temps réel et gérer les connexions actives</string>
@@ -577,12 +576,7 @@
     <string name="traffic_monitor_waiting">● Surveillance en pause (VPN non connecté)</string>
     <string name="traffic_connecting_api">Connexion à Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Total envoyé : %1$s  |  Total reçu : %2$s</string>
-    <string name="stun_test_summary">Détermine le comportement de mappage NAT du client et le comportement de
-        filtrage NAT défini dans la RFC 3478 à l\'aide de STUN.</string>
     <string name="start">Démarrer</string>
-    <string name="stun_attest_loading">Cela peut prendre quelques minutes…</string>
-    <string name="nat_stun_server_hint">Serveur STUN</string>
-    <string name="nat_result_hint">Résultat de la vérification NAT</string>
     <string name="tools_network">Réseau</string>
     <string name="backup">Sauvegarde</string>
     <string name="backup_groups_and_configurations">Groupes et configurations</string>
@@ -858,7 +852,6 @@
     <string name="speed_test_finished_summary">Terminés : %1$d, échoués : %2$d, annulés : %3$d</string>
     <string name="spoof_user_agent">User-Agent par défaut</string>
     <string name="spoof_user_agent_summary">Utilisé pour les mises à jour d\'abonnement quand l\'abonnement n\'a pas son propre User-Agent</string>
-    <string name="stun_binding_test">Liaison rapide (adresse externe uniquement)</string>
     <string name="wireguard_listen_port">Port d\'écoute</string>
     <string name="wireguard_persistent_keepalive">Intervalle de keepalive persistant (secondes)</string>
     <string name="wireguard_peer_allowed_ips">IP autorisées du pair</string>

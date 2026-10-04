@@ -442,7 +442,6 @@
         وأقل أمانًا. يسعى هذا المشروع إلى أقوى أمان ضد تحليل حركة المرور.
         استخدامه بطريقة غير آمنة يبطل الغرض منه. \n\nإذا كان عليك استخدام هذا، جرب N=2 أولاً
         لترى إذا كان يحل مشاكلك. نوصي بشدة بعدم استخدام أكثر من 4 اتصالات هنا.</string>
-    <string name="stun_test">اكتشاف سلوك NAT</string>
 
     <string name="traffic_chart_title">حركة المرور والاتصالات في الوقت الفعلي</string>
     <string name="traffic_chart_summary">عرض مخطط السرعة اللحظي وإدارة الاتصالات النشطة</string>
@@ -462,12 +461,7 @@
     <string name="traffic_monitor_waiting">● المراقبة متوقفة (VPN غير متصل)</string>
     <string name="traffic_connecting_api">الاتصال بـ Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">إجمالي الرفع: %1$s  |  إجمالي التنزيل: %2$s</string>
-    <string name="stun_test_summary">تحديد سلوك تعيين NAT الخاص بالعميل وسلوك تصفية NAT
-        المحدد في RFC 3478 باستخدام STUN.</string>
     <string name="start">ابدأ</string>
-    <string name="stun_attest_loading">قد يستغرق هذا بضع دقائق…</string>
-    <string name="nat_stun_server_hint">خادم STUN</string>
-    <string name="nat_result_hint">نتيجة فحص NAT</string>
     <string name="tools_network">الشبكة</string>
     <string name="backup">نسخ احتياطي</string>
     <string name="backup_groups_and_configurations">المجموعات والإعدادات</string>
@@ -907,7 +901,6 @@
     <string name="speed_test_finished_summary">انتهى: %1$d، فشل: %2$d، أُلغي: %3$d</string>
     <string name="spoof_user_agent">User-Agent الافتراضي</string>
     <string name="spoof_user_agent_summary">يُستخدم لتحديثات الاشتراك عندما لا يكون للاشتراك User-Agent خاص به</string>
-    <string name="stun_binding_test">ربط سريع (العنوان الخارجي فقط)</string>
     <string name="hide_unavailable_profiles">إخفاء الملفات غير المتاحة</string>
     <string name="default_subscription_user_agent">وكيل المستخدم الافتراضي للاشتراك</string>
     <string name="ua_updated_toast">تم تحديث User-Agent</string>

@@ -550,7 +550,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
         e meno sicuro. Questo progetto si impegna per la massima sicurezza contro l\'analisi del traffico.
         Usarlo in modo non sicuro vanifica il suo scopo. \n\nSe devi usarlo, prova prima N=2 per
         vedere se risolve i tuoi problemi. Si consiglia vivamente di non usare più di 4 connessioni qui.</string>
-    <string name="stun_test">Rilevamento comportamento NAT</string>
 
     <string name="traffic_chart_title">Traffico e connessioni in tempo reale</string>
     <string name="traffic_chart_summary">Grafico velocità in tempo reale e gestione connessioni attive</string>
@@ -570,12 +569,7 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="traffic_monitor_waiting">● Monitoraggio in pausa (VPN non connessa)</string>
     <string name="traffic_connecting_api">Connessione a Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Totale inviato: %1$s  |  Totale ricevuto: %2$s</string>
-    <string name="stun_test_summary">Determina il comportamento di mappatura NAT del client e il comportamento
-        di filtraggio NAT definito in RFC 3478 utilizzando STUN.</string>
     <string name="start">Avvia</string>
-    <string name="stun_attest_loading">Potrebbero volerci alcuni minuti…</string>
-    <string name="nat_stun_server_hint">Server STUN</string>
-    <string name="nat_result_hint">Risultato controllo NAT</string>
     <string name="tools_network">Rete</string>
     <string name="backup">Backup</string>
     <string name="backup_groups_and_configurations">Gruppi e configurazioni</string>
@@ -855,7 +849,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="speed_test_finished_summary">Completati: %1$d, falliti: %2$d, annullati: %3$d</string>
     <string name="spoof_user_agent">User-Agent predefinito</string>
     <string name="spoof_user_agent_summary">Usato per gli aggiornamenti dell\'abbonamento quando l\'abbonamento non ha un proprio User-Agent</string>
-    <string name="stun_binding_test">Binding rapido (solo indirizzo esterno)</string>
     <string name="wireguard_listen_port">Porta in ascolto</string>
     <string name="wireguard_persistent_keepalive">Intervallo keepalive persistente (secondi)</string>
     <string name="wireguard_peer_allowed_ips">IP consentiti del peer</string>

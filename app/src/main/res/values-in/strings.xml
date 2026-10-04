@@ -526,7 +526,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
         dan kurang aman. Proyek ini berupaya memberikan keamanan terkuat terhadap analisis lalu lintas.
         Menggunakannya dengan cara yang tidak aman akan mengalahkan tujuannya. \n\nJika Anda harus menggunakannya, coba N=2 terlebih dahulu untuk
         melihat apakah itu menyelesaikan masalah Anda. Sangat disarankan untuk tidak menggunakan lebih dari 4 koneksi di sini.</string>
-    <string name="stun_test">Deteksi Perilaku NAT</string>
 
     <string name="traffic_chart_title">Trafik &amp; koneksi real-time</string>
     <string name="traffic_chart_summary">Lihat grafik kecepatan real-time dan kelola koneksi aktif</string>
@@ -546,12 +545,7 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="traffic_monitor_waiting">● Monitor dijeda (VPN belum tersambung)</string>
     <string name="traffic_connecting_api">Menyambung ke Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Total unggah: %1$s  |  Total unduh: %2$s</string>
-    <string name="stun_test_summary">Tentukan perilaku pemetaan NAT klien dan perilaku
-        penyaringan NAT yang didefinisikan dalam RFC 3478 menggunakan STUN.</string>
     <string name="start">Mulai</string>
-    <string name="stun_attest_loading">Ini mungkin memakan beberapa menit…</string>
-    <string name="nat_stun_server_hint">Server STUN</string>
-    <string name="nat_result_hint">Hasil pemeriksaan NAT</string>
     <string name="tools_network">Jaringan</string>
     <string name="backup">Cadangan</string>
     <string name="backup_groups_and_configurations">Grup dan konfigurasi</string>
@@ -832,7 +826,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="speed_test_finished_summary">Selesai: %1$d, gagal: %2$d, dibatalkan: %3$d</string>
     <string name="spoof_user_agent">User-Agent bawaan</string>
     <string name="spoof_user_agent_summary">Digunakan untuk pembaruan langganan saat langganan tidak memiliki User-Agent sendiri</string>
-    <string name="stun_binding_test">Pengikatan cepat (hanya alamat eksternal)</string>
     <string name="wireguard_listen_port">Porta dengar</string>
     <string name="wireguard_persistent_keepalive">Interval keepalive persisten (detik)</string>
     <string name="wireguard_peer_allowed_ips">IP Diizinkan Rekan</string>

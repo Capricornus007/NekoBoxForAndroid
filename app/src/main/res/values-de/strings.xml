@@ -378,7 +378,6 @@
     <string name="speed_test_finished_summary">Abgeschlossen: %1$d, fehlgeschlagen: %2$d, abgebrochen: %3$d</string>
     <string name="spoof_user_agent">Standard-User-Agent</string>
     <string name="spoof_user_agent_summary">Wird für Abo-Aktualisierungen verwendet, wenn das Abo keinen eigenen User-Agent hat</string>
-    <string name="stun_binding_test">Schnelle Bindung (nur externe Adresse)</string>
     <string name="use_system_theme">Systemdesign verwenden</string>
     <string name="use_system_theme_summary">Systemdynamische Farben verwenden (Android 12+)</string>
     <string name="disable_mixed_inbound">Gemischten Eingang deaktivieren</string>
@@ -523,7 +522,6 @@
     <string name="pcap_notice">Pcap-Dateien werden unter %s gespeichert</string>
     <string name="naive_insecure_concurrency">Unsichere Nebenläufigkeit</string>
     <string name="naive_insecure_concurrency_summary">N gleichzeitige Tunnelverbindungen für mehr Robustheit bei schlechten Bedingungen verwenden</string>
-    <string name="stun_test">NAT-Verhalten ermitteln</string>
 
     <string name="traffic_chart_title">Echtzeit-Traffic &amp; Verbindungen</string>
     <string name="traffic_chart_summary">Echtzeit-Geschwindigkeitsdiagramm anzeigen und aktive Verbindungen verwalten</string>
@@ -543,10 +541,6 @@
     <string name="traffic_monitor_waiting">● Überwachung pausiert (VPN nicht verbunden)</string>
     <string name="traffic_connecting_api">Verbinde mit Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Gesamt-Upload: %1$s  |  Gesamt-Download: %2$s</string>
-    <string name="stun_test_summary">NAT-Mapping-Verhalten und NAT-Filterung des Clients bestimmen</string>
-    <string name="stun_attest_loading">Das kann einige Minuten dauern…</string>
-    <string name="nat_stun_server_hint">STUN-Server</string>
-    <string name="nat_result_hint">NAT-Prüfergebnis</string>
     <string name="tools_network">Netzwerk</string>
     <string name="backup">Backup</string>
     <string name="backup_groups_and_configurations">Gruppen und Konfigurationen</string>

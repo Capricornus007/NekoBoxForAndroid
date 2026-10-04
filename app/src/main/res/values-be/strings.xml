@@ -152,7 +152,6 @@
     <string name="speed_test_finished_summary">Завершана: %1$d, з правалам: %2$d, скасавана: %3$d</string>
     <string name="spoof_user_agent">User-Agent па змаўчанні</string>
     <string name="spoof_user_agent_summary">Выкарыстоўваецца для абнаўленняў падпіскі, калі ў падпіскі няма ўласнага User-Agent</string>
-    <string name="stun_binding_test">Хуткая привязка (толькі знешні адрас)</string>
     <string name="use_system_theme">Выкарыстоўваць сістэмную тэму</string>
     <string name="use_system_theme_summary">Выкарыстоўваць сістэмныя колеры Monet (Android 12+)</string>
     <string name="auto_switch_timeout">Аўтапереключэнне па таймауту</string>
@@ -565,7 +564,6 @@
     <string name="pcap_notice">Pcap-файлы будуць захаваны ў %s</string>
     <string name="naive_insecure_concurrency">Небяспечная паралельнасць</string>
     <string name="naive_insecure_concurrency_summary">N адначасовых злучэнняў тунэля для большай устойлівасці пры дрэнных умовах</string>
-    <string name="stun_test">Выяўленне NAT</string>
 
     <string name="traffic_chart_title">Трафік і злучэнні ў рэжыме рэальнага часу</string>
     <string name="traffic_chart_summary">Прагляд графіка хуткасці і кіраванне актыўнымі злучэннямі</string>
@@ -585,11 +583,7 @@
     <string name="traffic_monitor_waiting">● Маніторынг прыпынены (VPN не падлучаны)</string>
     <string name="traffic_connecting_api">Злучэнне з Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Усяго аддача: %1$s  |  Усяго спампоўка: %2$s</string>
-    <string name="stun_test_summary">Вызначыць паводзіны NAT кліента і фільтрацыю</string>
     <string name="start">Старт</string>
-    <string name="stun_attest_loading">Гэта можа заняць некалькі хвілін…</string>
-    <string name="nat_stun_server_hint">STUN-сервер</string>
-    <string name="nat_result_hint">Вынік праверкі NAT</string>
     <string name="backup">Рэзервовае капіраванне</string>
     <string name="backup_groups_and_configurations">Групы і канфігурацыі</string>
     <string name="backup_rules">Правілы маршрутызацыі</string>

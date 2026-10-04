@@ -544,7 +544,6 @@
     <string name="naive_insecure_concurrency_summary">Use N conexões de túnel simultâneas para ser mais robusto em condições de rede ruins. Mais conexões tornam o tunelamento mais fácil de detectar e menos seguro. Este projeto busca a segurança mais forte contra análise de tráfego. Usá-lo de forma insegura anula seu propósito. 
 
 Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problemas. Recomenda-se fortemente não usar mais de 4 conexões aqui.</string>
-    <string name="stun_test">Descoberta de comportamento NAT</string>
 
     <string name="traffic_chart_title">Tráfego e conexões em tempo real</string>
     <string name="traffic_chart_summary">Veja o gráfico de velocidade em tempo real e gerencie conexões ativas</string>
@@ -564,11 +563,7 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="traffic_monitor_waiting">● Monitoramento pausado (VPN não conectado)</string>
     <string name="traffic_connecting_api">Conectando à Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Total enviado: %1$s  |  Total recebido: %2$s</string>
-    <string name="stun_test_summary">Determine o comportamento de mapeamento NAT do cliente e o comportamento de filtragem NAT definido na RFC 3478 usando STUN.</string>
     <string name="start">Iniciar</string>
-    <string name="stun_attest_loading">Isso pode levar alguns minutos…</string>
-    <string name="nat_stun_server_hint">Servidor STUN</string>
-    <string name="nat_result_hint">Resultado da verificação NAT</string>
     <string name="tools_network">Rede</string>
     <string name="backup">Backup</string>
     <string name="backup_groups_and_configurations">Grupos e configurações</string>
@@ -908,7 +903,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="speed_test_finished_summary">Concluídos: %1$d, falharam: %2$d, cancelados: %3$d</string>
     <string name="spoof_user_agent">User-Agent predefinido</string>
     <string name="spoof_user_agent_summary">Usado nas atualizações de subscrição quando a subscrição não tem User-Agent próprio</string>
-    <string name="stun_binding_test">Ligação rápida (apenas endereço externo)</string>
     <string name="batch_update_summary" formatted="false">Atualização em lote concluída: %1$d êxitos, %2$d falhas</string>
     <string name="probe_tolerance">Tolerância de alternância do balanceador (ms)</string>
     <string name="byedpi_cli_strategy">Estratégia de CLI</string>

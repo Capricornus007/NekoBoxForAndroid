@@ -439,7 +439,6 @@
     <string name="pcap_notice">PCAP-Dateien werden in %s gespeichert</string>
     <string name="naive_insecure_concurrency">Unsicheres Concurrency</string>
     <string name="naive_insecure_concurrency_summary">Verwenden Sie N gleichzeitige Tunnelverbindungen, um unter schlechten Netzwerkbedingungen robuster zu sein. Mehr Verbindungen machen das Tunneling leichter erkennbar und weniger sicher. Dieses Projekt strebt die stärkste Sicherheit gegen Verkehrsanalyse an. Die Verwendung auf unsichere Weise widerspricht seinem Zweck. \n\nWenn Sie dies verwenden müssen, versuchen Sie zuerst N=2, um zu sehen, ob es Ihre Probleme löst. Es wird dringend davon abgeraten, hier mehr als 4 Verbindungen zu verwenden.</string>
-    <string name="stun_test">NAT-Verhaltenserkennung</string>
 
     <string name="traffic_chart_title">Echtzeit-Traffic &amp; Verbindungen</string>
     <string name="traffic_chart_summary">Echtzeit-Geschwindigkeitsdiagramm anzeigen und aktive Verbindungen verwalten</string>
@@ -459,11 +458,7 @@
     <string name="traffic_monitor_waiting">● Überwachung pausiert (VPN nicht verbunden)</string>
     <string name="traffic_connecting_api">Verbinde mit Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Gesamt-Upload: %1$s  |  Gesamt-Download: %2$s</string>
-    <string name="stun_test_summary">Bestimmen Sie das NAT-Mapping-Verhalten und das NAT-Filterverhalten des Clients gemäß RFC 3478 mit STUN.</string>
     <string name="start">Starten</string>
-    <string name="stun_attest_loading">Dies kann einige Minuten dauern…</string>
-    <string name="nat_stun_server_hint">STUN-Server</string>
-    <string name="nat_result_hint">NAT-Prüfergebnis</string>
     <string name="tools_network">Netzwerk</string>
     <string name="backup">Sicherung</string>
     <string name="backup_groups_and_configurations">Gruppen und Konfigurationen</string>
@@ -900,7 +895,6 @@
     <string name="speed_test_finished_summary">Abgeschlossen: %1$d, fehlgeschlagen: %2$d, abgebrochen: %3$d</string>
     <string name="spoof_user_agent">Standard-User-Agent</string>
     <string name="spoof_user_agent_summary">Wird für Abo-Aktualisierungen verwendet, wenn das Abo keinen eigenen User-Agent hat</string>
-    <string name="stun_binding_test">Schnelle Bindung (nur externe Adresse)</string>
     <string name="hide_unavailable_profiles">Nicht verfügbare Profile ausblenden</string>
     <string name="default_subscription_user_agent">Standard-Abonnement-User-Agent</string>
     <string name="ua_updated_toast">User-Agent aktualisiert</string>

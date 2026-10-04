@@ -419,7 +419,6 @@
     <string name="pcap_notice">Pcap ファイルは %s に保存されます</string>
     <string name="naive_insecure_concurrency">安全でない同時接続</string>
     <string name="naive_insecure_concurrency_summary">悪いネットワーク状況下での堅牢性を高めるため、N 個の同時トンネル接続を使用します。接続数が増えるとトンネリングが検出されやすくなり、安全性が低下します。本プロジェクトはトラフィック解析に対する最強のセキュリティを目指しています。安全でない方法で使用すると、その目的が損なわれます。\n\nどうしても使用する必要がある場合は、まず N=2 を試して問題が解決するか確認してください。ここで 4 接続を超えて使用することは強くお勧めしません。</string>
-    <string name="stun_test">NAT 動作の検出</string>
 
     <string name="traffic_chart_title">リアルタイム通信量と接続</string>
     <string name="traffic_chart_summary">リアルタイム速度グラフの表示とアクティブ接続の管理</string>
@@ -439,11 +438,7 @@
     <string name="traffic_monitor_waiting">● 監視一時停止（VPN 未接続）</string>
     <string name="traffic_connecting_api">Clash API (127.0.0.1:9090) に接続中…</string>
     <string name="traffic_total_updown">合計アップ: %1$s ｜ 合計ダウン: %2$s</string>
-    <string name="stun_test_summary">STUN を使用して、RFC 3478 で定義されたクライアントの NAT マッピング動作と NAT フィルタリング動作を判定します。</string>
     <string name="start">開始</string>
-    <string name="stun_attest_loading">数分かかる場合があります…</string>
-    <string name="nat_stun_server_hint">STUN サーバー</string>
-    <string name="nat_result_hint">NAT チェック結果</string>
     <string name="tools_network">ネットワーク</string>
     <string name="backup">バックアップ</string>
     <string name="backup_groups_and_configurations">グループと設定</string>
@@ -656,7 +651,6 @@
     <string name="speed_test_finished_summary">完了: %1$d、失敗: %2$d、キャンセル: %3$d</string>
     <string name="spoof_user_agent">既定の User-Agent</string>
     <string name="spoof_user_agent_summary">サブスクリプションが独自の User-Agent を持たない場合の更新に使用されます</string>
-    <string name="stun_binding_test">クイックバインド（外部アドレスのみ）</string>
     <string name="wireguard_listen_port">リッスンポート</string>
     <string name="wireguard_persistent_keepalive">持続的キープアライブ間隔（秒）</string>
     <string name="wireguard_peer_allowed_ips">ピアの許可 IP</string>

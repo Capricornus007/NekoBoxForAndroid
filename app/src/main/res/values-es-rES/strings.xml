@@ -447,7 +447,6 @@
 
 Si debe usarlo, pruebe N=2 primero para
         ver si resuelve sus problemas. Se recomienda encarecidamente no usar más de 4 conexiones aquí.</string>
-    <string name="stun_test">Descubrimiento de comportamiento NAT</string>
 
     <string name="traffic_chart_title">Tráfico y conexiones en tiempo real</string>
     <string name="traffic_chart_summary">Ver gráfico de velocidad en tiempo real y gestionar conexiones activas</string>
@@ -467,12 +466,7 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="traffic_monitor_waiting">● Monitoreo en pausa (VPN no conectado)</string>
     <string name="traffic_connecting_api">Conectando a Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Total subido: %1$s  |  Total descargado: %2$s</string>
-    <string name="stun_test_summary">Determine el comportamiento de mapeo NAT del cliente y el
-        comportamiento de filtrado NAT definido en RFC 3478 usando STUN.</string>
     <string name="start">Iniciar</string>
-    <string name="stun_attest_loading">Esto puede tardar unos minutos…</string>
-    <string name="nat_stun_server_hint">Servidor STUN</string>
-    <string name="nat_result_hint">Resultado de verificación NAT</string>
     <string name="tools_network">Red</string>
     <string name="backup">Copia de seguridad</string>
     <string name="backup_groups_and_configurations">Grupos y configuraciones</string>
@@ -910,7 +904,6 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="speed_test_finished_summary">Finalizado: %1$d, fallidos: %2$d, cancelados: %3$d</string>
     <string name="spoof_user_agent">User-Agent predeterminado</string>
     <string name="spoof_user_agent_summary">Se usa en las actualizaciones de suscripción cuando la suscripción no tiene User-Agent propio</string>
-    <string name="stun_binding_test">Vinculación rápida (solo dirección externa)</string>
     <string name="hide_unavailable_profiles">Ocultar perfiles no disponibles</string>
     <string name="default_subscription_user_agent">User-Agent de suscripción predeterminado</string>
     <string name="ua_updated_toast">User-Agent actualizado</string>

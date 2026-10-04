@@ -296,8 +296,6 @@
     <string name="naive_insecure_concurrency_summary">Использовать N параллельных соединений для повышения отказоустойчивости в условиях ненадёжной сети. Большее число соединений увеличивает риск обнаружения туннелей и снижает безопасность. Этот проект стремится к максимальной защите от анализа трафика, следовательно, использование его небезопасным образом противоречит данной цели. 
  
 Если придётся использовать данную функцию, попробуйте N=2, чтобы проверить, решит ли это проблему. Настоятельно не рекомендуется использовать более 4 соединений.</string>
-    <string name="nat_result_hint">Провести проверку NAT</string>
-    <string name="nat_stun_server_hint">STUN сервер</string>
     <string name="need_reload">Перезагрузите прокси-сервис, чтобы применить изменения</string>
     <string name="need_restart">Перезапустите приложение для применения изменений</string>
     <string name="network">Сеть</string>
@@ -470,8 +468,6 @@
     <string name="status_bar_notification_info_overflow">&gt;999</string>
     <string name="stop">Остановить</string>
     <string name="stopping">Выключение…</string>
-    <string name="stun_attest_loading">Пожалуйста, подождите…</string>
-    <string name="stun_test">Обнаружение поведения NAT</string>
 
     <string name="traffic_chart_title">Трафик и соединения в реальном времени</string>
     <string name="traffic_chart_summary">График скорости в реальном времени и управление активными соединениями</string>
@@ -491,7 +487,6 @@
     <string name="traffic_monitor_waiting">● Мониторинг приостановлен (VPN не подключён)</string>
     <string name="traffic_connecting_api">Подключение к Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Всего отдано: %1$s  |  Всего загружено: %2$s</string>
-    <string name="stun_test_summary">Определить поведение сопоставления адресов NAT и поведение фильтрации NAT в соответствии с RFC 5780 при помощи STUN.</string>
     <string name="subscription">Подписка</string>
     <string name="subscription_expire">Истекает: %s</string>
     <string name="subscription_import">Импортировать подписку</string>
@@ -731,7 +726,6 @@
     <string name="speed_test_finished_summary">Завершено: %1$d, с ошибкой: %2$d, отменено: %3$d</string>
     <string name="spoof_user_agent">User-Agent по умолчанию</string>
     <string name="spoof_user_agent_summary">Используется при обновлениях подписки, если у подписки нет своего User-Agent</string>
-    <string name="stun_binding_test">Быстрая привязка (только внешний адрес)</string>
     <string name="use_system_theme">Использовать системную тему</string>
     <string name="use_system_theme_summary">Использовать системные цвета Monet (Android 12+)</string>
     <string name="quick_clear_cache_restart">Перезапуск после очистки</string>

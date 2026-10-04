@@ -558,7 +558,6 @@
     <string name="pcap_notice">Файли Pcap будуть збережені у %s</string>
     <string name="naive_insecure_concurrency">Небезпечна одночасність</string>
     <string name="naive_insecure_concurrency_summary">Використовуйте N одночасних тунельних з\'єднань для підвищення стійкості в поганих мережевих умовах. Більше з\'єднань робить тунелювання більш помітним і менш безпечним. Цей проект прагне до найсильнішої безпеки проти аналізу трафіку. Використання його в небезпечний спосіб зводить нанівець його мету. \n\nЯкщо ви повинні використовувати це, спробуйте спочатку N=2, щоб побачити, чи вирішить це ваші проблеми. Наполегливо рекомендуємо не використовувати більше 4 з\'єднань.</string>
-    <string name="stun_test">Визначення поведінки NAT</string>
 
     <string name="traffic_chart_title">Трафік і з\'єднання в реальному часі</string>
     <string name="traffic_chart_summary">Графік швидкості в реальному часі та керування активними з\'єднаннями</string>
@@ -578,11 +577,7 @@
     <string name="traffic_monitor_waiting">● Моніторинг призупинено (VPN не підключено)</string>
     <string name="traffic_connecting_api">З\'єднання з Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Всього віддано: %1$s  |  Всього завантажено: %2$s</string>
-    <string name="stun_test_summary">Визначення поведінки NAT-мапування та NAT-фільтрації клієнта, визначеної в RFC 3478, за допомогою STUN.</string>
     <string name="start">Почати</string>
-    <string name="stun_attest_loading">Це може зайняти кілька хвилин…</string>
-    <string name="nat_stun_server_hint">STUN сервер</string>
-    <string name="nat_result_hint">Результат перевірки NAT</string>
     <string name="tools_network">Мережа</string>
     <string name="backup">Резервне копіювання</string>
     <string name="backup_groups_and_configurations">Групи та конфігурації</string>
@@ -718,7 +713,6 @@
     <string name="speed_test_finished_summary">Завершено: %1$d, з помилкою: %2$d, скасовано: %3$d</string>
     <string name="spoof_user_agent">User-Agent за замовчуванням</string>
     <string name="spoof_user_agent_summary">Використовується для оновлень підписки, якщо підписка не має власного User-Agent</string>
-    <string name="stun_binding_test">Швидка прив\'язка (лише зовнішня адреса)</string>
     <string name="use_system_theme">Використовувати системну тему</string>
     <string name="use_system_theme_summary">Використовувати системні кольори Monet (Android 12+)</string>
     <string name="disable_mixed_inbound">Вимкнути змішаний вхід</string>

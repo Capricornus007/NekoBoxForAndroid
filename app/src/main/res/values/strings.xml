@@ -602,7 +602,6 @@
         Using it in an insecure way defeats its purpose. \n\nIf you must use this, try N=2 first to
         see if it solves your issues. Strongly recommend against using more than 4 connections here.</string>
 
-    <string name="stun_test">NAT behaviour discovery</string>
 
     <string name="traffic_chart_title">Real-time Traffic &amp; Connections</string>
     <string name="traffic_chart_summary">View real-time speed chart and manage active connections</string>
@@ -622,13 +621,7 @@
     <string name="traffic_monitor_waiting">● Monitoring paused (VPN not connected)</string>
     <string name="traffic_connecting_api">Connecting to Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Total up: %1$s  |  Total down: %2$s</string>
-    <string name="stun_test_summary">Determine the client\'s NAT mapping behaviour and the NAT
-        filtering behaviour defined in RFC 3478 using STUN.</string>
-    <string name="stun_binding_test">Quick binding (external address only)</string>
     <string name="start">Start</string>
-    <string name="stun_attest_loading">This may take a few minutes…</string>
-    <string name="nat_stun_server_hint">Stun server</string>
-    <string name="nat_result_hint">NAT check result</string>
     <string name="tools_network">Network</string>
     <string name="mtu" translatable="false">MTU</string>
 

@@ -550,7 +550,6 @@ Aanbeveling: Schakel dit alleen in als u alle geïnstalleerde apps vertrouwt.</s
     <string name="naive_insecure_concurrency_summary">Gebruik N gelijktijdige tunnelverbindingen om robuuster te zijn onder slechte netwerkomstandigheden. Meer verbindingen maken het tunnelen gemakkelijker te detecteren en minder veilig. Dit project streeft naar de sterkste beveiliging tegen verkeersanalyse. Het op een onveilige manier gebruiken verslaat het doel. 
 
 Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen oplost. Sterk afgeraden om hier meer dan 4 verbindingen te gebruiken.</string>
-    <string name="stun_test">NAT-gedrag detectie</string>
 
     <string name="traffic_chart_title">Realtime verkeer &amp; verbindingen</string>
     <string name="traffic_chart_summary">Bekijk realtime snelheidsgrafiek en beheer actieve verbindingen</string>
@@ -570,11 +569,7 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="traffic_monitor_waiting">● Monitoring gepauzeerd (VPN niet verbonden)</string>
     <string name="traffic_connecting_api">Verbinden met Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Totaal upload: %1$s  |  Totaal download: %2$s</string>
-    <string name="stun_test_summary">Bepaal het NAT-mappinggedrag van de client en het NAT-filtergedrag zoals gedefinieerd in RFC 3478 met behulp van STUN.</string>
     <string name="start">Start</string>
-    <string name="stun_attest_loading">Dit kan een paar minuten duren…</string>
-    <string name="nat_stun_server_hint">STUN-server</string>
-    <string name="nat_result_hint">NAT-controresultaat</string>
     <string name="tools_network">Netwerk</string>
     <string name="backup">Back-up</string>
     <string name="backup_groups_and_configurations">Groepen en configuraties</string>
@@ -821,7 +816,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="speed_test_finished_summary">Voltooid: %1$d, mislukt: %2$d, geannuleerd: %3$d</string>
     <string name="spoof_user_agent">Standaard User-Agent</string>
     <string name="spoof_user_agent_summary">Wordt gebruikt voor abonnementsupdates wanneer het abonnement geen eigen User-Agent heeft</string>
-    <string name="stun_binding_test">Snelle binding (alleen extern adres)</string>
     <string name="wireguard_listen_port">Luisterpoort</string>
     <string name="wireguard_persistent_keepalive">Persistente keepalive-interval (seconden)</string>
     <string name="wireguard_peer_allowed_ips">Toegestane IP\'s van peer</string>

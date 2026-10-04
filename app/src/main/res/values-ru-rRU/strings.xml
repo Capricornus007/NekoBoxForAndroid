@@ -443,7 +443,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="pcap_notice">Файлы pcap будут сохранены в %s</string>
     <string name="naive_insecure_concurrency">Небезопасный параллелизм</string>
     <string name="naive_insecure_concurrency_summary">Использовать N параллельных туннельных соединений для повышения устойчивости при плохих сетевых условиях. Больше соединений облегчает обнаружение туннелирования и снижает безопасность. \n\nЕсли вы должны использовать это, начните с N=2, чтобы проверить, решает ли это ваши проблемы. Настоятельно не рекомендуется использовать более 4 соединений.</string>
-    <string name="stun_test">Обнаружение поведения NAT</string>
 
     <string name="traffic_chart_title">Трафик и соединения в реальном времени</string>
     <string name="traffic_chart_summary">График скорости в реальном времени и управление активными соединениями</string>
@@ -463,11 +462,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="traffic_monitor_waiting">● Мониторинг приостановлен (VPN не подключён)</string>
     <string name="traffic_connecting_api">Подключение к Clash API (127.0.0.1:9090)…</string>
     <string name="traffic_total_updown">Всего отдано: %1$s  |  Всего загружено: %2$s</string>
-    <string name="stun_test_summary">Определить поведение NAT-маппинга и фильтрации NAT, описанное в RFC 3478, с помощью STUN.</string>
     <string name="start">Запустить</string>
-    <string name="stun_attest_loading">Это может занять несколько минут…</string>
-    <string name="nat_stun_server_hint">STUN сервер</string>
-    <string name="nat_result_hint">Результат проверки NAT</string>
     <string name="tools_network">Сеть</string>
     <string name="backup">Резервное копирование</string>
     <string name="backup_groups_and_configurations">Группы и конфигурации</string>
@@ -959,7 +954,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="speed_test_finished_summary">Завершено: %1$d, с ошибкой: %2$d, отменено: %3$d</string>
     <string name="spoof_user_agent">User-Agent по умолчанию</string>
     <string name="spoof_user_agent_summary">Используется при обновлениях подписки, если у подписки нет своего User-Agent</string>
-    <string name="stun_binding_test">Быстрая привязка (только внешний адрес)</string>
     <string name="hide_unavailable_profiles">Скрыть недоступные профили</string>
     <string name="default_subscription_user_agent">User-Agent подписки по умолчанию</string>
     <string name="ua_updated_toast">User-Agent обновлён</string>
