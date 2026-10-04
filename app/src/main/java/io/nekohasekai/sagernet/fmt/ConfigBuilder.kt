@@ -1367,7 +1367,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         }
                     }
                     if (rule.network.isNotBlank()) {
-                        network = listOf(rule.network)
+                        // 選單是單選，但從 V2 備份還原回來的規則（BackupFormatV2.decodeRule）是把
+                        // JSON 字串原樣塞進 network 欄位，可能帶 "tcp,udp" 這種多值；整串塞成
+                        // 一個 item 核心永遠比不中，照逗號/換行拆開才對（own 4dc26e047）。
+                        network = rule.network.listByLineOrComma()
                     }
                     if (rule.source.isNotBlank()) {
                         source_ip_cidr = rule.source.listByLineOrComma()

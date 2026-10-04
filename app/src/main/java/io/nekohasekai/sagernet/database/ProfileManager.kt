@@ -311,7 +311,40 @@ object ProfileManager {
                 )
             }
             rules = SagerDatabase.rulesDao.allRules()
+        } else if (rules.isNotEmpty()) {
+            if (enrichPlayStoreRules(rules)) {
+                rules = SagerDatabase.rulesDao.allRules()
+            }
         }
         return rules
+    }
+
+    // 舊安裝的「Google Play」規則是在 CDN 網域與下載方套件補齊之前建好的，只改首建清單救不到他們：
+    // 那條規則缺 gvt*/playstoregatewayadapter 那批域，安裝會卡在 0%；也缺 packages，所以它對全機
+    // 生效、白吃代理流量。這裡就地補一次（own 1a27397dd 的遷移思路）。
+    //
+    // 跟 own 的差別：只認「走代理（outbound == 0）且已含 domain:googleapis.cn 或 com.android.vending」
+    // 的規則，避免把使用者自己寫的 googleapis.cn 直連/封鎖規則一起改壞；補齊的內容直接復用
+    // PLAY_STORE_DOMAINS/PLAY_STORE_PACKAGES，不再抄一份清單。補過一次之後條件就不再成立，不會
+    // 每次進頁面都寫庫；原規則裡多出來的欄位一律保留。
+    private suspend fun enrichPlayStoreRules(rules: List<RuleEntity>): Boolean {
+        val wantedDomains = PLAY_STORE_DOMAINS.split("\n")
+        var changed = false
+        rules.forEach { rule ->
+            if (rule.outbound != 0L) return@forEach
+            val haveDomains = rule.domains.lineSequence().map { it.trim() }
+                .filter { it.isNotBlank() }.toSet()
+            if (!haveDomains.contains("domain:googleapis.cn") && !rule.packages.contains("com.android.vending")) {
+                return@forEach
+            }
+            val missingDomains = wantedDomains.filterNot { it in haveDomains }
+            val missingPackages = PLAY_STORE_PACKAGES - rule.packages
+            if (missingDomains.isEmpty() && missingPackages.isEmpty()) return@forEach
+            rule.domains = (haveDomains + missingDomains).joinToString("\n")
+            rule.packages = rule.packages + missingPackages
+            SagerDatabase.rulesDao.updateRule(rule)
+            changed = true
+        }
+        return changed
     }
 }
