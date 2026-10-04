@@ -62,11 +62,112 @@ class ActiveOutboundTrackerTest {
         }
 
         val title = ActiveOutboundTracker.formatNotificationTitle(balancer)
-        assertEquals("自动选择", title)
+        assertEquals("自动选择 · 最低延迟", title)
 
         ActiveOutboundTracker.updateActiveLeaf(101L, "日本 02")
         val leafDisplay = ActiveOutboundTracker.getActiveLeafNodeDisplay(balancer)
         assertEquals("日本 02", leafDisplay)
+    }
+
+    @Test
+    fun testBuildNotificationTextsTemplate1_StrategyGroupShowGroupOn() {
+        val balancer = ProxyEntity().apply {
+            id = 1L
+            type = ProxyEntity.TYPE_BALANCER
+            putBean(BalancerBean().apply {
+                name = "🇯🇵日本"
+                strategy = BalancerBean.STRATEGY_LEAST_PING
+            })
+        }
+        val bundle = ActiveOutboundTracker.buildNotificationTexts(
+            profile = balancer,
+            leafNode = "🇯🇵Japan 01",
+            strategyName = "最低延迟",
+            groupName = "机场订阅",
+            showGroup = true,
+            showDirectSpeed = true,
+            proxySpeed = "↑1.2 KB/s ↓5.4 KB/s",
+            directSpeed = "↑0 B/s ↓120 B/s"
+        )
+        assertEquals("🇯🇵日本 · 最低延迟", bundle.title)
+        assertEquals("当前: 🇯🇵Japan 01 · 代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.collapsedText)
+        assertEquals("当前: 🇯🇵Japan 01\n代理: ↑1.2 KB/s ↓5.4 KB/s\n直连: ↑0 B/s ↓120 B/s", bundle.bigText)
+        assertTrue(!bundle.collapsedText.contains("当前节点"))
+        assertTrue(!bundle.bigText.contains("当前节点"))
+    }
+
+    @Test
+    fun testBuildNotificationTextsTemplate2_StrategyGroupShowGroupOff() {
+        val balancer = ProxyEntity().apply {
+            id = 1L
+            type = ProxyEntity.TYPE_BALANCER
+            putBean(BalancerBean().apply {
+                name = "🇯🇵日本"
+                strategy = BalancerBean.STRATEGY_LEAST_PING
+            })
+        }
+        val bundle = ActiveOutboundTracker.buildNotificationTexts(
+            profile = balancer,
+            leafNode = "🇯🇵Japan 01",
+            strategyName = "最低延迟",
+            groupName = "机场订阅",
+            showGroup = false,
+            showDirectSpeed = true,
+            proxySpeed = "↑1.2 KB/s ↓5.4 KB/s",
+            directSpeed = "↑0 B/s ↓120 B/s"
+        )
+        assertEquals("🇯🇵Japan 01", bundle.title)
+        assertEquals("策略: 最低延迟 · 代理: ↑1.2 KB/s ↓5.4 KB/s", bundle.collapsedText)
+        assertEquals("策略: 最低延迟\n代理: ↑1.2 KB/s ↓5.4 KB/s\n直连: ↑0 B/s ↓120 B/s", bundle.bigText)
+        assertTrue(!bundle.bigText.contains("🇯🇵Japan 01")) // Leaf name not repeated in body
+    }
+
+    @Test
+    fun testBuildNotificationTextsTemplate3_SingleNodeShowGroupOn() {
+        val singleNode = ProxyEntity().apply {
+            id = 100L
+            type = 0
+            putBean(ShadowsocksBean().apply {
+                name = "🇸🇬新加坡·移联02"
+            })
+        }
+        val bundle = ActiveOutboundTracker.buildNotificationTexts(
+            profile = singleNode,
+            leafNode = null,
+            strategyName = "规则分流",
+            groupName = "吹雪云",
+            showGroup = true,
+            showDirectSpeed = true,
+            proxySpeed = "↑0 B/s ↓0 B/s",
+            directSpeed = "↑10 B/s ↓20 B/s"
+        )
+        assertEquals("吹雪云 · 🇸🇬新加坡·移联02", bundle.title)
+        assertEquals("代理: ↑0 B/s ↓0 B/s", bundle.collapsedText)
+        assertEquals("代理: ↑0 B/s ↓0 B/s\n直连: ↑10 B/s ↓20 B/s", bundle.bigText)
+    }
+
+    @Test
+    fun testBuildNotificationTextsTemplate4_SingleNodeShowGroupOff() {
+        val singleNode = ProxyEntity().apply {
+            id = 100L
+            type = 0
+            putBean(ShadowsocksBean().apply {
+                name = "🇸🇬新加坡·移联02"
+            })
+        }
+        val bundle = ActiveOutboundTracker.buildNotificationTexts(
+            profile = singleNode,
+            leafNode = null,
+            strategyName = "规则分流",
+            groupName = "吹雪云",
+            showGroup = false,
+            showDirectSpeed = false,
+            proxySpeed = "↑0 B/s ↓0 B/s",
+            directSpeed = "↑0 B/s ↓0 B/s"
+        )
+        assertEquals("🇸🇬新加坡·移联02", bundle.title)
+        assertEquals("代理: ↑0 B/s ↓0 B/s", bundle.collapsedText)
+        assertEquals("代理: ↑0 B/s ↓0 B/s", bundle.bigText)
     }
 
     @Test

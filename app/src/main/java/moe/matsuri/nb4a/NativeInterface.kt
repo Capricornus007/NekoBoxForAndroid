@@ -313,7 +313,7 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
                 )
 
                 if (isBalancer || isGroupStrategy) {
-                    val memberMap = runCatching { data.proxy?.config?.balancerMemberMap?.get(activeProfile?.id) }.getOrNull()
+                    val memberMap = runCatching { data.proxy?.safeConfig?.balancerMemberMap?.get(activeProfile?.id) }.getOrNull()
                         ?: if (isGroupStrategy) runCatching { SagerDatabase.proxyDao.getByGroup(group!!.id).map { it.id } }.getOrNull() else null
                     if (memberMap != null && id in memberMap) {
                         ActiveOutboundTracker.updateActiveLeaf(id, ent.displayName())

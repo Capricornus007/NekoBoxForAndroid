@@ -112,15 +112,17 @@ class TrafficLooper
             ignore = true
             // post traffic when switch
             if (DataStore.profileTrafficStatistics) {
-                data.proxy?.config?.trafficMap?.get(tag)?.firstOrNull()?.let {
+                data.proxy?.safeConfig?.trafficMap?.get(tag)?.firstOrNull()?.let {
                     it.rx = rx
                     it.tx = tx
                     ProfileManager.updateTraffic(it.id, it.rx, it.tx)
                 }
             }
         }
+        val currentConfig = data.proxy?.safeConfig
+        val balancerMembers = currentConfig?.balancerMemberMap
         // If old proxy was balancer, set old members to ignore = true
-        data.proxy?.config?.balancerMemberMap?.get(selectorNowId)?.forEach { memberId ->
+        balancerMembers?.get(selectorNowId)?.forEach { memberId ->
             idMap[memberId]?.ignore = true
         }
 
@@ -132,7 +134,7 @@ class TrafficLooper
         }
 
         // If new proxy is balancer, set new members to ignore = false
-        data.proxy?.config?.balancerMemberMap?.get(id)?.forEach { memberId ->
+        balancerMembers?.get(id)?.forEach { memberId ->
             idMap[memberId]?.ignore = false
         }
     }
@@ -150,7 +152,7 @@ class TrafficLooper
                 }
             }
 
-            data.proxy?.config?.trafficMap?.values?.forEach { entities ->
+            data.proxy?.safeConfig?.trafficMap?.values?.forEach { entities ->
                 entities.forEach { entity ->
                     if (entity.id in targetIds) {
                         entity.tx = 0L
@@ -209,13 +211,16 @@ class TrafficLooper
             if (!proxy.isInitialized()) continue
 
             val snapshot = withStateLock {
+                val currentConfig = proxy.safeConfig ?: return@withStateLock null
+                val balancerMemberMap = currentConfig.balancerMemberMap
+
                 if (trafficUpdater == null) {
                     idMap.clear()
                     tagMap.clear()
                     idMap[-1] = itemBypass
                     //
                     val tags = hashSetOf(TAG_PROXY, TAG_BYPASS)
-                    proxy.config.trafficMap.forEach { (tag, ents) ->
+                    currentConfig.trafficMap.forEach { (tag, ents) ->
                         tags.add(tag)
                         for (ent in ents) {
                             val item = TrafficUpdater.TrafficLooperData(
@@ -224,17 +229,17 @@ class TrafficLooper
                                 tx = ent.tx,
                                 rxBase = ent.rx,
                                 txBase = ent.tx,
-                                ignore = proxy.config.selectorGroupId >= 0L,
+                                ignore = currentConfig.selectorGroupId >= 0L,
                             )
                             idMap[ent.id] = item
                             tagMap[tag] = item
                             Logs.d("traffic count $tag to ${ent.id}")
                         }
                     }
-                    if (proxy.config.selectorGroupId >= 0L) {
-                        selectMainLocked(proxy.config.mainEntId)
+                    if (currentConfig.selectorGroupId >= 0L) {
+                        selectMainLocked(currentConfig.mainEntId)
                     } else {
-                        proxy.config.balancerMemberMap.values.forEach { memberIds ->
+                        balancerMemberMap.values.forEach { memberIds ->
                             memberIds.forEach { idMap[it]?.ignore = false }
                         }
                     }
@@ -249,7 +254,7 @@ class TrafficLooper
                 currentCoroutineContext().ensureActive()
 
                 // Accumulate member traffic into Balancer entity
-                proxy.config.balancerMemberMap.forEach { (balancerId, memberIds) ->
+                balancerMemberMap.forEach { (balancerId, memberIds) ->
                     val balancerItem = idMap[balancerId] ?: return@forEach
                     val members = memberIds.filter { it != balancerId }.mapNotNull { idMap[it] }
                     if (members.isNotEmpty()) {
@@ -285,7 +290,7 @@ class TrafficLooper
                 var mainRxRate = 0L
                 var mainTx = 0L
                 var mainRx = 0L
-                val balancerMemberIds = proxy.config.balancerMemberMap.entries.flatMap { (bId, mIds) ->
+                val balancerMemberIds = balancerMemberMap.entries.flatMap { (bId, mIds) ->
                     mIds.filter { it != bId }
                 }.toSet()
                 idMap.forEach { (id, it) ->
@@ -307,7 +312,7 @@ class TrafficLooper
                         }
                     }
                 }
-                val snapshot = LoopSnapshot(
+                val loopSnapshot = LoopSnapshot(
                     speed = SpeedDisplayData(
                         mainTxRate,
                         mainRxRate,
@@ -327,9 +332,9 @@ class TrafficLooper
                         if (data.binder.callbackIdMap[callback] ==
                             SagerConnection.CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND
                         ) {
-                            callback.cbSpeedUpdate(snapshot.speed)
-                            if (snapshot.trafficUpdates.isNotEmpty()) {
-                                snapshot.trafficUpdates.chunked(TRAFFIC_BATCH_SIZE).forEach {
+                            callback.cbSpeedUpdate(loopSnapshot.speed)
+                            if (loopSnapshot.trafficUpdates.isNotEmpty()) {
+                                loopSnapshot.trafficUpdates.chunked(TRAFFIC_BATCH_SIZE).forEach {
                                     callback.cbTrafficUpdate(TrafficDataBatch(ArrayList(it)))
                                 }
                             }
@@ -341,7 +346,11 @@ class TrafficLooper
                     proxy.displayProfileName = newTitle
                     data.notification?.postNotificationTitle(newTitle)
                 }
-                snapshot
+                loopSnapshot
+            }
+            if (snapshot == null) {
+                delay(if (isForegroundUI) baseDelayMs else 3000L)
+                continue
             }
             currentCoroutineContext().ensureActive()
 

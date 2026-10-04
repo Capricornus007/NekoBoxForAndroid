@@ -90,6 +90,12 @@ object ActiveOutboundTracker {
         return null
     }
 
+    data class NotificationTextBundle(
+        val title: String,
+        val collapsedText: String,
+        val bigText: String,
+    )
+
     fun formatNotificationTitle(
         profile: ProxyEntity,
         isGlobalMode: Boolean? = null
@@ -110,10 +116,117 @@ object ActiveOutboundTracker {
                 return leafNode
             }
             // 用户开启了“显示分组”（或尚未检测到叶子节点）：主标题为策略组自身的名字
-            return if (isBalancer) profile.displayName() else (group?.displayName() ?: profile.displayName())
+            val baseName = if (isBalancer) profile.displayName() else (group?.displayName() ?: profile.displayName())
+            val strategyName = getStrategyDisplayName(profile)
+            val cleanStrategy = if (strategyName == "策略组") "" else strategyName
+            return if (cleanStrategy.isNotBlank() && !baseName.contains(cleanStrategy)) {
+                "$baseName · $cleanStrategy"
+            } else {
+                baseName
+            }
         }
 
         return runCatching { ServiceNotification.genTitle(profile) }.getOrDefault(profile.displayName())
+    }
+
+    fun buildNotificationTexts(
+        profile: ProxyEntity?,
+        leafNode: String?,
+        strategyName: String,
+        groupName: String?,
+        showGroup: Boolean,
+        showDirectSpeed: Boolean,
+        proxySpeed: String,
+        directSpeed: String,
+    ): NotificationTextBundle {
+        if (profile == null) {
+            return NotificationTextBundle(
+                title = "",
+                collapsedText = "代理: $proxySpeed",
+                bigText = "代理: $proxySpeed" + if (showDirectSpeed) "\n直连: $directSpeed" else ""
+            )
+        }
+
+        val isBalancer = profile.type == ProxyEntity.TYPE_BALANCER
+        val isGroupStrategy = groupName != null && (
+            runCatching { DataStore.isGroupUrlTest(profile.groupId) }.getOrDefault(false) ||
+            runCatching { DataStore.isGroupLoadBalance(profile.groupId) }.getOrDefault(false)
+        )
+        val isStrategy = isBalancer || isGroupStrategy
+
+        val title: String
+        val collapsedText: String
+        val bigContent: String
+
+        if (isStrategy) {
+            val cleanStrategy = if (strategyName == "策略组") "" else strategyName
+            if (showGroup) {
+                // Template 1: 策略组 + 显示组名开启
+                val baseName = if (isBalancer) profile.displayName() else (groupName ?: profile.displayName())
+                title = if (cleanStrategy.isNotBlank() && !baseName.contains(cleanStrategy)) {
+                    "$baseName · $cleanStrategy"
+                } else {
+                    baseName
+                }
+                collapsedText = if (!leafNode.isNullOrBlank()) {
+                    "当前: $leafNode · 代理: $proxySpeed"
+                } else {
+                    "代理: $proxySpeed"
+                }
+                bigContent = buildString {
+                    if (!leafNode.isNullOrBlank()) {
+                        append("当前: ").append(leafNode).append("\n")
+                    }
+                    append("代理: ").append(proxySpeed)
+                    if (showDirectSpeed) {
+                        append("\n直连: ").append(directSpeed)
+                    }
+                }
+            } else {
+                // Template 2: 策略组 + 显示组名关闭
+                title = if (!leafNode.isNullOrBlank()) leafNode else profile.displayName()
+                collapsedText = if (cleanStrategy.isNotBlank()) {
+                    "策略: $cleanStrategy · 代理: $proxySpeed"
+                } else {
+                    "代理: $proxySpeed"
+                }
+                bigContent = buildString {
+                    if (cleanStrategy.isNotBlank()) {
+                        append("策略: ").append(cleanStrategy).append("\n")
+                    }
+                    append("代理: ").append(proxySpeed)
+                    if (showDirectSpeed) {
+                        append("\n直连: ").append(directSpeed)
+                    }
+                }
+            }
+        } else {
+            val profileName = profile.displayName()
+            if (showGroup && !groupName.isNullOrBlank()) {
+                // Template 3: 普通单节点 + 显示组名开启
+                title = if (!profileName.startsWith("$groupName · ")) {
+                    "$groupName · $profileName"
+                } else {
+                    profileName
+                }
+            } else {
+                // Template 4: 普通单节点 + 显示组名关闭
+                title = profileName
+            }
+            collapsedText = "代理: $proxySpeed"
+            bigContent = buildString {
+                append("代理: ").append(proxySpeed)
+                if (showDirectSpeed) {
+                    append("\n直连: ").append(directSpeed)
+                }
+            }
+        }
+
+        return NotificationTextBundle(
+            title = title,
+            collapsedText = collapsedText,
+            bigText = bigContent
+        )
     }
 
     fun formatNotificationSubText(
@@ -177,7 +290,7 @@ object ActiveOutboundTracker {
         }
 
         // Strategy group: resolve active member
-        val balancerMembers = runCatching { proxy.config.balancerMemberMap[profile.id] }.getOrNull()
+        val balancerMembers = runCatching { proxy.safeConfig?.balancerMemberMap?.get(profile.id) }.getOrNull()
         val memberMap = balancerMembers
             ?: if (isGroupStrategy) runCatching { SagerDatabase.proxyDao.getByGroup(group!!.id).map { it.id } }.getOrNull() else null
 
@@ -190,7 +303,7 @@ object ActiveOutboundTracker {
         }
 
         // Target tag for this specific strategy group (do not blindly query "proxy")
-        val balancerTag = runCatching { proxy.config.profileTagMap[profile.id] }.getOrNull()
+        val balancerTag = runCatching { proxy.safeConfig?.profileTagMap?.get(profile.id) }.getOrNull()
             ?.takeIf { it.isNotBlank() } ?: profile.displayName()
         var candidateTag = queryClashNowTag(balancerTag)
         if (candidateTag.isNullOrBlank() && balancerTag != "proxy" && isGroupStrategy) {
@@ -200,8 +313,8 @@ object ActiveOutboundTracker {
         var candidateId: Long? = null
         if (!candidateTag.isNullOrBlank()) {
             val resolved = runCatching {
-                proxy.config.profileTagMap.entries
-                    .firstOrNull { it.value == candidateTag }
+                proxy.safeConfig?.profileTagMap?.entries
+                    ?.firstOrNull { it.value == candidateTag }
                     ?.key
                     ?.let { abs(it) }
             }.getOrNull()

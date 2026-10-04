@@ -48,8 +48,13 @@ class ServiceNotification(
 
         fun genTitle(ent: ProxyEntity): String {
             val gn = if (DataStore.showGroupInNotification)
-                SagerDatabase.groupDao.getById(ent.groupId)?.displayName() else null
-            return if (gn == null) ent.displayName() else "[$gn] ${ent.displayName()}"
+                runCatching { SagerDatabase.groupDao.getById(ent.groupId)?.displayName() }.getOrNull() else null
+            val profileName = ent.displayName()
+            return if (!gn.isNullOrBlank() && !profileName.startsWith("$gn · ")) {
+                "$gn · $profileName"
+            } else {
+                profileName
+            }
         }
     }
 
@@ -63,81 +68,47 @@ class ServiceNotification(
         val ctx = service as Context
         val currentProfile = service.data.proxy?.profile
 
-        val proxySpeed = ctx.getString(
-            R.string.traffic,
-            ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateProxy)),
-            ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateProxy))
-        )
-        val directSpeed = ctx.getString(
-            R.string.traffic,
-            ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.txRateDirect)),
-            ctx.getString(R.string.speed, Formatter.formatFileSize(ctx, stats.rxRateDirect))
-        )
+        val proxySpeed = "↑${Formatter.formatFileSize(ctx, stats.txRateProxy)}/s ↓${Formatter.formatFileSize(ctx, stats.rxRateProxy)}/s"
+        val directSpeed = "↑${Formatter.formatFileSize(ctx, stats.txRateDirect)}/s ↓${Formatter.formatFileSize(ctx, stats.rxRateDirect)}/s"
 
         val showGroup = DataStore.showGroupInNotification
-        val isBalancer = currentProfile?.type == ProxyEntity.TYPE_BALANCER
         val group = if (currentProfile != null) {
             runCatching { SagerDatabase.groupDao.getById(currentProfile.groupId) }.getOrNull()
         } else null
-        val isGroupStrategy = group != null && (
-            runCatching { DataStore.isGroupUrlTest(group.id) }.getOrDefault(false) ||
-            runCatching { DataStore.isGroupLoadBalance(group.id) }.getOrDefault(false)
-        )
-        val isStrategy = isBalancer || isGroupStrategy
 
         val leafNode = if (currentProfile != null) {
             ActiveOutboundTracker.getActiveLeafNodeDisplay(currentProfile)
         } else null
+        val strategyName = if (currentProfile != null) {
+            ActiveOutboundTracker.getStrategyDisplayName(currentProfile)
+        } else ""
 
-        val notificationTitle = if (currentProfile != null) {
-            ActiveOutboundTracker.formatNotificationTitle(currentProfile)
-        } else null
+        val texts = ActiveOutboundTracker.buildNotificationTexts(
+            profile = currentProfile,
+            leafNode = leafNode,
+            strategyName = strategyName,
+            groupName = group?.displayName(),
+            showGroup = showGroup,
+            showDirectSpeed = showDirectSpeed,
+            proxySpeed = proxySpeed,
+            directSpeed = directSpeed,
+        )
 
-        val collapsedText = if (isStrategy && showGroup && !leafNode.isNullOrBlank()) {
-            "当前节点: $leafNode · 代理: $proxySpeed"
-        } else {
-            "代理: $proxySpeed"
-        }
-
-        val bigContent = buildString {
-            if (isStrategy) {
-                if (showGroup) {
-                    val strategyName = if (isBalancer) currentProfile?.displayName().orEmpty() else (group?.displayName() ?: currentProfile?.displayName().orEmpty())
-                    append("策略组: ").append(strategyName).append("\n")
-                }
-                if (!leafNode.isNullOrBlank()) {
-                    append("当前节点: ").append(leafNode).append("\n")
-                }
-            } else if (currentProfile != null) {
-                append("当前节点: ").append(currentProfile.displayName()).append("\n")
-                if (showGroup) {
-                    val groupName = group?.displayName()
-                    if (!groupName.isNullOrBlank()) {
-                        append("所属分组: ").append(groupName).append("\n")
-                    }
-                }
-            }
-            append("代理: ").append(proxySpeed)
-            if (showDirectSpeed) {
-                append("\n直连: ").append(directSpeed)
-            }
-        }
-
-        val isChanged = (notificationTitle != null && notificationTitle != lastTitle) ||
-                        (collapsedText != lastText) ||
-                        (bigContent != lastBigText)
+        val isChanged = (texts.title != lastTitle) ||
+                        (texts.collapsedText != lastText) ||
+                        (texts.bigText != lastBigText)
         if (!isChanged) return
 
-        lastTitle = notificationTitle ?: lastTitle
-        lastText = collapsedText
-        lastBigText = bigContent
+        lastTitle = texts.title
+        lastText = texts.collapsedText
+        lastBigText = texts.bigText
 
         useBuilder {
-            if (notificationTitle != null) {
-                it.setContentTitle(notificationTitle)
+            if (texts.title.isNotBlank()) {
+                it.setContentTitle(texts.title)
             }
-            it.setStyle(NotificationCompat.BigTextStyle().bigText(bigContent))
-            it.setContentText(collapsedText)
+            it.setStyle(NotificationCompat.BigTextStyle().bigText(texts.bigText))
+            it.setContentText(texts.collapsedText)
             it.setSubText(null)
         }
         update()

@@ -41,6 +41,9 @@ abstract class BoxInstance(
         return ::config.isInitialized && ::box.isInitialized
     }
 
+    val safeConfig: ConfigBuildResult?
+        get() = if (::config.isInitialized) config else null
+
     protected fun initPlugin(name: String): PluginManager.InitResult {
         return pluginPath.getOrPut(name) { PluginManager.init(name)!! }
     }
