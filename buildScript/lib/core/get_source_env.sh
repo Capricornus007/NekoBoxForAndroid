@@ -32,4 +32,4 @@ export COMMIT_WIREGUARD_GO="5c8c2d946422ae687d4138b91bde45a3252dcd3d"
 # runners do not accidentally depend on a developer machine's existing clone.
 export COMMIT_SING_QUIC="1f4a0d0c6d9fe5da589f4b4bbf25391288c117ff"
 export COMMIT_SING_JUICITY="b44e4aa2d6a033ab70371cbc3e7c39b54613bcaf"
-export COMMIT_SING_TRUSTTUNNEL="ffbffe838a6f8f53c5e0b3bbebaefe166c5ffbb7"
+export COMMIT_SING_TRUSTTUNNEL="d20c66fa59d888aab6455126a9183fdbee208139"
