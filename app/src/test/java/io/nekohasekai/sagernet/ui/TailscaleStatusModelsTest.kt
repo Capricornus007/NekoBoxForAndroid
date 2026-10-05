@@ -55,8 +55,14 @@ class TailscaleStatusModelsTest {
         val peer = status.node!!.peers.single()
         assertTrue(format.peer(peer).contains(context.getString(R.string.tailscale_status_offline)))
         assertEquals(context.getString(R.string.tailscale_status_expired), format.expiry(peer.copy(expired = true)))
-        assertEquals(context.getString(R.string.tailscale_status_expiry_unknown), format.expiry(peer.copy(keyExpiry = -1)))
-        assertEquals(context.getString(R.string.tailscale_status_expiry_unknown), format.expiry(peer.copy(keyExpiry = Long.MAX_VALUE)))
+        assertEquals(
+            context.getString(R.string.tailscale_status_expiry_unknown),
+            format.expiry(peer.copy(keyExpiry = -1)),
+        )
+        assertEquals(
+            context.getString(R.string.tailscale_status_expiry_unknown),
+            format.expiry(peer.copy(keyExpiry = Long.MAX_VALUE)),
+        )
         assertNotEquals(format.expiry(peer), format.expiry(peer.copy(keyExpiry = 1_900_000_000)))
     }
 
@@ -72,8 +78,16 @@ class TailscaleStatusModelsTest {
         val failed = result("direct", "timeout").sample!!
         assertEquals("unknown", failed.path)
         assertNull(failed.latencyMs)
-        assertTrue(format.sample(result("peer-relay").sample!!).contains(context.getString(R.string.tailscale_status_path_peer_relay)))
-        assertTrue(format.sample(result("unknown").sample!!).contains(context.getString(R.string.tailscale_status_path_unknown)))
+        assertTrue(
+            format.sample(
+                result("peer-relay").sample!!,
+            ).contains(context.getString(R.string.tailscale_status_path_peer_relay)),
+        )
+        assertTrue(
+            format.sample(
+                result("unknown").sample!!,
+            ).contains(context.getString(R.string.tailscale_status_path_unknown)),
+        )
     }
 
     @Test fun unsupportedVersionAndOversizedInventoryFailClosed() {
@@ -92,8 +106,14 @@ class TailscaleStatusModelsTest {
         val state = TailscaleStatusUiState(connected = true, serviceState = State.Connected, status = status)
         assertEquals(context.getString(R.string.stopping), format.state(state.copy(serviceState = State.Stopping)))
         assertEquals(context.getString(R.string.connecting), format.state(state.copy(serviceState = State.Connecting)))
-        assertEquals(context.getString(R.string.connecting), format.state(state.copy(serviceState = State.Stopped, refreshing = true)))
-        assertEquals(context.getString(R.string.tailscale_status_stopped), format.state(state.copy(serviceState = State.Stopped, status = null)))
+        assertEquals(
+            context.getString(R.string.connecting),
+            format.state(state.copy(serviceState = State.Stopped, refreshing = true)),
+        )
+        assertEquals(
+            context.getString(R.string.tailscale_status_stopped),
+            format.state(state.copy(serviceState = State.Stopped, status = null)),
+        )
     }
 
     @Test fun onlyDurableExitOutcomesRenderAsSuccess() {

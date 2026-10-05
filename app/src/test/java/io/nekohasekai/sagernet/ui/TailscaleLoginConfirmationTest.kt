@@ -47,10 +47,16 @@ class TailscaleLoginConfirmationTest {
     @Test
     fun httpContinueOpensExactlyOnceAfterConfirmation() = withContext { context ->
         var opens = 0
-        val dialog = confirmTailscaleLogin(context, TailscaleLoginLink.parse("http://login.example.test/login")!!) { opens++ }!!
+        val dialog = confirmTailscaleLogin(
+            context,
+            TailscaleLoginLink.parse("http://login.example.test/login")!!,
+        ) { opens++ }!!
         try {
             assertEquals(0, opens)
-            assertEquals(context.getString(R.string.tailscale_login_continue), dialog.getButton(AlertDialog.BUTTON_POSITIVE).text.toString())
+            assertEquals(
+                context.getString(R.string.tailscale_login_continue),
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).text.toString(),
+            )
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick()
             shadowOf(Looper.getMainLooper()).idle()
             assertEquals(1, opens)
@@ -62,7 +68,9 @@ class TailscaleLoginConfirmationTest {
     @Test
     fun httpsKeepsDirectExplicitOpenWithoutNewConfirmation() = withContext { context ->
         var opens = 0
-        assertNull(confirmTailscaleLogin(context, TailscaleLoginLink.parse("https://login.example.test/login")!!) { opens++ })
+        assertNull(
+            confirmTailscaleLogin(context, TailscaleLoginLink.parse("https://login.example.test/login")!!) { opens++ },
+        )
         assertEquals(1, opens)
     }
 

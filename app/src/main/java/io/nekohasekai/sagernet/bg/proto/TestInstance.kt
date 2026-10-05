@@ -18,11 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 const val TAILSCALE_READY_TIMEOUT_MS = 20_000
 
 // Short JNI rounds bound cancellation latency without closing a box while it is initializing.
-internal suspend fun awaitTailscaleReady(
-    box: libcore.BoxInstance,
-    tag: String,
-    waitForExitNode: Boolean,
-) {
+internal suspend fun awaitTailscaleReady(box: libcore.BoxInstance, tag: String, waitForExitNode: Boolean) {
     val deadline = SystemClock.elapsedRealtime() + TAILSCALE_READY_TIMEOUT_MS
     while (true) {
         currentCoroutineContext().ensureActive()
@@ -31,7 +27,12 @@ internal suspend fun awaitTailscaleReady(
             return
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
-            if (SystemClock.elapsedRealtime() >= deadline || e.readableMessage.contains("Tailscale needs login:")) throw e
+            if (SystemClock.elapsedRealtime() >= deadline || e.readableMessage.contains(
+                    "Tailscale needs login:",
+                )
+            ) {
+                throw e
+            }
         }
         delay(50)
     }

@@ -12,7 +12,12 @@ class TailscaleStatusBoundaryTest {
     ).first { it.isFile }.readText()
 
     @Test fun statusPathHasNoVpnEditorOrLoggingSideEffects() {
-        val sources = listOf("TailscaleStatusActivity", "TailscaleStatusViewModel", "TailscaleStatusSession", "TailscaleStatusClient")
+        val sources = listOf(
+            "TailscaleStatusActivity",
+            "TailscaleStatusViewModel",
+            "TailscaleStatusSession",
+            "TailscaleStatusClient",
+        )
             .joinToString("\n") { source(it) }
         for (forbidden in listOf(
             "startService(",

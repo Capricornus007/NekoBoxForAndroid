@@ -245,7 +245,9 @@ class TailscaleSettingsActivity :
         // readiness wait returns.
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val entity = SagerDatabase.proxyDao.getById(profileId) ?: error(getString(R.string.tailscale_save_first))
+                val entity = SagerDatabase.proxyDao.getById(
+                    profileId,
+                ) ?: error(getString(R.string.tailscale_save_first))
                 val prepared = buildConfig(entity, forTest = true)
                 val peers = try {
                     loadPeers(entity, prepared)
@@ -316,7 +318,9 @@ class TailscaleSettingsActivity :
                     }
                 }
             }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> if (continuation.isActive) continuation.resume(false) }
+            .setNegativeButton(
+                android.R.string.cancel,
+            ) { _, _ -> if (continuation.isActive) continuation.resume(false) }
             .setOnCancelListener { if (continuation.isActive) continuation.resume(false) }
             .show()
         continuation.invokeOnCancellation { runOnUiThread { dialog.dismiss() } }
@@ -392,7 +396,13 @@ class TailscaleSettingsActivity :
                 throw e
             } catch (e: Exception) {
                 Logs.w(e)
-                onMainDispatcher { Toast.makeText(this@TailscaleSettingsActivity, e.readableMessage, Toast.LENGTH_LONG).show() }
+                onMainDispatcher {
+                    Toast.makeText(
+                        this@TailscaleSettingsActivity,
+                        e.readableMessage,
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
             }
         }
     }

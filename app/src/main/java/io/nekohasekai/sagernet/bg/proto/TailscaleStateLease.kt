@@ -82,6 +82,7 @@ internal class TailscaleStateLease private constructor(
             failure?.let { throw it }
         }
 
-        private fun busyMessage(id: Long) = "Tailscale node $id is in use. Stop the service or close the active probe and retry."
+        private fun busyMessage(id: Long) =
+            "Tailscale node $id is in use. Stop the service or close the active probe and retry."
     }
 }

@@ -97,7 +97,9 @@ abstract class BoxInstance(
             for (id in nodes) {
                 val snapshot = snapshots[id] ?: error("Missing Tailscale profile snapshot")
                 val current = SagerDatabase.proxyDao.getById(id)
-                check(current?.type == ProxyEntity.TYPE_TAILSCALE && current.uuid == snapshot.uuid && current.requireBean() == snapshot.requireBean()) {
+                check(
+                    current?.type == ProxyEntity.TYPE_TAILSCALE && current.uuid == snapshot.uuid && current.requireBean() == snapshot.requireBean(),
+                ) {
                     "Tailscale profile changed. Retry with the saved profile."
                 }
             }

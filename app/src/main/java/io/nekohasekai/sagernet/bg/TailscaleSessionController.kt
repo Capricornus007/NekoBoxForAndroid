@@ -57,7 +57,9 @@ internal class TailscaleSessionController(
 
     init {
         synchronized(registryLock) {
-            draining = controllers.any { it.data.state == BaseService.State.Connecting || it.data.state == BaseService.State.Stopping }
+            draining = controllers.any {
+                it.data.state == BaseService.State.Connecting || it.data.state == BaseService.State.Stopping
+            }
             controllers.add(this)
         }
     }
@@ -94,7 +96,9 @@ internal class TailscaleSessionController(
             ?: states.firstOrNull { it == BaseService.State.Connected } ?: BaseService.State.Stopped
     }
 
-    private fun runningData(): BaseService.Data? = DataStore.baseService?.data?.takeIf { it.state == BaseService.State.Connected }
+    private fun runningData(): BaseService.Data? = DataStore.baseService?.data?.takeIf {
+        it.state == BaseService.State.Connected
+    }
         ?: snapshot().firstOrNull { it.data.state == BaseService.State.Connected }?.data
 
     private class Session(val cb: ISagerNetServiceCallback, val id: Long, val profileId: Long, val identity: String, val temporary: Boolean, val sequence: AtomicLong) {
@@ -136,7 +140,12 @@ internal class TailscaleSessionController(
 
     fun open(cb: ISagerNetServiceCallback, sessionId: Long, profileId: Long, identity: String, temporary: Boolean) {
         synchronized(lock) {
-            if (destroyed || !registered(cb.asBinder()) || sessionId <= 0 || profileId <= 0 || identity.length > 128) return
+            if (destroyed || !registered(
+                    cb.asBinder(),
+                ) || sessionId <= 0 || profileId <= 0 || identity.length > 128
+            ) {
+                return
+            }
             val mayStartTemporary = temporary && !draining && managementState() == BaseService.State.Stopped
             val key = cb.asBinder() to sessionId
             if (retiringSessions.containsKey(key)) return
@@ -187,7 +196,12 @@ internal class TailscaleSessionController(
                             status(s, "error", code = "tailscale:not-stopped")
                             return@supervisorScope
                         }
-                        while (!temporary && (synchronized(lock) { draining } || managementState() == BaseService.State.Connecting || managementState() == BaseService.State.Stopping)) {
+                        while (!temporary && (
+                                synchronized(lock) {
+                                    draining
+                                } || managementState() == BaseService.State.Connecting || managementState() == BaseService.State.Stopping
+                                )
+                        ) {
                             status(s, "starting")
                             delay(250)
                         }
@@ -208,7 +222,17 @@ internal class TailscaleSessionController(
                                 TailscaleAccess.whileStopped(::managementState) {
                                     TailscaleSessionInstance(read(s)).runSession { instance ->
                                         val endpoint = instance.config.tailscaleEndpoints.getValue(profileId)
-                                        observe(s, Target(data, instance, instance.profile, endpoint.tag, TailscaleReadinessIntent(), true))
+                                        observe(
+                                            s,
+                                            Target(
+                                                data,
+                                                instance,
+                                                instance.profile,
+                                                endpoint.tag,
+                                                TailscaleReadinessIntent(),
+                                                true,
+                                            ),
+                                        )
                                     }
                                 }
                             }
@@ -252,7 +276,14 @@ internal class TailscaleSessionController(
     }
 
     private fun checkRuntime(s: Session, snapshot: ProxyEntity): ProxyEntity = read(s).also {
-        check(snapshot.uuid == s.identity && TailscaleProfileStore.sameRuntime(it.tailscaleBean!!, snapshot.tailscaleBean!!)) { "tailscale:conflict" }
+        check(
+            snapshot.uuid == s.identity && TailscaleProfileStore.sameRuntime(
+                it.tailscaleBean!!,
+                snapshot.tailscaleBean!!,
+            ),
+        ) {
+            "tailscale:conflict"
+        }
     }
 
     private fun valid(s: Session, t: Target): Boolean = current(s) && s.target === t &&
@@ -294,7 +325,10 @@ internal class TailscaleSessionController(
     private fun status(s: Session, stage: String, node: String? = null, code: String = "", terminal: Boolean = false) {
         val json = JSONObject().put("version", 1).put("profileId", s.profileId).put("identity", s.identity)
             .put("generation", s.generation).put("source", if (terminal) "none" else s.source)
-            .put("stage", stage).put("savedExit", s.savedExit).put("node", node?.let { JSONObject(it) } ?: JSONObject.NULL)
+            .put(
+                "stage",
+                stage,
+            ).put("savedExit", s.savedExit).put("node", node?.let { JSONObject(it) } ?: JSONObject.NULL)
             .put("errorCode", code).put("message", "").toString()
         val event = StatusDelivery(json, terminal)
         if (!terminal && (stage == "closed" || stage == "error")) {
@@ -318,10 +352,21 @@ internal class TailscaleSessionController(
         }
     }
 
-    private fun request(cb: ISagerNetServiceCallback, sessionId: Long, requestId: Long, kind: String, block: suspend (Session, Target?) -> Unit) {
+    private fun request(
+        cb: ISagerNetServiceCallback,
+        sessionId: Long,
+        requestId: Long,
+        kind: String,
+        block: suspend (Session, Target?) -> Unit,
+    ) {
         synchronized(lock) {
             val s = sessions[cb.asBinder() to sessionId] ?: return
-            if (destroyed || draining || !s.accepting || !registered(cb.asBinder()) || !s.job.isActive || requestId <= s.lastRequest || s.requests.size >= 4) return
+            if (destroyed || draining || !s.accepting || !registered(
+                    cb.asBinder(),
+                ) || !s.job.isActive || requestId <= s.lastRequest || s.requests.size >= 4
+            ) {
+                return
+            }
             val target = s.target
             if (target != null && !valid(s, target)) return
             s.lastRequest = requestId
@@ -397,7 +442,10 @@ internal class TailscaleSessionController(
     }
 
     private fun pingResult(done: Boolean, sample: JSONObject? = null, code: String = "") = JSONObject()
-        .put("kind", "ping").put("done", done).put("sample", sample ?: JSONObject.NULL).put("errorCode", code).put("message", "")
+        .put(
+            "kind",
+            "ping",
+        ).put("done", done).put("sample", sample ?: JSONObject.NULL).put("errorCode", code).put("message", "")
 
     fun setExit(cb: ISagerNetServiceCallback, sessionId: Long, requestId: Long, peerId: String, expectedExit: String) {
         if (peerId.length > 256 || expectedExit.length > 4096) return
@@ -423,7 +471,8 @@ internal class TailscaleSessionController(
                 }
                 val oldIntent = t.intent.get(s.profileId, t.snapshot.tailscaleBean!!.exitNode.orEmpty().isNotEmpty())
                 // This is the application admission point shared with stop and owner cleanup.
-                val admitted = synchronized(lock) { !draining && valid(s, t) && s.requests[requestId]?.job?.isActive == true }
+                val admitted =
+                    synchronized(lock) { !draining && valid(s, t) && s.requests[requestId]?.job?.isActive == true }
                 if (!admitted) return@withLock TailscaleExitResult("cancelled-before-apply", s.savedExit)
                 finalizeTailscaleExit(
                     profile.tailscaleBean!!.exitNode.orEmpty(),
@@ -440,7 +489,13 @@ internal class TailscaleSessionController(
                         }
                     },
                     save = { value ->
-                        TailscaleProfileStore.compareAndSetRuntimeExit(s.profileId, s.identity, expectedExit, value, t.snapshot.tailscaleBean)
+                        TailscaleProfileStore.compareAndSetRuntimeExit(
+                            s.profileId,
+                            s.identity,
+                            expectedExit,
+                            value,
+                            t.snapshot.tailscaleBean,
+                        )
                         s.savedExit = value
                     },
                     applied = { t.intent.set(s.profileId, it) },
@@ -452,8 +507,9 @@ internal class TailscaleSessionController(
         }
     }
 
-    private fun exitResult(outcome: TailscaleExitResult) = JSONObject().put("kind", "exit").put("outcome", outcome.outcome)
-        .put("savedExit", outcome.savedExit).put("errorCode", outcome.errorCode).put("message", "")
+    private fun exitResult(outcome: TailscaleExitResult) =
+        JSONObject().put("kind", "exit").put("outcome", outcome.outcome)
+            .put("savedExit", outcome.savedExit).put("errorCode", outcome.errorCode).put("message", "")
 
     private fun finishExit(s: Session, requestId: Long, t: Target, outcome: TailscaleExitResult) {
         // Refresh both sides after success, conflict or divergence, without restarting anything.
@@ -464,14 +520,24 @@ internal class TailscaleSessionController(
                 t.intent.set(s.profileId, !JSONObject(actual).isNull("currentExit"))
             }
             val observers = synchronized(lock) {
-                sessions.values.filter { it.profileId == s.profileId && it.identity == s.identity && it.target?.instance === t.instance }
+                sessions.values.filter {
+                    it.profileId == s.profileId && it.identity == s.identity && it.target?.instance === t.instance
+                }
             }
             for (observer in observers) {
                 observer.savedExit = s.savedExit
                 status(observer, "observing", actual)
             }
         }
-        val name = if (outcome.outcome == "applied-and-saved" && !valid(s, t)) "saved-for-next-start" else outcome.outcome
+        val name = if (outcome.outcome == "applied-and-saved" && !valid(
+                s,
+                t,
+            )
+        ) {
+            "saved-for-next-start"
+        } else {
+            outcome.outcome
+        }
         result(s, requestId, exitResult(outcome.copy(outcome = name, savedExit = s.savedExit)))
     }
 

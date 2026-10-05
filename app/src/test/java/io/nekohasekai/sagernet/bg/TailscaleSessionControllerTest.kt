@@ -355,7 +355,12 @@ class TailscaleSessionControllerTest {
             val result = terminal(client, 13)
             assertEquals(if (failSave) "failed-rolled-back" else "applied-and-saved", result.getString("outcome"))
             assertEquals(1, finalizations.get())
-            assertEquals(if (failSave) "" else "100.64.0.2", ConfigBuilderTestEnv.io { TailscaleProfileStore.read(profile.id).tailscaleBean!!.exitNode })
+            assertEquals(
+                if (failSave) "" else "100.64.0.2",
+                ConfigBuilderTestEnv.io {
+                    TailscaleProfileStore.read(profile.id).tailscaleBean!!.exitNode
+                },
+            )
             assertNull(client.resultEvents.poll(100, TimeUnit.MILLISECONDS))
         } finally {
             release.countDown()
@@ -403,7 +408,9 @@ class TailscaleSessionControllerTest {
         otherMode.binder.registerCallback(second.callback, SagerConnection.CONNECTION_ID_TAILSCALE_STATUS)
         otherMode.binder.observeTailscale(second.callback, 1, profile.id, profile.uuid)
         second.status()
-        val sessionsField = TailscaleSessionController::class.java.getDeclaredField("sessions").apply { isAccessible = true }
+        val sessionsField = TailscaleSessionController::class.java.getDeclaredField(
+            "sessions",
+        ).apply { isAccessible = true }
         val oldSession = (sessionsField.get(otherMode.tailscale) as Map<*, *>).values.single()!!
         val owner = oldSession.javaClass.getDeclaredField("job").apply { isAccessible = true }.get(oldSession) as Job
         val entered = CompletableDeferred<Unit>()
@@ -520,7 +527,10 @@ class TailscaleSessionControllerTest {
             release.countDown()
             drain.await()
             assertTrue(committed.get())
-            assertEquals("100.64.0.2", ConfigBuilderTestEnv.io { TailscaleProfileStore.read(profile.id).tailscaleBean!!.exitNode })
+            assertEquals(
+                "100.64.0.2",
+                ConfigBuilderTestEnv.io { TailscaleProfileStore.read(profile.id).tailscaleBean!!.exitNode },
+            )
             assertEquals("tailscale:runtime-changed", client.status().getString("errorCode"))
         } finally {
             release.countDown()
@@ -535,8 +545,12 @@ class TailscaleSessionControllerTest {
         val reservationAtTerminal = LinkedBlockingQueue<Boolean>()
         client.onStatus = { id, json ->
             if (json.getString("stage") == "error") {
-                val field = TailscaleSessionController::class.java.getDeclaredField("temporaryOwner").apply { isAccessible = true }
-                val registryLock = TailscaleSessionController::class.java.getDeclaredField("registryLock").apply { isAccessible = true }.get(null)
+                val field = TailscaleSessionController::class.java.getDeclaredField(
+                    "temporaryOwner",
+                ).apply { isAccessible = true }
+                val registryLock = TailscaleSessionController::class.java.getDeclaredField("registryLock").apply {
+                    isAccessible = true
+                }.get(null)
                 reservationAtTerminal.add(synchronized(registryLock) { field.get(null) == null })
             }
             if (id == 1L && json.getString("stage") == "error") {
@@ -582,16 +596,24 @@ class TailscaleSessionControllerTest {
     private data class DeliveryCounts(val sessions: Int, val statuses: Int, val results: Int)
 
     private fun deliveryCounts(): DeliveryCounts {
-        val lock = TailscaleSessionController::class.java.getDeclaredField("lock").apply { isAccessible = true }.get(data.tailscale)
+        val lock = TailscaleSessionController::class.java.getDeclaredField("lock").apply {
+            isAccessible = true
+        }.get(data.tailscale)
         return synchronized(lock) {
-            val sessions = TailscaleSessionController::class.java.getDeclaredField("deliverySessions").apply { isAccessible = true }
+            val sessions = TailscaleSessionController::class.java.getDeclaredField(
+                "deliverySessions",
+            ).apply { isAccessible = true }
                 .get(data.tailscale) as Set<*>
             var statuses = 0
             var results = 0
             for (session in sessions.filterNotNull()) {
-                val sender = session.javaClass.getDeclaredField("delivery").apply { isAccessible = true }.get(session) as Job
+                val sender = session.javaClass.getDeclaredField(
+                    "delivery",
+                ).apply { isAccessible = true }.get(session) as Job
                 if (!sender.isCompleted) statuses++
-                val requests = session.javaClass.getDeclaredField("requests").apply { isAccessible = true }.get(session) as Map<*, *>
+                val requests = session.javaClass.getDeclaredField(
+                    "requests",
+                ).apply { isAccessible = true }.get(session) as Map<*, *>
                 results += requests.size
             }
             DeliveryCounts(sessions.size, statuses, results)

@@ -6,7 +6,11 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class TailscaleExitFinalizerTest {
-    private class Change(private val events: MutableList<String>, private val failRollback: Boolean = false, private val failCommit: Boolean = false) : TailscaleExitChange {
+    private class Change(
+        private val events: MutableList<String>,
+        private val failRollback: Boolean = false,
+        private val failCommit: Boolean = false,
+    ) : TailscaleExitChange {
         override fun savedValue() = "100.64.0.2"
         override fun commit() {
             events += "commit"
@@ -38,7 +42,8 @@ class TailscaleExitFinalizerTest {
     @Test
     fun dbFailureRollsBackExactNativeStateAndReadiness() = runTest {
         val events = mutableListOf<String>()
-        val result = finalizeTailscaleExit("old", { Change(events) }, { error("disk") }, {}, { events += "restore-intent" })
+        val result =
+            finalizeTailscaleExit("old", { Change(events) }, { error("disk") }, {}, { events += "restore-intent" })
         assertEquals(listOf("rollback-exact", "restore-intent"), events)
         assertEquals("failed-rolled-back", result.outcome)
         assertEquals("old", result.savedExit)
@@ -57,7 +62,12 @@ class TailscaleExitFinalizerTest {
     @Test
     fun failedRollbackOrCommitReportsDivergence() = runTest {
         val events = mutableListOf<String>()
-        assertEquals("diverged", finalizeTailscaleExit("old", { Change(events, failRollback = true) }, { error("disk") }, {}, {}).outcome)
+        assertEquals(
+            "diverged",
+            finalizeTailscaleExit("old", {
+                Change(events, failRollback = true)
+            }, { error("disk") }, {}, {}).outcome,
+        )
         events.clear()
         val result = finalizeTailscaleExit("old", { Change(events, failCommit = true) }, {}, {}, {})
         assertEquals("diverged", result.outcome)
@@ -67,7 +77,14 @@ class TailscaleExitFinalizerTest {
 
     @Test
     fun rejectionDoesNotWriteDatabaseOrReadiness() = runTest {
-        val result = finalizeTailscaleExit("old", { error("peer removed") }, { fail("save") }, { fail("intent") }, { fail("rollback") })
+        val result =
+            finalizeTailscaleExit(
+                "old",
+                { error("peer removed") },
+                { fail("save") },
+                { fail("intent") },
+                { fail("rollback") },
+            )
         assertEquals("failed-unchanged", result.outcome)
     }
 

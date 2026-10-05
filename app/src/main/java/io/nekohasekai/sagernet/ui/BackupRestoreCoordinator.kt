@@ -86,7 +86,11 @@ internal object DatabaseBackupRestoreOperations : BackupRestoreOperations {
             staged.forEach { recoverTailscaleRestore(it) }
             // No original or replacement Tailscale row exists for these IDs. Keep orphan files
             // untouched on SQL failure; after commit they cannot be exposed to a foreign node.
-            orphans.forEach { check(tailscaleStateFile(it).deleteRecursively()) { "Cannot remove orphan Tailscale identity" } }
+            orphans.forEach {
+                check(
+                    tailscaleStateFile(it).deleteRecursively(),
+                ) { "Cannot remove orphan Tailscale identity" }
+            }
         } finally {
             lease?.close()
         }

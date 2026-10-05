@@ -233,11 +233,21 @@ class BaseService {
             data?.tailscale?.releaseOwner(cb.asBinder())
         }
 
-        override fun observeTailscale(cb: ISagerNetServiceCallback, sessionId: Long, profileId: Long, expectedIdentity: String) {
+        override fun observeTailscale(
+            cb: ISagerNetServiceCallback,
+            sessionId: Long,
+            profileId: Long,
+            expectedIdentity: String,
+        ) {
             data?.tailscale?.open(cb, sessionId, profileId, expectedIdentity, false)
         }
 
-        override fun startTailscaleCheck(cb: ISagerNetServiceCallback, sessionId: Long, profileId: Long, expectedIdentity: String) {
+        override fun startTailscaleCheck(
+            cb: ISagerNetServiceCallback,
+            sessionId: Long,
+            profileId: Long,
+            expectedIdentity: String,
+        ) {
             data?.tailscale?.open(cb, sessionId, profileId, expectedIdentity, true)
         }
 
@@ -245,11 +255,23 @@ class BaseService {
             data?.tailscale?.closeSession(cb, sessionId)
         }
 
-        override fun pingTailscalePeer(cb: ISagerNetServiceCallback, sessionId: Long, requestId: Long, peerId: String, timeoutMs: Int) {
+        override fun pingTailscalePeer(
+            cb: ISagerNetServiceCallback,
+            sessionId: Long,
+            requestId: Long,
+            peerId: String,
+            timeoutMs: Int,
+        ) {
             data?.tailscale?.ping(cb, sessionId, requestId, peerId, timeoutMs)
         }
 
-        override fun setTailscaleExitNode(cb: ISagerNetServiceCallback, sessionId: Long, requestId: Long, peerId: String, expectedSavedSelection: String) {
+        override fun setTailscaleExitNode(
+            cb: ISagerNetServiceCallback,
+            sessionId: Long,
+            requestId: Long,
+            peerId: String,
+            expectedSavedSelection: String,
+        ) {
             data?.tailscale?.setExit(cb, sessionId, requestId, peerId, expectedSavedSelection)
         }
 

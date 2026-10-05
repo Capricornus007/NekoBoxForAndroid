@@ -37,7 +37,8 @@ internal fun acquireTailscaleState(ids: Collection<Long>): Closeable {
     }
 }
 
-internal fun tailscaleRestoreDirectory(profileId: Long) = File(SagerNet.application.noBackupFilesDir, "tailscale-restore/$profileId")
+internal fun tailscaleRestoreDirectory(profileId: Long) =
+    File(SagerNet.application.noBackupFilesDir, "tailscale-restore/$profileId")
 
 internal fun tailscaleStateIds(): Set<Long> = listOf("tailscale", "tailscale-restore").flatMap { name ->
     File(SagerNet.application.noBackupFilesDir, name).listFiles().orEmpty().mapNotNull { it.name.toLongOrNull() }
@@ -135,8 +136,9 @@ internal fun recoverTailscaleRestore(profileId: Long) {
     check(staging.deleteRecursively()) { failure }
 }
 
-internal fun retainsTailscaleIdentity(previous: ProxyEntity?, restored: ProxyEntity): Boolean = previous?.type == ProxyEntity.TYPE_TAILSCALE && restored.type == ProxyEntity.TYPE_TAILSCALE &&
-    previous.uuid.isNotBlank() && previous.uuid == restored.uuid && previous.requireBean() == restored.requireBean()
+internal fun retainsTailscaleIdentity(previous: ProxyEntity?, restored: ProxyEntity): Boolean =
+    previous?.type == ProxyEntity.TYPE_TAILSCALE && restored.type == ProxyEntity.TYPE_TAILSCALE &&
+        previous.uuid.isNotBlank() && previous.uuid == restored.uuid && previous.requireBean() == restored.requireBean()
 
 // Adding provenance to a legacy local node does not change or remove its credentials.
 internal fun profilesForBackup(): List<ProxyEntity> {
@@ -152,7 +154,9 @@ internal fun profilesForBackup(): List<ProxyEntity> {
             check(legacy.all { it.id in legacyIds }) { "Tailscale profiles changed. Retry the backup." }
             legacy.forEach {
                 it.uuid = UUID.randomUUID().toString()
-                check(SagerDatabase.proxyDao.setTailscaleMarker(it.id, it.uuid) == 1) { "Tailscale profile changed. Retry the backup." }
+                check(
+                    SagerDatabase.proxyDao.setTailscaleMarker(it.id, it.uuid) == 1,
+                ) { "Tailscale profile changed. Retry the backup." }
             }
         }
     }
@@ -166,9 +170,13 @@ internal fun resetTailscaleIdentity(profileId: Long): String {
         try {
             SagerDatabase.instance.runInTransaction {
                 val current = SagerDatabase.proxyDao.getById(profileId)
-                check(current != null && current.type == ProxyEntity.TYPE_TAILSCALE) { "Tailscale profile no longer exists" }
+                check(
+                    current != null && current.type == ProxyEntity.TYPE_TAILSCALE,
+                ) { "Tailscale profile no longer exists" }
                 stageTailscaleRestore(profileId, current.uuid, marker)
-                check(SagerDatabase.proxyDao.setTailscaleMarker(profileId, marker) == 1) { "Tailscale profile changed during reset" }
+                check(
+                    SagerDatabase.proxyDao.setTailscaleMarker(profileId, marker) == 1,
+                ) { "Tailscale profile changed during reset" }
             }
         } catch (failure: Throwable) {
             try {
@@ -182,7 +190,10 @@ internal fun resetTailscaleIdentity(profileId: Long): String {
         try {
             recoverTailscaleRestore(profileId)
         } catch (failure: Throwable) {
-            throw IllegalStateException("Tailscale identity reset committed; recovery is required before restarting this node.", failure)
+            throw IllegalStateException(
+                "Tailscale identity reset committed; recovery is required before restarting this node.",
+                failure,
+            )
         }
         marker
     }

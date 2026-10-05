@@ -80,9 +80,13 @@ class SagerConnection(
             }
         }
 
-        override fun cbTailscaleStatus(sessionId: Long, sequence: Long, json: String) = deliver { it.cbTailscaleStatus(sessionId, sequence, json) }
+        override fun cbTailscaleStatus(sessionId: Long, sequence: Long, json: String) = deliver {
+            it.cbTailscaleStatus(sessionId, sequence, json)
+        }
 
-        override fun cbTailscaleResult(sessionId: Long, requestId: Long, json: String) = deliver { it.cbTailscaleResult(sessionId, requestId, json) }
+        override fun cbTailscaleResult(sessionId: Long, requestId: Long, json: String) = deliver {
+            it.cbTailscaleResult(sessionId, requestId, json)
+        }
 
         override fun stateChanged(state: Int, profileName: String?, msg: String?) {
             if (state < 0) return // skip private
@@ -177,7 +181,12 @@ class SagerConnection(
         try {
             if (listenForDeath || connectionId == CONNECTION_ID_TAILSCALE_STATUS) {
                 val connectedEpoch = epoch
-                deathRecipient = IBinder.DeathRecipient { handleDeath(connectedEpoch, binder) }.also { binder.linkToDeath(it, 0) }
+                deathRecipient = IBinder.DeathRecipient {
+                    handleDeath(
+                        connectedEpoch,
+                        binder,
+                    )
+                }.also { binder.linkToDeath(it, 0) }
             }
             check(!callbackRegistered)
             service.registerCallback(serviceCallback, connectionId)

@@ -12,7 +12,10 @@ internal class TailscaleStatusFormatting(private val context: Context) {
     fun expiry(peer: TailscaleStatusPeer): String = when {
         peer.expired -> text(R.string.tailscale_status_expired)
         peer.keyExpiry <= 0 || peer.keyExpiry > Long.MAX_VALUE / 1000 -> text(R.string.tailscale_status_expiry_unknown)
-        else -> text(R.string.tailscale_status_expiry, DateFormat.getDateTimeInstance().format(Date(peer.keyExpiry * 1000)))
+        else -> text(
+            R.string.tailscale_status_expiry,
+            DateFormat.getDateTimeInstance().format(Date(peer.keyExpiry * 1000)),
+        )
     }
 
     fun peer(peer: TailscaleStatusPeer): String = listOfNotNull(
@@ -36,7 +39,11 @@ internal class TailscaleStatusFormatting(private val context: Context) {
             return text(R.string.tailscale_status_starting)
         }
         if (status?.stage == "starting") return text(R.string.connecting)
-        if (!state.connected) return text(if (state.failed) R.string.tailscale_status_error else R.string.tailscale_status_connecting)
+        if (!state.connected) {
+            return text(
+                if (state.failed) R.string.tailscale_status_error else R.string.tailscale_status_connecting,
+            )
+        }
         if (status?.stage == "closed") return text(R.string.tailscale_status_closed)
         if (status?.stage == "error") return text(R.string.tailscale_status_error)
         val node = status?.node ?: return text(R.string.tailscale_status_stopped)
@@ -53,13 +60,19 @@ internal class TailscaleStatusFormatting(private val context: Context) {
         val exit = node.currentExit ?: return text(R.string.tailscale_status_none)
         val name = node.peers.firstOrNull { it.id == exit.id }?.name?.takeIf { it.isNotEmpty() }
         val label = listOfNotNull(name, exit.ip.takeIf { it.isNotEmpty() } ?: exit.id).joinToString(" · ")
-        return text(if (exit.live) R.string.tailscale_status_exit_live else R.string.tailscale_status_exit_not_live, label)
+        return text(
+            if (exit.live) R.string.tailscale_status_exit_live else R.string.tailscale_status_exit_not_live,
+            label,
+        )
     }
 
     fun sample(sample: TailscalePingSample): String {
         val path = when (sample.path) {
             "direct" -> text(R.string.tailscale_status_path_direct)
-            "derp" -> text(R.string.tailscale_status_path_derp, sample.derpRegionCode.ifEmpty { sample.derpRegionId.toString() })
+            "derp" -> text(
+                R.string.tailscale_status_path_derp,
+                sample.derpRegionCode.ifEmpty { sample.derpRegionId.toString() },
+            )
             "peer-relay" -> text(R.string.tailscale_status_path_peer_relay)
             else -> text(R.string.tailscale_status_path_unknown)
         }

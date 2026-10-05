@@ -9,7 +9,12 @@ internal object TailscaleProfileStore {
         ?.takeIf { it.type == ProxyEntity.TYPE_TAILSCALE && it.tailscaleBean != null }
         ?: error("tailscale:conflict")
 
-    fun compareAndSetExit(profileId: Long, expectedIdentity: String, expectedExit: String, newExit: String): ProxyEntity = compareAndSetRuntimeExit(profileId, expectedIdentity, expectedExit, newExit, null)
+    fun compareAndSetExit(
+        profileId: Long,
+        expectedIdentity: String,
+        expectedExit: String,
+        newExit: String,
+    ): ProxyEntity = compareAndSetRuntimeExit(profileId, expectedIdentity, expectedExit, newExit, null)
 
     internal fun compareAndSetRuntimeExit(
         profileId: Long,
@@ -20,7 +25,9 @@ internal object TailscaleProfileStore {
     ): ProxyEntity = SagerDatabase.instance.runInTransaction(
         Callable {
             val current = read(profileId)
-            check(current.uuid == expectedIdentity && current.tailscaleBean!!.exitNode.orEmpty() == expectedExit) { "tailscale:conflict" }
+            check(current.uuid == expectedIdentity && current.tailscaleBean!!.exitNode.orEmpty() == expectedExit) {
+                "tailscale:conflict"
+            }
             if (runtimeBean != null) check(sameRuntime(current.tailscaleBean!!, runtimeBean)) { "tailscale:conflict" }
             write(current, current.tailscaleBean!!.clone().apply { exitNode = newExit })
         },

@@ -524,10 +524,16 @@ class TailscaleStatusSessionTest {
     }
 
     companion object {
-        private fun terminal(stage: String, errorCode: String = "", generation: Long = 1): String = JSONObject(status(stage = stage, source = "none", generation = generation))
-            .put("node", JSONObject.NULL).put("errorCode", errorCode).toString()
+        private fun terminal(stage: String, errorCode: String = "", generation: Long = 1): String =
+            JSONObject(status(stage = stage, source = "none", generation = generation))
+                .put("node", JSONObject.NULL).put("errorCode", errorCode).toString()
 
-        internal fun status(stage: String = "observing", source: String = "running", generation: Long = 1, savedExit: String = "100.64.0.2"): String = """
+        internal fun status(
+            stage: String = "observing",
+            source: String = "running",
+            generation: Long = 1,
+            savedExit: String = "100.64.0.2",
+        ): String = """
             {"version":1,"profileId":42,"identity":"identity","generation":$generation,
              "source":"$source","stage":"$stage","savedExit":"$savedExit","errorCode":"","message":"",
              "node":{"backendState":"Running","needsLogin":true,"needsApproval":true,
@@ -537,7 +543,8 @@ class TailscaleStatusSessionTest {
                  "online":false,"expired":false,"keyExpiry":0,"exitNodeOption":true,"exitNodeSelected":true}],
                "totalPeers":300,"peersTruncated":true}}
         """.trimIndent()
-        private fun exitResult(outcome: String) = """{"kind":"exit","outcome":"$outcome","savedExit":"100.64.0.2","errorCode":"","message":""}"""
+        private fun exitResult(outcome: String) =
+            """{"kind":"exit","outcome":"$outcome","savedExit":"100.64.0.2","errorCode":"","message":""}"""
         private fun pingResult(sequence: Int, peerId: String = "peer-stable", done: Boolean = false) = """
             {"kind":"ping","done":$done,"errorCode":"","message":"","sample":{
             "peerId":"$peerId","peerIp":"100.64.0.2","sequence":$sequence,"latencyMs":12.5,

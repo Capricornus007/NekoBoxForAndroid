@@ -27,7 +27,10 @@ class SagerConnectionTailscaleTest {
         val binder = Binder()
         lateinit var callback: ISagerNetServiceCallback
         val calls = mutableListOf<Pair<String, List<Any?>>>()
-        val api = Proxy.newProxyInstance(ISagerNetService::class.java.classLoader, arrayOf(ISagerNetService::class.java)) { _, method, args ->
+        val api = Proxy.newProxyInstance(
+            ISagerNetService::class.java.classLoader,
+            arrayOf(ISagerNetService::class.java),
+        ) { _, method, args ->
             when (method.name) {
                 "asBinder" -> binder
 

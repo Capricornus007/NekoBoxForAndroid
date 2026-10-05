@@ -6,5 +6,6 @@ internal data class TailscaleEditorBaseline(
     val exit: String,
     val exitEdited: Boolean = false,
 ) {
-    fun refreshed(identity: String, exit: String): TailscaleEditorBaseline = if (exitEdited || this.identity != identity) this else copy(exit = exit)
+    fun refreshed(identity: String, exit: String): TailscaleEditorBaseline =
+        if (exitEdited || this.identity != identity) this else copy(exit = exit)
 }

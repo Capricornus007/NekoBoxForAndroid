@@ -45,7 +45,10 @@ class TailscaleLoginPending(val url: String) : Exception("Tailscale needs login"
 
 // A short-lived node for a Tailscale profile the service is not running, used to list its
 // peers. It reuses the profile's saved identity, which is free while the service does not.
-class TailscalePeersInstance(profile: ProxyEntity, private val preparedConfig: ConfigBuildResult? = null) : BoxInstance(profile) {
+class TailscalePeersInstance(
+    profile: ProxyEntity,
+    private val preparedConfig: ConfigBuildResult? = null,
+) : BoxInstance(profile) {
 
     override fun buildConfig() {
         config = preparedConfig ?: buildConfig(profile, true)
@@ -58,22 +61,23 @@ class TailscalePeersInstance(profile: ProxyEntity, private val preparedConfig: C
     // [onLoginRequired] gets the interactive login URL of a node without an auth key; returning
     // true keeps the node up while the user signs in, until the login completes or
     // TAILSCALE_LOGIN_TIMEOUT_MS passes.
-    suspend fun listPeers(onLoginRequired: suspend (url: String) -> Boolean = { false }): List<TailscalePeer> = runProbe {
-        // The config may also carry a group's Tailscale front or landing node; pick this profile's.
-        val endpoint = config.tailscaleEndpoints.getValue(profile.id)
-        try {
-            // Only the login matters here; the configured exit node may be the one being replaced.
-            awaitTailscaleReady(box, endpoint.tag, false)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            val url = Libcore.tailscaleAuthURL(box, endpoint.tag)
-            if (url.isEmpty()) throw e
-            if (!onLoginRequired(url)) throw TailscaleLoginDeclined()
-            awaitLogin(endpoint.tag)
+    suspend fun listPeers(onLoginRequired: suspend (url: String) -> Boolean = { false }): List<TailscalePeer> =
+        runProbe {
+            // The config may also carry a group's Tailscale front or landing node; pick this profile's.
+            val endpoint = config.tailscaleEndpoints.getValue(profile.id)
+            try {
+                // Only the login matters here; the configured exit node may be the one being replaced.
+                awaitTailscaleReady(box, endpoint.tag, false)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                val url = Libcore.tailscaleAuthURL(box, endpoint.tag)
+                if (url.isEmpty()) throw e
+                if (!onLoginRequired(url)) throw TailscaleLoginDeclined()
+                awaitLogin(endpoint.tag)
+            }
+            parseTailscalePeers(Libcore.tailscalePeers(box, endpoint.tag))
         }
-        parseTailscalePeers(Libcore.tailscalePeers(box, endpoint.tag))
-    }
 
     // tailscaleWaitReady returns at once while a login is pending, so poll in short rounds; the
     // delay between rounds is where cancellation (leaving the editor) takes effect.

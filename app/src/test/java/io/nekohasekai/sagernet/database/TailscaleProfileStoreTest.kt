@@ -101,7 +101,13 @@ class TailscaleProfileStoreTest {
             }.exceptionOrNull()?.message,
         )
         assertEquals("100.64.0.1", draft.exitNode)
-        val cleared = TailscaleProfileStore.saveEditor(a.id, a.uuid, "100.64.0.2", draft.clone().apply { exitNode = "" }, true)
+        val cleared = TailscaleProfileStore.saveEditor(
+            a.id,
+            a.uuid,
+            "100.64.0.2",
+            draft.clone().apply { exitNode = "" },
+            true,
+        )
         assertEquals("", cleared.tailscaleBean!!.exitNode)
     }
 

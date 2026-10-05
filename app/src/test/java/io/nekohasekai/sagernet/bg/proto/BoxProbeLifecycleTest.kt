@@ -308,20 +308,22 @@ class BoxProbeLifecycleTest {
     fun testAndPeerInstancesReuseTheExactPreparedConfig() {
         val node = node()
         val config = prepared(node)
-        val instances = listOf(TestInstance(node, "https://example.invalid", 1_000, config), TailscalePeersInstance(node, config))
+        val instances =
+            listOf(TestInstance(node, "https://example.invalid", 1_000, config), TailscalePeersInstance(node, config))
         for (instance in instances) {
             instance.javaClass.getDeclaredMethod("buildConfig").apply { isAccessible = true }.invoke(instance)
             assertSame(config, instance.config)
         }
     }
 
-    private fun cleanupOnlyProbe(node: ProxyEntity, preparedConfig: ConfigBuildResult = prepared(node)) = object : BoxInstance(node) {
-        override suspend fun init() {
-            config = preparedConfig
-        }
+    private fun cleanupOnlyProbe(node: ProxyEntity, preparedConfig: ConfigBuildResult = prepared(node)) =
+        object : BoxInstance(node) {
+            override suspend fun init() {
+                config = preparedConfig
+            }
 
-        override fun launch() = Unit
-    }
+            override fun launch() = Unit
+        }
 
     private fun node() = ProxyEntity(groupId = 1).putBean(TailscaleBean().apply { initializeDefaultValues() }).also {
         it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) }
@@ -330,10 +332,17 @@ class BoxProbeLifecycleTest {
     private fun prepared(
         node: ProxyEntity,
         port: Int? = null,
-        endpoints: Map<Long, ConfigBuildResult.TailscaleEndpoint> = mapOf(node.id to ConfigBuildResult.TailscaleEndpoint("node", false)),
+        endpoints: Map<Long, ConfigBuildResult.TailscaleEndpoint> =
+            mapOf(node.id to ConfigBuildResult.TailscaleEndpoint("node", false)),
     ) = ConfigBuildResult(
         config = "{}",
-        externalIndex = if (port == null) emptyList() else listOf(ConfigBuildResult.IndexEntity(linkedMapOf(port to node))),
+        externalIndex = if (port == null) {
+            emptyList()
+        } else {
+            listOf(
+                ConfigBuildResult.IndexEntity(linkedMapOf(port to node)),
+            )
+        },
         mainEntId = node.id,
         trafficMap = mapOf("node" to listOf(node)),
         profileTagMap = mapOf(node.id to "node"),

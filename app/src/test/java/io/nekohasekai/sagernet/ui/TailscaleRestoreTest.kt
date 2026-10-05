@@ -146,7 +146,13 @@ class TailscaleRestoreTest {
                 ConfigBuilderTestEnv.io {
                     acquireTailscaleState(listOf(local.id)).use {
                         stageTailscaleRestore(local.id, local.uuid, if (deleted) null else "replacement")
-                        if (deleted) SagerDatabase.proxyDao.deleteById(local.id) else SagerDatabase.proxyDao.setTailscaleMarker(local.id, "replacement")
+                        if (deleted) {
+                            SagerDatabase.proxyDao.deleteById(
+                                local.id,
+                            )
+                        } else {
+                            SagerDatabase.proxyDao.setTailscaleMarker(local.id, "replacement")
+                        }
                         assertTrue(staging.resolve("state").deleteRecursively())
                         if (!metadataRemains) assertTrue(staging.resolve("metadata.json").delete())
                     }
@@ -173,7 +179,9 @@ class TailscaleRestoreTest {
             staging.resolve(name).apply { mkdirs() }.resolve("preserve").writeBytes(byteArrayOf(0, -1, 42))
             val before = fileTree(staging)
             try {
-                val failure = ConfigBuilderTestEnv.io { runCatching { acquireTailscaleState(listOf(local.id)).close() }.exceptionOrNull() }
+                val failure = ConfigBuilderTestEnv.io {
+                    runCatching { acquireTailscaleState(listOf(local.id)).close() }.exceptionOrNull()
+                }
                 assertNotNull(failure)
                 assertEquals(before, fileTree(staging))
                 assertEquals(rows, databaseRows())
@@ -205,7 +213,9 @@ class TailscaleRestoreTest {
             }
             Files.createSymbolicLink(link.toPath(), target.toPath())
             try {
-                val failure = ConfigBuilderTestEnv.io { runCatching { acquireTailscaleState(listOf(local.id)).close() }.exceptionOrNull() }
+                val failure = ConfigBuilderTestEnv.io {
+                    runCatching { acquireTailscaleState(listOf(local.id)).close() }.exceptionOrNull()
+                }
                 assertNotNull(failure)
                 assertTrue(Files.isSymbolicLink(link.toPath()))
                 assertEquals(rows, databaseRows())
@@ -259,7 +269,9 @@ class TailscaleRestoreTest {
         val files = fileTree(tailscaleRestoreDirectory(local.id))
         try {
             ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.setTailscaleMarker(local.id, "unknown") }
-            val failure = ConfigBuilderTestEnv.io { runCatching { acquireTailscaleState(listOf(local.id)).close() }.exceptionOrNull() }
+            val failure = ConfigBuilderTestEnv.io {
+                runCatching { acquireTailscaleState(listOf(local.id)).close() }.exceptionOrNull()
+            }
             assertNotNull(failure)
             assertEquals(files, fileTree(tailscaleRestoreDirectory(local.id)))
             assertFalse(tailscaleStateFile(local.id).exists())
@@ -283,7 +295,13 @@ class TailscaleRestoreTest {
                 acquireTailscaleState(listOf(local.id)).use {
                     stageTailscaleRestore(local.id, local.uuid, if (deleted) null else "replacement")
                     SagerDatabase.instance.runInTransaction {
-                        if (deleted) SagerDatabase.proxyDao.deleteById(local.id) else SagerDatabase.proxyDao.setTailscaleMarker(local.id, "replacement")
+                        if (deleted) {
+                            SagerDatabase.proxyDao.deleteById(
+                                local.id,
+                            )
+                        } else {
+                            SagerDatabase.proxyDao.setTailscaleMarker(local.id, "replacement")
+                        }
                     }
                 }
             }
@@ -306,7 +324,9 @@ class TailscaleRestoreTest {
         val stagedFiles = fileTree(tailscaleRestoreDirectory(local.id))
         val active = tailscaleStateFile(local.id).apply { mkdirs() }.resolve("unexpected")
         active.writeBytes(byteArrayOf(3, 1, 4))
-        val failure = ConfigBuilderTestEnv.io { runCatching { acquireTailscaleState(listOf(local.id)).close() }.exceptionOrNull() }
+        val failure = ConfigBuilderTestEnv.io {
+            runCatching { acquireTailscaleState(listOf(local.id)).close() }.exceptionOrNull()
+        }
         assertNotNull(failure)
         assertEquals(stagedFiles, fileTree(tailscaleRestoreDirectory(local.id)))
         assertEquals(listOf<Byte>(3, 1, 4), active.readBytes().toList())
@@ -326,7 +346,9 @@ class TailscaleRestoreTest {
         try {
             metadata.writeText("invalid")
             val before = fileTree(staging)
-            val failure = ConfigBuilderTestEnv.io { runCatching { acquireTailscaleState(listOf(local.id)).close() }.exceptionOrNull() }
+            val failure = ConfigBuilderTestEnv.io {
+                runCatching { acquireTailscaleState(listOf(local.id)).close() }.exceptionOrNull()
+            }
             assertNotNull(failure)
             assertEquals(before, fileTree(staging))
             assertFalse(tailscaleStateFile(local.id).exists())
@@ -381,13 +403,19 @@ class TailscaleRestoreTest {
 
     @Test
     fun resetMarkerWriteFailuresRestoreExactCredentialsAndRows() {
-        for ((timing, action) in listOf("BEFORE" to "IGNORE", "BEFORE" to "ABORT, 'reset rejection'", "AFTER" to "ABORT, 'reset rollback'")) {
+        for ((timing, action) in listOf(
+            "BEFORE" to "IGNORE",
+            "BEFORE" to "ABORT, 'reset rejection'",
+            "AFTER" to "ABORT, 'reset rollback'",
+        )) {
             val local = setup()
             val rows = databaseRows()
             val files = credentialFiles(local.id)
             ConfigBuilderTestEnv.io {
                 val db = SagerDatabase.instance.openHelper.writableDatabase
-                db.execSQL("CREATE TRIGGER reject_reset $timing UPDATE OF uuid ON proxy_entities BEGIN SELECT RAISE($action); END")
+                db.execSQL(
+                    "CREATE TRIGGER reject_reset $timing UPDATE OF uuid ON proxy_entities BEGIN SELECT RAISE($action); END",
+                )
                 try {
                     assertNotNull(runCatching { resetTailscaleIdentity(local.id) }.exceptionOrNull())
                 } finally {
@@ -424,7 +452,9 @@ class TailscaleRestoreTest {
             acquireTailscaleState(listOf(local.id)).use {
                 // Inject at the existing staging helper after acquisition, before any marker write.
                 assertTrue(tailscaleRestoreDirectory(local.id).mkdirs())
-                assertNotNull(runCatching { stageTailscaleRestore(local.id, local.uuid, "reset-marker") }.exceptionOrNull())
+                assertNotNull(
+                    runCatching { stageTailscaleRestore(local.id, local.uuid, "reset-marker") }.exceptionOrNull(),
+                )
                 recoverTailscaleRestore(local.id)
                 recoverTailscaleRestore(local.id)
             }

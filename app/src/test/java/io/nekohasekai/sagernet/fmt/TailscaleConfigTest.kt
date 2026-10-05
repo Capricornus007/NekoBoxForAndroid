@@ -37,8 +37,13 @@ class TailscaleConfigTest {
         serverPort = 1080
     }
 
-    private fun add(bean: AbstractBean, groupId: Long = 0, order: Long = 0): ProxyEntity = ProxyEntity(groupId = groupId, userOrder = order).putBean(bean.apply { initializeDefaultValues() })
-        .also { it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) } }
+    private fun add(bean: AbstractBean, groupId: Long = 0, order: Long = 0): ProxyEntity =
+        ProxyEntity(groupId = groupId, userOrder = order).putBean(
+            bean.apply {
+                initializeDefaultValues()
+            },
+        )
+            .also { it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) } }
 
     private fun chain(vararg hops: ProxyEntity) = ChainBean().apply { proxies = hops.map { it.id } }
 
@@ -105,7 +110,10 @@ class TailscaleConfigTest {
         if (forTest) {
             assertTrue(config.objects("inbounds").isEmpty())
             val tailscaleServers = servers.filter { it.optString("type") == "tailscale" }.map { it.getString("tag") }
-            assertEquals(setOf("dns-local", "dns-direct") + tailscaleServers, servers.map { it.getString("tag") }.toSet())
+            assertEquals(
+                setOf("dns-local", "dns-direct") + tailscaleServers,
+                servers.map { it.getString("tag") }.toSet(),
+            )
             assertEquals(preferred, dns.objects("rules"))
             assertFalse(servers.single { it.getString("tag") == "dns-direct" }.has("detour"))
         }
@@ -150,7 +158,11 @@ class TailscaleConfigTest {
         for (tailscale in listOf(true, false)) {
             for (chainFirst in listOf(false, true)) {
                 ConfigBuilderTestEnv.reset()
-                val groupId = ConfigBuilderTestEnv.io { SagerDatabase.groupDao.createGroup(ProxyGroup(isSelector = true)) }
+                val groupId = ConfigBuilderTestEnv.io {
+                    SagerDatabase.groupDao.createGroup(
+                        ProxyGroup(isSelector = true),
+                    )
+                }
                 val entry = add(if (tailscale) node() else socks("entry"), groupId, 0)
                 val exit = add(socks(), groupId, 1)
                 val chain = add(chain(entry, exit), groupId, if (chainFirst) -1 else 2)
@@ -166,7 +178,12 @@ class TailscaleConfigTest {
                 val chainTag = if (chainFirst) "socks" else "socks-1"
                 val outbounds = config.objects("outbounds") + config.objects("endpoints")
                 assertEquals(entryTag, outbounds.single { it.optString("tag") == chainTag }.getString("detour"))
-                assertEquals(3, config.objects("outbounds").single { it.optString("type") == "selector" }.getJSONArray("outbounds").length())
+                assertEquals(
+                    3,
+                    config.objects("outbounds").single {
+                        it.optString("type") == "selector"
+                    }.getJSONArray("outbounds").length(),
+                )
                 assertEquals(entryTag, result.profileTagMap[entry.id])
                 assertEquals(chainTag, result.profileTagMap[chain.id])
                 assertEquals(if (tailscale) 1 else 0, config.objects("endpoints").size)
@@ -182,19 +199,26 @@ class TailscaleConfigTest {
         val socks = add(socks())
         val chain = add(chain(node, socks))
         ConfigBuilderTestEnv.io {
-            SagerDatabase.rulesDao.createRule(RuleEntity(enabled = true, domains = "full:chain.example", outbound = chain.id))
+            SagerDatabase.rulesDao.createRule(
+                RuleEntity(enabled = true, domains = "full:chain.example", outbound = chain.id),
+            )
         }
         for (mode in modes) {
             val config = fixture("extra-chain-$mode", build(node, mode), "tailnet")
             assertEquals(1, config.objects("endpoints").size)
             if (mode != "test") {
-                assertEquals("tailnet", config.objects("outbounds").single { it.optString("tag") == "socks" }.getString("detour"))
+                assertEquals(
+                    "tailnet",
+                    config.objects("outbounds").single { it.optString("tag") == "socks" }.getString("detour"),
+                )
             }
             assertMagicDns(config, mode == "test")
         }
         ConfigBuilderTestEnv.io {
             SagerDatabase.rulesDao.reset()
-            SagerDatabase.rulesDao.createRule(RuleEntity(enabled = true, domains = "full:tailnet.example", outbound = node.id))
+            SagerDatabase.rulesDao.createRule(
+                RuleEntity(enabled = true, domains = "full:tailnet.example", outbound = node.id),
+            )
         }
         val config = fixture("extra-tailnet", build(socks, "normal"), "socks")
         assertEquals(1, config.objects("endpoints").size)
@@ -207,7 +231,9 @@ class TailscaleConfigTest {
         DataStore.enableDnsRouting = true
         DataStore.enableFakeDns = true
         ConfigBuilderTestEnv.io {
-            SagerDatabase.rulesDao.createRule(RuleEntity(enabled = true, domains = "full:blocked.ts.test", outbound = -2))
+            SagerDatabase.rulesDao.createRule(
+                RuleEntity(enabled = true, domains = "full:blocked.ts.test", outbound = -2),
+            )
         }
         val node = add(node())
         val service = fixture("dns-service", build(node, "normal"), "tailnet")
@@ -218,7 +244,10 @@ class TailscaleConfigTest {
         val block = rules.indexOfFirst { it.optString("action") == "predefined" }
         val magic = rules.indexOfFirst { it.has("preferred_by") }
         val fake = rules.indexOfFirst { it.optString("server") == "dns-fake" }
-        assertTrue("DNS precedence: $rules", bootstrap >= 0 && bootstrap < hosts && hosts < block && block < magic && magic < fake)
+        assertTrue(
+            "DNS precedence: $rules",
+            bootstrap >= 0 && bootstrap < hosts && hosts < block && block < magic && magic < fake,
+        )
         val probe = fixture("dns-test", build(node, "test"), "tailnet")
         assertMagicDns(probe, true)
     }
@@ -245,7 +274,12 @@ class TailscaleConfigTest {
         assertTrue(result.profileTagMap.containsKey(valid.id))
         assertEquals(1, config.objects("endpoints").size)
         val nodeTag = config.objects("endpoints").single().getString("tag")
-        assertEquals(nodeTag, config.objects("outbounds").single { it.optString("tag") == result.profileTagMap[valid.id] }.getString("detour"))
+        assertEquals(
+            nodeTag,
+            config.objects("outbounds").single {
+                it.optString("tag") == result.profileTagMap[valid.id]
+            }.getString("detour"),
+        )
         assertMagicDns(config, false)
     }
 

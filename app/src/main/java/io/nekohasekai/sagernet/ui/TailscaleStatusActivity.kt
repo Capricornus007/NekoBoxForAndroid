@@ -153,7 +153,9 @@ class TailscaleStatusActivity : ThemedActivity(R.layout.layout_tailscale_status)
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             ViewCompat.setOnApplyWindowInsetsListener(listView) { list, insets ->
-                val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+                val bars = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+                )
                 list.updatePadding(left = bars.left, right = bars.right, bottom = bars.bottom)
                 insets
             }
@@ -192,7 +194,14 @@ class TailscaleStatusActivity : ThemedActivity(R.layout.layout_tailscale_status)
             rows.getValue("currentExit").summary = format.currentExit(node)
             rows.getValue("savedExit").summary = status?.let {
                 it.savedExit.ifEmpty { getString(R.string.tailscale_status_none) } +
-                    if (node?.savedExitDiffers(it.savedExit) == true) "\n" + getString(R.string.tailscale_status_exit_mismatch) else ""
+                    if (node?.savedExitDiffers(
+                            it.savedExit,
+                        ) == true
+                    ) {
+                        "\n" + getString(R.string.tailscale_status_exit_mismatch)
+                    } else {
+                        ""
+                    }
             } ?: getString(R.string.tailscale_status_unknown)
             rows.getValue("exit").apply {
                 isEnabled = state.canOperate
@@ -203,13 +212,21 @@ class TailscaleStatusActivity : ThemedActivity(R.layout.layout_tailscale_status)
                 summary = state.exitOutcome?.let(format::exitOutcome)
             }
             rows.getValue("ping").summary = buildList {
-                add(getString(if (state.pending == "ping") R.string.tailscale_status_ping_pending else R.string.tailscale_status_ping_summary))
+                add(
+                    getString(
+                        if (state.pending == "ping") R.string.tailscale_status_ping_pending else R.string.tailscale_status_ping_summary,
+                    ),
+                )
                 addAll(state.samples.map(format::sample))
             }.joinToString("\n")
             rows.getValue("cancelRequest").isVisible = state.pending != null
             val inventory = node?.peers.orEmpty()
             rows.getValue("inventory").title = when {
-                node?.peersTruncated == true -> getString(R.string.tailscale_status_inventory, inventory.size, node.totalPeers)
+                node?.peersTruncated == true -> getString(
+                    R.string.tailscale_status_inventory,
+                    inventory.size,
+                    node.totalPeers,
+                )
                 inventory.isEmpty() -> getString(R.string.tailscale_status_no_peers)
                 else -> getString(R.string.tailscale_status_inventory_complete, inventory.size)
             }
@@ -252,7 +269,9 @@ class TailscaleStatusActivity : ThemedActivity(R.layout.layout_tailscale_status)
                     MaterialAlertDialogBuilder(requireContext())
                         .setTitle(R.string.tailscale_status_exit_action)
                         .setMessage(message)
-                        .setPositiveButton(android.R.string.ok) { _, _ -> model.session?.selectExit(peerId, status.savedExit) }
+                        .setPositiveButton(
+                            android.R.string.ok,
+                        ) { _, _ -> model.session?.selectExit(peerId, status.savedExit) }
                         .setNegativeButton(android.R.string.cancel, null).show()
                 }
                 .setNegativeButton(android.R.string.cancel, null).show()

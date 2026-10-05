@@ -207,7 +207,15 @@ internal class TailscaleStatusSession(
         mutableState.value = mutableState.value.copy(
             status = if (terminal) status.copy(node = null, source = "none") else status,
             refreshing = false,
-            temporaryRequested = if (terminal || status.source in setOf("temporary", "running")) false else mutableState.value.temporaryRequested,
+            temporaryRequested = if (terminal || status.source in setOf(
+                    "temporary",
+                    "running",
+                )
+            ) {
+                false
+            } else {
+                mutableState.value.temporaryRequested
+            },
             pending = if (terminal || changedGeneration) null else mutableState.value.pending,
             samples = if (terminal || changedGeneration) emptyList() else mutableState.value.samples,
             exitOutcome = if (changedGeneration) null else mutableState.value.exitOutcome,
@@ -251,7 +259,12 @@ internal class TailscaleStatusSession(
         try {
             action()
         } catch (_: Exception) {
-            mutableState.value = mutableState.value.copy(failed = true, refreshing = false, temporaryRequested = false, pending = null)
+            mutableState.value = mutableState.value.copy(
+                failed = true,
+                refreshing = false,
+                temporaryRequested = false,
+                pending = null,
+            )
             observationPending = false
             requestId = 0
         }
