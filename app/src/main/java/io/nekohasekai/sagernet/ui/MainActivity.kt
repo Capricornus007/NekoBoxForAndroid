@@ -89,11 +89,11 @@ class MainActivity : ThemedActivity(),
 
         binding = LayoutMainBinding.inflate(layoutInflater)
         binding.fab.initProgress(binding.fabProgress)
-        val isNight = Theme.usingNightMode()
+        val isNight = Theme.usingNightMode(this)
         val fabBgColor = when {
-            Theme.isBlackTheme() -> Color.BLACK
-            Theme.isWhiteTheme() -> Color.parseColor("#212121")
-            Theme.isLightGrayTheme() -> Color.parseColor("#1F2937")
+            Theme.isBlackTheme(this) -> Color.BLACK
+            Theme.isWhiteTheme(this) -> Color.parseColor("#212121")
+            Theme.isLightGrayTheme(this) -> Color.parseColor("#1F2937")
             else -> {
                 val bg = getColorAttr(R.attr.fabColorBackground)
                 if (isNight && ColorUtils.calculateLuminance(bg) > 0.75) {

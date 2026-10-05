@@ -43,6 +43,8 @@ import io.nekohasekai.sagernet.database.DataStore
 import moe.matsuri.nb4a.utils.Util
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.StringReader
+import java.util.Properties
 
 class AboutFragment : ToolbarFragment(R.layout.layout_about) {
 
@@ -279,32 +281,93 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         modernTLS()
                         tryProxyOutbound()
                     }
-                    val url = if (isPreview) {
+                    val currentVersion = if (isPreview && BuildConfig.PRE_VERSION_NAME.isNotBlank()) {
+                        BuildConfig.PRE_VERSION_NAME
+                    } else {
+                        BuildConfig.VERSION_NAME
+                    }
+
+                    var releaseName: String? = null
+                    var releaseUrl: String? = null
+
+                    // 1. 首先尝试 GitHub Releases API
+                    val apiUrl = if (isPreview) {
                         "https://api.github.com/repos/Own716/OwnBoxForAndroid/releases"
                     } else {
                         "https://api.github.com/repos/Own716/OwnBoxForAndroid/releases/latest"
                     }
-                    val response = client.newRequest().apply {
-                        setURL(url)
-                    }.execute()
-                    val responseStr = Util.getStringBox(response.contentString)
-                    val (releaseName, releaseUrl) = if (isPreview) {
-                        val arr = JSONArray(responseStr)
-                        if (arr.length() == 0) throw IllegalStateException("No releases found")
-                        val first = arr.getJSONObject(0)
-                        first.getString("name") to first.getString("html_url")
-                    } else {
-                        val release = JSONObject(responseStr)
-                        release.getString("name") to release.getString("html_url")
+                    try {
+                        val response = client.newRequest().apply {
+                            setURL(apiUrl)
+                            setUserAgent("OwnBox/${BuildConfig.VERSION_NAME}")
+                            setHeader("Accept", "application/vnd.github.v3+json")
+                        }.execute()
+                        val responseStr = Util.getStringBox(response.contentString)
+                        if (isPreview) {
+                            val arr = JSONArray(responseStr)
+                            if (arr.length() > 0) {
+                                val first = arr.getJSONObject(0)
+                                releaseName = first.optString("name").ifBlank { first.optString("tag_name") }
+                                releaseUrl = first.optString("html_url")
+                            }
+                        } else {
+                            val release = JSONObject(responseStr)
+                            releaseName = release.optString("name").ifBlank { release.optString("tag_name") }
+                            releaseUrl = release.optString("html_url")
+                        }
+                    } catch (e: Exception) {
+                        Logs.w("GitHub API check failed, falling back to static metadata", e)
                     }
-                    // Release name is the git tag, e.g. "v1.4.2-m20-10" or "Ownbox 2.3.5".
-                    // Compare it with the local version name segment by segment.
+
+                    // 2. 若 API 受到 403 限流或网络异常，无缝降级到静态 properties 源 (全球高速 CDN 托管，无 API 速率限制)
+                    if (releaseName.isNullOrBlank() || releaseUrl.isNullOrBlank()) {
+                        val staticUrls = listOf(
+                            "https://cdn.jsdelivr.net/gh/Own716/OwnBoxForAndroid@main/nb4a.properties",
+                            "https://fastly.jsdelivr.net/gh/Own716/OwnBoxForAndroid@main/nb4a.properties",
+                            "https://raw.githubusercontent.com/Own716/OwnBoxForAndroid/main/nb4a.properties"
+                        )
+                        var propsContent: String? = null
+                        for (staticUrl in staticUrls) {
+                            try {
+                                val resp = client.newRequest().apply {
+                                    setURL(staticUrl)
+                                    setUserAgent("OwnBox/${BuildConfig.VERSION_NAME}")
+                                }.execute()
+                                val body = Util.getStringBox(resp.contentString)
+                                if (body.contains("VERSION_NAME=")) {
+                                    propsContent = body
+                                    break
+                                }
+                            } catch (e: Exception) {
+                                Logs.w("Failed to fetch $staticUrl: ${e.message}")
+                            }
+                        }
+                        if (!propsContent.isNullOrBlank()) {
+                            val props = Properties().apply {
+                                load(StringReader(propsContent))
+                            }
+                            val targetVer = if (isPreview) {
+                                (props.getProperty("PRE_VERSION_NAME") ?: props.getProperty("VERSION_NAME")).orEmpty().trim()
+                            } else {
+                                props.getProperty("VERSION_NAME").orEmpty().trim()
+                            }
+                            if (targetVer.isNotBlank()) {
+                                releaseName = "v$targetVer"
+                                releaseUrl = "https://github.com/Own716/OwnBoxForAndroid/releases/tag/v$targetVer"
+                            }
+                        }
+                    }
+
+                    if (releaseName.isNullOrBlank() || releaseUrl.isNullOrBlank()) {
+                        throw IllegalStateException("无法获取版本信息，请检查网络或稍后重试")
+                    }
+
                     val cleanReleaseName = releaseName.replace(Regex("(?i)^Ownbox\\s*"), "")
                     val haveUpdate = cleanReleaseName.isNotBlank() &&
-                            compareVersionNames(cleanReleaseName, BuildConfig.VERSION_NAME) > 0
+                            compareVersionNames(cleanReleaseName, currentVersion) > 0
                     runOnMainDispatcher {
                         if (haveUpdate) {
-                            val context = requireContext()
+                            val context = context ?: return@runOnMainDispatcher
                             MaterialAlertDialogBuilder(context)
                                 .setTitle(R.string.update_dialog_title)
                                 .setMessage(

@@ -53,9 +53,9 @@ class ColorPickerPreference @JvmOverloads constructor(
         widgetFrame.removeAllViews()
 
         val displayColor = when {
-            Theme.isWhiteTheme() -> Color.WHITE
-            Theme.isLightGrayTheme() -> Color.parseColor("#F5F5F7")
-            Theme.isBlackTheme() -> Color.BLACK
+            Theme.isBlackTheme(context) -> Color.BLACK
+            Theme.isWhiteTheme(context) -> Color.WHITE
+            Theme.isLightGrayTheme(context) -> Color.parseColor("#F5F5F7")
             else -> context.getColorAttr(R.attr.colorPrimary)
         }
 

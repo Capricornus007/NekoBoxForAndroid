@@ -41,8 +41,9 @@ object LandingIpBottomSheet {
         tvAsn.text = if (info.asn.isNotBlank()) info.asn else activity.getString(R.string.unknown)
         tvDuration.text = "${info.durationMs} ms"
 
-        val isNight = io.nekohasekai.sagernet.utils.Theme.usingNightMode()
-        val isWhite = io.nekohasekai.sagernet.utils.Theme.isWhiteTheme()
+        val sheetContext = activity
+        val isNight = io.nekohasekai.sagernet.utils.Theme.usingNightMode(sheetContext)
+        val isWhite = io.nekohasekai.sagernet.utils.Theme.isWhiteTheme(sheetContext)
 
         val cardBgColor = when {
             isNight -> android.graphics.Color.parseColor("#1E1E1E")

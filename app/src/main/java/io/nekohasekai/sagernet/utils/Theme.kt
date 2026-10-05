@@ -77,14 +77,14 @@ object Theme {
 
     fun apply(context: Context) {
         context.setTheme(getTheme(context))
-        if (!isWhiteTheme() && !isLightGrayTheme() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.useSystemTheme && context is android.app.Activity) {
+        if (!isWhiteTheme(context) && !isLightGrayTheme(context) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.useSystemTheme && context is android.app.Activity) {
             com.google.android.material.color.DynamicColors.applyIfAvailable(context)
         }
     }
 
     fun applyDialog(context: Context) {
         context.setTheme(getDialogTheme(context))
-        if (!isWhiteTheme() && !isLightGrayTheme() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.useSystemTheme && context is android.app.Activity) {
+        if (!isWhiteTheme(context) && !isLightGrayTheme(context) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && DataStore.useSystemTheme && context is android.app.Activity) {
             com.google.android.material.color.DynamicColors.applyIfAvailable(context)
         }
     }
@@ -152,8 +152,13 @@ object Theme {
     }
 
     fun isSystemNight(context: Context = app): Boolean {
-        val res = (context as? android.app.Activity)?.resources ?: context.resources ?: app.resources
-        return (res.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        val ctxUiMode = (context as? android.app.Activity)?.resources?.configuration?.uiMode
+            ?: context.resources?.configuration?.uiMode
+        if (ctxUiMode != null && (ctxUiMode and Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_UNDEFINED) {
+            return (ctxUiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        }
+        val sysUiMode = android.content.res.Resources.getSystem().configuration.uiMode
+        return (sysUiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
     }
 
     fun isWhiteTheme(context: Context = app): Boolean = !usingNightMode(context) && DataStore.appTheme == WHITE
@@ -207,7 +212,7 @@ object Theme {
     fun applyNightTheme() {
         if (DataStore.nightTheme == 0) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-        } else if (DataStore.nightTheme == 1 || isBlackTheme()) {
+        } else if (DataStore.nightTheme == 1 || DataStore.appTheme == BLACK) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else if (DataStore.nightTheme == 2) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

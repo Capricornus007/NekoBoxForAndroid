@@ -18,6 +18,6 @@
         app:titleTextColor="?android:attr/textColorPrimary"
         app:subtitleTextColor="?android:attr/textColorSecondary"
         app:navigationIconTint="?android:attr/textColorPrimary"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
+        app:popupTheme="?attr/actionBarPopupTheme"
         app:title="@string/app_name" />
 </com.google.android.material.appbar.AppBarLayout>

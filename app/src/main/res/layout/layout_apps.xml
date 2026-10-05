@@ -30,7 +30,7 @@
                 app:titleTextColor="?attr/colorOnSurface"
                 app:navigationIconTint="?attr/colorOnSurface"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
+                app:popupTheme="?attr/actionBarPopupTheme"
                 app:title="@string/app_name" />
 
             <LinearLayout

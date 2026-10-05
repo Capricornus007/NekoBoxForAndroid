@@ -559,17 +559,17 @@ class ConfigurationFragment @JvmOverloads constructor(
         val textColor: Int
         val hintColor: Int
         when {
-            Theme.isWhiteTheme() -> {
+            Theme.isBlackTheme(ctx) -> {
+                textColor = Color.WHITE
+                hintColor = Color.parseColor("#CAC4D0")
+            }
+            Theme.isWhiteTheme(ctx) -> {
                 textColor = Color.parseColor("#212121")
                 hintColor = Color.parseColor("#8A000000")
             }
-            Theme.isLightGrayTheme() -> {
+            Theme.isLightGrayTheme(ctx) -> {
                 textColor = Color.parseColor("#1F2937")
                 hintColor = Color.parseColor("#6B7280")
-            }
-            Theme.isBlackTheme() -> {
-                textColor = Color.WHITE
-                hintColor = Color.parseColor("#CAC4D0")
             }
             else -> {
                 textColor = ctx.getColorAttr(android.R.attr.textColorPrimary)
@@ -671,8 +671,29 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
         }
 
+        val ctx = requireContext()
         when {
-            Theme.isWhiteTheme() -> {
+            Theme.isBlackTheme(ctx) -> {
+                val bg = Color.BLACK
+                view.findViewById<View>(R.id.appbar)?.setBackgroundColor(bg)
+                toolbar.setBackgroundColor(bg)
+                toolbar.setTitleTextColor(Color.WHITE)
+                tabLayout.setBackgroundColor(bg)
+                tabLayout.setSelectedTabIndicatorColor(Color.WHITE)
+                tabLayout.setTabTextColors(Color.parseColor("#CAC4D0"), Color.WHITE)
+                toolbar.navigationIcon?.let {
+                    val tinted = it.mutate()
+                    DrawableCompat.setTint(tinted, Color.WHITE)
+                    toolbar.navigationIcon = tinted
+                }
+                toolbar.overflowIcon?.let {
+                    val tinted = it.mutate()
+                    DrawableCompat.setTint(tinted, Color.WHITE)
+                    toolbar.overflowIcon = tinted
+                }
+                tintMenuIcons(toolbar.menu, Color.WHITE)
+            }
+            Theme.isWhiteTheme(ctx) -> {
                 view.findViewById<View>(R.id.appbar)?.setBackgroundColor(Color.WHITE)
                 toolbar.setBackgroundColor(Color.WHITE)
                 toolbar.setTitleTextColor(Color.parseColor("#212121"))
@@ -691,7 +712,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
                 tintMenuIcons(toolbar.menu, Color.parseColor("#212121"))
             }
-            Theme.isLightGrayTheme() -> {
+            Theme.isLightGrayTheme(ctx) -> {
                 val bg = Color.parseColor("#F5F5F7")
                 val textPrimary = Color.parseColor("#1F2937")
                 val textSecondary = Color.parseColor("#6B7280")
@@ -712,26 +733,6 @@ class ConfigurationFragment @JvmOverloads constructor(
                     toolbar.overflowIcon = tinted
                 }
                 tintMenuIcons(toolbar.menu, textPrimary)
-            }
-            Theme.isBlackTheme() -> {
-                val bg = Color.BLACK
-                view.findViewById<View>(R.id.appbar)?.setBackgroundColor(bg)
-                toolbar.setBackgroundColor(bg)
-                toolbar.setTitleTextColor(Color.WHITE)
-                tabLayout.setBackgroundColor(bg)
-                tabLayout.setSelectedTabIndicatorColor(Color.WHITE)
-                tabLayout.setTabTextColors(Color.parseColor("#CAC4D0"), Color.WHITE)
-                toolbar.navigationIcon?.let {
-                    val tinted = it.mutate()
-                    DrawableCompat.setTint(tinted, Color.WHITE)
-                    toolbar.navigationIcon = tinted
-                }
-                toolbar.overflowIcon?.let {
-                    val tinted = it.mutate()
-                    DrawableCompat.setTint(tinted, Color.WHITE)
-                    toolbar.overflowIcon = tinted
-                }
-                tintMenuIcons(toolbar.menu, Color.WHITE)
             }
             else -> {
                 val tabIndicatorColor = requireContext().getColorAttr(R.attr.tabIndicatorColor)
@@ -758,11 +759,12 @@ class ConfigurationFragment @JvmOverloads constructor(
                 // Show back navigation arrow on the toolbar for clear exit path
                 if (!select) {
                     toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24)
+                    val searchContext = requireContext()
                     val primaryColor = when {
-                        Theme.isWhiteTheme() -> Color.parseColor("#212121")
-                        Theme.isLightGrayTheme() -> Color.parseColor("#1F2937")
-                        Theme.isBlackTheme() -> Color.WHITE
-                        else -> requireContext().getColorAttr(android.R.attr.textColorPrimary)
+                        Theme.isBlackTheme(searchContext) -> Color.WHITE
+                        Theme.isWhiteTheme(searchContext) -> Color.parseColor("#212121")
+                        Theme.isLightGrayTheme(searchContext) -> Color.parseColor("#1F2937")
+                        else -> searchContext.getColorAttr(android.R.attr.textColorPrimary)
                     }
                     toolbar.navigationIcon?.let {
                         val tinted = it.mutate()
@@ -4112,11 +4114,12 @@ class ConfigurationFragment @JvmOverloads constructor(
             toolbar.menu.findItem(R.id.action_add)?.isVisible = true
             toolbar.title = getString(R.string.app_name)
 
+            val cancelContext = requireContext()
             val primaryColor = when {
-                Theme.isWhiteTheme() -> Color.parseColor("#212121")
-                Theme.isLightGrayTheme() -> Color.parseColor("#1F2937")
-                Theme.isBlackTheme() -> Color.WHITE
-                else -> requireContext().getColorAttr(android.R.attr.textColorPrimary)
+                Theme.isBlackTheme(cancelContext) -> Color.WHITE
+                Theme.isWhiteTheme(cancelContext) -> Color.parseColor("#212121")
+                Theme.isLightGrayTheme(cancelContext) -> Color.parseColor("#1F2937")
+                else -> cancelContext.getColorAttr(android.R.attr.textColorPrimary)
             }
 
             if (!select) {
