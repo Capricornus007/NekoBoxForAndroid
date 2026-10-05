@@ -98,6 +98,27 @@ else
     done < <(grep -oP "=> github\.com/$OWNER/\K[a-z0-9._/-]+(?= v)" "$LCORE" | sort -u)
 fi
 
+echo "== 段 1c：核心版本字串的兩處記錄必須一致（硬比較）=="
+# 教訓（2026-10-05）：抬 sing-box pin 時只改 get_source_env.sh 的 VERSION_SING_BOX 是不夠的——
+# 真正蓋進 libgojni.so 的是 libcore/build.sh:31 從 nb4a.properties 讀的 SINGBOX_VERSION
+# （build.sh:38 用 -X github.com/sagernet/sing-box/constant.Version=… 注入）。
+# 兩處不同步時，產物裡印出來的核心版本會停在舊值，看起來就像「CI 綠但裝上去還是舊核心」，
+# 實測因此白查過一輪（APK 明明是新的、字串卻報 mod.23）。
+V_ENV=$(grep -oP '^export VERSION_SING_BOX="\K[^"]+' "$ENV_FILE" 2>/dev/null | tr -d '\r' || true)
+V_PROP=$(grep -oP '^SINGBOX_VERSION=\K[^ ]+' nb4a.properties 2>/dev/null | tr -d '\r' || true)
+V_ENV=${V_ENV#v}
+V_PROP=${V_PROP#v}
+if [ -z "$V_ENV" ] || [ -z "$V_PROP" ]; then
+    echo "  **資料缺失**  VERSION_SING_BOX='$V_ENV' SINGBOX_VERSION='$V_PROP'（任一為空就查不出漂移）"
+    failures=$((failures + 1))
+elif [ "$V_ENV" != "$V_PROP" ]; then
+    echo "  **不同步**  get_source_env.sh=$V_ENV  nb4a.properties=$V_PROP"
+    echo "            → app 顯示與二進位內嵌的是 nb4a.properties 那一個；兩邊要一起抬。"
+    failures=$((failures + 1))
+else
+    echo "  一致      $V_ENV"
+fi
+
 echo "== 段 2：每條 COMMIT_* 是否等於該 fork 預設分支尖端（僅報告）=="
 while read -r key; do
     [ -n "$key" ] || continue
