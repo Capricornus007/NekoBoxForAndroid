@@ -27,8 +27,6 @@ import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.ui.SwitchActivity
-import io.nekohasekai.sagernet.utils.LandingIpManager
-import io.nekohasekai.sagernet.utils.RegionExtractor
 import io.nekohasekai.sagernet.utils.Theme
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -160,7 +158,6 @@ class ServiceNotification(
 
         Theme.apply(app)
         Theme.apply(service)
-        applyLiveUpdateCapsule(builder, service.data.state)
 
         // startForegroundService() has a strict deadline. Promote synchronously before receiver
         // registration, coroutine scheduling, database refreshes, or proxy initialization.
