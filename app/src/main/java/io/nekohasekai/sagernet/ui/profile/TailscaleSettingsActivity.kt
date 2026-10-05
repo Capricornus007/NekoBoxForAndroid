@@ -394,7 +394,6 @@ class TailscaleSettingsActivity :
                 Logs.w(e)
                 onMainDispatcher { Toast.makeText(this@TailscaleSettingsActivity, e.readableMessage, Toast.LENGTH_LONG).show() }
             }
-            }
         }
     }
 }

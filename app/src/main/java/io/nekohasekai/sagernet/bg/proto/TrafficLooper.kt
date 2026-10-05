@@ -202,7 +202,7 @@ class TrafficLooper(
                 TrafficDataBatch(ArrayList(it))
             }
             data.binder.broadcast { callback ->
-                if (data.binder.callbackIdMap[callback] ==
+                if (data.binder.callbackIdMap[callback.asBinder()] ==
                     SagerConnection.CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND
                 ) {
                     batches.forEach { callback.cbTrafficUpdateBatch(it) }
