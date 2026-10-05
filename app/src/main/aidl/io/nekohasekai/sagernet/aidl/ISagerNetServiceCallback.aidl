@@ -12,4 +12,6 @@ oneway interface ISagerNetServiceCallback {
   void cbTrafficUpdateList(in List<TrafficData> stats);
   void cbTrafficUpdateBatch(in TrafficDataBatch stats);
   void cbSelectorUpdate(long id);
+  void cbTailscaleStatus(long sessionId, long sequence, String json);
+  void cbTailscaleResult(long sessionId, long requestId, String json);
 }

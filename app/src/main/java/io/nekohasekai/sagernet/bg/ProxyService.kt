@@ -21,6 +21,11 @@ class ProxyService : Service(), BaseService.Interface {
             .apply { acquire() }
     }
 
+    override fun onDestroy() {
+        data.binder.close()
+        super.onDestroy()
+    }
+
     override fun onBind(intent: Intent) = super.onBind(intent)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int =
         super<BaseService.Interface>.onStartCommand(intent, flags, startId)

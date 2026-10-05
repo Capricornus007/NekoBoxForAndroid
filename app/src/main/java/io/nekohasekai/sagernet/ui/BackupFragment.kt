@@ -24,6 +24,7 @@ import io.nekohasekai.sagernet.database.preference.PublicDatabase
 import io.nekohasekai.sagernet.databinding.LayoutBackupBinding
 import io.nekohasekai.sagernet.databinding.LayoutImportBinding
 import io.nekohasekai.sagernet.databinding.LayoutProgressBinding
+import io.nekohasekai.sagernet.fmt.tailscale.profilesForBackup
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ktx.app
 import kotlinx.coroutines.CancellationException
@@ -635,7 +636,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         val out = JSONObject().apply {
             put("version", BackupFormatV2.VERSION)
             if (profile) {
-                put("profiles", BackupFormatV2.encodeProfiles(SagerDatabase.proxyDao.getAll()))
+                put("profiles", BackupFormatV2.encodeProfiles(profilesForBackup()))
                 put("groups", BackupFormatV2.encodeGroups(SagerDatabase.groupDao.allGroups()))
             }
             if (rule) {

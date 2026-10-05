@@ -12,12 +12,11 @@ import (
 	"time"
 
 	"github.com/matsuridayo/libneko/speedtest"
+	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/common/dialer"
-	"github.com/sagernet/sing-box/protocol/tailscale"
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	"github.com/sagernet/tailscale/ipn"
-	"github.com/sagernet/tailscale/ipn/ipnstate"
 )
 
 // deferPanicToError converts a panic into an error via onError; helper ported from hawkff's
@@ -54,31 +53,22 @@ func UrlTestOutbound(i *BoxInstance, tag string, link string, timeout int32) (la
 	return speedtest.UrlTest(ctx, client, link, speedtest.UrlTestStandard_RTT)
 }
 
-func tailscaleEndpoint(i *BoxInstance, tag string) (*tailscale.Endpoint, error) {
-	if i == nil {
-		return nil, E.New("no instance")
+// tailscaleReady reports backend and exit selection readiness, not packet reachability.
+func tailscaleReady(status *adapter.TailscaleEndpointStatus, exitNodeWanted bool) bool {
+	if status == nil || status.BackendState != ipn.Running.String() {
+		return false
 	}
-	endpoint, loaded := i.Box.Endpoint().Get(tag)
-	if !loaded {
-		return nil, E.New("endpoint not found: ", tag)
+	if !exitNodeWanted {
+		return true
 	}
-	ts, isTailscale := endpoint.(*tailscale.Endpoint)
-	if !isTailscale {
-		return nil, E.New("not a Tailscale endpoint: ", tag)
+	// ExitNodeStatus comes from a netmap snapshot that can miss peer deltas.
+	// Only the live peer state establishes current selection and approval.
+	for _, peer := range nativeTailscalePeers(status) {
+		if peer != nil && peer.ExitNode && peer.ExitNodeOption {
+			return true
+		}
 	}
-	return ts, nil
-}
-
-func tailscaleStatus(ctx context.Context, i *BoxInstance, tag string) (*ipnstate.Status, error) {
-	endpoint, err := tailscaleEndpoint(i, tag)
-	if err != nil {
-		return nil, err
-	}
-	client, err := endpoint.Server().LocalClient()
-	if err != nil {
-		return nil, err
-	}
-	return client.Status(ctx)
+	return false
 }
 
 // TailscaleWaitReady blocks until the node is running, and its exit node is selected when
@@ -86,17 +76,19 @@ func tailscaleStatus(ctx context.Context, i *BoxInstance, tag string) (*ipnstate
 // can show why a node never came up.
 func TailscaleWaitReady(i *BoxInstance, tag string, exitNodeWanted bool, timeoutMs int32) (err error) {
 	defer deferPanicToError("box.TailscaleWaitReady", func(err_ error) { err = err_ })
-	if _, err = tailscaleEndpoint(i, tag); err != nil {
+	endpoint, lifetime, release, err := acquireTailscale(i, tag)
+	if err != nil {
 		return err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeoutMs)*time.Millisecond)
+	defer release()
+	ctx, cancel := context.WithTimeout(lifetime, time.Duration(timeoutMs)*time.Millisecond)
 	defer cancel()
 	lastState := ""
 	for {
-		status, statusErr := tailscaleStatus(ctx, i, tag)
-		if statusErr == nil {
+		status, statusErr := firstTailscaleStatus(ctx, endpoint)
+		if statusErr == nil && status != nil {
 			lastState = status.BackendState
-			if status.BackendState == ipn.Running.String() && (!exitNodeWanted || status.ExitNodeStatus != nil) {
+			if tailscaleReady(status, exitNodeWanted) {
 				return nil
 			}
 			if status.BackendState == ipn.NeedsLogin.String() && status.AuthURL != "" {
@@ -118,9 +110,14 @@ func TailscaleWaitReady(i *BoxInstance, tag string, exitNodeWanted bool, timeout
 // is not waiting for a login.
 func TailscaleAuthURL(i *BoxInstance, tag string) (result string, err error) {
 	defer deferPanicToError("box.TailscaleAuthURL", func(err_ error) { err = err_ })
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	endpoint, lifetime, release, err := acquireTailscale(i, tag)
+	if err != nil {
+		return "", err
+	}
+	defer release()
+	ctx, cancel := context.WithTimeout(lifetime, 5*time.Second)
 	defer cancel()
-	status, err := tailscaleStatus(ctx, i, tag)
+	status, err := firstTailscaleStatus(ctx, endpoint)
 	if err != nil {
 		return "", err
 	}
@@ -143,24 +140,27 @@ type tailscalePeer struct {
 // offer themselves as an exit node and have it approved.
 func TailscalePeers(i *BoxInstance, tag string) (result string, err error) {
 	defer deferPanicToError("box.TailscalePeers", func(err_ error) { err = err_ })
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	status, err := tailscaleStatus(ctx, i, tag)
+	endpoint, lifetime, release, err := acquireTailscale(i, tag)
 	if err != nil {
 		return "", err
 	}
-	peers := make([]tailscalePeer, 0, len(status.Peer))
-	for _, peer := range status.Peer {
-		ips := make([]string, 0, len(peer.TailscaleIPs))
-		for _, ip := range peer.TailscaleIPs {
-			ips = append(ips, ip.String())
-		}
+	defer release()
+	ctx, cancel := context.WithTimeout(lifetime, 5*time.Second)
+	defer cancel()
+	status, err := firstTailscaleStatus(ctx, endpoint)
+	if err != nil {
+		return "", err
+	}
+	nativePeers := nativeTailscalePeers(status)
+	peers := make([]tailscalePeer, 0, len(nativePeers))
+	for _, peer := range nativePeers {
+		ips := append([]string{}, peer.TailscaleIPs...)
 		name := peer.HostName
 		if name == "" {
 			name = strings.TrimSuffix(peer.DNSName, ".")
 		}
 		peers = append(peers, tailscalePeer{
-			ID:       string(peer.ID),
+			ID:       peer.StableID,
 			Name:     name,
 			DNSName:  strings.TrimSuffix(peer.DNSName, "."),
 			IPs:      ips,
@@ -168,7 +168,12 @@ func TailscalePeers(i *BoxInstance, tag string) (result string, err error) {
 			ExitNode: peer.ExitNodeOption,
 		})
 	}
-	sort.Slice(peers, func(a, b int) bool { return peers[a].Name < peers[b].Name })
+	sort.Slice(peers, func(a, b int) bool {
+		if peers[a].Name != peers[b].Name {
+			return peers[a].Name < peers[b].Name
+		}
+		return peers[a].ID < peers[b].ID
+	})
 	encoded, err := json.Marshal(peers)
 	if err != nil {
 		return "", err

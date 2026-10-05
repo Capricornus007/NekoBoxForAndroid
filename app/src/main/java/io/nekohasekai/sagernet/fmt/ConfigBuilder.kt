@@ -887,7 +887,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 }
 
                 // The edge now points at the previously generated final tag, so the duplicate
-                // object can be skipped without leaving a dangling detour.
+                // object can be skipped without leaving a dangling detour. resolveChainHopTag()
+                // already registered the tag in globalOutbounds when it was new.
                 if (resolvedTag.reused) return@forEachIndexed
 
                 if (proxyEntity.needExternal()) {
@@ -1284,6 +1285,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 },
             )
 
+            // This fork always creates the local mixed inbound (there is no keepMixedInbound
+            // opt-out), so its route rule is unconditional.
             route.rules.add(
                 Rule_DefaultOptions().apply {
                     inbound = listOf(TAG_MIXED)
@@ -1621,8 +1624,34 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             }
         }
 
+        // MagicDNS: one resolver per Tailscale node answering its MagicDNS hosts, the tailnet's
+        // split-DNS suffixes and single-label machine names. Registered before the test/live split
+        // because a standalone Tailscale probe has to resolve those names too. Appended after the
+        // user DNS rules so an explicit block or rewrite still wins, and ahead of FakeDNS so
+        // tailnet names get real addresses.
+        val tailscaleDnsRules = mutableListOf<DNSRule_DefaultOptions>()
+        tailscaleTags.forEachIndexed { index, tag ->
+            val serverTag = "dns-tailscale-$index"
+            dns.servers.add(
+                DNSServerOptions().apply {
+                    type = "tailscale"
+                    this.tag = serverTag
+                    _hack_config_map["endpoint"] = tag
+                    _hack_config_map["accept_search_domain"] = true
+                },
+            )
+            tailscaleDnsRules += DNSRule_DefaultOptions().apply {
+                _hack_config_map["preferred_by"] = listOf(serverTag)
+                server = serverTag
+            }
+        }
+        dns.rules.addAll(tailscaleDnsRules)
+
         if (forTest) {
-            dns.rules = listOf()
+            // A probe drops the user's own DNS rules so the measured latency stays the node's,
+            // but keeps the Tailscale MagicDNS rules above; public names still resolve through
+            // dns-direct (dns.final_).
+            dns.rules = tailscaleDnsRules
         } else {
             route.rules.add(
                 0,
@@ -1653,27 +1682,6 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     action = "reject"
                 },
             )
-            // MagicDNS: one resolver per Tailscale node answering its MagicDNS hosts, the
-            // tailnet's split-DNS suffixes and single-label machine names. Appended after the
-            // user DNS rules so an explicit block or rewrite still wins, and ahead of FakeDNS
-            // so tailnet names get real addresses.
-            tailscaleTags.forEachIndexed { index, tag ->
-                val serverTag = "dns-tailscale-$index"
-                dns.servers.add(
-                    DNSServerOptions().apply {
-                        type = "tailscale"
-                        this.tag = serverTag
-                        _hack_config_map["endpoint"] = tag
-                        _hack_config_map["accept_search_domain"] = true
-                    },
-                )
-                dns.rules.add(
-                    DNSRule_DefaultOptions().apply {
-                        _hack_config_map["preferred_by"] = listOf(serverTag)
-                        server = serverTag
-                    },
-                )
-            }
             // FakeDNS obj
             if (useFakeDns) {
                 dns.servers.add(

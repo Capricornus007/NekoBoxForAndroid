@@ -27,4 +27,6 @@ type BoxPlatformInterface interface {
 	// Notifications the core asks for, e.g. a Tailscale login URL; openURL may be empty.
 	SendNotification(identifier string, typeID int32, title string, body string, openURL string) error
 	CancelNotification(identifier string, typeID int32) error
+	// JSON list of the device's interfaces, for Tailscale; see registerTailscaleInterfaces.
+	NetworkInterfaces() (string, error)
 }
