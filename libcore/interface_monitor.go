@@ -167,7 +167,15 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 	// 官方：先刷新平台接口列表
 	// 诊断：计时 —— 每次事件（含 onCapabilitiesChanged 风暴）都会触发，
 	// 且 UpdateInterfaces 经 JNI 回调 Kotlin getInterfaces 全量枚举网卡。
+	//
+	// 刷新必须和下面的读取放在同一把锁内：UpdateInterfaces 写的是 NetworkManager 那份
+	// 共享接口缓存，而 resolveInterface（下方）在 m.access 内读它。原先刷新落在锁外，
+	// 等于「A 线程写缓存」与「B 线程读缓存」可以重叠 —— WiFi 与移动数据同时在线时会有
+	// 两条网络事件同时打进来，那个重叠窗口就是竞态本身。
+	// 持锁跨 JNI 是本文件既有模式（resolveInterface 就在锁内调 networkManager），
+	// 所以这里不引入新的死锁类别。
 	var updateElapsed time.Duration
+	m.access.Lock()
 	if m.wrapper.networkManager != nil {
 		start := time.Now()
 		if err := m.wrapper.networkManager.UpdateInterfaces(); err != nil {
@@ -176,7 +184,6 @@ func (m *interfaceMonitor) UpdateDefaultInterface(interfaceName string, interfac
 		updateElapsed = time.Since(start)
 	}
 
-	m.access.Lock()
 	if interfaceIndex == -1 {
 		oldDesc := "nil"
 		if m.defaultInterface != nil {
