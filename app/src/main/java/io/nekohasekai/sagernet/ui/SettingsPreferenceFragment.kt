@@ -106,6 +106,11 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat(), OnPreferenceDataS
             activity?.recreate()
             true
         }
+        findPreference<SwitchPreference>(Key.BLUR_EFFECT_MODE)?.setOnPreferenceChangeListener { _, newValue ->
+            DataStore.blurEffectMode = newValue as Boolean
+            activity?.recreate()
+            true
+        }
         val appLanguage = findPreference<SimpleMenuPreference>(Key.APP_LANGUAGE)!!
         appLanguage.setOnPreferenceChangeListener { _, newValue ->
             AppLocale.apply(newValue as String)

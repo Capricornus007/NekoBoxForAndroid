@@ -23,6 +23,7 @@ object LandingIpBottomSheet {
         onRefresh: () -> Unit,
     ) {
         val dialog = BottomSheetDialog(activity)
+        io.nekohasekai.sagernet.utils.BlurWindowHelper.applyBlur(dialog.window, 50)
         val view = LayoutInflater.from(activity).inflate(R.layout.layout_landing_ip_details, null)
         dialog.setContentView(view)
 
@@ -44,13 +45,19 @@ object LandingIpBottomSheet {
         val sheetContext = activity
         val isNight = io.nekohasekai.sagernet.utils.Theme.usingNightMode(sheetContext)
         val isWhite = io.nekohasekai.sagernet.utils.Theme.isWhiteTheme(sheetContext)
+        val isBlur = io.nekohasekai.sagernet.database.DataStore.blurEffectMode
 
         val cardBgColor = when {
+            isBlur && isNight -> android.graphics.Color.parseColor("#CC1A1A1A")
+            isBlur && isWhite -> android.graphics.Color.parseColor("#E6FFFFFF")
+            isBlur -> android.graphics.Color.parseColor("#D9232834")
             isNight -> android.graphics.Color.parseColor("#1E1E1E")
             isWhite -> android.graphics.Color.parseColor("#F5F6F8")
             else -> null
         }
         val strokeColor = when {
+            isBlur && isNight -> android.graphics.Color.parseColor("#4DFFFFFF")
+            isBlur -> android.graphics.Color.parseColor("#33000000")
             isNight -> android.graphics.Color.parseColor("#333333")
             isWhite -> android.graphics.Color.parseColor("#E0E0E0")
             else -> null

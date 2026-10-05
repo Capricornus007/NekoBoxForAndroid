@@ -175,6 +175,11 @@ class QRCodeDialog() : DialogFragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        io.nekohasekai.sagernet.utils.BlurWindowHelper.applyBlur(dialog?.window, 50)
+    }
+
     private fun generateQrBitmap(url: String): Bitmap? {
         return try {
             val size = resources.getDimensionPixelSize(R.dimen.qrcode_size)

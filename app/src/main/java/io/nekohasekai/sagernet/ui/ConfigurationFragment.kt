@@ -3735,9 +3735,27 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             private fun applySelected(selected: Boolean) {
                 val ctx = card.context
-                val surface = ctx.getColorAttr(R.attr.colorSurface)
+                val isBlur = DataStore.blurEffectMode
+                val surface = if (isBlur) {
+                    val isNight = Theme.usingNightMode(ctx)
+                    if (isNight) Color.parseColor("#14FFFFFF") else Color.parseColor("#B3FFFFFF")
+                } else {
+                    ctx.getColorAttr(R.attr.colorSurface)
+                }
                 card.setCardBackgroundColor(surface)
-                if (DataStore.profileCardStyle == 1) {
+                if (isBlur) {
+                    val primary = ctx.getColorAttr(R.attr.colorPrimary)
+                    selectedIndicator.isVisible = selected
+                    card.cardElevation = 0f
+                    card.strokeWidth = ctx.resources.getDimensionPixelSize(
+                        if (selected) R.dimen.card_stroke_width_selected
+                        else R.dimen.card_stroke_width
+                    )
+                    card.strokeColor = if (selected) primary else {
+                        val isNight = Theme.usingNightMode(ctx)
+                        if (isNight) Color.parseColor("#26FFFFFF") else Color.parseColor("#1A000000")
+                    }
+                } else if (DataStore.profileCardStyle == 1) {
                     val primary = ctx.getColorAttr(R.attr.colorPrimary)
                     selectedIndicator.isVisible = false
                     card.cardElevation = 0f

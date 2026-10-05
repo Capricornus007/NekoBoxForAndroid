@@ -48,6 +48,12 @@ open class ToolbarFragment : Fragment {
         }
         val appbar = view.findViewById<AppBarLayout?>(R.id.appbar)
         if (appbar != null) {
+            if (io.nekohasekai.sagernet.database.DataStore.blurEffectMode) {
+                val ctx = requireContext()
+                val isNight = Theme.usingNightMode(ctx)
+                val translucentBg = if (isNight) Color.parseColor("#CC121212") else Color.parseColor("#E6FFFFFF")
+                appbar.setBackgroundColor(translucentBg)
+            }
             ViewCompat.setOnApplyWindowInsetsListener(appbar) { v, insets ->
                 val bars = insets.getInsets(
                     WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()

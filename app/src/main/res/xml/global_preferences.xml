@@ -84,6 +84,13 @@
             app:title="@string/night_mode"
             app:useSimpleSummaryProvider="true" />
 
+        <SwitchPreference
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_blur_on_24"
+            app:key="blurEffectMode"
+            app:summary="@string/blur_effect_mode_summary"
+            app:title="@string/blur_effect_mode" />
+
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue=""
             app:entries="@array/language_entries"

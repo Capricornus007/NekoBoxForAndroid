@@ -178,11 +178,11 @@ class StatsBar @JvmOverloads constructor(
         if (!this::statusText.isInitialized) return
         val currentContext = context ?: return
         if (Theme.isBlackTheme(currentContext)) {
-            backgroundTintList = ColorStateList.valueOf(Color.BLACK)
+            backgroundTintList = ColorStateList.valueOf(if (DataStore.blurEffectMode) Color.parseColor("#CC121212") else Color.BLACK)
         } else if (Theme.isWhiteTheme(currentContext)) {
-            backgroundTintList = ColorStateList.valueOf(Color.WHITE)
+            backgroundTintList = ColorStateList.valueOf(if (DataStore.blurEffectMode) Color.parseColor("#E6FFFFFF") else Color.WHITE)
         } else if (Theme.isLightGrayTheme(currentContext)) {
-            backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F5F5F7"))
+            backgroundTintList = ColorStateList.valueOf(if (DataStore.blurEffectMode) Color.parseColor("#D9F5F5F7") else Color.parseColor("#F5F5F7"))
         }
         val effectiveBgColor = backgroundTintList?.defaultColor
             ?: currentContext.getColorAttr(R.attr.colorPrimary)

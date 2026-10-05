@@ -1,7 +1,9 @@
 package io.nekohasekai.sagernet.ui
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import io.nekohasekai.sagernet.utils.Theme
 import android.text.format.Formatter
 import android.view.MenuItem
 import android.view.View
@@ -473,6 +475,16 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
             updateButton.isInvisible = proxyGroup.type != GroupType.SUBSCRIPTION
             groupName.text = if (isDisabled) "${proxyGroup.displayName()} ${getString(R.string.group_disabled_status)}" else proxyGroup.displayName()
             itemView.alpha = if (isDisabled) 0.6f else 1.0f
+
+            val card = itemView as? com.google.android.material.card.MaterialCardView
+            if (card != null && DataStore.blurEffectMode) {
+                val ctx = card.context
+                val isNight = Theme.usingNightMode(ctx)
+                card.setCardBackgroundColor(if (isNight) Color.parseColor("#14FFFFFF") else Color.parseColor("#B3FFFFFF"))
+                card.cardElevation = 0f
+                card.strokeWidth = dp2px(1)
+                card.strokeColor = if (isNight) Color.parseColor("#26FFFFFF") else Color.parseColor("#1A000000")
+            }
 
             editButton.setOnClickListener {
                 startActivity(Intent(it.context, GroupSettingsActivity::class.java).apply {

@@ -34,6 +34,7 @@ abstract class ThemedActivity : AppCompatActivity {
     private var lastAppTheme: Int = 0
     private var lastNightTheme: Int = 0
     private var lastUsingNight: Boolean = false
+    private var lastBlurEffectMode: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         lastUseSystemTheme = DataStore.useSystemTheme
@@ -41,12 +42,14 @@ abstract class ThemedActivity : AppCompatActivity {
         lastAppTheme = DataStore.appTheme
         lastNightTheme = DataStore.nightTheme
         lastUsingNight = Theme.usingNightMode(this)
+        lastBlurEffectMode = DataStore.blurEffectMode
 
         Theme.applyNightTheme()
         if (!isDialog) {
             Theme.apply(this)
         } else {
             Theme.applyDialog(this)
+            io.nekohasekai.sagernet.utils.BlurWindowHelper.applyBlur(window, 50)
         }
 
         super.onCreate(savedInstanceState)
@@ -116,7 +119,8 @@ abstract class ThemedActivity : AppCompatActivity {
             (DataStore.useSystemTheme && lastWallpaperColor != currentWallpaperColor) ||
             (!DataStore.useSystemTheme && lastAppTheme != DataStore.appTheme) ||
             lastNightTheme != DataStore.nightTheme ||
-            lastUsingNight != currentUsingNight) {
+            lastUsingNight != currentUsingNight ||
+            lastBlurEffectMode != DataStore.blurEffectMode) {
             ActivityCompat.recreate(this)
         }
     }
