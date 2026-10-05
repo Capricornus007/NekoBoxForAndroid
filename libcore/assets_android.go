@@ -9,7 +9,7 @@ import (
 	"os"
 	"strconv"
 
-	"golang.org/x/mobile/asset"
+	"github.com/sagernet/gomobile/asset"
 )
 
 func extractAssets() {

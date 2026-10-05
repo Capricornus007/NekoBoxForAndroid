@@ -17,6 +17,10 @@ class ProxyInstance(
 
     var notTmp = true
 
+    // Live exit-node switching needs the per-node readiness intent; owned by the instance so
+    // teardown clears it together with the box.
+    internal val tailscaleReadiness = TailscaleReadinessIntent()
+
     // Keep construction free of database access: BaseService resolves the optional group title
     // on its existing worker before creating this instance on the service main thread.
     var displayProfileName = initialDisplayProfileName
@@ -61,6 +65,7 @@ class ProxyInstance(
                 looper?.stop()
             } finally {
                 looper = null
+                tailscaleReadiness.clear()
             }
         },
     ) {

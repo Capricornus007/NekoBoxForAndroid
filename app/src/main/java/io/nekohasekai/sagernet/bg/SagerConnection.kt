@@ -36,6 +36,7 @@ class SagerConnection(
         const val CONNECTION_ID_RESTART_BG = 4
         const val CONNECTION_ID_SHARE_CONNECTION = 5
         const val CONNECTION_ID_TAILSCALE_SETTINGS = 6
+        const val CONNECTION_ID_TAILSCALE_STATUS = 7
 
         var restartingApp = false
     }
@@ -50,6 +51,8 @@ class SagerConnection(
         }
         fun cbTrafficUpdateBatch(data: TrafficDataBatch) {}
         fun cbSelectorUpdate(id: Long) {}
+        fun cbTailscaleStatus(sessionId: Long, sequence: Long, json: String) {}
+        fun cbTailscaleResult(sessionId: Long, requestId: Long, json: String) {}
 
         fun stateChanged(state: BaseService.State, profileName: String?, msg: String?)
 
@@ -67,37 +70,40 @@ class SagerConnection(
     private var connectionActive = false
     private var callbackRegistered = false
     private var callback: Callback? = null
-    private val serviceCallback = object : ISagerNetServiceCallback.Stub() {
+
+    @Volatile private var epoch = 0L
+    private var serviceCallback = newServiceCallback(epoch)
+    private fun newServiceCallback(callbackEpoch: Long) = object : ISagerNetServiceCallback.Stub() {
+        private fun deliver(block: (Callback) -> Unit) {
+            runOnMainDispatcher {
+                if (epoch == callbackEpoch && service != null) callback?.let(block)
+            }
+        }
+
+        override fun cbTailscaleStatus(sessionId: Long, sequence: Long, json: String) = deliver { it.cbTailscaleStatus(sessionId, sequence, json) }
+
+        override fun cbTailscaleResult(sessionId: Long, requestId: Long, json: String) = deliver { it.cbTailscaleResult(sessionId, requestId, json) }
 
         override fun stateChanged(state: Int, profileName: String?, msg: String?) {
             if (state < 0) return // skip private
             val s = BaseService.State.values()[state]
-            DataStore.serviceState = s
-            val callback = callback ?: return
             runOnMainDispatcher {
-                callback.stateChanged(s, profileName, msg)
+                if (epoch != callbackEpoch || service == null) return@runOnMainDispatcher
+                DataStore.serviceState = s
+                callback?.stateChanged(s, profileName, msg)
             }
         }
 
         override fun cbSpeedUpdate(stats: SpeedDisplayData) {
-            val callback = callback ?: return
-            runOnMainDispatcher {
-                callback.cbSpeedUpdate(stats)
-            }
+            deliver { it.cbSpeedUpdate(stats) }
         }
 
         override fun cbTrafficUpdate(stats: TrafficData) {
-            val callback = callback ?: return
-            runOnMainDispatcher {
-                callback.cbTrafficUpdate(stats)
-            }
+            deliver { it.cbTrafficUpdate(stats) }
         }
 
         override fun cbTrafficUpdateList(stats: MutableList<TrafficData>) {
-            val callback = callback ?: return
-            runOnMainDispatcher {
-                callback.cbTrafficUpdateList(stats)
-            }
+            deliver { it.cbTrafficUpdateList(stats) }
         }
 
         override fun cbTrafficUpdateBatch(stats: TrafficDataBatch) {
@@ -108,23 +114,50 @@ class SagerConnection(
         }
 
         override fun cbSelectorUpdate(id: Long) {
-            val callback = callback ?: return
-            runOnMainDispatcher {
-                callback.cbSelectorUpdate(id)
-            }
+            deliver { it.cbSelectorUpdate(id) }
         }
 
         override fun missingPlugin(profileName: String, pluginName: String) {
-            val callback = callback ?: return
-            runOnMainDispatcher {
-                callback.missingPlugin(profileName, pluginName)
-            }
+            deliver { it.missingPlugin(profileName, pluginName) }
         }
     }
 
     private var binder: IBinder? = null
+    private var deathRecipient: IBinder.DeathRecipient? = null
+
+    @Volatile private var tailscaleBinding: Pair<ISagerNetService, ISagerNetServiceCallback>? = null
 
     var service: ISagerNetService? = null
+
+    fun observeTailscale(sessionId: Long, profileId: Long, expectedIdentity: String) {
+        val binding = checkNotNull(tailscaleBinding)
+        binding.first.observeTailscale(binding.second, sessionId, profileId, expectedIdentity)
+    }
+
+    fun startTailscaleCheck(sessionId: Long, profileId: Long, expectedIdentity: String) {
+        val binding = checkNotNull(tailscaleBinding)
+        binding.first.startTailscaleCheck(binding.second, sessionId, profileId, expectedIdentity)
+    }
+
+    fun closeTailscaleSession(sessionId: Long) {
+        val binding = tailscaleBinding ?: return
+        binding.first.closeTailscaleSession(binding.second, sessionId)
+    }
+
+    fun pingTailscalePeer(sessionId: Long, requestId: Long, peerId: String, timeoutMs: Int) {
+        val binding = checkNotNull(tailscaleBinding)
+        binding.first.pingTailscalePeer(binding.second, sessionId, requestId, peerId, timeoutMs)
+    }
+
+    fun setTailscaleExitNode(sessionId: Long, requestId: Long, peerId: String, expectedSavedSelection: String) {
+        val binding = checkNotNull(tailscaleBinding)
+        binding.first.setTailscaleExitNode(binding.second, sessionId, requestId, peerId, expectedSavedSelection)
+    }
+
+    fun cancelTailscaleRequest(sessionId: Long, requestId: Long) {
+        val binding = tailscaleBinding ?: return
+        binding.first.cancelTailscaleRequest(binding.second, sessionId, requestId)
+    }
 
     fun updateConnectionId(id: Int) {
         connectionId = id
@@ -136,14 +169,21 @@ class SagerConnection(
     }
 
     override fun onServiceConnected(name: ComponentName?, binder: IBinder) {
+        epoch++
+        serviceCallback = newServiceCallback(epoch)
         this.binder = binder
         val service = ISagerNetService.Stub.asInterface(binder)!!
         this.service = service
         try {
-            if (listenForDeath) binder.linkToDeath(this, 0)
+            if (listenForDeath || connectionId == CONNECTION_ID_TAILSCALE_STATUS) {
+                val connectedEpoch = epoch
+                deathRecipient = IBinder.DeathRecipient { handleDeath(connectedEpoch, binder) }.also { binder.linkToDeath(it, 0) }
+            }
             check(!callbackRegistered)
             service.registerCallback(serviceCallback, connectionId)
             callbackRegistered = true
+            tailscaleBinding = service to serviceCallback
+            DataStore.serviceState = BaseService.State.values()[service.state]
         } catch (e: RemoteException) {
             e.printStackTrace()
         }
@@ -151,17 +191,24 @@ class SagerConnection(
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
+        tailscaleBinding = null
+        epoch++
         unregisterCallback()
         callback?.onServiceDisconnected()
         service = null
         binder = null
     }
 
-    override fun binderDied() {
-        service = null
-        callbackRegistered = false
-        if (!restartingApp) {
-            callback?.also { runOnMainDispatcher { it.onBinderDied() } }
+    override fun binderDied() = handleDeath(epoch, binder)
+
+    private fun handleDeath(connectedEpoch: Long, deadBinder: IBinder?) {
+        runOnMainDispatcher {
+            if (epoch != connectedEpoch || binder !== deadBinder) return@runOnMainDispatcher
+            tailscaleBinding = null
+            epoch++
+            service = null
+            callbackRegistered = false
+            if (!restartingApp) callback?.onBinderDied()
         }
     }
 
@@ -186,6 +233,8 @@ class SagerConnection(
     }
 
     fun disconnect(context: Context) {
+        tailscaleBinding = null
+        epoch++
         unregisterCallback()
         if (connectionActive) {
             try {
@@ -194,13 +243,14 @@ class SagerConnection(
             } // ignore
         }
         connectionActive = false
-        if (listenForDeath) {
+        if (listenForDeath || connectionId == CONNECTION_ID_TAILSCALE_STATUS) {
             try {
-                binder?.unlinkToDeath(this, 0)
+                deathRecipient?.let { binder?.unlinkToDeath(it, 0) }
             } catch (_: NoSuchElementException) {
             }
         }
         binder = null
+        deathRecipient = null
         service = null
         callback = null
     }

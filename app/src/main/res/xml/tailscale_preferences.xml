@@ -7,6 +7,10 @@
         app:useSimpleSummaryProvider="true" />
 
     <PreferenceCategory app:title="@string/tailscale">
+        <Preference
+            app:key="tailscaleStatus"
+            app:title="@string/tailscale_status_title"
+            app:summary="@string/tailscale_status_entry" />
         <EditTextPreference
             app:dialogLayout="@layout/layout_password_dialog"
             app:icon="@drawable/ic_baseline_vpn_key_24"

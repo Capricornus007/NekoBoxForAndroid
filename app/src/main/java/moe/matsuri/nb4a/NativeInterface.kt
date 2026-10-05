@@ -34,6 +34,8 @@ import libcore.Libcore
 import libcore.NB4AInterface
 import libcore.NetworkInterfaceIterator
 import libcore.StringIterator
+import org.json.JSONArray
+import org.json.JSONObject
 import java.net.Inet6Address
 import java.net.InetSocketAddress
 import java.net.InterfaceAddress
@@ -263,7 +265,7 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(app, POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {
-            Logs.w("notification permission missing; $identifier: $openURL")
+            Logs.w("notification permission missing; $identifier")
             return
         }
         val login = identifier.startsWith(TAILSCALE_LOGIN_NOTIFICATION)
@@ -290,6 +292,28 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
     override fun cancelNotification(identifier: String, typeID: Int) {
         SagerNet.notification.cancel(identifier, typeID)
     }
+
+    // Tailscale's interface list. Go's net.Interfaces needs a netlink bind that Android 11+
+    // denies to apps; this API still works there, only without hardware addresses. An
+    // enumeration failure reaches the core as an error.
+    override fun networkInterfaces(): String = JSONArray().apply {
+        for (nif in NetworkInterface.getNetworkInterfaces()?.toList().orEmpty()) {
+            val addresses = nif.interfaceAddresses.mapNotNull { address ->
+                address.address?.hostAddress?.substringBefore('%')?.let { "$it/${address.networkPrefixLength}" }
+            }
+            put(
+                JSONObject()
+                    .put("name", nif.name)
+                    .put("index", nif.index)
+                    .put("mtu", runCatching { nif.mtu }.getOrDefault(0))
+                    .put("up", runCatching { nif.isUp }.getOrDefault(false))
+                    .put("loopback", runCatching { nif.isLoopback }.getOrDefault(false))
+                    .put("pointToPoint", runCatching { nif.isPointToPoint }.getOrDefault(false))
+                    .put("multicast", runCatching { nif.supportsMulticast() }.getOrDefault(false))
+                    .put("addresses", JSONArray(addresses)),
+            )
+        }
+    }.toString()
 
     // nb4a interface
 

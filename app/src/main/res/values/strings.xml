@@ -546,7 +546,7 @@
     <string name="wireguard_extra_peers">Extra Peers</string>
     <string name="tailscale" translatable="false">Tailscale</string>
     <string name="tailscale_auth_key">Auth key</string>
-    <string name="tailscale_auth_key_sum">Pre-authentication key from the admin console. Without it the login URL only appears in the log.</string>
+    <string name="tailscale_auth_key_sum">Pre-authentication key from the admin console. Without it you will be prompted to log in.</string>
     <string name="tailscale_control_url">Control URL</string>
     <string name="tailscale_control_url_sum">Leave empty for Tailscale; set for Headscale or another coordination server.</string>
     <string name="tailscale_hostname">Machine name</string>

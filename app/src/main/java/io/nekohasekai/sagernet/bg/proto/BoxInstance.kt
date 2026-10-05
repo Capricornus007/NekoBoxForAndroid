@@ -7,6 +7,7 @@ import io.nekohasekai.sagernet.bg.GuardedProcessPool
 import io.nekohasekai.sagernet.bg.GuardedProcessRestartPolicy
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
+import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.ConfigBuildResult
 import io.nekohasekai.sagernet.fmt.LOCALHOST
 import io.nekohasekai.sagernet.fmt.buildConfig
@@ -21,14 +22,18 @@ import io.nekohasekai.sagernet.fmt.naive.NaiveBean
 import io.nekohasekai.sagernet.fmt.naive.buildNaiveConfig
 import io.nekohasekai.sagernet.fmt.olcrtc.OlcrtcBean
 import io.nekohasekai.sagernet.fmt.olcrtc.buildOlcrtcArgs
+import io.nekohasekai.sagernet.fmt.tailscale.acquireTailscaleState
+import io.nekohasekai.sagernet.fmt.tailscale.pruneTailscaleState
 import io.nekohasekai.sagernet.fmt.trojan_go.TrojanGoBean
 import io.nekohasekai.sagernet.fmt.trojan_go.buildTrojanGoConfig
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.plugin.PluginManager
 import kotlinx.coroutines.*
+import kotlinx.coroutines.selects.select
 import libcore.BoxInstance
 import libcore.Libcore
 import moe.matsuri.nb4a.net.LocalResolverImpl
+import java.io.Closeable
 import java.io.File
 import java.io.IOException
 import java.net.InetSocketAddress
@@ -50,6 +55,9 @@ abstract class BoxInstance(
     private val olcrtcReadyMarkers = hashMapOf<Int, File>()
     private val olcrtcReadyMarkerOwner = UUID.randomUUID().toString()
     private var cacheFiles = ArrayList<File>()
+
+    // Tailscale state files are owned by one core at a time; the lease is released on close().
+    private var stateLease: Closeable? = null
 
     private fun olcrtcReadyTimeoutMillis() = olcrtcSidecarReadyTimeoutMillis(
         configuredTimeoutMillis = DataStore.connectionTestTimeout.toLong(),
@@ -80,6 +88,21 @@ abstract class BoxInstance(
 
     open suspend fun init() {
         buildConfig()
+        val nodes = config.tailscaleEndpoints.keys
+        if (nodes.isNotEmpty()) {
+            stateLease = acquireTailscaleState(nodes)
+            // Config construction may precede queued probe serialization or a restore/reset.
+            // Never run its old JSON against a newly assigned identity at the same numeric ID.
+            val snapshots = config.trafficMap.values.flatten().associateBy { it.id }
+            for (id in nodes) {
+                val snapshot = snapshots[id] ?: error("Missing Tailscale profile snapshot")
+                val current = SagerDatabase.proxyDao.getById(id)
+                check(current?.type == ProxyEntity.TYPE_TAILSCALE && current.uuid == snapshot.uuid && current.requireBean() == snapshot.requireBean()) {
+                    "Tailscale profile changed. Retry with the saved profile."
+                }
+            }
+        }
+        currentCoroutineContext().ensureActive()
         for ((chain) in config.externalIndex) {
             chain.entries.forEachIndexed { index, (port, profile) ->
                 when (val bean = profile.requireBean()) {
@@ -440,6 +463,10 @@ abstract class BoxInstance(
             // superseded start during reload). A port that never bound on a dead pool is an
             // orphan, not a real failure - drop it instead of throwing.
             if (!processes.isActive) {
+                // A URL test owns its pool (runProbe), so a stopped pool here means the sidecar
+                // never came up: report that clearly instead of letting the probe end with a
+                // flaky "connection refused". The live path keeps the ignore-and-log behaviour.
+                if (strict) throw IOException("sidecar process pool stopped before listener readiness")
                 Logs.w(
                     "sidecar listener not ready on port(s): ${pending.joinToString()}; " +
                         "process pool already stopped (superseded start), ignoring",
@@ -469,24 +496,83 @@ abstract class BoxInstance(
         }
     }
 
-    @Suppress("EXPERIMENTAL_API_USAGE")
-    override fun close() {
-        for (instance in externalInstances.values) {
-            runCatching {
-                instance.close()
+    // The child owns initialization and JNI calls. Cancellation joins it before close, so a
+    // native object published late cannot escape cleanup or outlive its state lease.
+    internal suspend fun <T> runProbe(query: suspend () -> T): T = withContext(Dispatchers.IO) {
+        supervisorScope {
+            val failure = CompletableDeferred<Nothing>()
+            processes = GuardedProcessPool {
+                // Keep the sidecar failure in the log; the deferred carries it to the caller.
+                Logs.w(it)
+                failure.completeExceptionally(it)
+            }
+            val worker = async {
+                init()
+                ensureActive()
+                this@BoxInstance.launch()
+                ensureActive()
+                awaitExternalProcessesReady(strict = true)
+                ensureActive()
+                if (failure.isCompleted) failure.await()
+                query()
+            }
+            var ended: Throwable? = null
+            try {
+                select {
+                    failure.onAwait { it }
+                    worker.onAwait { it }
+                }
+            } catch (e: Throwable) {
+                ended = e
+                throw e
+            } finally {
+                withContext(NonCancellable) {
+                    worker.cancelAndJoin()
+                    try {
+                        close()
+                    } catch (e: Exception) {
+                        // A cleanup error is the outcome of a successful query, but it must not
+                        // replace the failure that ended the probe.
+                        ended?.addSuppressed(e) ?: throw e
+                    } finally {
+                        processes.coroutineContext[Job]?.join()
+                    }
+                }
             }
         }
+    }
 
-        cacheFiles.removeAll {
-            it.delete()
-            true
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    override fun close() {
+        // Nested finally blocks: a failing step must not skip the cleanup that follows, and a
+        // cleanup error must not replace the failure that ended the probe.
+        try {
+            for (instance in externalInstances.values) {
+                runCatching {
+                    instance.close()
+                }
+            }
+            try {
+                if (::processes.isInitialized) processes.close(GlobalScope + Dispatchers.IO)
+            } finally {
+                if (::box.isInitialized) box.close()
+            }
+        } finally {
+            cacheFiles.removeAll {
+                it.delete()
+                true
+            }
+            olcrtcReadyMarkers.values.forEach { it.delete() }
+            stateLease?.close()
+            stateLease = null
         }
-
-        if (::processes.isInitialized) processes.close(GlobalScope + Dispatchers.IO)
-        olcrtcReadyMarkers.values.forEach { it.delete() }
-
-        if (::box.isInitialized) {
-            box.close()
+        if (::config.isInitialized && config.tailscaleEndpoints.isNotEmpty()) {
+            try {
+                pruneTailscaleState(profileIds = config.tailscaleEndpoints.keys)
+            } catch (_: Exception) {
+                // Best-effort housekeeping must not replace the probe result or its failure.
+                Logs.w("Tailscale state cleanup deferred")
+            }
         }
     }
 }

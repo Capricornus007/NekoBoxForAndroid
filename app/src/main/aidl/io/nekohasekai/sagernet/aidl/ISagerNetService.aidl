@@ -10,6 +10,13 @@ interface ISagerNetService {
   oneway void unregisterCallback(in ISagerNetServiceCallback cb);
   oneway void resetTraffic(in long[] profileIds);
 
+  oneway void observeTailscale(in ISagerNetServiceCallback cb, long sessionId, long profileId, String expectedIdentity);
+  oneway void startTailscaleCheck(in ISagerNetServiceCallback cb, long sessionId, long profileId, String expectedIdentity);
+  oneway void closeTailscaleSession(in ISagerNetServiceCallback cb, long sessionId);
+  oneway void pingTailscalePeer(in ISagerNetServiceCallback cb, long sessionId, long requestId, String peerId, int timeoutMs);
+  oneway void setTailscaleExitNode(in ISagerNetServiceCallback cb, long sessionId, long requestId, String peerId, String expectedSavedSelection);
+  oneway void cancelTailscaleRequest(in ISagerNetServiceCallback cb, long sessionId, long requestId);
+
   int urlTest();
   // Connection test through the running outbound of one profile in the current
   // configuration (a Tailscale node used as a hop counts); fails when it is not part of it.

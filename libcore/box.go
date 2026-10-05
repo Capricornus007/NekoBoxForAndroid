@@ -113,6 +113,8 @@ type BoxInstance struct {
 	access sync.Mutex
 
 	*box.Box
+	// ctx is the instance context handed to admitted Tailscale workers; cancel tears it down.
+	ctx    context.Context
 	cancel context.CancelFunc
 	state  boxLifecycleState
 
@@ -121,6 +123,14 @@ type BoxInstance struct {
 	startBox func() error
 	closeBox func() error
 	startErr error
+
+	// tailscaleWork counts in-flight Tailscale status / ping / exit-node mutations. Close()
+	// cancels ctx and then drains it WITHOUT holding access, because a worker may still need
+	// the lock to finish (see TestBoxCloseDrainsTailscaleOutsideAccess). closeDone lets a
+	// concurrent Close wait for the teardown already running instead of closing the native
+	// box twice.
+	tailscaleWork sync.WaitGroup
+	closeDone     chan struct{}
 
 	v2api        *boxapi.SbV2rayServer
 	connections  *connectionTracker
@@ -207,6 +217,7 @@ func newSingBoxInstance(config string, localTransport LocalDNSTransport, platfor
 
 	b = &BoxInstance{
 		Box:          instance,
+		ctx:          ctx,
 		cancel:       cancel,
 		startBox:     instance.Start,
 		closeBox:     instance.Close,
@@ -297,6 +308,10 @@ func (b *BoxInstance) Start() (err error) {
 	}()
 	defer device.DeferPanicToError("box.Start", func(err_ error) { err = err_ })
 
+	// Android 11+ hides netlink from apps, so the Tailscale endpoint needs the interface list
+	// Java publishes. Re-register it before every start: an endpoint close clears the getter.
+	registerTailscaleInterfaces()
+
 	err = runOnFreshStack("box.Start", func() error {
 		if b.startBox != nil {
 			return b.startBox()
@@ -311,14 +326,32 @@ func (b *BoxInstance) Start() (err error) {
 
 func (b *BoxInstance) Close() (err error) {
 	b.access.Lock()
-	defer b.access.Unlock()
 
-	// no double close
-	if b.state == boxStateClosed {
+	// no double close: a teardown already running or finished is waited for, not repeated
+	if b.state == boxStateClosing || b.state == boxStateClosed {
+		done := b.closeDone
+		b.access.Unlock()
+		if done != nil {
+			<-done
+		}
 		return nil
 	}
 	previousState := b.state
 	b.state = boxStateClosing
+	b.closeDone = make(chan struct{})
+	done := b.closeDone
+	b.access.Unlock()
+	defer close(done)
+
+	// Stop admission before cancellation, then drain the workers WITHOUT holding access:
+	// a Tailscale worker may still need the lock to finish, so holding it here deadlocks.
+	if b.cancel != nil {
+		b.cancel()
+	}
+	b.tailscaleWork.Wait()
+
+	b.access.Lock()
+	defer b.access.Unlock()
 	defer func() {
 		b.state = boxStateClosed
 		// A partially started box already rolled its own resources back, so the
@@ -338,10 +371,7 @@ func (b *BoxInstance) Close() (err error) {
 	}
 
 	// close box —— 只有真正拆 gvisor 樹的那幾行要換到新堆疊上，上面的 mainInstance /
-	// goServeProtect / cancel 狀態機留在原 goroutine，避免把同步語意搞亂。
-	if b.cancel != nil {
-		b.cancel()
-	}
+	// goServeProtect 狀態機留在原 goroutine，避免把同步語意搞亂。
 	err = runOnFreshStack("box.Close", func() error {
 		if b.closeBox != nil {
 			return b.closeBox()

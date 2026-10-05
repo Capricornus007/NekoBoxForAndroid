@@ -61,6 +61,7 @@ import moe.matsuri.nb4a.proxy.config.ConfigBean
 import moe.matsuri.nb4a.proxy.config.ConfigSettingActivity
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSBean
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSSettingsActivity
+import java.util.UUID
 
 @Entity(
     tableName = "proxy_entities",
@@ -83,6 +84,7 @@ data class ProxyEntity(
     var lifetimeTx: Long = 0L,
     var status: Int = 0,
     var ping: Int = 0,
+    // Tailscale node provenance; unrelated to protocol authentication UUID fields in beans.
     var uuid: String = "",
     var error: String? = null,
     @ColumnInfo(defaultValue = "''") var speedTestMode: String = "",
@@ -749,10 +751,32 @@ data class ProxyEntity(
         fun deleteProxy(proxies: List<ProxyEntity>): Int
 
         @Update
-        fun updateProxy(proxy: ProxyEntity): Int
+        fun updateProxyRow(proxy: ProxyEntity): Int
 
-        @Update
-        fun updateProxy(proxies: List<ProxyEntity>): Int
+        // Editors and test results may hold old snapshots across reset or backup export.
+        // Ordinary updates cannot roll back the durable node marker or a saved exit.
+        @Transaction
+        fun updateProxy(proxy: ProxyEntity): Int {
+            if (proxy.type == TYPE_TAILSCALE) {
+                val current = getById(proxy.id)
+                proxy.uuid = if (current?.type == TYPE_TAILSCALE) current.uuid else UUID.randomUUID().toString()
+                if (current?.type == TYPE_TAILSCALE) {
+                    proxy.tailscaleBean = proxy.tailscaleBean?.clone()?.apply {
+                        exitNode = current.tailscaleBean?.exitNode.orEmpty()
+                    }
+                }
+            }
+            return updateProxyRow(proxy)
+        }
+
+        @Transaction
+        fun updateProxy(proxies: List<ProxyEntity>): Int = proxies.sumOf { updateProxy(it) }
+
+        @Query("UPDATE proxy_entities SET tailscaleBean = :bean WHERE id = :id AND type = 28 AND uuid = :identity")
+        fun updateTailscaleBean(id: Long, identity: String, bean: TailscaleBean): Int
+
+        @Query("UPDATE proxy_entities SET uuid = :marker WHERE id = :id AND type = 28")
+        fun setTailscaleMarker(id: Long, marker: String): Int
 
         @Query("UPDATE proxy_entities SET rx = :rx, tx = :tx WHERE id = :proxyId")
         fun updateTraffic(proxyId: Long, rx: Long, tx: Long): Int
@@ -794,10 +818,24 @@ data class ProxyEntity(
         fun clearTestResults(groupId: Long): Int
 
         @Insert
-        fun addProxy(proxy: ProxyEntity): Long
+        fun addProxyRow(proxy: ProxyEntity): Long
+
+        @Transaction
+        fun addProxy(proxy: ProxyEntity): Long {
+            if (proxy.type == TYPE_TAILSCALE) proxy.uuid = UUID.randomUUID().toString()
+            return addProxyRow(proxy)
+        }
 
         @Insert
-        fun insert(proxies: List<ProxyEntity>)
+        fun insertRows(proxies: List<ProxyEntity>)
+
+        @Transaction
+        fun insert(proxies: List<ProxyEntity>) {
+            proxies.filter { it.id == 0L && it.type == TYPE_TAILSCALE }.forEach {
+                it.uuid = UUID.randomUUID().toString()
+            }
+            insertRows(proxies)
+        }
 
         @Query("DELETE FROM proxy_entities WHERE groupId = :groupId")
         fun deleteAll(groupId: Long): Int
