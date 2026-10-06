@@ -93,7 +93,7 @@ class TailscaleConfigTest {
         return ConfigBuilderTestEnv.io { buildConfig(profile, forTest = mode == "test", forExport = mode == "export") }
     }
 
-    private fun assertMagicDns(config: JSONObject, forTest: Boolean) {
+    private fun assertMagicDns(config: JSONObject, forTest: Boolean, extraServerTags: Set<String> = emptySet()) {
         val dns = config.getJSONObject("dns")
         val servers = dns.objects("servers")
         val preferred = dns.objects("rules").filter { it.has("preferred_by") }
@@ -111,11 +111,16 @@ class TailscaleConfigTest {
             assertTrue(config.objects("inbounds").isEmpty())
             val tailscaleServers = servers.filter { it.optString("type") == "tailscale" }.map { it.getString("tag") }
             assertEquals(
-                setOf("dns-local", "dns-direct") + tailscaleServers,
+                // dns-block 是本倉每份配置都建的封鎖伺服器（見 ProtocolRegistryDispatchTest
+                // 對「本倉用 dns-block、上游 fork 用 action: predefined」的記錄）。
+                setOf("dns-local", "dns-direct", "dns-block") + tailscaleServers + extraServerTags,
                 servers.map { it.getString("tag") }.toSet(),
             )
             assertEquals(preferred, dns.objects("rules"))
-            assertFalse(servers.single { it.getString("tag") == "dns-direct" }.has("detour"))
+            // 本倉把 dns-local／dns-direct 一律釘在 direct 出口上（ConfigBuilder 的
+            // detour = TAG_DIRECT），探測配置裡 direct 出口恆在，fixture() 已驗過
+            // 每個 detour 都解析得到；上游 fork 探測時不釘，這一條認的是我們的寫法。
+            assertEquals("direct", servers.single { it.getString("tag") == "dns-direct" }.getString("detour"))
         }
     }
 
@@ -241,7 +246,7 @@ class TailscaleConfigTest {
         val rules = service.getJSONObject("dns").objects("rules")
         val bootstrap = rules.indexOfFirst { it.optString("server") == "dns-direct" }
         val hosts = rules.indexOfFirst { it.optString("server") == TAG_DNS_HOSTS }
-        val block = rules.indexOfFirst { it.optString("action") == "predefined" }
+        val block = rules.indexOfFirst { it.optString("server") == "dns-block" }
         val magic = rules.indexOfFirst { it.has("preferred_by") }
         val fake = rules.indexOfFirst { it.optString("server") == "dns-fake" }
         assertTrue(
@@ -249,7 +254,7 @@ class TailscaleConfigTest {
             bootstrap >= 0 && bootstrap < hosts && hosts < block && block < magic && magic < fake,
         )
         val probe = fixture("dns-test", build(node, "test"), "tailnet")
-        assertMagicDns(probe, true)
+        assertMagicDns(probe, true, setOf(TAG_DNS_HOSTS))
     }
 
     @Test

@@ -772,7 +772,9 @@ data class ProxyEntity(
         @Transaction
         fun updateProxy(proxies: List<ProxyEntity>): Int = proxies.sumOf { updateProxy(it) }
 
-        @Query("UPDATE proxy_entities SET tailscaleBean = :bean WHERE id = :id AND type = ${ProxyEntity.TYPE_TAILSCALE} AND uuid = :identity")
+        @Query(
+            "UPDATE proxy_entities SET tailscaleBean = :bean WHERE id = :id AND type = ${ProxyEntity.TYPE_TAILSCALE} AND uuid = :identity",
+        )
         fun updateTailscaleBean(id: Long, identity: String, bean: TailscaleBean): Int
 
         @Query("UPDATE proxy_entities SET uuid = :marker WHERE id = :id AND type = ${ProxyEntity.TYPE_TAILSCALE}")
