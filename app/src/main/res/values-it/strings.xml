@@ -12,9 +12,6 @@
     <string name="menu_group">Gruppo</string>
     <string name="menu_about">Informazioni</string>
     <string name="theme">Tema</string>
-
-    <string name="blur_effect_mode">Effetto vetro smerigliato</string>
-    <string name="blur_effect_mode_summary">Sfoca lo sfondo di finestre, barre e schede (sperimentale)</string>
     <string name="theme_dynamic">Dinamico (Material You)</string>
     <string name="theme_dark_high_contrast">Scuro ad alto contrasto</string>
     <string name="theme_dracula_m3">Dracula</string>

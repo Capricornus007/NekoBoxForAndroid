@@ -12,9 +12,6 @@
     <string name="menu_group">Gruppe</string>
     <string name="menu_about">Über</string>
     <string name="theme">Design</string>
-
-    <string name="blur_effect_mode">Milchglas-Oberflächeneffekt</string>
-    <string name="blur_effect_mode_summary">Hintergrund-Weichzeichnung für Dialoge, Leisten und Karten (experimentell)</string>
     <string name="use_system_theme">System-Theme verwenden</string>
     <string name="use_system_theme_summary">Monet-Farben des Systems verwenden (Android 12+)</string>
     <string name="document">Dokument</string>

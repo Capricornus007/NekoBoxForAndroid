@@ -30,7 +30,6 @@ abstract class ThemedActivity : AppCompatActivity {
             Theme.apply(this)
         } else {
             Theme.applyDialog(this)
-            io.nekohasekai.sagernet.utils.BlurWindowHelper.applyBlur(window, 50)
         }
         Theme.applyNightTheme()
 

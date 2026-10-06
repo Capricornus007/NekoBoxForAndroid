@@ -12,9 +12,6 @@
     <string name="menu_group">Groep</string>
     <string name="menu_about">Over</string>
     <string name="theme">Thema</string>
-
-    <string name="blur_effect_mode">Matglas-effect</string>
-    <string name="blur_effect_mode_summary">Achtergrond vervagen voor dialogs, balken en kaarten (experimenteel)</string>
     <string name="theme_dynamic">Dynamisch (Material You)</string>
     <string name="theme_dark_high_contrast">Donker hoog contrast</string>
     <string name="theme_dracula_m3">Dracula</string>

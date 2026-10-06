@@ -263,8 +263,6 @@
     <string name="file_manager_missing">您的设备缺少 Android 标准文件选择器, 请安装一个, 如 Material Files.</string>
     <string name="need_reload">重载代理服务以应用修改</string>
     <string name="theme">主题颜色</string>
-    <string name="blur_effect_mode">高斯模糊 / 毛玻璃视觉</string>
-    <string name="blur_effect_mode_summary">为窗口弹窗、顶栏底栏与卡片应用现代亚克力毛玻璃质感（实验性）</string>
     <string name="use_system_theme">使用系统主题色</string>
     <string name="use_system_theme_summary">使用系统 Monet 动态取色 (Android 12+)</string>
     <string name="extra_headers">附加标头</string>

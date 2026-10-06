@@ -987,6 +987,4 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_warning_accept">Saya mengerti</string>
 
     <string name="action_reset">Atur ulang</string>
-    <string name="blur_effect_mode">Efek kaca buram</string>
-    <string name="blur_effect_mode_summary">Bias latar pada dialog, bilah, dan kartu (eksperimental)</string>
 </resources>

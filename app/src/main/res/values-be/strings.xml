@@ -102,9 +102,6 @@
     <string name="group_default">Разгрупаваны</string>
     <string name="document">Дакумент</string>
     <string name="theme">Тэма</string>
-
-    <string name="blur_effect_mode">Эфект матовага шкла</string>
-    <string name="blur_effect_mode_summary">Размыццё фону ў дыялогах, панэлях і картках (эксперыментальна)</string>
     <string name="menu_about">Пра</string>
     <string name="menu_group">Група</string>
     <string name="menu_configuration">Канфігурацыя</string>

@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.ui
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -24,7 +23,6 @@ import io.nekohasekai.sagernet.databinding.LayoutGroupItemBinding
 import io.nekohasekai.sagernet.fmt.toUniversalLink
 import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.ktx.*
-import io.nekohasekai.sagernet.utils.Theme
 import io.nekohasekai.sagernet.widget.ListListener
 import io.nekohasekai.sagernet.widget.QRCodeDialog
 import io.nekohasekai.sagernet.widget.UndoSnackbarManager
@@ -442,18 +440,6 @@ class GroupFragment :
             editButton.isVisible = true
             updateButton.isInvisible = proxyGroup.type != GroupType.SUBSCRIPTION
             groupName.text = proxyGroup.displayName()
-
-            val card = itemView as? com.google.android.material.card.MaterialCardView
-            if (card != null && DataStore.blurEffectMode) {
-                val ctx = card.context
-                val isNight = Theme.usingNightMode()
-                card.setCardBackgroundColor(
-                    if (isNight) Color.parseColor("#14FFFFFF") else Color.parseColor("#B3FFFFFF"),
-                )
-                card.cardElevation = 0f
-                card.strokeWidth = dp2px(1)
-                card.strokeColor = if (isNight) Color.parseColor("#26FFFFFF") else Color.parseColor("#1A000000")
-            }
 
             editButton.setOnClickListener {
                 startActivity(

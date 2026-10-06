@@ -27,7 +27,6 @@ object Key {
     // to another theme. Storage key kept as "nightThemeBeforeDracula" for
     // backward compatibility with previously persisted values.
     const val NIGHT_THEME_BEFORE_DRACULA = "nightThemeBeforeDracula"
-    const val BLUR_EFFECT_MODE = "blurEffectMode"
     const val APP_LANGUAGE = "appLanguage"
     const val DYNAMIC_COLORS = "dynamicColors"
     const val UI_DESIGN_VERSION = "uiDesignVersion"

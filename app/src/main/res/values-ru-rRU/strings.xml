@@ -12,9 +12,6 @@
     <string name="menu_group">Группа</string>
     <string name="menu_about">О программе</string>
     <string name="theme">Тема</string>
-
-    <string name="blur_effect_mode">Эффект матового стекла</string>
-    <string name="blur_effect_mode_summary">Размытие фона в диалогах, панелях и карточках (экспериментально)</string>
     <string name="use_system_theme">Использовать системную тему</string>
     <string name="use_system_theme_summary">Использовать цвета Monet системы (Android 12+)</string>
     <string name="document">Документ</string>

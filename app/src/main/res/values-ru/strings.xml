@@ -504,9 +504,6 @@
     <string name="telegram">Канал обновлений в Telegram</string>
     <string name="test_concurrency">Число параллельных подключений</string>
     <string name="theme">Тема</string>
-
-    <string name="blur_effect_mode">Эффект матового стекла</string>
-    <string name="blur_effect_mode_summary">Размытие фона в диалогах, панелях и карточках (экспериментально)</string>
     <string name="tls">Использовать TLS</string>
     <string name="tls_camouflage_settings">Настройки защиты TLS</string>
     <string name="tools_network">Сеть</string>

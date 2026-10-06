@@ -129,10 +129,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             recreateActivityAfterPreferencePersisted()
             true
         }
-        findPreference<SwitchPreferenceCompat>(Key.BLUR_EFFECT_MODE)?.setOnPreferenceChangeListener { _, _ ->
-            recreateActivityAfterPreferencePersisted()
-            true
-        }
 
         nightTheme.setOnPreferenceChangeListener { _, newTheme ->
             Theme.currentNightMode = (newTheme as String).toInt()

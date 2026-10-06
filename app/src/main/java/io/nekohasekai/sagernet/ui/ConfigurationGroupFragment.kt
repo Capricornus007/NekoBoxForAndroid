@@ -1,6 +1,5 @@
 package io.nekohasekai.sagernet.ui
 
-import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.text.format.Formatter
@@ -53,7 +52,6 @@ import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.scrollTo
 import io.nekohasekai.sagernet.ktx.showAllowingStateLoss
 import io.nekohasekai.sagernet.ktx.tryToShow
-import io.nekohasekai.sagernet.utils.Theme
 import io.nekohasekai.sagernet.widget.QRCodeDialog
 import io.nekohasekai.sagernet.widget.UndoSnackbarManager
 import kotlinx.coroutines.CancellationException
@@ -1270,30 +1268,18 @@ class ConfigurationGroupFragment : Fragment() {
         private fun applySelected(selected: Boolean) {
             val ctx = card.context
             val primary = ctx.getColorAttr(R.attr.colorPrimary)
-            val blur = DataStore.blurEffectMode
-            val isNight = Theme.usingNightMode()
-            // 霧化時卡片底色必須半透明，否則不透明的 colorSurface 會蓋掉系統背後的模糊。
-            val surface = when {
-                blur && isNight -> Color.parseColor("#14FFFFFF")
-                blur -> Color.parseColor("#B3FFFFFF")
-                else -> ctx.getColorAttr(R.attr.colorSurface)
-            }
-            if (blur || DataStore.profileCardStyle == 1) {
+            val surface = ctx.getColorAttr(R.attr.colorSurface)
+            if (DataStore.profileCardStyle == 1) {
                 card.strokeWidth = ctx.resources.getDimensionPixelSize(
                     if (selected) R.dimen.card_stroke_width_selected else R.dimen.card_stroke_width,
                 )
-                card.strokeColor = when {
-                    selected -> primary
-                    blur && isNight -> Color.parseColor("#26FFFFFF")
-                    blur -> Color.parseColor("#1A000000")
-                    else -> ctx.getColour(R.color.card_stroke)
-                }
-                if (blur) card.cardElevation = 0f
+                card.strokeColor =
+                    if (selected) primary else ctx.getColour(R.color.card_stroke)
             } else {
                 card.strokeWidth = 0
             }
             card.setCardBackgroundColor(
-                if (selected && !blur) {
+                if (selected) {
                     ColorUtils.compositeColors(
                         ColorUtils.setAlphaComponent(primary, 26),
                         surface,

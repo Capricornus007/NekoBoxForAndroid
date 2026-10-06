@@ -12,9 +12,6 @@
     <string name="menu_group">그룹</string>
     <string name="menu_about">정보</string>
     <string name="theme">테마</string>
-
-    <string name="blur_effect_mode">무광 유리 UI 효과</string>
-    <string name="blur_effect_mode_summary">대화 상자, 막대, 카드 배경을 흐리게 합니다(실험적)</string>
     <string name="use_system_theme">시스템 테마 사용</string>
     <string name="use_system_theme_summary">시스템 Monet 색상 사용 (Android 12+)</string>
     <string name="document">문서</string>
