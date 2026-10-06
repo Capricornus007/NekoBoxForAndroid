@@ -129,7 +129,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             recreateActivityAfterPreferencePersisted()
             true
         }
-        findPreference<SwitchPreference>(Key.BLUR_EFFECT_MODE)?.setOnPreferenceChangeListener { _, _ ->
+        findPreference<SwitchPreferenceCompat>(Key.BLUR_EFFECT_MODE)?.setOnPreferenceChangeListener { _, _ ->
             recreateActivityAfterPreferencePersisted()
             true
         }

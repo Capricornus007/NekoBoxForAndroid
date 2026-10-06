@@ -17,7 +17,7 @@
             app:title="@string/night_mode"
             app:useSimpleSummaryProvider="true" />
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:defaultValue="false"
             app:icon="@drawable/ic_baseline_blur_on_24"
             app:key="blurEffectMode"
