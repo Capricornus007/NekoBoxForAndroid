@@ -654,9 +654,16 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 			if a < len(s.stats) && s.stats[a] != nil {
 				la = s.stats[a].latencyEmaMs.Load()
 			}
-			if la <= 0 && s.history != nil && a < len(s.tags) {
-				if h := s.history.LoadURLTestHistory(s.tags[a]); h != nil && h.Delay > 0 {
-					la = int64(h.Delay)
+			if la <= 0 && s.history != nil {
+				if a < len(s.tags) {
+					if h := s.history.LoadURLTestHistory(s.tags[a]); h != nil && h.Delay > 0 {
+						la = int64(h.Delay)
+					}
+				}
+				if la <= 0 && a < len(s.outbounds) && s.outbounds[a] != nil {
+					if h := s.history.LoadURLTestHistory(s.outbounds[a].Tag()); h != nil && h.Delay > 0 {
+						la = int64(h.Delay)
+					}
 				}
 			}
 			if la <= 0 {
@@ -667,9 +674,16 @@ func (s *LoadBalance) candidateIndices(ctx context.Context, dest M.Socksaddr) []
 			if b < len(s.stats) && s.stats[b] != nil {
 				lb = s.stats[b].latencyEmaMs.Load()
 			}
-			if lb <= 0 && s.history != nil && b < len(s.tags) {
-				if h := s.history.LoadURLTestHistory(s.tags[b]); h != nil && h.Delay > 0 {
-					lb = int64(h.Delay)
+			if lb <= 0 && s.history != nil {
+				if b < len(s.tags) {
+					if h := s.history.LoadURLTestHistory(s.tags[b]); h != nil && h.Delay > 0 {
+						lb = int64(h.Delay)
+					}
+				}
+				if lb <= 0 && b < len(s.outbounds) && s.outbounds[b] != nil {
+					if h := s.history.LoadURLTestHistory(s.outbounds[b].Tag()); h != nil && h.Delay > 0 {
+						lb = int64(h.Delay)
+					}
 				}
 			}
 			if lb <= 0 {

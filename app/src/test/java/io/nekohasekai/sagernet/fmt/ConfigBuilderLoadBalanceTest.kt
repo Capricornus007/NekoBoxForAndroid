@@ -46,6 +46,13 @@ class ConfigBuilderLoadBalanceTest {
     }
 
     @Test
+    fun balancerBeanDefaultToleranceIs50() {
+        val bean = io.nekohasekai.sagernet.fmt.internal.BalancerBean()
+        assertEquals(50, bean.tolerance)
+        assertEquals(50L, bean.calculateToleranceMs())
+    }
+
+    @Test
     fun verifyTunImplementationSingTunMapping() {
         val stack = when (io.nekohasekai.sagernet.TunImplementation.SING_TUN) {
             io.nekohasekai.sagernet.TunImplementation.GVISOR -> "gvisor"

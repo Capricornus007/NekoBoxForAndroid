@@ -1018,7 +1018,7 @@
     <string name="balancer_interval">Probe Interval (s)</string>
     <string name="balancer_interval_sum">Periodic health-check and observation interval in seconds, default 300s</string>
     <string name="balancer_tolerance">Switch Tolerance (Tolerance)</string>
-    <string name="balancer_tolerance_sum">Latency switch tolerance threshold, default 300ms</string>
+    <string name="balancer_tolerance_sum">Latency switch tolerance threshold, default 50ms</string>
     <string name="balancer_tolerance_unit">Tolerance Unit (Unit)</string>
     <string name="unit_ms">Milliseconds (ms)</string>
     <string name="unit_s">Seconds (s)</string>

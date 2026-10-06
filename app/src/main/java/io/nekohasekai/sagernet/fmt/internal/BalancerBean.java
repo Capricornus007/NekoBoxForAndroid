@@ -35,7 +35,7 @@ public class BalancerBean extends InternalBean {
     public String strategy = STRATEGY_LEAST_PING;
     public String testUrl = "";
     public int interval = 300;
-    public int tolerance = 300;
+    public int tolerance = 50;
     public String toleranceUnit = "ms";
     // v4 fields
     public boolean useFrontProxy = false;

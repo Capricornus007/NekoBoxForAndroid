@@ -921,7 +921,7 @@
     <string name="balancer_interval">探测间隔 (秒)</string>
     <string name="balancer_interval_sum">节点健康检查与周期探测间隔，默认 300 秒</string>
     <string name="balancer_tolerance">切换容差 (Tolerance)</string>
-    <string name="balancer_tolerance_sum">最低延迟切换阈值，避免微小抖动频繁切换，默认 300ms</string>
+    <string name="balancer_tolerance_sum">最低延迟切换阈值，避免微小抖动频繁切换，默认 50ms</string>
     <string name="balancer_tolerance_unit">容差单位</string>
     <string name="unit_ms">毫秒 (ms)</string>
     <string name="unit_s">秒 (s)</string>

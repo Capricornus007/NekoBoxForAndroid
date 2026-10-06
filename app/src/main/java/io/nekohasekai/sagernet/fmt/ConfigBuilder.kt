@@ -153,7 +153,7 @@ internal fun buildLoadBalanceOutbound(
             ?: "https://cp.cloudflare.com/generate_204"
         val iv = (intervalSec?.takeIf { it > 0 } ?: 300L).coerceAtLeast(10L)
         interval = "${iv}s"
-        tolerance = toleranceMs?.takeIf { it >= 0 } ?: 300
+        tolerance = toleranceMs?.takeIf { it >= 0 } ?: 50
         idle_timeout = idleTimeoutStr?.takeIf { it.isNotBlank() } ?: "${iv}s"
         interrupt_exist_connections = interruptExist ?: false
     }
