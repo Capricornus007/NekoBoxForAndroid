@@ -172,10 +172,11 @@ class BaseService {
         CoroutineScope,
         AutoCloseable {
         private val callbacks = object : RemoteCallbackList<ISagerNetServiceCallback>() {
-            override fun onCallbackDied(callback: ISagerNetServiceCallback?, cookie: Any?) {
-                super.onCallbackDied(callback, cookie)
-                // A died callback must not keep its id mapping or its Tailscale session owner alive.
-                callback?.let { releaseCallback(it) }
+            // 只覆寫一參這個入口（與上游同）：RemoteCallbackList 的兩參預設實作會轉呼叫它，
+            // 所以框架真正的死亡回調照樣進得來；反过来只覆寫兩參的話，任何走一參入口的呼叫
+            // （包含本倉測試）都不會觸發清理，callbackIdMap 與 Tailscale session owner 會留殭屍。
+            override fun onCallbackDied(callback: ISagerNetServiceCallback) {
+                releaseCallback(callback)
             }
         }
 
