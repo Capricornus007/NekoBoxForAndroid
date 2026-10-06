@@ -220,4 +220,9 @@ class QRCodeDialog() : DialogFragment() {
             }
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        io.nekohasekai.sagernet.utils.BlurWindowHelper.applyBlur(dialog?.window, 50)
+    }
 }

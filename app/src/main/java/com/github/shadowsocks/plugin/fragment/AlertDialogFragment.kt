@@ -50,6 +50,11 @@ abstract class AlertDialogFragment<Arg : Parcelable, Ret : Parcelable?> :
     override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog =
         MaterialAlertDialogBuilder(requireContext()).also { it.prepare(this) }.create()
 
+    override fun onStart() {
+        super.onStart()
+        io.nekohasekai.sagernet.utils.BlurWindowHelper.applyBlur(dialog?.window, 50)
+    }
+
     override fun onClick(dialog: DialogInterface?, which: Int) {
         setFragmentResult(
             resultKey ?: return,

@@ -12,6 +12,9 @@
     <string name="menu_group">المجموعة</string>
     <string name="menu_about">حول</string>
     <string name="theme">السمة</string>
+
+    <string name="blur_effect_mode">تأثير الزجاج المموّه</string>
+    <string name="blur_effect_mode_summary">تمويه الخلفية في النوافذ والأشرطة والبطاقات (تجريبي)</string>
     <string name="use_system_theme">استخدام سمة النظام</string>
     <string name="use_system_theme_summary">استخدام ألوان Monet في النظام (Android 12+)</string>
     <string name="document">المستند</string>

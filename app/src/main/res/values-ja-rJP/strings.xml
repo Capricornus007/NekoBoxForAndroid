@@ -12,6 +12,9 @@
     <string name="menu_group">グループ</string>
     <string name="menu_about">概要</string>
     <string name="theme">テーマ</string>
+
+    <string name="blur_effect_mode">すりガラス風 UI 効果</string>
+    <string name="blur_effect_mode_summary">ダイアログ・バー・カードの背景をぼかす（実験的）</string>
     <string name="use_system_theme">システムテーマを使用</string>
     <string name="use_system_theme_summary">システムMonetカラーを使用（Android 12以上）</string>
     <string name="document">ドキュメント</string>

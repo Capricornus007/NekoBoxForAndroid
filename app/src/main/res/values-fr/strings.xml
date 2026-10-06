@@ -12,6 +12,9 @@
     <string name="menu_group">Groupe</string>
     <string name="menu_about">À propos</string>
     <string name="theme">Thème</string>
+
+    <string name="blur_effect_mode">Effet verre dépoli</string>
+    <string name="blur_effect_mode_summary">Flou de l\'arrière-plan des boîtes, barres et cartes (expérimental)</string>
     <string name="theme_dynamic">Dynamique (Material You)</string>
     <string name="theme_dark_high_contrast">Sombre contraste élevé</string>
     <string name="theme_dracula_m3">Dracula</string>

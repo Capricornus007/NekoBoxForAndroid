@@ -12,6 +12,9 @@
     <string name="menu_group">群組</string>
     <string name="menu_about">關於</string>
     <string name="theme">主題</string>
+
+    <string name="blur_effect_mode">霧化玻璃介面效果</string>
+    <string name="blur_effect_mode_summary">對話框、工具列與卡片改用霧化背景（實驗性）</string>
     <string name="use_system_theme">使用系統主題</string>
     <string name="use_system_theme_summary">使用系統 Monet 色彩 (Android 12+)</string>
     <string name="document">文件</string>

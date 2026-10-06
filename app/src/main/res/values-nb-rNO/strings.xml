@@ -10,6 +10,9 @@
     <string name="menu_group">Gruppe</string>
     <string name="menu_about">Om</string>
     <string name="theme">Tema</string>
+
+    <string name="blur_effect_mode">Matt glass-effekt</string>
+    <string name="blur_effect_mode_summary">Gjør bakgrunnen uskarp i dialoger, felt og kort (eksperimentelt)</string>
     <string name="use_system_theme">Bruk systemtema</string>
     <string name="use_system_theme_summary">Bruk systemets Monet-farger (Android 12+)</string>
     <string name="document">Dokument</string>

@@ -12,6 +12,9 @@
     <string name="menu_group">گروه</string>
     <string name="menu_about">درباره</string>
     <string name="theme">پوسته</string>
+
+    <string name="blur_effect_mode">جلوه شیشه‌مات</string>
+    <string name="blur_effect_mode_summary">محو پس‌زمینه در پنجره‌ها، نوارها و کارت‌ها (آزمایشی)</string>
     <string name="use_system_theme">استفاده از تم سیستم</string>
     <string name="use_system_theme_summary">استفاده از رنگ‌های Monet سیستم (اندروید ۱۲+)</string>
     <string name="document">مستند</string>

@@ -43,6 +43,9 @@
     <string name="group_default">グループ化されていない</string>
     <string name="document">ドキュメント（英語）</string>
     <string name="theme">テーマ</string>
+
+    <string name="blur_effect_mode">すりガラス風 UI 効果</string>
+    <string name="blur_effect_mode_summary">ダイアログ・バー・カードの背景をぼかす（実験的）</string>
     <string name="menu_about">このアプリについて</string>
     <string name="menu_group">グループ</string>
     <string name="menu_configuration">設定</string>

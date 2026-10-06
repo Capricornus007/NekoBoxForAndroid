@@ -144,6 +144,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     // night-mode value to restore when leaving a dark-only theme (Dracula or
     // Dark High Contrast). Key name kept for backward compatibility.
     var nightThemeBeforeDracula by configurationStore.int(Key.NIGHT_THEME_BEFORE_DRACULA) { -1 }
+    var blurEffectMode by configurationStore.boolean(Key.BLUR_EFFECT_MODE) { false }
     var appLanguage by configurationStore.string(Key.APP_LANGUAGE) { "" }
     var dynamicColors by configurationStore.boolean(Key.DYNAMIC_COLORS)
     var uiDesignVersion by configurationStore.int(Key.UI_DESIGN_VERSION)

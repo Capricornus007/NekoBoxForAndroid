@@ -12,6 +12,9 @@
     <string name="menu_group">Група</string>
     <string name="menu_about">Про програму</string>
     <string name="theme">Тема</string>
+
+    <string name="blur_effect_mode">Ефект матового скла</string>
+    <string name="blur_effect_mode_summary">Розмиття фону в діалогах, панелях і картках (експериментально)</string>
     <string name="theme_dynamic">Динамічна (Material You)</string>
     <string name="theme_dark_high_contrast">Темна висококонтрастна</string>
     <string name="theme_dracula_m3">Dracula M3</string>

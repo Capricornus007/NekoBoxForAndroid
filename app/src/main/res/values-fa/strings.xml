@@ -12,6 +12,9 @@
     <string name="menu_group">گروه‌ها</string>
     <string name="menu_about">درباره برنامه</string>
     <string name="theme">ظاهر</string>
+
+    <string name="blur_effect_mode">جلوه شیشه‌مات</string>
+    <string name="blur_effect_mode_summary">محو پس‌زمینه در پنجره‌ها، نوارها و کارت‌ها (آزمایشی)</string>
     <string name="document">مستندات</string>
     <string name="group_default">گروه پیش‌فرض</string>
     <string name="quick_toggle">تغییر وضعیت</string>

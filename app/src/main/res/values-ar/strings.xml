@@ -12,6 +12,9 @@
     <string name="menu_group">المجموعة</string>
     <string name="menu_about">حول</string>
     <string name="theme">السمة</string>
+
+    <string name="blur_effect_mode">تأثير الزجاج المموّه</string>
+    <string name="blur_effect_mode_summary">تمويه الخلفية في النوافذ والأشرطة والبطاقات (تجريبي)</string>
     <string name="theme_dynamic">ديناميكي (Material You)</string>
     <string name="theme_dark_high_contrast">داكن عالي التباين</string>
     <string name="theme_dracula_m3">دراكولا</string>

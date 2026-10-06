@@ -12,6 +12,9 @@
     <string name="menu_group">Група</string>
     <string name="menu_about">Про програму</string>
     <string name="theme">Тема</string>
+
+    <string name="blur_effect_mode">Ефект матового скла</string>
+    <string name="blur_effect_mode_summary">Розмиття фону в діалогах, панелях і картках (експериментально)</string>
     <string name="use_system_theme">Використовувати системну тему</string>
     <string name="use_system_theme_summary">Використовувати системні кольори Monet (Android 12+)</string>
     <string name="document">Документ</string>
