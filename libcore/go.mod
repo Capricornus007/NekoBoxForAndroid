@@ -31,7 +31,7 @@ require (
 	github.com/ajg/form v1.7.1 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/alexbrainman/sspi v0.0.0-20231016080023-1a75b4708caa // indirect
-	github.com/amnezia-vpn/amneziawg-go v1.0.4 // indirect
+	github.com/amnezia-vpn/amneziawg-go/v3 v3.1.20260828 // indirect
 	github.com/andybalholm/brotli v1.1.1 // indirect
 	github.com/andybalholm/cascadia v1.3.5 // indirect
 	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be // indirect
@@ -152,13 +152,11 @@ require (
 	github.com/tailscale/peercred v0.0.0-20250107143737-35a0c7bd7edc // indirect
 	github.com/tailscale/web-client-prebuilt v0.0.0-20250124233751-d4cd19a26976 // indirect
 	github.com/tetratelabs/wazero v1.12.0 // indirect
-	github.com/tevino/abool v1.2.0 // indirect
 	github.com/vishvananda/netns v0.0.5 // indirect
 	github.com/wasilibs/go-re2 v1.12.0 // indirect
 	github.com/wasilibs/wazero-helpers v0.0.0-20250123031827-cd30c44769bb // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zeebo/blake3 v0.2.4 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.1 // indirect
 	go.uber.org/zap/exp v0.3.0 // indirect
@@ -178,6 +176,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	google.golang.org/grpc v1.79.3 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
+	gvisor.dev/gvisor v0.0.0-20250606233247-e3c4c4cad86f // indirect
 	lukechampine.com/blake3 v1.3.0 // indirect
 )
 
@@ -225,3 +224,13 @@ replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.5-0.2026
 
 // sing-shadowquic 復刻到自有 fork（與 sing 家族其他包一致），跟 Capricornus007/sing-shadowquic main。
 replace github.com/exclavenetwork/sing-shadowquic => github.com/Capricornus007/sing-shadowquic v0.0.0-20260904152941-03a261e772e4
+
+// 與 sing-box/go.mod 保持同一條：v3 的 amneziawg 會拉 gvisor.dev/gvisor，
+// 我方實際用的是 Capricornus007/gvisor-awg（AWG 改過的那版）；
+// replace 只在主模組生效，libcore 這個主模組必須自己寫一遍。
+replace gvisor.dev/gvisor => github.com/Capricornus007/gvisor-awg v0.0.0-20260902104837-6728272f3831
+
+// 同一個理由：libcore/tailscale*.go 直接 import github.com/sagernet/tailscale/{ipn,net/tsaddr,net/netmon}，
+// 而 sing-box 已把該模組換成我方 fork。少了這條，APK 裡的 tailscale 就會編上游原版，
+// 跟 sing-box/protocol/tailscale 測過的不是同一份代碼。
+replace github.com/sagernet/tailscale => github.com/Capricornus007/tailscale v1.102.1-sing-box-1.14-mod.5.0.20260928041336-0b9fafb0a134

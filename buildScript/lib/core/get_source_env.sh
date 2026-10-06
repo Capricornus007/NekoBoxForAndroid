@@ -10,11 +10,15 @@
 # 生命週期冪等（closeOnce）、AwneziaWG magic header 不再被抹掉、AWG 參數 CRLF 注入與金鑰
 # 長度驗證、packet-up 拒絕非正數 sc_max_each_post_bytes，另外修掉 randStringFromCharset
 # 的 byte 溢位死迴圈與 vless 加密握手失敗時的 typed-nil panic。
-export COMMIT_SING_BOX="020e8c3e01d66c8d7770eb572d6af31f6b098e7c"
+# mod.28（3bddc8ae6）= amneziawg 整條從 v1 換到 amneziawg-go/v3（按取捨規則：上游 v3 已含
+# 我方 fork 的功能且更新），v3 會新拉 gvisor.dev/gvisor，因此 libcore 必須自己補上
+# 那條 replace => Capricornus007/gvisor-awg；同一輪 check-core-pins.sh 段 1e 又抓到
+# libcore 一直在編「上游 SagerNet 原版 tailscale」（缺 fork replace），一并補齊。
+export COMMIT_SING_BOX="3bddc8ae6786313366ab59f905cbb4b202fcf661"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.27"
+export VERSION_SING_BOX="1.15.0-alpha.10-mod.28"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to

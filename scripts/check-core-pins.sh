@@ -119,6 +119,47 @@ else
     echo "  一致      $V_ENV"
 fi
 
+echo "== 段 1e：sing-box 有 replace、libcore 也吃這個模組 → libcore 必須帶同一條 replace（硬比較）=="
+# 段 1b 是「libcore 釘了、sing-box 沒跟上」；這一段補反方向：**sing-box 換了 fork、
+# libcore 卻沒寫那條 replace**。因為 replace 只在主模組生效，libcore 會靜默去吃上游原版，
+# 於是 APK 裡跑的跟 sing-box CI 測過的不是同一份代碼，而本機因 ../../ 檔案系統 replace 永遠綠。
+# 2026-10-06 實測踩到兩條：① sing-box 的 amneziawg 換 v3 之後新拉進 gvisor.dev/gvisor，
+# sing-box 把它 replace 成 Capricornus007/gvisor-awg，libcore 卻沒有那條；
+# ② libcore/tailscale*.go 直接 import github.com/sagernet/tailscale（build.sh 也帶 ts_omit_*），
+# 但 sing-box 早已把該模組換成 Capricornus007/tailscale、libcore 沒跟 → APK 裡的 tailscale
+# 一直編上游原版。兩條都只能靠逐條比對抓得到。
+if [ -f "$LCORE" ]; then
+    while IFS='|' read -r amod atgt; do
+        [ -n "$amod" ] || continue
+        esc=${amod//./\\.}
+        if ! grep -qE "^[[:space:]]+${esc} v" "$LCORE"; then
+            continue   # libcore 的依賴圖根本沒這個模組，不用比
+        fi
+        lctgt=$(grep -oP "^[[:space:]]*replace[[:space:]]+${esc}[[:space:]]+=>[[:space:]]+\K.*" "$LCORE" | head -1 || true)
+        # 檔案系統路徑（../../wireguard-go 那類）是隔離編譯副本的既有佈局，不是「沒換 fork」。
+        # 路徑型 replace 沒有版本字串可逐字比對，只能比「有沒有這條」，所以直接算通過。
+        case "$atgt" in
+            .*|/*) continue ;;
+        esac
+        case "$lctgt" in
+            .*|/*)
+                echo "  本地路徑  $amod  libcore=$lctgt（隔離編譯佈局，sing-box=$atgt）"
+                continue
+                ;;
+        esac
+        if [ -z "$lctgt" ]; then
+            echo "  **缺 replace**  libcore 吃 $amod 但沒換成 fork：sing-box 用 $atgt"
+            echo "            → APK 會用上游原版而不是我方 fork；把同一條 replace 補進 libcore/go.mod。"
+            failures=$((failures + 1))
+        elif [ "$lctgt" != "$atgt" ]; then
+            echo "  **不同步**  $amod  libcore=$lctgt sing-box=$atgt"
+            failures=$((failures + 1))
+        else
+            echo "  一致      $amod  $lctgt"
+        fi
+    done < <(awk '/^replace[[:space:]]/{tgt=""; for(i=2;i<=NF;i++){if($i=="=>"){tgt=$i; continue} if(tgt!=""){tgt=tgt" "$i}}  sub(/^[[:space:]]*replace[[:space:]]+/,""); n=split($0,a," => "); if(n==2){gsub(/[[:space:]]+$/,"",a[1]); gsub(/^[[:space:]]+|[[:space:]]+$/,"",a[2]); if(a[2]!="") print a[1]"|"a[2]}}' "$gomod")
+fi
+
 echo "== 段 2：每條 COMMIT_* 是否等於該 fork 預設分支尖端（僅報告）=="
 while read -r key; do
     [ -n "$key" ] || continue
