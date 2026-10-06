@@ -718,6 +718,7 @@ fun buildConfig(
             servers = mutableListOf()
             rules = mutableListOf()
             independent_cache = true
+            disable_expire = true
         }
 
         fun autoDnsDomainStrategy(s: String, isProxied: Boolean = false): String? {
@@ -1179,6 +1180,7 @@ fun buildConfig(
                     // 测速配置必须与正式连接一致（对齐 husi）：沿用统一的服务器
                     // 域名解析策略。曾强制空——测速解析出的 IP/协议族与真实路径不同。
                     _hack_config_map["domain_strategy"] = defaultServerDomainStrategy
+                    _hack_config_map["bind_address_no_port"] = true
 
                     _hack_config_map["tag"] = tagOut
 
@@ -1640,6 +1642,7 @@ fun buildConfig(
                 type = "direct"
                 // Ensure both direct and bypass outbounds bind to Android default physical network interface
                 _hack_config_map["network_strategy"] = "default"
+                _hack_config_map["bind_address_no_port"] = true
                 if (ipv6Mode == IPv6Mode.DISABLE) {
                     _hack_config_map["domain_strategy"] = "ipv4_only"
                 } else if (ipv6Mode == IPv6Mode.ONLY) {
