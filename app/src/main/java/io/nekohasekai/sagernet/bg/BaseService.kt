@@ -113,16 +113,13 @@ class BaseService {
                     // Do NOT call proxy?.box?.sleep() / pauseManager.DevicePause().
                     // Pausing the core on screen off kills idle TCP keepalives and marks connections as dead,
                     // causing Telegram/WeChat to get stuck in "Connecting..." when switching apps or unlocking.
-                    // Instead, only run a memory trim while keeping TUN/network completely alive.
-                    if (!DataStore.performancePriorityMode) {
-                        Libcore.forceGc()
-                        System.gc()
-                    }
+                    // Keep TUN/network completely alive without unnecessary GC thrashing.
                 }
 
                 Intent.ACTION_SCREEN_ON,
                 Intent.ACTION_USER_PRESENT -> {
                     proxy?.box?.wake()
+                    proxy?.looper?.triggerWakeup()
                     runOnDefaultDispatcher {
                         proxy?.looper?.postLastSnapshotSpeed()
                     }

@@ -27,6 +27,11 @@ class TrafficLooper
 
     private var job: Job? = null
     private var lastSpeedSnapshot: SpeedDisplayData? = null
+    private var wakeupSignal: CompletableDeferred<Unit>? = null
+
+    fun triggerWakeup() {
+        wakeupSignal?.complete(Unit)
+    }
 
     suspend fun postLastSnapshotSpeed() {
         val speed = lastSpeedSnapshot ?: return
@@ -363,32 +368,25 @@ class TrafficLooper
                 }
             }
 
-            // Memory profile & background power optimization
-            if (!DataStore.performancePriorityMode) {
-                // In low-power / standard mode: aggressively reclaim memory when idle in background
-                if (!isForegroundUI && snapshot.speed.txRateProxy == 0L && snapshot.speed.rxRateProxy == 0L) {
-                    idleSeconds += (lastDelayMs / 1000).toInt().coerceAtLeast(1)
-                    if (idleSeconds >= 30) {
-                        idleSeconds = 0
-                        Libcore.forceGc()
-                        System.gc()
-                    }
-                } else {
-                    idleSeconds = 0
-                }
-            } else {
-                // In performance priority mode: keep memory buffers hot, do not force GC
-                idleSeconds = 0
-            }
-
+            // Background low-power battery optimization:
+            // Avoid periodic forced GC which causes CPU page faults and prevents deep sleep.
+            // When screen is off, suspend polling up to 5 minutes to let SoC enter Doze/C-states;
+            // when screen turns on, triggerWakeup() wakes this coroutine immediately.
             val nextDelay = when {
                 isForegroundUI -> baseDelayMs
-                !isInteractive -> if (DataStore.performancePriorityMode) 10000L else 30000L
+                !isInteractive -> if (DataStore.performancePriorityMode) 60000L else 300000L
                 data.notification?.listenPostSpeed == true -> if (DataStore.performancePriorityMode) 3000L else 6000L
                 else -> if (DataStore.performancePriorityMode) 5000L else 15000L
             }
             lastDelayMs = nextDelay
-            delay(nextDelay)
+            withTimeoutOrNull(nextDelay) {
+                val deferred = CompletableDeferred<Unit>().also { wakeupSignal = it }
+                try {
+                    deferred.await()
+                } finally {
+                    wakeupSignal = null
+                }
+            }
         }
     }
 }

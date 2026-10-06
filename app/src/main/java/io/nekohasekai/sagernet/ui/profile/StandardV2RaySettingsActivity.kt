@@ -266,9 +266,23 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
 
     private fun updateTls(tls: String) {
         val isTLS = "tls" in tls
-        securityCategory.isVisible = isTLS
-        tlsCamouflageCategory.isVisible = isTLS
-        echCategory.isVisible = isTLS
+        val isReality = tls == "reality"
+        val showSecurity = isTLS || isReality
+        securityCategory.isVisible = showSecurity
+        tlsCamouflageCategory.isVisible = showSecurity
+        echCategory.isVisible = isTLS && !isReality
+
+        val hasRealityConfig = isReality || realityPubKey.readStringFromCache().isNotBlank()
+        realityPubKey.preference.isVisible = hasRealityConfig
+        realityShortId.preference.isVisible = hasRealityConfig
+
+        if (isReality) {
+            val fp = utlsFingerprint.readStringFromCache()
+            if (fp.isBlank() || fp == "none") {
+                io.nekohasekai.sagernet.database.DataStore.profileCacheStore.putString(utlsFingerprint.cacheName, "chrome")
+                (utlsFingerprint.preference as? moe.matsuri.nb4a.ui.SimpleMenuPreference)?.value = "chrome"
+            }
+        }
     }
 
 }

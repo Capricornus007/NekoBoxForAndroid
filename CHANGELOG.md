@@ -1,5 +1,11 @@
 # OwnBox for Android 更新日志 (Changelog)
 
+# OwnBox for Android v3.0.1 正式版
+
+* **Reality 协议**：新增独立配置选项，支持节点链接导入与导出。
+* **AmneziaWG 协议**：新增 AWG 混淆参数支持及节点导入导出。
+* **后台省电优化**：优化后台调度与息屏功耗，保持稳定不掉线。
+
 # OwnBox for Android v3.0.0 正式版
 
 * **分流与规则**：激活底层 TUN 包名嗅探与 UID 独立并行匹配，智能联动系统下载管理器，彻底解决 Google Play 下载与更新卡 0% 故障。

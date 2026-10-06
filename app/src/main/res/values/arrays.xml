@@ -444,6 +444,7 @@
     <string-array name="transport_layer_encryption_value">
         <item>none</item>
         <item>tls</item>
+        <item>reality</item>
     </string-array>
 
     <string-array name="notification_entry">

@@ -217,6 +217,134 @@ class WireGuardFmtTest {
         assertEquals(25, resaved.persistentKeepaliveInterval)
     }
 
+    @Test
+    fun buildEndpointMapsAwgFieldsWhenConfigured() {
+        val bean = completeBean("").apply {
+            jc = 4
+            jmin = 40
+            jmax = 70
+            s1 = 15
+            s2 = 39
+            h1 = 1000000001L
+            h2 = 1000000002L
+            h3 = 1000000003L
+            h4 = 1000000004L
+        }
+        val endpoint = buildSingBoxEndpointWireGuardBean(bean)
+        assertEquals(Integer.valueOf(4), endpoint.jc)
+        assertEquals(Integer.valueOf(40), endpoint.jmin)
+        assertEquals(Integer.valueOf(70), endpoint.jmax)
+        assertEquals(Integer.valueOf(15), endpoint.s1)
+        assertEquals(Integer.valueOf(39), endpoint.s2)
+        assertEquals(java.lang.Long.valueOf(1000000001L), endpoint.h1)
+        assertEquals(java.lang.Long.valueOf(1000000002L), endpoint.h2)
+        assertEquals(java.lang.Long.valueOf(1000000003L), endpoint.h3)
+        assertEquals(java.lang.Long.valueOf(1000000004L), endpoint.h4)
+        assertTrue(bean.isAwg)
+    }
+
+    @Test
+    fun parseWireGuardConfigParsesAwgFields() {
+        val conf = """
+            [Interface]
+            Address = 10.0.0.2/32
+            PrivateKey = $TEST_PRIVATE_KEY
+            Jc = 4
+            Jmin = 40
+            Jmax = 70
+            S1 = 15
+            S2 = 39
+            H1 = 1000000001
+            H2 = 1000000002
+            H3 = 1000000003
+            H4 = 1000000004
+
+            [Peer]
+            Endpoint = 198.51.100.10:51820
+            PublicKey = $TEST_PUBLIC_KEY
+        """.trimIndent()
+        val beans = parseWireGuardConfig(conf)
+        assertEquals(1, beans.size)
+        val bean = beans[0]
+        assertTrue(bean.isAwg)
+        assertEquals(Integer.valueOf(4), bean.jc)
+        assertEquals(Integer.valueOf(40), bean.jmin)
+        assertEquals(Integer.valueOf(70), bean.jmax)
+        assertEquals(Integer.valueOf(15), bean.s1)
+        assertEquals(Integer.valueOf(39), bean.s2)
+        assertEquals(java.lang.Long.valueOf(1000000001L), bean.h1)
+        assertEquals(java.lang.Long.valueOf(1000000002L), bean.h2)
+        assertEquals(java.lang.Long.valueOf(1000000003L), bean.h3)
+        assertEquals(java.lang.Long.valueOf(1000000004L), bean.h4)
+    }
+
+    @Test
+    fun wireGuardBeanRoundTripPreservesAwgFields() {
+        val bean = completeBean("").apply {
+            jc = 4
+            jmin = 40
+            jmax = 70
+            s1 = 15
+            s2 = 39
+            h1 = 1000000001L
+            h2 = 1000000002L
+            h3 = 1000000003L
+            h4 = 1000000004L
+        }
+        val bytes = KryoConverters.serialize(bean)
+        val deserialized = KryoConverters.deserialize(WireGuardBean(), bytes)
+        assertTrue(deserialized.isAwg)
+        assertEquals(Integer.valueOf(4), deserialized.jc)
+        assertEquals(Integer.valueOf(40), deserialized.jmin)
+        assertEquals(Integer.valueOf(70), deserialized.jmax)
+        assertEquals(Integer.valueOf(15), deserialized.s1)
+        assertEquals(Integer.valueOf(39), deserialized.s2)
+        assertEquals(java.lang.Long.valueOf(1000000001L), deserialized.h1)
+        assertEquals(java.lang.Long.valueOf(1000000002L), deserialized.h2)
+        assertEquals(java.lang.Long.valueOf(1000000003L), deserialized.h3)
+        assertEquals(java.lang.Long.valueOf(1000000004L), deserialized.h4)
+    }
+
+    @Test
+    fun toUriExportsAwgSchemeWhenAwg() {
+        val bean = completeBean("").apply {
+            name = "Test AWG"
+            jc = 4
+            jmin = 40
+            jmax = 70
+            s1 = 15
+            s2 = 39
+            h1 = 1000000001L
+            h2 = 1000000002L
+            h3 = 1000000003L
+            h4 = 1000000004L
+        }
+        val uri = bean.toUri()
+        assertTrue(uri.startsWith("awg://"))
+        assertTrue(uri.contains("jc=4"))
+        assertTrue(uri.contains("jmin=40"))
+        assertTrue(uri.contains("jmax=70"))
+        assertTrue(uri.contains("s1=15"))
+        assertTrue(uri.contains("s2=39"))
+        assertTrue(uri.contains("h1=1000000001"))
+        assertTrue(uri.contains("h2=1000000002"))
+        assertTrue(uri.contains("h3=1000000003"))
+        assertTrue(uri.contains("h4=1000000004"))
+
+        val parsed = parseWireGuardLink(uri)
+        requireNotNull(parsed)
+        assertTrue(parsed.isAwg)
+        assertEquals(Integer.valueOf(4), parsed.jc)
+        assertEquals(Integer.valueOf(40), parsed.jmin)
+        assertEquals(Integer.valueOf(70), parsed.jmax)
+        assertEquals(Integer.valueOf(15), parsed.s1)
+        assertEquals(Integer.valueOf(39), parsed.s2)
+        assertEquals(java.lang.Long.valueOf(1000000001L), parsed.h1)
+        assertEquals(java.lang.Long.valueOf(1000000002L), parsed.h2)
+        assertEquals(java.lang.Long.valueOf(1000000003L), parsed.h3)
+        assertEquals(java.lang.Long.valueOf(1000000004L), parsed.h4)
+    }
+
     private fun completeBean(reservedValue: String) = WireGuardBean().apply {
         serverAddress = "198.51.100.10"
         serverPort = 51820

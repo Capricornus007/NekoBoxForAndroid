@@ -62,4 +62,61 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="AmneziaWG (AWG)">
+        <EditTextPreference
+            app:defaultValue="0"
+            app:icon="@drawable/ic_action_lock_open"
+            app:key="jc"
+            app:title="Jc (Junk packet count)"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="0"
+            app:icon="@drawable/ic_action_lock_open"
+            app:key="jmin"
+            app:title="Jmin (Junk packet min size)"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="0"
+            app:icon="@drawable/ic_action_lock_open"
+            app:key="jmax"
+            app:title="Jmax (Junk packet max size)"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="0"
+            app:icon="@drawable/ic_action_lock_open"
+            app:key="s1"
+            app:title="S1 (Init packet magic header)"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="0"
+            app:icon="@drawable/ic_action_lock_open"
+            app:key="s2"
+            app:title="S2 (Response packet magic header)"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="0"
+            app:icon="@drawable/ic_baseline_fingerprint_24"
+            app:key="h1"
+            app:title="H1 (Handshake init header)"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="0"
+            app:icon="@drawable/ic_baseline_fingerprint_24"
+            app:key="h2"
+            app:title="H2 (Handshake resp header)"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="0"
+            app:icon="@drawable/ic_baseline_fingerprint_24"
+            app:key="h3"
+            app:title="H3 (Underload header)"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="0"
+            app:icon="@drawable/ic_baseline_fingerprint_24"
+            app:key="h4"
+            app:title="H4 (Transport header)"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

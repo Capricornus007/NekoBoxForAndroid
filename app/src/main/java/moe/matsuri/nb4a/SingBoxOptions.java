@@ -2911,6 +2911,17 @@ public class SingBoxOptions {
 
         public List<Endpoint_WireGuardPeer> peers;
 
+        // AmneziaWG (AWG) Obfuscation fields
+        public Integer jc;
+        public Integer jmin;
+        public Integer jmax;
+        public Integer s1;
+        public Integer s2;
+        public Long h1;
+        public Long h2;
+        public Long h3;
+        public Long h4;
+
         public Long udp_timeout;
 
         public Integer workers;

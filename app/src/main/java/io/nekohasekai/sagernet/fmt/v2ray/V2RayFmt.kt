@@ -44,7 +44,7 @@ data class VmessQRCode(
 )
 
 fun StandardV2RayBean.isTLS(): Boolean {
-    return security == "tls"
+    return security == "tls" || security == "reality" || realityPubKey.isNotBlank()
 }
 
 fun StandardV2RayBean.setTLS(boolean: Boolean) {
@@ -227,7 +227,7 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl, defaultName: String? = null) {
 
     when (security) {
         "tls", "reality" -> {
-            security = "tls"
+            security = if (security == "reality" || !url.queryParameter("pbk").isNullOrBlank()) "reality" else "tls"
             url.queryParameter("allowInsecure")?.let {
                 allowInsecure = it == "1" || it == "true"
             }
@@ -635,7 +635,7 @@ fun StandardV2RayBean.toUriVMessVLESSTrojan(isTrojan: Boolean): String {
     if (security.isNotBlank() && security != "none") {
         builder.addQueryParameter("security", security)
         when (security) {
-            "tls" -> {
+            "tls", "reality" -> {
                 if (sni.isNotBlank()) {
                     builder.addQueryParameter("sni", sni)
                 }
@@ -651,7 +651,7 @@ fun StandardV2RayBean.toUriVMessVLESSTrojan(isTrojan: Boolean): String {
                 if (utlsFingerprint.isNotBlank()) {
                     builder.addQueryParameter("fp", utlsFingerprint)
                 }
-                if (realityPubKey.isNotBlank()) {
+                if (realityPubKey.isNotBlank() || security == "reality") {
                     builder.setQueryParameter("security", "reality")
                     builder.addQueryParameter("pbk", realityPubKey)
                     builder.addQueryParameter("sid", realityShortId)

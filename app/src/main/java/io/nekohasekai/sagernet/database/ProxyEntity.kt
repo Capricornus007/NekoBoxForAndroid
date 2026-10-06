@@ -36,6 +36,7 @@ import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.juicity.toUri
 import io.nekohasekai.sagernet.fmt.v2ray.*
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
+import io.nekohasekai.sagernet.fmt.wireguard.toUri
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ui.profile.*
 import moe.matsuri.nb4a.SingBoxOptions.BrutalOptions
@@ -224,7 +225,7 @@ data class ProxyEntity(
         TYPE_NAIVE -> "Naïve"
         TYPE_HYSTERIA -> "Hysteria" + hysteriaBean!!.protocolVersion
         TYPE_SSH -> "SSH"
-        TYPE_WG -> "WireGuard"
+        TYPE_WG -> if (wgBean?.isAwg == true) "AmneziaWG" else "WireGuard"
         TYPE_TUIC -> "TUIC"
         TYPE_JUICITY -> "Juicity"
         TYPE_SHADOWTLS -> "ShadowTLS"
@@ -277,7 +278,7 @@ data class ProxyEntity(
     fun haveStandardLink(): Boolean {
         return when (requireBean()) {
             is SSHBean -> false
-            is WireGuardBean -> false
+            is WireGuardBean -> true
             is ShadowTLSBean -> false
             is NekoBean -> false
             is ConfigBean -> false
@@ -300,6 +301,7 @@ data class ProxyEntity(
             is JuicityBean -> toUri()
             is AnyTLSBean -> toUri()
             is SnellBean -> toUri()
+            is WireGuardBean -> toUri()
             is NekoBean -> ""
             else -> toUniversalLink()
         }

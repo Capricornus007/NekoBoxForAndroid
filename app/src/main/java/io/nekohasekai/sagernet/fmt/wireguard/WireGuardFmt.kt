@@ -19,7 +19,18 @@ fun parseWireGuardConfig(conf: String): List<WireGuardBean> {
         load(StringReader(conf))
     }
     val iface = ini["Interface"] ?: error("Missing 'Interface' selection")
-    val isAwg = iface["Jc"] != null || iface["S1"] != null || iface["H1"] != null || conf.contains("awg://", ignoreCase = true)
+    val jc = iface["Jc"]?.trim()?.toIntOrNull()
+    val jmin = iface["Jmin"]?.trim()?.toIntOrNull()
+    val jmax = iface["Jmax"]?.trim()?.toIntOrNull()
+    val s1 = iface["S1"]?.trim()?.toIntOrNull()
+    val s2 = iface["S2"]?.trim()?.toIntOrNull()
+    val h1 = iface["H1"]?.trim()?.toLongOrNull()
+    val h2 = iface["H2"]?.trim()?.toLongOrNull()
+    val h3 = iface["H3"]?.trim()?.toLongOrNull()
+    val h4 = iface["H4"]?.trim()?.toLongOrNull()
+    val isAwg = (jc != null && jc > 0) || (s1 != null && s1 > 0) || (s2 != null && s2 > 0)
+            || (h1 != null && h1 > 0) || (h2 != null && h2 > 0) || (h3 != null && h3 > 0) || (h4 != null && h4 > 0)
+            || conf.contains("awg://", ignoreCase = true)
     val localAddresses = iface.getAll("Address")
         ?.flatMap { value -> value.split(',') }
         ?.map { it.trim() }
@@ -33,6 +44,15 @@ fun parseWireGuardConfig(conf: String): List<WireGuardBean> {
         privateKey = iface["PrivateKey"]?.trim().orEmpty()
         iface["MTU"]?.trim()?.toIntOrNull()?.let { mtu = it }
         listenPort = iface["ListenPort"]?.trim()?.toIntOrNull() ?: 0
+        this.jc = jc
+        this.jmin = jmin
+        this.jmax = jmax
+        this.s1 = s1
+        this.s2 = s2
+        this.h1 = h1
+        this.h2 = h2
+        this.h3 = h3
+        this.h4 = h4
     }
 
     val peers = ini.getAll("Peer")
@@ -103,6 +123,15 @@ fun parseWireGuardEndpoint(json: JsonObject): WireGuardBean? {
         peerPreSharedKey = peer.stringValue("pre_shared_key").orEmpty()
         persistentKeepaliveInterval = peer.intValue("persistent_keepalive_interval") ?: 0
         reserved = peer.reservedValue().orEmpty()
+        jc = json.intValue("jc") ?: 0
+        jmin = json.intValue("jmin") ?: 0
+        jmax = json.intValue("jmax") ?: 0
+        s1 = json.intValue("s1") ?: 0
+        s2 = json.intValue("s2") ?: 0
+        h1 = json.longValue("h1") ?: 0L
+        h2 = json.longValue("h2") ?: 0L
+        h3 = json.longValue("h3") ?: 0L
+        h4 = json.longValue("h4") ?: 0L
     }.applyDefaultValues()
 }
 
@@ -126,6 +155,12 @@ private fun JsonObject.intValue(name: String): Int? {
     val value = get(name)?.takeUnless(JsonElement::isJsonNull) ?: return null
     if (!value.isJsonPrimitive) return null
     return value.asJsonPrimitive.asString.trim().toIntOrNull()
+}
+
+private fun JsonObject.longValue(name: String): Long? {
+    val value = get(name)?.takeUnless(JsonElement::isJsonNull) ?: return null
+    if (!value.isJsonPrimitive) return null
+    return value.asJsonPrimitive.asString.trim().toLongOrNull()
 }
 
 private fun JsonObject.arrayValue(name: String): JsonArray? {
@@ -185,6 +220,17 @@ fun buildSingBoxEndpointWireGuardBean(bean: WireGuardBean): SingBoxOptions.Endpo
         private_key = bean.privateKey
         mtu = bean.mtu?.takeIf { it > 0 }
         listen_port = bean.listenPort?.takeIf { it > 0 }
+        if (bean.isAwg) {
+            jc = bean.jc?.takeIf { it > 0 }
+            jmin = bean.jmin?.takeIf { it > 0 }
+            jmax = bean.jmax?.takeIf { it > 0 }
+            s1 = bean.s1?.takeIf { it > 0 }
+            s2 = bean.s2?.takeIf { it > 0 }
+            h1 = bean.h1?.takeIf { it > 0L }
+            h2 = bean.h2?.takeIf { it > 0L }
+            h3 = bean.h3?.takeIf { it > 0L }
+            h4 = bean.h4?.takeIf { it > 0L }
+        }
         peers = listOf(
             SingBoxOptions.Endpoint_WireGuardPeer().apply {
                 address = bean.serverAddress?.takeIf { it.isNotBlank() }
@@ -237,12 +283,22 @@ fun parseWireGuardLink(link: String): WireGuardBean? {
         val psk = uri.queryParameter("preshared_key") ?: uri.queryParameter("presharedkey") ?: uri.queryParameter("psk") ?: ""
         val mtu = uri.queryParameter("mtu")?.toIntOrNull() ?: 1420
         val reserved = uri.queryParameter("reserved") ?: ""
-        val tag = uri.fragment?.takeIf { it.isNotBlank() } ?: "WireGuard"
+        val tag = uri.fragment?.takeIf { it.isNotBlank() } ?: (if (isAwg) "AmneziaWG" else "WireGuard")
 
-        val hasAwgParams = isAwg || uri.queryParameter("jc") != null || uri.queryParameter("jmin") != null || uri.queryParameter("s1") != null || uri.queryParameter("h1") != null
+        val jc = uri.queryParameter("jc")?.toIntOrNull() ?: 0
+        val jmin = uri.queryParameter("jmin")?.toIntOrNull() ?: 0
+        val jmax = uri.queryParameter("jmax")?.toIntOrNull() ?: 0
+        val s1 = uri.queryParameter("s1")?.toIntOrNull() ?: 0
+        val s2 = uri.queryParameter("s2")?.toIntOrNull() ?: 0
+        val h1 = uri.queryParameter("h1")?.toLongOrNull() ?: 0L
+        val h2 = uri.queryParameter("h2")?.toLongOrNull() ?: 0L
+        val h3 = uri.queryParameter("h3")?.toLongOrNull() ?: 0L
+        val h4 = uri.queryParameter("h4")?.toLongOrNull() ?: 0L
+
+        val hasAwgParams = isAwg || jc > 0 || s1 > 0 || s2 > 0 || h1 > 0L || h2 > 0L || h3 > 0L || h4 > 0L
 
         return WireGuardBean().apply {
-            name = if (hasAwgParams) "[AWG-Compat] $tag" else tag
+            name = if (hasAwgParams && !tag.contains("AWG", ignoreCase = true) && !tag.contains("Amnezia", ignoreCase = true)) "[AWG-Compat] $tag" else tag
             this.serverAddress = serverAddress
             this.serverPort = serverPort
             this.localAddress = address.replace(",", "\n")
@@ -251,8 +307,63 @@ fun parseWireGuardLink(link: String): WireGuardBean? {
             this.peerPreSharedKey = psk
             this.mtu = mtu
             this.reserved = reserved
+            this.jc = jc
+            this.jmin = jmin
+            this.jmax = jmax
+            this.s1 = s1
+            this.s2 = s2
+            this.h1 = h1
+            this.h2 = h2
+            this.h3 = h3
+            this.h4 = h4
         }.applyDefaultValues()
     } catch (e: Exception) {
         return null
     }
+}
+
+fun WireGuardBean.toUri(): String {
+    val scheme = if (isAwg) "awg" else "wireguard"
+    val builder = StringBuilder("$scheme://")
+    if (!privateKey.isNullOrBlank()) {
+        builder.append(java.net.URLEncoder.encode(privateKey, "UTF-8"))
+        builder.append("@")
+    }
+    builder.append(serverAddress.orEmpty())
+    if (serverPort != null && serverPort > 0) {
+        builder.append(":").append(serverPort)
+    }
+    builder.append("?")
+    val params = mutableListOf<String>()
+    if (!peerPublicKey.isNullOrBlank()) {
+        params.add("public_key=${java.net.URLEncoder.encode(peerPublicKey, "UTF-8")}")
+    }
+    if (!localAddress.isNullOrBlank()) {
+        params.add("address=${java.net.URLEncoder.encode(localAddress.replace("\n", ","), "UTF-8")}")
+    }
+    if (!peerPreSharedKey.isNullOrBlank()) {
+        params.add("preshared_key=${java.net.URLEncoder.encode(peerPreSharedKey, "UTF-8")}")
+    }
+    if (mtu != null && mtu > 0) {
+        params.add("mtu=$mtu")
+    }
+    if (!reserved.isNullOrBlank()) {
+        params.add("reserved=${java.net.URLEncoder.encode(reserved, "UTF-8")}")
+    }
+    if (isAwg) {
+        if (jc != null && jc > 0) params.add("jc=$jc")
+        if (jmin != null && jmin > 0) params.add("jmin=$jmin")
+        if (jmax != null && jmax > 0) params.add("jmax=$jmax")
+        if (s1 != null && s1 > 0) params.add("s1=$s1")
+        if (s2 != null && s2 > 0) params.add("s2=$s2")
+        if (h1 != null && h1 > 0L) params.add("h1=$h1")
+        if (h2 != null && h2 > 0L) params.add("h2=$h2")
+        if (h3 != null && h3 > 0L) params.add("h3=$h3")
+        if (h4 != null && h4 > 0L) params.add("h4=$h4")
+    }
+    builder.append(params.joinToString("&"))
+    if (!name.isNullOrBlank()) {
+        builder.append("#").append(java.net.URLEncoder.encode(name, "UTF-8"))
+    }
+    return builder.toString()
 }
