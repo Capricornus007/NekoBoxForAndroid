@@ -45,9 +45,16 @@ class GroupSettingsActivity(
 
     private lateinit var frontProxyPreference: OutboundPreference
     private lateinit var landingProxyPreference: OutboundPreference
+    var isUngrouped: Boolean = false
 
     fun ProxyGroup.init() {
-        DataStore.groupName = name ?: ""
+        DataStore.groupName = name.takeIf { !it.isNullOrBlank() } ?: if (ungrouped) {
+            getString(
+                R.string.group_default,
+            )
+        } else {
+            ""
+        }
         DataStore.groupType = type
         DataStore.groupOrder = order
         DataStore.groupIsSelector = isSelector
@@ -178,6 +185,10 @@ class GroupSettingsActivity(
         val groupType = findPreference<SimpleMenuPreference>(Key.GROUP_TYPE)!!
         val groupSubscription = findPreference<PreferenceCategory>(Key.GROUP_SUBSCRIPTION)!!
         val subscriptionUpdate = findPreference<PreferenceCategory>(Key.SUBSCRIPTION_UPDATE)!!
+
+        if (isUngrouped) {
+            groupType.isVisible = false
+        }
 
         fun updateGroupType(groupType: Int = DataStore.groupType) {
             val isSubscription = groupType == GroupType.SUBSCRIPTION
@@ -337,10 +348,12 @@ class GroupSettingsActivity(
                         }
                         return@runOnDefaultDispatcher
                     }
+                    isUngrouped = entity.ungrouped
                     entity.init()
                 }
 
                 onMainDispatcher {
+                    invalidateOptionsMenu()
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.settings, MyPreferenceFragmentCompat())
                         .commit()
@@ -374,6 +387,9 @@ class GroupSettingsActivity(
                 entity.subscription?.subscriptionUserinfo = ""
             }
             GroupManager.updateGroup(entity.apply { serialize() })
+            if (DataStore.serviceState.canStop) {
+                SagerNet.reloadService()
+            }
         }
 
         finish()
@@ -383,7 +399,17 @@ class GroupSettingsActivity(
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.profile_config_menu, menu)
+        if (isUngrouped) {
+            menu.findItem(R.id.action_delete)?.isVisible = false
+        }
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        if (isUngrouped) {
+            menu.findItem(R.id.action_delete)?.isVisible = false
+        }
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = child.onOptionsItemSelected(item)
@@ -434,7 +460,9 @@ class GroupSettingsActivity(
 
         override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
             R.id.action_delete -> {
-                if (DataStore.editingId == 0L) {
+                if (activity?.isUngrouped == true) {
+                    true
+                } else if (DataStore.editingId == 0L) {
                     requireActivity().finish()
                 } else {
                     DeleteConfirmationDialogFragment().apply {
