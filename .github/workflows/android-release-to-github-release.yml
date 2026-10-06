@@ -114,6 +114,13 @@ jobs:
             sha256sum *.apk > SHA256SUMS.txt
           )
 
+      - name: Verify APK signatures (release gate)
+        # 規則 71：公開發布的 APK 一律要 v1+v2+v3，而且只認產物、不認 gradle 配置。
+        # 這條是 debug 通道（assembleOssDebug），所以不設 REQUIRE_RELEASE_KEY，
+        # 但「完全沒簽」「少某個 scheme」「apksigner 找不到」都要讓 workflow 紅。
+        shell: bash
+        run: bash ./scripts/check-apk-signature.sh release-assets/*.apk
+
       - name: Create release when started manually
         if: github.event_name == 'workflow_dispatch'
         shell: bash

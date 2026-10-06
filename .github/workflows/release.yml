@@ -188,6 +188,25 @@ jobs:
             cd "$APK"
             sha256sum ./*.apk > SHA256SUMS
           )
+      - name: Verify APK signatures (release gate)
+        # 規則 71：正式版鏈公開發布的每顆 APK 都要 v1+v2+v3，且**不能是 debug 憑證**。
+        # 這條鏈的簽名依賴一個「有 secret 才解 keystore」的 if —— secret 被改名或清掉時
+        # 它靜默跳過、gradle 退回 debug 金鑰，badge 照綠（moregramX 那個月未簽名的同款形狀），
+        # 所以收口只認下載得到的實物：apksigner 的判定 + 憑證 DN/SHA-256 一律印進日誌。
+        shell: bash
+        env:
+          APK: ${{ env.APK }}
+          REQUIRE_RELEASE_KEY: '1'
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          apks=("$APK"/*.apk)
+          if [ "${#apks[@]}" -eq 0 ]; then
+            echo "::error::$APK 底下沒有任何 APK，收口無從驗起" >&2
+            exit 1
+          fi
+          bash ./scripts/check-apk-signature.sh "${apks[@]}"
+
       - uses: actions/upload-artifact@v7 # v7
         with:
           name: APKs
