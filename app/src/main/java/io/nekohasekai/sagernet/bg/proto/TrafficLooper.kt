@@ -346,7 +346,7 @@ class TrafficLooper
                         }
                     }
                 }
-                if (ActiveOutboundTracker.checkAndUpdate(data)) {
+                if (isInteractive && ActiveOutboundTracker.checkAndUpdate(data)) {
                     val newTitle = ActiveOutboundTracker.formatNotificationTitle(proxy.profile)
                     proxy.displayProfileName = newTitle
                     data.notification?.postNotificationTitle(newTitle)

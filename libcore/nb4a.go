@@ -137,8 +137,8 @@ func sendFdToProtect(fd int, path string) error {
 
 // SetMemoryProfile dynamically switches the Go runtime GC profile.
 // Called from Android at VPN service start based on user's "性能优先模式" toggle.
-//   - performancePriority=false (default): balanced low-power mode — GOGC=80, limit=256MB.
-//     Prevents CPU GC thrashing while keeping memory controlled and saving battery.
+//   - performancePriority=false (default): balanced low-power mode — GOGC=100, soft limit=512MB.
+//     Provides ample headroom for high-throughput streaming and downloads without GC mutator assist throttling.
 //   - performancePriority=true: high-performance mode — GOGC=100, no memory limit.
 //     Maximises throughput for power users at the cost of higher background RAM.
 //
@@ -149,8 +149,8 @@ func SetMemoryProfile(performancePriority bool) {
 		debug.SetGCPercent(100)
 		debug.SetMemoryLimit(-1) // -1 = math.MaxInt64, disables the soft limit
 	} else {
-		// Balanced low-power: GOGC=80, cap at 256 MiB to avoid aggressive GC wakeups in background
-		debug.SetGCPercent(80)
-		debug.SetMemoryLimit(256 * 1024 * 1024)
+		// Balanced low-power: GOGC=100, cap at 512 MiB to avoid aggressive GC interrupts while handling high throughput
+		debug.SetGCPercent(100)
+		debug.SetMemoryLimit(512 * 1024 * 1024)
 	}
 }
