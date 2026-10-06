@@ -5,12 +5,16 @@
 # BeginTailscaleExitNodeChange 與 adapter.TailscaleEndpointStatus.SelectedExitNodeID/IP，
 # 那些 API 在 hawkff maintenance/native-stack 那條線上（cherry-pick 54564a44e 進來、
 # 加上我方 modernize 修正），tag = v1.15.0-alpha.10-mod.26。
-# 上一筆 d468ba64（mod.25）是 UDP 封包緩衝空指標崩潰的修復，已含在這一筆的祖先裡。
-export COMMIT_SING_BOX="8e94ade97ac978d1cea9c7dc39212dfcbbd2f504"
+# 上一筆 d468ba64（mod.25）是 UDP 包緩衝空指標崩潰的修復，已含在這一筆的祖先裡。
+# mod.27（020e8c3e0）= sing-box 1.15.x 整條吃下 hawkff/maintenance/native-stack 的 25 筆：
+# 生命週期冪等（closeOnce）、AwneziaWG magic header 不再被抹掉、AWG 參數 CRLF 注入與金鑰
+# 長度驗證、packet-up 拒絕非正數 sc_max_each_post_bytes，另外修掉 randStringFromCharset
+# 的 byte 溢位死迴圈與 vless 加密握手失敗時的 typed-nil panic。
+export COMMIT_SING_BOX="020e8c3e01d66c8d7770eb572d6af31f6b098e7c"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.26"
+export VERSION_SING_BOX="1.15.0-alpha.10-mod.27"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
