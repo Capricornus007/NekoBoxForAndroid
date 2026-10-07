@@ -753,17 +753,6 @@
     <issue
         id="TypographyEllipsis"
         message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
-        errorLine1="    &lt;string name=&quot;stun_attest_loading&quot;>ممکن است چند دقیقه‌ای طول بکشد...&lt;/string>"
-        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values-fa/strings.xml"
-            line="453"
-            column="40"/>
-    </issue>
-
-    <issue
-        id="TypographyEllipsis"
-        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
         errorLine1="    &lt;string name=&quot;backup_importing&quot;>افزودن...&lt;/string>"
         errorLine2="                                    ~~~~~~~~~">
         <location
@@ -963,17 +952,6 @@
             file="src/main/java/moe/matsuri/nb4a/ui/ThemePickerPreference.kt"
             line="61"
             column="13"/>
-    </issue>
-
-    <issue
-        id="LabelFor"
-        message="Missing accessibility label: provide either a view with an `android:labelFor` that references this view or provide an `android:hint`"
-        errorLine1="                        &lt;EditText"
-        errorLine2="                         ~~~~~~~~">
-        <location
-            file="src/main/res/layout/layout_stun.xml"
-            line="66"
-            column="26"/>
     </issue>
 
 </issues>
