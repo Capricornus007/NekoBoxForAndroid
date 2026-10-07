@@ -45,10 +45,19 @@ for apk in "$@"; do
 
   missing=""
   for abi in $abis; do
-    printf '%s\n' "$listing" | grep -qx "lib/$abi/$SIDECAR" || missing="$missing $abi"
+    # 用 case 逐字比對，不走 pipe：grep -qx 一命中就收工，printf 會噴
+    # 「printf: write error: Broken pipe」把錯誤資訊混在日誌裡。
+    case $'\n'"$listing"$'\n' in
+      *$'\n'"lib/$abi/$SIDECAR"$'\n'*) ;;
+      *) missing="$missing $abi" ;;
+    esac
   done
   if [ -n "$missing" ]; then
     echo "::error::${apk} 缺 ${SIDECAR}：${missing# }（這些 ABI 上 Proton 取節點頁完全不能用）" >&2
+    echo "  包內的 native 清單（照這個對照 app/executableSo 與 jniLibs 到底哪一段掉了）：" >&2
+    while IFS= read -r entry; do
+      case $entry in lib/*) printf '    %s\n' "$entry" >&2 ;; esac
+    done <<< "$listing"
     fail=1
     continue
   fi

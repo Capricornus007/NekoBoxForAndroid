@@ -148,6 +148,10 @@ jobs:
               fi
             done
           done
+          # 「檔在」不等於「能用」：快取/artifact 還原出來的 .so 只要 .arch 跟目錄對不上，
+          # Gradle 就不會把它塞進包裡，紅燈要等到驗產物那層才亮。在這裡先擋掉。
+          bash ./scripts/check-sidecar-elf.sh app/executableSo
+          ls -l app/executableSo/*/libprotonvpn.so
       - name: Gradle cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:

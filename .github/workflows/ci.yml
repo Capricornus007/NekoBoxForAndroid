@@ -282,6 +282,10 @@ jobs:
               fi
             done
           done
+          # 「檔在」不等於「能用」：快取/artifact 還原出來的 .so 只要 .arch 跟目錄對不上，
+          # Gradle 就不會把它塞進包裡，紅燈要等到驗產物那層才亮。在這裡先擋掉。
+          bash ./scripts/check-sidecar-elf.sh app/executableSo
+          ls -l app/executableSo/*/libprotonvpn.so
       - name: Gradle cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -327,6 +331,16 @@ jobs:
           APK=$(find app/build/outputs/apk -name '*arm64-v8a*.apk')
           APK=$(dirname $APK)
           echo "APK=$APK" >> $GITHUB_ENV
+
+      - name: Trace sidecar packaging path
+        # 紅的時候要看得見是哪一段掉的：輸入 .so → merged_jni_libs → merged_native_libs →
+        # stripped_native_libs → APK。少在哪一段就修哪一段，不要靠猜。
+        shell: bash
+        run: |
+          for stage in merged_jni_libs merged_native_libs stripped_native_libs; do
+            echo "===== $stage"
+            find "app/build/intermediates/$stage" -name 'libprotonvpn.so' -printf '  %p %s\n' 2>/dev/null | sort
+          done
 
       - name: Verify Proton sidecar in APKs
         # 「憑什麼要讓它缺席」：這個 job 最後會把 APK 傳到公開的 nightly release，
