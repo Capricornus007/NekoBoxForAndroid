@@ -274,7 +274,10 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         if (isReality) {
             val fp = utlsFingerprint.readStringFromCache()
             if (fp.isBlank() || fp == "none") {
-                io.nekohasekai.sagernet.database.DataStore.profileCacheStore.putString(utlsFingerprint.cacheName, "chrome")
+                io.nekohasekai.sagernet.database.DataStore.profileCacheStore.putString(
+                    utlsFingerprint.cacheName,
+                    "chrome",
+                )
                 (utlsFingerprint.preference as? moe.matsuri.nb4a.ui.SimpleMenuPreference)?.value = "chrome"
             }
         }

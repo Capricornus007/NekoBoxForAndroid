@@ -18,9 +18,11 @@ private const val BASE64_ALPHABET =
 // and adds the Jc/Jmin/Jmax/S1-S4/H1-H4/I1-I5 obfuscation parameters. `dns` has no bean
 // field and is ignored.
 fun parseWireGuardLink(link: String): WireGuardBean {
+    // 順序有意義："wg://" 是 "awg://" 的子字串，先替換它會把 awg:// 打成 ahttps://，
+    // 於是要嘛解析失敗、嘛把遮罩參數當成一般 wireguard 連結吞掉。
     val url = link.replaceFirst("wireguard://", "https://", ignoreCase = true)
-        .replaceFirst("wg://", "https://", ignoreCase = true)
         .replaceFirst("awg://", "https://", ignoreCase = true)
+        .replaceFirst("wg://", "https://", ignoreCase = true)
         .toHttpUrlOrNull() ?: error("invalid wireguard link")
     return WireGuardBean().apply {
         serverAddress = url.host

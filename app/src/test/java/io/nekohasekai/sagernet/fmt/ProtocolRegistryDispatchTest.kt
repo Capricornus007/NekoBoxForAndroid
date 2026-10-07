@@ -465,7 +465,6 @@ class ProtocolRegistryDispatchTest {
         )
         val nonStandardLinkTypes = setOf(
             ProxyEntity.TYPE_SSH,
-            ProxyEntity.TYPE_WG,
             ProxyEntity.TYPE_AWG,
             ProxyEntity.TYPE_TAILSCALE,
             ProxyEntity.TYPE_SHADOWTLS,
@@ -490,6 +489,8 @@ class ProtocolRegistryDispatchTest {
             ProxyEntity.TYPE_MASTERDNSVPN,
             ProxyEntity.TYPE_OLCRTC,
             ProxyEntity.TYPE_BYEDPI,
+            // OwnBox 帶進來的 toUri()：WG 走專屬匯出（單 peer），不再只靠 toUniversalLink
+            ProxyEntity.TYPE_WG,
         )
 
         assertEquals(26, allBeans.size)
