@@ -207,6 +207,23 @@ jobs:
           fi
           bash ./scripts/check-apk-signature.sh "${apks[@]}"
 
+      - name: Verify Proton sidecar in APKs (release gate)
+        # 「憑什麼要讓它缺席」：包裡有幾個 ABI，每個 ABI 就要有一支 libprotonvpn.so。
+        # 前面的「Verify Sidecar Artifacts」只證明下載到的 .so 齊全，這一層驗的是打包後的
+        # 實物；缺 sidecar 時 Proton 取節點頁完全不能用，這種包不能發出去。
+        shell: bash
+        env:
+          APK: ${{ env.APK }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          apks=("$APK"/*.apk)
+          if [ "${#apks[@]}" -eq 0 ]; then
+            echo "::error::$APK 底下沒有任何 APK，收口無從驗起" >&2
+            exit 1
+          fi
+          bash ./scripts/check-apk-sidecars.sh "${apks[@]}"
+
       - uses: actions/upload-artifact@v7 # v7
         with:
           name: APKs

@@ -68,6 +68,12 @@
             app:title="@string/subscription_direct_fallback" />
         <SwitchPreferenceCompat
             app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_vpn_key_24"
+            app:key="protonAutoLogin"
+            app:summary="@string/proton_auto_login_summary"
+            app:title="@string/proton_auto_login" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
             app:icon="@drawable/ic_baseline_shutter_speed_24"
             app:key="adaptiveTrafficPolling"
             app:summary="@string/adaptive_traffic_polling_summary"

@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.fmt.proton
 
+import android.system.Os
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.Dispatchers
@@ -139,6 +140,40 @@ object ProtonSidecar {
         File(SagerNet.application.getNoBackupFilesDir(), "proton-session.json")
     }
 
+    // 自動登入的憑證只存在 noBackupFilesDir：不進設定資料庫、不進日誌、不進錯誤訊息。
+    private val credentialsFile: File by lazy {
+        File(SagerNet.application.getNoBackupFilesDir(), "proton-credentials.json")
+    }
+
+    fun storeCredentials(account: String, password: String): Boolean = runCatching {
+        val body = JSONObject().apply {
+            put("username", account)
+            put("password", password)
+        }
+        // session 檔是 sidecar 自己建目錄的，憑證檔由這裡寫，所以目錄要自己確保存在。
+        credentialsFile.parentFile?.mkdirs()
+        credentialsFile.writeText(body.toString())
+        // writeText 建成 0644，跟 sidecar 自己寫的 session 檔不一致，在這裡補回 0600。
+        Os.chmod(credentialsFile.absolutePath, CREDENTIALS_FILE_MODE)
+        true
+    }.getOrElse {
+        Logs.w("proton: failed to store credentials", it)
+        false
+    }
+
+    fun readCredentials(): Pair<String, String>? {
+        val obj = runCatching { JSONObject(credentialsFile.readText()) }.getOrNull() ?: return null
+        val account = obj.optString("username", "")
+        val password = obj.optString("password", "")
+        return if (account.isEmpty() || password.isEmpty()) null else account to password
+    }
+
+    fun clearCredentials() {
+        if (!credentialsFile.delete() && credentialsFile.exists()) {
+            Logs.w("proton: failed to delete stored credentials")
+        }
+    }
+
     private fun executable(): File? {
         val dir = SagerNet.application.applicationInfo.nativeLibraryDir ?: return null
         val file = File(dir, EXECUTABLE_NAME)
@@ -268,4 +303,7 @@ object ProtonSidecar {
 
     private const val TIMEOUT_SECONDS = 45L
     private const val TIMEOUT_MILLIS = 2000L
+
+    // Os.chmod 要整數模式，Kotlin 沒有八進位字面值：0b110000000 就是 0600。
+    private const val CREDENTIALS_FILE_MODE = 0b110000000
 }

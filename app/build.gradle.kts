@@ -161,6 +161,36 @@ val buildHevTun = tasks.register("buildHevTun") {
     }
 }
 
+// libprotonvpn.so 缺席不允許存在：缺任何一支 ABI 就當場編，編不出來直接讓建置紅。
+// Proton 取節點頁是靠子行程跑這支 sidecar 的，缺了那頁就完全不能用，所以這裡不設計
+// 「缺席就降級」的路徑（使用者裁定：憑什麼要讓它缺席）。
+// protonvpn.sh 第一行 `source "buildScript/init/env.sh"` 是相對路徑，工作目錄必須是倉庫根。
+val buildProtonvpn = tasks.register("buildProtonvpn") {
+    val protonAbis = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+    val scriptPath = rootProject.file("buildScript/lib/protonvpn.sh").absolutePath
+    val rootPath = rootProject.projectDir.absolutePath
+    val appDirPath = projectDir.absolutePath
+    val soPaths = protonAbis.map { "$appDirPath/executableSo/$it/libprotonvpn.so" }
+    inputs.file(scriptPath)
+    outputs.files(soPaths)
+    doLast {
+        val missing = soPaths.any { !File(it).exists() }
+        if (missing || System.getenv("FORCE_PROTON") == "1") {
+            val proc = ProcessBuilder("bash", scriptPath)
+                .directory(File(rootPath))
+                .inheritIO()
+                .start()
+            val code = proc.waitFor()
+            if (code != 0) {
+                throw GradleException(
+                    "protonvpn.sh failed with exit code $code: 缺 libprotonvpn.so 時 Proton " +
+                        "取節點頁會因為沒有 sidecar 而完全不能用，所以這裡不允許跳過。",
+                )
+            }
+        }
+    }
+}
+
 tasks.named("preBuild") {
-    dependsOn(buildHevTun)
+    dependsOn(buildHevTun, buildProtonvpn)
 }

@@ -116,6 +116,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var spoofUserAgent by configurationStore.string(Key.SPOOF_USER_AGENT) { "" }
     var autoSelectLowestLatency by configurationStore.boolean(Key.AUTO_SELECT_LOWEST_LATENCY)
     var protonWarningAccepted by configurationStore.boolean(Key.PROTON_WARNING_ACCEPTED)
+    var protonAutoLogin by configurationStore.boolean(Key.PROTON_AUTO_LOGIN)
 
     var showBottomBar by configurationStore.boolean(Key.SHOW_BOTTOM_BAR)
     var confirmProfileDelete by configurationStore.boolean(Key.CONFIRM_PROFILE_DELETE) { true }

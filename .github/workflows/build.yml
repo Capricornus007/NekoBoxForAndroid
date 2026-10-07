@@ -185,6 +185,23 @@ jobs:
           APK=$(dirname $APK)
           echo "APK=$APK" >> $GITHUB_ENV
 
+      - name: Verify Proton sidecar in APKs
+        # 「憑什麼要讓它缺席」：包裡每個 ABI 都要有 libprotonvpn.so，缺了 Proton
+        # 取節點頁就不能用。前面的「Verify Sidecar Artifacts」只看下載到的 .so，
+        # 這一層驗的是打包後的實物。
+        shell: bash
+        env:
+          APK: ${{ env.APK }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          apks=("$APK"/*.apk)
+          if [ "${#apks[@]}" -eq 0 ]; then
+            echo "::error::$APK 底下沒有任何 APK，無從驗起" >&2
+            exit 1
+          fi
+          bash ./scripts/check-apk-sidecars.sh "${apks[@]}"
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v7
         with:

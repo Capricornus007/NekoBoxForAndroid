@@ -35,6 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - libcore
+      - sidecars
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -48,6 +49,13 @@ jobs:
         with:
           name: libcore-aar-ci
           path: app/libs
+      # 任何 gradle 呼叫都會跑 preBuild 的 buildProtonvpn：缺 .so 就現編，而這裡沒有
+      # Go 1.27，所以要把 sidecar 先放好（不能缺席，也不能讓它紅在環境上）。
+      - name: Download Sidecars
+        uses: actions/download-artifact@v8 # v8
+        with:
+          name: sidecars-so-ci
+          path: app/executableSo
       - name: Gradle cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -64,6 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - libcore
+      - sidecars
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -77,6 +86,12 @@ jobs:
         with:
           name: libcore-aar-ci
           path: app/libs
+      # 同 test job：lint 也要起 gradle，preBuild 的 buildProtonvpn 需要 sidecar 就位。
+      - name: Download Sidecars
+        uses: actions/download-artifact@v8 # v8
+        with:
+          name: sidecars-so-ci
+          path: app/executableSo
       - name: Gradle cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -312,6 +327,23 @@ jobs:
           APK=$(find app/build/outputs/apk -name '*arm64-v8a*.apk')
           APK=$(dirname $APK)
           echo "APK=$APK" >> $GITHUB_ENV
+
+      - name: Verify Proton sidecar in APKs
+        # 「憑什麼要讓它缺席」：這個 job 最後會把 APK 傳到公開的 nightly release，
+        # 包裡每個 ABI 都要有 libprotonvpn.so；缺了 Proton 取節點頁就不能用，寧可紅。
+        # 前面的「Verify Sidecar Artifacts」只證明下載到的 .so 齊全，這一層驗實物。
+        shell: bash
+        env:
+          APK: ${{ env.APK }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          apks=("$APK"/*.apk)
+          if [ "${#apks[@]}" -eq 0 ]; then
+            echo "::error::$APK 底下沒有任何 APK，無從驗起" >&2
+            exit 1
+          fi
+          bash ./scripts/check-apk-sidecars.sh "${apks[@]}"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v7

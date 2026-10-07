@@ -978,6 +978,10 @@
     <string name="proton_node_count">Серверов: %1$d, пропущено: %2$d</string>
     <string name="proton_sidecar_missing">В этой сборке нет вспомогательного модуля Proton.</string>
     <string name="proton_2fa_required">Для этого аккаунта нужен код 2FA.</string>
+    <string name="proton_auto_login">Автовход в Proton</string>
+    <string name="proton_auto_login_summary">Входит заново и обновляет список серверов сам.</string>
+    <string name="proton_auto_login_message">NB4A войдёт заново, когда сессия истечёт. Пароль хранится только в закрытом хранилище NB4A на этом устройстве.</string>
+    <string name="proton_auto_login_2fa">Автовход не может использовать одноразовый код 2FA. Войдите вручную.</string>
     <string name="proton_warning_title">Предупреждаем заранее</string>
     <string name="proton_warning_message">Это не официальное приложение Proton. Оно обращается к API Proton так же, как собственные клиенты Proton, поэтому Proton может изменить API в любой момент — и функция перестанет работать, а мы не сможем подготовиться заранее.\n\nПароль и сессия хранятся только на этом устройстве, в закрытом хранилище NB4A, и отправляются лишь на вход в Proton. Использование подписки вне приложений Proton может не покрываться их условиями.</string>
     <string name="proton_warning_accept">Понятно</string>

@@ -43,9 +43,16 @@ class ProtonActivity : AppCompatActivity() {
         binding.signOut.setOnClickListener { signOut() }
         binding.refresh.setOnClickListener { refresh() }
 
-        if (DataStore.protonWarningAccepted && ProtonSidecar.hasSession()) {
-            binding.status.setText(R.string.proton_signed_in)
-            refresh()
+        // 開關關著就不主動打網路：只有開了自動登入，進頁才自己登入／自己取節點。
+        if (DataStore.protonWarningAccepted && DataStore.protonAutoLogin) {
+            if (ProtonSidecar.hasSession()) {
+                binding.status.setText(R.string.proton_signed_in)
+                refresh()
+            } else {
+                ProtonSidecar.readCredentials()?.let { (account, password) ->
+                    runSignIn(account, password, "", fromForm = false)
+                }
+            }
         }
     }
 
@@ -68,7 +75,11 @@ class ProtonActivity : AppCompatActivity() {
         val password = binding.password.text?.toString().orEmpty()
         val twoFactor = binding.twoFactor.text?.toString()?.trim().orEmpty()
         if (account.isEmpty() || password.isEmpty()) return
+        runSignIn(account, password, twoFactor, fromForm = true)
+    }
 
+    // fromForm = false 是自動登入那條路：不碰表單，也不能把密碼留在畫面上。
+    private fun runSignIn(account: String, password: String, twoFactor: String, fromForm: Boolean) {
         binding.signIn.isEnabled = false
         binding.refresh.isEnabled = false
         binding.status.setText(R.string.proton_refresh)
@@ -80,7 +91,11 @@ class ProtonActivity : AppCompatActivity() {
             binding.refresh.isEnabled = true
             when {
                 result.ok -> {
-                    binding.password.text = null
+                    if (fromForm) {
+                        binding.password.text = null
+                        // 只有開了自動登入才把憑證留在本機：session 過期時才登得回來。
+                        if (DataStore.protonAutoLogin) ProtonSidecar.storeCredentials(account, password)
+                    }
                     binding.twoFactorLayout.visibility = View.GONE
                     binding.status.setText(R.string.proton_signed_in)
                     refresh()
@@ -90,6 +105,12 @@ class ProtonActivity : AppCompatActivity() {
                     // Keep the code field visible so the retry is one tap away.
                     binding.twoFactorLayout.visibility = View.VISIBLE
                     binding.status.setText(R.string.proton_2fa_required)
+                    if (!fromForm) {
+                        // 驗證碼一直換，存著的密碼登不進去：開關對 2FA 帳號無效，
+                        // 關掉並清掉憑證，免得每次進頁都白打一次網路。
+                        ProtonSidecar.clearCredentials()
+                        DataStore.protonAutoLogin = false
+                    }
                 }
 
                 else -> binding.status.text = result.error.ifEmpty { result.reason }
@@ -99,6 +120,9 @@ class ProtonActivity : AppCompatActivity() {
 
     private fun signOut() {
         ProtonSidecar.logout()
+        // 人都登出了，憑證沒有理由還留在手機裡；開關一起關，不然下次進頁又自己登回來。
+        ProtonSidecar.clearCredentials()
+        DataStore.protonAutoLogin = false
         nodes = emptyList()
         binding.nodeList.removeAllViews()
         binding.status.setText(R.string.proton_not_signed_in)
@@ -111,11 +135,29 @@ class ProtonActivity : AppCompatActivity() {
         }
         binding.refresh.isEnabled = false
         lifecycleScope.launch {
-            val result = ProtonSidecar.nodes()
+            var result = ProtonSidecar.nodes()
+            var reloginNote: String? = null
+            // sidecar 取節點失敗只回一段文字、不帶原因碼，判不出「是不是 session 過期」，
+            // 所以開關打開時一律拿本機憑證補登一次再取；登不回來就照實講原因，不假裝成功。
+            if (!result.ok && DataStore.protonAutoLogin) {
+                ProtonSidecar.readCredentials()?.let { (account, password) ->
+                    val again = ProtonSidecar.login(account, password)
+                    when {
+                        again.ok -> result = ProtonSidecar.nodes()
+                        again.twoFactorRequired -> {
+                            ProtonSidecar.clearCredentials()
+                            DataStore.protonAutoLogin = false
+                            reloginNote = getString(R.string.proton_auto_login_2fa)
+                        }
+
+                        else -> reloginNote = again.error.ifEmpty { again.reason }
+                    }
+                }
+            }
             if (isFinishing || isDestroyed) return@launch
             binding.refresh.isEnabled = true
             if (!result.ok) {
-                binding.status.text = result.error
+                binding.status.text = reloginNote ?: result.error
                 return@launch
             }
             nodes = result.nodes

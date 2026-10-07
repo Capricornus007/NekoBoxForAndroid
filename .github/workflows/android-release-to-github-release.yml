@@ -121,6 +121,12 @@ jobs:
         shell: bash
         run: bash ./scripts/check-apk-signature.sh release-assets/*.apk
 
+      - name: Verify Proton sidecar in APKs (release gate)
+        # 「憑什麼要讓它缺席」：這顆包是公開掛到 GitHub Release 上的實物，裡面每個 ABI
+        # 都要有 libprotonvpn.so，缺了 Proton 取節點頁就完全不能用，寧可讓 workflow 紅。
+        shell: bash
+        run: bash ./scripts/check-apk-sidecars.sh release-assets/*.apk
+
       - name: Create release when started manually
         if: github.event_name == 'workflow_dispatch'
         shell: bash

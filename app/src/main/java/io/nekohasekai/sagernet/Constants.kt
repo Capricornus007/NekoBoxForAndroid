@@ -10,6 +10,7 @@ object Key {
     const val CLEAR_CACHE = "clearCache"
     const val PLUGIN_SIGNER_APPROVALS = "pluginSignerApprovals"
     const val PROTON_WARNING_ACCEPTED = "protonWarningAccepted"
+    const val PROTON_AUTO_LOGIN = "protonAutoLogin"
 
     /**
      * Staged in-app update release name (e.g. 1.4.2-mod-07).

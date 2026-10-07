@@ -68,6 +68,12 @@ jobs:
         with:
           path: ~/.gradle
           key: gradle-oss-${{ hashFiles('**/*.gradle.kts') }}
+      # 這條鏈沒有 sidecars job，而 preBuild 的 buildProtonvpn 缺 .so 就會自己編，
+      # 所以這裡要有 Go 1.27+：缺了編譯直接失敗、建置就紅（libprotonvpn.so 不允許缺席）。
+      - name: Install Golang
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.1'
       - name: Gradle Build
         env:
           BUILD_PLUGIN: none
@@ -113,6 +119,21 @@ jobs:
           done
           
           echo "APK=$APK_DIR" >> $GITHUB_ENV
+      - name: Verify Proton sidecar in APKs
+        # 「憑什麼要讓它缺席」：包裡有幾個 ABI，每個 ABI 都要有一支 libprotonvpn.so，
+        # 缺了 Proton 取節點頁就不能用，這種包不要上傳。
+        shell: bash
+        env:
+          APK: ${{ env.APK }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          apks=("$APK"/*.apk)
+          if [ "${#apks[@]}" -eq 0 ]; then
+            echo "::error::$APK 底下沒有任何 APK，無從驗起" >&2
+            exit 1
+          fi
+          bash ./scripts/check-apk-sidecars.sh "${apks[@]}"
       - uses: actions/upload-artifact@v7
         with:
           name: APKs
