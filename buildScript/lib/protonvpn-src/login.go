@@ -14,9 +14,13 @@ import (
 	proton "github.com/ProtonMail/go-proton-api"
 )
 
-// protonAppVersion is what Proton's API gates on: requests without a recognised
-// app version get code 5001/5003 rather than a useful error.
-const protonAppVersion = "NB4A/1.0.0"
+// protonAppVersion 是 x-pm-appversion 的內容，格式被 Proton 的閘門寫死成
+// 「<產品名>_<semver>」：他們用 strings.Split(v, "_") 要求剛好切成兩段、第二段要能
+// 被 semver 解析，否則直接回 HTTP 400、Code 5003（實測到的那句 invalid app version）。
+// 所以這裡絕對不能用「NB4A/1.0.0」這種斜線寫法——切不出兩段就等於沒報版本。
+// 判式與回碼的參考實作就在依賴裡：go-proton-api@v0.4.0/server/router.go 的
+// requireValidAppVersion + validateAppVersion。
+const protonAppVersion = "NB4A_1.0.0"
 
 const defaultProtonAPIURL = "https://api.protonmail.ch"
 

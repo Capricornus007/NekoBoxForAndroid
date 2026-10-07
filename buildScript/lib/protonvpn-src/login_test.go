@@ -61,6 +61,19 @@ func newMockAuthServer(t *testing.T, twoFA proton.TwoFAStatus) *mockAuthServer {
 func (m *mockAuthServer) handler(t *testing.T) http.Handler {
 	t.Helper()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Proton 的閘門對 x-pm-appversion 的格式是有條件的：「<產品名>_<semver>」，
+		// 切成兩段、第二段要能當 semver 解析，否則 HTTP 400 + Code 5003。這一步要是在
+		// mock 裡缺席，測試就會放過一個「登入必定無效」的常數（真實用戶端就是這樣吃到
+		// 400 invalid app version 的）。
+		if v := r.Header.Get("x-pm-appversion"); !validAppVersionHeader(v) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"Code":    5003,
+				"Message": "Invalid app version: " + v,
+			})
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 		switch r.URL.Path {
 		case "/auth/v4/info":
