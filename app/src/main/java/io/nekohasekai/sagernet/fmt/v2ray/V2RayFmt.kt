@@ -82,7 +82,7 @@ private fun StandardV2RayBean.echParam() = echConfig.lines().filterNot {
 }.joinToString("").trim()
 
 fun StandardV2RayBean.isTLS(): Boolean {
-    return security == "tls"
+    return security == "tls" || security == "reality" || realityPubKey.isNotBlank()
 }
 
 fun StandardV2RayBean.setTLS(boolean: Boolean) {
@@ -298,7 +298,7 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
 
     when (security) {
         "tls", "reality" -> {
-            security = "tls"
+            security = if (security == "reality" || !url.queryParameter("pbk").isNullOrBlank()) "reality" else "tls"
             url.queryParameter("allowInsecure")?.let {
                 allowInsecure = it == "1" || it == "true"
             }
@@ -738,7 +738,7 @@ fun StandardV2RayBean.toUriVMessVLESSTrojan(isTrojan: Boolean): String {
     if (security.isNotBlank() && security != "none") {
         builder.addQueryParameter("security", security)
         when (security) {
-            "tls" -> {
+            "tls", "reality" -> {
                 if (sni.isNotBlank()) {
                     builder.addQueryParameter("sni", sni)
                 }
@@ -757,10 +757,17 @@ fun StandardV2RayBean.toUriVMessVLESSTrojan(isTrojan: Boolean): String {
                 if (enableECH) {
                     echParam().takeIf { it.isNotBlank() }?.let { builder.addQueryParameter("ech", it) }
                 }
-                if (realityPubKey.isNotBlank()) {
+                // OwnBox 的修正帶進來：security 已經是 reality 時，就算公鑰還沒填也要保留 reality
+                // 語意，否則匯出會被還原成普通 tls。空值欄位不寫進 URL，免得其他客戶端讀到
+                // `pbk=` 這種空參數。
+                if (realityPubKey.isNotBlank() || security == "reality") {
                     builder.setQueryParameter("security", "reality")
-                    builder.addQueryParameter("pbk", realityPubKey)
-                    builder.addQueryParameter("sid", realityShortId)
+                    if (realityPubKey.isNotBlank()) {
+                        builder.addQueryParameter("pbk", realityPubKey)
+                    }
+                    if (realityShortId.isNotBlank()) {
+                        builder.addQueryParameter("sid", realityShortId)
+                    }
                 }
                 if (enableECH) {
                     builder.addQueryParameter(

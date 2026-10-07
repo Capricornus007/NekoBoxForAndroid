@@ -150,6 +150,9 @@ func (s *URLTest) Now() string {
 	} else if s.group.selectedOutboundUDP != nil {
 		return s.group.selectedOutboundUDP.Tag()
 	}
+	if outbound, _ := s.group.Select(N.NetworkTCP); outbound != nil {
+		return outbound.Tag()
+	}
 	return ""
 }
 
@@ -346,47 +349,65 @@ func (g *URLTestGroup) Close() error {
 }
 
 func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
-	var minDelay uint16
-	var minOutbound adapter.Outbound
+	var currentSelected adapter.Outbound
+	var currentDelay uint16
 	switch network {
 	case N.NetworkTCP:
-		if g.selectedOutboundTCP != nil {
-			if history := g.history.LoadURLTestHistory(group.RealTag(g.selectedOutboundTCP, N.NetworkTCP)); history != nil {
-				minOutbound = g.selectedOutboundTCP
-				minDelay = history.Delay
-			}
-		}
+		currentSelected = g.selectedOutboundTCP
 	case N.NetworkUDP:
-		if g.selectedOutboundUDP != nil {
-			if history := g.history.LoadURLTestHistory(group.RealTag(g.selectedOutboundUDP, N.NetworkUDP)); history != nil {
-				minOutbound = g.selectedOutboundUDP
-				minDelay = history.Delay
-			}
+		currentSelected = g.selectedOutboundUDP
+	}
+	if currentSelected != nil {
+		if history := g.history.LoadURLTestHistory(group.RealTag(currentSelected, network)); history != nil && history.Delay > 0 {
+			currentDelay = history.Delay
 		}
 	}
+
+	// 阶段一：在所有候选节点中找出客观测量绝对最低延迟节点（无先手偏见）
+	var bestOutbound adapter.Outbound
+	var bestDelay uint16
 	for _, detour := range g.outbounds {
 		if !common.Contains(detour.Network(), network) {
 			continue
 		}
 		history := g.history.LoadURLTestHistory(group.RealTag(detour, network))
-		if history == nil {
+		if history == nil || history.Delay == 0 {
 			continue
 		}
-		if minDelay == 0 || minDelay > history.Delay+g.tolerance {
-			minDelay = history.Delay
-			minOutbound = detour
+		if bestDelay == 0 || history.Delay < bestDelay {
+			bestDelay = history.Delay
+			bestOutbound = detour
 		}
 	}
-	if minOutbound == nil {
-		for _, detour := range g.outbounds {
-			if !common.Contains(detour.Network(), network) {
-				continue
-			}
+
+	// 阶段二：平滑防抖决策
+	if bestOutbound != nil {
+		// 若当前无活跃节点，或当前活跃节点无有效测速/已失效，直接无条件采用最优节点
+		if currentSelected == nil || currentDelay == 0 {
+			return bestOutbound, true
+		}
+		// 若最优节点就是当前活跃节点，继续保持
+		if bestOutbound == currentSelected {
+			return currentSelected, true
+		}
+		// 容差判定：仅在最优节点比当前活跃节点快超过 tolerance 时才触发平滑切换
+		if currentDelay > bestDelay+g.tolerance {
+			return bestOutbound, true
+		}
+		// 微小抖动未超出 tolerance，保持当前活跃节点，避免频繁颠簸
+		return currentSelected, true
+	}
+
+	// 阶段三：Fallback（若所有节点均无测速，返回首个支持该网络的节点作为临时占位）
+	if currentSelected != nil && common.Contains(currentSelected.Network(), network) {
+		return currentSelected, false
+	}
+	for _, detour := range g.outbounds {
+		if common.Contains(detour.Network(), network) {
 			return detour, false
 		}
-		return nil, false
 	}
-	return minOutbound, true
+	return nil, false
 }
 
 func (g *URLTestGroup) loopCheck(ticker *time.Ticker, closeChan <-chan struct{}) {

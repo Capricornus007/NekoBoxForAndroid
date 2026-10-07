@@ -11,6 +11,7 @@ object Type {
     const val TextToInt = 1
     const val Int = 2
     const val Bool = 3
+    const val TextToLong = 4
 }
 
 class PreferenceBinding(
@@ -41,6 +42,11 @@ class PreferenceBinding(
         return value
     }
 
+    fun readStringToLongFromCache(): Long {
+        val value = DataStore.profileCacheStore.getString(cacheName)?.toLongOrNull() ?: 0L
+        return value
+    }
+
     fun fromCache() {
         if (disable) return
         val f = try {
@@ -54,6 +60,7 @@ class PreferenceBinding(
             Type.TextToInt -> f.set(bean, readStringToIntFromCache())
             Type.Int -> f.set(bean, readIntFromCache())
             Type.Bool -> f.set(bean, readBoolFromCache())
+            Type.TextToLong -> f.set(bean, readStringToLongFromCache())
         }
     }
 
@@ -87,6 +94,11 @@ class PreferenceBinding(
             Type.Bool -> {
                 if (value is Boolean) {
                     DataStore.profileCacheStore.putBoolean(cacheName, value)
+                }
+            }
+            Type.TextToLong -> {
+                if (value is Long) {
+                    DataStore.profileCacheStore.putString(cacheName, value.toString())
                 }
             }
         }

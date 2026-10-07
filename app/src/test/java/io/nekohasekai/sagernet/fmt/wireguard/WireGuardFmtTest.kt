@@ -5,6 +5,7 @@ import com.google.gson.JsonParser
 import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 
@@ -114,6 +115,61 @@ class WireGuardFmtTest {
         assertEquals(0, parsed.persistentKeepaliveInterval)
         assertEquals("", parsed.peerAllowedIps)
         assertEquals("", parsed.extraPeers)
+    }
+
+    @Test
+    fun standardLinkExportRoundTrip() {
+        val bean = WireGuardBean().applyDefaultValues().apply {
+            name = "Home WG"
+            serverAddress = "vpn.example.com"
+            serverPort = 51820
+            localAddress = "10.0.0.2/32\nfd00::2/128"
+            privateKey = "A".repeat(43) + "="
+            peerPublicKey = "B".repeat(43) + "="
+            peerPreSharedKey = "C".repeat(43) + "="
+            peerAllowedIps = "0.0.0.0/0, ::/0"
+            mtu = 1420
+            persistentKeepaliveInterval = 25
+        }
+
+        val link = bean.toUri()
+        assertTrue(link.startsWith("wireguard://"))
+
+        val parsed = parseWireGuardLink(link)
+        assertEquals(bean.name, parsed.name)
+        assertEquals(bean.serverAddress, parsed.serverAddress)
+        assertEquals(bean.serverPort, parsed.serverPort)
+        assertEquals(bean.localAddress, parsed.localAddress)
+        assertEquals(bean.privateKey, parsed.privateKey)
+        assertEquals(bean.peerPublicKey, parsed.peerPublicKey)
+        assertEquals(bean.peerPreSharedKey, parsed.peerPreSharedKey)
+        assertEquals(listOf("0.0.0.0/0", "::/0"), parseWireGuardAllowedIPs(parsed.peerAllowedIps))
+        assertEquals(1420, parsed.mtu)
+        assertEquals(25, parsed.persistentKeepaliveInterval)
+    }
+
+    @Test
+    fun awgLinkCarriesObfuscationParameters() {
+        val bean = parseWireGuardLink(
+            "awg://" + "A".repeat(43) + "%3D@vpn.example.com:51820" +
+                "?public_key=" + "B".repeat(43) + "%3D" +
+                "&address=10.0.0.2%2F32" +
+                "&jc=10&jmin=4&s1=1212&h1=1234567890123456789&i1=100",
+        )
+
+        assertTrue(bean.isAmneziaWG)
+        assertEquals(10, bean.jc)
+        assertEquals(4, bean.jmin)
+        assertEquals(1212, bean.s1)
+        assertEquals("1234567890123456789", bean.h1)
+        assertEquals("100", bean.i1)
+        assertEquals("vpn.example.com", bean.serverAddress)
+        assertEquals("10.0.0.2/32", bean.localAddress)
+        // 遮罩參數要能在回貼時活下來：匯出仍是 wireguard://，參數原樣帶出。
+        val exported = bean.toUri()
+        assertTrue(exported.startsWith("wireguard://"))
+        assertTrue(exported.contains("jc=10"))
+        assertTrue(exported.contains("h1=1234567890123456789"))
     }
 
     private companion object {

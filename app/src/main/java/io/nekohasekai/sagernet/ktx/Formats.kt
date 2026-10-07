@@ -3,6 +3,7 @@ package io.nekohasekai.sagernet.ktx
 import com.google.gson.JsonParser
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.Serializable
+import io.nekohasekai.sagernet.fmt.amneziawg.toAmneziaWGBean
 import io.nekohasekai.sagernet.fmt.byedpi.parseByeDPI
 import io.nekohasekai.sagernet.fmt.http.parseHttp
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria1
@@ -413,10 +414,13 @@ suspend fun parseProxies(text: String, subscription: Boolean = false): List<Abst
             }.onFailure {
                 Logs.w("byeDPI parser rejected input")
             }
-        } else if (startsWith("wireguard://") || startsWith("wg://")) {
+        } else if (startsWith("wireguard://") || startsWith("wg://") || startsWith("awg://")) {
             Logs.d("Trying WireGuard parser")
             runCatching {
-                entities.add(parseWireGuardLink(this))
+                val bean = parseWireGuardLink(this)
+                // 自方架構把 AmneziaWG 遮罩參數歸在獨立的 AWG profile：連結帶著 Jc/S/H 時直接
+                // 升成 AWG profile（同 RawUpdater 的轉換），否則這些參數會在普通 wireguard 端點被丟掉。
+                entities.add(if (bean.isAmneziaWG) bean.toAmneziaWGBean() else bean)
             }.onFailure {
                 Logs.w("WireGuard parser rejected input")
             }

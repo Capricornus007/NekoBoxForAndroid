@@ -41,6 +41,7 @@ import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
 import io.nekohasekai.sagernet.fmt.v2ray.isTLS
 import io.nekohasekai.sagernet.fmt.v2ray.toUriVMessVLESSTrojan
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
+import io.nekohasekai.sagernet.fmt.wireguard.toUri
 import io.nekohasekai.sagernet.ui.profile.*
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSBean
 import moe.matsuri.nb4a.proxy.anytls.AnyTLSSettingsActivity
@@ -220,9 +221,12 @@ object ProtocolRegistry {
             beanClass = WireGuardBean::class.java,
             getBean = { it.wgBean },
             setBean = { e, b -> e.wgBean = b as WireGuardBean? },
-            displayType = { "WireGuard" },
+            // AWG 參數藏在 WireGuard profile 裡時（舊匯入路徑）標出 AmneziaWG，語意取自我方
+            // displayType 階梯；OwnBox bb86df5f6 也是同一個意圖。
+            displayType = { if (it.wgBean?.isAmneziaWG == true) "AmneziaWG 2.0" else "WireGuard" },
             settingsActivityClass = WireGuardSettingsActivity::class.java,
-            hasStandardLink = false,
+            // OwnBox 帶進來的能力：WireGuard 也能複製標準連結（單 peer 格式，多 peer 請匯出 conf）。
+            toStandardLink = { (it as WireGuardBean).toUri() },
         ),
         ProtocolDescriptor(
             type = ProxyEntity.TYPE_TUIC,

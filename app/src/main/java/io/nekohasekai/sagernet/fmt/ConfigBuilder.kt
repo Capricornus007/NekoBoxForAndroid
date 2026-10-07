@@ -567,6 +567,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             servers = mutableListOf()
             rules = mutableListOf()
             independent_cache = true
+            disable_expire = true
         }
 
         fun autoDnsDomainStrategy(s: String): String? {
@@ -1012,6 +1013,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     // 域名解析策略。曾强制空——测速解析出的 IP/协议族与真实路径不同。
                     _hack_custom_config = bean.customOutboundJson
                     applyDomainStrategyIfSupported(defaultServerDomainStrategy)
+                    // OwnBox c12d3e08e：TCP socket 加 IP_BIND_ADDRESS_NO_PORT，同一來源位址
+                    // 不再先佔用一個連接埠，大量併發時不會把自己綁死（核心只在 Linux/Android
+                    // 有效，不支援時靜默忽略）。
+                    _hack_config_map["bind_address_no_port"] = true
 
                     _hack_config_map["tag"] = tagOut
                 }
@@ -1516,6 +1521,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     if (freedom == TAG_DIRECT) {
                         _hack_config_map["network_strategy"] = "default"
                     }
+                    // OwnBox c12d3e08e：直連與繞過兩條出口都補上免佔埠綁定，避免大量直連
+                    // 把本地來源埠用光。
+                    _hack_config_map["bind_address_no_port"] = true
                 },
             )
         }
