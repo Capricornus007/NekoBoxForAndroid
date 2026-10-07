@@ -30,6 +30,10 @@ jobs:
         run: bash scripts/check-release-publish-gate.sh --self-test
       - name: Guard - core pins must agree with sing-box go.mod
         run: bash ./scripts/check-core-pins.sh
+      - name: Guard - visible activities must follow the app theme
+        # 直接繼承 AppCompatActivity 的頁面不會 Theme.apply，實測後果是按鈕文字畫成
+        # 跟背景同色（Proton／TrafficChart 都踩過）。編譯與 lint 全綠，只能這樣擋。
+        run: bash ./scripts/check-themed-activities.sh
   test:
     name: Unit Tests
     runs-on: ubuntu-latest

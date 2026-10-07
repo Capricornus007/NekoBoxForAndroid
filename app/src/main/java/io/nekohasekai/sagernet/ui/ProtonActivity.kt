@@ -3,7 +3,6 @@ package io.nekohasekai.sagernet.ui
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -18,7 +17,7 @@ import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.launch
 
-class ProtonActivity : AppCompatActivity() {
+class ProtonActivity : ThemedActivity() {
 
     private lateinit var binding: ActivityProtonBinding
     private var nodes: List<ProtonNode> = emptyList()
@@ -27,6 +26,8 @@ class ProtonActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityProtonBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.toolbar.setNavigationOnClickListener { finish() }
 
         if (!DataStore.protonWarningAccepted) {
             showWarning()

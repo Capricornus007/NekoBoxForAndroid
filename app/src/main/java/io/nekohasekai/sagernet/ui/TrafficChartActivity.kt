@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
@@ -41,7 +40,7 @@ import java.net.InetSocketAddress
 import java.util.concurrent.TimeUnit
 import kotlin.math.min
 
-class TrafficChartActivity : AppCompatActivity() {
+class TrafficChartActivity : ThemedActivity() {
 
     private lateinit var binding: ActivityTrafficChartBinding
     private val client = OkHttpClient.Builder()
