@@ -101,7 +101,10 @@ fi
 BUILD="$(pwd)/.protonvpn-wrapper"
 rm -rf "$BUILD"
 mkdir -p "$BUILD"
-cp "$SRC/main.go" "$SRC/main_test.go" "$SRC/login.go" "$SRC/login_test.go" "$SRC/nodes.go" "$SRC/nodes_test.go" "$SRC/keypair.go" "$SRC/keypair_test.go" "$SRC/go.mod" "$BUILD/"
+# 整個 *.go 一次抄過去，不要逐檔點名：之前寫死清單時，新增加的 *_test.go 不會被抄進
+# 建置目錄，結果是「本地看得到、CI 的 go test 讀不到」而 [build failed]，或更糟——
+# 新測試靜默不被執行，收口變成假綠。
+cp "$SRC"/*.go "$SRC/go.mod" "$BUILD/"
 ( cd "$BUILD" && go mod edit -replace "github.com/ProtonVPN/go-vpn-lib=$WORK" && go mod tidy )
 
 # Host-side gate: the pinned Proton stack must build and its offline selftest must

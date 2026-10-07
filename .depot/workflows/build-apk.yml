@@ -69,9 +69,7 @@ jobs:
             buildScript/lib/olcrtc-src/main_test.go \
             buildScript/lib/olcrtc-src/go.mod \
             buildScript/lib/protonvpn.sh \
-            buildScript/lib/protonvpn-src/main.go \
-            buildScript/lib/protonvpn-src/main_test.go \
-            buildScript/lib/protonvpn-src/go.mod \
+            buildScript/lib/protonvpn-src \
             buildScript/init/env.sh \
             buildScript/init/env_ndk.sh \
             | sha256sum \
