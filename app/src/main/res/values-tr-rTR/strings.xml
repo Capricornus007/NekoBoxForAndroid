@@ -1008,6 +1008,10 @@
     <string name="proton_node_count">%1$d sunucu, %2$d atlandı</string>
     <string name="proton_sidecar_missing">Bu derleme Proton yardımcısını içermiyor.</string>
     <string name="proton_2fa_required">Bu hesap 2FA kodu gerektiriyor.</string>
+    <string name="proton_auto_login">Otomatik Proton girişi</string>
+    <string name="proton_auto_login_summary">Kendisi yeniden giriş yapar ve sunucu listesini yeniler.</string>
+    <string name="proton_auto_login_message">Oturum düştüğünde NB4A yeniden giriş yapar. Parolanız yalnızca bu telefonda, NB4A\'nın özel deposunda saklanır.</string>
+    <string name="proton_auto_login_2fa">Otomatik giriş, değişen 2FA kodunu yeniden kullanamaz. Elle giriş yapın.</string>
     <string name="proton_warning_title">Önceden uyarıldınız</string>
     <string name="proton_warning_message">Bu bir Proton uygulaması değil. Proton API\'sine Proton\'un kendi istemcileri gibi bağlanıyor; Proton bu API\'yi istediği an değiştirebilir ve bu özellik bozulabilir, biz de önceden hazırlanamayız.\n\nParolanız ve oturumunuz yalnızca bu cihazda, NB4A\'nın özel deposunda saklanır ve Proton\'a giriş dışında hiçbir yere gönderilmez. Aboneliği Proton\'un kendi uygulamaları dışında kullanmak şartları kapsamına girmeyebilir.</string>
     <string name="proton_warning_accept">Anladım</string>

@@ -982,6 +982,10 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_node_count">%1$d server, %2$d dilewati</string>
     <string name="proton_sidecar_missing">Build ini tidak menyertakan pembantu Proton.</string>
     <string name="proton_2fa_required">Akun ini memerlukan kode 2FA.</string>
+    <string name="proton_auto_login">Masuk otomatis Proton</string>
+    <string name="proton_auto_login_summary">Masuk ulang dan segarkan daftar server secara otomatis.</string>
+    <string name="proton_auto_login_message">NB4A masuk ulang ketika sesi kedaluwarsa. Kata sandi Anda hanya disimpan di penyimpanan privat NB4A di ponsel ini.</string>
+    <string name="proton_auto_login_2fa">Masuk otomatis tidak bisa memakai ulang kode 2FA yang berubah. Masuk secara manual.</string>
     <string name="proton_warning_title">Anda sudah diperingatkan</string>
     <string name="proton_warning_message">Ini bukan aplikasi Proton. Aplikasi ini berbicara ke API Proton seperti klien resmi Proton, jadi Proton bisa mengubah API kapan saja dan membuat fitur ini berhenti, dan kami tak bisa mengantisipasinya.\n\nKata sandi dan sesi Anda hanya disimpan di perangkat ini, di penyimpanan privat NB4A, dan tidak dikirim ke mana pun selain untuk masuk ke Proton. Menggunakan langganan di luar aplikasi Proton mungkin tidak tercakup dalam ketentuan mereka.</string>
     <string name="proton_warning_accept">Saya mengerti</string>

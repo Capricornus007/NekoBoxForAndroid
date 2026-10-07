@@ -921,6 +921,10 @@
     <string name="proton_node_count">%1$d Server, %2$d übersprungen</string>
     <string name="proton_sidecar_missing">Dieser Build enthält keinen Proton-Helfer.</string>
     <string name="proton_2fa_required">Dieses Konto benötigt einen 2FA-Code.</string>
+    <string name="proton_auto_login">Auto-Anmeldung bei Proton</string>
+    <string name="proton_auto_login_summary">Meldet sich selbst an und aktualisiert die Serverliste.</string>
+    <string name="proton_auto_login_message">NB4A meldet sich erneut an, wenn die Sitzung abläuft. Ihr Passwort bleibt nur im privaten Speicher von NB4A auf diesem Telefon.</string>
+    <string name="proton_auto_login_2fa">Automatische Anmeldung kann wechselnde 2FA-Codes nicht wiederverwenden. Melden Sie sich manuell an.</string>
     <string name="proton_warning_title">Vorab gewarnt</string>
     <string name="proton_warning_message">Dies ist keine Proton-App. Sie spricht das Proton-API so an wie Protons eigene Clients, daher kann Proton das API jederzeit ändern und diese Funktion ausfallen lassen, ohne dass wir vorher reagieren können.\n\nPasswort und Sitzung werden nur auf diesem Gerät im privaten Speicher von NB4A gehalten und außer zum Anmelden bei Proton nirgendwohin gesendet. Die Nutzung eines Abos außerhalb der Proton-Apps ist möglicherweise nicht durch deren Bedingungen gedeckt.</string>
     <string name="proton_warning_accept">Verstanden</string>

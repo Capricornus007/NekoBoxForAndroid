@@ -1003,6 +1003,10 @@
     <string name="proton_node_count">Сервераў: %1$d, прапушчана: %2$d</string>
     <string name="proton_sidecar_missing">Гэтая зборка не змяшчае дапаможны модуль Proton.</string>
     <string name="proton_2fa_required">Гэтаму акаўнту патрэбны код 2FA.</string>
+    <string name="proton_auto_login">Аўтаўваход у Proton</string>
+    <string name="proton_auto_login_summary">Зноў уваходзіць і сама абнаўляе спіс сервераў.</string>
+    <string name="proton_auto_login_message">NB4A зноў увайдзе, калі сесія скончыцца. Пароль захоўваецца толькі ў прыватным сховішчы NB4A на гэтым тэлефоне.</string>
+    <string name="proton_auto_login_2fa">Аўтаўваход не можа паўторна выкарыстоўваць аднаразовы код 2FA. Увайдзіце ўручную.</string>
     <string name="proton_warning_title">Папярэджваем загадзя</string>
     <string name="proton_warning_message">Гэта не праграма Proton. Яна звяртаецца да API Proton так жа, як уласныя кліенты Proton, таму Proton можа змяніць API ў любы момант — і функцыя перастане працаваць, а мы не зможам падрыхтавацца загадзя.\n\nПароль і сесія захоўваюцца толькі на гэтай прыладзе, у прыватным сховішчы NB4A, і не адпраўляюцца нікуды, акрамя ўваходу ў Proton. Выкарыстанне падпіскі па-за праграмамі Proton можа не покрывацца іхнямі ўмовамі.</string>
     <string name="proton_warning_accept">Зразумела</string>

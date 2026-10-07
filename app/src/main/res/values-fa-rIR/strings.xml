@@ -1007,6 +1007,10 @@
     <string name="proton_node_count">%1$d سرور، %2$d نادیده گرفته شد</string>
     <string name="proton_sidecar_missing">این نسخه شامل کمک‌برنامه Proton نیست.</string>
     <string name="proton_2fa_required">این حساب به کد 2FA نیاز دارد.</string>
+    <string name="proton_auto_login">ورود خودکار Proton</string>
+    <string name="proton_auto_login_summary">خودکار دوباره وارد می‌شود و فهرست سرورها را نوسازی می‌کند.</string>
+    <string name="proton_auto_login_message">NB4A هنگام پایان نشست دوباره وارد می‌شود. گذرواژه شما فقط در حافظه خصوصی NB4A روی همین گوشی نگه داشته می‌شود.</string>
+    <string name="proton_auto_login_2fa">ورود خودکار نمی‌تواند کد متغیر 2FA را دوباره استفاده کند. دستی وارد شوید.</string>
     <string name="proton_warning_title">از پیش هشدار داده شده‌اید</string>
     <string name="proton_warning_message">این برنامه رسمی Proton نیست. همان‌طور که کلاینت‌های خود Proton عمل می‌کنند با API آن ارتباط برقرار می‌کند، بنابراین Proton ممکن است هر زمان API را تغییر دهد و این قابلیت از کار بیفتد و ما نتوانیم پیش‌بینی کنیم.\n\nگذرواژه و نشست شما فقط روی این دستگاه و در حافظه خصوصی NB4A نگه‌داری می‌شود و جز برای ورود به Proton به هیچ‌جا فرستاده نمی‌شود. استفاده از اشتراک خارج از برنامه‌های Proton ممکن است مشمول شرایط آن‌ها نباشد.</string>
     <string name="proton_warning_accept">فهمیدم</string>
