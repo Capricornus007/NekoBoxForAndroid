@@ -990,9 +990,8 @@
     <string name="proton_sidecar_missing">此版本未包含 Proton 辅助组件。</string>
     <string name="proton_2fa_required">此账户需要 2FA 验证码。</string>
     <string name="proton_auto_login">Proton 自动登录</string>
-    <string name="proton_auto_login_summary">自动重新登录并自行刷新服务器列表。</string>
-    <string name="proton_auto_login_message">会话过期后，NB4A 会自动重新登录。你的密码仅保存在这台手机上 NB4A 的私有存储区中。</string>
-    <string name="proton_auto_login_2fa">自动登录无法复用会变的 2FA 验证码。请手动登录。</string>
+    <string name="proton_auto_login_summary">进入页面时沿用已登录的会话，自行获取服务器列表。</string>
+    <string name="proton_auto_login_message">请先登录：NB4A 只沿用会话，不会保存你的密码。</string>
     <string name="proton_warning_title">先提醒你一句</string>
     <string name="proton_warning_message">这不是 Proton 官方应用。它按 Proton 自家客户端的方式与 Proton API 通信，因此 Proton 随时可能改动 API，导致此功能失效，而我们无法提前应对。\n\n你的密码与会话仅保存在这台手机上 NB4A 的私有存储区，除向 Proton 登录外不会发送到任何地方。在 Proton 自家应用之外使用订阅，可能不在其条款保障范围内。</string>
     <string name="proton_warning_accept">我知道了</string>

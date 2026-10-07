@@ -19,7 +19,6 @@ import io.nekohasekai.sagernet.SpeedTestSettings
 import io.nekohasekai.sagernet.bg.RuleAssetUpdater
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
-import io.nekohasekai.sagernet.fmt.proton.ProtonSidecar
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.root.RootManager
@@ -84,28 +83,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 DataStore.allowAccess = allowSwitch.isChecked
                 preference.summary = localProxySummary()
                 needReload()
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
-    }
-
-    // 自動登入要先把憑證收下來才讓開關打開：帳號密碼沿用 Proton 頁那組輸入元件，
-    // 憑證只寫進 noBackupFilesDir（0600），不進設定資料庫、也不進對話框的文字。
-    private fun showProtonCredentialsDialog(switch: SwitchPreferenceCompat) {
-        val view = layoutInflater.inflate(R.layout.layout_proton_credentials_dialog, null)
-        val accountField = view.findViewById<TextInputEditText>(R.id.protonAccountField)
-        val passwordField = view.findViewById<TextInputEditText>(R.id.protonPasswordField)
-        ProtonSidecar.readCredentials()?.let { accountField.setText(it.first) }
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.proton_auto_login)
-            .setMessage(R.string.proton_auto_login_message)
-            .setView(view)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                val account = accountField.text?.toString()?.trim().orEmpty()
-                val password = passwordField.text?.toString().orEmpty()
-                if (account.isEmpty() || password.isEmpty()) return@setPositiveButton
-                // 憑證存不下就讓開關維持關著：不能開一個登不回來的自動登入。
-                if (ProtonSidecar.storeCredentials(account, password)) switch.isChecked = true
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
@@ -327,19 +304,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 if (DataStore.serviceState.started) {
                     SagerNet.reloadService()
                 }
-                true
-            }
-        }
-
-        val protonAutoLogin = findPreference<SwitchPreferenceCompat>(Key.PROTON_AUTO_LOGIN)!!
-        protonAutoLogin.setOnPreferenceChangeListener { preference, newValue ->
-            if (newValue as Boolean) {
-                // 存到憑證才算打開（跟 appendHttpProxy 一樣先回 false 等對話框確認）。
-                showProtonCredentialsDialog(preference as SwitchPreferenceCompat)
-                false
-            } else {
-                // 關開關就把手機裡的憑證刪掉，不留著給下次誤開。
-                ProtonSidecar.clearCredentials()
                 true
             }
         }

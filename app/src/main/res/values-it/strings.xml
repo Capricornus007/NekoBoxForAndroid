@@ -1006,9 +1006,8 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_sidecar_missing">Questa versione non include l\'assistente Proton.</string>
     <string name="proton_2fa_required">Questo account richiede un codice 2FA.</string>
     <string name="proton_auto_login">Accesso automatico Proton</string>
-    <string name="proton_auto_login_summary">Accede di nuovo e aggiorna l\'elenco dei server da solo.</string>
-    <string name="proton_auto_login_message">NB4A accede di nuovo quando la sessione scade. La password resta solo nell\'archivio privato di NB4A su questo telefono.</string>
-    <string name="proton_auto_login_2fa">L\'accesso automatico non può riutilizzare un codice 2FA variabile. Accedi manualmente.</string>
+    <string name="proton_auto_login_summary">Carica l’elenco dei server all’apertura di questa pagina usando la sessione in corso.</string>
+    <string name="proton_auto_login_message">Accedi prima: NB4A riutilizza quella sessione e non salva mai la tua password.</string>
     <string name="proton_warning_title">Avvertito prima</string>
     <string name="proton_warning_message">Non è un\'app di Proton. Parla con l\'API di Proton come i client ufficiali, quindi Proton può modificarla in qualsiasi momento e rompere questa funzione senza che possiamo anticiparlo.\n\nPassword e sessione restano solo su questo telefono, nell\'archivio privato di NB4A, e non vengono inviate da nessuna parte se non per l\'accesso a Proton. Usare un abbonamento al di fuori delle app Proton potrebbe non essere coperto dai loro termini.</string>
     <string name="proton_warning_accept">Ho capito</string>

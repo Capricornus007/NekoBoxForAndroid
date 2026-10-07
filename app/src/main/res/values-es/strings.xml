@@ -1164,9 +1164,8 @@
     <string name="proton_sidecar_missing">Esta compilación no incluye el ayudante de Proton.</string>
     <string name="proton_2fa_required">Esta cuenta necesita un código 2FA.</string>
     <string name="proton_auto_login">Acceso automático a Proton</string>
-    <string name="proton_auto_login_summary">Inicia sesión por su cuenta y actualiza los servidores.</string>
-    <string name="proton_auto_login_message">NB4A vuelve a iniciar sesión cuando la sesión caduca. Tu contraseña se guarda solo en el almacenamiento privado de NB4A en este teléfono.</string>
-    <string name="proton_auto_login_2fa">El acceso automático no puede reutilizar un código 2FA que cambia. Inicia sesión manualmente.</string>
+    <string name="proton_auto_login_summary">Carga la lista de servidores al abrir esta página usando la sesión en la que ya iniciaste sesión.</string>
+    <string name="proton_auto_login_message">Inicia sesión primero: NB4A reutiliza esa sesión y nunca guarda tu contraseña.</string>
     <string name="proton_warning_title">Advertido estás</string>
     <string name="proton_warning_message">Esta no es una aplicación de Proton. Habla con la API de Proton igual que los clientes oficiales, así que Proton puede cambiar esa API en cualquier momento y romper esta función sin que podamos anticiparlo.\n\nTu contraseña y tu sesión se guardan solo en este teléfono, en el almacenamiento privado de NB4A, y no se envían a ningún sitio salvo para iniciar sesión en Proton. Usar una suscripción fuera de las aplicaciones de Proton puede no estar cubierto por sus condiciones.</string>
     <string name="proton_warning_accept">Entendido</string>

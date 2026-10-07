@@ -1014,9 +1014,8 @@
     <string name="proton_sidecar_missing">لا يتضمن هذا الإصدار مساعد Proton.</string>
     <string name="proton_2fa_required">هذا الحساب يتطلب رمز 2FA.</string>
     <string name="proton_auto_login">تسجيل دخول Proton تلقائيًا</string>
-    <string name="proton_auto_login_summary">يعيد تسجيل الدخول ويحدّث قائمة الخوادم من تلقاء نفسه.</string>
-    <string name="proton_auto_login_message">تعيد NB4A تسجيل الدخول عند انتهاء الجلسة. تُحفظ كلمة المرور في التخزين الخاص بـ NB4A على هذا الهاتف فقط.</string>
-    <string name="proton_auto_login_2fa">لا يمكن لتسجيل الدخول تلقائيًا إعادة استخدام رمز 2FA المتغيّر. سجّل الدخول يدويًا.</string>
+    <string name="proton_auto_login_summary">يحمّل قائمة الخوادم عند فتح هذه الصفحة باستخدام الجلسة التي سجّلت الدخول بها.</string>
+    <string name="proton_auto_login_message">سجّل الدخول أولًا: تعيد NB4A استخدام تلك الجلسة ولا تحفظ كلمة مرورك أبدًا.</string>
     <string name="proton_warning_title">لقد حذّرناك مسبقًا</string>
     <string name="proton_warning_message">هذا ليس تطبيقًا من Proton. إنه يخاطب واجهة Proton بنفس طريقة عملاء Proton الرسميين، لذا قد تغيّر Proton الواجهة في أي وقت ويتوقف هذه الميزة دون أن نستطيع الاستباق.\n\nتُحفظ كلمة المرور والجلسة على هذا الجهاز فقط، في التخزين الخاص بتطبيق NB4A، ولا تُرسل إلى أي مكان سوى لتسجيل الدخول إلى Proton. استخدام الاشتراك خارج تطبيقات Proton قد لا تغطيه شروطهم.</string>
     <string name="proton_warning_accept">فهمت</string>

@@ -1089,9 +1089,8 @@
     <string name="proton_sidecar_missing">This build does not include the Proton helper.</string>
     <string name="proton_2fa_required">This account needs a 2FA code.</string>
     <string name="proton_auto_login">Proton auto sign-in</string>
-    <string name="proton_auto_login_summary">Sign in again and refresh the server list on its own.</string>
-    <string name="proton_auto_login_message">NB4A signs in again when the session expires. Your password is kept only in NB4A\'s private storage on this phone.</string>
-    <string name="proton_auto_login_2fa">Auto sign-in cannot reuse a rotating 2FA code. Sign in manually.</string>
+    <string name="proton_auto_login_summary">Loads the server list when this page opens, using the session you signed in with.</string>
+    <string name="proton_auto_login_message">Sign in first: NB4A reuses that session and never stores your password.</string>
     <string name="proton_warning_title">You have been warned</string>
     <string name="proton_warning_message">This is not a Proton app. It talks to Proton\'s API the way Proton\'s own clients do, so Proton can change that API at any time and this stops working with no way for us to fix it in advance.\n\nYour password and session are kept only on this phone, in NB4A\'s private storage, and are sent nowhere except Proton\'s sign-in endpoint. Using a subscription outside Proton\'s own apps may not be covered by their terms.</string>
     <string name="proton_warning_accept">I understand</string>

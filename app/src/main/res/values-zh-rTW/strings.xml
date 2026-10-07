@@ -989,9 +989,8 @@
     <string name="proton_sidecar_missing">此版本未內含 Proton 協助元件。</string>
     <string name="proton_2fa_required">此帳號需要 2FA 代碼。</string>
     <string name="proton_auto_login">Proton 自動登入</string>
-    <string name="proton_auto_login_summary">自動重新登入並自行更新伺服器清單。</string>
-    <string name="proton_auto_login_message">工作階段逾期後，NB4A 會自動重新登入。你的密碼只存放在這支手機上 NB4A 的私有儲存區。</string>
-    <string name="proton_auto_login_2fa">自動登入無法重複使用一直更換的 2FA 代碼。請手動登入。</string>
+    <string name="proton_auto_login_summary">進頁時沿用已登入的工作階段，自行取得伺服器清單。</string>
+    <string name="proton_auto_login_message">請先登入：NB4A 只沿用工作階段，不會存放你的密碼。</string>
     <string name="proton_warning_title">先提醒你一句</string>
     <string name="proton_warning_message">這不是 Proton 官方的 App。它照 Proton 自己客戶端的方式跟 Proton API 溝通，所以 Proton 隨時可能改動 API，讓這個功能失效，而我們無法提前因應。\n\n你的密碼與工作階段只存放在這支手機上 NB4A 的私有儲存區，除了向 Proton 登入之外不會送到任何地方。在 Proton 自己的 App 之外使用訂閱，可能不在他們的條款保障範圍內。</string>
     <string name="proton_warning_accept">我明白了</string>
