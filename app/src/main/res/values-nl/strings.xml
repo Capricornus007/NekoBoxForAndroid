@@ -984,7 +984,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="proton_captcha_title">Mensverificatie</string>
     <string name="proton_captcha_hint">Los de uitdaging hieronder op, dan keer je hier terug.</string>
     <string name="proton_captcha_reload">Opnieuw laden</string>
-    <string name="proton_captcha_open">Browser</string>
     <string name="proton_captcha_failed">De verificatiepagina werd niet geladen.</string>
     <string name="proton_captcha_expired">De CAPTCHA is verlopen. Tik op Opnieuw laden.</string>
     <string name="proton_captcha_solving">Geverifieerd, bezig met aanmelden…</string>

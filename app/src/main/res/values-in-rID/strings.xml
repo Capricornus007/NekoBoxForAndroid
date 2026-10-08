@@ -1029,7 +1029,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_captcha_title">Verifikasi manusia</string>
     <string name="proton_captcha_hint">Selesaikan tantangan di bawah, lalu kembali ke sini.</string>
     <string name="proton_captcha_reload">Muat ulang</string>
-    <string name="proton_captcha_open">Peramban</string>
     <string name="proton_captcha_failed">Halaman verifikasi tidak termuat.</string>
     <string name="proton_captcha_expired">CAPTCHA kedaluwarsa. Ketuk Muat ulang.</string>
     <string name="proton_captcha_solving">Terverifikasi, masuk…</string>

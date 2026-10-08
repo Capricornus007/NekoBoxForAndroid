@@ -1098,7 +1098,6 @@
     <string name="proton_captcha_title">Human verification</string>
     <string name="proton_captcha_hint">Solve the challenge below, then it returns here.</string>
     <string name="proton_captcha_reload">Reload</string>
-    <string name="proton_captcha_open">Browser</string>
     <string name="proton_captcha_failed">The verification page did not load.</string>
     <string name="proton_captcha_expired">The CAPTCHA expired. Tap Reload.</string>
     <string name="proton_captcha_solving">Verified, signing in…</string>

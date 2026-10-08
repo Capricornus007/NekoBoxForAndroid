@@ -999,7 +999,6 @@
     <string name="proton_captcha_title">人工驗證</string>
     <string name="proton_captcha_hint">在下方解完驗證，它會回到這裡。</string>
     <string name="proton_captcha_reload">重新載入</string>
-    <string name="proton_captcha_open">瀏覽器</string>
     <string name="proton_captcha_failed">驗證頁面載入失敗。</string>
     <string name="proton_captcha_expired">CAPTCHA 已過期，請按重新載入。</string>
     <string name="proton_captcha_solving">驗證通過，登入中…</string>

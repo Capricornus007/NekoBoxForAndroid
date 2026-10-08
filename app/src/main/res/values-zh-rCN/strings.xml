@@ -1000,7 +1000,6 @@
     <string name="proton_captcha_title">人工验证</string>
     <string name="proton_captcha_hint">在下方完成验证，它会回到这里。</string>
     <string name="proton_captcha_reload">重新加载</string>
-    <string name="proton_captcha_open">浏览器</string>
     <string name="proton_captcha_failed">验证页面加载失败。</string>
     <string name="proton_captcha_expired">CAPTCHA 已过期，请点重新加载。</string>
     <string name="proton_captcha_solving">验证通过，登录中…</string>

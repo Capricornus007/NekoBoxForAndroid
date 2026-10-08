@@ -1025,7 +1025,6 @@
     <string name="proton_captcha_title">التحقق من أنك إنسان</string>
     <string name="proton_captcha_hint">أكمل التحدي في الأسفل ثم عُد إلى هنا.</string>
     <string name="proton_captcha_reload">إعادة التحميل</string>
-    <string name="proton_captcha_open">المتصفح</string>
     <string name="proton_captcha_failed">لم يتم تحميل صفحة التحقق.</string>
     <string name="proton_captcha_expired">انتهت صلاحية CAPTCHA. اضغط إعادة التحميل.</string>
     <string name="proton_captcha_solving">تم التحقق، جارٍ تسجيل الدخول…</string>

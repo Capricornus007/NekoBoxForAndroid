@@ -1015,7 +1015,6 @@
     <string name="proton_captcha_title">Пацверджанне, што вы чалавек</string>
     <string name="proton_captcha_hint">Выканайце заданне ніжэй, затым вярніцеся сюды.</string>
     <string name="proton_captcha_reload">Абнавіць</string>
-    <string name="proton_captcha_open">Браўзер</string>
     <string name="proton_captcha_failed">Старонка праверкі не загрузілася.</string>
     <string name="proton_captcha_expired">CAPTCHA састарэла. Націсніце Абнавіць.</string>
     <string name="proton_captcha_solving">Праверана, выконваецца ўваход…</string>

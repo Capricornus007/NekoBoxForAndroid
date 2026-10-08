@@ -1028,7 +1028,6 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="proton_captcha_title">Verificación humana</string>
     <string name="proton_captcha_hint">Resuelve el desafío de abajo y vuelve aquí.</string>
     <string name="proton_captcha_reload">Recargar</string>
-    <string name="proton_captcha_open">Navegador</string>
     <string name="proton_captcha_failed">No se cargó la página de verificación.</string>
     <string name="proton_captcha_expired">El CAPTCHA expiró. Toca Recargar.</string>
     <string name="proton_captcha_solving">Verificado, iniciando sesión…</string>

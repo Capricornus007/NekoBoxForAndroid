@@ -1017,7 +1017,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_captcha_title">Verifica umana</string>
     <string name="proton_captcha_hint">Risolvi la sfida qui sotto, quindi ritorna qui.</string>
     <string name="proton_captcha_reload">Ricarica</string>
-    <string name="proton_captcha_open">Browser</string>
     <string name="proton_captcha_failed">La pagina di verifica non è stata caricata.</string>
     <string name="proton_captcha_expired">Il CAPTCHA è scaduto. Tocca Ricarica.</string>
     <string name="proton_captcha_solving">Verificato, accesso in corso…</string>

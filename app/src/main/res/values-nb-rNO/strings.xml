@@ -957,7 +957,6 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="proton_captcha_title">Menneskeverifisering</string>
     <string name="proton_captcha_hint">Løs utfordringen nedenfor, så kommer du tilbake hit.</string>
     <string name="proton_captcha_reload">Last inn på nytt</string>
-    <string name="proton_captcha_open">Nettleser</string>
     <string name="proton_captcha_failed">Bekreftelsessiden ble ikke lastet.</string>
     <string name="proton_captcha_expired">CAPTCHA-utfordringen er utløpt. Trykk Last inn på nytt.</string>
     <string name="proton_captcha_solving">Bekreftet, logger inn…</string>

@@ -980,7 +980,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="proton_captcha_title">Verificação humana</string>
     <string name="proton_captcha_hint">Resolva o desafio abaixo e volte aqui.</string>
     <string name="proton_captcha_reload">Recarregar</string>
-    <string name="proton_captcha_open">Navegador</string>
     <string name="proton_captcha_failed">A página de verificação não carregou.</string>
     <string name="proton_captcha_expired">O CAPTCHA expirou. Toque em Recarregar.</string>
     <string name="proton_captcha_solving">Verificado, entrando…</string>

@@ -1019,7 +1019,6 @@
     <string name="proton_captcha_title">Menschliche Überprüfung</string>
     <string name="proton_captcha_hint">Lösen Sie die Aufgabe unten, danach geht es hier weiter.</string>
     <string name="proton_captcha_reload">Neu laden</string>
-    <string name="proton_captcha_open">Browser</string>
     <string name="proton_captcha_failed">Die Verifizierungsseite konnte nicht geladen werden.</string>
     <string name="proton_captcha_expired">Das CAPTCHA ist abgelaufen. Bitte neu laden.</string>
     <string name="proton_captcha_solving">Überprüft, Anmeldung läuft…</string>

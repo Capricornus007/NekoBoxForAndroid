@@ -1028,7 +1028,6 @@
     <string name="proton_captcha_title">Підтвердження, що ви людина</string>
     <string name="proton_captcha_hint">Виконайте завдання нижче, потім поверніться сюди.</string>
     <string name="proton_captcha_reload">Оновити</string>
-    <string name="proton_captcha_open">Браузер</string>
     <string name="proton_captcha_failed">Сторінку перевірки не завантажено.</string>
     <string name="proton_captcha_expired">CAPTCHA завершилася. Натисніть «Оновити».</string>
     <string name="proton_captcha_solving">Перевірено, виконується вхід…</string>

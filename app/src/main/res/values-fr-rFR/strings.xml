@@ -1034,7 +1034,6 @@
     <string name="proton_captcha_title">Vérification humaine</string>
     <string name="proton_captcha_hint">Résolvez le défi ci-dessous, la suite se passe ici.</string>
     <string name="proton_captcha_reload">Recharger</string>
-    <string name="proton_captcha_open">Navigateur</string>
     <string name="proton_captcha_failed">Le chargement de la page de vérification a échoué.</string>
     <string name="proton_captcha_expired">Le CAPTCHA a expiré. Rechargez.</string>
     <string name="proton_captcha_solving">Vérifié, connexion en cours…</string>

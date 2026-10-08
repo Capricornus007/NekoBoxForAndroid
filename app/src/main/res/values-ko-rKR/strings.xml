@@ -1010,7 +1010,6 @@
     <string name="proton_captcha_title">인간 확인</string>
     <string name="proton_captcha_hint">아래 문제를 풀면 여기로 돌아옵니다.</string>
     <string name="proton_captcha_reload">새로 고침</string>
-    <string name="proton_captcha_open">브라우저</string>
     <string name="proton_captcha_failed">확인 페이지를 불러오지 못했습니다.</string>
     <string name="proton_captcha_expired">CAPTCHA가 만료되었습니다. 새로 고침을 누르세요.</string>
     <string name="proton_captcha_solving">확인 완료, 로그인 중…</string>

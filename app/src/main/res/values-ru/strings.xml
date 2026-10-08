@@ -990,7 +990,6 @@
     <string name="proton_captcha_title">Подтверждение, что вы человек</string>
     <string name="proton_captcha_hint">Выполните задание ниже, затем вернитесь сюда.</string>
     <string name="proton_captcha_reload">Обновить</string>
-    <string name="proton_captcha_open">Браузер</string>
     <string name="proton_captcha_failed">Страница проверки не загрузилась.</string>
     <string name="proton_captcha_expired">CAPTCHA истекла. Нажмите «Обновить».</string>
     <string name="proton_captcha_solving">Проверено, выполняем вход…</string>

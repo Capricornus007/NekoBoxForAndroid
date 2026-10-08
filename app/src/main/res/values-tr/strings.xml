@@ -973,7 +973,6 @@
     <string name="proton_captcha_title">İnsan doğrulaması</string>
     <string name="proton_captcha_hint">Aşağıdaki sorunu çözün, sonra buraya döner.</string>
     <string name="proton_captcha_reload">Yeniden yükle</string>
-    <string name="proton_captcha_open">Tarayıcı</string>
     <string name="proton_captcha_failed">Doğrulama sayfası yüklenemedi.</string>
     <string name="proton_captcha_expired">CAPTCHA süresi doldu, yeniden yükleyin.</string>
     <string name="proton_captcha_solving">Doğrulandı, giriş yapılıyor…</string>

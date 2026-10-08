@@ -1019,7 +1019,6 @@
     <string name="proton_captcha_title">اثبات انسان بودن</string>
     <string name="proton_captcha_hint">چالش پایین را حل کنید، سپس به اینجا برمی‌گردد.</string>
     <string name="proton_captcha_reload">بارگذاری دوباره</string>
-    <string name="proton_captcha_open">مرورگر</string>
     <string name="proton_captcha_failed">صفحه تأیید بارگذاری نشد.</string>
     <string name="proton_captcha_expired">CAPTCHA منقضی شد. بارگذاری دوباره را بزنید.</string>
     <string name="proton_captcha_solving">تأیید شد، در حال وارد شدن…</string>

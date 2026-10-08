@@ -255,7 +255,6 @@ class ProtonActivity : ThemedActivity() {
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
             dialogBinding.reload.setOnClickListener { web.reload() }
-            dialogBinding.openExternal.setOnClickListener { openInBrowser(challenge.inAppUrl) }
             // WebView 是會 leak 的那類 view：關掉時先從父層摘掉再 destroy，否則每開一次
             // 驗證碼就留一整顆 chromium 在記憶體裡。
             created.setOnDismissListener {
@@ -265,10 +264,12 @@ class ProtonActivity : ThemedActivity() {
             }
             created.show()
             dialog = created
-            // 拼圖需要高度，對話框盡量佔滿畫面；轉方向時對話框重建，重新載入就好。
+            // 視窗高度交給內容決定：之前硬把視窗拉到 90% 螢幕高，而 WebView 在
+            // MaterialAlertDialog 裡拿不到 weight → 結果是「按鈕上方一小條 + 下面一大塊空白」，
+            // 用戶以為頁面掛了。高度改由版面給定的 420dp 決定。
             created.window?.setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                (resources.displayMetrics.heightPixels * 0.9f).toInt(),
+                ViewGroup.LayoutParams.WRAP_CONTENT,
             )
         }
 
