@@ -23,11 +23,11 @@
 # Android、iptables DNS hijack 被 input connmark 跳過、go stack 重寫、arm64 NEON checksum 等），
 # libcore 的 require 同時對齊 sing-box 的 7539c98。這批全是 Android 資料路徑上的修正，值得為它
 # 多跑一輪核心建置。
-export COMMIT_SING_BOX="04b20057f25bed07e6d50025ffc146de2d28ccfd"
+export COMMIT_SING_BOX="1cf4f1e18f6dccc18dfa563ffe176f82a60eb3e3"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.31"
+export VERSION_SING_BOX="1.15.0-alpha.10-mod.32"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
