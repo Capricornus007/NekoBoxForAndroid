@@ -14,13 +14,23 @@ import (
 	proton "github.com/ProtonMail/go-proton-api"
 )
 
-// protonAppVersion 是 x-pm-appversion 的內容，格式被 Proton 的閘門寫死成
-// 「<產品名>_<semver>」：他們用 strings.Split(v, "_") 要求剛好切成兩段、第二段要能
-// 被 semver 解析，否則直接回 HTTP 400、Code 5003（實測到的那句 invalid app version）。
-// 所以這裡絕對不能用「NB4A/1.0.0」這種斜線寫法——切不出兩段就等於沒報版本。
-// 判式與回碼的參考實作就在依賴裡：go-proton-api@v0.4.0/server/router.go 的
-// requireValidAppVersion + validateAppVersion。
-const protonAppVersion = "NB4A_1.0.0"
+// protonAppVersion 是 x-pm-appversion 的內容。Proton 正式閘門的規則是
+// 「<平台>-<產品>@<版本>」，三段都有要求，用錯分隔符會被逐段糾正（實測回碼）：
+//
+//	"NB4A_1.0.0"                  -> 400/5002 Invalid app version
+//	"NB4A@1.0.0"                  -> 400/2064 Application platform and product must be separated by a dash
+//	"android-nb4a@1.0.0"          -> 400/2064 Product `nb4a` is not valid
+//	"NB4A-android@1.0.0"          -> 400/2064 Application name must be in lowercase
+//	"android-vpn@1.0.0"           -> 422/5003 This version of the app is no longer supported
+//	"android-vpn@5.20.57.0"       -> 401（已過版本閘門，進到驗 token）
+//
+// 平台與產品都要在他們登記過的清單裡，所以第三方客戶端只能沿用官方 Android 客戶端的
+// 身分；格式與值直接取自公開源碼 ProtonVPN/android-app：
+//   app/src/main/java/com/protonvpn/android/utils/Constants.kt:73  MOBILE_CLIENT_ID = "android-vpn"
+//   app/src/main/java/com/protonvpn/android/api/VpnApiClient.kt:49 "${clientId}@" + versionName()
+// 版本號取該倉最新 release（5.20.57.0，2026-09-30）。Proton 會淘汰舊版本（見上面的
+// 422/5003），所以這行是會過期的常數：哪天登入吃到 5003，就到上面那個倉抓新的 release tag。
+const protonAppVersion = "android-vpn@5.20.57.0"
 
 const defaultProtonAPIURL = "https://api.protonmail.ch"
 
