@@ -30,8 +30,8 @@ class ServiceButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) :
-    FloatingActionButton(context, attrs, defStyleAttr), DynamicAnimation.OnAnimationEndListener {
+) : FloatingActionButton(context, attrs, defStyleAttr),
+    DynamicAnimation.OnAnimationEndListener {
 
     private val callback = object : Animatable2Compat.AnimationCallback() {
         override fun onAnimationEnd(drawable: Drawable) {
@@ -124,10 +124,13 @@ class ServiceButton @JvmOverloads constructor(
     fun changeState(state: BaseService.State, previousState: BaseService.State, animate: Boolean) {
         when (state) {
             BaseService.State.Connecting -> changeState(iconConnecting, animate)
+
             BaseService.State.Connected -> changeState(iconConnected, animate)
+
             BaseService.State.Stopping -> {
                 changeState(iconStopping, animate && previousState == BaseService.State.Connected)
             }
+
             else -> changeState(iconStopped, animate)
         }
         checked = state == BaseService.State.Connected
@@ -164,10 +167,10 @@ class ServiceButton @JvmOverloads constructor(
     }
 
     private fun changeState(icon: AnimatedState, animate: Boolean) {
-        fun counters(a: AnimatedState, b: AnimatedState): Boolean = a == iconStopped && b == iconConnecting ||
-            a == iconConnecting && b == iconStopped ||
-            a == iconConnected && b == iconStopping ||
-            a == iconStopping && b == iconConnected
+        fun counters(a: AnimatedState, b: AnimatedState): Boolean = (a == iconStopped && b == iconConnecting) ||
+            (a == iconConnecting && b == iconStopped) ||
+            (a == iconConnected && b == iconStopping) ||
+            (a == iconStopping && b == iconConnected)
         if (animate) {
             if (animationQueue.size < 2 || !counters(animationQueue.last, icon)) {
                 animationQueue.add(icon)

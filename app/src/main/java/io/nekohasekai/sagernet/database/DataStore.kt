@@ -68,8 +68,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     val pluginSignerApprovals: Set<String>
         get() = configurationStore.getStringSet(Key.PLUGIN_SIGNER_APPROVALS).orEmpty()
 
-    suspend fun approvePluginSigner(identity: String) =
-        configurationStore.addToStringSetDurable(Key.PLUGIN_SIGNER_APPROVALS, setOf(identity))
+    suspend fun approvePluginSigner(identity: String) = configurationStore.addToStringSetDurable(Key.PLUGIN_SIGNER_APPROVALS, setOf(identity))
 
     fun currentGroupId(): Long {
         val currentSelected = configurationStore.getLong(Key.PROFILE_GROUP, -1)
@@ -274,9 +273,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         }
     }
 
-    private fun getLocalPort(key: String, default: Int): Int {
-        return parsePort(configurationStore.getString(key), default + userIndex)
-    }
+    private fun getLocalPort(key: String, default: Int): Int = parsePort(configurationStore.getString(key), default + userIndex)
 
     private fun saveLocalPort(key: String, value: Int) {
         configurationStore.putString(key, "$value")

@@ -26,8 +26,7 @@ class IniConfig private constructor(private val sections: List<Section>) {
         operator fun get(key: String): String? = entries.firstOrNull { it.first == key }?.second
 
         /** All values for [key] in order, or null if none (mirrors ini4j Section.getAll). */
-        fun getAll(key: String): List<String>? =
-            entries.filter { it.first == key }.map { it.second }.takeIf { it.isNotEmpty() }
+        fun getAll(key: String): List<String>? = entries.filter { it.first == key }.map { it.second }.takeIf { it.isNotEmpty() }
     }
 
     /** First section named [name], or null (mirrors ini4j Ini.get / ini[name]). */

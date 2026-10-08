@@ -29,9 +29,7 @@ data class RuleEntity(
     var packages: Set<String> = emptySet(),
 ) : Parcelable {
 
-    fun displayName(): String {
-        return name.takeIf { it.isNotBlank() } ?: app.getString(R.string.rule_default_name, id)
-    }
+    fun displayName(): String = name.takeIf { it.isNotBlank() } ?: app.getString(R.string.rule_default_name, id)
 
     fun mkSummary(): String {
         var summary = ""
@@ -58,14 +56,15 @@ data class RuleEntity(
         }
     }
 
-    fun displayOutbound(): String {
-        return when (outbound) {
-            0L -> app.getString(R.string.route_proxy)
-            -1L -> app.getString(R.string.route_bypass)
-            -2L -> app.getString(R.string.route_block)
-            else -> ProfileManager.getProfile(outbound)?.displayName()
-                ?: app.getString(R.string.error_title)
-        }
+    fun displayOutbound(): String = when (outbound) {
+        0L -> app.getString(R.string.route_proxy)
+
+        -1L -> app.getString(R.string.route_bypass)
+
+        -2L -> app.getString(R.string.route_block)
+
+        else -> ProfileManager.getProfile(outbound)?.displayName()
+            ?: app.getString(R.string.error_title)
     }
 
     @androidx.room.Dao

@@ -204,13 +204,11 @@ class ConfigurationFragment @JvmOverloads constructor(
 
     internal fun isRunningProfile(profileId: Long) = serviceStartedSnapshot && currentProfileSnapshot == profileId
 
-    fun getCurrentGroupFragment(): ConfigurationGroupFragment? {
-        return try {
-            childFragmentManager.findFragmentByTag("f" + DataStore.selectedGroup) as ConfigurationGroupFragment?
-        } catch (e: Exception) {
-            Logs.e(e)
-            null
-        }
+    fun getCurrentGroupFragment(): ConfigurationGroupFragment? = try {
+        childFragmentManager.findFragmentByTag("f" + DataStore.selectedGroup) as ConfigurationGroupFragment?
+    } catch (e: Exception) {
+        Logs.e(e)
+        null
     }
 
     fun switchAllGroupFragmentsLayout() {
@@ -322,6 +320,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                     android.view.MotionEvent.ACTION_DOWN -> {
                         startX = e.x
                     }
+
                     android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
                         val endX = e.x
                         val diffX = endX - startX
@@ -355,7 +354,8 @@ class ConfigurationFragment @JvmOverloads constructor(
             if (adapter.groupList.size > position) {
                 tab.text = adapter.groupList[position].displayName()
             }
-            tab.view.setOnLongClickListener { // clear toast
+            tab.view.setOnLongClickListener {
+                // clear toast
                 true
             }
         }.also { it.attach() }
@@ -1426,27 +1426,19 @@ class ConfigurationFragment @JvmOverloads constructor(
             reload(true)
         }
 
-        override fun getItemCount(): Int {
-            return groupList.size
-        }
+        override fun getItemCount(): Int = groupList.size
 
-        override fun createFragment(position: Int): Fragment {
-            return ConfigurationGroupFragment().apply {
-                proxyGroup = groupList[position]
-                groupFragments[proxyGroup.id] = this
-                if (position == selectedGroupIndex) {
-                    selected = true
-                }
+        override fun createFragment(position: Int): Fragment = ConfigurationGroupFragment().apply {
+            proxyGroup = groupList[position]
+            groupFragments[proxyGroup.id] = this
+            if (position == selectedGroupIndex) {
+                selected = true
             }
         }
 
-        override fun getItemId(position: Int): Long {
-            return groupList[position].id
-        }
+        override fun getItemId(position: Int): Long = groupList[position].id
 
-        override fun containsItem(itemId: Long): Boolean {
-            return groupList.any { it.id == itemId }
-        }
+        override fun containsItem(itemId: Long): Boolean = groupList.any { it.id == itemId }
 
         override suspend fun groupAdd(group: ProxyGroup) {
             if (disposed) return

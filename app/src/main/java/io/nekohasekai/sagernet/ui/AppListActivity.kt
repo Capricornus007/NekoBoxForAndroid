@@ -123,8 +123,7 @@ class AppListActivity : ThemedActivity() {
             onBindViewHolder(holder, position)
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder =
-            AppViewHolder(LayoutAppsItemBinding.inflate(layoutInflater, parent, false))
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppViewHolder = AppViewHolder(LayoutAppsItemBinding.inflate(layoutInflater, parent, false))
 
         override fun getItemCount(): Int = filteredApps.size
 
@@ -140,9 +139,7 @@ class AppListActivity : ThemedActivity() {
             notifyDataSetChanged()
         }
 
-        override fun getPopupText(view: View, position: Int): CharSequence {
-            return filteredApps[position].name.firstOrNull()?.toString() ?: ""
-        }
+        override fun getPopupText(view: View, position: Int): CharSequence = filteredApps[position].name.firstOrNull()?.toString() ?: ""
     }
 
     private val loading by lazy { binding.loading }
@@ -354,8 +351,7 @@ class AppListActivity : ThemedActivity() {
         return true
     }
 
-    override fun supportNavigateUpTo(upIntent: Intent) =
-        super.supportNavigateUpTo(upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
+    override fun supportNavigateUpTo(upIntent: Intent) = super.supportNavigateUpTo(upIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?) = if (keyCode == KeyEvent.KEYCODE_MENU) {
         if (binding.toolbar.isOverflowMenuShowing) binding.toolbar.hideOverflowMenu() else binding.toolbar.showOverflowMenu()

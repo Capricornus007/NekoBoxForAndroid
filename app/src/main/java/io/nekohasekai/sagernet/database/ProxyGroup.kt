@@ -82,9 +82,7 @@ data class ProxyGroup(
         }
     }
 
-    fun displayName(): String {
-        return name.takeIf { !it.isNullOrBlank() } ?: app.getString(R.string.group_default)
-    }
+    fun displayName(): String = name.takeIf { !it.isNullOrBlank() } ?: app.getString(R.string.group_default)
 
     @androidx.room.Dao
     interface Dao {
@@ -127,13 +125,9 @@ data class ProxyGroup(
         @JvmField
         val CREATOR = object : Serializable.CREATOR<ProxyGroup>() {
 
-            override fun newInstance(): ProxyGroup {
-                return ProxyGroup()
-            }
+            override fun newInstance(): ProxyGroup = ProxyGroup()
 
-            override fun newArray(size: Int): Array<ProxyGroup?> {
-                return arrayOfNulls(size)
-            }
+            override fun newArray(size: Int): Array<ProxyGroup?> = arrayOfNulls(size)
         }
     }
 }

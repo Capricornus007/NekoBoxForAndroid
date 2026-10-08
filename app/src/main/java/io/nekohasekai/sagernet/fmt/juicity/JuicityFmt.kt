@@ -56,27 +56,25 @@ fun JuicityBean.toUri(): String {
     return builder.toLink("juicity")
 }
 
-fun buildSingBoxOutboundJuicityBean(bean: JuicityBean): Outbound_JuicityOptions {
-    return Outbound_JuicityOptions().apply {
-        type = "juicity"
-        server = bean.serverAddress
-        server_port = bean.serverPort
-        uuid = bean.uuid
-        password = bean.password
+fun buildSingBoxOutboundJuicityBean(bean: JuicityBean): Outbound_JuicityOptions = Outbound_JuicityOptions().apply {
+    type = "juicity"
+    server = bean.serverAddress
+    server_port = bean.serverPort
+    uuid = bean.uuid
+    password = bean.password
 
-        // Create TLS options object
-        tls = SingBoxOptions.OutboundTLSOptions().apply {
-            enabled = true
-            if (bean.sni.isNotBlank()) {
-                server_name = bean.sni
-            }
-            insecure = bean.allowInsecure || DataStore.globalAllowInsecure || bean.pinnedCertchainSha256.isNotBlank()
+    // Create TLS options object
+    tls = SingBoxOptions.OutboundTLSOptions().apply {
+        enabled = true
+        if (bean.sni.isNotBlank()) {
+            server_name = bean.sni
         }
+        insecure = bean.allowInsecure || DataStore.globalAllowInsecure || bean.pinnedCertchainSha256.isNotBlank()
+    }
 
-        if (bean.pinnedCertchainSha256.isNotBlank()) {
-            normalizePinnedCertChainHash(bean.pinnedCertchainSha256.listByLineOrComma().firstOrNull())?.let {
-                pin_cert_sha256 = it
-            }
+    if (bean.pinnedCertchainSha256.isNotBlank()) {
+        normalizePinnedCertChainHash(bean.pinnedCertchainSha256.listByLineOrComma().firstOrNull())?.let {
+            pin_cert_sha256 = it
         }
     }
 }
@@ -86,6 +84,7 @@ private fun normalizePinnedCertChainHash(rawHash: String?): String? {
     return when {
         certChainHash.length == 64 -> Base64.getUrlEncoder()
             .encodeToString(certChainHash.chunked(2).map { chunk -> chunk.toInt(16).toByte() }.toByteArray())
+
         else -> certChainHash.replace('/', '_').replace('+', '-')
     }
 }

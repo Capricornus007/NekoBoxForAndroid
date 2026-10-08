@@ -11,7 +11,9 @@ internal class TailscaleStatusFormatting(private val context: Context) {
 
     fun expiry(peer: TailscaleStatusPeer): String = when {
         peer.expired -> text(R.string.tailscale_status_expired)
+
         peer.keyExpiry <= 0 || peer.keyExpiry > Long.MAX_VALUE / 1000 -> text(R.string.tailscale_status_expiry_unknown)
+
         else -> text(
             R.string.tailscale_status_expiry,
             DateFormat.getDateTimeInstance().format(Date(peer.keyExpiry * 1000)),
@@ -69,11 +71,14 @@ internal class TailscaleStatusFormatting(private val context: Context) {
     fun sample(sample: TailscalePingSample): String {
         val path = when (sample.path) {
             "direct" -> text(R.string.tailscale_status_path_direct)
+
             "derp" -> text(
                 R.string.tailscale_status_path_derp,
                 sample.derpRegionCode.ifEmpty { sample.derpRegionId.toString() },
             )
+
             "peer-relay" -> text(R.string.tailscale_status_path_peer_relay)
+
             else -> text(R.string.tailscale_status_path_unknown)
         }
         val latency = when {

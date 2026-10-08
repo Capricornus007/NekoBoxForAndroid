@@ -21,9 +21,7 @@ object LocalResolverImpl : LocalDNSTransport {
 
     private const val RCODE_NXDOMAIN = 3
 
-    override fun raw(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-    }
+    override fun raw(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
     override fun networkHandle(): Long {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

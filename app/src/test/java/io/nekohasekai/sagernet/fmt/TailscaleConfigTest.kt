@@ -37,13 +37,12 @@ class TailscaleConfigTest {
         serverPort = 1080
     }
 
-    private fun add(bean: AbstractBean, groupId: Long = 0, order: Long = 0): ProxyEntity =
-        ProxyEntity(groupId = groupId, userOrder = order).putBean(
-            bean.apply {
-                initializeDefaultValues()
-            },
-        )
-            .also { it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) } }
+    private fun add(bean: AbstractBean, groupId: Long = 0, order: Long = 0): ProxyEntity = ProxyEntity(groupId = groupId, userOrder = order).putBean(
+        bean.apply {
+            initializeDefaultValues()
+        },
+    )
+        .also { it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) } }
 
     private fun chain(vararg hops: ProxyEntity) = ChainBean().apply { proxies = hops.map { it.id } }
 

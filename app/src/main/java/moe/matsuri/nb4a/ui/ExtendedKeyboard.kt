@@ -49,19 +49,13 @@ class ExtendedKeyboard @JvmOverloads constructor(
 
         companion object {
             private val diffCallback = object : DiffUtil.ItemCallback<String>() {
-                override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
-                    return oldItem == newItem
-                }
+                override fun areItemsTheSame(oldItem: String, newItem: String): Boolean = oldItem == newItem
 
-                override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
-                    return oldItem == newItem
-                }
+                override fun areContentsTheSame(oldItem: String, newItem: String): Boolean = oldItem == newItem
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): KeyViewHolder {
-            return KeyViewHolder.create(parent, keyListener)
-        }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): KeyViewHolder = KeyViewHolder.create(parent, keyListener)
 
         override fun onBindViewHolder(holder: KeyViewHolder, position: Int) {
             holder.bind(getItem(position))

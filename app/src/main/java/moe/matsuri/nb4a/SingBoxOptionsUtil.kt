@@ -9,9 +9,7 @@ import kotlin.Exception
 object SingBoxOptionsUtil {
 
     fun domainStrategy(tag: String): String {
-        fun auto2(key: String, newS: String): String {
-            return (DataStore.configurationStore.getString(key) ?: "").replace("auto", newS)
-        }
+        fun auto2(key: String, newS: String): String = (DataStore.configurationStore.getString(key) ?: "").replace("auto", newS)
         return when (tag) {
             "dns-remote" -> {
                 auto2("domain_strategy_for_remote", "")
@@ -174,19 +172,19 @@ fun SingBoxOptions.Rule_DefaultOptions.checkEmpty(): Boolean {
     return true
 }
 
-fun processRulesetUrl(origUrl: String): Pair<String, Boolean> {
-    return when {
-        origUrl.startsWith("rsip:") -> {
-            // IP-type ruleset
-            Pair(origUrl.substring(5), true)
-        }
-        origUrl.startsWith("rssite:") -> {
-            // domain-type ruleset
-            Pair(origUrl.substring(7), false)
-        }
-        else -> {
-            throw kotlin.Exception(SagerNet.application.getString(R.string.ruleset_prefix_error))
-        }
+fun processRulesetUrl(origUrl: String): Pair<String, Boolean> = when {
+    origUrl.startsWith("rsip:") -> {
+        // IP-type ruleset
+        Pair(origUrl.substring(5), true)
+    }
+
+    origUrl.startsWith("rssite:") -> {
+        // domain-type ruleset
+        Pair(origUrl.substring(7), false)
+    }
+
+    else -> {
+        throw kotlin.Exception(SagerNet.application.getString(R.string.ruleset_prefix_error))
     }
 }
 

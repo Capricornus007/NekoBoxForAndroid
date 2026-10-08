@@ -22,9 +22,7 @@ object NGUtil {
      * @param text
      * @return
      */
-    fun getEditable(text: String): Editable {
-        return Editable.Factory.getInstance().newEditable(text)
-    }
+    fun getEditable(text: String): Editable = Editable.Factory.getInstance().newEditable(text)
 
     /**
      * find value in array position
@@ -41,26 +39,22 @@ object NGUtil {
     /**
      * parseInt
      */
-    fun parseInt(str: String): Int {
-        return try {
-            Integer.parseInt(str)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            0
-        }
+    fun parseInt(str: String): Int = try {
+        Integer.parseInt(str)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        0
     }
 
     /**
      * get text from clipboard
      */
-    fun getClipboard(context: Context): String {
-        return try {
-            val cmb = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            cmb.primaryClip?.getItemAt(0)?.text.toString()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ""
-        }
+    fun getClipboard(context: Context): String = try {
+        val cmb = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        cmb.primaryClip?.getItemAt(0)?.text.toString()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        ""
     }
 
     /**
@@ -105,13 +99,11 @@ object NGUtil {
     /**
      * base64 encode
      */
-    fun encode(text: String): String {
-        return try {
-            Base64.encodeToString(text.toByteArray(charset("UTF-8")), Base64.NO_WRAP)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ""
-        }
+    fun encode(text: String): String = try {
+        Base64.encodeToString(text.toByteArray(charset("UTF-8")), Base64.NO_WRAP)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        ""
     }
 
     /**
@@ -156,9 +148,7 @@ object NGUtil {
         }
     }
 
-    fun isPureIpAddress(value: String): Boolean {
-        return (isIpv4Address(value) || isIpv6Address(value))
-    }
+    fun isPureIpAddress(value: String): Boolean = (isIpv4Address(value) || isIpv6Address(value))
 
     fun isIpv4Address(value: String): Boolean {
         val regV4 =
@@ -181,9 +171,7 @@ object NGUtil {
         return regV6.matches(addr)
     }
 
-    private fun isCoreDNSAddress(s: String): Boolean {
-        return s.startsWith("https") || s.startsWith("tcp") || s.startsWith("quic")
-    }
+    private fun isCoreDNSAddress(s: String): Boolean = s.startsWith("https") || s.startsWith("tcp") || s.startsWith("quic")
 
     fun openUri(context: Context, uriString: String) {
         val uri = uriString.toUri()
@@ -193,30 +181,24 @@ object NGUtil {
     /**
      * uuid
      */
-    fun getUuid(): String {
-        return try {
-            UUID.randomUUID().toString().replace("-", "")
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ""
-        }
+    fun getUuid(): String = try {
+        UUID.randomUUID().toString().replace("-", "")
+    } catch (e: Exception) {
+        e.printStackTrace()
+        ""
     }
 
-    fun urlDecode(url: String): String {
-        return try {
-            URLDecoder.decode(url, "UTF-8")
-        } catch (e: Exception) {
-            url
-        }
+    fun urlDecode(url: String): String = try {
+        URLDecoder.decode(url, "UTF-8")
+    } catch (e: Exception) {
+        url
     }
 
-    fun urlEncode(url: String): String {
-        return try {
-            URLEncoder.encode(url, "UTF-8")
-        } catch (e: Exception) {
-            e.printStackTrace()
-            url
-        }
+    fun urlEncode(url: String): String = try {
+        URLEncoder.encode(url, "UTF-8")
+    } catch (e: Exception) {
+        e.printStackTrace()
+        url
     }
 
     /**

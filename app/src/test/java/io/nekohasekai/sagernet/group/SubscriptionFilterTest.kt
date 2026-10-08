@@ -32,8 +32,7 @@ class SubscriptionFilterTest {
         }
     }
 
-    private fun filter(mode: Int, regex: String) =
-        RawUpdater.applySubscriptionFilter(nodes(), mode, regex).map { it.displayName() }
+    private fun filter(mode: Int, regex: String) = RawUpdater.applySubscriptionFilter(nodes(), mode, regex).map { it.displayName() }
 
     @Test
     fun includeKeepsMatchingNodes() {

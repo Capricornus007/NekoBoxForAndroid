@@ -202,8 +202,10 @@ object AmneziaWireGuardImporter {
         val lastConfigElement = awg["last_config"] ?: error("Missing last_config")
         val lastConfig = when {
             lastConfigElement.isJsonObject -> lastConfigElement.asJsonObject
+
             lastConfigElement.isJsonPrimitive ->
                 JsonParser.parseString(lastConfigElement.asString).asJsonObject
+
             else -> error("Invalid last_config")
         }
         val conf = lastConfig.stringValue("config") ?: error("Missing config")
@@ -316,16 +318,13 @@ object AmneziaWireGuardImporter {
         return host.takeIf(String::isNotBlank)?.let { Endpoint(it, port) }
     }
 
-    private fun hasIniOption(conf: String, key: String): Boolean =
-        Regex("(?im)^\\s*${Regex.escape(key)}\\s*=").containsMatchIn(conf)
+    private fun hasIniOption(conf: String, key: String): Boolean = Regex("(?im)^\\s*${Regex.escape(key)}\\s*=").containsMatchIn(conf)
 
     private fun IniSection.intValue(key: String): Int = get(key)?.toIntOrNull() ?: 0
 
-    private fun JsonObject.stringValue(key: String): String? =
-        get(key)?.takeIf { it.isJsonPrimitive }?.asString?.takeIf(String::isNotBlank)
+    private fun JsonObject.stringValue(key: String): String? = get(key)?.takeIf { it.isJsonPrimitive }?.asString?.takeIf(String::isNotBlank)
 
-    private fun JsonObject.intValue(key: String): Int? =
-        get(key)?.takeIf { it.isJsonPrimitive }?.asString?.toIntOrNull()
+    private fun JsonObject.intValue(key: String): Int? = get(key)?.takeIf { it.isJsonPrimitive }?.asString?.toIntOrNull()
 
     private fun ByteArray.firstNonWhitespace(): Byte? = firstOrNull { !it.toInt().toChar().isWhitespace() }
 

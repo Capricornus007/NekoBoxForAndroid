@@ -46,7 +46,9 @@ import libcore.NetworkInterface as LibcoreNetworkInterface
 // (protocol/tailscale/endpoint.go).
 const val TAILSCALE_LOGIN_NOTIFICATION = "tailscale-authentication"
 
-class NativeInterface : BoxPlatformInterface, NB4AInterface {
+class NativeInterface :
+    BoxPlatformInterface,
+    NB4AInterface {
 
     //  libbox interface
 
@@ -61,24 +63,20 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
         return DataStore.vpnService!!.startVpn(singTunOptionsJson, tunPlatformOptionsJson).toLong()
     }
 
-    override fun useProcFS(): Boolean {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
-    }
+    override fun useProcFS(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
 
     // own f1ac98919：部分 ROM（MIUI 等）在連線已結束／無權限查證時會直接從這個 binder 回調拋
     // SecurityException／IllegalState，原本會一路頂進核心的路由層。查不到就回 -1（未知擁有者），
     // 由呼叫端優雅降級，不把「查不到」升級成崩潰。
     @RequiresApi(Build.VERSION_CODES.Q)
-    override fun findConnectionOwner(ipProto: Int, srcIp: String, srcPort: Int, destIp: String, destPort: Int): Int {
-        return try {
-            SagerNet.connectivity.getConnectionOwnerUid(
-                ipProto,
-                InetSocketAddress(srcIp, srcPort),
-                InetSocketAddress(destIp, destPort),
-            )
-        } catch (_: Throwable) {
-            -1
-        }
+    override fun findConnectionOwner(ipProto: Int, srcIp: String, srcPort: Int, destIp: String, destPort: Int): Int = try {
+        SagerNet.connectivity.getConnectionOwnerUid(
+            ipProto,
+            InetSocketAddress(srcIp, srcPort),
+            InetSocketAddress(destIp, destPort),
+        )
+    } catch (_: Throwable) {
+        -1
     }
 
     override fun packageNameByUid(uid: Int): String {
@@ -220,12 +218,15 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
                 .let { it.toStringIterator(it.size) }
             boxInterface.type = when {
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> Libcore.InterfaceTypeWIFI
+
                 networkCapabilities.hasTransport(
                     NetworkCapabilities.TRANSPORT_CELLULAR,
                 ) -> Libcore.InterfaceTypeCellular
+
                 networkCapabilities.hasTransport(
                     NetworkCapabilities.TRANSPORT_ETHERNET,
                 ) -> Libcore.InterfaceTypeEthernet
+
                 else -> Libcore.InterfaceTypeOther
             }
             boxInterface.index = networkInterface.index
@@ -317,9 +318,7 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
 
     // nb4a interface
 
-    override fun useOfficialAssets(): Boolean {
-        return DataStore.rulesProvider == 0
-    }
+    override fun useOfficialAssets(): Boolean = DataStore.rulesProvider == 0
 
     override fun selector_OnProxySelected(selectorTag: String, tag: String) {
         if (selectorTag != "proxy") {
@@ -348,19 +347,15 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
     }
 }
 
-private fun Iterable<String>.toStringIterator(size: Int): StringIterator {
-    return object : StringIterator {
-        private val it = iterator()
-        override fun hasNext(): Boolean = it.hasNext()
-        override fun next(): String = it.next()
-        override fun length(): Int = size
-    }
+private fun Iterable<String>.toStringIterator(size: Int): StringIterator = object : StringIterator {
+    private val it = iterator()
+    override fun hasNext(): Boolean = it.hasNext()
+    override fun next(): String = it.next()
+    override fun length(): Int = size
 }
 
-private fun InterfaceAddress.toPrefix(): String {
-    return if (address is Inet6Address) {
-        "${Inet6Address.getByAddress(address.address).hostAddress}/$networkPrefixLength"
-    } else {
-        "${address.hostAddress}/$networkPrefixLength"
-    }
+private fun InterfaceAddress.toPrefix(): String = if (address is Inet6Address) {
+    "${Inet6Address.getByAddress(address.address).hostAddress}/$networkPrefixLength"
+} else {
+    "${address.hostAddress}/$networkPrefixLength"
 }

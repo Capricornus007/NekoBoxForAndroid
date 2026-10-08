@@ -223,21 +223,15 @@ class GroupFragment :
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupHolder {
-            return GroupHolder(LayoutGroupItemBinding.inflate(layoutInflater, parent, false))
-        }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupHolder = GroupHolder(LayoutGroupItemBinding.inflate(layoutInflater, parent, false))
 
         override fun onBindViewHolder(holder: GroupHolder, position: Int) {
             holder.bind(groupList[position])
         }
 
-        override fun getItemCount(): Int {
-            return groupList.size
-        }
+        override fun getItemCount(): Int = groupList.size
 
-        override fun getItemId(position: Int): Long {
-            return groupList[position].id
-        }
+        override fun getItemId(position: Int): Long = groupList[position].id
 
         private val updated = HashSet<ProxyGroup>()
 
@@ -502,11 +496,9 @@ class GroupFragment :
             if (subscription != null && !subscription.subscriptionUserinfo.isNullOrBlank()) { // Raw
                 var text = ""
 
-                fun get(regex: String): String? {
-                    return regex.toRegex().findAll(subscription.subscriptionUserinfo).mapNotNull {
-                        if (it.groupValues.size > 1) it.groupValues[1] else null
-                    }.firstOrNull()
-                }
+                fun get(regex: String): String? = regex.toRegex().findAll(subscription.subscriptionUserinfo).mapNotNull {
+                    if (it.groupValues.size > 1) it.groupValues[1] else null
+                }.firstOrNull()
 
                 try {
                     var used: Long = 0

@@ -81,9 +81,7 @@ private fun StandardV2RayBean.echParam() = echConfig.lines().filterNot {
     it.startsWith("-----")
 }.joinToString("").trim()
 
-fun StandardV2RayBean.isTLS(): Boolean {
-    return security == "tls" || security == "reality" || realityPubKey.isNotBlank()
-}
+fun StandardV2RayBean.isTLS(): Boolean = security == "tls" || security == "reality" || realityPubKey.isNotBlank()
 
 fun StandardV2RayBean.setTLS(boolean: Boolean) {
     security = if (boolean) "tls" else ""
@@ -585,8 +583,11 @@ private fun parseCsvVMess(csv: String): VMessBean {
     args.subList(5, args.size).forEach {
         when {
             it == "over-tls=true" -> bean.security = "tls"
+
             it.startsWith("tls-host=") -> bean.host = it.substringAfter("=")
+
             it.startsWith("obfs=") -> bean.type = it.substringAfter("=")
+
             it.startsWith("obfs-path=") || it.contains("Host:") -> {
                 runCatching {
                     bean.path = it.substringAfter("obfs-path=\"").substringBefore("\"obfs")
@@ -675,6 +676,7 @@ fun StandardV2RayBean.toUriVMessVLESSTrojan(isTrojan: Boolean): String {
 
     when (type) {
         "tcp" -> {}
+
         "ws", "http", "httpupgrade" -> {
             if (host.isNotBlank()) {
                 builder.addQueryParameter("host", host)

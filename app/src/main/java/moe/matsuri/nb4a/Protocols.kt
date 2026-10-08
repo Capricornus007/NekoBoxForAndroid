@@ -37,11 +37,9 @@ object Protocols {
 
     // Display
 
-    fun Context.getProtocolColor(type: Int): Int {
-        return when (type) {
-            TYPE_NEKO -> getColorAttr(com.google.android.material.R.attr.colorOnSurface)
-            else -> getColorAttr(R.attr.colorPrimary)
-        }
+    fun Context.getProtocolColor(type: Int): Int = when (type) {
+        TYPE_NEKO -> getColorAttr(com.google.android.material.R.attr.colorOnSurface)
+        else -> getColorAttr(R.attr.colorPrimary)
     }
 
     // Test

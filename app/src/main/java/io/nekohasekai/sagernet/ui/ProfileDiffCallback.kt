@@ -12,9 +12,7 @@ internal class ProfileDiffCallback(
 
     override fun getNewListSize() = newIds.size
 
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-        oldIds[oldItemPosition] == newIds[newItemPosition]
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) = oldIds[oldItemPosition] == newIds[newItemPosition]
 
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-        oldStamps[oldIds[oldItemPosition]] == newStamps[newIds[newItemPosition]]
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) = oldStamps[oldIds[oldItemPosition]] == newStamps[newIds[newItemPosition]]
 }

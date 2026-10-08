@@ -19,7 +19,8 @@ import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 class SagerConnection(
     private var connectionId: Int,
     private var listenForDeath: Boolean = false,
-) : ServiceConnection, IBinder.DeathRecipient {
+) : ServiceConnection,
+    IBinder.DeathRecipient {
 
     companion object {
         val serviceClass

@@ -102,10 +102,16 @@ object AnsiLog {
                 continue
             }
             when {
-                code == 0 -> color = null // reset
+                code == 0 -> color = null
+
+                // reset
                 code in 30..37 -> color = STANDARD[code - 30]
+
                 code in 90..97 -> color = BRIGHT[code - 90]
-                code == 39 -> color = null // default foreground
+
+                code == 39 -> color = null
+
+                // default foreground
                 code == 38 -> {
                     // Extended foreground: 38;5;n (256) or 38;2;r;g;b (truecolor).
                     when (codes.getOrNull(k + 1)?.toIntOrNull()) {
@@ -114,6 +120,7 @@ object AnsiLog {
                             if (idx != null) color = color256(idx)
                             k += 2
                         }
+
                         2 -> {
                             val r = codes.getOrNull(k + 2)?.toIntOrNull()
                             val g = codes.getOrNull(k + 3)?.toIntOrNull()
@@ -123,6 +130,7 @@ object AnsiLog {
                             if (r != null && g != null && b != null) color = argb(r, g, b)
                             k += 4
                         }
+
                         // Unknown sub-mode (e.g. a future 38;6;...): advance past the mode
                         // value so it is not re-processed as a standalone SGR code.
                         else -> k += 1
@@ -138,16 +146,20 @@ object AnsiLog {
     /** Map an xterm 256-color index to ARGB. */
     private fun color256(n: Int): Int = when {
         n in 0..7 -> STANDARD[n]
+
         n in 8..15 -> BRIGHT[n - 8]
+
         n in 16..231 -> {
             // 6x6x6 color cube; xterm component levels are 0,95,135,175,215,255.
             val v = n - 16
             argb(CUBE[v / 36], CUBE[(v / 6) % 6], CUBE[v % 6])
         }
+
         n in 232..255 -> {
             val level = 8 + (n - 232) * 10
             argb(level, level, level)
         }
+
         else -> STANDARD[7]
     }
 

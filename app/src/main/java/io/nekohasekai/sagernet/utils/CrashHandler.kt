@@ -233,13 +233,11 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
         return systemProperties
     }
 
-    private fun getSystemPropertyWithAndroidAPI(property: String): String? {
-        return try {
-            System.getProperty(property)
-        } catch (e: Exception) {
-            Logs.e("Failed to get system property \"" + property + "\":" + e.message)
-            null
-        }
+    private fun getSystemPropertyWithAndroidAPI(property: String): String? = try {
+        System.getProperty(property)
+    } catch (e: Exception) {
+        Logs.e("Failed to get system property \"" + property + "\":" + e.message)
+        null
     }
 
     @SuppressLint("SimpleDateFormat")

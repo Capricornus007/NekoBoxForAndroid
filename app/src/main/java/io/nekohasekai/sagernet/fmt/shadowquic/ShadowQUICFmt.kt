@@ -48,25 +48,23 @@ fun ShadowQUICBean.toUri(): String {
     return builder.toLink("shadowquic")
 }
 
-fun buildSingBoxOutboundShadowQUICBean(bean: ShadowQUICBean): Outbound_ShadowQUICOptions {
-    return Outbound_ShadowQUICOptions().apply {
-        type = "shadowquic"
-        server = bean.serverAddress
-        server_port = bean.serverPort
-        username = bean.username
-        password = bean.password
+fun buildSingBoxOutboundShadowQUICBean(bean: ShadowQUICBean): Outbound_ShadowQUICOptions = Outbound_ShadowQUICOptions().apply {
+    type = "shadowquic"
+    server = bean.serverAddress
+    server_port = bean.serverPort
+    username = bean.username
+    password = bean.password
 
-        if (bean.sni.isNotBlank()) {
-            server_name = bean.sni
-        }
-        if (bean.alpn.isNotBlank()) {
-            alpn = bean.alpn.split(",").map { it.trim() }
-        }
-        if (bean.congestionControl.isNotBlank()) {
-            congestion_control = bean.congestionControl
-        }
-        udp_over_stream = bean.udpOverStream
-        zero_rtt_handshake = bean.zeroRTT
-        sunny_quic = bean.sunnyQUIC
+    if (bean.sni.isNotBlank()) {
+        server_name = bean.sni
     }
+    if (bean.alpn.isNotBlank()) {
+        alpn = bean.alpn.split(",").map { it.trim() }
+    }
+    if (bean.congestionControl.isNotBlank()) {
+        congestion_control = bean.congestionControl
+    }
+    udp_over_stream = bean.udpOverStream
+    zero_rtt_handshake = bean.zeroRTT
+    sunny_quic = bean.sunnyQUIC
 }

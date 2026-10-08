@@ -88,7 +88,9 @@ class SpeedTestQueueRunner<T>(
     }
 }
 
-class AndroidSpeedTestSession(profile: ProxyEntity) : BoxInstance(profile), SpeedTestNodeSession {
+class AndroidSpeedTestSession(profile: ProxyEntity) :
+    BoxInstance(profile),
+    SpeedTestNodeSession {
     @Volatile
     private var nativeSession: SpeedTestSession? = null
 

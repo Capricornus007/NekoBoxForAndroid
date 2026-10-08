@@ -141,9 +141,7 @@ class TestSettingsContractTest {
         setter = { name, value -> values[name] = value },
     )
 
-    private fun sourceFile(relative: String): File {
-        return sequenceOf(File(relative), File("app", relative))
-            .firstOrNull(File::isFile)
-            ?: error("Cannot locate project file: $relative")
-    }
+    private fun sourceFile(relative: String): File = sequenceOf(File(relative), File("app", relative))
+        .firstOrNull(File::isFile)
+        ?: error("Cannot locate project file: $relative")
 }

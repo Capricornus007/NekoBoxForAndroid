@@ -80,8 +80,7 @@ object RuleAssets {
      * 判斷抽成純函數是因為本倉的 unit test 裡 org.json 是 android.jar 的佔位實作
      * （isReturnDefaultValues=true，put() 不落地），測不出 JSON 內容。
      */
-    fun matchesReleaseAsset(assetName: String?, fileName: String): Boolean =
-        assetName == fileName || assetName == "$fileName.xz"
+    fun matchesReleaseAsset(assetName: String?, fileName: String): Boolean = assetName == fileName || assetName == "$fileName.xz"
 
     fun pickReleaseAsset(assets: List<JSONObject>, fileName: String): JSONObject? = assets.find {
         matchesReleaseAsset(it.getStr("name"), fileName)

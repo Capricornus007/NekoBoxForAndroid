@@ -16,7 +16,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 packages/apps/ExactCalculator/+/8c43f06/src/com/android/calculator2/AlertDialogFragment.java
  */
 abstract class AlertDialogFragment<Arg : Parcelable, Ret : Parcelable?> :
-    AppCompatDialogFragment(), DialogInterface.OnClickListener {
+    AppCompatDialogFragment(),
+    DialogInterface.OnClickListener {
     companion object {
         private const val KEY_RESULT = "result"
         private const val KEY_ARG = "arg"
@@ -47,8 +48,7 @@ abstract class AlertDialogFragment<Arg : Parcelable, Ret : Parcelable?> :
     fun arg(arg: Arg) = args().putParcelable(KEY_ARG, arg)
     fun key(resultKey: String = javaClass.name) = args().putString(KEY_RESULT, resultKey)
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog =
-        MaterialAlertDialogBuilder(requireContext()).also { it.prepare(this) }.create()
+    override fun onCreateDialog(savedInstanceState: Bundle?): AlertDialog = MaterialAlertDialogBuilder(requireContext()).also { it.prepare(this) }.create()
 
     override fun onClick(dialog: DialogInterface?, which: Int) {
         setFragmentResult(

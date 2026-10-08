@@ -191,13 +191,11 @@ class ScannerActivity : ThemedActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return if (item.itemId == R.id.action_import_file) {
-            importCodeFile.launch("image/*")
-            true
-        } else {
-            super.onOptionsItemSelected(item)
-        }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = if (item.itemId == R.id.action_import_file) {
+        importCodeFile.launch("image/*")
+        true
+    } else {
+        super.onOptionsItemSelected(item)
     }
 
     private val importCodeFile = registerForActivityResult(
@@ -246,39 +244,37 @@ class ScannerActivity : ThemedActivity() {
      * Arbitrary gallery images can be huge; decoding at full resolution risks an OOM
      * before any exception handler runs. ML Kit detects QR codes fine at this size.
      */
-    private fun decodeBoundedBitmap(uri: android.net.Uri): android.graphics.Bitmap {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            ImageDecoder.decodeBitmap(
-                ImageDecoder.createSource(contentResolver, uri),
-            ) { decoder, info, _ ->
-                decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-                decoder.isMutableRequired = true
-                val longer = maxOf(info.size.width, info.size.height)
-                if (longer > MAX_IMPORT_DIMEN) {
-                    val scale = MAX_IMPORT_DIMEN.toFloat() / longer
-                    decoder.setTargetSize(
-                        (info.size.width * scale).toInt().coerceAtLeast(1),
-                        (info.size.height * scale).toInt().coerceAtLeast(1),
-                    )
-                }
+    private fun decodeBoundedBitmap(uri: android.net.Uri): android.graphics.Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        ImageDecoder.decodeBitmap(
+            ImageDecoder.createSource(contentResolver, uri),
+        ) { decoder, info, _ ->
+            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            decoder.isMutableRequired = true
+            val longer = maxOf(info.size.width, info.size.height)
+            if (longer > MAX_IMPORT_DIMEN) {
+                val scale = MAX_IMPORT_DIMEN.toFloat() / longer
+                decoder.setTargetSize(
+                    (info.size.width * scale).toInt().coerceAtLeast(1),
+                    (info.size.height * scale).toInt().coerceAtLeast(1),
+                )
             }
-        } else {
-            // Pre-P: read bounds first, then decode with an inSampleSize so the full-res
-            // bitmap is never materialized.
-            val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-            contentResolver.openInputStream(uri)?.use {
-                android.graphics.BitmapFactory.decodeStream(it, null, bounds)
-            }
-            var sample = 1
-            val longer = maxOf(bounds.outWidth, bounds.outHeight)
-            while (longer / sample > MAX_IMPORT_DIMEN) sample *= 2
-            val opts = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
-            (
-                contentResolver.openInputStream(uri)?.use {
-                    android.graphics.BitmapFactory.decodeStream(it, null, opts)
-                }
-                ) ?: error("Cannot decode image")
         }
+    } else {
+        // Pre-P: read bounds first, then decode with an inSampleSize so the full-res
+        // bitmap is never materialized.
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        contentResolver.openInputStream(uri)?.use {
+            android.graphics.BitmapFactory.decodeStream(it, null, bounds)
+        }
+        var sample = 1
+        val longer = maxOf(bounds.outWidth, bounds.outHeight)
+        while (longer / sample > MAX_IMPORT_DIMEN) sample *= 2
+        val opts = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
+        (
+            contentResolver.openInputStream(uri)?.use {
+                android.graphics.BitmapFactory.decodeStream(it, null, opts)
+            }
+            ) ?: error("Cannot decode image")
     }
 
     /**
@@ -287,43 +283,41 @@ class ScannerActivity : ThemedActivity() {
      * so callers can wait before finishing. A SubscriptionFoundException opens the
      * subscription import flow instead.
      */
-    private suspend fun importText(text: String): Int {
-        return try {
-            val results = RawUpdater.parseRaw(text)
-            if (!results.isNullOrEmpty()) {
-                val currentGroupId = DataStore.selectedGroupForImport()
-                if (DataStore.selectedGroup != currentGroupId) {
-                    DataStore.selectedGroup = currentGroupId
-                }
-                var n = 0
-                for (profile in results) {
-                    ProfileManager.createProfile(currentGroupId, profile)
-                    n++
-                }
-                importedN.addAndGet(n)
-                n
-            } else {
-                onMainDispatcher {
-                    Toast.makeText(app, R.string.action_import_err, Toast.LENGTH_SHORT).show()
-                }
-                0
+    private suspend fun importText(text: String): Int = try {
+        val results = RawUpdater.parseRaw(text)
+        if (!results.isNullOrEmpty()) {
+            val currentGroupId = DataStore.selectedGroupForImport()
+            if (DataStore.selectedGroup != currentGroupId) {
+                DataStore.selectedGroup = currentGroupId
             }
-        } catch (e: SubscriptionFoundException) {
-            startActivity(
-                Intent(this@ScannerActivity, MainActivity::class.java).apply {
-                    action = Intent.ACTION_VIEW
-                    data = e.link.toUri()
-                },
-            )
-            0
-        } catch (e: Throwable) {
-            Logs.w(e)
+            var n = 0
+            for (profile in results) {
+                ProfileManager.createProfile(currentGroupId, profile)
+                n++
+            }
+            importedN.addAndGet(n)
+            n
+        } else {
             onMainDispatcher {
-                val msg = getString(R.string.action_import_err) + "\n" + e.readableMessage
-                Toast.makeText(app, msg, Toast.LENGTH_SHORT).show()
+                Toast.makeText(app, R.string.action_import_err, Toast.LENGTH_SHORT).show()
             }
             0
         }
+    } catch (e: SubscriptionFoundException) {
+        startActivity(
+            Intent(this@ScannerActivity, MainActivity::class.java).apply {
+                action = Intent.ACTION_VIEW
+                data = e.link.toUri()
+            },
+        )
+        0
+    } catch (e: Throwable) {
+        Logs.w(e)
+        onMainDispatcher {
+            val msg = getString(R.string.action_import_err) + "\n" + e.readableMessage
+            Toast.makeText(app, msg, Toast.LENGTH_SHORT).show()
+        }
+        0
     }
 
     override fun onDestroy() {

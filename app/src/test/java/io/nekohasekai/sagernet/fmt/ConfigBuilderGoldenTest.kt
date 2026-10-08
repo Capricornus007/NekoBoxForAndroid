@@ -475,16 +475,14 @@ class ConfigBuilderGoldenTest {
         }
     }
 
-    private fun build(profile: ProxyEntity, forTest: Boolean = false, forExport: Boolean = false) =
-        ConfigBuilderTestEnv.io { buildConfig(profile, forTest = forTest, forExport = forExport) }
+    private fun build(profile: ProxyEntity, forTest: Boolean = false, forExport: Boolean = false) = ConfigBuilderTestEnv.io { buildConfig(profile, forTest = forTest, forExport = forExport) }
 
     private fun assertResultMaps(result: ConfigBuildResult, profile: ProxyEntity) {
         assertTrue(result.profileTagMap.containsKey(profile.id))
         assertTrue(result.trafficMap.values.flatten().any { it.id == profile.id })
     }
 
-    private fun outbound(root: JSONObject, type: String) =
-        objects(root.getJSONArray("outbounds")).single { it.optString("type") == type }
+    private fun outbound(root: JSONObject, type: String) = objects(root.getJSONArray("outbounds")).single { it.optString("type") == type }
 
     private fun objects(array: JSONArray) = (0 until array.length()).map(array::getJSONObject)
 

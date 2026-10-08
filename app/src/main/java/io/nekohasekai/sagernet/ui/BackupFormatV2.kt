@@ -146,9 +146,7 @@ internal object BackupFormatV2 {
         value = decodeBytes(json.getString("value"))
     }
 
-    private fun encodeBytes(bytes: ByteArray): String {
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
-    }
+    private fun encodeBytes(bytes: ByteArray): String = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
 
     private fun decodeBytes(text: String): ByteArray = Base64.getUrlDecoder().decode(text)
 
@@ -156,15 +154,9 @@ internal object BackupFormatV2 {
         put(name, value ?: JSONObject.NULL)
     }
 
-    private fun JSONObject.optNullableString(name: String): String? {
-        return if (!has(name) || isNull(name)) null else getString(name)
-    }
+    private fun JSONObject.optNullableString(name: String): String? = if (!has(name) || isNull(name)) null else getString(name)
 
-    private fun <T> JSONArray.mapObjects(transform: (JSONObject) -> T): List<T> {
-        return (0 until length()).map { index -> transform(getJSONObject(index)) }
-    }
+    private fun <T> JSONArray.mapObjects(transform: (JSONObject) -> T): List<T> = (0 until length()).map { index -> transform(getJSONObject(index)) }
 
-    private fun JSONArray.mapStrings(): List<String> {
-        return (0 until length()).map { index -> getString(index) }
-    }
+    private fun JSONArray.mapStrings(): List<String> = (0 until length()).map { index -> getString(index) }
 }

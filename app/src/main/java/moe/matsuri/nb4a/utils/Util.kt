@@ -97,21 +97,13 @@ object Util {
         return pageSize in 512..65536 && pageSize and (pageSize - 1) == 0
     }
 
-    fun b64EncodeUrlSafe(s: String): String {
-        return b64EncodeUrlSafe(s.toByteArray())
-    }
+    fun b64EncodeUrlSafe(s: String): String = b64EncodeUrlSafe(s.toByteArray())
 
-    fun b64EncodeUrlSafe(b: ByteArray): String {
-        return String(Base64.encode(b, Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE))
-    }
+    fun b64EncodeUrlSafe(b: ByteArray): String = String(Base64.encode(b, Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE))
 
-    fun b64EncodeOneLine(b: ByteArray): String {
-        return String(Base64.encode(b, Base64.NO_WRAP))
-    }
+    fun b64EncodeOneLine(b: ByteArray): String = String(Base64.encode(b, Base64.NO_WRAP))
 
-    fun b64EncodeDefault(b: ByteArray): String {
-        return String(Base64.encode(b, Base64.DEFAULT))
-    }
+    fun b64EncodeDefault(b: ByteArray): String = String(Base64.encode(b, Base64.DEFAULT))
 
     fun b64Decode(b: String): ByteArray {
         var ret: ByteArray? = null
@@ -278,9 +270,7 @@ object Util {
     @SuppressLint("SimpleDateFormat")
     val sdf1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
-    fun timeStamp2Text(t: Long): String {
-        return sdf1.format(Date(t))
-    }
+    fun timeStamp2Text(t: Long): String = sdf1.format(Date(t))
 
     fun tryToSetField(o: Any, name: String, value: Any) {
         try {

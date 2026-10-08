@@ -348,12 +348,10 @@ private fun StandardV2RayBean.applySingBoxMux(json: JSONObject) {
 // Helpers
 // ---------------------------------------------------------------------------
 
-private fun parseSingBoxPacketEncoding(value: String?): Int {
-    return when (value) {
-        "packetaddr" -> 1
-        "xudp" -> 2
-        else -> 0
-    }
+private fun parseSingBoxPacketEncoding(value: String?): Int = when (value) {
+    "packetaddr" -> 1
+    "xudp" -> 2
+    else -> 0
 }
 
 /** server_port 或 server_ports -> HysteriaBean.serverPorts 格式（"443" 或 "8080,9000-9100"） */
@@ -381,10 +379,8 @@ private fun JSONArray.toStringList(): List<String> {
 }
 
 /** sing-box HTTPHeader 的值可能是字符串或字符串数组 */
-private fun JSONObject.optHeaderValue(name: String): String? {
-    return when (val value = opt(name)) {
-        is String -> value
-        is JSONArray -> value.toStringList().joinToString("\n")
-        else -> null
-    }
+private fun JSONObject.optHeaderValue(name: String): String? = when (val value = opt(name)) {
+    is String -> value
+    is JSONArray -> value.toStringList().joinToString("\n")
+    else -> null
 }

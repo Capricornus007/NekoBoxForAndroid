@@ -75,28 +75,32 @@ object PluginManager {
         return when (pluginId) {
             // Hysteria v1 resolves through the external plugin only; its bundled sidecar was removed.
             "mieru-plugin" -> soIfExist("libmieru.so")
+
             "masterdnsvpn-plugin" -> soIfExist("libmasterdnsvpn.so")
+
             "olcrtc-plugin" -> soIfExist("libolcrtc.so")
+
             "naive-plugin" -> soIfExist("libnaive.so")
+
             else -> null
         }
     }
 
-    private fun initNativeFaster(provider: ProviderInfo): String? {
-        return provider.loadString(Plugins.METADATA_KEY_EXECUTABLE_PATH)
-            ?.let { relativePath ->
-                File(provider.applicationInfo.nativeLibraryDir).resolve(relativePath).apply {
-                    check(canExecute())
-                }.absolutePath
-            }
-    }
+    private fun initNativeFaster(provider: ProviderInfo): String? = provider.loadString(Plugins.METADATA_KEY_EXECUTABLE_PATH)
+        ?.let { relativePath ->
+            File(provider.applicationInfo.nativeLibraryDir).resolve(relativePath).apply {
+                check(canExecute())
+            }.absolutePath
+        }
 
     fun ComponentInfo.loadString(key: String) = when (val value = metaData.get(key)) {
         is String -> value
+
         is Int -> SagerNet.application.packageManager.getResourcesForApplication(applicationInfo)
             .getString(value)
 
         null -> null
+
         else -> error("meta-data $key has invalid type ${value.javaClass}")
     }
 }

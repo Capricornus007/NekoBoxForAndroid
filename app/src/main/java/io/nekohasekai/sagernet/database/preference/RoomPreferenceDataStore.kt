@@ -474,20 +474,15 @@ open class RoomPreferenceDataStore(
 
     // ---- getters ---------------------------------------------------------------------------
 
-    fun getBoolean(key: String): Boolean? =
-        if (cached) cachedRead(key) { (it as? CachedValue.Bool)?.v } else kvPairDao[key]?.boolean
+    fun getBoolean(key: String): Boolean? = if (cached) cachedRead(key) { (it as? CachedValue.Bool)?.v } else kvPairDao[key]?.boolean
 
-    fun getFloat(key: String): Float? =
-        if (cached) cachedRead(key) { (it as? CachedValue.Flt)?.v } else kvPairDao[key]?.float
+    fun getFloat(key: String): Float? = if (cached) cachedRead(key) { (it as? CachedValue.Flt)?.v } else kvPairDao[key]?.float
 
-    fun getInt(key: String): Int? =
-        if (cached) cachedRead(key) { (it as? CachedValue.Lng)?.v?.toInt() } else kvPairDao[key]?.long?.toInt()
+    fun getInt(key: String): Int? = if (cached) cachedRead(key) { (it as? CachedValue.Lng)?.v?.toInt() } else kvPairDao[key]?.long?.toInt()
 
-    fun getLong(key: String): Long? =
-        if (cached) cachedRead(key) { (it as? CachedValue.Lng)?.v } else kvPairDao[key]?.long
+    fun getLong(key: String): Long? = if (cached) cachedRead(key) { (it as? CachedValue.Lng)?.v } else kvPairDao[key]?.long
 
-    fun getString(key: String): String? =
-        if (cached) cachedRead(key) { (it as? CachedValue.Str)?.v } else kvPairDao[key]?.string
+    fun getString(key: String): String? = if (cached) cachedRead(key) { (it as? CachedValue.Str)?.v } else kvPairDao[key]?.string
 
     fun getStringSet(key: String): Set<String>? = if (cached) {
         cachedRead(

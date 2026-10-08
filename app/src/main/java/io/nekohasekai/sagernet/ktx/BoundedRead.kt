@@ -7,8 +7,7 @@ import java.io.InputStream
 /** Shared cap for untrusted imported/downloaded content. Mirrors the Clash YAML codePointLimit. */
 const val MAX_IMPORT_BYTES: Long = 10L * 1024 * 1024 // 10 MiB
 
-class ImportTooLargeException(limit: Long) :
-    IOException("Imported content exceeds the $limit-byte limit")
+class ImportTooLargeException(limit: Long) : IOException("Imported content exceeds the $limit-byte limit")
 
 /** Read at most [limit] bytes; throw [ImportTooLargeException] if the stream is larger. */
 fun InputStream.readBytesBounded(limit: Long = MAX_IMPORT_BYTES): ByteArray {
@@ -26,5 +25,4 @@ fun InputStream.readBytesBounded(limit: Long = MAX_IMPORT_BYTES): ByteArray {
 }
 
 /** Read at most [limit] bytes and decode as UTF-8. */
-fun InputStream.readTextBounded(limit: Long = MAX_IMPORT_BYTES): String =
-    readBytesBounded(limit).toString(Charsets.UTF_8)
+fun InputStream.readTextBounded(limit: Long = MAX_IMPORT_BYTES): String = readBytesBounded(limit).toString(Charsets.UTF_8)

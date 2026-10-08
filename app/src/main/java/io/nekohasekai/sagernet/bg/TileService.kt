@@ -12,7 +12,9 @@ import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import android.service.quicksettings.TileService as BaseTileService
 
 @RequiresApi(24)
-class TileService : BaseTileService(), SagerConnection.Callback {
+class TileService :
+    BaseTileService(),
+    SagerConnection.Callback {
     private val iconIdle by lazy { Icon.createWithResource(this, R.drawable.ic_service_idle) }
     private val iconBusy by lazy { Icon.createWithResource(this, R.drawable.ic_service_busy) }
     private val iconConnected by lazy {
@@ -21,8 +23,7 @@ class TileService : BaseTileService(), SagerConnection.Callback {
     private var tapPending = false
 
     private val connection = SagerConnection(SagerConnection.CONNECTION_ID_TILE)
-    override fun stateChanged(state: BaseService.State, profileName: String?, msg: String?) =
-        updateTile(state, profileName)
+    override fun stateChanged(state: BaseService.State, profileName: String?, msg: String?) = updateTile(state, profileName)
 
     override fun onServiceConnected(service: ISagerNetService) {
         updateTile(BaseService.State.values()[service.state], service.profileName)
@@ -68,6 +69,7 @@ class TileService : BaseTileService(), SagerConnection.Callback {
             label = null
             when (serviceState) {
                 BaseService.State.Idle -> error("serviceState")
+
                 BaseService.State.Connecting -> {
                     icon = iconBusy
                     state = Tile.STATE_ACTIVE

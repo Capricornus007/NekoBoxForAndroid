@@ -69,10 +69,12 @@ inline fun <reified T> Context.unwrap(): T {
 
 inline fun <T> Iterable<T>.forEachTry(action: (T) -> Unit) {
     var result: Exception? = null
-    for (element in this) try {
-        action(element)
-    } catch (e: Exception) {
-        if (result == null) result = e else result.addSuppressed(e)
+    for (element in this) {
+        try {
+            action(element)
+        } catch (e: Exception) {
+            if (result == null) result = e else result.addSuppressed(e)
+        }
     }
     if (result != null) {
         throw result
@@ -96,17 +98,15 @@ private val getInt by lazy {
 }
 val FileDescriptor.int get() = getInt.invoke(this) as Int
 
-suspend fun <T> HttpURLConnection.useCancellable(block: suspend HttpURLConnection.() -> T): T {
-    return suspendCancellableCoroutine { cont ->
-        cont.invokeOnCancellation {
-            if (Build.VERSION.SDK_INT >= 26) disconnect() else GlobalScope.launch(Dispatchers.IO) { disconnect() }
-        }
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                cont.resume(block())
-            } catch (e: Throwable) {
-                cont.resumeWithException(e)
-            }
+suspend fun <T> HttpURLConnection.useCancellable(block: suspend HttpURLConnection.() -> T): T = suspendCancellableCoroutine { cont ->
+    cont.invokeOnCancellation {
+        if (Build.VERSION.SDK_INT >= 26) disconnect() else GlobalScope.launch(Dispatchers.IO) { disconnect() }
+    }
+    GlobalScope.launch(Dispatchers.IO) {
+        try {
+            cont.resume(block())
+        } catch (e: Throwable) {
+            cont.resumeWithException(e)
         }
     }
 }
@@ -171,17 +171,16 @@ private val parseNumericAddress by lazy {
     }
 }
 
-fun String?.parseNumericAddress(): InetAddress? =
-    Os.inet_pton(OsConstants.AF_INET, this) ?: Os.inet_pton(OsConstants.AF_INET6, this)?.let {
-        if (Build.VERSION.SDK_INT >= 29) {
-            it
-        } else {
-            parseNumericAddress.invoke(
-                null,
-                this,
-            ) as InetAddress
-        }
+fun String?.parseNumericAddress(): InetAddress? = Os.inet_pton(OsConstants.AF_INET, this) ?: Os.inet_pton(OsConstants.AF_INET6, this)?.let {
+    if (Build.VERSION.SDK_INT >= 29) {
+        it
+    } else {
+        parseNumericAddress.invoke(
+            null,
+            this,
+        ) as InetAddress
     }
+}
 
 @JvmOverloads
 fun DialogFragment.showAllowingStateLoss(fragmentManager: FragmentManager, tag: String? = null) {
@@ -193,13 +192,9 @@ fun String.pathSafe(): String {
     return URLEncoder.encode(this, "UTF-8")
 }
 
-fun String.urlSafe(): String {
-    return URLEncoder.encode(this, "UTF-8").replace("+", "%20")
-}
+fun String.urlSafe(): String = URLEncoder.encode(this, "UTF-8").replace("+", "%20")
 
-fun String.unUrlSafe(): String {
-    return NGUtil.urlDecode(this)
-}
+fun String.unUrlSafe(): String = NGUtil.urlDecode(this)
 
 fun RecyclerView.scrollTo(index: Int, force: Boolean = false) {
     if (force) {
@@ -214,9 +209,7 @@ fun RecyclerView.scrollTo(index: Int, force: Boolean = false) {
                     targetPosition = index
                 }
 
-                override fun getVerticalSnapPreference(): Int {
-                    return SNAP_TO_START
-                }
+                override fun getVerticalSnapPreference(): Int = SNAP_TO_START
             })
         } catch (ignored: IllegalArgumentException) {
         }
@@ -243,13 +236,9 @@ fun View.crossFadeFrom(other: View) {
     }).duration = shortAnimTime
 }
 
-fun Context.getColour(@ColorRes colorRes: Int): Int {
-    return ContextCompat.getColor(this, colorRes)
-}
+fun Context.getColour(@ColorRes colorRes: Int): Int = ContextCompat.getColor(this, colorRes)
 
-fun Context.getColorAttr(@AttrRes resId: Int): Int {
-    return MaterialColors.getColor(this, resId, 0)
-}
+fun Context.getColorAttr(@AttrRes resId: Int): Int = MaterialColors.getColor(this, resId, 0)
 
 val isExpert: Boolean by lazy { BuildConfig.DEBUG || DataStore.isExpert }
 const val isOss = BuildConfig.FLAVOR == "oss"

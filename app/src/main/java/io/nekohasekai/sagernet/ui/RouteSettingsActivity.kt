@@ -104,9 +104,7 @@ class RouteSettingsActivity(
 
     private lateinit var editConfigPreference: EditConfigPreference
 
-    fun needSave(): Boolean {
-        return DataStore.dirty
-    }
+    fun needSave(): Boolean = DataStore.dirty
 
     fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.route_preferences)
@@ -183,9 +181,7 @@ class RouteSettingsActivity(
         }
     }
 
-    fun displayPreferenceDialog(preference: Preference): Boolean {
-        return false
-    }
+    fun displayPreferenceDialog(preference: Preference): Boolean = false
 
     class UnsavedChangesDialogFragment : AlertDialogFragment<Empty, Empty>() {
         override fun AlertDialog.Builder.prepare(listener: DialogInterface.OnClickListener) {

@@ -37,9 +37,7 @@ import org.json.JSONObject
 
 // JSON & Base64
 
-fun JSONObject.toStringPretty(): String {
-    return gson.toJson(JsonParser.parseString(this.toString()))
-}
+fun JSONObject.toStringPretty(): String = gson.toJson(JsonParser.parseString(this.toString()))
 
 inline fun <reified T : Any> JSONArray.filterIsInstance(): List<T> {
     val list = mutableListOf<T>()
@@ -89,12 +87,10 @@ fun JSONObject.getStr(name: String): String? {
     }
 }
 
-fun JSONObject.getBool(name: String): Boolean? {
-    return try {
-        getBoolean(name)
-    } catch (ignored: Exception) {
-        null
-    }
+fun JSONObject.getBool(name: String): Boolean? = try {
+    getBoolean(name)
+} catch (ignored: Exception) {
+    null
 }
 
 /**
@@ -120,28 +116,22 @@ fun JSONObject.getTriStateBool(name: String): Boolean? = when (val value = opt(n
 }
 
 // name collision, nya
-fun JSONObject.getIntNya(name: String): Int? {
-    return try {
-        getInt(name)
-    } catch (ignored: Exception) {
-        null
-    }
+fun JSONObject.getIntNya(name: String): Int? = try {
+    getInt(name)
+} catch (ignored: Exception) {
+    null
 }
 
-fun String.decodeBase64UrlSafe(): String {
-    return String(Util.b64Decode(this))
-}
+fun String.decodeBase64UrlSafe(): String = String(Util.b64Decode(this))
 
 // Sub
 
 class SubscriptionFoundException(val link: String) : RuntimeException()
 
-fun String.linesNoComments(): List<String> {
-    return removePrefix("\uFEFF")
-        .split('\n')
-        .map { it.trim() }
-        .filterNot { it.startsWith("#") || it.isEmpty() }
-}
+fun String.linesNoComments(): List<String> = removePrefix("\uFEFF")
+    .split('\n')
+    .map { it.trim() }
+    .filterNot { it.startsWith("#") || it.isEmpty() }
 
 // 「代理證據」＝有帳號密碼、端口不是協定預設值、或自帶查詢參數。面板習慣在訂閱末尾
 // 放自己的官網／客服連結（https://panel.example/），那種網址路徑剛好是 "/"，而

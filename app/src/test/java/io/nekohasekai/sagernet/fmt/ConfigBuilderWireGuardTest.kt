@@ -143,8 +143,7 @@ class ConfigBuilderWireGuardTest {
         assertTopologyReferencesResolve(config)
     }
 
-    private fun node(config: JsonObject, section: String, tag: String) =
-        config.getAsJsonArray(section).map { it.asJsonObject }.single { it.get("tag").asString == tag }
+    private fun node(config: JsonObject, section: String, tag: String) = config.getAsJsonArray(section).map { it.asJsonObject }.single { it.get("tag").asString == tag }
 
     // 拓撲完整性：群組成員、endpoint 的 detour 與 route.final 引用的 tag 必須真的存在，
     // 否則內核會在啟動階段整份配置打回。

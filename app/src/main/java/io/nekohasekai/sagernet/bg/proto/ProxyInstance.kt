@@ -12,8 +12,7 @@ class ProxyInstance(
     profile: ProxyEntity,
     var service: BaseService.Interface? = null,
     initialDisplayProfileName: String = profile.displayName(),
-) :
-    BoxInstance(profile) {
+) : BoxInstance(profile) {
 
     var notTmp = true
 

@@ -64,18 +64,14 @@ abstract class BoxInstance(
         recoveryEnabled = enableOlcrtcRecovery,
     )
 
-    fun isInitialized(): Boolean {
-        return ::config.isInitialized && ::box.isInitialized
-    }
+    fun isInitialized(): Boolean = ::config.isInitialized && ::box.isInitialized
 
     // config 是 lateinit：核心還沒起就讀它會拋 UninitializedPropertyAccessException。
     // 硬關機路徑（persistStats）與選節點回調都可能落在這個時機，呼叫端一律走這個 nullable 版。
     val safeConfig: ConfigBuildResult?
         get() = if (::config.isInitialized) config else null
 
-    protected fun initPlugin(name: String): PluginManager.InitResult {
-        return pluginPath.getOrPut(name) { PluginManager.init(name)!! }
-    }
+    protected fun initPlugin(name: String): PluginManager.InitResult = pluginPath.getOrPut(name) { PluginManager.init(name)!! }
 
     protected open fun buildConfig() {
         config = buildConfig(profile)
@@ -374,38 +370,37 @@ abstract class BoxInstance(
         }
     }
 
-    private suspend fun pendingExternalPorts(ports: Collection<Int>, timeoutMillis: Long) =
-        withContext(Dispatchers.IO) {
-            val deadline = SystemClock.elapsedRealtime() + timeoutMillis
-            val pending = ports.toMutableSet()
-            while (
-                pending.isNotEmpty() &&
-                SystemClock.elapsedRealtime() < deadline &&
-                processes.isActive
-            ) {
-                ensureActive()
-                if (!processes.isActive) break
-                val iterator = pending.iterator()
-                while (iterator.hasNext()) {
-                    val port = iterator.next()
-                    val readyMarker = olcrtcReadyMarkers[port]
-                    if (!readinessMarkerSatisfied(readyMarker != null, readyMarker?.isFile == true)) continue
-                    try {
-                        Socket().use {
-                            it.connect(InetSocketAddress(LOCALHOST, port), 100)
-                        }
-                        iterator.remove()
-                    } catch (_: IOException) {
-                        // not ready yet
+    private suspend fun pendingExternalPorts(ports: Collection<Int>, timeoutMillis: Long) = withContext(Dispatchers.IO) {
+        val deadline = SystemClock.elapsedRealtime() + timeoutMillis
+        val pending = ports.toMutableSet()
+        while (
+            pending.isNotEmpty() &&
+            SystemClock.elapsedRealtime() < deadline &&
+            processes.isActive
+        ) {
+            ensureActive()
+            if (!processes.isActive) break
+            val iterator = pending.iterator()
+            while (iterator.hasNext()) {
+                val port = iterator.next()
+                val readyMarker = olcrtcReadyMarkers[port]
+                if (!readinessMarkerSatisfied(readyMarker != null, readyMarker?.isFile == true)) continue
+                try {
+                    Socket().use {
+                        it.connect(InetSocketAddress(LOCALHOST, port), 100)
                     }
-                }
-                if (pending.isNotEmpty()) {
-                    if (!processes.isActive) break
-                    delay(50)
+                    iterator.remove()
+                } catch (_: IOException) {
+                    // not ready yet
                 }
             }
-            pending
+            if (pending.isNotEmpty()) {
+                if (!processes.isActive) break
+                delay(50)
+            }
         }
+        pending
+    }
 
     private suspend fun awaitExternalPortReady(port: Int, timeoutMillis: Long) {
         if (pendingExternalPorts(listOf(port), timeoutMillis).isNotEmpty()) {

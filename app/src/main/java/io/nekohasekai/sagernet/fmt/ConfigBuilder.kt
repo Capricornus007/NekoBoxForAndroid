@@ -164,8 +164,7 @@ internal fun buildUrlTestOutbound(memberTags: List<String>) = Outbound_URLTestOp
     tolerance = 50
 }
 
-private fun endpointTag(value: Any?): String? =
-    (value as? Map<*, *>)?.get("tag")?.toString()?.takeIf { it.isNotBlank() }
+private fun endpointTag(value: Any?): String? = (value as? Map<*, *>)?.get("tag")?.toString()?.takeIf { it.isNotBlank() }
 
 private fun mergeEndpointList(existing: List<*>, incoming: List<*>, prependNew: Boolean = false): MutableList<Any?> {
     val result = existing.toMutableList()
@@ -244,9 +243,7 @@ class ConfigBuildResult(
     data class TailscaleEndpoint(val tag: String, val waitForExitNode: Boolean)
 }
 
-private fun sanitizeDnsEntry(value: String): String {
-    return value.filterNot { it.isISOControl() }.trim()
-}
+private fun sanitizeDnsEntry(value: String): String = value.filterNot { it.isISOControl() }.trim()
 
 // Validate a hosts address token strictly enough for sing-box's netip-based
 // parser: the app-wide isIpAddress() regex is looser (it allows IPv4 leading
@@ -518,14 +515,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     // v6 不通的网络里测速假 err（节点实际可用），反之假成功。
     val ipv6Mode = DataStore.ipv6Mode
 
-    fun genDomainStrategy(noAsIs: Boolean): String {
-        return when {
-            !noAsIs -> ""
-            ipv6Mode == IPv6Mode.DISABLE -> "ipv4_only"
-            ipv6Mode == IPv6Mode.PREFER -> "prefer_ipv6"
-            ipv6Mode == IPv6Mode.ONLY -> "ipv6_only"
-            else -> "prefer_ipv4"
-        }
+    fun genDomainStrategy(noAsIs: Boolean): String = when {
+        !noAsIs -> ""
+        ipv6Mode == IPv6Mode.DISABLE -> "ipv4_only"
+        ipv6Mode == IPv6Mode.PREFER -> "prefer_ipv6"
+        ipv6Mode == IPv6Mode.ONLY -> "ipv6_only"
+        else -> "prefer_ipv4"
     }
 
     return MyOptions().apply {
@@ -969,6 +964,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
                         is ByeDPIBean ->
                             buildSingBoxOutboundByeDPIBean(bean)
+
                         is TailscaleBean -> {
                             chainTailscaleEndpoints[proxyEntity.id] =
                                 ConfigBuildResult.TailscaleEndpoint(tagOut, bean.exitNode!!.isNotBlank())
@@ -1030,6 +1026,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                             is HysteriaBean -> {
                                 if (bean.protocolVersion == 1) "hysteria-plugin" else "hysteria2-plugin"
                             }
+
                             else -> ""
                         }
                         if (Plugins.isUsingMatsuriExe(pluginId)) {
@@ -1397,23 +1394,21 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         protocol = rule.protocol.listByLineOrComma()
                     }
 
-                    fun makeDnsRuleObj(): DNSRule_DefaultOptions {
-                        return DNSRule_DefaultOptions().apply {
-                            if (uidList.isNotEmpty()) user_id = uidList
-                            domainList?.let { makeSingBoxRule(it) }
+                    fun makeDnsRuleObj(): DNSRule_DefaultOptions = DNSRule_DefaultOptions().apply {
+                        if (uidList.isNotEmpty()) user_id = uidList
+                        domainList?.let { makeSingBoxRule(it) }
 
-                            val nonIpRulesets = mutableListOf<String>()
-                            if (rule_set != null && rulesetTags.isNotEmpty()) {
-                                for (tag in rule_set) {
-                                    val tagInfo = rulesetTags.find { it.first == tag }
-                                    if (tag.startsWith("ruleset-") && tagInfo != null && !tagInfo.second) {
-                                        nonIpRulesets.add(tag)
-                                    }
+                        val nonIpRulesets = mutableListOf<String>()
+                        if (rule_set != null && rulesetTags.isNotEmpty()) {
+                            for (tag in rule_set) {
+                                val tagInfo = rulesetTags.find { it.first == tag }
+                                if (tag.startsWith("ruleset-") && tagInfo != null && !tagInfo.second) {
+                                    nonIpRulesets.add(tag)
                                 }
                             }
-                            if (nonIpRulesets.isNotEmpty()) {
-                                rule_set = nonIpRulesets
-                            }
+                        }
+                        if (nonIpRulesets.isNotEmpty()) {
+                            rule_set = nonIpRulesets
                         }
                     }
 
@@ -1540,9 +1535,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             outbounds.add(fragmentOutbound)
         }
 
-        fun isExclusiveCustomHost(host: String): Boolean {
-            return hostResolvers[host]?.size == 1 && !nonCustomFinalHosts.contains(host)
-        }
+        fun isExclusiveCustomHost(host: String): Boolean = hostResolvers[host]?.size == 1 && !nonCustomFinalHosts.contains(host)
 
         bypassDNSBeans.forEach {
             var serverAddr = it.serverAddress

@@ -507,9 +507,8 @@ internal class TailscaleSessionController(
         }
     }
 
-    private fun exitResult(outcome: TailscaleExitResult) =
-        JSONObject().put("kind", "exit").put("outcome", outcome.outcome)
-            .put("savedExit", outcome.savedExit).put("errorCode", outcome.errorCode).put("message", "")
+    private fun exitResult(outcome: TailscaleExitResult) = JSONObject().put("kind", "exit").put("outcome", outcome.outcome)
+        .put("savedExit", outcome.savedExit).put("errorCode", outcome.errorCode).put("message", "")
 
     private fun finishExit(s: Session, requestId: Long, t: Target, outcome: TailscaleExitResult) {
         // Refresh both sides after success, conflict or divergence, without restarting anything.

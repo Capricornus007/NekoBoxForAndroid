@@ -59,13 +59,11 @@ fun SOCKSBean.toV2rayN(): String {
     return link
 }
 
-fun buildSingBoxOutboundSocksBean(bean: SOCKSBean): SingBoxOptions.Outbound_SocksOptions {
-    return SingBoxOptions.Outbound_SocksOptions().apply {
-        type = "socks"
-        server = bean.serverAddress
-        server_port = bean.serverPort
-        username = bean.username
-        password = bean.password
-        version = bean.protocolVersionName()
-    }
+fun buildSingBoxOutboundSocksBean(bean: SOCKSBean): SingBoxOptions.Outbound_SocksOptions = SingBoxOptions.Outbound_SocksOptions().apply {
+    type = "socks"
+    server = bean.serverAddress
+    server_port = bean.serverPort
+    username = bean.username
+    password = bean.password
+    version = bean.protocolVersionName()
 }

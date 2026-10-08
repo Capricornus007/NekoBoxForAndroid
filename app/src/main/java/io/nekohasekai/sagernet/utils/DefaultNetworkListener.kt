@@ -46,59 +46,65 @@ object DefaultNetworkListener {
         val listeners = mutableMapOf<Any, (Network?) -> Unit>()
         var network: Network? = null
         val pendingRequests = arrayListOf<NetworkMessage.Get>()
-        for (message in channel) when (message) {
-            is NetworkMessage.Start -> {
-                try {
-                    if (listeners.isEmpty()) register()
-                    listeners[message.key] = message.listener
-                    if (network != null) {
-                        message.listener(network)
-                    } else if (fallback) {
-                        message.listener(SagerNet.connectivity.activeNetwork)
+        for (message in channel) {
+            when (message) {
+                is NetworkMessage.Start -> {
+                    try {
+                        if (listeners.isEmpty()) register()
+                        listeners[message.key] = message.listener
+                        if (network != null) {
+                            message.listener(network)
+                        } else if (fallback) {
+                            message.listener(SagerNet.connectivity.activeNetwork)
+                        }
+                        message.processed.complete(Unit)
+                    } catch (error: Throwable) {
+                        val removed = listeners.remove(message.key) != null
+                        if (removed && listeners.isEmpty()) runCatching { unregister() }
+                        message.processed.completeExceptionally(error)
                     }
-                    message.processed.complete(Unit)
-                } catch (error: Throwable) {
-                    val removed = listeners.remove(message.key) != null
-                    if (removed && listeners.isEmpty()) runCatching { unregister() }
-                    message.processed.completeExceptionally(error)
                 }
-            }
-            is NetworkMessage.Get -> {
-                check(listeners.isNotEmpty()) { "Getting network without any listeners is not supported" }
-                if (network == null) {
-                    pendingRequests += message
-                } else {
-                    message.response.complete(
-                        network,
-                    )
-                }
-            }
-            is NetworkMessage.Stop -> if (listeners.isNotEmpty() && // was not empty
-                listeners.remove(message.key) != null && listeners.isEmpty()
-            ) {
-                network = null
-                unregister()
-            }
 
-            is NetworkMessage.Put -> {
-                // 诊断：夜间/飞行模式网络事件时间线（与 Go UpdateDefaultInterface 对照）
-                Logs.i("DefaultNetworkListener Put network=${message.network} listeners=${listeners.size}")
-                network = message.network
-                pendingRequests.forEach { it.response.complete(message.network) }
-                pendingRequests.clear()
-                listeners.values.forEach { it(network) }
-            }
-            is NetworkMessage.Update -> if (network == message.network) {
-                listeners.values.forEach {
-                    it(
-                        network,
-                    )
+                is NetworkMessage.Get -> {
+                    check(listeners.isNotEmpty()) { "Getting network without any listeners is not supported" }
+                    if (network == null) {
+                        pendingRequests += message
+                    } else {
+                        message.response.complete(
+                            network,
+                        )
+                    }
                 }
-            }
-            is NetworkMessage.Lost -> if (network == message.network) {
-                Logs.i("DefaultNetworkListener Lost network=${message.network} listeners=${listeners.size}")
-                network = null
-                listeners.values.forEach { it(null) }
+
+                is NetworkMessage.Stop -> if (listeners.isNotEmpty() && // was not empty
+                    listeners.remove(message.key) != null && listeners.isEmpty()
+                ) {
+                    network = null
+                    unregister()
+                }
+
+                is NetworkMessage.Put -> {
+                    // 诊断：夜间/飞行模式网络事件时间线（与 Go UpdateDefaultInterface 对照）
+                    Logs.i("DefaultNetworkListener Put network=${message.network} listeners=${listeners.size}")
+                    network = message.network
+                    pendingRequests.forEach { it.response.complete(message.network) }
+                    pendingRequests.clear()
+                    listeners.values.forEach { it(network) }
+                }
+
+                is NetworkMessage.Update -> if (network == message.network) {
+                    listeners.values.forEach {
+                        it(
+                            network,
+                        )
+                    }
+                }
+
+                is NetworkMessage.Lost -> if (network == message.network) {
+                    Logs.i("DefaultNetworkListener Lost network=${message.network} listeners=${listeners.size}")
+                    network = null
+                    listeners.values.forEach { it(null) }
+                }
             }
         }
     }
@@ -202,6 +208,12 @@ object DefaultNetworkListener {
      *
      * Source: https://android.googlesource.com/platform/frameworks/base/+/2df4c7d/services/core/java/com/android/server/ConnectivityService.java#887
      */
+    // ktlint 1.8 的 standard:annotation 要求「最後一個註解後面要換行」，而
+    // standard:curly-spacing 又要求「{ 前面不許有換行」。@RequiresApi(n) 直接貼在
+    // when 分支的 block 上會同時踩到兩條，--format 跑四轮只在這兩條之間來回、永遠收不斂。
+    // 只對這個函式關掉這兩條，保留 @RequiresApi 的原形態；要根治得把四個分支拆成本地函式，
+    // 那會改變 Android lint 對 NewApi 的判定，不混在排版修正裡做。
+    @Suppress("ktlint:standard:annotation", "ktlint:standard:curly-spacing")
     private fun register() {
         if (callbackRegistration.requiresFallback) {
             callbackRegistration.unregister {
@@ -226,21 +238,25 @@ object DefaultNetworkListener {
                             mainHandler,
                         )
                     }
+
                 in 28 until 31 ->
                     @RequiresApi(28)
                     { // we want REQUEST here instead of LISTEN
                         SagerNet.connectivity.requestNetwork(request, Callback, mainHandler)
                     }
+
                 in 26 until 28 ->
                     @RequiresApi(26)
                     {
                         SagerNet.connectivity.registerDefaultNetworkCallback(Callback, mainHandler)
                     }
+
                 in 24 until 26 ->
                     @RequiresApi(24)
                     {
                         SagerNet.connectivity.registerDefaultNetworkCallback(Callback)
                     }
+
                 else -> {
                     SagerNet.connectivity.requestNetwork(request, Callback)
                     // known bug on API 23: https://stackoverflow.com/a/33509180/2245107

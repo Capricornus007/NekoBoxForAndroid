@@ -232,6 +232,7 @@ object XhttpExtraConverter {
                                 }
                             }
                         }
+
                         "reality" -> {
                             xrayDown.optJSONObject("realitySettings")?.let { realitySettings ->
                                 convertField(realitySettings, tls, "serverName", "server_name")
@@ -337,12 +338,10 @@ object XhttpExtraConverter {
         }
     }
 
-    private fun isSingBoxFormat(json: JSONObject): Boolean {
-        return json.has("x_padding_bytes") || json.has("sc_max_each_post_bytes") ||
-            json.has("sc_min_posts_interval_ms") || json.has("sc_stream_up_server_secs") ||
-            json.has("session_id_table") || json.has("session_id_length") ||
-            json.has("download")
-    }
+    private fun isSingBoxFormat(json: JSONObject): Boolean = json.has("x_padding_bytes") || json.has("sc_max_each_post_bytes") ||
+        json.has("sc_min_posts_interval_ms") || json.has("sc_stream_up_server_secs") ||
+        json.has("session_id_table") || json.has("session_id_length") ||
+        json.has("download")
 
     /**
      * 3x-ui 把 VMess XHTTP 的 extra 欄位直接攤在分享物件上、不嵌一層 extra。
@@ -357,12 +356,10 @@ object XhttpExtraConverter {
         return out.takeIf { it.length() > 0 }
     }
 
-    private fun isXrayFormat(json: JSONObject): Boolean {
-        return json.has("xPaddingBytes") || json.has("scMaxEachPostBytes") ||
-            json.has("scMinPostsIntervalMs") || json.has("scStreamUpServerSecs") ||
-            json.has("sessionIDTable") || json.has("sessionIDLength") ||
-            json.has("downloadSettings")
-    }
+    private fun isXrayFormat(json: JSONObject): Boolean = json.has("xPaddingBytes") || json.has("scMaxEachPostBytes") ||
+        json.has("scMinPostsIntervalMs") || json.has("scStreamUpServerSecs") ||
+        json.has("sessionIDTable") || json.has("sessionIDLength") ||
+        json.has("downloadSettings")
 
     private fun convertField(from: JSONObject, to: JSONObject, fromKey: String, toKey: String) {
         if (from.has(fromKey)) {

@@ -31,6 +31,7 @@ fun parseTrojanGo(server: String): TrojanGoBean {
                         path = it
                     }
                 }
+
                 else -> {
                 }
             }
@@ -80,97 +81,96 @@ fun TrojanGoBean.toUri(): String {
     return builder.toLink("trojan-go")
 }
 
-fun TrojanGoBean.buildTrojanGoConfig(port: Int): String {
-    return JSONObject().apply {
-        put("run_type", "client")
-        put("local_addr", LOCALHOST)
-        put("local_port", port)
-        put("remote_addr", finalAddress)
-        put("remote_port", finalPort)
-        put(
-            "password",
-            JSONArray().apply {
-                put(password)
-            },
-        )
-        put("log_level", if (DataStore.logLevel > 0) 0 else 2)
+fun TrojanGoBean.buildTrojanGoConfig(port: Int): String = JSONObject().apply {
+    put("run_type", "client")
+    put("local_addr", LOCALHOST)
+    put("local_port", port)
+    put("remote_addr", finalAddress)
+    put("remote_port", finalPort)
+    put(
+        "password",
+        JSONArray().apply {
+            put(password)
+        },
+    )
+    put("log_level", if (DataStore.logLevel > 0) 0 else 2)
 //        if (Protocols.shouldEnableMux("trojan-go")) put("mux", JSONObject().apply {
 //            put("enabled", true)
 //            put("concurrency", DataStore.muxConcurrency)
 //        })
-        put(
-            "tcp",
+    put(
+        "tcp",
+        JSONObject().apply {
+            put("prefer_ipv4", DataStore.ipv6Mode <= IPv6Mode.ENABLE)
+        },
+    )
+
+    when (type) {
+        "original" -> {
+        }
+
+        "ws" -> put(
+            "websocket",
             JSONObject().apply {
-                put("prefer_ipv4", DataStore.ipv6Mode <= IPv6Mode.ENABLE)
+                put("enabled", true)
+                put("host", host)
+                put("path", path)
             },
         )
+    }
 
-        when (type) {
-            "original" -> {
-            }
-            "ws" -> put(
-                "websocket",
-                JSONObject().apply {
-                    put("enabled", true)
-                    put("host", host)
-                    put("path", path)
-                },
-            )
+    if (sni.isBlank() && finalAddress == LOCALHOST && !serverAddress.isIpAddress()) {
+        sni = serverAddress
+    }
+
+    put(
+        "ssl",
+        JSONObject().apply {
+            if (sni.isNotBlank()) put("sni", sni)
+            if (allowInsecure) put("verify", false)
+        },
+    )
+
+    when {
+        encryption == "none" -> {
         }
 
-        if (sni.isBlank() && finalAddress == LOCALHOST && !serverAddress.isIpAddress()) {
-            sni = serverAddress
-        }
-
-        put(
-            "ssl",
+        encryption.startsWith("ss;") -> put(
+            "shadowsocks",
             JSONObject().apply {
-                if (sni.isNotBlank()) put("sni", sni)
-                if (allowInsecure) put("verify", false)
+                put("enabled", true)
+                put("method", encryption.substringAfter(";").substringBefore(":"))
+                put("password", encryption.substringAfter(":"))
             },
         )
+    }
+}.toStringPretty()
 
-        when {
-            encryption == "none" -> {
-            }
-            encryption.startsWith("ss;") -> put(
-                "shadowsocks",
-                JSONObject().apply {
-                    put("enabled", true)
-                    put("method", encryption.substringAfter(";").substringBefore(":"))
-                    put("password", encryption.substringAfter(":"))
-                },
-            )
+fun JSONObject.parseTrojanGo(): TrojanGoBean = TrojanGoBean().applyDefaultValues().apply {
+    serverAddress = optString("remote_addr", serverAddress)
+    serverPort = optInt("remote_port", serverPort)
+    when (val pass = get("password")) {
+        is String -> {
+            password = pass
         }
-    }.toStringPretty()
-}
 
-fun JSONObject.parseTrojanGo(): TrojanGoBean {
-    return TrojanGoBean().applyDefaultValues().apply {
-        serverAddress = optString("remote_addr", serverAddress)
-        serverPort = optInt("remote_port", serverPort)
-        when (val pass = get("password")) {
-            is String -> {
-                password = pass
-            }
-            is List<*> -> {
-                password = pass[0] as String
-            }
+        is List<*> -> {
+            password = pass[0] as String
         }
-        optJSONArray("ssl")?.apply {
-            sni = optString("sni", sni)
+    }
+    optJSONArray("ssl")?.apply {
+        sni = optString("sni", sni)
+    }
+    optJSONArray("websocket")?.apply {
+        if (optBoolean("enabled", false)) {
+            type = "ws"
+            host = optString("host", host)
+            path = optString("path", path)
         }
-        optJSONArray("websocket")?.apply {
-            if (optBoolean("enabled", false)) {
-                type = "ws"
-                host = optString("host", host)
-                path = optString("path", path)
-            }
-        }
-        optJSONArray("shadowsocks")?.apply {
-            if (optBoolean("enabled", false)) {
-                encryption = "ss;${optString("method", "")}:${optString("password", "")}"
-            }
+    }
+    optJSONArray("shadowsocks")?.apply {
+        if (optBoolean("enabled", false)) {
+            encryption = "ss;${optString("method", "")}:${optString("password", "")}"
         }
     }
 }

@@ -128,9 +128,7 @@ class GroupSettingsActivity(
 
     private var isFromClipboard = false
 
-    fun needSave(): Boolean {
-        return DataStore.dirty
-    }
+    fun needSave(): Boolean = DataStore.dirty
 
     fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.group_preferences)

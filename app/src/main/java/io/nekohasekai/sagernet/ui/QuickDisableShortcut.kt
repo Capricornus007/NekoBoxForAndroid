@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  *                                                                             *
  *  Copyright (C) 2017 by Max Lv <max.c.lv@gmail.com>                          *
  *  Copyright (C) 2017 by Mygod Studio <[Email1]>  *
@@ -30,7 +30,9 @@ import io.nekohasekai.sagernet.aidl.ISagerNetService
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.SagerConnection
 
-class QuickDisableShortcut : Activity(), SagerConnection.Callback {
+class QuickDisableShortcut :
+    Activity(),
+    SagerConnection.Callback {
     private val connection = SagerConnection(SagerConnection.CONNECTION_ID_SHORTCUT)
 
     override fun onCreate(savedInstanceState: Bundle?) {

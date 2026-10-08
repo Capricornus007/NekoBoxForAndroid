@@ -42,7 +42,9 @@ class WebDAVSettingsActivity : ThemedActivity() {
         return true
     }
 
-    class WebDAVSettingsFragment : PreferenceFragmentCompat(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+    class WebDAVSettingsFragment :
+        PreferenceFragmentCompat(),
+        PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
         private var lastClickTime = 0L
         private val DEBOUNCE_TIME = 1000L // no repeated clicks allowed within 1 second
         private var isFragmentAlive = true
@@ -201,8 +203,6 @@ class WebDAVSettingsActivity : ThemedActivity() {
             }
         }
 
-        override fun onPreferenceStartFragment(caller: PreferenceFragmentCompat, pref: Preference): Boolean {
-            return false
-        }
+        override fun onPreferenceStartFragment(caller: PreferenceFragmentCompat, pref: Preference): Boolean = false
     }
 }

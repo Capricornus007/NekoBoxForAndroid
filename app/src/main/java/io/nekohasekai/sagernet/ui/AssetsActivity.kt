@@ -100,9 +100,7 @@ class AssetsActivity : ThemedActivity() {
         }).attachToRecyclerView(binding.recyclerView)
     }
 
-    override fun snackbarInternal(text: CharSequence): Snackbar {
-        return Snackbar.make(layout.coordinator, text, Snackbar.LENGTH_LONG)
-    }
+    override fun snackbarInternal(text: CharSequence): Snackbar = Snackbar.make(layout.coordinator, text, Snackbar.LENGTH_LONG)
 
     val assetNames = RuleAssets.MANAGED
 
@@ -210,17 +208,13 @@ class AssetsActivity : ThemedActivity() {
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AssetHolder {
-            return AssetHolder(LayoutAssetItemBinding.inflate(layoutInflater, parent, false))
-        }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AssetHolder = AssetHolder(LayoutAssetItemBinding.inflate(layoutInflater, parent, false))
 
         override fun onBindViewHolder(holder: AssetHolder, position: Int) {
             holder.bind(assets[position])
         }
 
-        override fun getItemCount(): Int {
-            return assets.size
-        }
+        override fun getItemCount(): Int = assets.size
 
         fun remove(index: Int) {
             assets.removeAt(index)
@@ -244,8 +238,7 @@ class AssetsActivity : ThemedActivity() {
 
     val updating = AtomicInteger()
 
-    inner class AssetHolder(val binding: LayoutAssetItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class AssetHolder(val binding: LayoutAssetItemBinding) : RecyclerView.ViewHolder(binding.root) {
         lateinit var file: File
 
         fun bind(file: File) {

@@ -194,8 +194,7 @@ object PluginTrust {
         return "$pluginId\u0000${rejection.packageName}\u0000$identity"
     }
 
-    private fun isValidPackageName(packageName: String) =
-        packageName.isNotBlank() && packageName.none { it == '|' || it == ',' || it == '\n' || it == '\r' }
+    private fun isValidPackageName(packageName: String) = packageName.isNotBlank() && packageName.none { it == '|' || it == ',' || it == '\n' || it == '\r' }
 
     private fun isValidSignerRecord(signer: SignerRecord): Boolean {
         if (signer.current.isEmpty()) return false

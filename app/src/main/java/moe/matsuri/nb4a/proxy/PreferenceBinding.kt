@@ -24,17 +24,11 @@ class PreferenceBinding(
     var cacheName = fieldName
     var disable = false
 
-    fun readStringFromCache(): String {
-        return DataStore.profileCacheStore.getString(cacheName) ?: ""
-    }
+    fun readStringFromCache(): String = DataStore.profileCacheStore.getString(cacheName) ?: ""
 
-    fun readBoolFromCache(): Boolean {
-        return DataStore.profileCacheStore.getBoolean(cacheName, false)
-    }
+    fun readBoolFromCache(): Boolean = DataStore.profileCacheStore.getBoolean(cacheName, false)
 
-    fun readIntFromCache(): Int {
-        return DataStore.profileCacheStore.getInt(cacheName, 0)
-    }
+    fun readIntFromCache(): Int = DataStore.profileCacheStore.getInt(cacheName, 0)
 
     fun readStringToIntFromCache(): Int {
         val value = DataStore.profileCacheStore.getString(cacheName)?.toIntOrNull() ?: 0
@@ -80,22 +74,26 @@ class PreferenceBinding(
                     DataStore.profileCacheStore.putString(cacheName, value)
                 }
             }
+
             Type.TextToInt -> {
                 if (value is Int) {
 //                    Logs.d("writeToCache TEXT2INT $value $cacheName -> $fieldName")
                     DataStore.profileCacheStore.putString(cacheName, value.toString())
                 }
             }
+
             Type.Int -> {
                 if (value is Int) {
                     DataStore.profileCacheStore.putInt(cacheName, value)
                 }
             }
+
             Type.Bool -> {
                 if (value is Boolean) {
                     DataStore.profileCacheStore.putBoolean(cacheName, value)
                 }
             }
+
             Type.TextToLong -> {
                 if (value is Long) {
                     DataStore.profileCacheStore.putString(cacheName, value.toString())

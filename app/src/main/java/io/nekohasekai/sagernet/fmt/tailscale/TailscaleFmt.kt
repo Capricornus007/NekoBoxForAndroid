@@ -37,8 +37,7 @@ internal fun acquireTailscaleState(ids: Collection<Long>): Closeable {
     }
 }
 
-internal fun tailscaleRestoreDirectory(profileId: Long) =
-    File(SagerNet.application.noBackupFilesDir, "tailscale-restore/$profileId")
+internal fun tailscaleRestoreDirectory(profileId: Long) = File(SagerNet.application.noBackupFilesDir, "tailscale-restore/$profileId")
 
 internal fun tailscaleStateIds(): Set<Long> = listOf("tailscale", "tailscale-restore").flatMap { name ->
     File(SagerNet.application.noBackupFilesDir, name).listFiles().orEmpty().mapNotNull { it.name.toLongOrNull() }
@@ -136,9 +135,8 @@ internal fun recoverTailscaleRestore(profileId: Long) {
     check(staging.deleteRecursively()) { failure }
 }
 
-internal fun retainsTailscaleIdentity(previous: ProxyEntity?, restored: ProxyEntity): Boolean =
-    previous?.type == ProxyEntity.TYPE_TAILSCALE && restored.type == ProxyEntity.TYPE_TAILSCALE &&
-        previous.uuid.isNotBlank() && previous.uuid == restored.uuid && previous.requireBean() == restored.requireBean()
+internal fun retainsTailscaleIdentity(previous: ProxyEntity?, restored: ProxyEntity): Boolean = previous?.type == ProxyEntity.TYPE_TAILSCALE && restored.type == ProxyEntity.TYPE_TAILSCALE &&
+    previous.uuid.isNotBlank() && previous.uuid == restored.uuid && previous.requireBean() == restored.requireBean()
 
 // Adding provenance to a legacy local node does not change or remove its credentials.
 internal fun profilesForBackup(): List<ProxyEntity> {
@@ -226,17 +224,16 @@ fun pruneTailscaleState(keep: Set<Long>? = null, profileIds: Collection<Long>? =
     }
 }
 
-fun buildSingBoxEndpointTailscaleBean(bean: TailscaleBean, profileId: Long): SingBoxOptions.Endpoint_TailscaleOptions =
-    SingBoxOptions.Endpoint_TailscaleOptions().apply {
-        type = "tailscale"
-        state_directory = tailscaleStateDirectory(profileId)
-        if (bean.authKey!!.isNotBlank()) auth_key = bean.authKey
-        if (bean.controlUrl!!.isNotBlank()) control_url = bean.controlUrl
-        if (bean.hostname!!.isNotBlank()) hostname = bean.hostname
-        if (bean.exitNode!!.isNotBlank()) {
-            exit_node = bean.exitNode
-            if (bean.exitNodeAllowLanAccess == true) exit_node_allow_lan_access = true
-        }
-        if (bean.acceptRoutes == true) accept_routes = true
-        if (bean.onlyTcp443 == true) only_tcp_443 = true
+fun buildSingBoxEndpointTailscaleBean(bean: TailscaleBean, profileId: Long): SingBoxOptions.Endpoint_TailscaleOptions = SingBoxOptions.Endpoint_TailscaleOptions().apply {
+    type = "tailscale"
+    state_directory = tailscaleStateDirectory(profileId)
+    if (bean.authKey!!.isNotBlank()) auth_key = bean.authKey
+    if (bean.controlUrl!!.isNotBlank()) control_url = bean.controlUrl
+    if (bean.hostname!!.isNotBlank()) hostname = bean.hostname
+    if (bean.exitNode!!.isNotBlank()) {
+        exit_node = bean.exitNode
+        if (bean.exitNodeAllowLanAccess == true) exit_node_allow_lan_access = true
     }
+    if (bean.acceptRoutes == true) accept_routes = true
+    if (bean.onlyTcp443 == true) only_tcp_443 = true
+}

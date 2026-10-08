@@ -12,6 +12,7 @@ internal enum class BackupArchiveFormat {
 
 internal fun encodeBackupArchive(jsonContent: String, format: BackupArchiveFormat) = when (format) {
     BackupArchiveFormat.JSON -> jsonContent.toByteArray(Charsets.UTF_8)
+
     BackupArchiveFormat.ZIP -> ByteArrayOutputStream().use { output ->
         ZipOutputStream(output).use { zip ->
             zip.setLevel(Deflater.BEST_COMPRESSION)

@@ -31,12 +31,10 @@ private enum class TrustTunnelTag(val code: Long) {
  * The official format may carry multiple server addresses, so this returns one profile per
  * address. Keeping the legacy parser means old exported links continue to work unchanged.
  */
-fun parseTrustTunnel(url: String): List<TrustTunnelBean> {
-    return if (url.startsWith(OFFICIAL_PREFIX, ignoreCase = true)) {
-        parseOfficialTrustTunnel(url)
-    } else {
-        listOf(parseLegacyTrustTunnel(url))
-    }
+fun parseTrustTunnel(url: String): List<TrustTunnelBean> = if (url.startsWith(OFFICIAL_PREFIX, ignoreCase = true)) {
+    parseOfficialTrustTunnel(url)
+} else {
+    listOf(parseLegacyTrustTunnel(url))
 }
 
 private fun parseLegacyTrustTunnel(url: String): TrustTunnelBean {
@@ -100,23 +98,31 @@ private fun parseOfficialTrustTunnel(url: String): List<TrustTunnelBean> {
                     "invalid trusttunnel version"
                 }
             }
+
             TrustTunnelTag.HOSTNAME.code -> hostname = value.requireUtf8("hostname")
+
             TrustTunnelTag.ADDRESSES.code -> addresses += value.requireUtf8("address")
+
             TrustTunnelTag.CUSTOM_SNI.code -> customSni = value.requireUtf8("custom SNI")
+
             TrustTunnelTag.USERNAME.code -> username = value.requireUtf8("username")
+
             TrustTunnelTag.PASSWORD.code -> password = value.requireUtf8("password")
+
             TrustTunnelTag.SKIP_VERIFICATION.code -> {
                 require(value.size == 1 && (value[0].toInt() == 0 || value[0].toInt() == 1)) {
                     "invalid trusttunnel verification flag"
                 }
                 allowInsecure = value[0].toInt() == 1
             }
+
             TrustTunnelTag.UPSTREAM_PROTOCOL.code -> {
                 require(value.size == 1 && (value[0].toInt() == 1 || value[0].toInt() == 2)) {
                     "invalid trusttunnel upstream protocol"
                 }
                 quic = value[0].toInt() == 2
             }
+
             TrustTunnelTag.NAME.code -> name = String(value, StandardCharsets.UTF_8)
             // Forward compatibility: unknown tags are intentionally ignored by the spec.
         }
@@ -227,24 +233,22 @@ fun TrustTunnelBean.toUri(): String {
     return builder.toLink("tt")
 }
 
-fun buildSingBoxOutboundTrustTunnelBean(bean: TrustTunnelBean): Outbound_TrustTunnelOptions {
-    return Outbound_TrustTunnelOptions().apply {
-        type = "trusttunnel"
-        server = bean.serverAddress
-        server_port = bean.serverPort
-        username = bean.username
-        password = bean.password
-        quic = bean.quic
-        quic_congestion_control = bean.quicCongestionControl
-        health_check = bean.healthCheck
+fun buildSingBoxOutboundTrustTunnelBean(bean: TrustTunnelBean): Outbound_TrustTunnelOptions = Outbound_TrustTunnelOptions().apply {
+    type = "trusttunnel"
+    server = bean.serverAddress
+    server_port = bean.serverPort
+    username = bean.username
+    password = bean.password
+    quic = bean.quic
+    quic_congestion_control = bean.quicCongestionControl
+    health_check = bean.healthCheck
 
-        tls = SingBoxOptions.OutboundTLSOptions().apply {
-            enabled = true
-            if (bean.sni.isNotBlank()) {
-                server_name = bean.sni
-            }
-            insecure = bean.allowInsecure || DataStore.globalAllowInsecure
+    tls = SingBoxOptions.OutboundTLSOptions().apply {
+        enabled = true
+        if (bean.sni.isNotBlank()) {
+            server_name = bean.sni
         }
+        insecure = bean.allowInsecure || DataStore.globalAllowInsecure
     }
 }
 
@@ -253,6 +257,7 @@ private fun normalizePinnedCertChainHash(rawHash: String?): String? {
     return when {
         certChainHash.length == 64 -> Base64.getUrlEncoder()
             .encodeToString(certChainHash.chunked(2).map { chunk -> chunk.toInt(16).toByte() }.toByteArray())
+
         else -> certChainHash.replace('/', '_').replace('+', '-')
     }
 }

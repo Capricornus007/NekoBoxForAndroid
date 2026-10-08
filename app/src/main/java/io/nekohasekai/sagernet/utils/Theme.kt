@@ -65,13 +65,6 @@ object Theme {
      *
      * @param id          one of the Theme int constants above (persisted to appTheme)
      * @param nameRes     display name string resource
-     * @param previewColor color resource for the preview swatch shown next to the name
-     */
-    /**
-     * Metadata for a theme shown in the modern named picker.
-     *
-     * @param id          one of the Theme int constants above (persisted to appTheme)
-     * @param nameRes     display name string resource
      * @param previewColor fill color for the preview swatch shown next to the name
      * @param ringColor   optional circumference-ring color; when non-zero the swatch
      *                    is drawn as [previewColor] fill + a thin [ringColor] frame.
@@ -207,7 +200,9 @@ object Theme {
 
     fun usingNightMode(): Boolean = when (DataStore.nightTheme) {
         1 -> true
+
         2 -> false
+
         else -> (app.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
             Configuration.UI_MODE_NIGHT_YES
     }

@@ -1,4 +1,4 @@
-/******************************************************************************
+/* *****************************************************************************
  * Copyright (C) 2026 by nekohasekai <contact-git@sekai.icu>                  *
  *                                                                            *
  * This program is free software: you can redistribute it and/or modify       *
@@ -126,11 +126,9 @@ fun MasterDnsVpnBean.buildMasterDnsVpnConfig(port: Int, protectPath: String): St
 }
 
 /** Resolver entries to write into the client's resolvers file (one per line). */
-fun MasterDnsVpnBean.resolverLines(): String {
-    return resolvers.split("\n", ",").map { it.trim() }
-        .filter { it.isNotEmpty() }
-        .joinToString("\n")
-}
+fun MasterDnsVpnBean.resolverLines(): String = resolvers.split("\n", ",").map { it.trim() }
+    .filter { it.isNotEmpty() }
+    .joinToString("\n")
 
 /**
  * Serializes a MasterDnsVPN profile to a shareable `masterdns://` link.

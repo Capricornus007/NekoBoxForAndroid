@@ -42,9 +42,7 @@ object Plugins {
             auth.startsWith(AUTHORITIES_PREFIX_NEKO_EXE)
     }
 
-    fun preferExePrefix(): String {
-        return AUTHORITIES_PREFIX_NEKO_EXE
-    }
+    fun preferExePrefix(): String = AUTHORITIES_PREFIX_NEKO_EXE
 
     fun isUsingMatsuriExe(pluginId: String): Boolean {
         getPlugin(pluginId)?.apply {
@@ -55,14 +53,12 @@ object Plugins {
         return false
     }
 
-    fun displayExeProvider(pkgName: String): String {
-        return if (pkgName.startsWith(AUTHORITIES_PREFIX_SEKAI_EXE)) {
-            "SagerNet"
-        } else if (pkgName.startsWith(AUTHORITIES_PREFIX_NEKO_EXE)) {
-            "Matsuri"
-        } else {
-            "Unknown"
-        }
+    fun displayExeProvider(pkgName: String): String = if (pkgName.startsWith(AUTHORITIES_PREFIX_SEKAI_EXE)) {
+        "SagerNet"
+    } else if (pkgName.startsWith(AUTHORITIES_PREFIX_NEKO_EXE)) {
+        "Matsuri"
+    } else {
+        "Unknown"
     }
 
     fun getPlugin(pluginId: String): ProviderInfo? {

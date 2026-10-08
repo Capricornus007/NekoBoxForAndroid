@@ -31,9 +31,7 @@ fun ByeDPIBean.toUri(): String {
     return builder.toLink("byedpi", appendDefaultPort = false)
 }
 
-fun buildSingBoxOutboundByeDPIBean(bean: ByeDPIBean): Outbound_ByeDPIOptions {
-    return Outbound_ByeDPIOptions().apply {
-        type = "byedpi"
-        cli = bean.cliStrategy
-    }
+fun buildSingBoxOutboundByeDPIBean(bean: ByeDPIBean): Outbound_ByeDPIOptions = Outbound_ByeDPIOptions().apply {
+    type = "byedpi"
+    cli = bean.cliStrategy
 }

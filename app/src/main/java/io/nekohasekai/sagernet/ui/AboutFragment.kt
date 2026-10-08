@@ -157,22 +157,19 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
             private val DIFF = object : DiffUtil.ItemCallback<AboutItem>() {
                 override fun areItemsTheSame(oldItem: AboutItem, newItem: AboutItem) = oldItem.text == newItem.text
 
-                override fun areContentsTheSame(oldItem: AboutItem, newItem: AboutItem) =
-                    oldItem.icon == newItem.icon &&
-                        oldItem.text == newItem.text &&
-                        oldItem.subText == newItem.subText
+                override fun areContentsTheSame(oldItem: AboutItem, newItem: AboutItem) = oldItem.icon == newItem.icon &&
+                    oldItem.text == newItem.text &&
+                    oldItem.subText == newItem.subText
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AboutViewHolder {
-            return AboutViewHolder(
-                LayoutAboutItemBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false,
-                ),
-            )
-        }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AboutViewHolder = AboutViewHolder(
+            LayoutAboutItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            ),
+        )
 
         override fun onBindViewHolder(holder: AboutViewHolder, position: Int) {
             holder.bind(getItem(position))

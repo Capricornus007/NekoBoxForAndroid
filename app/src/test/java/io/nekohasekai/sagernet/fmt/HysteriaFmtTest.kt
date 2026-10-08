@@ -46,8 +46,7 @@ class HysteriaFmtTest {
         initializeDefaultValues()
     }
 
-    private fun buildHysteria2(bean: HysteriaBean) =
-        buildSingBoxOutboundHysteriaBean(bean) as SingBoxOptions.Outbound_Hysteria2Options
+    private fun buildHysteria2(bean: HysteriaBean) = buildSingBoxOutboundHysteriaBean(bean) as SingBoxOptions.Outbound_Hysteria2Options
 
     @Test
     fun parseHysteria2Json_mapsCoreFields() {

@@ -311,9 +311,8 @@ class ProtocolRegistryDispatchTest {
     fun tailscaleRunsOneInstancePerConfig() {
         ConfigBuilderTestEnv.reset()
         val groupId = ConfigBuilderTestEnv.io { SagerDatabase.groupDao.createGroup(ProxyGroup(isSelector = true)) }
-        fun add(bean: AbstractBean, order: Long = 0L) =
-            ProxyEntity(groupId = groupId, userOrder = order).putBean(bean.apply { initializeDefaultValues() })
-                .also { it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) } }
+        fun add(bean: AbstractBean, order: Long = 0L) = ProxyEntity(groupId = groupId, userOrder = order).putBean(bean.apply { initializeDefaultValues() })
+            .also { it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) } }
         val node = add(tailscale())
         val server = add(socks())
         // Both Tailscale hops are the same node, so this chain would start it twice.

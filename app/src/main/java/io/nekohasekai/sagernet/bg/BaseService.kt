@@ -103,9 +103,11 @@ class BaseService {
         val receiver = broadcastReceiverWithSelf { self, ctx, intent ->
             when (intent.action) {
                 Intent.ACTION_SHUTDOWN -> service.persistStats(self)
+
                 Action.RELOAD -> service.reload(
                     intent.getLongExtra(Action.EXTRA_PROFILE_ID, -1L),
                 )
+
                 // Ported from own/54c76ba71 (LAN sharing group): a reload keeps the tunnel
                 // object alive, so changes that need a brand new core (e.g. exposing the
                 // inbound to the LAN) use this hard restart instead.
@@ -113,6 +115,7 @@ class BaseService {
                     Logs.i("BaseService: Action.RESTART received, forcing stopRunner(restart = true)")
                     service.stopRunner(restart = true)
                 }
+
                 // Action.SWITCH_WAKE_LOCK -> runOnDefaultDispatcher { service.switchWakeLock() }
                 PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
                     // Only act once fully Connected: the close receiver is now registered during
@@ -185,8 +188,7 @@ class BaseService {
         override val coroutineContext = Dispatchers.Main.immediate + Job()
 
         override fun getState(): Int = (data?.state ?: State.Idle).ordinal
-        override fun getProfileName(): String =
-            data?.proxy?.displayProfileName ?: SagerNet.application.getString(R.string.idle)
+        override fun getProfileName(): String = data?.proxy?.displayProfileName ?: SagerNet.application.getString(R.string.idle)
 
         override fun registerCallback(cb: ISagerNetServiceCallback, id: Int) {
             if (id == SagerConnection.CONNECTION_ID_RESTART_BG) {
@@ -347,8 +349,7 @@ class BaseService {
             }
         }
 
-        override fun runningTailscaleProfiles(): String =
-            JSONArray(runningProxy().config.tailscaleEndpoints.keys.toList()).toString()
+        override fun runningTailscaleProfiles(): String = JSONArray(runningProxy().config.tailscaleEndpoints.keys.toList()).toString()
 
         override fun connections(includeClosed: Boolean): String = data?.proxy?.takeIf {
             it.isInitialized()
@@ -377,8 +378,7 @@ class BaseService {
         val tag: String
         fun createNotification(profileName: String): ServiceNotification
 
-        fun ensureForegroundNotification(profileName: String): ServiceNotification =
-            data.notification ?: createNotification(profileName).also { data.notification = it }
+        fun ensureForegroundNotification(profileName: String): ServiceNotification = data.notification ?: createNotification(profileName).also { data.notification = it }
 
         fun onBind(intent: Intent): IBinder? = if (intent.action == Action.SERVICE) data.binder else null
 
@@ -401,6 +401,7 @@ class BaseService {
                     // a negative/absent id leaves selectedProxy as the refreshed snapshot value.
                     when {
                         profileId == 0L -> DataStore.selectedProxy = 0L
+
                         profileId > 0L && SagerDatabase.proxyDao.getById(profileId) != null ->
                             DataStore.selectedProxy = profileId
                     }
@@ -835,6 +836,7 @@ class BaseService {
                     DataStore.configurationStore.refreshSuspend()
                     when {
                         ipcProfileId == 0L -> DataStore.selectedProxy = 0L
+
                         ipcProfileId > 0L && SagerDatabase.proxyDao.getById(ipcProfileId) != null ->
                             DataStore.selectedProxy = ipcProfileId
                     }

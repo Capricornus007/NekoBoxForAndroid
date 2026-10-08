@@ -32,7 +32,8 @@ class StatsBar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = com.google.android.material.R.attr.materialCardViewStyle,
-) : MaterialCardView(context, attrs, defStyleAttr), CoordinatorLayout.AttachedBehavior {
+) : MaterialCardView(context, attrs, defStyleAttr),
+    CoordinatorLayout.AttachedBehavior {
 
     private lateinit var statusText: TextView
     private var lastMeasuredLatency = 0

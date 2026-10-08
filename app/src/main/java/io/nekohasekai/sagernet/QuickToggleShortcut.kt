@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  *                                                                             *
  *  Copyright (C) 2017 by Max Lv <max.c.lv@gmail.com>                          *
  *  Copyright (C) 2017 by Mygod Studio <contact-shadowsocks-android@mygod.be>  *
@@ -38,7 +38,9 @@ import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 
 @Suppress("DEPRECATION")
-class QuickToggleShortcut : Activity(), SagerConnection.Callback {
+class QuickToggleShortcut :
+    Activity(),
+    SagerConnection.Callback {
     private val connection = SagerConnection(SagerConnection.CONNECTION_ID_SHORTCUT)
     private var profileId = -1L
 
@@ -99,6 +101,7 @@ class QuickToggleShortcut : Activity(), SagerConnection.Callback {
                             SagerNet.reloadService(validProfileId)
                         }
                     }
+
                     state == BaseService.State.Stopped -> {
                         if (validProfileId >= 0L) DataStore.selectedProxy = validProfileId
                         SagerNet.startService(validProfileId)

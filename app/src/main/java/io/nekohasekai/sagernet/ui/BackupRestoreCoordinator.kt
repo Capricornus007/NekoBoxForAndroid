@@ -154,6 +154,7 @@ internal suspend fun restoreBackup(
         BackupFormatV2.sanitizeSettings(
             when (version) {
                 BackupFormatV2.VERSION -> BackupFormatV2.decodeSettings(content.getJSONArray("settings"))
+
                 else -> decodeArray(content.getJSONArray("settings")) {
                     KeyValuePair.CREATOR.createFromParcel(it)
                 }

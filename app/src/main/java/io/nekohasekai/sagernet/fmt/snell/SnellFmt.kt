@@ -68,30 +68,28 @@ fun SnellBean.toUri(): String {
     return builder.toString()
 }
 
-fun parseClashSnell(proxy: Map<String, Any?>): SnellBean {
-    return SnellBean().apply {
-        name = proxy["name"] as? String ?: ""
-        serverAddress = proxy["server"] as? String ?: ""
-        serverPort = (proxy["port"] as? Number)?.toInt() ?: 443
-        psk = proxy["psk"] as? String ?: ""
+fun parseClashSnell(proxy: Map<String, Any?>): SnellBean = SnellBean().apply {
+    name = proxy["name"] as? String ?: ""
+    serverAddress = proxy["server"] as? String ?: ""
+    serverPort = (proxy["port"] as? Number)?.toInt() ?: 443
+    psk = proxy["psk"] as? String ?: ""
 
-        val clashVersion = ((proxy["version"] as? Number)?.toInt() ?: 4).coerceIn(1, 5)
-        version = clashVersion
+    val clashVersion = ((proxy["version"] as? Number)?.toInt() ?: 4).coerceIn(1, 5)
+    version = clashVersion
 
-        reuse = proxy["reuse"] as? Boolean ?: false
+    reuse = proxy["reuse"] as? Boolean ?: false
 
-        val udpEnabled = proxy["udp"] as? Boolean ?: false
-        network = if (udpEnabled) {
-            ""
-        } else {
-            "tcp"
-        }
+    val udpEnabled = proxy["udp"] as? Boolean ?: false
+    network = if (udpEnabled) {
+        ""
+    } else {
+        "tcp"
+    }
 
-        // obfs-opts
-        (proxy["obfs-opts"] as? Map<*, *>)?.let { obfsOpts ->
-            obfsMode = obfsOpts["mode"] as? String ?: ""
-            obfsHost = obfsOpts["host"] as? String ?: ""
-        }
+    // obfs-opts
+    (proxy["obfs-opts"] as? Map<*, *>)?.let { obfsOpts ->
+        obfsMode = obfsOpts["mode"] as? String ?: ""
+        obfsHost = obfsOpts["host"] as? String ?: ""
     }
 }
 

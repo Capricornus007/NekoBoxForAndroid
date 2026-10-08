@@ -49,6 +49,7 @@ class TrojanGoSettingsActivity : ProfileSettingsActivity<TrojanGoBean>() {
             "ss" -> {
                 "ss;" + DataStore.serverMethod + ":" + DataStore.serverPassword1
             }
+
             else -> {
                 security
             }
@@ -103,6 +104,7 @@ class TrojanGoSettingsActivity : ProfileSettingsActivity<TrojanGoBean>() {
             "ws" -> {
                 wsCategory.isVisible = true
             }
+
             else -> {
                 wsCategory.isVisible = false
             }
@@ -118,6 +120,7 @@ class TrojanGoSettingsActivity : ProfileSettingsActivity<TrojanGoBean>() {
                     method.value = trojanGoMethods[0]
                 }
             }
+
             else -> {
                 ssCategory.isVisible = false
             }

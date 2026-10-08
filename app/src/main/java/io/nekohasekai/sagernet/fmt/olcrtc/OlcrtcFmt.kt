@@ -1,4 +1,4 @@
-/******************************************************************************
+/* *****************************************************************************
  * Copyright (C) 2026 by nekohasekai <contact-git@sekai.icu>                  *
  *                                                                            *
  * This program is free software: you can redistribute it and/or modify       *
@@ -274,16 +274,22 @@ fun OlcrtcBean.carrierHost(): String? = when (carrier.orEmpty()) {
         val authority = room.substringAfter("://", room).trimStart('/').substringBefore('/').trim()
         when {
             authority.isBlank() -> null
+
             authority.startsWith('[') -> {
                 val closingBracket = authority.indexOf(']')
                 if (closingBracket <= 1) null else authority.substring(1, closingBracket)
             }
+
             authority.count { it == ':' } == 1 -> authority.substringBefore(':').ifBlank { null }
+
             else -> authority
         }
     }
+
     "telemost" -> "telemost.yandex.ru"
+
     "wbstream" -> "stream.wb.ru"
+
     else -> null
 }
 
@@ -374,7 +380,6 @@ private fun String.ipv6Segments(): List<String>? {
     return split(':').takeIf { segments -> segments.none { it.isEmpty() } }
 }
 
-private fun Char.isSafeZoneCharacter(): Boolean =
-    this in 'a'..'z' || this in 'A'..'Z' || this in '0'..'9' || this == '_' || this == '-' || this == '.'
+private fun Char.isSafeZoneCharacter(): Boolean = this in 'a'..'z' || this in 'A'..'Z' || this in '0'..'9' || this == '_' || this == '-' || this == '.'
 
 private fun Char.isHexDigit(): Boolean = this in '0'..'9' || this in 'a'..'f' || this in 'A'..'F'

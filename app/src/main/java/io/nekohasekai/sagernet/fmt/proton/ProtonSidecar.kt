@@ -147,23 +147,23 @@ object ProtonSidecar {
 
     fun isAvailable(): Boolean = executable() != null
 
-    suspend fun login(username: String, password: String, totp: String = ""): ProtonLoginState =
-        withContext(Dispatchers.IO) {
-            val body = JSONObject().apply {
-                put("username", username)
-                put("password", password)
-                if (totp.isNotEmpty()) put("twoFactorCode", totp)
-            }
-            // Never log the stdin payload: it carries the account password.
-            when (val result = runSidecar(listOf("login", "--state", sessionFile.absolutePath), body.toString())) {
-                is ProtonOutcome.Success -> ProtonJson.parseLogin(result.json)
-                is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
-                    ProtonJson.parseLogin(result.stdout)
-                } else {
-                    ProtonLoginState(false, error = result.message)
-                }
+    suspend fun login(username: String, password: String, totp: String = ""): ProtonLoginState = withContext(Dispatchers.IO) {
+        val body = JSONObject().apply {
+            put("username", username)
+            put("password", password)
+            if (totp.isNotEmpty()) put("twoFactorCode", totp)
+        }
+        // Never log the stdin payload: it carries the account password.
+        when (val result = runSidecar(listOf("login", "--state", sessionFile.absolutePath), body.toString())) {
+            is ProtonOutcome.Success -> ProtonJson.parseLogin(result.json)
+
+            is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
+                ProtonJson.parseLogin(result.stdout)
+            } else {
+                ProtonLoginState(false, error = result.message)
             }
         }
+    }
 
     suspend fun nodes(country: String = "", limit: Int = 0): ProtonNodesState = withContext(Dispatchers.IO) {
         if (!sessionFile.exists()) {
@@ -174,6 +174,7 @@ object ProtonSidecar {
         if (limit > 0) args += listOf("--limit", limit.toString())
         when (val result = runSidecar(args, null)) {
             is ProtonOutcome.Success -> ProtonJson.parseNodes(result.json)
+
             is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
                 ProtonJson.parseNodes(result.stdout)
             } else {

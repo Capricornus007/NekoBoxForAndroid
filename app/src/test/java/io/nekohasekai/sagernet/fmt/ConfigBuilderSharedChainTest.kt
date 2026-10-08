@@ -152,16 +152,14 @@ class ConfigBuilderSharedChainTest {
         assertEquals(available.size, availableTagsInOrder(config).size)
     }
 
-    private fun node(config: JsonObject, tag: String) =
-        (config.getAsJsonArray("endpoints") + config.getAsJsonArray("outbounds"))
-            .map { it.asJsonObject }
-            .single { it.get("tag").asString == tag }
+    private fun node(config: JsonObject, tag: String) = (config.getAsJsonArray("endpoints") + config.getAsJsonArray("outbounds"))
+        .map { it.asJsonObject }
+        .single { it.get("tag").asString == tag }
 
     private fun availableTags(config: JsonObject) = availableTagsInOrder(config).toSet()
 
-    private fun availableTagsInOrder(config: JsonObject) =
-        (config.getAsJsonArray("endpoints") + config.getAsJsonArray("outbounds"))
-            .map { it.asJsonObject.get("tag").asString }
+    private fun availableTagsInOrder(config: JsonObject) = (config.getAsJsonArray("endpoints") + config.getAsJsonArray("outbounds"))
+        .map { it.asJsonObject.get("tag").asString }
 
     private companion object {
         const val MAIN_ID = 2913L

@@ -101,17 +101,21 @@ abstract class GroupUpdater {
                 is HttpBean -> {
                     if (isTLS() && sni.isBlank()) sni = bean.serverAddress
                 }
+
                 is StandardV2RayBean -> {
                     when (security) {
                         "tls" -> if (sni.isBlank()) sni = bean.serverAddress
                     }
                 }
+
                 is TrojanBean -> {
                     if (sni.isBlank()) sni = bean.serverAddress
                 }
+
                 is TrojanGoBean -> {
                     if (sni.isBlank()) sni = bean.serverAddress
                 }
+
                 is HysteriaBean -> {
                     if (sni.isBlank()) sni = bean.serverAddress
                 }

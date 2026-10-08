@@ -19,12 +19,10 @@ object HevTunRuntime {
 
     private var running = false
 
-    fun isRunning(): Boolean {
-        return try {
-            HevTunNative.TProxyIsRunning()
-        } catch (e: UnsatisfiedLinkError) {
-            false
-        }
+    fun isRunning(): Boolean = try {
+        HevTunNative.TProxyIsRunning()
+    } catch (e: UnsatisfiedLinkError) {
+        false
     }
 
     @Synchronized
@@ -85,7 +83,5 @@ object HevTunRuntime {
         }
     }
 
-    private fun String.yamlEscape(): String {
-        return replace("'", "''")
-    }
+    private fun String.yamlEscape(): String = replace("'", "''")
 }

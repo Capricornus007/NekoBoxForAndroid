@@ -206,7 +206,7 @@ class MainActivity :
         val uri = intent.data ?: return
 
         runOnDefaultDispatcher {
-            if (uri.scheme == "sn" && uri.host == "subscription" || uri.scheme == "clash") {
+            if ((uri.scheme == "sn" && uri.host == "subscription") || uri.scheme == "clash") {
                 importSubscription(uri)
             } else {
                 importProfile(uri)
@@ -345,9 +345,11 @@ class MainActivity :
                 if (isFinishing || isDestroyed) return@onMainDispatcher
                 when {
                     rejected.size > 1 -> showPluginApprovalConflict(rejected)
+
                     rejected.singleOrNull()?.currentFingerprints?.isNotEmpty() == true -> {
                         showPluginApprovalDialog(pluginName, rejected.single())
                     }
+
                     else -> showMissingPluginDialog(profileName, pluginEntity)
                 }
             }
@@ -469,7 +471,9 @@ class MainActivity :
                     playIndex -> launchCustomTab(
                         "https://play.google.com/store/apps/details?id=${pluginEntry.packageName}",
                     )
+
                     fdroidIndex -> launchCustomTab("https://f-droid.org/packages/${pluginEntry.packageName}/")
+
                     downloadIndex -> launchCustomTab(pluginEntry.downloadSource.downloadLink)
                 }
             }
@@ -576,10 +580,15 @@ class MainActivity :
             }
 
             R.id.nav_group -> displayFragment(GroupFragment())
+
             R.id.nav_route -> displayFragment(RouteFragment())
+
             R.id.nav_settings -> displayFragment(SettingsFragment())
+
             R.id.nav_tools -> displayFragment(ToolsFragment())
+
             R.id.nav_logcat -> displayFragment(LogcatFragment())
+
             R.id.nav_about -> displayFragment(AboutFragment())
 
             else -> return false
@@ -601,13 +610,11 @@ class MainActivity :
         if (msg != null) snackbar(getString(R.string.vpn_error, msg)).show()
     }
 
-    override fun snackbarInternal(text: CharSequence): Snackbar {
-        return Snackbar.make(binding.coordinator, text, Snackbar.LENGTH_LONG).apply {
-            if (binding.fab.isShown) {
-                anchorView = binding.fab
-            }
-            // TODO
+    override fun snackbarInternal(text: CharSequence): Snackbar = Snackbar.make(binding.coordinator, text, Snackbar.LENGTH_LONG).apply {
+        if (binding.fab.isShown) {
+            anchorView = binding.fab
         }
+        // TODO
     }
 
     override fun stateChanged(state: BaseService.State, profileName: String?, msg: String?) {
@@ -673,11 +680,14 @@ class MainActivity :
             if (isDestroyed || isFinishing) return@runOnMainDispatcher
             when (key) {
                 Key.SERVICE_MODE -> onBinderDied()
+
                 Key.SHOW_BOTTOM_BAR -> syncMainControls(
                     showWhenConnected = DataStore.showBottomBar,
                     animate = true,
                 )
+
                 Key.SPEED_INTERVAL -> binding.stats.refreshSpeedVisibility()
+
                 Key.PROXY_APPS, Key.BYPASS_MODE, Key.INDIVIDUAL -> {
                     if (DataStore.serviceState.canStop) {
                         snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {

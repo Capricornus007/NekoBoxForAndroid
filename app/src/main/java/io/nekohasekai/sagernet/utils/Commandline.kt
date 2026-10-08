@@ -100,6 +100,7 @@ object Commandline {
                         result.append('\\') // intentionally no break
                         result.append(it)
                     }
+
                     else -> result.append(it)
                 }
             }
@@ -131,11 +132,14 @@ object Commandline {
                     redacted.add("<redacted>")
                     redactNext = false
                 }
+
                 flag in SENSITIVE_VALUE_FLAGS && eq > 0 -> redacted.add("$flag=<redacted>")
+
                 flag in SENSITIVE_VALUE_FLAGS -> {
                     redacted.add(arg)
                     redactNext = true
                 }
+
                 else -> redacted.add(arg)
             }
         }
@@ -183,6 +187,7 @@ object Commandline {
                 } else {
                     current.append(nextTok)
                 }
+
                 inDoubleQuote -> when (nextTok) {
                     "\"" -> if (lastTokenIsSlash) {
                         current.append(nextTok)
@@ -191,12 +196,14 @@ object Commandline {
                         lastTokenHasBeenQuoted = true
                         state = normal
                     }
+
                     "\\" -> lastTokenIsSlash = if (lastTokenIsSlash) {
                         current.append(nextTok)
                         false
                     } else {
                         true
                     }
+
                     else -> {
                         if (lastTokenIsSlash) {
                             current.append("\\") // unescaped
@@ -205,19 +212,25 @@ object Commandline {
                         current.append(nextTok)
                     }
                 }
+
                 else -> {
                     when {
                         lastTokenIsSlash -> {
                             current.append(nextTok)
                             lastTokenIsSlash = false
                         }
+
                         "\\" == nextTok -> lastTokenIsSlash = true
+
                         "\'" == nextTok -> state = inQuote
+
                         "\"" == nextTok -> state = inDoubleQuote
+
                         " " == nextTok -> if (lastTokenHasBeenQuoted || current.isNotEmpty()) {
                             result.add(current.toString())
                             current.setLength(0)
                         }
+
                         else -> current.append(nextTok)
                     }
                     lastTokenHasBeenQuoted = false

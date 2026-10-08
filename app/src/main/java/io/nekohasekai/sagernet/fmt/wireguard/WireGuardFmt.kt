@@ -191,22 +191,22 @@ private fun JsonObject.reservedValue(): String? {
     val value = get("reserved")?.takeUnless(JsonElement::isJsonNull) ?: return null
     return when {
         value.isJsonPrimitive && value.asJsonPrimitive.isString -> value.asString.trim()
+
         value.isJsonArray -> value.asJsonArray.mapNotNull { element ->
             element.takeIf(JsonElement::isJsonPrimitive)?.asJsonPrimitive?.asString?.trim()
         }.joinToString(", ")
+
         else -> null
     }?.takeIf(String::isNotEmpty)
 }
 
-fun buildSingBoxEndpointWireGuardBean(bean: WireGuardBean): SingBoxOptions.Endpoint_WireGuardOptions {
-    return SingBoxOptions.Endpoint_WireGuardOptions().apply {
-        type = "wireguard"
-        address = bean.localAddress.listByLineOrComma().map(::normalizeWireGuardLocalAddress)
-        private_key = normalizeBase64Key(bean.privateKey)
-        mtu = bean.mtu?.takeIf { it > 0 }
-        listen_port = bean.listenPort?.takeIf { it > 0 }
-        peers = buildWireGuardPeers(bean)
-    }
+fun buildSingBoxEndpointWireGuardBean(bean: WireGuardBean): SingBoxOptions.Endpoint_WireGuardOptions = SingBoxOptions.Endpoint_WireGuardOptions().apply {
+    type = "wireguard"
+    address = bean.localAddress.listByLineOrComma().map(::normalizeWireGuardLocalAddress)
+    private_key = normalizeBase64Key(bean.privateKey)
+    mtu = bean.mtu?.takeIf { it > 0 }
+    listen_port = bean.listenPort?.takeIf { it > 0 }
+    peers = buildWireGuardPeers(bean)
 }
 
 /**
@@ -358,12 +358,10 @@ fun formatWireGuardPeerBlocks(specs: List<WireGuardPeerSpec>): String = buildStr
     }
 }.trim()
 
-private fun formatWireGuardEndpointAddress(host: String, port: Int): String =
-    if (host.contains(':')) "[$host]:$port" else "$host:$port"
+private fun formatWireGuardEndpointAddress(host: String, port: Int): String = if (host.contains(':')) "[$host]:$port" else "$host:$port"
 
 @Deprecated("WireGuard is an endpoint in sing-box 1.14+")
-fun buildSingBoxOutboundWireguardBean(bean: WireGuardBean): SingBoxOptions.Endpoint_WireGuardOptions =
-    buildSingBoxEndpointWireGuardBean(bean)
+fun buildSingBoxOutboundWireguardBean(bean: WireGuardBean): SingBoxOptions.Endpoint_WireGuardOptions = buildSingBoxEndpointWireGuardBean(bean)
 
 private fun normalizeBase64Key(value: String): String {
     if (value.isBlank()) return value
@@ -377,61 +375,59 @@ private fun normalizeBase64Key(value: String): String {
  * `wireguard://` 是單 peer 格式：`extraPeers`（多餘的 `[Peer]` 區塊）無法塞進去，
  * 所以多 peer 的 profile 請改用匯出 conf，不要用這條標準連結。
  */
-fun WireGuardBean.toUri(): String {
-    return buildString {
-        // 一律用 wireguard://：awg:// 在我方 TypeMap 裡是獨立的 TYPE_AWG，而這個 bean 是
-        // WireGuard profile，遮罩參數以查詢參數帶出，回貼時由 parseWireGuardLink 還原。
-        append("wireguard://")
-        if (!privateKey.isNullOrBlank()) {
-            append(URLEncoder.encode(privateKey, "UTF-8")).append('@')
+fun WireGuardBean.toUri(): String = buildString {
+    // 一律用 wireguard://：awg:// 在我方 TypeMap 裡是獨立的 TYPE_AWG，而這個 bean 是
+    // WireGuard profile，遮罩參數以查詢參數帶出，回貼時由 parseWireGuardLink 還原。
+    append("wireguard://")
+    if (!privateKey.isNullOrBlank()) {
+        append(URLEncoder.encode(privateKey, "UTF-8")).append('@')
+    }
+    append(serverAddress.orEmpty())
+    if ((serverPort ?: 0) > 0) {
+        append(':').append(serverPort)
+    }
+    append('?')
+    val params = mutableListOf<String>()
+    if (!peerPublicKey.isNullOrBlank()) {
+        params.add("public_key=" + URLEncoder.encode(peerPublicKey, "UTF-8"))
+    }
+    if (!localAddress.isNullOrBlank()) {
+        params.add("address=" + URLEncoder.encode(localAddress.replace("\n", ","), "UTF-8"))
+    }
+    if (!peerPreSharedKey.isNullOrBlank()) {
+        params.add("preshared_key=" + URLEncoder.encode(peerPreSharedKey, "UTF-8"))
+    }
+    if (!peerAllowedIps.isNullOrBlank()) {
+        params.add("allowed_ips=" + URLEncoder.encode(peerAllowedIps.replace("\n", ","), "UTF-8"))
+    }
+    if ((mtu ?: 0) > 0) {
+        params.add("mtu=$mtu")
+    }
+    if (!reserved.isNullOrBlank()) {
+        params.add("reserved=" + URLEncoder.encode(reserved, "UTF-8"))
+    }
+    if ((persistentKeepaliveInterval ?: 0) > 0) {
+        params.add("keepalive=$persistentKeepaliveInterval")
+    }
+    if (isAmneziaWG) {
+        if ((jc ?: 0) > 0) params.add("jc=$jc")
+        if ((jmin ?: 0) > 0) params.add("jmin=$jmin")
+        if ((jmax ?: 0) > 0) params.add("jmax=$jmax")
+        if ((s1 ?: 0) > 0) params.add("s1=$s1")
+        if ((s2 ?: 0) > 0) params.add("s2=$s2")
+        if ((s3 ?: 0) > 0) params.add("s3=$s3")
+        if ((s4 ?: 0) > 0) params.add("s4=$s4")
+        listOf(h1, h2, h3, h4).forEachIndexed { index, value ->
+            if (!value.isNullOrEmpty()) params.add("h${index + 1}=" + URLEncoder.encode(value, "UTF-8"))
         }
-        append(serverAddress.orEmpty())
-        if ((serverPort ?: 0) > 0) {
-            append(':').append(serverPort)
+        listOf(i1, i2, i3, i4, i5).forEachIndexed { index, value ->
+            if (!value.isNullOrEmpty()) params.add("i${index + 1}=" + URLEncoder.encode(value, "UTF-8"))
         }
-        append('?')
-        val params = mutableListOf<String>()
-        if (!peerPublicKey.isNullOrBlank()) {
-            params.add("public_key=" + URLEncoder.encode(peerPublicKey, "UTF-8"))
-        }
-        if (!localAddress.isNullOrBlank()) {
-            params.add("address=" + URLEncoder.encode(localAddress.replace("\n", ","), "UTF-8"))
-        }
-        if (!peerPreSharedKey.isNullOrBlank()) {
-            params.add("preshared_key=" + URLEncoder.encode(peerPreSharedKey, "UTF-8"))
-        }
-        if (!peerAllowedIps.isNullOrBlank()) {
-            params.add("allowed_ips=" + URLEncoder.encode(peerAllowedIps.replace("\n", ","), "UTF-8"))
-        }
-        if ((mtu ?: 0) > 0) {
-            params.add("mtu=$mtu")
-        }
-        if (!reserved.isNullOrBlank()) {
-            params.add("reserved=" + URLEncoder.encode(reserved, "UTF-8"))
-        }
-        if ((persistentKeepaliveInterval ?: 0) > 0) {
-            params.add("keepalive=$persistentKeepaliveInterval")
-        }
-        if (isAmneziaWG) {
-            if ((jc ?: 0) > 0) params.add("jc=$jc")
-            if ((jmin ?: 0) > 0) params.add("jmin=$jmin")
-            if ((jmax ?: 0) > 0) params.add("jmax=$jmax")
-            if ((s1 ?: 0) > 0) params.add("s1=$s1")
-            if ((s2 ?: 0) > 0) params.add("s2=$s2")
-            if ((s3 ?: 0) > 0) params.add("s3=$s3")
-            if ((s4 ?: 0) > 0) params.add("s4=$s4")
-            listOf(h1, h2, h3, h4).forEachIndexed { index, value ->
-                if (!value.isNullOrEmpty()) params.add("h${index + 1}=" + URLEncoder.encode(value, "UTF-8"))
-            }
-            listOf(i1, i2, i3, i4, i5).forEachIndexed { index, value ->
-                if (!value.isNullOrEmpty()) params.add("i${index + 1}=" + URLEncoder.encode(value, "UTF-8"))
-            }
-        }
-        append(params.joinToString("&"))
-        if (!name.isNullOrBlank()) {
-            // fragment 用的是 URL 編碼而非表單編碼：URLEncoder 把空格寫成 '+'，
-            // 但片段裡的 '+' 只會被解成字面加號，所以一律換成 %20。
-            append('#').append(URLEncoder.encode(name, "UTF-8").replace("+", "%20"))
-        }
+    }
+    append(params.joinToString("&"))
+    if (!name.isNullOrBlank()) {
+        // fragment 用的是 URL 編碼而非表單編碼：URLEncoder 把空格寫成 '+'，
+        // 但片段裡的 '+' 只會被解成字面加號，所以一律換成 %20。
+        append('#').append(URLEncoder.encode(name, "UTF-8").replace("+", "%20"))
     }
 }

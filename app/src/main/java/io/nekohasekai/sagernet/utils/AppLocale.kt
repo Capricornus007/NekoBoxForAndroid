@@ -7,12 +7,10 @@ import io.nekohasekai.sagernet.database.DataStore
 object AppLocale {
 
     // Empty tag means "follow system".
-    fun localeList(tag: String?): LocaleListCompat {
-        return if (tag.isNullOrEmpty()) {
-            LocaleListCompat.getEmptyLocaleList()
-        } else {
-            LocaleListCompat.forLanguageTags(tag)
-        }
+    fun localeList(tag: String?): LocaleListCompat = if (tag.isNullOrEmpty()) {
+        LocaleListCompat.getEmptyLocaleList()
+    } else {
+        LocaleListCompat.forLanguageTags(tag)
     }
 
     // Applies the in-app language. AppCompat handles persistence (API 33+ via the

@@ -88,10 +88,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             .show()
     }
 
-    private fun sanitizeDnsPreferenceValue(value: String): String {
-        return value.lines().joinToString("\n") { line ->
-            line.filterNot { it.isISOControl() }.trim()
-        }
+    private fun sanitizeDnsPreferenceValue(value: String): String = value.lines().joinToString("\n") { line ->
+        line.filterNot { it.isISOControl() }.trim()
     }
 
     private fun dnsReloadListener(

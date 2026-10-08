@@ -227,7 +227,9 @@ class TailscaleStatusActivity : ThemedActivity(R.layout.layout_tailscale_status)
                     inventory.size,
                     node.totalPeers,
                 )
+
                 inventory.isEmpty() -> getString(R.string.tailscale_status_no_peers)
+
                 else -> getString(R.string.tailscale_status_inventory_complete, inventory.size)
             }
             val removed = peers.keys - inventory.map { it.id }.toSet()

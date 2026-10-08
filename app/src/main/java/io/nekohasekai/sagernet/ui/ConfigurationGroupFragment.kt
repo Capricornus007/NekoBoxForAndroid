@@ -77,9 +77,7 @@ class ConfigurationGroupFragment : Fragment() {
     lateinit var proxyGroup: ProxyGroup
     var selected = false
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return LayoutProfileListBinding.inflate(inflater).root
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = LayoutProfileListBinding.inflate(inflater).root
 
     var undoManager: UndoSnackbarManager<ProxyEntity>? = null
     var adapter: ConfigurationAdapter? = null
@@ -138,20 +136,16 @@ class ConfigurationGroupFragment : Fragment() {
                 return makeMovementFlags(dragFlags, 0) // No swipe flags
             }
 
-            override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-                return 0
-            }
+            override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int = 0
 
-            override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-                return if (isEnabled && adapter?.canDrag() == true) {
-                    if (DataStore.groupLayoutMode == 1) {
-                        ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-                    } else {
-                        ItemTouchHelper.UP or ItemTouchHelper.DOWN
-                    }
+            override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int = if (isEnabled && adapter?.canDrag() == true) {
+                if (DataStore.groupLayoutMode == 1) {
+                    ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
                 } else {
-                    0
+                    ItemTouchHelper.UP or ItemTouchHelper.DOWN
                 }
+            } else {
+                0
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -588,9 +582,11 @@ class ConfigurationGroupFragment : Fragment() {
         private fun sortMasterProfiles() {
             val sorted = when (proxyGroup.order) {
                 GroupOrder.BY_NAME -> masterProfiles.values.sortedBy { it.displayName() }
+
                 GroupOrder.BY_DELAY -> masterProfiles.values.sortedBy {
                     if (it.status == 1) it.ping else 114514
                 }
+
                 else -> masterProfiles.values.sortedBy { it.userOrder }
             }
             masterIds.clear()
@@ -672,19 +668,15 @@ class ConfigurationGroupFragment : Fragment() {
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConfigurationHolder {
-            return ConfigurationHolder(
-                LayoutProfileBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false,
-                ),
-            )
-        }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConfigurationHolder = ConfigurationHolder(
+            LayoutProfileBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            ),
+        )
 
-        override fun getItemId(position: Int): Long {
-            return configurationIdList[position]
-        }
+        override fun getItemId(position: Int): Long = configurationIdList[position]
 
         override fun onBindViewHolder(holder: ConfigurationHolder, position: Int) {
             try {
@@ -695,9 +687,7 @@ class ConfigurationGroupFragment : Fragment() {
             }
         }
 
-        override fun getItemCount(): Int {
-            return configurationIdList.size
-        }
+        override fun getItemCount(): Int = configurationIdList.size
 
         fun updateSpeedTestResult(profileId: Long, outcome: SpeedTestOutcome) {
             val profile = configurationList[profileId] ?: return
@@ -1049,9 +1039,11 @@ class ConfigurationGroupFragment : Fragment() {
                 var profiles = SagerDatabase.proxyDao.getByGroup(groupId)
                 profiles = when (order) {
                     GroupOrder.BY_NAME -> profiles.sortedBy { it.displayName() }
+
                     GroupOrder.BY_DELAY -> profiles.sortedBy {
                         if (it.status == 1) it.ping else 114514
                     }
+
                     else -> profiles
                 }
                 // OwnBox 移植：軟隱藏測試不可用的節點（保留當前選中節點作兜底，
@@ -1103,8 +1095,7 @@ class ConfigurationGroupFragment : Fragment() {
     val profileAccess = Mutex()
     val reloadAccess = Mutex()
 
-    inner class ConfigurationHolder(val binding: LayoutProfileBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class ConfigurationHolder(val binding: LayoutProfileBinding) : RecyclerView.ViewHolder(binding.root) {
 
         val view: View get() = binding.root
 
@@ -1219,14 +1210,17 @@ class ConfigurationGroupFragment : Fragment() {
                         openSettings(anchor, profileId)
                         true
                     }
+
                     R.id.action_share -> {
                         showShareMenu(anchor, profileId)
                         true
                     }
+
                     R.id.action_delete -> {
                         requestRemove(profileId)
                         true
                     }
+
                     else -> false
                 }
             }
@@ -1450,13 +1444,17 @@ class ConfigurationGroupFragment : Fragment() {
                 val name = profile.displayName().orEmpty()
                 when (item.itemId) {
                     R.id.action_standard_qr -> showMultiFormatCode(profile, name, initialIsSn = false)
+
                     R.id.action_standard_clipboard -> export(profile.toStdLink())
+
                     R.id.action_universal_qr -> showMultiFormatCode(profile, name, initialIsSn = true)
+
                     R.id.action_universal_clipboard -> export(
                         profile.requireBean().toUniversalLink(),
                     )
 
                     R.id.action_config_export_clipboard -> export(profile.exportConfig().first)
+
                     R.id.action_config_export_file -> {
                         val config = profile.exportConfig()
                         DataStore.serverConfig = config.first

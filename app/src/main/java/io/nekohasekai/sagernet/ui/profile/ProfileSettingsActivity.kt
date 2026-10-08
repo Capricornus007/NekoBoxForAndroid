@@ -46,7 +46,8 @@ import kotlin.properties.Delegates
 @Suppress("UNCHECKED_CAST")
 abstract class ProfileSettingsActivity<T : AbstractBean>(
     @LayoutRes resId: Int = R.layout.layout_config_settings,
-) : ThemedActivity(resId), OnPreferenceDataStoreChangeListener {
+) : ThemedActivity(resId),
+    OnPreferenceDataStoreChangeListener {
 
     class UnsavedChangesDialogFragment : AlertDialogFragment<Empty, Empty>() {
         override fun AlertDialog.Builder.prepare(listener: DialogInterface.OnClickListener) {
@@ -194,9 +195,7 @@ abstract class ProfileSettingsActivity<T : AbstractBean>(
     open fun PreferenceFragmentCompat.viewCreated(view: View, savedInstanceState: Bundle?) {
     }
 
-    open fun PreferenceFragmentCompat.displayPreferenceDialog(preference: Preference): Boolean {
-        return false
-    }
+    open fun PreferenceFragmentCompat.displayPreferenceDialog(preference: Preference): Boolean = false
 
     class MyPreferenceFragmentCompat : PreferenceFragmentCompat() {
 

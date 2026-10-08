@@ -44,13 +44,9 @@ fun HttpUrl.Builder.toLink(scheme: String, appendDefaultPort: Boolean = true): S
     }
 }
 
-fun String.isIpAddress(): Boolean {
-    return NGUtil.isIpv4Address(this) || NGUtil.isIpv6Address(this)
-}
+fun String.isIpAddress(): Boolean = NGUtil.isIpv4Address(this) || NGUtil.isIpv6Address(this)
 
-fun String.isIpAddressV6(): Boolean {
-    return NGUtil.isIpv6Address(this)
-}
+fun String.isIpAddressV6(): Boolean = NGUtil.isIpv6Address(this)
 
 // [2001:4860:4860::8888] -> 2001:4860:4860::8888
 fun String.unwrapIPV6Host(): String {
@@ -70,9 +66,7 @@ fun String.wrapIPV6Host(): String {
     }
 }
 
-fun AbstractBean.wrapUri(): String {
-    return "${finalAddress.wrapIPV6Host()}:$finalPort"
-}
+fun AbstractBean.wrapUri(): String = "${finalAddress.wrapIPV6Host()}:$finalPort"
 
 fun mkPort(): Int {
     val socket = Socket()

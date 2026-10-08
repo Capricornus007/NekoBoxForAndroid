@@ -178,6 +178,7 @@ class GuardedProcessPool(private val onFatal: suspend (IOException) -> Unit) : C
                     }
                     when (generation.exitCode) {
                         128 + OsConstants.SIGKILL -> Logs.w("$cmdName was killed")
+
                         else -> Logs.w(
                             IOException("$cmdName unexpectedly exits with code ${generation.exitCode}"),
                         )

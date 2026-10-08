@@ -19,8 +19,6 @@ abstract class Serializable : Parcelable {
     abstract class CREATOR<T : Serializable> : Parcelable.Creator<T> {
         abstract fun newInstance(): T
 
-        override fun createFromParcel(source: Parcel): T {
-            return KryoConverters.deserialize(newInstance(), source.createByteArray())
-        }
+        override fun createFromParcel(source: Parcel): T = KryoConverters.deserialize(newInstance(), source.createByteArray())
     }
 }

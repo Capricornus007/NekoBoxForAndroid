@@ -33,8 +33,7 @@ class UtilDatabaseQuarantineTest {
         return header
     }
 
-    private fun corruptSiblings(name: String) =
-        dir.listFiles { f -> f.name.startsWith("$name.corrupt-") }?.toList().orEmpty()
+    private fun corruptSiblings(name: String) = dir.listFiles { f -> f.name.startsWith("$name.corrupt-") }?.toList().orEmpty()
 
     @Test
     fun healthySqliteIsLeftAlone() {

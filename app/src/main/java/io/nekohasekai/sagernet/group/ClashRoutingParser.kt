@@ -1,4 +1,4 @@
-/******************************************************************************
+/* *****************************************************************************
  *                                                                            *
  * This program is free software: you can redistribute it and/or modify       *
  * it under the terms of the GNU General Public License as published by       *
@@ -136,7 +136,9 @@ object ClashRoutingParser {
                     val payload = (provider["payload"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
                     inlineProviders[providerName] = payload
                 }
+
                 "http" -> httpProviderNames.add(providerName)
+
                 else -> {}
             }
         }
@@ -155,11 +157,18 @@ object ClashRoutingParser {
                 )
             when (type) {
                 "DOMAIN" -> entity.domains = "full:$payload"
+
                 "DOMAIN-SUFFIX" -> entity.domains = "domain:$payload"
+
                 "DOMAIN-KEYWORD" -> entity.domains = "keyword:$payload"
+
                 "IP-CIDR", "IP-CIDR6" -> entity.ip = payload
+
                 "DST-PORT" -> entity.port = payload
-                "MATCH" -> {} // no matcher fields: matches everything
+
+                "MATCH" -> {}
+
+                // no matcher fields: matches everything
                 else -> {
                     skipped++
                     skippedTypes.add(type)
@@ -178,6 +187,7 @@ object ClashRoutingParser {
                 "MATCH" -> {
                     if (tokens.size >= 2) addRule("MATCH", "", tokens[1])
                 }
+
                 "RULE-SET" -> {
                     if (tokens.size < 3) return
                     val providerName = tokens[1]
@@ -191,16 +201,20 @@ object ClashRoutingParser {
                                 }
                             }
                         }
+
                         httpProviderNames.contains(providerName) -> skippedHttpProviders.add(providerName)
+
                         else -> {
                             skipped++
                             skippedTypes.add("RULE-SET:$providerName")
                         }
                     }
                 }
+
                 "DOMAIN", "DOMAIN-SUFFIX", "DOMAIN-KEYWORD", "IP-CIDR", "IP-CIDR6", "DST-PORT" -> {
                     if (tokens.size >= 3) addRule(type, tokens[1], tokens[2])
                 }
+
                 else -> {
                     skipped++
                     skippedTypes.add(type)

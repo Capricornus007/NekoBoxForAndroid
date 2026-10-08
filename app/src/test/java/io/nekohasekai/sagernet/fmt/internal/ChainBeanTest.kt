@@ -172,13 +172,11 @@ class ChainBeanTest {
         assertEquals(FastestCandidateResolutionError.INVALID_REGEX, error.error)
     }
 
-    private fun namedProxy(name: String): ProxyEntity {
-        return ProxyEntity(
-            type = ProxyEntity.TYPE_CHAIN,
-            chainBean = ChainBean().apply {
-                initializeDefaultValues()
-                this.name = name
-            },
-        )
-    }
+    private fun namedProxy(name: String): ProxyEntity = ProxyEntity(
+        type = ProxyEntity.TYPE_CHAIN,
+        chainBean = ChainBean().apply {
+            initializeDefaultValues()
+            this.name = name
+        },
+    )
 }

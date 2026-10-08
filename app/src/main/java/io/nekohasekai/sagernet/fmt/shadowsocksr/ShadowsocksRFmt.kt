@@ -37,53 +37,47 @@ fun parseShadowsocksR(url: String): ShadowsocksRBean {
     return bean
 }
 
-fun ShadowsocksRBean.toUri(): String {
-    return "ssr://" + Util.b64EncodeUrlSafe(
-        "%s:%d:%s:%s:%s:%s/?obfsparam=%s&protoparam=%s&remarks=%s".format(
-            Locale.ENGLISH,
-            serverAddress,
-            serverPort,
-            protocol,
-            method,
-            obfs,
-            Util.b64EncodeUrlSafe("%s".format(Locale.ENGLISH, password)),
-            Util.b64EncodeUrlSafe("%s".format(Locale.ENGLISH, obfsParam)),
-            Util.b64EncodeUrlSafe("%s".format(Locale.ENGLISH, protocolParam)),
-            Util.b64EncodeUrlSafe(
-                "%s".format(
-                    Locale.ENGLISH,
-                    name ?: "",
-                ),
+fun ShadowsocksRBean.toUri(): String = "ssr://" + Util.b64EncodeUrlSafe(
+    "%s:%d:%s:%s:%s:%s/?obfsparam=%s&protoparam=%s&remarks=%s".format(
+        Locale.ENGLISH,
+        serverAddress,
+        serverPort,
+        protocol,
+        method,
+        obfs,
+        Util.b64EncodeUrlSafe("%s".format(Locale.ENGLISH, password)),
+        Util.b64EncodeUrlSafe("%s".format(Locale.ENGLISH, obfsParam)),
+        Util.b64EncodeUrlSafe("%s".format(Locale.ENGLISH, protocolParam)),
+        Util.b64EncodeUrlSafe(
+            "%s".format(
+                Locale.ENGLISH,
+                name ?: "",
             ),
         ),
-    )
+    ),
+)
+
+fun JSONObject.parseShadowsocksR(): ShadowsocksRBean = ShadowsocksRBean().applyDefaultValues().apply {
+    serverAddress = optString("server", serverAddress)
+    serverPort = optInt("server_port", serverPort)
+    method = optString("method", method)
+    password = optString("password", password)
+    protocol = optString("protocol", protocol)
+    protocolParam = optString("protocol_param", protocolParam)
+    obfs = optString("obfs", obfs)
+    obfsParam = optString("obfs_param", obfsParam)
+    name = optString("remarks", name)
 }
 
-fun JSONObject.parseShadowsocksR(): ShadowsocksRBean {
-    return ShadowsocksRBean().applyDefaultValues().apply {
-        serverAddress = optString("server", serverAddress)
-        serverPort = optInt("server_port", serverPort)
-        method = optString("method", method)
-        password = optString("password", password)
-        protocol = optString("protocol", protocol)
-        protocolParam = optString("protocol_param", protocolParam)
-        obfs = optString("obfs", obfs)
-        obfsParam = optString("obfs_param", obfsParam)
-        name = optString("remarks", name)
-    }
-}
-
-fun buildSingBoxOutboundShadowsocksRBean(bean: ShadowsocksRBean): SingBoxOptions.Outbound_ShadowsocksROptions {
-    return SingBoxOptions.Outbound_ShadowsocksROptions().apply {
-        type = "shadowsocksr"
-        server = bean.serverAddress
-        server_port = bean.serverPort
-        method = bean.method
-        password = bean.password
-        protocol = bean.protocol
-        protocol_param = bean.protocolParam
-        obfs = bean.obfs
-        obfs_param = bean.obfsParam
-        // do NOT set network field here
-    }
+fun buildSingBoxOutboundShadowsocksRBean(bean: ShadowsocksRBean): SingBoxOptions.Outbound_ShadowsocksROptions = SingBoxOptions.Outbound_ShadowsocksROptions().apply {
+    type = "shadowsocksr"
+    server = bean.serverAddress
+    server_port = bean.serverPort
+    method = bean.method
+    password = bean.password
+    protocol = bean.protocol
+    protocol_param = bean.protocolParam
+    obfs = bean.obfs
+    obfs_param = bean.obfsParam
+    // do NOT set network field here
 }

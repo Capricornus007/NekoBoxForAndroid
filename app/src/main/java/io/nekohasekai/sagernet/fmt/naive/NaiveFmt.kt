@@ -54,47 +54,45 @@ fun NaiveBean.toUri(proxyOnly: Boolean = false): String {
     return builder.toLink(if (proxyOnly) proto else "naive+$proto", false)
 }
 
-fun NaiveBean.buildNaiveConfig(port: Int, listenUsername: String? = null, listenPassword: String? = null): String {
-    return JSONObject().apply {
-        // process ipv6
-        finalAddress = finalAddress.wrapIPV6Host()
-        serverAddress = serverAddress.wrapIPV6Host()
+fun NaiveBean.buildNaiveConfig(port: Int, listenUsername: String? = null, listenPassword: String? = null): String = JSONObject().apply {
+    // process ipv6
+    finalAddress = finalAddress.wrapIPV6Host()
+    serverAddress = serverAddress.wrapIPV6Host()
 
-        // process sni
-        if (sni.isNotBlank()) {
-            put("host-resolver-rules", "MAP $sni $finalAddress")
-            finalAddress = sni
+    // process sni
+    if (sni.isNotBlank()) {
+        put("host-resolver-rules", "MAP $sni $finalAddress")
+        finalAddress = sni
+    } else {
+        if (serverAddress.isIpAddress()) {
+            // for naive, using IP as SNI name hardly happens
+            // and host-resolver-rules cannot resolve the SNI problem
+            // so do nothing
         } else {
-            if (serverAddress.isIpAddress()) {
-                // for naive, using IP as SNI name hardly happens
-                // and host-resolver-rules cannot resolve the SNI problem
-                // so do nothing
-            } else {
-                put("host-resolver-rules", "MAP $serverAddress $finalAddress")
-                finalAddress = serverAddress
-            }
+            put("host-resolver-rules", "MAP $serverAddress $finalAddress")
+            finalAddress = serverAddress
         }
+    }
 
-        // Authenticate the local SOCKS listener so other apps on the device cannot use
-        // this loopback port as an open relay and leak the egress IP (#1166). The
-        // sing-box socks outbound dials with the same credentials.
-        if (!listenUsername.isNullOrBlank() && !listenPassword.isNullOrBlank()) {
-            put(
-                "listen",
-                "socks://${listenUsername.urlSafe()}:${listenPassword.urlSafe()}@$LOCALHOST:$port",
-            )
-        } else {
-            put("listen", "socks://$LOCALHOST:$port")
-        }
-        put("proxy", toUri(true))
-        if (extraHeaders.isNotBlank()) {
-            put("extra-headers", extraHeaders.split("\n").joinToString("\r\n"))
-        }
-        if (DataStore.logLevel > 0) {
-            put("log", "")
-        }
-        if (insecureConcurrency > 0) {
-            put("insecure-concurrency", insecureConcurrency)
-        }
-    }.toStringPretty()
-}
+    // Authenticate the local SOCKS listener so other apps on the device cannot use
+    // this loopback port as an open relay and leak the egress IP (#1166). The
+    // sing-box socks outbound dials with the same credentials.
+    if (!listenUsername.isNullOrBlank() && !listenPassword.isNullOrBlank()) {
+        put(
+            "listen",
+            "socks://${listenUsername.urlSafe()}:${listenPassword.urlSafe()}@$LOCALHOST:$port",
+        )
+    } else {
+        put("listen", "socks://$LOCALHOST:$port")
+    }
+    put("proxy", toUri(true))
+    if (extraHeaders.isNotBlank()) {
+        put("extra-headers", extraHeaders.split("\n").joinToString("\r\n"))
+    }
+    if (DataStore.logLevel > 0) {
+        put("log", "")
+    }
+    if (insecureConcurrency > 0) {
+        put("insecure-concurrency", insecureConcurrency)
+    }
+}.toStringPretty()

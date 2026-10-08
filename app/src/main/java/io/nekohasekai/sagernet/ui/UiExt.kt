@@ -27,11 +27,9 @@ import kotlinx.coroutines.delay
 
 // Safe activity resolution: fall back to the last alive activity recorded in MessageStore so a
 // detached fragment (e.g. mid batch subscription update) no longer crashes on requireActivity().
-private fun Fragment.safeMainActivity(): MainActivity? =
-    (activity as? MainActivity) ?: (MessageStore.getCurrentActivity() as? MainActivity)
+private fun Fragment.safeMainActivity(): MainActivity? = (activity as? MainActivity) ?: (MessageStore.getCurrentActivity() as? MainActivity)
 
-private fun Fragment.snackbarView(): View? =
-    safeMainActivity()?.window?.decorView?.findViewById<View>(android.R.id.content)
+private fun Fragment.snackbarView(): View? = safeMainActivity()?.window?.decorView?.findViewById<View>(android.R.id.content)
 
 fun Fragment.snackbar(textId: Int): Snackbar {
     val mainAct = safeMainActivity()

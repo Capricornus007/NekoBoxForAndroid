@@ -316,14 +316,13 @@ class BoxProbeLifecycleTest {
         }
     }
 
-    private fun cleanupOnlyProbe(node: ProxyEntity, preparedConfig: ConfigBuildResult = prepared(node)) =
-        object : BoxInstance(node) {
-            override suspend fun init() {
-                config = preparedConfig
-            }
-
-            override fun launch() = Unit
+    private fun cleanupOnlyProbe(node: ProxyEntity, preparedConfig: ConfigBuildResult = prepared(node)) = object : BoxInstance(node) {
+        override suspend fun init() {
+            config = preparedConfig
         }
+
+        override fun launch() = Unit
+    }
 
     private fun node() = ProxyEntity(groupId = 1).putBean(TailscaleBean().apply { initializeDefaultValues() }).also {
         it.id = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.addProxy(it) }

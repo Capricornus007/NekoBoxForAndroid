@@ -165,34 +165,30 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
                 ItemTouchHelper.UP or ItemTouchHelper.DOWN,
                 ItemTouchHelper.START,
             ) {
-                override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) =
-                    if (viewHolder is ProfileHolder) {
-                        super.getSwipeDirs(recyclerView, viewHolder)
-                    } else {
-                        0
-                    }
+                override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) = if (viewHolder is ProfileHolder) {
+                    super.getSwipeDirs(recyclerView, viewHolder)
+                } else {
+                    0
+                }
 
-                override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) =
-                    if (viewHolder is ProfileHolder) {
-                        super.getDragDirs(recyclerView, viewHolder)
-                    } else {
-                        0
-                    }
+                override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) = if (viewHolder is ProfileHolder) {
+                    super.getDragDirs(recyclerView, viewHolder)
+                } else {
+                    0
+                }
 
                 override fun onMove(
                     recyclerView: RecyclerView,
                     viewHolder: RecyclerView.ViewHolder,
                     target: RecyclerView.ViewHolder,
-                ): Boolean {
-                    return if (target !is ProfileHolder) {
-                        false
-                    } else {
-                        configurationAdapter.move(
-                            viewHolder.bindingAdapterPosition,
-                            target.bindingAdapterPosition,
-                        )
-                        true
-                    }
+                ): Boolean = if (target !is ProfileHolder) {
+                    false
+                } else {
+                    configurationAdapter.move(
+                        viewHolder.bindingAdapterPosition,
+                        target.bindingAdapterPosition,
+                    )
+                    true
                 }
 
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -268,20 +264,14 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
             DataStore.dirty = true
         }
 
-        override fun getItemId(position: Int): Long {
-            return if (position == 0) 0 else proxyList[position - 1].id
-        }
+        override fun getItemId(position: Int): Long = if (position == 0) 0 else proxyList[position - 1].id
 
-        override fun getItemViewType(position: Int): Int {
-            return if (position == 0) 0 else 1
-        }
+        override fun getItemViewType(position: Int): Int = if (position == 0) 0 else 1
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return if (viewType == 0) {
-                AddHolder(LayoutAddEntityBinding.inflate(layoutInflater, parent, false))
-            } else {
-                ProfileHolder(LayoutProfileBinding.inflate(layoutInflater, parent, false))
-            }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = if (viewType == 0) {
+            AddHolder(LayoutAddEntityBinding.inflate(layoutInflater, parent, false))
+        } else {
+            ProfileHolder(LayoutProfileBinding.inflate(layoutInflater, parent, false))
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -292,14 +282,10 @@ class BalancerSettingsActivity : ProfileSettingsActivity<BalancerBean>(R.layout.
             }
         }
 
-        override fun getItemCount(): Int {
-            return proxyList.size + 1
-        }
+        override fun getItemCount(): Int = proxyList.size + 1
     }
 
-    fun testProfileAllowed(profile: ProxyEntity): Boolean {
-        return profile.id != DataStore.editingId
-    }
+    fun testProfileAllowed(profile: ProxyEntity): Boolean = profile.id != DataStore.editingId
 
     var replacing = 0
 

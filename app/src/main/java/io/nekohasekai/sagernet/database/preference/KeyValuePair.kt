@@ -21,13 +21,9 @@ class KeyValuePair() : Parcelable {
 
         @JvmField
         val CREATOR = object : Parcelable.Creator<KeyValuePair> {
-            override fun createFromParcel(parcel: Parcel): KeyValuePair {
-                return KeyValuePair(parcel)
-            }
+            override fun createFromParcel(parcel: Parcel): KeyValuePair = KeyValuePair(parcel)
 
-            override fun newArray(size: Int): Array<KeyValuePair?> {
-                return arrayOfNulls(size)
-            }
+            override fun newArray(size: Int): Array<KeyValuePair?> = arrayOfNulls(size)
         }
     }
 
@@ -67,11 +63,11 @@ class KeyValuePair() : Parcelable {
     @Deprecated("Use long.", ReplaceWith("long"))
     val int: Int?
         get() = if (valueType == TYPE_INT) ByteBuffer.wrap(value).int else null
+
+    @Suppress("DEPRECATION")
     val long: Long?
         get() = when (valueType) {
-            @Suppress("DEPRECATION")
-            TYPE_INT,
-            -> ByteBuffer.wrap(value).int.toLong()
+            TYPE_INT -> ByteBuffer.wrap(value).int.toLong()
             TYPE_LONG -> ByteBuffer.wrap(value).long
             else -> null
         }
@@ -143,16 +139,14 @@ class KeyValuePair() : Parcelable {
     }
 
     @Suppress("IMPLICIT_CAST_TO_ANY")
-    override fun toString(): String {
-        return when (valueType) {
-            TYPE_BOOLEAN -> boolean
-            TYPE_FLOAT -> float
-            TYPE_LONG -> long
-            TYPE_STRING -> string
-            TYPE_STRING_SET -> stringSet
-            else -> null
-        }?.toString() ?: "null"
-    }
+    override fun toString(): String = when (valueType) {
+        TYPE_BOOLEAN -> boolean
+        TYPE_FLOAT -> float
+        TYPE_LONG -> long
+        TYPE_STRING -> string
+        TYPE_STRING_SET -> stringSet
+        else -> null
+    }?.toString() ?: "null"
 
     constructor(parcel: Parcel) : this() {
         key = parcel.readString()!!
@@ -166,7 +160,5 @@ class KeyValuePair() : Parcelable {
         parcel.writeByteArray(value)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 }

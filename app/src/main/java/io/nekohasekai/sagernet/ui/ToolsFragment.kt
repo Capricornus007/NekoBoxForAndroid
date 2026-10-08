@@ -23,7 +23,8 @@ class ToolsFragment : ToolbarFragment(R.layout.layout_tools) {
 
         TabLayoutMediator(binding.toolsTab, binding.toolsPager) { tab, position ->
             tab.text = tools[position].name()
-            tab.view.setOnLongClickListener { // clear toast
+            tab.view.setOnLongClickListener {
+                // clear toast
                 true
             }
         }.attach()

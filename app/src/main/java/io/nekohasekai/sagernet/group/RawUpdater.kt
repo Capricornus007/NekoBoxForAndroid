@@ -56,9 +56,7 @@ object RawUpdater : GroupUpdater() {
     private const val CIRCUIT_BREAK_MIN_PROFILES = 10
     private const val CIRCUIT_BREAK_MAX_DROP_RATIO = 0.7
 
-    internal fun subscriptionFilterActive(filterMode: Int, filterRegex: String): Boolean {
-        return filterMode != SubscriptionFilterMode.DISABLED && filterRegex.isNotBlank()
-    }
+    internal fun subscriptionFilterActive(filterMode: Int, filterRegex: String): Boolean = filterMode != SubscriptionFilterMode.DISABLED && filterRegex.isNotBlank()
 
     /**
      * Apply the subscription name filter. Matching ignores case - people type "hk" for a
@@ -90,10 +88,8 @@ object RawUpdater : GroupUpdater() {
      * An include/exclude filter is the user asking for a smaller group, so its result must
      * never be read as a truncated subscription response.
      */
-    internal fun deletionCircuitBreak(existsSize: Int, fetchedSize: Int, filterActive: Boolean): Boolean {
-        return !filterActive && existsSize >= CIRCUIT_BREAK_MIN_PROFILES &&
-            fetchedSize < existsSize * CIRCUIT_BREAK_MAX_DROP_RATIO
-    }
+    internal fun deletionCircuitBreak(existsSize: Int, fetchedSize: Int, filterActive: Boolean): Boolean = !filterActive && existsSize >= CIRCUIT_BREAK_MIN_PROFILES &&
+        fetchedSize < existsSize * CIRCUIT_BREAK_MAX_DROP_RATIO
 
     internal data class ReconciliationResult(
         val contentChanged: Boolean,
@@ -390,13 +386,10 @@ object RawUpdater : GroupUpdater() {
         )
     }
 
-    fun findBodyHeader(content: String, name: String): String? {
-        return Regex("(?m)^\\s*#$name:\\s*(.+)$", RegexOption.IGNORE_CASE)
-            .find(content)?.groupValues?.get(1)?.trim()
-    }
+    fun findBodyHeader(content: String, name: String): String? = Regex("(?m)^\\s*#$name:\\s*(.+)$", RegexOption.IGNORE_CASE)
+        .find(content)?.groupValues?.get(1)?.trim()
 
-    fun parseBodyProfileTitle(content: String): String =
-        decodeProfileTitle(findBodyHeader(content, "profile-title") ?: "")
+    fun parseBodyProfileTitle(content: String): String = decodeProfileTitle(findBodyHeader(content, "profile-title") ?: "")
 
     fun decodeProfileTitle(raw: String): String {
         var title = raw.trim()
@@ -777,6 +770,7 @@ object RawUpdater : GroupUpdater() {
                             "vmess", "vless", "trojan" -> {
                                 val bean = when (type) {
                                     "vmess" -> VMessBean()
+
                                     "vless" -> VMessBean().apply {
                                         alterId = -1 // make it VLESS
                                         packetEncoding = 2 // clash meta default XUDP
@@ -795,6 +789,7 @@ object RawUpdater : GroupUpdater() {
                                 for (opt in proxy) {
                                     when (opt.key) {
                                         "name" -> bean.name = opt.value?.toString()
+
                                         "password" -> if (bean is TrojanBean) {
                                             bean.password =
                                                 opt.value?.toString()
@@ -1017,14 +1012,19 @@ object RawUpdater : GroupUpdater() {
                                     if (opt.value == null) continue
                                     when (opt.key.replace("_", "-")) {
                                         "name" -> bean.name = opt.value.toString()
+
                                         "server" -> bean.serverAddress = opt.value as String
+
                                         "port" -> bean.serverPort = opt.value.toString().toInt()
+
                                         "password" -> bean.password = opt.value.toString()
+
                                         "client-fingerprint" ->
                                             bean.utlsFingerprint =
                                                 opt.value as String
 
                                         "sni" -> bean.sni = opt.value.toString()
+
                                         "skip-cert-verify" ->
                                             bean.allowInsecure =
                                                 opt.value.toString() == "true"
@@ -1033,9 +1033,11 @@ object RawUpdater : GroupUpdater() {
                                             val alpn = (opt.value as? (List<String>))
                                             bean.alpn = alpn?.joinToString("\n")
                                         }
+
                                         "reality-pub-key", "public-key" ->
                                             bean.realityPubKey =
                                                 opt.value.toString()
+
                                         "reality-short-id", "short-id" ->
                                             bean.realityShortId =
                                                 opt.value.toString()
@@ -1050,10 +1052,15 @@ object RawUpdater : GroupUpdater() {
                                     if (opt.value == null) continue
                                     when (opt.key.replace("_", "-")) {
                                         "name" -> bean.name = opt.value.toString()
+
                                         "server" -> bean.serverAddress = opt.value as String
+
                                         "port" -> bean.serverPort = opt.value.toString().toIntOrNull() ?: 0
+
                                         "uuid" -> bean.uuid = opt.value.toString()
+
                                         "password" -> bean.password = opt.value.toString()
+
                                         "sni" -> bean.sni = opt.value.toString()
 
                                         // mihomo spells juicity's TLS bypass as allow-insecure, not
@@ -1083,9 +1090,13 @@ object RawUpdater : GroupUpdater() {
                                     for ((key, value) in configToUse) {
                                         when (key.replace("_", "-")) {
                                             "server" -> serverAddress = value.toString()
+
                                             "port" -> serverPort = value.toString().toIntOrNull() ?: 0
+
                                             "mtu" -> mtu = value.toString().toIntOrNull() ?: 0
+
                                             "allowed-ips" -> peerAllowedIps = value.clashList()
+
                                             "ip" -> {
                                                 val ipValue = value.toString()
                                                 localAddress = if (!ipValue.contains("/")) {
@@ -1094,6 +1105,7 @@ object RawUpdater : GroupUpdater() {
                                                     ipValue
                                                 }
                                             }
+
                                             "ipv6" -> {
                                                 val ipv6Value = value.toString()
                                                 val processedIPv6Value = if (!ipv6Value.contains("/")) {
@@ -1107,9 +1119,13 @@ object RawUpdater : GroupUpdater() {
                                                     localAddress += "\n$processedIPv6Value"
                                                 }
                                             }
+
                                             "private-key" -> privateKey = value.toString()
+
                                             "public-key" -> peerPublicKey = value.toString()
+
                                             "pre-shared-key", "preshared-key" -> peerPreSharedKey = value.toString()
+
                                             "reserved" -> {
                                                 val reservedValue = value
                                                 when (reservedValue) {
@@ -1125,6 +1141,7 @@ object RawUpdater : GroupUpdater() {
                                                             ) { it.toString() }
                                                         }
                                                     }
+
                                                     else -> {
                                                         reserved = reservedValue.toString().replace(
                                                             "[\\[\\] ]".toRegex(),
@@ -1152,8 +1169,11 @@ object RawUpdater : GroupUpdater() {
                                     if (opt.value == null) continue
                                     when (opt.key.replace("_", "-")) {
                                         "name" -> bean.name = opt.value.toString()
+
                                         "server" -> bean.serverAddress = opt.value as String
+
                                         "port" -> bean.serverPorts = opt.value.toString()
+
                                         "ports" -> hopPorts = opt.value.toString()
 
                                         "obfs" -> bean.obfuscation = opt.value.toString()
@@ -1211,8 +1231,11 @@ object RawUpdater : GroupUpdater() {
                                     if (opt.value == null) continue
                                     when (opt.key.replace("_", "-")) {
                                         "name" -> bean.name = opt.value.toString()
+
                                         "server" -> bean.serverAddress = opt.value as String
+
                                         "port" -> bean.serverPorts = opt.value.toString()
+
                                         "ports" -> hopPorts = opt.value.toString()
 
                                         "obfs-password" -> bean.obfuscation = opt.value.toString()
@@ -1251,8 +1274,11 @@ object RawUpdater : GroupUpdater() {
                                     if (opt.value == null) continue
                                     when (opt.key.replace("_", "-")) {
                                         "name" -> bean.name = opt.value.toString()
+
                                         "server" -> bean.serverAddress = opt.value.toString()
+
                                         "ip" -> ip = opt.value.toString()
+
                                         "port" -> bean.serverPort = opt.value.toString().toInt()
 
                                         "token" -> {
@@ -1398,11 +1424,9 @@ object RawUpdater : GroupUpdater() {
         return null
     }
 
-    fun clashCipher(cipher: String): String {
-        return when (cipher) {
-            "dummy" -> "none"
-            else -> cipher
-        }
+    fun clashCipher(cipher: String): String = when (cipher) {
+        "dummy" -> "none"
+        else -> cipher
     }
 
     /**
@@ -1418,9 +1442,7 @@ object RawUpdater : GroupUpdater() {
         return beans
     }
 
-    fun parseWireGuard(conf: String): List<WireGuardBean> {
-        return AmneziaWireGuardImporter.parseWireGuard(conf)
-    }
+    fun parseWireGuard(conf: String): List<WireGuardBean> = AmneziaWireGuardImporter.parseWireGuard(conf)
 
     /** clash YAML 的 `peers:` 列表第二筆起也要留得下來。 */
     private fun clashWireGuardPeerSpec(entry: Map<String, Any?>): WireGuardPeerSpec? {
@@ -1477,8 +1499,7 @@ object RawUpdater : GroupUpdater() {
 
     // 交由匯入器解析後再轉型：它本來是第二套實作，會漏掉 AllowedIPs、多 peer 的
     // 分流合併、IPv6 方括號與本地位址補前綴，留著只會跟匯入路徑越走越不一致。
-    fun parseAmneziaWG(conf: String): List<AmneziaWGBean> =
-        AmneziaWireGuardImporter.parseWireGuard(conf).map { it.toAmneziaWGBean() }
+    fun parseAmneziaWG(conf: String): List<AmneziaWGBean> = AmneziaWireGuardImporter.parseWireGuard(conf).map { it.toAmneziaWGBean() }
 
     fun parseJSON(json: Any): List<AbstractBean> {
         val proxies = ArrayList<AbstractBean>()

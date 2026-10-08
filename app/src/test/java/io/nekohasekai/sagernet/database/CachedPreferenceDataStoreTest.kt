@@ -47,8 +47,7 @@ class CachedPreferenceDataStoreTest {
     /** Runs submitted tasks immediately on the calling thread (deterministic, ordered). */
     private val directExecutor = Executor { it.run() }
 
-    private fun newStore(dao: FakeDao) =
-        RoomPreferenceDataStore(dao, cached = true, database = null, diskExecutor = directExecutor)
+    private fun newStore(dao: FakeDao) = RoomPreferenceDataStore(dao, cached = true, database = null, diskExecutor = directExecutor)
 
     @Test
     fun prime_seedsReadsFromDb() {

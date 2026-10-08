@@ -193,34 +193,30 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
             ItemTouchHelper.START,
         ) {
-            override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) =
-                if (viewHolder is ProfileHolder) {
-                    super.getSwipeDirs(recyclerView, viewHolder)
-                } else {
-                    0
-                }
+            override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) = if (viewHolder is ProfileHolder) {
+                super.getSwipeDirs(recyclerView, viewHolder)
+            } else {
+                0
+            }
 
-            override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) =
-                if (viewHolder is ProfileHolder) {
-                    super.getDragDirs(recyclerView, viewHolder)
-                } else {
-                    0
-                }
+            override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) = if (viewHolder is ProfileHolder) {
+                super.getDragDirs(recyclerView, viewHolder)
+            } else {
+                0
+            }
 
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder,
-            ): Boolean {
-                return if (target !is ProfileHolder) {
-                    false
-                } else {
-                    configurationAdapter.move(
-                        viewHolder.bindingAdapterPosition,
-                        target.bindingAdapterPosition,
-                    )
-                    true
-                }
+            ): Boolean = if (target !is ProfileHolder) {
+                false
+            } else {
+                configurationAdapter.move(
+                    viewHolder.bindingAdapterPosition,
+                    target.bindingAdapterPosition,
+                )
+                true
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -258,25 +254,23 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         ignoreCase = DataStore.fastestIgnoreCase
     }
 
-    private fun fastestResolutionMessage(exception: FastestCandidateResolutionException): String {
-        return when (exception.error) {
-            FastestCandidateResolutionError.EMPTY_REGEX ->
-                getString(R.string.fastest_regex_error_empty)
+    private fun fastestResolutionMessage(exception: FastestCandidateResolutionException): String = when (exception.error) {
+        FastestCandidateResolutionError.EMPTY_REGEX ->
+            getString(R.string.fastest_regex_error_empty)
 
-            FastestCandidateResolutionError.INVALID_REGEX -> getString(
-                R.string.fastest_regex_error_invalid,
-                exception.cause?.message.orEmpty(),
-            )
+        FastestCandidateResolutionError.INVALID_REGEX -> getString(
+            R.string.fastest_regex_error_invalid,
+            exception.cause?.message.orEmpty(),
+        )
 
-            FastestCandidateResolutionError.SOURCE_GROUP_MISSING ->
-                getString(R.string.fastest_regex_error_source_missing)
+        FastestCandidateResolutionError.SOURCE_GROUP_MISSING ->
+            getString(R.string.fastest_regex_error_source_missing)
 
-            FastestCandidateResolutionError.SOURCE_GROUP_NOT_SUBSCRIPTION ->
-                getString(R.string.fastest_regex_error_source_not_subscription)
+        FastestCandidateResolutionError.SOURCE_GROUP_NOT_SUBSCRIPTION ->
+            getString(R.string.fastest_regex_error_source_not_subscription)
 
-            FastestCandidateResolutionError.DUPLICATE_MANUAL_CANDIDATES ->
-                getString(R.string.profile_reference_not_allowed)
-        }
+        FastestCandidateResolutionError.DUPLICATE_MANUAL_CANDIDATES ->
+            getString(R.string.profile_reference_not_allowed)
     }
 
     private fun showRegexPreview(result: Result<List<ProxyEntity>>) {
@@ -338,20 +332,14 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             DataStore.dirty = true
         }
 
-        override fun getItemId(position: Int): Long {
-            return if (position == 0) 0 else proxyList[position - 1].id
-        }
+        override fun getItemId(position: Int): Long = if (position == 0) 0 else proxyList[position - 1].id
 
-        override fun getItemViewType(position: Int): Int {
-            return if (position == 0) 0 else 1
-        }
+        override fun getItemViewType(position: Int): Int = if (position == 0) 0 else 1
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            return if (viewType == 0) {
-                AddHolder(LayoutAddEntityBinding.inflate(layoutInflater, parent, false))
-            } else {
-                ProfileHolder(LayoutProfileBinding.inflate(layoutInflater, parent, false))
-            }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = if (viewType == 0) {
+            AddHolder(LayoutAddEntityBinding.inflate(layoutInflater, parent, false))
+        } else {
+            ProfileHolder(LayoutProfileBinding.inflate(layoutInflater, parent, false))
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -362,9 +350,7 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             }
         }
 
-        override fun getItemCount(): Int {
-            return proxyList.size + 1
-        }
+        override fun getItemCount(): Int = proxyList.size + 1
     }
 
     fun testProfileAllowed(profile: ProxyEntity): Boolean {
@@ -457,8 +443,7 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             }
         }
 
-    inner class AddHolder(val binding: LayoutAddEntityBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class AddHolder(val binding: LayoutAddEntityBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind() {
             binding.root.setOnClickListener {
                 replacing = 0
@@ -472,8 +457,7 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         }
     }
 
-    inner class ProfileHolder(binding: LayoutProfileBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class ProfileHolder(binding: LayoutProfileBinding) : RecyclerView.ViewHolder(binding.root) {
 
         val profileName = binding.profileName
         val profileType = binding.profileType
