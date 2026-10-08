@@ -23,7 +23,7 @@
 # Android、iptables DNS hijack 被 input connmark 跳過、go stack 重寫、arm64 NEON checksum 等），
 # libcore 的 require 同時對齊 sing-box 的 7539c98。這批全是 Android 資料路徑上的修正，值得為它
 # 多跑一輪核心建置。
-export COMMIT_SING_BOX="1cf4f1e18f6dccc18dfa563ffe176f82a60eb3e3"
+export COMMIT_SING_BOX="e008139bf15828474866a717864a5fd6226515ae"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
