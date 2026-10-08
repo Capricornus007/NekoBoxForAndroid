@@ -55,6 +55,15 @@ android {
     }
 }
 
+// 失敗的單測要在 CI 日誌裡看得到斷言訊息本身（只有 "java.lang.AssertionError at Foo.kt:43"
+// 時，得把整個 job 重跑一次才知道是哪個值不對）。
+tasks.withType<Test>().configureEach {
+    testLogging {
+        events(org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED)
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+}
+
 // KSP options (room schema export). The `ksp { }` extension is registered by the KSP Gradle
 // plugin at the project level, not inside the Android DSL, so it is declared as a top-level
 // block here.
@@ -81,6 +90,12 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.8.0")
     implementation("androidx.work:work-runtime-ktx:2.11.2")
     implementation("androidx.work:work-multiprocess:2.11.2")
+    // lifecycle 是遞補進來的（appcompat／fragment／camera 都要它），解析結果停在 2.9.4。
+    // 那版自帶的 lint.jar 還引用 Kotlin 2.4 已移除的 KtLightModifierList#getKotlinOrigin()，
+    // 於是 AGP 9.5 的 lint 用 ObsoleteLintCustomCheck（FATAL）把整個 registry 踢掉、lintOssDebug
+    // 直接紅。釘最新穩定版 2.11.0：實地解開 2.8.7／2.9.4／2.10.0／2.11.0／2.12.0-alpha04 的
+    // lint.jar 比對過，2.10.0 起不再引用那個 API。這樣既不用關 lint 檢查也不用降工具鏈。
+    implementation("androidx.lifecycle:lifecycle-runtime:2.11.0")
 
     implementation("com.google.android.material:material:1.14.0")
     implementation("com.google.code.gson:gson:2.14.0")
@@ -128,7 +143,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
     // Robolectric is available for tests that must touch Android framework classes;
     // prefer extracting pure functions over using it (see Plan 007).
-    testImplementation("org.robolectric:robolectric:4.16.1")
+    testImplementation("org.robolectric:robolectric:4.17")
 
     // Instrumented tests (androidTest) — Room migration verification on a real SQLite.
     // Runs on the CI "Instrumented (Room migrations)" job when the runner has KVM; otherwise
