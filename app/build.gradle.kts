@@ -104,6 +104,11 @@ dependencies {
     implementation(platform("io.github.rosemoe:editor-bom:0.24.6"))
     implementation("io.github.rosemoe:editor")
     implementation("io.github.rosemoe:language-textmate")
+    // language-textmate publishes org.eclipse.jdt.annotation in "runtime" scope, but its
+    // Java API (IThemeSource.fromInputStream) is annotated with it. Kotlin 2.4 turns that
+    // missing compile-time annotation class into an error, so pin it as compileOnly here.
+    // Version matches the one language-textmate 0.24.6 already ships at runtime.
+    compileOnly("org.eclipse.jdt:org.eclipse.jdt.annotation:2.4.100")
 
     implementation("com.squareup.okhttp3:okhttp:5.5.0")
     implementation("org.yaml:snakeyaml:2.6")
