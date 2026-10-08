@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -16,28 +17,106 @@ import (
 	srp "github.com/ProtonMail/go-srp"
 )
 
-// Proton 的閘門（參考實作：go-proton-api/server/router.go 的 validateAppVersion）把
-// x-pm-appversion 切成「<產品名>_<semver>」，第二段要能當 semver 解析。這裡只驗
-// 主.副.修 加可选的 prerelease／build，跟 semver 的實際接受範圍一致。
-var semverRE = regexp.MustCompile(`^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$`)
+// 正式閘門的規則是「<平台>-<產品>@<版本>」，2026-10-08 用公開端點 /auth/v4/info 逐個
+// 字串量測得來（該端點在驗 token 之前就會先過版本閘門，所以不需要帳密）：
+//
+//	"NB4A_1.0.0"             -> 400/5002 Invalid app version
+//	"NB4A@1.0.0"             -> 400/2064 Application platform and product must be separated by a dash
+//	"android-nb4a@1.0.0"     -> 400/2064 Product `nb4a` is not valid
+//	"NB4A-android@1.0.0"     -> 400/2064 Application name must be in lowercase
+//	"android-vpn@1.0.0"      -> 422/5003 This version of the app is no longer supported
+//	"android-vpn@5.20.57.0"  -> 401（過閘門，進到驗 token）
+//
+// 這裡刻意不沿用 go-proton-api 那套 mock 的 strings.Split(v,"_") 判式：它放過底線寫法、
+// 正式閘門不放，照它寫測試就會一路綠而真機永遠登入不進去（我們已經踩過兩次）。
+var appVersionRE = regexp.MustCompile(`^([^@]+)@([0-9][0-9.]*)$`)
 
-func validAppVersionHeader(v string) bool {
-	parts := strings.Split(v, "_")
-	if len(parts) != 2 || parts[0] == "" {
-		return false
-	}
-	return semverRE.MatchString(parts[1])
+var knownPlatforms = map[string]bool{
+	"android": true, "android_tv": true, "ios": true, "ios_tv": true,
+	"web": true, "linux": true, "macos": true, "windows": true, "macos_appstore": true,
 }
 
-// 這支測試盯的是「登入會不會一開始就被 400 擋掉」：常數寫成 NB4A/1.0.0 那種斜線格式時，
-// Proton 連 SRP 都不讓你走。
-func TestAppVersionHeaderMatchesProtonsFormatRule(t *testing.T) {
-	if !validAppVersionHeader(protonAppVersion) {
-		t.Fatalf("protonAppVersion = %q 不符合 Proton 的 <產品名>_<semver> 格式，實際登入會吃到 400/5003", protonAppVersion)
+var knownProducts = map[string]bool{
+	"vpn": true, "account": true, "mail": true, "calendar": true, "pass": true,
+}
+
+// minSupportedVersion 是「版本被淘汰」的下界，實測 5.10.0 起可過、1.0.0 吃 422/5003。
+var minSupportedVersion = []int{5, 10}
+
+// appVersionGate 回空字串代表放行，否則回 Proton 實際會給的那句錯誤。
+func appVersionGate(v string) string {
+	if v == "" {
+		return "Missing x-pm-appversion header"
 	}
-	for _, bad := range []string{"NB4A/1.0.0", "NB4A", "NB4A_1.0", "NB4A_1.0.0_1", "_1.0.0", "NB4A_v1.0.0", "NB4A_1.0.0-", ""} {
-		if validAppVersionHeader(bad) {
-			t.Errorf("validAppVersionHeader(%q) 回 true，但這個格式 Proton 會擋", bad)
+	name, version, ok := strings.Cut(v, "@")
+	if !ok {
+		return "Invalid app version"
+	}
+	if strings.ToLower(name) != name {
+		return "Application name must be in lowercase, got " + name
+	}
+	platform, product, hasDash := strings.Cut(name, "-")
+	if !hasDash {
+		return "Application platform and product must be separated by a dash"
+	}
+	if !knownPlatforms[platform] {
+		return "Platform `" + platform + "` is not valid (in `" + v + "')"
+	}
+	if !knownProducts[product] {
+		return "Product `" + product + "` is not valid (in `" + v + "')"
+	}
+	if !appVersionRE.MatchString(v) {
+		return "Invalid app version"
+	}
+	got := strings.Split(version, ".")
+	if len(got) < len(minSupportedVersion) {
+		return "This version of the app is no longer supported"
+	}
+	for i, floor := range minSupportedVersion {
+		n, err := strconv.Atoi(got[i])
+		if err != nil || n < floor {
+			return "This version of the app is no longer supported"
+		}
+		if n > floor {
+			break
+		}
+	}
+	return ""
+}
+
+// TestAppVersionHeaderMatchesProtonsFormatRule 盯的是「登入會不會一開始就被擋」：
+// 常數寫成 NB4A/1.0.0 或 NB4A_1.0.0 那種格式時，Proton 連 SRP 都不讓你走。
+func TestAppVersionHeaderMatchesProtonsFormatRule(t *testing.T) {
+	if reason := appVersionGate(protonAppVersion); reason != "" {
+		t.Fatalf("protonAppVersion = %q 會被 Proton 閘門擋掉：%s", protonAppVersion, reason)
+	}
+	bad := map[string]string{
+		"NB4A/1.0.0":         "Invalid app version",
+		"NB4A_1.0.0":         "Invalid app version",
+		"android-vpn":        "Invalid app version",
+		"android-vpn@":       "Invalid app version",
+		"NB4A@1.0.0":         "Application name must be in lowercase",
+		"NB4A-android@1.0.0": "Application name must be in lowercase",
+		"android@1.0.0":      "Application platform and product must be separated by a dash",
+		"android-nb4a@1.0.0": "Product `nb4a` is not valid",
+		"solar-vpn@1.0.0":    "Platform `solar` is not valid",
+		"android-vpn@1.0.0":  "This version of the app is no longer supported",
+		"":                   "Missing x-pm-appversion header",
+	}
+	for v, want := range bad {
+		got := appVersionGate(v)
+		if got == "" {
+			t.Errorf("appVersionGate(%q) 放行，但 Proton 會擋（期望含 %q）", v, want)
+			continue
+		}
+		if !strings.HasPrefix(got, want) {
+			t.Errorf("appVersionGate(%q) = %q，期望開頭是 %q", v, got, want)
+		}
+	}
+	// 官方 TV 端是 android_tv-vpn（ProtonVPN/android-app Constants.kt:73-74），別把底線擋掉。
+	for _, v := range []string{"android-vpn@5.20.57.0", "android_tv-vpn@5.20.57.0", "web-account@5.5.5.5"} {
+		if got := appVersionGate(v); got != "" {
+			t.Errorf("appVersionGate(%q) = %q，這個格式 Proton 是收的", v, got)
 		}
 	}
 }
@@ -89,16 +168,23 @@ func newMockAuthServer(t *testing.T, twoFA proton.TwoFAStatus) *mockAuthServer {
 func (m *mockAuthServer) handler(t *testing.T) http.Handler {
 	t.Helper()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Proton 的閘門對 x-pm-appversion 的格式是有條件的：「<產品名>_<semver>」，
-		// 切成兩段、第二段要能當 semver 解析，否則 HTTP 400 + Code 5003。這一步要是在
-		// mock 裡缺席，測試就會放過一個「登入必定無效」的常數（真實用戶端就是這樣吃到
-		// 400 invalid app version 的）。
-		if v := r.Header.Get("x-pm-appversion"); !validAppVersionHeader(v) {
+		// mock 這裡照正式閘門的規則走（見 appVersionGate 的註解與量測記錄）。
+		// 這一步要是缺席或写成舊的 "_" 判式，測試就會放過一個「登入必定無效」的常數。
+		if reason := appVersionGate(r.Header.Get("x-pm-appversion")); reason != "" {
+			code := 5002
+			status := http.StatusBadRequest
+			if strings.HasPrefix(reason, "This version") {
+				code = 5003
+				status = http.StatusUnprocessableEntity
+			} else if strings.HasPrefix(reason, "Platform") || strings.HasPrefix(reason, "Product") ||
+				strings.HasPrefix(reason, "Application name") || strings.HasPrefix(reason, "Application platform") {
+				code = 2064
+			}
 			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(status)
 			_ = json.NewEncoder(w).Encode(map[string]any{
-				"Code":    5003,
-				"Message": "Invalid app version: " + v,
+				"Code":    code,
+				"Message": reason,
 			})
 			return
 		}

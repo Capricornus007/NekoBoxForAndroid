@@ -26,8 +26,10 @@ import (
 //
 // 平台與產品都要在他們登記過的清單裡，所以第三方客戶端只能沿用官方 Android 客戶端的
 // 身分；格式與值直接取自公開源碼 ProtonVPN/android-app：
-//   app/src/main/java/com/protonvpn/android/utils/Constants.kt:73  MOBILE_CLIENT_ID = "android-vpn"
-//   app/src/main/java/com/protonvpn/android/api/VpnApiClient.kt:49 "${clientId}@" + versionName()
+//
+//	app/src/main/java/com/protonvpn/android/utils/Constants.kt:73  MOBILE_CLIENT_ID = "android-vpn"
+//	app/src/main/java/com/protonvpn/android/api/VpnApiClient.kt:49 "${clientId}@" + versionName()
+//
 // 版本號取該倉最新 release（5.20.57.0，2026-09-30）。Proton 會淘汰舊版本（見上面的
 // 422/5003），所以這行是會過期的常數：哪天登入吃到 5003，就到上面那個倉抓新的 release tag。
 const protonAppVersion = "android-vpn@5.20.57.0"
