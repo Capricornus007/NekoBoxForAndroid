@@ -128,6 +128,81 @@ class ProtonSidecarParseTest {
     }
 
     @Test
+    fun readsTheCaptchaChallengeOutOfARejectedLogin() {
+        // 422/Code 9001 的 Details 只有經 sidecar 轉成 hvToken/hvMethods，UI 才開得了
+        // App 內的驗證頁面；只留一句英文的話使用者就卡在「去瀏覽器解一次」那條死路。
+        val state = ProtonJson.parseLogin(
+            """{"ok":false,"reason":"captcha-required","code":9001,
+               "error":"For security reasons, please complete CAPTCHA.",
+               "hvToken":"HVSTART123","hvMethods":["captcha","email"]}""",
+        )
+        assertFalse(state.ok)
+        assertEquals("captcha-required", state.reason)
+        assertEquals("HVSTART123", state.captchaToken)
+        assertEquals(listOf("captcha", "email"), state.captchaMethods)
+    }
+
+    @Test
+    fun aLoginWithoutAChallengeKeepsTheFieldsEmpty() {
+        val state = ProtonJson.parseLogin("""{"ok":false,"reason":"wrong-password"}""")
+        assertEquals("", state.captchaToken)
+        assertTrue(state.captchaMethods.isEmpty())
+    }
+
+    @Test
+    fun readsTheCaptchaPagesTheSidecarBuilds() {
+        val challenge = ProtonJson.parseCaptchaBegin(
+            """{"ok":true,"token":"HVSTART123","methods":["captcha"],
+               "solveURL":"https://verify.proton.me/?embed=true&token=HVSTART123&methods=captcha&theme=2",
+               "captchaURL":"https://api.protonmail.ch/core/v4/captcha?Token=HVSTART123&ForceWebMessaging=0"}""",
+        )
+        assertTrue(challenge.ok)
+        assertTrue(challenge.usable)
+        // 首選官方驗證應用，API 自己的驗證頁是備選。
+        assertTrue(challenge.inAppUrl.startsWith("https://verify.proton.me/"))
+        assertTrue(challenge.captchaUrl.contains("ForceWebMessaging=0"))
+    }
+
+    @Test
+    fun fallsBackToTheApiCaptchaPageWhenTheVerifyAppIsNotOffered() {
+        val challenge = ProtonJson.parseCaptchaBegin(
+            """{"ok":true,"token":"HV1","captchaURL":"https://api.protonmail.ch/core/v4/captcha?Token=HV1"}""",
+        )
+        assertTrue(challenge.usable)
+        assertEquals("https://api.protonmail.ch/core/v4/captcha?Token=HV1", challenge.inAppUrl)
+    }
+
+    @Test
+    fun aChallengeWithNoPageToLoadIsNotUsable() {
+        val messageOnly = ProtonJson.parseCaptchaBegin(
+            """{"ok":true,"messageURL":"https://verify.proton.me/?methods=captcha&token=HV1"}""",
+        )
+        assertFalse("there is nothing to show in-app", messageOnly.usable)
+        assertEquals("https://verify.proton.me/?methods=captcha&token=HV1", messageOnly.messageUrl)
+
+        val nothing = ProtonJson.parseCaptchaBegin("""{"ok":false,"reason":"captcha-required"}""")
+        assertFalse(nothing.usable)
+        assertFalse(ProtonJson.parseCaptchaBegin("not json").ok)
+    }
+
+    @Test
+    fun readsTheSolvedAnswerToSendBackToLogin() {
+        val answer = ProtonJson.parseCaptchaSolve(
+            """{"ok":true,"token":"HVSTART123:solved","type":"captcha"}""",
+        )
+        assertTrue(answer.ok)
+        assertEquals("HVSTART123:solved", answer.token)
+        assertEquals("captcha", answer.type)
+
+        val expired = ProtonJson.parseCaptchaSolve(
+            """{"ok":false,"reason":"captcha-expired","error":"the verification challenge expired"}""",
+        )
+        assertFalse(expired.ok)
+        assertEquals("captcha-expired", expired.reason)
+        assertFalse(ProtonJson.parseCaptchaSolve("garbage").ok)
+    }
+
+    @Test
     fun generatesAWireGuardConfigTheImporterCanRead() {
         val node = ProtonNode(
             id = "11", name = "JP#2", penalty = 0.2, tier = 2, supportsIPv6 = true,

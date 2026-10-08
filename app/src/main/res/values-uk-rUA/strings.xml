@@ -1024,5 +1024,14 @@
     <string name="proton_warning_accept">Зрозуміло</string>
 
     <string name="action_reset">Скинути</string>
-    <string name="proton_captcha_required">Proton вимагає пройти CAPTCHA для цієї мережі. Виконайте її на щойно відкритій сторінці та знову торкніться «Увійти».</string>
+    <string name="proton_captcha_required">Proton вимагає пройти CAPTCHA для цієї мережі. Виконайте її нижче.</string>
+    <string name="proton_captcha_title">Підтвердження, що ви людина</string>
+    <string name="proton_captcha_hint">Виконайте завдання нижче, потім поверніться сюди.</string>
+    <string name="proton_captcha_reload">Оновити</string>
+    <string name="proton_captcha_open">Браузер</string>
+    <string name="proton_captcha_failed">Сторінку перевірки не завантажено.</string>
+    <string name="proton_captcha_expired">CAPTCHA завершилася. Натисніть «Оновити».</string>
+    <string name="proton_captcha_solving">Перевірено, виконується вхід…</string>
+    <string name="proton_captcha_rejected">Proton відхилив цю CAPTCHA. Увійдіть ще раз.</string>
+    <string name="proton_captcha_unavailable">Proton не дав CAPTCHA для проходження тут.</string>
 </resources>

@@ -980,5 +980,14 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="proton_warning_accept">Begrepen</string>
 
     <string name="action_reset">Herstel</string>
-    <string name="proton_captcha_required">Proton vereist een CAPTCHA voor dit netwerk. Los deze op op de pagina die zojuist is geopend en tik opnieuw op Aanmelden.</string>
+    <string name="proton_captcha_required">Proton vereist een CAPTCHA voor dit netwerk. Los het hieronder op.</string>
+    <string name="proton_captcha_title">Mensverificatie</string>
+    <string name="proton_captcha_hint">Los de uitdaging hieronder op, dan keer je hier terug.</string>
+    <string name="proton_captcha_reload">Opnieuw laden</string>
+    <string name="proton_captcha_open">Browser</string>
+    <string name="proton_captcha_failed">De verificatiepagina werd niet geladen.</string>
+    <string name="proton_captcha_expired">De CAPTCHA is verlopen. Tik op Opnieuw laden.</string>
+    <string name="proton_captcha_solving">Geverifieerd, bezig met aanmelden…</string>
+    <string name="proton_captcha_rejected">Proton heeft deze CAPTCHA geweigerd. Meld u opnieuw aan.</string>
+    <string name="proton_captcha_unavailable">Proton gaf hier geen CAPTCHA om op te lossen.</string>
 </resources>

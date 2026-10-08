@@ -1019,5 +1019,14 @@
     <string name="proton_warning_accept">J\'ai compris</string>
 
     <string name="action_reset">Réinitialiser</string>
-    <string name="proton_captcha_required">Proton exige un CAPTCHA pour ce réseau. Résolvez-le sur la page qui vient de s’ouvrir, puis touchez de nouveau Se connecter.</string>
+    <string name="proton_captcha_required">Proton exige un CAPTCHA pour ce réseau. Résolvez-le ci-dessous.</string>
+    <string name="proton_captcha_title">Vérification humaine</string>
+    <string name="proton_captcha_hint">Résolvez le défi ci-dessous, la suite se passe ici.</string>
+    <string name="proton_captcha_reload">Recharger</string>
+    <string name="proton_captcha_open">Navigateur</string>
+    <string name="proton_captcha_failed">Le chargement de la page de vérification a échoué.</string>
+    <string name="proton_captcha_expired">Le CAPTCHA a expiré. Rechargez.</string>
+    <string name="proton_captcha_solving">Vérifié, connexion en cours…</string>
+    <string name="proton_captcha_rejected">Proton a refusé ce CAPTCHA. Reconnectez-vous.</string>
+    <string name="proton_captcha_unavailable">Aucun CAPTCHA fourni par Proton pour ce réseau.</string>
 </resources>

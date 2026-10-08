@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -216,5 +217,27 @@ func TestNodesRejectsAMissingSession(t *testing.T) {
 	}
 	if !bytes.Contains(stdout.Bytes(), []byte("session")) {
 		t.Errorf("output %q should explain the session problem", stdout.String())
+	}
+}
+
+// 節點清單這一條被 Proton 要求人類驗證時（422/9001），錯誤訊息要講得出來，而且不能把
+// 含挑戰 token 的驗證網址吐給 Kotlin（那邊會進 Logs）。
+func TestNodesReportsACaptchaRequestWithoutLeakingTheToken(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		_, _ = w.Write([]byte(realCaptchaChallenge))
+	}))
+	defer srv.Close()
+
+	out, code := runNodesWith(t, srv.URL, writeTestSession(t, t.TempDir()))
+	if code == 0 || out.OK {
+		t.Fatalf("a 422 must not report success: %+v", out)
+	}
+	if !strings.Contains(out.Error, "CAPTCHA") {
+		t.Errorf("error = %q, want it to name the CAPTCHA", out.Error)
+	}
+	if strings.Contains(out.Error, "HVSTART123") {
+		t.Errorf("the challenge token leaked into the node-list error: %q", out.Error)
 	}
 }

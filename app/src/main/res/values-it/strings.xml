@@ -1013,5 +1013,14 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_warning_accept">Ho capito</string>
 
     <string name="action_reset">Ripristina</string>
-    <string name="proton_captcha_required">Proton richiede un CAPTCHA per questa rete. Risolvilo nella pagina appena aperta, poi tocca di nuovo Accedi.</string>
+    <string name="proton_captcha_required">Proton richiede un CAPTCHA per questa rete. Risolvilo qui sotto.</string>
+    <string name="proton_captcha_title">Verifica umana</string>
+    <string name="proton_captcha_hint">Risolvi la sfida qui sotto, quindi ritorna qui.</string>
+    <string name="proton_captcha_reload">Ricarica</string>
+    <string name="proton_captcha_open">Browser</string>
+    <string name="proton_captcha_failed">La pagina di verifica non è stata caricata.</string>
+    <string name="proton_captcha_expired">Il CAPTCHA è scaduto. Tocca Ricarica.</string>
+    <string name="proton_captcha_solving">Verificato, accesso in corso…</string>
+    <string name="proton_captcha_rejected">Proton ha rifiutato questo CAPTCHA. Accedi di nuovo.</string>
+    <string name="proton_captcha_unavailable">Proton non ha fornito un CAPTCHA da risolvere qui.</string>
 </resources>

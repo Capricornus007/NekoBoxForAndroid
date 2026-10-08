@@ -953,5 +953,14 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="proton_warning_accept">Jeg forstår</string>
 
     <string name="action_reset">Tilbakestill</string>
-    <string name="proton_captcha_required">Proton krever en CAPTCHA for dette nettverket. Løs den i siden som nettopp ble åpnet, og trykk Logg inn igjen.</string>
+    <string name="proton_captcha_required">Proton krever en CAPTCHA for dette nettverket. Løs den nedenfor.</string>
+    <string name="proton_captcha_title">Menneskeverifisering</string>
+    <string name="proton_captcha_hint">Løs utfordringen nedenfor, så kommer du tilbake hit.</string>
+    <string name="proton_captcha_reload">Last inn på nytt</string>
+    <string name="proton_captcha_open">Nettleser</string>
+    <string name="proton_captcha_failed">Bekreftelsessiden ble ikke lastet.</string>
+    <string name="proton_captcha_expired">CAPTCHA-utfordringen er utløpt. Trykk Last inn på nytt.</string>
+    <string name="proton_captcha_solving">Bekreftet, logger inn…</string>
+    <string name="proton_captcha_rejected">Proton avviste denne CAPTCHA-en. Logg inn igjen.</string>
+    <string name="proton_captcha_unavailable">Proton ga ingen CAPTCHA som kan løses her.</string>
 </resources>

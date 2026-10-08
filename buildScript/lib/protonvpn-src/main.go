@@ -50,6 +50,12 @@
 // came back, because a node the UI offers but cannot connect to is worse than a
 // shorter list.
 //
+// Proton can answer ANY of these calls with HTTP 422 / Code 9001 and demand a
+// CAPTCHA. There is no programmatic solve endpoint (see hv.go for the evidence),
+// so `captcha-begin` turns the 9001 Details into the page URL NekoBox loads in a
+// WebView, and `captcha-solve` normalises whatever that page hands back into the
+// two x-pm-human-verification-* headers `login` then retries with.
+//
 // Usage:
 //
 //	libprotonvpn.so version     - print pinned library provenance as JSON
@@ -384,6 +390,8 @@ commands:
   version     print the pinned Proton library provenance as JSON
   selftest    run the offline dependency checks, print JSON, exit 1 on failure
   login       exchange credentials on stdin for a stored session, print JSON
+  captcha-begin  turn a 9001 human-verification challenge into page URLs to load
+  captcha-solve  normalise the answer a verification page handed back
   nodes       list usable Proton servers from a stored session, print JSON
   keypair     print a fresh X25519 key pair as JSON, for a WireGuard tunnel
 `)
@@ -410,6 +418,12 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 
 	case "login":
 		return runLogin(args[1:], stdin, stdout, stderr)
+
+	case "captcha-begin":
+		return runCaptchaBegin(args[1:], stdin, stdout)
+
+	case "captcha-solve":
+		return runCaptchaSolve(args[1:], stdin, stdout)
 
 	case "nodes":
 		return runNodes(args[1:], stdout, stderr)

@@ -1024,5 +1024,14 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="proton_warning_accept">Entendido</string>
 
     <string name="action_reset">Restablecer</string>
-    <string name="proton_captcha_required">Proton pide un CAPTCHA para esta red. Resuélvelo en la página que acaba de abrir y vuelve a tocar Iniciar sesión.</string>
+    <string name="proton_captcha_required">Proton pide un CAPTCHA para esta red. Resuélvelo abajo.</string>
+    <string name="proton_captcha_title">Verificación humana</string>
+    <string name="proton_captcha_hint">Resuelve el desafío de abajo y vuelve aquí.</string>
+    <string name="proton_captcha_reload">Recargar</string>
+    <string name="proton_captcha_open">Navegador</string>
+    <string name="proton_captcha_failed">No se cargó la página de verificación.</string>
+    <string name="proton_captcha_expired">El CAPTCHA expiró. Toca Recargar.</string>
+    <string name="proton_captcha_solving">Verificado, iniciando sesión…</string>
+    <string name="proton_captcha_rejected">Proton rechazó ese CAPTCHA. Inicia sesión otra vez.</string>
+    <string name="proton_captcha_unavailable">Proton no dio ningún CAPTCHA para resolver aquí.</string>
 </resources>

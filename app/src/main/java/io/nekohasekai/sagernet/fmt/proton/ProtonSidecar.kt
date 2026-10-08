@@ -4,6 +4,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.CountDownLatch
@@ -36,6 +37,36 @@ class ProtonLoginState(
     val twoFactorRequired: Boolean = false,
     val reason: String = "",
     val error: String = "",
+    // Proton 要人先解 CAPTCHA（HTTP 422、Code 9001）時，sidecar 會把回應 Details 裡的
+    // 起點 token 與可用方法一起交出來，UI 才能直接在 App 內開驗證頁面。
+    // 這是短效憑證：只在記憶體裡傳，不寫 Logs、不寫檔。
+    val captchaToken: String = "",
+    val captchaMethods: List<String> = emptyList(),
+)
+
+// captcha-begin 的結果：兩個能在 WebView 裡載的網址。
+class ProtonCaptchaChallenge(
+    val ok: Boolean,
+    val token: String = "",
+    val methods: List<String> = emptyList(),
+    val solveUrl: String = "",
+    val captchaUrl: String = "",
+    val messageUrl: String = "",
+    val reason: String = "",
+    val error: String = "",
+) {
+    // 首選官方驗證應用（支援 captcha 以外的方法），退而求其次才是 API 自己的驗證頁。
+    val inAppUrl: String get() = solveUrl.ifEmpty { captchaUrl }
+    val usable: Boolean get() = ok && inAppUrl.isNotEmpty()
+}
+
+// captcha-solve 的結果：可以直接餵回 login 的一對值。
+class ProtonCaptchaAnswer(
+    val ok: Boolean,
+    val token: String = "",
+    val type: String = "",
+    val reason: String = "",
+    val error: String = "",
 )
 
 class ProtonNodesState(
@@ -62,7 +93,45 @@ object ProtonJson {
             twoFactorRequired = obj.optBoolean("twoFactorRequired"),
             reason = obj.optString("reason", ""),
             error = obj.optString("error", ""),
+            captchaToken = obj.optString("hvToken", ""),
+            captchaMethods = stringList(obj.optJSONArray("hvMethods")),
         )
+    }
+
+    fun parseCaptchaBegin(text: String): ProtonCaptchaChallenge {
+        val obj = runCatching { JSONObject(text) }.getOrNull()
+            ?: return ProtonCaptchaChallenge(false, error = "sidecar returned no JSON")
+        return ProtonCaptchaChallenge(
+            ok = obj.optBoolean("ok"),
+            token = obj.optString("token", ""),
+            methods = stringList(obj.optJSONArray("methods")),
+            solveUrl = obj.optString("solveURL", ""),
+            captchaUrl = obj.optString("captchaURL", ""),
+            messageUrl = obj.optString("messageURL", ""),
+            reason = obj.optString("reason", ""),
+            error = obj.optString("error", ""),
+        )
+    }
+
+    fun parseCaptchaSolve(text: String): ProtonCaptchaAnswer {
+        val obj = runCatching { JSONObject(text) }.getOrNull()
+            ?: return ProtonCaptchaAnswer(false, error = "sidecar returned no JSON")
+        return ProtonCaptchaAnswer(
+            ok = obj.optBoolean("ok"),
+            token = obj.optString("token", ""),
+            type = obj.optString("type", ""),
+            reason = obj.optString("reason", ""),
+            error = obj.optString("error", ""),
+        )
+    }
+
+    private fun stringList(array: JSONArray?): List<String> {
+        if (array == null) return emptyList()
+        val out = ArrayList<String>(array.length())
+        for (i in 0 until array.length()) {
+            array.optString(i).takeIf { it.isNotEmpty() }?.let { out += it }
+        }
+        return out
     }
 
     fun parseNodes(text: String): ProtonNodesState {
@@ -147,11 +216,21 @@ object ProtonSidecar {
 
     fun isAvailable(): Boolean = executable() != null
 
-    suspend fun login(username: String, password: String, totp: String = ""): ProtonLoginState = withContext(Dispatchers.IO) {
+    // captchaToken/captchaType 帶上就是「解完重試」：sidecar 會把它們放在
+    // x-pm-human-verification-token(-type) 上重新跑一次 SRP 登入。
+    suspend fun login(
+        username: String,
+        password: String,
+        totp: String = "",
+        captchaToken: String = "",
+        captchaType: String = "",
+    ): ProtonLoginState = withContext(Dispatchers.IO) {
         val body = JSONObject().apply {
             put("username", username)
             put("password", password)
             if (totp.isNotEmpty()) put("twoFactorCode", totp)
+            if (captchaToken.isNotEmpty()) put("captchaToken", captchaToken)
+            if (captchaType.isNotEmpty()) put("captchaType", captchaType)
         }
         // Never log the stdin payload: it carries the account password.
         when (val result = runSidecar(listOf("login", "--state", sessionFile.absolutePath), body.toString())) {
@@ -164,6 +243,51 @@ object ProtonSidecar {
             }
         }
     }
+
+    // 把 9001 的 Details 換成 WebView 該載的網址。協定字串全部由 sidecar 組，Proton
+    // 改格式時只動 Go 那一邊。
+    suspend fun captchaBegin(
+        token: String,
+        methods: List<String>,
+        error: String,
+        dark: Boolean,
+    ): ProtonCaptchaChallenge = withContext(Dispatchers.IO) {
+        val body = JSONObject().apply {
+            put("token", token)
+            put("methods", JSONArray(methods))
+            // Proton 的英文訊息有時直接附官方驗證連結， Details 缺 token 時只剩這條。
+            if (error.isNotEmpty()) put("error", error)
+            put("dark", dark)
+        }
+        when (val result = runSidecar(listOf("captcha-begin"), body.toString())) {
+            is ProtonOutcome.Success -> ProtonJson.parseCaptchaBegin(result.json)
+
+            is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
+                ProtonJson.parseCaptchaBegin(result.stdout)
+            } else {
+                ProtonCaptchaChallenge(false, error = result.message)
+            }
+        }
+    }
+
+    // 驗證頁面交回的成果先過一轉 sidecar（補前綴、辨過期），再拿去重試登入。
+    suspend fun captchaSolve(token: String, response: String, type: String): ProtonCaptchaAnswer =
+        withContext(Dispatchers.IO) {
+            val body = JSONObject().apply {
+                put("token", token)
+                put("response", response)
+                if (type.isNotEmpty()) put("type", type)
+            }
+            when (val result = runSidecar(listOf("captcha-solve"), body.toString())) {
+                is ProtonOutcome.Success -> ProtonJson.parseCaptchaSolve(result.json)
+
+                is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
+                    ProtonJson.parseCaptchaSolve(result.stdout)
+                } else {
+                    ProtonCaptchaAnswer(false, error = result.message)
+                }
+            }
+        }
 
     suspend fun nodes(country: String = "", limit: Int = 0): ProtonNodesState = withContext(Dispatchers.IO) {
         if (!sessionFile.exists()) {

@@ -995,5 +995,14 @@
     <string name="proton_warning_message">這不是 Proton 官方的 App。它照 Proton 自己客戶端的方式跟 Proton API 溝通，所以 Proton 隨時可能改動 API，讓這個功能失效，而我們無法提前因應。\n\n你的密碼與工作階段只存放在這支手機上 NB4A 的私有儲存區，除了向 Proton 登入之外不會送到任何地方。在 Proton 自己的 App 之外使用訂閱，可能不在他們的條款保障範圍內。</string>
     <string name="proton_warning_accept">我明白了</string>
 
-    <string name="proton_captcha_required">Proton 要求這個網路先通過 CAPTCHA 驗證。請在剛開啟的頁面完成驗證，再按一次登入。</string>
+    <string name="proton_captcha_required">Proton 要求這個網路先解 CAPTCHA。請在下方完成。</string>
+    <string name="proton_captcha_title">人工驗證</string>
+    <string name="proton_captcha_hint">在下方解完驗證，它會回到這裡。</string>
+    <string name="proton_captcha_reload">重新載入</string>
+    <string name="proton_captcha_open">瀏覽器</string>
+    <string name="proton_captcha_failed">驗證頁面載入失敗。</string>
+    <string name="proton_captcha_expired">CAPTCHA 已過期，請按重新載入。</string>
+    <string name="proton_captcha_solving">驗證通過，登入中…</string>
+    <string name="proton_captcha_rejected">Proton 退回這次的 CAPTCHA，請重新登入。</string>
+    <string name="proton_captcha_unavailable">Proton 沒有給可在這裡解的 CAPTCHA。</string>
 </resources>

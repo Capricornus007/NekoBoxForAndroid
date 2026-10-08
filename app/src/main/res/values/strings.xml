@@ -1094,5 +1094,14 @@
     <string name="proton_warning_title">You have been warned</string>
     <string name="proton_warning_message">This is not a Proton app. It talks to Proton\'s API the way Proton\'s own clients do, so Proton can change that API at any time and this stops working with no way for us to fix it in advance.\n\nYour password and session are kept only on this phone, in NB4A\'s private storage, and are sent nowhere except Proton\'s sign-in endpoint. Using a subscription outside Proton\'s own apps may not be covered by their terms.</string>
     <string name="proton_warning_accept">I understand</string>
-    <string name="proton_captcha_required">Proton requires a CAPTCHA for this network. Solve it in the page that just opened, then tap Sign in again.</string>
+    <string name="proton_captcha_required">Proton needs a CAPTCHA for this network. Solve it below.</string>
+    <string name="proton_captcha_title">Human verification</string>
+    <string name="proton_captcha_hint">Solve the challenge below, then it returns here.</string>
+    <string name="proton_captcha_reload">Reload</string>
+    <string name="proton_captcha_open">Browser</string>
+    <string name="proton_captcha_failed">The verification page did not load.</string>
+    <string name="proton_captcha_expired">The CAPTCHA expired. Tap Reload.</string>
+    <string name="proton_captcha_solving">Verified, signing in...</string>
+    <string name="proton_captcha_rejected">Proton rejected that CAPTCHA. Sign in again.</string>
+    <string name="proton_captcha_unavailable">Proton gave no CAPTCHA to solve here.</string>
 </resources>

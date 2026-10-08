@@ -125,22 +125,22 @@ func TestAppVersionHeaderMatchesProtonsFormatRule(t *testing.T) {
 		t.Fatalf("protonAppVersion = %q 會被 Proton 閘門擋掉：%s", protonAppVersion, reason)
 	}
 	bad := map[string]string{
-		"NB4A/1.0.0":             "Invalid app version",
-		"NB4A_1.0.0":             "Invalid app version",
-		"Otherx_1.0.0":           "Invalid app version",
-		"Other_1.0":              "Invalid app version",
-		"android-vpn":            "Invalid app version",
-		"android-vpn@":           "Invalid app version",
-		"NB4A@1.0.0":             "Application name must be in lowercase",
-		"NB4A-android@1.0.0":     "Application name must be in lowercase",
-		"android@1.0.0":          "Application platform and product must be separated by a dash",
-		"android-nb4a@1.0.0":     "Product `nb4a` is not valid",
-		"solar-vpn@1.0.0":        "Platform `solar` is not valid",
-		"android-vpn@1.0.0":      "This version of the app is no longer supported",
-		"android-vpn@5.20.57.0":  "Invalid access token",
-		"android-vpn@99.0.0":     "Invalid access token",
-		"web-account@5.5.5.5":    "Invalid access token",
-		"":                       "Missing x-pm-appversion header",
+		"NB4A/1.0.0":            "Invalid app version",
+		"NB4A_1.0.0":            "Invalid app version",
+		"Otherx_1.0.0":          "Invalid app version",
+		"Other_1.0":             "Invalid app version",
+		"android-vpn":           "Invalid app version",
+		"android-vpn@":          "Invalid app version",
+		"NB4A@1.0.0":            "Application name must be in lowercase",
+		"NB4A-android@1.0.0":    "Application name must be in lowercase",
+		"android@1.0.0":         "Application platform and product must be separated by a dash",
+		"android-nb4a@1.0.0":    "Product `nb4a` is not valid",
+		"solar-vpn@1.0.0":       "Platform `solar` is not valid",
+		"android-vpn@1.0.0":     "This version of the app is no longer supported",
+		"android-vpn@5.20.57.0": "Invalid access token",
+		"android-vpn@99.0.0":    "Invalid access token",
+		"web-account@5.5.5.5":   "Invalid access token",
+		"":                      "Missing x-pm-appversion header",
 	}
 	for v, want := range bad {
 		got := appVersionGate(v)
@@ -165,14 +165,29 @@ func TestAppVersionHeaderMatchesProtonsFormatRule(t *testing.T) {
 	}
 }
 
+// captchaGate 讓 mock 模仿「Proton 對這個出口要求先解驗證碼」的正式行為：在
+// gate.at 那一端，除非請求帶了 x-pm-human-verification-token（值必須等於 accept）與
+// x-pm-human-verification-token-type，否則回 HTTP 422 加 9001，Details 裡給起點 token
+// 與可用方法。欄位名與 Code 一律照 protoncore_android human-verification/README.md 與
+// WebClients 的 humanVerification.spec.ts，不要照 go-proton-api 的 mock 亂改。
+type captchaGate struct {
+	start   string
+	accept  string
+	methods []string
+	at      string
+}
+
 type mockAuthServer struct {
-	server      *srp.Server
-	salt        []byte
-	twoFA       proton.TwoFAStatus
-	uid         string
-	accessToken string
-	authCalls   int
-	infoCalls   int
+	server       *srp.Server
+	salt         []byte
+	twoFA        proton.TwoFAStatus
+	uid          string
+	accessToken  string
+	authCalls    int
+	infoCalls    int
+	captcha      *captchaGate
+	hvChallenges int
+	hvAccepted   int
 }
 
 const (
@@ -229,13 +244,19 @@ func (m *mockAuthServer) handler(t *testing.T) http.Handler {
 			}
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(status)
+			// 正式站的訊息欄位就叫 Error（go-proton-api 的 APIError.Message 也是
+			// `json:"Error"`），寫成 Message 會讓測試跟真站不一樣。
 			_ = json.NewEncoder(w).Encode(map[string]any{
-				"Code":    code,
-				"Message": reason,
+				"Code":  code,
+				"Error": reason,
 			})
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
+		if m.challenged(r) {
+			m.writeChallenge(w, t)
+			return
+		}
 		switch r.URL.Path {
 		case "/auth/v4/info":
 			m.infoCalls++
@@ -311,19 +332,55 @@ func (m *mockAuthServer) handler(t *testing.T) http.Handler {
 	})
 }
 
+// challenged 是 mock 的「這一把要不要出驗證碼」，只看兩個標頭，跟 Proton 一樣。
+func (m *mockAuthServer) challenged(r *http.Request) bool {
+	gate := m.captcha
+	if gate == nil || r.URL.Path != gate.at {
+		return false
+	}
+	if r.Header.Get(hvTokenHeader) == gate.accept && r.Header.Get(hvTypeHeader) != "" {
+		m.hvAccepted++
+		return false
+	}
+	m.hvChallenges++
+	return true
+}
+
+// writeChallenge 回的是量測到的形状：422、Code 9001、Details 裡兩個 HumanVerification*
+// 欄位。少了 Details 或把 token 放到別處，我們的 hvTransport 就抓不到挑戰，測試也該紅。
+func (m *mockAuthServer) writeChallenge(w http.ResponseWriter, t *testing.T) {
+	t.Helper()
+	gate := m.captcha
+	w.WriteHeader(http.StatusUnprocessableEntity)
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"Code":  hvAPIErrorCode,
+		"Error": "For security reasons, please complete CAPTCHA.",
+		"Details": map[string]any{
+			"HumanVerificationToken":   gate.start,
+			"HumanVerificationMethods": gate.methods,
+		},
+	})
+}
+
 func runLoginWith(t *testing.T, apiURL, statePath, twoFactorCode string) (loginOutput, int) {
 	t.Helper()
-	in, err := json.Marshal(loginInput{
+	return runLoginInput(t, statePath, loginInput{
 		Username:      mockUsername,
 		Password:      mockPassword,
 		TwoFactorCode: twoFactorCode,
 		APIURL:        apiURL,
 	})
+}
+
+// runLoginInput 走的是跟 Kotlin 端一樣的入口：stdin 進 JSON、stdout 出 JSON。
+func runLoginInput(t *testing.T, statePath string, in loginInput) (loginOutput, int) {
+	t.Helper()
+	payload, err := json.Marshal(in)
 	if err != nil {
 		t.Fatalf("marshal input: %v", err)
 	}
 	var stdout, stderr bytes.Buffer
-	code := runLogin([]string{"--state", statePath}, bytes.NewReader(in), &stdout, &stderr)
+	code := runLogin([]string{"--state", statePath}, bytes.NewReader(payload), &stdout, &stderr)
 	var out loginOutput
 	if err := json.Unmarshal(bytes.TrimSpace(stdout.Bytes()), &out); err != nil {
 		t.Fatalf("parse stdout %q: %v (stderr %q)", stdout.String(), err, stderr.String())
@@ -437,5 +494,156 @@ func TestLoginReportsAWrongPasswordWithoutEchoingIt(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(t.TempDir(), "session.json")); err == nil {
 		t.Error("a session file exists after a failed login")
+	}
+}
+
+// TestLoginHandsBackTheCaptchaChallenge 是用戶真機上那一幕：422/9001 一來，login 不能
+// 只留一句英文，必須把 Details 裡的起點 token 與方法清單結構化地交出去，UI 才開得了
+// 站內的驗證頁面。
+func TestLoginHandsBackTheCaptchaChallenge(t *testing.T) {
+	mock := newMockAuthServer(t, 0)
+	mock.captcha = &captchaGate{
+		start: "HVSTART123", accept: "HVSTART123:solved",
+		methods: []string{"captcha"}, at: "/auth/v4",
+	}
+	srv := httptest.NewServer(mock.handler(t))
+	defer srv.Close()
+
+	statePath := filepath.Join(t.TempDir(), "session.json")
+	out, code := runLoginWith(t, srv.URL, statePath, "")
+
+	if code == 0 || out.OK {
+		t.Fatalf("a 9001 must not look like a success: code=%d out=%+v", code, out)
+	}
+	if out.Reason != reasonCaptchaRequired {
+		t.Errorf("reason = %q, want %q", out.Reason, reasonCaptchaRequired)
+	}
+	if out.Code != hvAPIErrorCode {
+		t.Errorf("code = %d, want %d", out.Code, hvAPIErrorCode)
+	}
+	if out.HVToken != "HVSTART123" {
+		t.Errorf("hvToken = %q, want the Details token; a missing token means the UI has nothing to load", out.HVToken)
+	}
+	if strings.Join(out.HVMethods, ",") != "captcha" {
+		t.Errorf("hvMethods = %v, want [captcha]", out.HVMethods)
+	}
+	if mock.hvChallenges != 1 {
+		t.Errorf("challenges handed out = %d, want 1 (go-proton-api must not retry a 422)", mock.hvChallenges)
+	}
+	if _, err := os.Stat(statePath); !os.IsNotExist(err) {
+		t.Error("a session file was written for an unverified login")
+	}
+}
+
+// TestLoginRetriesWithTheSolvedCaptchaHeaders 是這條功能的核心：解完之後同一支 login
+// 帶上複合 token 重試，要真的把兩個標頭送出去並登入成功。少了這個流程，用戶在沒有
+// 乾淨 IP 的情況下永遠登不進去。
+func TestLoginRetriesWithTheSolvedCaptchaHeaders(t *testing.T) {
+	mock := newMockAuthServer(t, 0)
+	mock.captcha = &captchaGate{
+		start: "HVSTART123", accept: "HVSTART123:solved",
+		methods: []string{"captcha"}, at: "/auth/v4",
+	}
+	srv := httptest.NewServer(mock.handler(t))
+	defer srv.Close()
+
+	statePath := filepath.Join(t.TempDir(), "session.json")
+	if out, _ := runLoginWith(t, srv.URL, statePath, ""); out.Reason != reasonCaptchaRequired {
+		t.Fatalf("the first attempt should ask for a CAPTCHA, got %+v", out)
+	}
+
+	// Kotlin 就是拿 WebView 交回的東西喂給 captcha-solve，這裡走同一條正規化。
+	solved, _ := runCaptchaSolveJSON(t, captchaSolveInput{
+		Token: "HVSTART123", Response: "solved", Type: hvMethodCaptcha,
+	})
+	if solved.Token != "HVSTART123:solved" {
+		t.Fatalf("captcha-solve produced %q, want the composite token", solved.Token)
+	}
+
+	out, code := runLoginInput(t, statePath, loginInput{
+		Username:     mockUsername,
+		Password:     mockPassword,
+		APIURL:       srv.URL,
+		CaptchaToken: solved.Token,
+		CaptchaType:  solved.Type,
+	})
+	if code != 0 || !out.OK {
+		t.Fatalf("retry with the solved CAPTCHA failed: code=%d out=%+v (accepted %d)", code, out, mock.hvAccepted)
+	}
+	if mock.hvAccepted != 1 {
+		t.Errorf("requests the mock accepted the token on = %d, want 1", mock.hvAccepted)
+	}
+	if mock.hvChallenges != 1 {
+		t.Errorf("challenges handed out = %d, want 1", mock.hvChallenges)
+	}
+	// 每一把 login 都從 /auth/v4/info 重跑一次 SRP：這跟 go-proton-api 自己
+	// NewClientWithLoginWithHVToken 的做法一致，SRP session 本來就是一次性的。
+	// authCalls 只數通過閘門的那次，被 422 擋掉的不會進到驗證 proof 的分支。
+	if mock.infoCalls != 2 || mock.authCalls != 1 {
+		t.Errorf("endpoint calls = info %d, auth %d; want 2 and 1", mock.infoCalls, mock.authCalls)
+	}
+	if _, err := os.Stat(statePath); err != nil {
+		t.Errorf("the retried login did not store a session: %v", err)
+	}
+}
+
+// 標頭名稱或值打錯時 Proton 只會再丟一次 9001，畫面就會卡住；所以錯誤的那一把一定要
+// 講明「剛剛那個驗證被退回」，不能报成「請你再去解一次同樣的東西」。
+func TestLoginReportsARejectedCaptchaSolution(t *testing.T) {
+	mock := newMockAuthServer(t, 0)
+	mock.captcha = &captchaGate{
+		start: "HVSTART123", accept: "HVSTART123:solved",
+		methods: []string{"captcha"}, at: "/auth/v4",
+	}
+	srv := httptest.NewServer(mock.handler(t))
+	defer srv.Close()
+
+	out, code := runLoginInput(t, filepath.Join(t.TempDir(), "session.json"), loginInput{
+		Username:     mockUsername,
+		Password:     mockPassword,
+		APIURL:       srv.URL,
+		CaptchaToken: "HVSTART123:not-the-answer",
+		CaptchaType:  hvMethodCaptcha,
+	})
+	if code == 0 || out.OK {
+		t.Fatalf("a rejected CAPTCHA answer must not log the user in: %+v", out)
+	}
+	if out.Reason != reasonCaptchaRejected {
+		t.Errorf("reason = %q, want %q", out.Reason, reasonCaptchaRejected)
+	}
+	if out.HVToken != "HVSTART123" {
+		t.Errorf("hvToken = %q, want a fresh challenge so the UI can retry", out.HVToken)
+	}
+}
+
+// Proton 也可能在交 SRP proof 之前就攔人（/auth/v4/info）。那一端同樣是 9001，
+// hvTransport 在傳輸層動作，兩端都要抓得到，否則換個擋點功能就消失。
+func TestLoginCapturesAChallengeFromTheInfoEndpoint(t *testing.T) {
+	mock := newMockAuthServer(t, 0)
+	mock.captcha = &captchaGate{
+		start: "HVINFO456", accept: "HVINFO456:solved",
+		methods: []string{"captcha", "email"}, at: "/auth/v4/info",
+	}
+	srv := httptest.NewServer(mock.handler(t))
+	defer srv.Close()
+
+	statePath := filepath.Join(t.TempDir(), "session.json")
+	out, _ := runLoginWith(t, srv.URL, statePath, "")
+	if out.Reason != reasonCaptchaRequired || out.HVToken != "HVINFO456" {
+		t.Fatalf("the challenge from /auth/v4/info was not reported: %+v", out)
+	}
+	if strings.Join(out.HVMethods, ",") != "captcha,email" {
+		t.Errorf("hvMethods = %v, want the two methods Proton listed", out.HVMethods)
+	}
+
+	retry, code := runLoginInput(t, statePath, loginInput{
+		Username:     mockUsername,
+		Password:     mockPassword,
+		APIURL:       srv.URL,
+		CaptchaToken: "HVINFO456:solved",
+		CaptchaType:  hvMethodCaptcha,
+	})
+	if code != 0 || !retry.OK {
+		t.Fatalf("retry after the info-endpoint challenge failed: code=%d out=%+v", code, retry)
 	}
 }

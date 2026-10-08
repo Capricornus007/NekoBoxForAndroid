@@ -976,5 +976,14 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="proton_warning_accept">Entendi</string>
 
     <string name="action_reset">Restaurar</string>
-    <string name="proton_captcha_required">O Proton exige um CAPTCHA para esta rede. Resolva-o na página que acabou de abrir e toque em Entrar novamente.</string>
+    <string name="proton_captcha_required">O Proton exige um CAPTCHA para esta rede. Resolva abaixo.</string>
+    <string name="proton_captcha_title">Verificação humana</string>
+    <string name="proton_captcha_hint">Resolva o desafio abaixo e volte aqui.</string>
+    <string name="proton_captcha_reload">Recarregar</string>
+    <string name="proton_captcha_open">Navegador</string>
+    <string name="proton_captcha_failed">A página de verificação não carregou.</string>
+    <string name="proton_captcha_expired">O CAPTCHA expirou. Toque em Recarregar.</string>
+    <string name="proton_captcha_solving">Verificado, entrando…</string>
+    <string name="proton_captcha_rejected">O Proton rejeitou esse CAPTCHA. Entre de novo.</string>
+    <string name="proton_captcha_unavailable">O Proton não forneceu um CAPTCHA para resolver aqui.</string>
 </resources>

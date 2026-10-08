@@ -915,5 +915,14 @@
     <string name="proton_warning_accept">Зразумела</string>
 
     <string name="action_reset">Скінуць</string>
-    <string name="proton_captcha_required">Proton патрабуе праходжання CAPTCHA для гэтай сеткі. Выканайце яе на старонцы, якая толькі што адкрылася, і зноў націсніце «Увайсці».</string>
+    <string name="proton_captcha_required">Proton патрабуе прайсці CAPTCHA для гэтай сеткі. Выканайце ніжэй.</string>
+    <string name="proton_captcha_title">Пацверджанне, што вы чалавек</string>
+    <string name="proton_captcha_hint">Выканайце заданне ніжэй, затым вярніцеся сюды.</string>
+    <string name="proton_captcha_reload">Абнавіць</string>
+    <string name="proton_captcha_open">Браўзер</string>
+    <string name="proton_captcha_failed">Старонка праверкі не загрузілася.</string>
+    <string name="proton_captcha_expired">CAPTCHA састарэла. Націсніце Абнавіць.</string>
+    <string name="proton_captcha_solving">Праверана, выконваецца ўваход…</string>
+    <string name="proton_captcha_rejected">Proton адхіліў гэту CAPTCHA. Увайдзіце зноў.</string>
+    <string name="proton_captcha_unavailable">Proton не даў CAPTCHA для вырашэння тут.</string>
 </resources>

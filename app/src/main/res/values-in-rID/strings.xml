@@ -1025,5 +1025,14 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_warning_accept">Saya mengerti</string>
 
     <string name="action_reset">Atur ulang</string>
-    <string name="proton_captcha_required">Proton memerlukan CAPTCHA untuk jaringan ini. Selesaikan di halaman yang baru dibuka, lalu ketuk Masuk lagi.</string>
+    <string name="proton_captcha_required">Proton butuh CAPTCHA untuk jaringan ini. Selesaikan di bawah.</string>
+    <string name="proton_captcha_title">Verifikasi manusia</string>
+    <string name="proton_captcha_hint">Selesaikan tantangan di bawah, lalu kembali ke sini.</string>
+    <string name="proton_captcha_reload">Muat ulang</string>
+    <string name="proton_captcha_open">Peramban</string>
+    <string name="proton_captcha_failed">Halaman verifikasi tidak termuat.</string>
+    <string name="proton_captcha_expired">CAPTCHA kedaluwarsa. Ketuk Muat ulang.</string>
+    <string name="proton_captcha_solving">Terverifikasi, masuk…</string>
+    <string name="proton_captcha_rejected">Proton menolak CAPTCHA itu. Masuk lagi.</string>
+    <string name="proton_captcha_unavailable">Proton tidak memberi CAPTCHA untuk diselesaikan di sini.</string>
 </resources>

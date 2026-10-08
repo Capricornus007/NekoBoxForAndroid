@@ -1074,5 +1074,14 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_warning_accept">Понятно</string>
 
     <string name="action_reset">Сброс</string>
-    <string name="proton_captcha_required">Proton требует пройти CAPTCHA для этой сети. Выполните её на только что открытой странице и снова нажмите «Войти».</string>
+    <string name="proton_captcha_required">Proton требует пройти CAPTCHA для этой сети. Выполните его ниже.</string>
+    <string name="proton_captcha_title">Подтверждение, что вы человек</string>
+    <string name="proton_captcha_hint">Выполните задание ниже, затем вернитесь сюда.</string>
+    <string name="proton_captcha_reload">Обновить</string>
+    <string name="proton_captcha_open">Браузер</string>
+    <string name="proton_captcha_failed">Страница проверки не загрузилась.</string>
+    <string name="proton_captcha_expired">CAPTCHA истекла. Нажмите «Обновить».</string>
+    <string name="proton_captcha_solving">Проверено, выполняем вход…</string>
+    <string name="proton_captcha_rejected">Proton отклонил эту CAPTCHA. Войдите снова.</string>
+    <string name="proton_captcha_unavailable">Proton не дал CAPTCHA для прохождения здесь.</string>
 </resources>

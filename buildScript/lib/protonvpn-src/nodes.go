@@ -155,6 +155,20 @@ func fetchLogicalServers(ctx context.Context, apiURL string, cred storedCredenti
 	switch {
 	case res.StatusCode == http.StatusUnauthorized, res.StatusCode == http.StatusForbidden:
 		return nil, errSessionExpired
+	case res.StatusCode == http.StatusUnprocessableEntity:
+		// 422 在 Proton 那邊幾乎一定是人類驗證（Code 9001）。節點清單這條路目前沒有
+		// 站內解驗證碼的流程（那是 login 的功能），但至少要講出發生了什麼。
+		// 不能吐 Proton 的原文：那句話裡含驗證網址，網址裡含挑戰 token，進了 Kotlin
+		// 的日誌就等于把短效憑證外洩。
+		body, _ := io.ReadAll(io.LimitReader(res.Body, 4096))
+		var api struct {
+			Code int `json:"Code"`
+		}
+		_ = json.Unmarshal(body, &api)
+		if api.Code == hvAPIErrorCode {
+			return nil, errors.New("Proton wants a CAPTCHA for this network before listing servers: sign in again from the Proton page")
+		}
+		return nil, fmt.Errorf("API returned HTTP %d (code %d)", res.StatusCode, api.Code)
 	case res.StatusCode != http.StatusOK:
 		return nil, fmt.Errorf("API returned HTTP %d", res.StatusCode)
 	}

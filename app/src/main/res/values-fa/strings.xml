@@ -986,5 +986,14 @@
     <string name="proton_warning_accept">فهمیدم</string>
 
     <string name="action_reset">بازنشانی</string>
-    <string name="proton_captcha_required">Proton برای این شبکه کپچا می‌خواهد. آن را در صفحه‌ای که تازه باز شده حل کنید، سپس دوباره «ورود» را بزنید.</string>
+    <string name="proton_captcha_required">Proton برای این شبکه CAPTCHA می‌خواهد. در پایین حل کنید.</string>
+    <string name="proton_captcha_title">اثبات انسان بودن</string>
+    <string name="proton_captcha_hint">چالش پایین را حل کنید، سپس به اینجا برمی‌گردد.</string>
+    <string name="proton_captcha_reload">بارگذاری دوباره</string>
+    <string name="proton_captcha_open">مرورگر</string>
+    <string name="proton_captcha_failed">صفحه تأیید بارگذاری نشد.</string>
+    <string name="proton_captcha_expired">CAPTCHA منقضی شد. بارگذاری دوباره را بزنید.</string>
+    <string name="proton_captcha_solving">تأیید شد، در حال وارد شدن…</string>
+    <string name="proton_captcha_rejected">Proton آن CAPTCHA را رد کرد. دوباره وارد شوید.</string>
+    <string name="proton_captcha_unavailable">Proton برای حل در اینجا CAPTCHA ارائه نکرد.</string>
 </resources>

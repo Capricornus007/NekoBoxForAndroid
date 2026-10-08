@@ -1016,5 +1016,14 @@
     <string name="proton_warning_accept">Anladım</string>
 
     <string name="action_reset">Sıfırla</string>
-    <string name="proton_captcha_required">Proton bu ağ için CAPTCHA istiyor. Az önce açılan sayfada çözün, ardından Oturum Aç’a yeniden dokunun.</string>
+    <string name="proton_captcha_required">Proton bu ağ için CAPTCHA istiyor. Aşağıda çözün.</string>
+    <string name="proton_captcha_title">İnsan doğrulaması</string>
+    <string name="proton_captcha_hint">Aşağıdaki sorunu çözün, sonra buraya döner.</string>
+    <string name="proton_captcha_reload">Yeniden yükle</string>
+    <string name="proton_captcha_open">Tarayıcı</string>
+    <string name="proton_captcha_failed">Doğrulama sayfası yüklenemedi.</string>
+    <string name="proton_captcha_expired">CAPTCHA süresi doldu, yeniden yükleyin.</string>
+    <string name="proton_captcha_solving">Doğrulandı, giriş yapılıyor…</string>
+    <string name="proton_captcha_rejected">Proton bu doğrulamayı reddetti. Yeniden giriş yapın.</string>
+    <string name="proton_captcha_unavailable">Proton burada çözülecek bir CAPTCHA vermedi.</string>
 </resources>

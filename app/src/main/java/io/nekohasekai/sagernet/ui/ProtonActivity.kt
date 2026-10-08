@@ -1,9 +1,21 @@
 package io.nekohasekai.sagernet.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.webkit.ConsoleMessage
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
@@ -12,12 +24,17 @@ import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.databinding.ActivityProtonBinding
+import io.nekohasekai.sagernet.databinding.DialogProtonCaptchaBinding
+import io.nekohasekai.sagernet.fmt.proton.ProtonCaptchaChallenge
 import io.nekohasekai.sagernet.fmt.proton.ProtonJson
+import io.nekohasekai.sagernet.fmt.proton.ProtonLoginState
 import io.nekohasekai.sagernet.fmt.proton.ProtonNode
 import io.nekohasekai.sagernet.fmt.proton.ProtonSidecar
 import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.util.concurrent.atomic.AtomicBoolean
 
 class ProtonActivity : ThemedActivity() {
 
@@ -90,13 +107,19 @@ class ProtonActivity : ThemedActivity() {
         runSignIn(account, password, twoFactor)
     }
 
-    private fun runSignIn(account: String, password: String, twoFactor: String) {
+    private fun runSignIn(
+        account: String,
+        password: String,
+        twoFactor: String,
+        captchaToken: String = "",
+        captchaType: String = "",
+    ) {
         binding.signIn.isEnabled = false
         binding.refresh.isEnabled = false
         binding.status.setText(R.string.proton_refresh)
 
         lifecycleScope.launch {
-            val result = ProtonSidecar.login(account, password, twoFactor)
+            val result = ProtonSidecar.login(account, password, twoFactor, captchaToken, captchaType)
             if (isFinishing || isDestroyed) return@launch
             binding.signIn.isEnabled = true
             binding.refresh.isEnabled = true
@@ -110,33 +133,249 @@ class ProtonActivity : ThemedActivity() {
                     refresh()
                 }
 
-                result.twoFactorRequired -> {
+                result.twoFactorRequired && !result.needsCaptcha() -> {
                     // Keep the code field visible so the retry is one tap away.
                     binding.twoFactorLayout.visibility = View.VISIBLE
                     binding.status.setText(R.string.proton_2fa_required)
                 }
 
-                result.reason == "human-verification-required" -> {
-                    // Proton Sentinel 對「這個出口 IP」要求解 CAPTCHA（API 回 422、Code 9001）。
-                    // 他們的 captcha 是自家 JS 小工具（go-proton-api 的 GetCaptcha 還得帶
-                    // ForceWebMessaging=1），沒有可程式化验證的路徑；社群實測（rclone #9397、
-                    // Proton-API-Bridge #29）是「在同一個出口 IP 上用瀏覽器解一次，Sentinel
-                    // 就把那個 IP 放行」，所以把人送到官方登入頁，解完回來再按一次登入。
+                result.needsCaptcha() -> {
+                    // Proton Sentinel 對「這個出口 IP」要求先解 CAPTCHA（HTTP 422、Code 9001）。
+                    // 使用者不一定有乾淨 IP 可以換到瀏覽器解一次，所以走 Proton 官方 Android
+                    // 客戶端同一條路：App 內開 WebView 載驗證頁，解完把成果交回 sidecar，
+                    // 由它附在重試的登入請求上（x-pm-human-verification-token）。
                     binding.status.setText(R.string.proton_captcha_required)
-                    runCatching {
-                        startActivity(
-                            Intent(Intent.ACTION_VIEW, "https://account.proton.me/login".toUri())
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                        )
-                    }.onFailure {
-                        Logs.w("Proton: 打不开驗證頁面", it)
-                    }
+                    askForCaptcha(result, account, password, twoFactor)
+                }
+
+                result.reason == "captcha-rejected" -> {
+                    // 剛剛那把驗證被退回：不要自動再彈一次頁面（會變成循環），講清楚就好，
+                    // 使用者按「登入」會重新拿一道新的挑战。
+                    binding.status.setText(R.string.proton_captcha_rejected)
                 }
 
                 else -> binding.status.text = result.error.ifEmpty { result.reason }
             }
         }
     }
+
+    // 老 sidecar（重新建置 .so 之前的殘留產物）回的是舊 reason 字樣，一起認，
+    // 免得換了 .so 之後這條路徑無聲失效。
+    private fun ProtonLoginState.needsCaptcha(): Boolean =
+        reason == "captcha-required" || reason == "human-verification-required"
+
+    private fun askForCaptcha(
+        state: ProtonLoginState,
+        account: String,
+        password: String,
+        twoFactor: String,
+    ) {
+        lifecycleScope.launch {
+            val challenge = ProtonSidecar.captchaBegin(
+                state.captchaToken,
+                state.captchaMethods,
+                state.error,
+                usingDarkUi(),
+            )
+            if (isFinishing || isDestroyed) return@launch
+            if (!challenge.usable) {
+                // 連 App 內可載的頁面都拿不到（Proton 沒給 token、訊息裡也沒連結）：
+                // 這時只剩外部瀏覽器一條路，講明白，別假裝解好了。
+                binding.status.setText(R.string.proton_captcha_unavailable)
+                openInBrowser(challenge.messageUrl.ifEmpty { PROTON_LOGIN_URL })
+                return@launch
+            }
+            showCaptchaDialog(challenge, account, password, twoFactor)
+        }
+    }
+
+    private fun showCaptchaDialog(
+        challenge: ProtonCaptchaChallenge,
+        account: String,
+        password: String,
+        twoFactor: String,
+    ) {
+        CaptchaSession(challenge, account, password, twoFactor).start()
+    }
+
+    // Proton 官方 Android 端就是用 WebView + JavaScriptInterface 做人類驗證
+    // （protoncore_android 的 HV3DialogFragment：JS 介面名稱就是 "AndroidInterface"，
+    // 頁面偵測到它就改呼叫原生橋而不是 postMessage）。介面名稱與訊息格式都不能自創。
+    // 這個包裡所有類別都被 proguard 的 `-keep class io.nekohasekai.sagernet.**` 保住，
+    // R8 不會把 @JavascriptInterface 的方法名改掉。
+    @SuppressLint("SetJavaScriptEnabled")
+    private inner class CaptchaSession(
+        private val challenge: ProtonCaptchaChallenge,
+        private val account: String,
+        private val password: String,
+        private val twoFactor: String,
+    ) {
+        private val dialogBinding = DialogProtonCaptchaBinding.inflate(layoutInflater)
+        private val web = dialogBinding.captcha
+
+        // 驗證頁面可能連呼兩次同一個成果（iframe 與外层各報一次），只認第一把。
+        private val solved = AtomicBoolean(false)
+        private var usedFallback = false
+        private var dialog: AlertDialog? = null
+
+        fun start() {
+            web.settings.javaScriptEnabled = true
+            // 驗證頁的拼圖元件會存狀態，沒開 DOM Storage 會卡在載入。
+            web.settings.domStorageEnabled = true
+            web.addJavascriptInterface(Bridge(), JS_INTERFACE_NAME)
+            web.webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    dialogBinding.progress.visibility = View.GONE
+                }
+
+                override fun onReceivedError(
+                    view: WebView,
+                    request: WebResourceRequest,
+                    error: WebResourceError,
+                ) {
+                    if (request.isForMainFrame) onLoadFailed()
+                }
+
+                override fun onReceivedHttpError(
+                    view: WebView,
+                    request: WebResourceRequest,
+                    errorResponse: WebResourceResponse,
+                ) {
+                    if (request.isForMainFrame) onLoadFailed()
+                }
+            }
+            // 驗證頁的 console 會印出含 token 的網址與成果，一律吞掉、不進 logcat。
+            web.webChromeClient = object : WebChromeClient() {
+                override fun onConsoleMessage(message: ConsoleMessage?): Boolean = true
+            }
+            web.loadUrl(challenge.inAppUrl)
+
+            val created = MaterialAlertDialogBuilder(this@ProtonActivity)
+                .setTitle(R.string.proton_captcha_title)
+                .setView(dialogBinding.root)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
+            dialogBinding.reload.setOnClickListener { web.reload() }
+            dialogBinding.openExternal.setOnClickListener { openInBrowser(challenge.inAppUrl) }
+            // WebView 是會 leak 的那類 view：關掉時先從父層摘掉再 destroy，否則每開一次
+            // 驗證碼就留一整顆 chromium 在記憶體裡。
+            created.setOnDismissListener {
+                runCatching { web.removeJavascriptInterface(JS_INTERFACE_NAME) }
+                (web.parent as? ViewGroup)?.removeView(web)
+                web.destroy()
+            }
+            created.show()
+            dialog = created
+            // 拼圖需要高度，對話框盡量佔滿畫面；轉方向時對話框重建，重新載入就好。
+            created.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                (resources.displayMetrics.heightPixels * 0.9f).toInt(),
+            )
+        }
+
+        private fun onLoadFailed() {
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                dialogBinding.progress.visibility = View.GONE
+                if (!usedFallback && challenge.captchaUrl.isNotEmpty()) {
+                    // 首選站台（verify.proton.me）進不去時，改載 API 自己的驗證頁：
+                    // 它只需要同一條 API 出口，而 sidecar 已經證明那條通得到。
+                    usedFallback = true
+                    web.loadUrl(challenge.captchaUrl)
+                    return@runOnUiThread
+                }
+                dialogBinding.hint.setText(R.string.proton_captcha_failed)
+            }
+        }
+
+        // JS 介面：名稱與方法都是 Proton 那边定的，兩條通道分别是
+        // verify.proton.me 的 broadcast.ts（dispatch）與 /core/v4/captcha 頁面
+        // （receiveResponse / receiveExpiredResponse）。
+        inner class Bridge {
+
+            @JavascriptInterface
+            fun dispatch(message: String) {
+                onBridgeMessage(message)
+            }
+
+            @JavascriptInterface
+            fun receiveResponse(response: String) {
+                deliver(response, "captcha")
+            }
+
+            @JavascriptInterface
+            fun receiveExpiredResponse(response: String) {
+                runOnUiThread {
+                    if (!isFinishing && !isDestroyed) dialogBinding.hint.setText(R.string.proton_captcha_expired)
+                }
+            }
+        }
+
+        // dispatch 落在 JavaBridge 執行緒：先在這裡判掉重複，再把活丢回主行程。
+        private fun onBridgeMessage(raw: String) {
+            val payload = runCatching { JSONObject(raw) }.getOrNull() ?: return
+            when (payload.optString("type")) {
+                "HUMAN_VERIFICATION_SUCCESS" -> {
+                    val data = payload.optJSONObject("payload") ?: return
+                    deliver(
+                        data.optString("token", ""),
+                        data.optString("type", "captcha").ifEmpty { "captcha" },
+                    )
+                }
+
+                "NOTIFICATION" -> {
+                    val text = payload.optJSONObject("payload")?.optString("text").orEmpty()
+                    if (text.isNotEmpty()) {
+                        runOnUiThread {
+                            // Proton 頁面自己的文案（他們沒給在地化字串），只顯示、不寫日誌。
+                            if (!isFinishing && !isDestroyed) dialogBinding.hint.text = text
+                        }
+                    }
+                }
+
+                "LOADED" -> runOnUiThread {
+                    if (!isFinishing && !isDestroyed) dialogBinding.progress.visibility = View.GONE
+                }
+
+                "CLOSE" -> runOnUiThread {
+                    if (!isFinishing && !isDestroyed) dialog?.dismiss()
+                }
+            }
+        }
+
+        private fun deliver(response: String, type: String) {
+            if (response.isBlank()) return
+            if (!solved.compareAndSet(false, true)) return
+            lifecycleScope.launch {
+                binding.status.setText(R.string.proton_captcha_solving)
+                val answer = ProtonSidecar.captchaSolve(challenge.token, response, type)
+                if (isFinishing || isDestroyed) return@launch
+                dialog?.dismiss()
+                if (!answer.ok) {
+                    // 成果不屬於這一道挑戰（或被 sidecar 判定過期）：講清楚，
+                    // 不要拿著它去撞登入，那只會多一次 9001。
+                    binding.status.text = answer.error.ifEmpty { answer.reason }
+                    return@launch
+                }
+                runSignIn(account, password, twoFactor, answer.token, answer.type)
+            }
+        }
+    }
+
+    private fun usingDarkUi(): Boolean =
+        (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
+
+    private fun openInBrowser(url: String) {
+        if (url.isEmpty()) return
+        // 網址裡含挑戰 token：只記「開過了」，不把 URL 寫進日誌。
+        runCatching {
+            startActivity(
+                Intent(Intent.ACTION_VIEW, url.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+        }.onFailure { Logs.w("Proton: 驗證頁面開不起來") }
+    }
+
 
     private fun signOut() {
         ProtonSidecar.logout()
@@ -236,6 +475,13 @@ class ProtonActivity : ThemedActivity() {
     }
 
     companion object {
+        // Proton 的驗證頁就是找這個名字的原生介面（WebClients shared/lib/broadcast/broadcast.ts
+        // 的 getClient()、protoncore_android HV3DialogFragment 的 JS_INTERFACE_NAME）。
+        private const val JS_INTERFACE_NAME = "AndroidInterface"
+
+        // 拿不到 App 內可載的頁面時最後的退路：官方登入頁。
+        private const val PROTON_LOGIN_URL = "https://account.proton.me/login"
+
         // Proton's own client constants: the in-tunnel address is fixed rather than
         // assigned, and its DNS is the server side of that same pair.
         private const val CLIENT_IP = "10.2.0.2"

@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -52,6 +53,10 @@ type loginInput struct {
 	Password      string `json:"password"`
 	TwoFactorCode string `json:"twoFactorCode,omitempty"`
 	APIURL        string `json:"apiURL,omitempty"`
+	// CaptchaToken 是驗證頁面交回的複合 token（`<起點>:<結果>`），帶上它就是「解完重試」。
+	// CaptchaType 是該成果所屬的方法，Proton 要的是 x-pm-human-verification-token-type。
+	CaptchaToken string `json:"captchaToken,omitempty"`
+	CaptchaType  string `json:"captchaType,omitempty"`
 }
 
 type storedCredential struct {
@@ -76,6 +81,11 @@ type loginOutput struct {
 	// Reason is a machine-readable tag so the UI can pick a string resource
 	// instead of matching on Proton's English message text.
 	Reason string `json:"reason,omitempty"`
+	// HVToken 與 HVMethods 只在 reason 是 captcha-required/captcha-rejected 時出現，
+	// 是 9001 回應的 Details 内容；UI 拿它們去呼叫 captcha-begin 換 WebView 網址。
+	// 這是短效的驗證憑證：只走 stdout 給 NB4A，不進 stderr、不寫日誌。
+	HVToken   string   `json:"hvToken,omitempty"`
+	HVMethods []string `json:"hvMethods,omitempty"`
 }
 
 func runLogin(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
@@ -107,12 +117,25 @@ func runLogin(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSec)*time.Second)
 	defer cancel()
 
-	m := proton.New(proton.WithHostURL(apiURL), proton.WithAppVersion(protonAppVersion))
+	// go-proton-api v0.4.0 的 APIError 把 9001 的 Details（要解哪道驗證、起點 token）
+	// 整個丢掉，而且它的 AddPostRequestHook 在中間件鏈裡排不到 422，所以用一層
+	// RoundTripper 同時攔回應、附標頭（細故見 hv.go）。
+	var challenge *hvChallenge
+	transport := &hvTransport{base: http.DefaultTransport, challenge: &challenge}
+	if in.CaptchaToken != "" {
+		transport.attach = &hvSolution{Token: in.CaptchaToken, Type: in.CaptchaType}
+	}
+
+	m := proton.New(
+		proton.WithHostURL(apiURL),
+		proton.WithAppVersion(protonAppVersion),
+		proton.WithTransport(transport),
+	)
 	defer m.Close()
 
 	c, auth, err := m.NewClientWithLogin(ctx, in.Username, []byte(in.Password))
 	if err != nil {
-		return emitLogin(stdout, classifyLoginError(err))
+		return emitLogin(stdout, attachChallenge(classifyLoginError(err), in, challenge))
 	}
 	defer c.Close()
 
@@ -126,9 +149,13 @@ func runLogin(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		}
 		if err := c.Auth2FA(ctx, proton.Auth2FAReq{TwoFactorCode: in.TwoFactorCode}); err != nil {
 			out := classifyLoginError(err)
+			// /auth/v4/2fa 也可能被 Proton 要求先過驗證碼，那種時候不能把它硬標成
+			// 「2FA 密碼錯」，否則 UI 會叫使用者重複打碼而不開驗證頁面。
+			if out.Reason != reasonCaptchaRequired && out.Reason != reasonCaptchaRejected {
+				out.Reason = "two-factor-rejected"
+			}
 			out.TwoFactorRequired = true
-			out.Reason = "two-factor-rejected"
-			return emitLogin(stdout, out)
+			return emitLogin(stdout, attachChallenge(out, in, challenge))
 		}
 		auth.TwoFA.Enabled = proton.HasTOTP
 	}
@@ -172,7 +199,7 @@ func classifyLoginError(err error) loginOutput {
 	case proton.InvalidValue:
 		out.Reason = "bad-request"
 	case proton.HumanVerificationRequired:
-		out.Reason = "human-verification-required"
+		out.Reason = reasonCaptchaRequired
 	case proton.AppVersionBadCode, proton.AppVersionMissingCode:
 		out.Reason = "app-version-rejected"
 	case proton.PaidPlanRequired:
@@ -182,12 +209,30 @@ func classifyLoginError(err error) loginOutput {
 	}
 	// 實戰兜底：Proton 的 captcha 要求正式編號是 9001（go-proton-api 的
 	// HumanVerificationRequired），但同一句話也可能帶著別的 Code 回來（例如攔在
-	// /auth/v4/info 那一步、或以后改代碼）。UI 要靠這個 reason 決定「開瀏覽器解
-	// CAPTCHA」那條路，所以訊息裡有 captcha 字樣就一律歸到同一個 reason。
+	// /auth/v4/info 那一步、或以后改代碼）。UI 要靠這個 reason 決定「開驗證頁面」那條路，
+	// 所以訊息裡有 captcha 字樣就一律歸到同一個 reason。
 	if !strings.Contains(strings.ToLower(out.Error), "captcha") {
 		return out
 	}
-	out.Reason = "human-verification-required"
+	out.Reason = reasonCaptchaRequired
+	return out
+}
+
+// attachChallenge 把 9001 回應裡的 Details 掛到輸出上，讓 UI 有東西可以送去
+// captcha-begin。reason 不是 captcha 相關時原樣回傳。
+func attachChallenge(out loginOutput, in loginInput, challenge *hvChallenge) loginOutput {
+	if out.Reason != reasonCaptchaRequired && out.Reason != reasonCaptchaRejected {
+		return out
+	}
+	if challenge != nil {
+		out.HVToken = challenge.Token
+		out.HVMethods = normalizeMethods(challenge.Methods)
+	}
+	// 上一輪已經帶過一個解好的 token，Proton 還是拒：換個 reason，UI 才能講出
+	// 「剛剛那個驗證失敗」而不是叫使用者再解一次同樣的東西。
+	if in.CaptchaToken != "" {
+		out.Reason = reasonCaptchaRejected
+	}
 	return out
 }
 

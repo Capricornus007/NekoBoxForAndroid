@@ -1014,5 +1014,14 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_warning_accept">了解しました</string>
 
     <string name="action_reset">リセット</string>
-    <string name="proton_captcha_required">Proton はこのネットワークに対して CAPTCHA を要求しています。新しく開いたページで認証を済ませ、もう一度ログインをタップしてください。</string>
+    <string name="proton_captcha_required">Proton はこのネットワークに CAPTCHA を要求しています。下で解答してください。</string>
+    <string name="proton_captcha_title">人間の確認</string>
+    <string name="proton_captcha_hint">下の課題を解くと、ここに戻ります。</string>
+    <string name="proton_captcha_reload">再読み込み</string>
+    <string name="proton_captcha_open">ブラウザ</string>
+    <string name="proton_captcha_failed">確認ページを読み込めませんでした。</string>
+    <string name="proton_captcha_expired">CAPTCHA が期限切れです。再読み込みをタップしてください。</string>
+    <string name="proton_captcha_solving">確認済み、サインイン中…</string>
+    <string name="proton_captcha_rejected">Proton がその CAPTCHA を却下しました。もう一度サインインしてください。</string>
+    <string name="proton_captcha_unavailable">Proton はここで解ける CAPTCHA を返しませんでした。</string>
 </resources>
