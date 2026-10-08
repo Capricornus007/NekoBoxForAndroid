@@ -20,8 +20,8 @@ github.com/Capricornus007/sing-shadowquic v0.0.0-20260904152941-03a261e772e4 h1:
 github.com/Capricornus007/sing-shadowquic v0.0.0-20260904152941-03a261e772e4/go.mod h1:dnogioLE7ZFypHbYHMFo2NMvzUniEdhht0qKlN0IlIM=
 github.com/Capricornus007/sing-snell v0.0.0-20261001053801-d9bd2c6eb6a0 h1:1oYo9cSa/lqwqcdEwlSS3xLQXEDzfvBRxVh9G3zlNc8=
 github.com/Capricornus007/sing-snell v0.0.0-20261001053801-d9bd2c6eb6a0/go.mod h1:LBytgFmbtHFUAOVuBhBcGIOs0mCjuLwvgdNV02H+tpw=
-github.com/Capricornus007/sing-tun v0.9.4-0.20261007034102-e9825db7eb92 h1:rcUo/Zq4mtucyuRUWO53CIwdsdxLmGk3ToEZyr6lw7o=
-github.com/Capricornus007/sing-tun v0.9.4-0.20261007034102-e9825db7eb92/go.mod h1:gL0xE4X4x5c5JKcP0ZKETnGDPAhw6fkcKFjygs2X6/o=
+github.com/Capricornus007/sing-tun v0.9.4-0.20261008083110-69b8f1a44d67 h1:seUeiY9OWRkrVfNrr0m20sIYObluwinS+irvu7iqEnQ=
+github.com/Capricornus007/sing-tun v0.9.4-0.20261008083110-69b8f1a44d67/go.mod h1:gL0xE4X4x5c5JKcP0ZKETnGDPAhw6fkcKFjygs2X6/o=
 github.com/Capricornus007/sing-vmess v0.2.9-0.20260930034700-237367371d4f h1:UdfeCW75TfsE2VVntPKhDTOeCZ8OkQc0/EmFLbp98sM=
 github.com/Capricornus007/sing-vmess v0.2.9-0.20260930034700-237367371d4f/go.mod h1:mZjljwCAsUOwEn1MRMEXtTJakcw4rbhEWfRmhbDRS1Q=
 github.com/Capricornus007/tailscale v1.102.1-sing-box-1.14-mod.5.0.20260928041336-0b9fafb0a134 h1:e4Rif1x6pLQUPeNMtZEXEaJH9iECN65VulXMlKmEAFc=

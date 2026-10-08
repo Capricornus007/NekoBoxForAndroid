@@ -15,15 +15,19 @@
 # 那條 replace => Capricornus007/gvisor-awg；同一輪 check-core-pins.sh 段 1e 又抓到
 # libcore 一直在編「上游 SagerNet 原版 tailscale」（缺 fork replace），一并補齊。
 # mod.30（4fdc0a83d）= 吃下 upstream/testing 39 筆（b93f56a7a..fe92ab3e7，含 stable 的 3 筆）：
-# tailssh 的 SSH banner 修正、redirect.go 改用 DNSModeOrDefault、sing-tun 對齊上游 NAT 重做後的
-# require（我們的 fork e9825db 的 flow* 與上游 7539c98 逐字相同，所以 replace 不用動）、iOS roothide
-# 一行、masque 與 migration 文件精簡。route.go／wireguard／tailscale 那 29 檔衝突全部取我方（上游
-# 那些是同一邏輯的簡化版或會把 UDP 緩衝快取兩次）。
-export COMMIT_SING_BOX="4fdc0a83dc68e57f273546b00c186738f3ef86b4"
+# tailssh 的 SSH banner 修正、redirect.go 改用 DNSModeOrDefault、sing-tun 的 require 抬到上游
+# NAT 重做之後那版、iOS roothide 一行、masque 與 migration 文件精簡。route.go／wireguard／
+# tailscale 那 29 檔衝突全部取我方（上游那些是同一邏輯的簡化版或會把 UDP 緩衝快取兩次）。
+# mod.31（04b20057）= sing-tun 的 fork replace 抬到 69b8f1a：我們的 sing-tun fork 合併了
+# upstream/dev 27 筆（Fix Android VPNService kernel bypass、fully functional auto redirect for
+# Android、iptables DNS hijack 被 input connmark 跳過、go stack 重寫、arm64 NEON checksum 等），
+# libcore 的 require 同時對齊 sing-box 的 7539c98。這批全是 Android 資料路徑上的修正，值得為它
+# 多跑一輪核心建置。
+export COMMIT_SING_BOX="04b20057f25bed07e6d50025ffc146de2d28ccfd"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.30"
+export VERSION_SING_BOX="1.15.0-alpha.10-mod.31"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
