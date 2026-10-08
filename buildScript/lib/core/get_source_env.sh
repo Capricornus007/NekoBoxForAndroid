@@ -14,11 +14,16 @@
 # 我方 fork 的功能且更新），v3 會新拉 gvisor.dev/gvisor，因此 libcore 必須自己補上
 # 那條 replace => Capricornus007/gvisor-awg；同一輪 check-core-pins.sh 段 1e 又抓到
 # libcore 一直在編「上游 SagerNet 原版 tailscale」（缺 fork replace），一并補齊。
-export COMMIT_SING_BOX="913bc3d3f4ba8857a787f335672be0f3c965453e"
+# mod.30（4fdc0a83d）= 吃下 upstream/testing 39 筆（b93f56a7a..fe92ab3e7，含 stable 的 3 筆）：
+# tailssh 的 SSH banner 修正、redirect.go 改用 DNSModeOrDefault、sing-tun 對齊上游 NAT 重做後的
+# require（我們的 fork e9825db 的 flow* 與上游 7539c98 逐字相同，所以 replace 不用動）、iOS roothide
+# 一行、masque 與 migration 文件精簡。route.go／wireguard／tailscale 那 29 檔衝突全部取我方（上游
+# 那些是同一邏輯的簡化版或會把 UDP 緩衝快取兩次）。
+export COMMIT_SING_BOX="4fdc0a83dc68e57f273546b00c186738f3ef86b4"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.29"
+export VERSION_SING_BOX="1.15.0-alpha.10-mod.30"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
