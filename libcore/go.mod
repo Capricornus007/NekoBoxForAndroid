@@ -181,7 +181,7 @@ require (
 
 replace github.com/matsuridayo/libneko => github.com/Capricornus007/libneko v0.0.0-20260902104842-d5ae8b4d046a
 
-replace github.com/amnezia-vpn/amneziawg-go/v3 => github.com/Capricornus007/amneziawg-go/v3 v3.1.20260828-mod.2
+replace github.com/amnezia-vpn/amneziawg-go/v3 => github.com/Capricornus007/amneziawg-go/v3 v3.1.20261008-mod.4
 
 replace github.com/sagernet/sing-box => ../../sing-box
 
@@ -207,7 +207,7 @@ replace github.com/sagernet/sing-quic => github.com/Capricornus007/sing-quic v0.
 // sing-quic: SagerNet 版には sing-box 1.14.x が必要とする realm PortMapping が含まれる。
 // replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
 
-replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20261002221502-6d9728b2edd9
+replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20261007034102-e9825db7eb92
 
 replace github.com/sagernet/quic-go => github.com/Capricornus007/quic-go v0.61.0-sing-box-mod.9.0.20261001054000-283264781fe5
 

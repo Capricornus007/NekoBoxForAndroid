@@ -14,11 +14,11 @@
 # 我方 fork 的功能且更新），v3 會新拉 gvisor.dev/gvisor，因此 libcore 必須自己補上
 # 那條 replace => Capricornus007/gvisor-awg；同一輪 check-core-pins.sh 段 1e 又抓到
 # libcore 一直在編「上游 SagerNet 原版 tailscale」（缺 fork replace），一并補齊。
-export COMMIT_SING_BOX="3bddc8ae6786313366ab59f905cbb4b202fcf661"
+export COMMIT_SING_BOX="913bc3d3f4ba8857a787f335672be0f3c965453e"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.28"
+export VERSION_SING_BOX="1.15.0-alpha.10-mod.29"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
@@ -40,4 +40,4 @@ export COMMIT_WIREGUARD_GO="5c8c2d946422ae687d4138b91bde45a3252dcd3d"
 # runners do not accidentally depend on a developer machine's existing clone.
 export COMMIT_SING_QUIC="1f4a0d0c6d9fe5da589f4b4bbf25391288c117ff"
 export COMMIT_SING_JUICITY="b44e4aa2d6a033ab70371cbc3e7c39b54613bcaf"
-export COMMIT_SING_TRUSTTUNNEL="d20c66fa59d888aab6455126a9183fdbee208139"
+export COMMIT_SING_TRUSTTUNNEL="3b04fc11a1cc9bc81379c93ced12615e63d20c98"
