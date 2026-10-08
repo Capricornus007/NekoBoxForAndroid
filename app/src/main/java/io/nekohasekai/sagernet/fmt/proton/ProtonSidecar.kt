@@ -271,23 +271,22 @@ object ProtonSidecar {
     }
 
     // 驗證頁面交回的成果先過一轉 sidecar（補前綴、辨過期），再拿去重試登入。
-    suspend fun captchaSolve(token: String, response: String, type: String): ProtonCaptchaAnswer =
-        withContext(Dispatchers.IO) {
-            val body = JSONObject().apply {
-                put("token", token)
-                put("response", response)
-                if (type.isNotEmpty()) put("type", type)
-            }
-            when (val result = runSidecar(listOf("captcha-solve"), body.toString())) {
-                is ProtonOutcome.Success -> ProtonJson.parseCaptchaSolve(result.json)
+    suspend fun captchaSolve(token: String, response: String, type: String): ProtonCaptchaAnswer = withContext(Dispatchers.IO) {
+        val body = JSONObject().apply {
+            put("token", token)
+            put("response", response)
+            if (type.isNotEmpty()) put("type", type)
+        }
+        when (val result = runSidecar(listOf("captcha-solve"), body.toString())) {
+            is ProtonOutcome.Success -> ProtonJson.parseCaptchaSolve(result.json)
 
-                is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
-                    ProtonJson.parseCaptchaSolve(result.stdout)
-                } else {
-                    ProtonCaptchaAnswer(false, error = result.message)
-                }
+            is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
+                ProtonJson.parseCaptchaSolve(result.stdout)
+            } else {
+                ProtonCaptchaAnswer(false, error = result.message)
             }
         }
+    }
 
     suspend fun nodes(country: String = "", limit: Int = 0): ProtonNodesState = withContext(Dispatchers.IO) {
         if (!sessionFile.exists()) {

@@ -161,8 +161,7 @@ class ProtonActivity : ThemedActivity() {
 
     // 老 sidecar（重新建置 .so 之前的殘留產物）回的是舊 reason 字樣，一起認，
     // 免得換了 .so 之後這條路徑無聲失效。
-    private fun ProtonLoginState.needsCaptcha(): Boolean =
-        reason == "captcha-required" || reason == "human-verification-required"
+    private fun ProtonLoginState.needsCaptcha(): Boolean = reason == "captcha-required" || reason == "human-verification-required"
 
     private fun askForCaptcha(
         state: ProtonLoginState,
@@ -362,9 +361,8 @@ class ProtonActivity : ThemedActivity() {
         }
     }
 
-    private fun usingDarkUi(): Boolean =
-        (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
-                Configuration.UI_MODE_NIGHT_YES
+    private fun usingDarkUi(): Boolean = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+        Configuration.UI_MODE_NIGHT_YES
 
     private fun openInBrowser(url: String) {
         if (url.isEmpty()) return
@@ -375,7 +373,6 @@ class ProtonActivity : ThemedActivity() {
             )
         }.onFailure { Logs.w("Proton: 驗證頁面開不起來") }
     }
-
 
     private fun signOut() {
         ProtonSidecar.logout()
