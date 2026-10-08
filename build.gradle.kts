@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id("com.google.devtools.ksp") version "2.3.9" apply false
-    id("com.diffplug.spotless") version "7.0.4"
+    id("com.google.devtools.ksp") version "2.3.12" apply false
+    id("com.diffplug.spotless") version "8.10.3"
 }
 
 allprojects {
@@ -20,11 +20,11 @@ spotless {
     kotlin {
         target("**/*.kt")
         targetExclude("**/build/**")
-        ktlint("1.2.1")
+        ktlint("1.8.0")
     }
     kotlinGradle {
         target("**/*.gradle.kts")
         targetExclude("**/build/**")
-        ktlint("1.2.1")
+        ktlint("1.8.0")
     }
 }
