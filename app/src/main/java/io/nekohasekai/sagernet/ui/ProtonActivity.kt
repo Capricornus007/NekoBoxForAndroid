@@ -1,10 +1,10 @@
 package io.nekohasekai.sagernet.ui
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -125,7 +125,7 @@ class ProtonActivity : ThemedActivity() {
                     binding.status.setText(R.string.proton_captcha_required)
                     runCatching {
                         startActivity(
-                            Intent(Intent.ACTION_VIEW, Uri.parse("https://account.proton.me/login"))
+                            Intent(Intent.ACTION_VIEW, "https://account.proton.me/login".toUri())
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                         )
                     }.onFailure {
