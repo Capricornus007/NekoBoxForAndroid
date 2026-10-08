@@ -14,25 +14,33 @@ import (
 	proton "github.com/ProtonMail/go-proton-api"
 )
 
-// protonAppVersion 是 x-pm-appversion 的內容。Proton 正式閘門的規則是
-// 「<平台>-<產品>@<版本>」，三段都有要求，用錯分隔符會被逐段糾正（實測回碼）：
+// protonAppVersion 是 x-pm-appversion 的內容。Proton 的正式閘門有兩種合法寫法：
+// 「<平台>-<產品>@<版本>」（官方客戶端）與「other_<版本>」（放行第三方客戶端），
+// 用錯分隔符會被逐段糾正（2026-10-08 用公開端點 /auth/v4/info 逐個字串量測得來，
+// 該端點在驗 token 之前就會先過版本閘門，所以不需要帳密）：
 //
 //	"NB4A_1.0.0"                  -> 400/5002 Invalid app version
 //	"NB4A@1.0.0"                  -> 400/2064 Application platform and product must be separated by a dash
 //	"android-nb4a@1.0.0"          -> 400/2064 Product `nb4a` is not valid
 //	"NB4A-android@1.0.0"          -> 400/2064 Application name must be in lowercase
+//	"Otherx_1.0.0"                -> 400/5002 Invalid app version（底線寫法只認 other 這個字）
 //	"android-vpn@1.0.0"           -> 422/5003 This version of the app is no longer supported
-//	"android-vpn@5.20.57.0"       -> 401（已過版本閘門，進到驗 token）
+//	"android-vpn@5.20.57.0"       -> 401 Invalid access token
+//	"android-vpn@99.0.0"          -> 401 Invalid access token
+//	"windows-vpn@5.20.57.0"       -> 200
+//	"Other_1.0.0" / "other_1.0.0" -> 200（other 這條不比較版本號）
 //
-// 平台與產品都要在他們登記過的清單裡，所以第三方客戶端只能沿用官方 Android 客戶端的
-// 身分；格式與值直接取自公開源碼 ProtonVPN/android-app：
+// 那兩記 401 是這版的死因：`android-vpn` 這組合被 Proton 在路由層整個拒掉（官方 VPN App
+// 已改走免密碼的 session 流程），跟我們的 token 無關——連不存在的用戶名都吃 401，而且換成
+// 99.0.0 也一樣；同一支產品換成 windows-vpn 就 200，所以擋的不是 product=vpn 整個類別。
+// 因此改用專門留給第三方客戶端的 other_<版本>：不冒充官方身分，也不會跟著官方的版本淘汰
+// 跑步機過期（上面那條 5003 就是會過期的常數會遇到的事）。
+//
+// 格式與值取自 Proton 公開源碼與 go-proton-api 的第三方用法；官方 Android 客戶端的身分是
 //
 //	app/src/main/java/com/protonvpn/android/utils/Constants.kt:73  MOBILE_CLIENT_ID = "android-vpn"
 //	app/src/main/java/com/protonvpn/android/api/VpnApiClient.kt:49 "${clientId}@" + versionName()
-//
-// 版本號取該倉最新 release（5.20.57.0，2026-09-30）。Proton 會淘汰舊版本（見上面的
-// 422/5003），所以這行是會過期的常數：哪天登入吃到 5003，就到上面那個倉抓新的 release tag。
-const protonAppVersion = "android-vpn@5.20.57.0"
+const protonAppVersion = "Other_1.0.0"
 
 const defaultProtonAPIURL = "https://api.protonmail.ch"
 
