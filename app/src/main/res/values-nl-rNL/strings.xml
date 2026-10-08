@@ -1035,4 +1035,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="proton_captcha_solving">Geverifieerd, bezig met aanmelden…</string>
     <string name="proton_captcha_rejected">Proton heeft deze CAPTCHA geweigerd. Meld u opnieuw aan.</string>
     <string name="proton_captcha_unavailable">Proton gaf hier geen CAPTCHA om op te lossen.</string>
+    <string name="proton_show_more">Meer weergeven</string>
+    <string name="proton_showing">%1$d van %2$d servers</string>
 </resources>

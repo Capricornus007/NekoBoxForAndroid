@@ -985,4 +985,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="proton_captcha_solving">Verificado, entrando…</string>
     <string name="proton_captcha_rejected">O Proton rejeitou esse CAPTCHA. Entre de novo.</string>
     <string name="proton_captcha_unavailable">O Proton não forneceu um CAPTCHA para resolver aqui.</string>
+    <string name="proton_show_more">Mostrar mais</string>
+    <string name="proton_showing">%1$d de %2$d servidores</string>
 </resources>

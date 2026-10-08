@@ -1005,4 +1005,6 @@
     <string name="proton_captcha_solving">验证通过，登录中…</string>
     <string name="proton_captcha_rejected">Proton 退回了这次 CAPTCHA，请重新登录。</string>
     <string name="proton_captcha_unavailable">Proton 没有给出可在此完成的 CAPTCHA。</string>
+    <string name="proton_show_more">显示更多</string>
+    <string name="proton_showing">显示 %1$d / 共 %2$d 个服务器</string>
 </resources>

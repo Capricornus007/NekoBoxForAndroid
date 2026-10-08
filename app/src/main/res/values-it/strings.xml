@@ -1022,4 +1022,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_captcha_solving">Verificato, accesso in corso…</string>
     <string name="proton_captcha_rejected">Proton ha rifiutato questo CAPTCHA. Accedi di nuovo.</string>
     <string name="proton_captcha_unavailable">Proton non ha fornito un CAPTCHA da risolvere qui.</string>
+    <string name="proton_show_more">Mostra altro</string>
+    <string name="proton_showing">%1$d di %2$d server</string>
 </resources>

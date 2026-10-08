@@ -938,4 +938,6 @@
     <string name="proton_captcha_solving">Überprüft, Anmeldung läuft…</string>
     <string name="proton_captcha_rejected">Proton hat dieses CAPTCHA abgelehnt. Bitte erneut anmelden.</string>
     <string name="proton_captcha_unavailable">Proton hat kein CAPTCHA zum Lösen geliefert.</string>
+    <string name="proton_show_more">Mehr anzeigen</string>
+    <string name="proton_showing">%1$d von %2$d Servern</string>
 </resources>

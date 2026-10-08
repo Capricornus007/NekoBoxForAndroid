@@ -1103,4 +1103,6 @@
     <string name="proton_captcha_solving">Verified, signing in…</string>
     <string name="proton_captcha_rejected">Proton rejected that CAPTCHA. Sign in again.</string>
     <string name="proton_captcha_unavailable">Proton gave no CAPTCHA to solve here.</string>
+    <string name="proton_show_more">Show more</string>
+    <string name="proton_showing">%1$d of %2$d servers</string>
 </resources>

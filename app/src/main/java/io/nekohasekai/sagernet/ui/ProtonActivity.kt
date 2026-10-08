@@ -17,6 +17,7 @@ import android.webkit.WebViewClient
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -41,6 +42,11 @@ class ProtonActivity : ThemedActivity() {
     private lateinit var binding: ActivityProtonBinding
     private var nodes: List<ProtonNode> = emptyList()
 
+    // 一次只渲染這麼多筆，其餘用「顯示更多」逐頁加：1599 條全建 View 既翻不完也卡。
+    private val nodePage = 60
+    private var query = ""
+    private var shownLimit = nodePage
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProtonBinding.inflate(layoutInflater)
@@ -63,6 +69,17 @@ class ProtonActivity : ThemedActivity() {
         binding.signIn.setOnClickListener { signIn() }
         binding.signOut.setOnClickListener { signOut() }
         binding.refresh.setOnClickListener { refresh() }
+        applySignedInState(ProtonSidecar.hasSession())
+
+        binding.filterText.doAfterTextChanged {
+            query = it?.toString().orEmpty()
+            shownLimit = nodePage
+            renderNodes()
+        }
+        binding.showMore.setOnClickListener {
+            shownLimit += nodePage
+            renderNodes()
+        }
 
         // 自動登入只是「進頁自己取節點清單」，靠的是已經登進去的那個工作階段；
         // 沒工作階段就沒什麼可沿用的，所以不讓開，也不碰密碼。
@@ -99,6 +116,20 @@ class ProtonActivity : ThemedActivity() {
             .show()
     }
 
+    // 登進去之後還留著帳號／密碼／登入鈕，等於畫面一直在問已經回答過的問題。
+    // 登入態只收掉輸入區，不動登出、自動登入開關、重新整理與節點清單。
+    private fun applySignedInState(signedIn: Boolean) {
+        val inputVisibility = if (signedIn) View.GONE else View.VISIBLE
+        binding.accountLayout.visibility = inputVisibility
+        binding.passwordLayout.visibility = inputVisibility
+        binding.signIn.visibility = inputVisibility
+        if (signedIn) {
+            binding.twoFactorLayout.visibility = View.GONE
+            binding.password.text = null
+            binding.twoFactor.text = null
+        }
+    }
+
     private fun signIn() {
         val account = binding.account.text?.toString()?.trim().orEmpty()
         val password = binding.password.text?.toString().orEmpty()
@@ -130,6 +161,7 @@ class ProtonActivity : ThemedActivity() {
                     binding.password.text = null
                     binding.twoFactorLayout.visibility = View.GONE
                     binding.status.setText(R.string.proton_signed_in)
+                    applySignedInState(true)
                     refresh()
                 }
 
@@ -246,6 +278,14 @@ class ProtonActivity : ThemedActivity() {
             // 驗證頁的 console 會印出含 token 的網址與成果，一律吞掉、不進 logcat。
             web.webChromeClient = object : WebChromeClient() {
                 override fun onConsoleMessage(message: ConsoleMessage?): Boolean = true
+            }
+            // 高度直接照螢幕算，兩個坑都繞開：MaterialAlertDialog 把 custom view 包在
+            // wrap_content 容器裡，用 layout_weight 會分到 0 高（實測＝整塊空白）；
+            // 寫死 dp 又太小——拼圖展開後要 600dp 上下，420dp 得滑才點得到（用戶實測）。
+            val minimumWebHeight = (360 * resources.displayMetrics.density).toInt()
+            web.layoutParams = web.layoutParams.apply {
+                height = ((resources.displayMetrics.heightPixels * 0.72f).toInt())
+                    .coerceAtLeast(minimumWebHeight)
             }
             web.loadUrl(challenge.inAppUrl)
 
@@ -383,6 +423,7 @@ class ProtonActivity : ThemedActivity() {
         nodes = emptyList()
         binding.nodeList.removeAllViews()
         binding.status.setText(R.string.proton_not_signed_in)
+        applySignedInState(false)
     }
 
     private fun refresh() {
@@ -402,16 +443,34 @@ class ProtonActivity : ThemedActivity() {
                 return@launch
             }
             nodes = result.nodes
+            shownLimit = nodePage
             binding.status.text =
                 getString(R.string.proton_node_count, result.nodes.size, result.dropped)
             renderNodes()
         }
     }
 
+    // 1599 條靠捲動是不可用的：先照搜尋字串（名稱／城市／國家）過濾，再按 Proton 自己的
+    // penalty（越低越空）排序，最後只渲染前 shownLimit 筆。一次建上千顆按鈕本身就是卡的來源。
+    private fun visibleNodes(): List<ProtonNode> {
+        val q = query.trim().lowercase()
+        val matched = if (q.isEmpty()) {
+            nodes
+        } else {
+            nodes.filter {
+                it.name.lowercase().contains(q) || it.city.lowercase().contains(q) ||
+                    it.country.lowercase().contains(q)
+            }
+        }
+        return matched.sortedBy { it.penalty }
+    }
+
     private fun renderNodes() {
         binding.nodeList.removeAllViews()
         val gap = (8 * resources.displayMetrics.density).toInt()
-        for (node in nodes) {
+        val visible = visibleNodes()
+        binding.filterLayout.visibility = if (nodes.isEmpty()) View.GONE else View.VISIBLE
+        for (node in visible.take(shownLimit)) {
             val button = MaterialButton(
                 this,
                 null,
@@ -425,6 +484,10 @@ class ProtonActivity : ThemedActivity() {
             button.setOnClickListener { import(node) }
             binding.nodeList.addView(button)
         }
+        val shown = minOf(shownLimit, visible.size)
+        binding.listCount.text = getString(R.string.proton_showing, shown, visible.size)
+        binding.listCount.visibility = if (visible.isEmpty()) View.GONE else View.VISIBLE
+        binding.showMore.visibility = if (visible.size > shown) View.VISIBLE else View.GONE
     }
 
     private fun nodeLabel(node: ProtonNode): String {

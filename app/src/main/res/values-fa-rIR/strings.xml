@@ -1024,4 +1024,6 @@
     <string name="proton_captcha_solving">تأیید شد، در حال وارد شدن…</string>
     <string name="proton_captcha_rejected">Proton آن CAPTCHA را رد کرد. دوباره وارد شوید.</string>
     <string name="proton_captcha_unavailable">Proton برای حل در اینجا CAPTCHA ارائه نکرد.</string>
+    <string name="proton_show_more">نمایش بیشتر</string>
+    <string name="proton_showing">%1$d از %2$d سرور</string>
 </resources>

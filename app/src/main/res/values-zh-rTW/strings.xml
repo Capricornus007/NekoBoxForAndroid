@@ -1004,4 +1004,6 @@
     <string name="proton_captcha_solving">驗證通過，登入中…</string>
     <string name="proton_captcha_rejected">Proton 退回這次的 CAPTCHA，請重新登入。</string>
     <string name="proton_captcha_unavailable">Proton 沒有給可在這裡解的 CAPTCHA。</string>
+    <string name="proton_show_more">顯示更多</string>
+    <string name="proton_showing">顯示 %1$d / 共 %2$d 個伺服器</string>
 </resources>

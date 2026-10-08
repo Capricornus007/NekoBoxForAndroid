@@ -1020,4 +1020,6 @@
     <string name="proton_captcha_solving">Праверана, выконваецца ўваход…</string>
     <string name="proton_captcha_rejected">Proton адхіліў гэту CAPTCHA. Увайдзіце зноў.</string>
     <string name="proton_captcha_unavailable">Proton не даў CAPTCHA для вырашэння тут.</string>
+    <string name="proton_show_more">Паказаць яшчэ</string>
+    <string name="proton_showing">%1$d з %2$d сервераў</string>
 </resources>

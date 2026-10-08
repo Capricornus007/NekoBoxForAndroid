@@ -1083,4 +1083,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_captcha_solving">Проверено, выполняем вход…</string>
     <string name="proton_captcha_rejected">Proton отклонил эту CAPTCHA. Войдите снова.</string>
     <string name="proton_captcha_unavailable">Proton не дал CAPTCHA для прохождения здесь.</string>
+    <string name="proton_show_more">Показать ещё</string>
+    <string name="proton_showing">%1$d из %2$d серверов</string>
 </resources>

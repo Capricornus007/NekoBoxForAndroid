@@ -836,4 +836,6 @@
     <string name="proton_captcha_solving">확인 완료, 로그인 중…</string>
     <string name="proton_captcha_rejected">Proton이 해당 CAPTCHA를 거부했습니다. 다시 로그인해 주세요.</string>
     <string name="proton_captcha_unavailable">Proton이 여기서 풀 수 있는 CAPTCHA를 주지 않았습니다.</string>
+    <string name="proton_show_more">더 보기</string>
+    <string name="proton_showing">서버 %2$d개 중 %1$d개</string>
 </resources>

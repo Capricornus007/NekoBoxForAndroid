@@ -1012,4 +1012,6 @@
     <string name="proton_captcha_solving">Перевірено, виконується вхід…</string>
     <string name="proton_captcha_rejected">Proton відхилив цю CAPTCHA. Увійдіть ще раз.</string>
     <string name="proton_captcha_unavailable">Proton не дав CAPTCHA для проходження тут.</string>
+    <string name="proton_show_more">Показати більше</string>
+    <string name="proton_showing">%1$d із %2$d серверів</string>
 </resources>

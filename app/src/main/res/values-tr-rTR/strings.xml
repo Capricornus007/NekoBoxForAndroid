@@ -1025,4 +1025,6 @@
     <string name="proton_captcha_solving">Doğrulandı, giriş yapılıyor…</string>
     <string name="proton_captcha_rejected">Proton bu doğrulamayı reddetti. Yeniden giriş yapın.</string>
     <string name="proton_captcha_unavailable">Proton burada çözülecek bir CAPTCHA vermedi.</string>
+    <string name="proton_show_more">Daha fazla göster</string>
+    <string name="proton_showing">%2$d sunucudan %1$d tanesi</string>
 </resources>

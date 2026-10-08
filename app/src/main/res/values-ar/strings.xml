@@ -992,4 +992,6 @@
     <string name="proton_captcha_solving">تم التحقق، جارٍ تسجيل الدخول…</string>
     <string name="proton_captcha_rejected">رفض Proton التحقق. سجّل الدخول مجددًا.</string>
     <string name="proton_captcha_unavailable">لم يعطِ Proton سؤال CAPTCHA ليُحل هنا.</string>
+    <string name="proton_show_more">عرض المزيد</string>
+    <string name="proton_showing">%1$d من %2$d خادم</string>
 </resources>

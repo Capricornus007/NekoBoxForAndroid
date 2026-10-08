@@ -1039,4 +1039,6 @@
     <string name="proton_captcha_solving">Vérifié, connexion en cours…</string>
     <string name="proton_captcha_rejected">Proton a refusé ce CAPTCHA. Reconnectez-vous.</string>
     <string name="proton_captcha_unavailable">Aucun CAPTCHA fourni par Proton pour ce réseau.</string>
+    <string name="proton_show_more">Afficher plus</string>
+    <string name="proton_showing">%1$d serveurs sur %2$d</string>
 </resources>

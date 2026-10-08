@@ -999,4 +999,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_captcha_solving">Terverifikasi, masuk…</string>
     <string name="proton_captcha_rejected">Proton menolak CAPTCHA itu. Masuk lagi.</string>
     <string name="proton_captcha_unavailable">Proton tidak memberi CAPTCHA untuk diselesaikan di sini.</string>
+    <string name="proton_show_more">Tampilkan lainnya</string>
+    <string name="proton_showing">%1$d dari %2$d server</string>
 </resources>

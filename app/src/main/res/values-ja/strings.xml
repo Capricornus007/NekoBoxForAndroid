@@ -841,4 +841,6 @@
     <string name="proton_captcha_solving">確認済み、サインイン中…</string>
     <string name="proton_captcha_rejected">Proton がその CAPTCHA を却下しました。もう一度サインインしてください。</string>
     <string name="proton_captcha_unavailable">Proton はここで解ける CAPTCHA を返しませんでした。</string>
+    <string name="proton_show_more">もっと見る</string>
+    <string name="proton_showing">%2$d 件中 %1$d のサーバー</string>
 </resources>
