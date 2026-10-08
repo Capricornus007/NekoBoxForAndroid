@@ -40,8 +40,12 @@ var knownProducts = map[string]bool{
 	"vpn": true, "account": true, "mail": true, "calendar": true, "pass": true,
 }
 
-// minSupportedVersion 是「版本被淘汰」的下界，實測 5.10.0 起可過、1.0.0 吃 422/5003。
-var minSupportedVersion = []int{5, 10}
+// minSupported 是「版本被淘汰」的下界，只填**量測過**的那條：android-vpn 實測 5.10.0
+// 可過、1.0.0 吃 422/5003。其他產品（例如 web-account@5.5.5.5 實測可過）沒有量過門檻，
+// 就不在這裡憑空發明數字，一律只驗格式。哪天我們改用別的身分，先去量再補。
+var minSupported = map[string][]int{
+	"android-vpn": {5, 10},
+}
 
 // appVersionGate 回空字串代表放行，否則回 Proton 實際會給的那句錯誤。
 func appVersionGate(v string) string {
@@ -68,16 +72,20 @@ func appVersionGate(v string) string {
 	if !appVersionRE.MatchString(v) {
 		return "Invalid app version"
 	}
+	floor, hasFloor := minSupported[name]
+	if !hasFloor {
+		return ""
+	}
 	got := strings.Split(version, ".")
-	if len(got) < len(minSupportedVersion) {
+	if len(got) < len(floor) {
 		return "This version of the app is no longer supported"
 	}
-	for i, floor := range minSupportedVersion {
+	for i, want := range floor {
 		n, err := strconv.Atoi(got[i])
-		if err != nil || n < floor {
+		if err != nil || n < want {
 			return "This version of the app is no longer supported"
 		}
-		if n > floor {
+		if n > want {
 			break
 		}
 	}
