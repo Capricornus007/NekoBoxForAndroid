@@ -86,34 +86,37 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 
 	// Set up some component
 	if isBgProcess {
-		// 同步登記「會有人去抽資產」，再啟動 goroutine：這樣 BoxInstance.Start() 一定
-		// 看得到這個旗標，不會因為競態而跳過等待。
+		// 同步登記「會有人去抽資產」，這樣 BoxInstance.Start() 一定看得到這個旗標。
 		assetsExtractionScheduled.Store(true)
 	}
-	go func() {
-		defer device.DeferPanicToError("InitCore-go", func(err error) { log.Println(err) })
-		if isBgProcess {
-			// 註冊在 goroutine 開頭而不是解壓那一段：就算 GoDebug / certs 那幾步 panic，
-			// channel 仍會被關閉，不會讓 Start() 白等 15 秒。
-			defer close(assetsReady)
-		}
-		device.GoDebug(process)
 
-		// certs: use the Java-provided system trust anchors when registered,
-		// otherwise fall back to an exported ca.pem bundle.
-		if androidCAStore != nil {
-			if pem := androidCAStore.Certificates(); len(pem) > 0 {
-				updateRootCACerts(pem)
-			}
-		} else if pem, err := os.ReadFile(externalAssetsPath + "ca.pem"); err == nil {
+	// 信任根與 APK 資產这两件事都需要 JNIEnv，只能在「Java 呼叫進來的這條執行緒」上做。
+	// 放進 goroutine 的後果不是慢，是整個進程消失：x/mobile/asset 拿不到 JVM 時走的是
+	// log.Fatalf，而 Go 的 log.Fatalf 等於 os.Exit(1) —— :bg 會在啟動後約 0.3 秒自我結束
+	// （AMS 記成 EXIT_SELF status=1、沒有 Java 異常也沒有 tombstone），用戶看到的症狀就是
+	// 「按連線完全沒反應」，而且因為每次啟動都失敗，系統的服務重啟退避會一路翻倍。
+	// GoDebug 內部自己會另開 goroutine，不需要 JNI，留在這裡呼叫即可。
+	device.GoDebug(process)
+
+	// certs: use the Java-provided system trust anchors when registered,
+	// otherwise fall back to an exported ca.pem bundle.
+	if androidCAStore != nil {
+		if pem := androidCAStore.Certificates(); len(pem) > 0 {
 			updateRootCACerts(pem)
 		}
+	} else if pem, err := os.ReadFile(externalAssetsPath + "ca.pem"); err == nil {
+		updateRootCACerts(pem)
+	}
 
-		// bg
-		if isBgProcess {
+	if isBgProcess {
+		// 先註冊 close 再註冊 recover：defer 是 LIFO，所以 panic 會被收掉、
+		// 之後 assetsReady 仍會關閉，Start() 不會白等 15 秒。
+		func() {
+			defer close(assetsReady)
+			defer device.DeferPanicToError("extractAssets", func(err error) { log.Println(err) })
 			extractAssets()
-		}
-	}()
+		}()
+	}
 }
 
 func sendFdToProtect(fd int, path string) error {
