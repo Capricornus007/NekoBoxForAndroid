@@ -1021,4 +1021,5 @@
     <string name="proton_warning_accept">فهمت</string>
 
     <string name="action_reset">إعادة تعيين</string>
+    <string name="proton_captcha_required">يفرض Proton التحقق عبر CAPTCHA لهذا الشبكة. أكمله في الصفحة التي فُتحت للتو، ثم اضغط «تسجيل الدخول» مجددًا.</string>
 </resources>

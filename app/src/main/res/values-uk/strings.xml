@@ -1003,4 +1003,5 @@
     <string name="proton_warning_accept">Зрозуміло</string>
 
     <string name="action_reset">Скинути</string>
+    <string name="proton_captcha_required">Proton вимагає пройти CAPTCHA для цієї мережі. Виконайте її на щойно відкритій сторінці та знову торкніться «Увійти».</string>
 </resources>

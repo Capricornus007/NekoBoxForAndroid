@@ -990,4 +990,5 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_warning_accept">Saya mengerti</string>
 
     <string name="action_reset">Atur ulang</string>
+    <string name="proton_captcha_required">Proton memerlukan CAPTCHA untuk jaringan ini. Selesaikan di halaman yang baru dibuka, lalu ketuk Masuk lagi.</string>
 </resources>

@@ -1016,4 +1016,5 @@
     <string name="proton_warning_accept">Anladım</string>
 
     <string name="action_reset">Sıfırla</string>
+    <string name="proton_captcha_required">Proton bu ağ için CAPTCHA istiyor. Az önce açılan sayfada çözün, ardından Oturum Aç’a yeniden dokunun.</string>
 </resources>

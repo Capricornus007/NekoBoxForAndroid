@@ -980,4 +980,5 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="proton_warning_accept">Begrepen</string>
 
     <string name="action_reset">Herstel</string>
+    <string name="proton_captcha_required">Proton vereist een CAPTCHA voor dit netwerk. Los deze op op de pagina die zojuist is geopend en tik opnieuw op Aanmelden.</string>
 </resources>

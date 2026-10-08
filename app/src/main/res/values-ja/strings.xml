@@ -832,4 +832,5 @@
     <string name="proton_warning_accept">了解しました</string>
 
     <string name="action_reset">リセット</string>
+    <string name="proton_captcha_required">Proton はこのネットワークに対して CAPTCHA を要求しています。新しく開いたページで認証を済ませ、もう一度ログインをタップしてください。</string>
 </resources>

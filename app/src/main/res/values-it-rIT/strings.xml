@@ -1025,4 +1025,5 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_warning_accept">Ho capito</string>
 
     <string name="action_reset">Ripristina</string>
+    <string name="proton_captcha_required">Proton richiede un CAPTCHA per questa rete. Risolvilo nella pagina appena aperta, poi tocca di nuovo Accedi.</string>
 </resources>

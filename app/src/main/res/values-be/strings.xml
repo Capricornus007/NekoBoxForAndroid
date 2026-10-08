@@ -915,4 +915,5 @@
     <string name="proton_warning_accept">Зразумела</string>
 
     <string name="action_reset">Скінуць</string>
+    <string name="proton_captcha_required">Proton патрабуе праходжання CAPTCHA для гэтай сеткі. Выканайце яе на старонцы, якая толькі што адкрылася, і зноў націсніце «Увайсці».</string>
 </resources>

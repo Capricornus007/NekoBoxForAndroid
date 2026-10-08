@@ -976,4 +976,5 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="proton_warning_accept">Entendi</string>
 
     <string name="action_reset">Restaurar</string>
+    <string name="proton_captcha_required">O Proton exige um CAPTCHA para esta rede. Resolva-o na página que acabou de abrir e toque em Entrar novamente.</string>
 </resources>

@@ -986,4 +986,5 @@
     <string name="proton_warning_accept">Понятно</string>
 
     <string name="action_reset">Сброс</string>
+    <string name="proton_captcha_required">Proton требует пройти CAPTCHA для этой сети. Выполните её на только что открытой странице и снова нажмите «Войти».</string>
 </resources>

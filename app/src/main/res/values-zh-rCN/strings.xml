@@ -996,4 +996,5 @@
     <string name="proton_warning_message">这不是 Proton 官方应用。它按 Proton 自家客户端的方式与 Proton API 通信，因此 Proton 随时可能改动 API，导致此功能失效，而我们无法提前应对。\n\n你的密码与会话仅保存在这台手机上 NB4A 的私有存储区，除向 Proton 登录外不会发送到任何地方。在 Proton 自家应用之外使用订阅，可能不在其条款保障范围内。</string>
     <string name="proton_warning_accept">我知道了</string>
 
+    <string name="proton_captcha_required">Proton 要求此网络先通过 CAPTCHA 验证。请在刚打开的页面完成验证，然后再点一次登录。</string>
 </resources>

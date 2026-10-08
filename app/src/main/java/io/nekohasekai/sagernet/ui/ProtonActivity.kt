@@ -1,5 +1,7 @@
 package io.nekohasekai.sagernet.ui
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -112,6 +114,23 @@ class ProtonActivity : ThemedActivity() {
                     // Keep the code field visible so the retry is one tap away.
                     binding.twoFactorLayout.visibility = View.VISIBLE
                     binding.status.setText(R.string.proton_2fa_required)
+                }
+
+                result.reason == "human-verification-required" -> {
+                    // Proton Sentinel 對「這個出口 IP」要求解 CAPTCHA（API 回 422、Code 9001）。
+                    // 他們的 captcha 是自家 JS 小工具（go-proton-api 的 GetCaptcha 還得帶
+                    // ForceWebMessaging=1），沒有可程式化验證的路徑；社群實測（rclone #9397、
+                    // Proton-API-Bridge #29）是「在同一個出口 IP 上用瀏覽器解一次，Sentinel
+                    // 就把那個 IP 放行」，所以把人送到官方登入頁，解完回來再按一次登入。
+                    binding.status.setText(R.string.proton_captcha_required)
+                    runCatching {
+                        startActivity(
+                            Intent(Intent.ACTION_VIEW, Uri.parse("https://account.proton.me/login"))
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                        )
+                    }.onFailure {
+                        Logs.w("Proton: 打不开驗證頁面", it)
+                    }
                 }
 
                 else -> binding.status.text = result.error.ifEmpty { result.reason }

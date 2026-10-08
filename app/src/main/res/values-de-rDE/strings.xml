@@ -1015,4 +1015,5 @@
     <string name="proton_warning_accept">Verstanden</string>
 
     <string name="action_reset">Zurücksetzen</string>
+    <string name="proton_captcha_required">Proton fordert für dieses Netzwerk ein CAPTCHA. Lösen Sie es auf der gerade geöffneten Seite und tippen Sie erneut auf „Anmelden“.</string>
 </resources>

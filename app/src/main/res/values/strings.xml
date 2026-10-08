@@ -1094,4 +1094,5 @@
     <string name="proton_warning_title">You have been warned</string>
     <string name="proton_warning_message">This is not a Proton app. It talks to Proton\'s API the way Proton\'s own clients do, so Proton can change that API at any time and this stops working with no way for us to fix it in advance.\n\nYour password and session are kept only on this phone, in NB4A\'s private storage, and are sent nowhere except Proton\'s sign-in endpoint. Using a subscription outside Proton\'s own apps may not be covered by their terms.</string>
     <string name="proton_warning_accept">I understand</string>
+    <string name="proton_captcha_required">Proton requires a CAPTCHA for this network. Solve it in the page that just opened, then tap Sign in again.</string>
 </resources>

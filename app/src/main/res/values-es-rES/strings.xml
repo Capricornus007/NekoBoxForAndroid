@@ -1024,4 +1024,5 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="proton_warning_accept">Entendido</string>
 
     <string name="action_reset">Restablecer</string>
+    <string name="proton_captcha_required">Proton pide un CAPTCHA para esta red. Resuélvelo en la página que acaba de abrir y vuelve a tocar Iniciar sesión.</string>
 </resources>

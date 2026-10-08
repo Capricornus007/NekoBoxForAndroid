@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	proton "github.com/ProtonMail/go-proton-api"
@@ -179,6 +180,14 @@ func classifyLoginError(err error) loginOutput {
 	default:
 		out.Reason = "api-error"
 	}
+	// 實戰兜底：Proton 的 captcha 要求正式編號是 9001（go-proton-api 的
+	// HumanVerificationRequired），但同一句話也可能帶著別的 Code 回來（例如攔在
+	// /auth/v4/info 那一步、或以后改代碼）。UI 要靠這個 reason 決定「開瀏覽器解
+	// CAPTCHA」那條路，所以訊息裡有 captcha 字樣就一律歸到同一個 reason。
+	if !strings.Contains(strings.ToLower(out.Error), "captcha") {
+		return out
+	}
+	out.Reason = "human-verification-required"
 	return out
 }
 

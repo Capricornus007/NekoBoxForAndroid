@@ -997,4 +997,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_warning_accept">我明白了</string>
 
     <string name="action_reset">重設</string>
+    <string name="proton_captcha_required">Proton 要求這個網路先通過 CAPTCHA 驗證。請在剛開啟的頁面完成驗證，再按一次登入。</string>
 </resources>

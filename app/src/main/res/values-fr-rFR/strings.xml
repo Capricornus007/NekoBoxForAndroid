@@ -1030,4 +1030,5 @@
     <string name="proton_warning_accept">J\'ai compris</string>
 
     <string name="action_reset">Réinitialiser</string>
+    <string name="proton_captcha_required">Proton exige un CAPTCHA pour ce réseau. Résolvez-le sur la page qui vient de s’ouvrir, puis touchez de nouveau Se connecter.</string>
 </resources>

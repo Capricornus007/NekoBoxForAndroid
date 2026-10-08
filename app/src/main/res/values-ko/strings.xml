@@ -827,4 +827,5 @@
     <string name="proton_warning_accept">이해했습니다</string>
 
     <string name="action_reset">초기화</string>
+    <string name="proton_captcha_required">Proton이 이 네트워크에 CAPTCHA를 요구합니다. 방금 열린 페이지에서 인증을 마친 뒤 로그인을 다시 누르세요.</string>
 </resources>
