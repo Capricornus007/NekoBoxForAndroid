@@ -35,18 +35,20 @@ data class ProtonFilter(
                     )
         }
         return when (sort) {
-            // 空閒度（Proton 的 Load 反過來）優先。penalty 只當次鍵：實測 /vpn/logicals
-            // 對每一台都不回 StatusReference，也就是 penalty 恆為 0，單靠它等於沒排。
-            Sort.IDLE -> matched.sortedWith(compareBy({ it.loadRank }, { it.penalty }))
+            // 空閒度（Proton 的 Load 反過來）優先，同分再用 Proton 自己的 Score 拉開
+            // （實測 Load=0 那 61 台的 Score 從 2.979 到 5.970 全不重複，正好分得出來）。
+            // penalty 只當最後一鍵：實測 /vpn/logicals 對每一台都不回 StatusReference，
+            // 也就是 penalty 恆為 0，單靠它等於沒排。
+            Sort.IDLE -> matched.sortedWith(compareBy({ it.loadRank }, { it.scoreRank }, { it.penalty }))
 
-            Sort.NAME -> matched.sortedWith(compareBy({ it.name.lowercase() }, { it.loadRank }))
+            Sort.NAME -> matched.sortedWith(compareBy({ it.name.lowercase() }, { it.loadRank }, { it.scoreRank }))
 
             Sort.COUNTRY -> matched.sortedWith(
-                compareBy({ it.countryKey }, { cityName(it.city).lowercase() }, { it.loadRank }),
+                compareBy({ it.countryKey }, { cityName(it.city).lowercase() }, { it.loadRank }, { it.scoreRank }),
             )
 
             Sort.CITY -> matched.sortedWith(
-                compareBy({ cityName(it.city).lowercase() }, { it.countryKey }, { it.loadRank }),
+                compareBy({ cityName(it.city).lowercase() }, { it.countryKey }, { it.loadRank }, { it.scoreRank }),
             )
         }
     }
@@ -85,6 +87,9 @@ private val ProtonNode.countryKey: String get() = country.trim().uppercase(Local
 // 沒有 load 的舊快取要排在最後，而不是被當成「最空」排到第一。
 private val ProtonNode.loadRank: Int get() = load.takeIf { it >= 0 } ?: Int.MAX_VALUE
 
+// 同理：沒有 score 的舊快取不能當成 Proton 眼中的最佳機台。
+private val ProtonNode.scoreRank: Double get() = if (score >= 0) score else Double.MAX_VALUE
+
 /**
  * 國家碼轉成本機語言的國名（Proton 只給 `ExitCountry` 兩位碼）。
  * 非 ISO 碼或空碼時 `Locale.Builder` 會丟例外，那種情況照原碼顯示，不猜。
@@ -94,11 +99,12 @@ fun countryName(code: String): String = runCatching {
     Locale.Builder().setRegion(code).build().getDisplayCountry(Locale.getDefault())
 }.getOrNull()?.takeIf { it.isNotEmpty() } ?: code
 
-/** 清單列與匯入後的節點名稱共用同一個拼法，兩邊長得不一樣會讓人對不上號。 */
+/**
+ * 清單列與匯入後的節點名稱共用同一個拼法，兩邊長得不一樣會讓人對不上號。
+ * 刻意不列國家：Proton 的節點名本身就帶國家碼（RW#10、US-FREE#2），城市又已經含國家，
+ * 三個都塞進一顆按鈕就會撐成兩行、整頁高度被拉開。城市缺資料時才退回國家碼。
+ */
 fun ProtonNode.placeLabel(): String {
-    val place = listOfNotNull(
-        cityName(city).takeIf { it.isNotEmpty() },
-        country.takeIf { it.isNotEmpty() }?.let { countryName(it) },
-    ).joinToString(" · ")
-    return if (place.isEmpty()) name else "$name   $place"
+    val place = cityName(city).ifEmpty { country.takeIf { it.isNotEmpty() }?.let { countryName(it) }.orEmpty() }
+    return if (place.isEmpty()) name else "$name $place"
 }

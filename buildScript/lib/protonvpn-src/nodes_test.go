@@ -46,11 +46,11 @@ func runNodesWith(t *testing.T, apiURL, statePath string, extra ...string) (node
 // server carries Load (0-100). The penalties below deliberately disagree with the
 // loads so the test proves which one actually drives the order.
 const serverListFixture = `{"LogicalServers":[
- {"ID":"11","Name":"JP#2 高載","Tier":2,"State":"up","ExitCountry":"jp","City":"Tokyo","Features":16,"Load":95,
+ {"ID":"11","Name":"JP#2 高載","Tier":2,"State":"up","ExitCountry":"jp","City":"Tokyo","Features":16,"Load":95,"Score":1.0,
   "StatusReference":{"Index":11,"Penalty":0.2,"Cost":1},
   "Servers":[{"Domain":"jp2.protonvpn.net","EntryIP":"1.2.3.5","Status":1,"X25519PublicKey":"BBBBAl==",
     "EntryPerProtocol":{"wireguard":{"IPv4":"1.2.3.55","Ports":[51820,443]}}}]},
- {"ID":"10","Name":"JP#1 空閒","Tier":2,"State":"up","ExitCountry":"jp","City":"Osaka","Features":0,"Load":5,
+ {"ID":"10","Name":"JP#1 空閒","Tier":2,"State":"up","ExitCountry":"jp","City":"Osaka","Features":0,"Load":5,"Score":9.0,
   "StatusReference":{"Index":10,"Penalty":0.9,"Cost":3},
   "Servers":[{"Domain":"jp1.protonvpn.net","EntryIP":"1.2.3.4","Status":1,"X25519PublicKey":"AAAAAl=="}]},
  {"ID":"12","Name":"無公鑰","Tier":0,"State":"up","ExitCountry":"jp",
@@ -110,6 +110,11 @@ func TestNodesReadsProtonsRealFieldNames(t *testing.T) {
 	}
 	if out.Servers[0].Load != 5 || out.Servers[1].Load != 95 {
 		t.Errorf("load = %d,%d; want the API's 5,95 so the UI can show idle capacity", out.Servers[0].Load, out.Servers[1].Load)
+	}
+	// The scores here are deliberately the other way round, so this also proves Load
+	// is the primary key and Score only breaks a tie.
+	if out.Servers[0].Score != 9.0 || out.Servers[1].Score != 1.0 {
+		t.Errorf("score = %v,%v; want the API's 9,1 carried through for tie-breaking", out.Servers[0].Score, out.Servers[1].Score)
 	}
 	if out.Servers[1].PublicKey != "BBBBAl==" {
 		t.Errorf("public key = %q, want the X25519PublicKey the API returned", out.Servers[1].PublicKey)

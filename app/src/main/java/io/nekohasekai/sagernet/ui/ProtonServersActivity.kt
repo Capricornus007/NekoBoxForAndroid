@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.ui
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.text.format.DateUtils
 import android.view.View
 import android.view.ViewGroup
@@ -83,6 +84,7 @@ class ProtonServersActivity : ThemedActivity() {
         }
         binding.sortFilter.setOnItemClickListener { _, _, position, _ ->
             filter = filter.copy(sort = sortOptions.getOrNull(position)?.first ?: ProtonFilter.Sort.IDLE)
+            renderSortLabel()
             shownLimit = nodePage
             renderNodes()
         }
@@ -95,6 +97,7 @@ class ProtonServersActivity : ThemedActivity() {
             shownLimit += nodePage
             renderNodes()
         }
+        renderSortLabel()
 
         if (!ProtonSidecar.isAvailable()) {
             binding.status.setText(R.string.proton_sidecar_missing)
@@ -184,6 +187,12 @@ class ProtonServersActivity : ThemedActivity() {
         }
     }
 
+    // 排序框不能留白：國家／城市那兩格都會回填目前選的是什麼，唯獨這格不回填的話，
+    // 用戶看不出清單現在是按什麼排的，也看不出自己刚刚選到了哪裡。
+    private fun renderSortLabel() {
+        binding.sortFilter.setText(sortOptions.first { it.first == filter.sort }.second, false)
+    }
+
     private fun refreshPlaceOptions() {
         countryOptions = listOf(
             ProtonFilter.Option(ProtonFilter.ALL, nodes.size, getString(R.string.proton_all_countries)),
@@ -218,6 +227,8 @@ class ProtonServersActivity : ThemedActivity() {
                 null,
                 com.google.android.material.R.attr.materialButtonOutlinedStyle,
             )
+            button.isSingleLine = true
+            button.ellipsize = TextUtils.TruncateAt.END
             button.layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -230,7 +241,7 @@ class ProtonServersActivity : ThemedActivity() {
                 append(" · ")
                 append(node.placeLabel())
                 if (idle != null) {
-                    append("   ")
+                    append(" ")
                     append(getString(R.string.proton_idle, idle))
                 }
             }

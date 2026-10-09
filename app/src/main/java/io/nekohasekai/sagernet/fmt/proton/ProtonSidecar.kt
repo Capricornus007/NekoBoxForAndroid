@@ -24,8 +24,12 @@ data class ProtonNode(
     // Proton's own utilisation number, 0-100. -1 means "the payload did not carry
     // it", which is what every cache file written before this field existed looks
     // like; treating absent as 0 would rank those nodes as the emptiest there are.
-    // 放在最後是必要的：既有呼叫端是用位置建這個物件的。
     val load: Int = -1,
+    // Proton 自己的「這台好不好」排名分數，越小越好：它的客戶端在 ServerManager2.kt
+    // 寫著「Sorted by score (best at front)」，而拿不到分數時的佔位值是 1_000_000.0。
+    // -1 也是「payload 沒帶這個欄位」（舊快取）的意思，不能當成 0，那是「最好」。
+    // 兩個新欄位都放在最後是必要的：既有呼叫端是用位置建這個物件的。
+    val score: Double = -1.0,
 ) {
     // 空閒度是他在清單上真正要比的東西，負載只是它的反面。
     val idlePercent: Int? get() = load.takeIf { it in 0..100 }?.let { 100 - it }
@@ -169,6 +173,7 @@ object ProtonJson {
                 name = item.optString("name", ""),
                 penalty = item.optDouble("penalty", 0.0),
                 load = if (item.has("load")) item.optInt("load", -1) else -1,
+                score = if (item.has("score")) item.optDouble("score", -1.0) else -1.0,
                 tier = item.optInt("tier"),
                 supportsIPv6 = item.optBoolean("ipv6"),
                 country = item.optString("country", ""),

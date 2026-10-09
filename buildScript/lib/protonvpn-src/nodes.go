@@ -33,6 +33,7 @@ type logicalServer struct {
 	Name            string  `json:"Name"`
 	State           string  `json:"State"`
 	Load            int     `json:"Load"`
+	Score           float64 `json:"Score"`
 	Tier            int     `json:"Tier"`
 	Features        int     `json:"Features"`
 	Country         string  `json:"ExitCountry"`
@@ -76,6 +77,7 @@ type nodeView struct {
 	ID        string  `json:"id"`
 	Name      string  `json:"name"`
 	Load      int     `json:"load"`
+	Score     float64 `json:"score"`
 	Penalty   float64 `json:"penalty"`
 	Tier      int     `json:"tier"`
 	IPv6      bool    `json:"ipv6,omitempty"`
@@ -222,6 +224,7 @@ func selectNodes(resp *logicalServersResp, country string, limit int) ([]nodeVie
 			ID:        ls.ID,
 			Name:      ls.Name,
 			Load:      ls.Load,
+			Score:     ls.Score,
 			Penalty:   ls.StatusReference.Penalty,
 			Tier:      ls.Tier,
 			IPv6:      ls.Features&featureIPv6 != 0,
@@ -234,14 +237,18 @@ func selectNodes(resp *logicalServersResp, country string, limit int) ([]nodeVie
 		})
 	}
 
-	// Load is the only utilisation number /vpn/logicals actually fills in: a live
-	// capture of all 1610 servers for this account returned Load (0-100) on every
-	// one of them, while StatusReference came back empty on every one, which makes
-	// Penalty a constant zero. Sorting by Penalty alone therefore silently does
-	// nothing, so it only breaks ties here.
+	// Load is the utilisation number Proton shows users (0-100), and Score is the
+	// same value Proton's own client ranks servers by: ServerManager2.kt says
+	// "Sorted by score (best at front)" before sortedBy(Server::score), and the
+	// placeholder for "no score yet" is 1_000_000.0, so lower is better.
+	// Penalty is only a last key because a live capture of all 1610 servers for this
+	// account returned no StatusReference at all, which makes it a constant zero.
 	sort.SliceStable(usable, func(i, j int) bool {
 		if usable[i].Load != usable[j].Load {
 			return usable[i].Load < usable[j].Load
+		}
+		if usable[i].Score != usable[j].Score {
+			return usable[i].Score < usable[j].Score
 		}
 		return usable[i].Penalty < usable[j].Penalty
 	})

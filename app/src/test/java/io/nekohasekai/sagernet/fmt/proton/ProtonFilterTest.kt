@@ -36,12 +36,14 @@ class ProtonFilterTest {
         city: String,
         penalty: Double = 0.5,
         load: Int = -1,
+        score: Double = -1.0,
         ipv6: Boolean = false,
     ) = ProtonNode(
         id = id,
         name = name,
         penalty = penalty,
         load = load,
+        score = score,
         tier = 2,
         supportsIPv6 = ipv6,
         country = country,
@@ -71,6 +73,20 @@ class ProtonFilterTest {
         // 舊快取沒有 load（-1）。當成 0 會把這台排到最前面，等於叫用戶先挑到資訊最少的一台。
         val withUnknown = nodes + node("5", "OLD-CACHE#1", "JP", "Fukuoka", load = -1)
         assertEquals(listOf("1", "3", "2", "4", "5"), ids(ProtonFilter().apply(withUnknown)))
+    }
+
+    @Test
+    fun `servers with the same idle capacity are separated by Proton's own score`() {
+        // 實測 Load=0 那 61 台的 Score 從 2.979 到 5.970 全不重複，所以同空閒度時
+        // 這個欄位分得出高低；Proton 自己的客戶端就是按它把最好的排最前。
+        val same = listOf(
+            node("a", "UG#1", "UG", "Kampala", load = 0, score = 2.99),
+            node("b", "UG#3", "UG", "Kampala", load = 0, score = 2.98),
+            node("c", "UG#9", "UG", "Kampala", load = 0, score = 5.97),
+            // 舊快取沒有 score：不能當成 2.98 那種「最好」，要排在有分數的後面。
+            node("d", "UG#0", "UG", "Kampala", load = 0),
+        )
+        assertEquals(listOf("b", "a", "c", "d"), ids(ProtonFilter().apply(same)))
     }
 
     @Test
