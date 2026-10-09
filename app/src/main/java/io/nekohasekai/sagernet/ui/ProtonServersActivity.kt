@@ -97,6 +97,12 @@ class ProtonServersActivity : ThemedActivity() {
             shownLimit += nodePage
             renderNodes()
         }
+        // 排序框也要裝 adapter：上一輪只補了回填標籤，結果框子裡有字、點下去卻開不出
+        // 清單——國家／城市那兩格能開就是因為它們在 refreshPlaceOptions() 裡設過。
+        // 排序項沒有「有幾台」這種數目，count 一律給 0，由 OptionAdapter 負責留空。
+        binding.sortFilter.setAdapter(
+            OptionAdapter(sortOptions.map { ProtonFilter.Option(it.first.name, 0, it.second) }),
+        )
         renderSortLabel()
 
         if (!ProtonSidecar.isAvailable()) {
@@ -180,7 +186,9 @@ class ProtonServersActivity : ThemedActivity() {
             val option = getItem(position)
             view.findViewById<TextView>(R.id.optionLabel).text = option?.label.orEmpty()
             view.findViewById<TextView>(R.id.optionCount).text = when {
-                option == null || option.key == ProtonFilter.ALL -> ""
+                // count<=0 是排序那格用來的：它沒有「有幾台」這回事，右側要留空。
+                option == null || option.key == ProtonFilter.ALL || option.count <= 0 -> ""
+
                 else -> option.count.toString()
             }
             return view
