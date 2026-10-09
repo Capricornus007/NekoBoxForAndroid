@@ -1088,7 +1088,7 @@
     <string name="proton_node_count">%1$d servers, %2$d skipped</string>
     <string name="proton_sidecar_missing">This build does not include the Proton helper.</string>
     <string name="proton_2fa_required">This account needs a 2FA code.</string>
-    <string name="proton_auto_login">Proton auto sign-in</string>
+    <string name="proton_auto_login">Auto sign-in</string>
     <string name="proton_auto_login_summary">Loads the server list when this page opens, using the session you signed in with.</string>
     <string name="proton_auto_login_message">Sign in first: NB4A reuses that session and never stores your password.</string>
     <string name="proton_warning_title">You have been warned</string>
@@ -1116,4 +1116,8 @@
     <string name="proton_signed_in_as">Signed in as: %1$s</string>
     <string name="proton_signed_in_unknown">Signed in (session reused; account not recorded)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">Servers</string>
+    <string name="proton_group_added">Group %1$s added</string>
+    <string name="proton_cached_at">Updated %1$s</string>
+    <string name="proton_pull_to_refresh">Pull down to refresh</string>
 </resources>

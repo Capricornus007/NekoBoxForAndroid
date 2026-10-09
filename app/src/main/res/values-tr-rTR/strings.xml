@@ -1008,7 +1008,7 @@
     <string name="proton_node_count">%1$d sunucu, %2$d atlandı</string>
     <string name="proton_sidecar_missing">Bu derleme Proton yardımcısını içermiyor.</string>
     <string name="proton_2fa_required">Bu hesap 2FA kodu gerektiriyor.</string>
-    <string name="proton_auto_login">Otomatik Proton girişi</string>
+    <string name="proton_auto_login">Otomatik oturum açma</string>
     <string name="proton_auto_login_summary">Bu sayfa açıldığında mevcut oturumu kullanarak sunucu listesini getirir.</string>
     <string name="proton_auto_login_message">Önce giriş yapın: NB4A o oturumu yeniden kullanır, parolanızı asla saklamaz.</string>
     <string name="proton_warning_title">Önceden uyarıldınız</string>
@@ -1038,4 +1038,8 @@
     <string name="proton_signed_in_as">Oturum açan hesap: %1$s</string>
     <string name="proton_signed_in_unknown">Oturum açık (oturum devralındı, hesap kaydedilmedi)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">Sunucu listesi</string>
+    <string name="proton_group_added">%1$s grubu eklendi</string>
+    <string name="proton_cached_at">%1$s güncellendi</string>
+    <string name="proton_pull_to_refresh">Yenilemek için aşağı çekin</string>
 </resources>

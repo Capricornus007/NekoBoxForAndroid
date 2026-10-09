@@ -988,7 +988,7 @@
     <string name="proton_node_count">%1$d 個伺服器，略過 %2$d 個</string>
     <string name="proton_sidecar_missing">此版本未內含 Proton 協助元件。</string>
     <string name="proton_2fa_required">此帳號需要 2FA 代碼。</string>
-    <string name="proton_auto_login">Proton 自動登入</string>
+    <string name="proton_auto_login">自動登入</string>
     <string name="proton_auto_login_summary">進頁時沿用已登入的工作階段，自行取得伺服器清單。</string>
     <string name="proton_auto_login_message">請先登入：NB4A 只沿用工作階段，不會存放你的密碼。</string>
     <string name="proton_warning_title">先提醒你一句</string>
@@ -1017,4 +1017,8 @@
     <string name="proton_signed_in_as">已登入：%1$s</string>
     <string name="proton_signed_in_unknown">已登入（沿用工作階段，未記錄帳號）</string>
     <string name="proton_option_count">%1$s（%2$d）</string>
+    <string name="proton_servers">伺服器清單</string>
+    <string name="proton_group_added">已新增 %1$s 分組</string>
+    <string name="proton_cached_at">更新於 %1$s</string>
+    <string name="proton_pull_to_refresh">下拉可更新清單</string>
 </resources>

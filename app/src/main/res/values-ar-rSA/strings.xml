@@ -1013,7 +1013,7 @@
     <string name="proton_node_count">%1$d خوادم، تم تخطي %2$d</string>
     <string name="proton_sidecar_missing">لا يتضمن هذا الإصدار مساعد Proton.</string>
     <string name="proton_2fa_required">هذا الحساب يتطلب رمز 2FA.</string>
-    <string name="proton_auto_login">تسجيل دخول Proton تلقائيًا</string>
+    <string name="proton_auto_login">تسجيل الدخول التلقائي</string>
     <string name="proton_auto_login_summary">يحمّل قائمة الخوادم عند فتح هذه الصفحة باستخدام الجلسة التي سجّلت الدخول بها.</string>
     <string name="proton_auto_login_message">سجّل الدخول أولًا: تعيد NB4A استخدام تلك الجلسة ولا تحفظ كلمة مرورك أبدًا.</string>
     <string name="proton_warning_title">لقد حذّرناك مسبقًا</string>
@@ -1043,4 +1043,8 @@
     <string name="proton_signed_in_as">تم تسجيل الدخول باسم: %1$s</string>
     <string name="proton_signed_in_unknown">تم تسجيل الدخول (أُعيد استخدام الجلسة دون حفظ الحساب)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">قائمة الخوادم</string>
+    <string name="proton_group_added">تمت إضافة المجموعة %1$s</string>
+    <string name="proton_cached_at">تم التحديث %1$s</string>
+    <string name="proton_pull_to_refresh">اسحب للأسفل للتحديث</string>
 </resources>

@@ -1163,7 +1163,7 @@
     <string name="proton_node_count">%1$d servidores, %2$d omitidos</string>
     <string name="proton_sidecar_missing">Esta compilación no incluye el ayudante de Proton.</string>
     <string name="proton_2fa_required">Esta cuenta necesita un código 2FA.</string>
-    <string name="proton_auto_login">Acceso automático a Proton</string>
+    <string name="proton_auto_login">Acceso automático</string>
     <string name="proton_auto_login_summary">Carga la lista de servidores al abrir esta página usando la sesión en la que ya iniciaste sesión.</string>
     <string name="proton_auto_login_message">Inicia sesión primero: NB4A reutiliza esa sesión y nunca guarda tu contraseña.</string>
     <string name="proton_warning_title">Advertido estás</string>
@@ -1193,4 +1193,8 @@
     <string name="proton_signed_in_as">Sesión iniciada como: %1$s</string>
     <string name="proton_signed_in_unknown">Sesión iniciada (sesión reaprovechada, cuenta sin registrar)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">Lista de servidores</string>
+    <string name="proton_group_added">Añadido el grupo %1$s</string>
+    <string name="proton_cached_at">Actualizado %1$s</string>
+    <string name="proton_pull_to_refresh">Desliza hacia abajo para actualizar</string>
 </resources>

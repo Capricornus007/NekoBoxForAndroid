@@ -989,7 +989,7 @@
     <string name="proton_node_count">%1$d 个服务器，跳过 %2$d 个</string>
     <string name="proton_sidecar_missing">此版本未包含 Proton 辅助组件。</string>
     <string name="proton_2fa_required">此账户需要 2FA 验证码。</string>
-    <string name="proton_auto_login">Proton 自动登录</string>
+    <string name="proton_auto_login">自动登录</string>
     <string name="proton_auto_login_summary">进入页面时沿用已登录的会话，自行获取服务器列表。</string>
     <string name="proton_auto_login_message">请先登录：NB4A 只沿用会话，不会保存你的密码。</string>
     <string name="proton_warning_title">先提醒你一句</string>
@@ -1018,4 +1018,8 @@
     <string name="proton_signed_in_as">已登录：%1$s</string>
     <string name="proton_signed_in_unknown">已登录（沿用会话，未记录账号）</string>
     <string name="proton_option_count">%1$s（%2$d）</string>
+    <string name="proton_servers">服务器列表</string>
+    <string name="proton_group_added">已新增 %1$s 分组</string>
+    <string name="proton_cached_at">更新于 %1$s</string>
+    <string name="proton_pull_to_refresh">下拉可更新列表</string>
 </resources>

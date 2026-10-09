@@ -1008,7 +1008,7 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="proton_node_count">%1$d tjenere, %2$d hoppet over</string>
     <string name="proton_sidecar_missing">Denne versjonen inneholder ikke Proton-hjelperen.</string>
     <string name="proton_2fa_required">Denne kontoen krever en 2FA-kode.</string>
-    <string name="proton_auto_login">Automatisk Proton-innlogging</string>
+    <string name="proton_auto_login">Automatisk pålogging</string>
     <string name="proton_auto_login_summary">Laster serverlisten når denne siden åpnes med den aktive økten.</string>
     <string name="proton_auto_login_message">Logg inn først: NB4A bruker økten på nytt og lagrer aldri passordet ditt.</string>
     <string name="proton_warning_title">Du er advart på forhånd</string>
@@ -1038,4 +1038,8 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="proton_signed_in_as">Logget inn som: %1$s</string>
     <string name="proton_signed_in_unknown">Logget inn (økt gjenopprettet, konto ikke lagret)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">Serverliste</string>
+    <string name="proton_group_added">%1$s-gruppen ble lagt til</string>
+    <string name="proton_cached_at">Oppdatert %1$s</string>
+    <string name="proton_pull_to_refresh">Dra nedover for å oppdatere</string>
 </resources>

@@ -272,6 +272,11 @@
             android:label="@string/proton_title"
             android:parentActivityName="io.nekohasekai.sagernet.ui.MainActivity" />
         <activity
+            android:name="io.nekohasekai.sagernet.ui.ProtonServersActivity"
+            android:configChanges="uiMode"
+            android:label="@string/proton_servers"
+            android:parentActivityName="io.nekohasekai.sagernet.ui.ProtonActivity" />
+        <activity
             android:name="io.nekohasekai.sagernet.ui.AppListActivity"
             android:configChanges="uiMode" />
         <activity

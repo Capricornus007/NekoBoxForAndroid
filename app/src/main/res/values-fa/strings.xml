@@ -978,7 +978,7 @@
     <string name="proton_node_count">%1$d سرور، %2$d نادیده گرفته شد</string>
     <string name="proton_sidecar_missing">این نسخه شامل کمک‌برنامه Proton نیست.</string>
     <string name="proton_2fa_required">این حساب به کد 2FA نیاز دارد.</string>
-    <string name="proton_auto_login">ورود خودکار Proton</string>
+    <string name="proton_auto_login">ورود خودکار</string>
     <string name="proton_auto_login_summary">هنگام باز کردن این صفحه، فهرست سرورها را با همان نشستی که وارد شده‌اید بارگیری می‌کند.</string>
     <string name="proton_auto_login_message">اول وارد شوید: NB4A فقط همان نشست را دوباره به کار می‌گیرد و رمز شما را ذخیره نمی‌کند.</string>
     <string name="proton_warning_title">از پیش هشدار داده شده‌اید</string>
@@ -1008,4 +1008,8 @@
     <string name="proton_signed_in_as">وارد شده به عنوان: %1$s</string>
     <string name="proton_signed_in_unknown">وارد شده (نشست بازیابی شد، حساب ثبت نشد)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">فهرست سرورها</string>
+    <string name="proton_group_added">گروه %1$s افزوده شد</string>
+    <string name="proton_cached_at">به‌روزرسانی %1$s</string>
+    <string name="proton_pull_to_refresh">برای تازه‌سازی به پایین بکشید</string>
 </resources>

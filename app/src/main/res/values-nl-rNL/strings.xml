@@ -1018,7 +1018,7 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="proton_node_count">%1$d servers, %2$d overgeslagen</string>
     <string name="proton_sidecar_missing">Deze build bevat geen Proton-hulpprogramma.</string>
     <string name="proton_2fa_required">Deze account heeft een 2FA-code nodig.</string>
-    <string name="proton_auto_login">Auto-aanmelden bij Proton</string>
+    <string name="proton_auto_login">Automatisch inloggen</string>
     <string name="proton_auto_login_summary">Haalt de serverlijst op wanneer deze pagina wordt geopend met uw huidige sessie.</string>
     <string name="proton_auto_login_message">Meld u eerst aan: NB4A gebruikt die sessie opnieuw en slaat uw wachtwoord nooit op.</string>
     <string name="proton_warning_title">Vooraf gewaarschuwd</string>
@@ -1048,4 +1048,8 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="proton_signed_in_as">Ingelogd als: %1$s</string>
     <string name="proton_signed_in_unknown">Ingelogd (sessie hervat, account niet opgeslagen)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">Serverlijst</string>
+    <string name="proton_group_added">Groep %1$s toegevoegd</string>
+    <string name="proton_cached_at">Bijgewerkt %1$s</string>
+    <string name="proton_pull_to_refresh">Trek naar beneden om te vernieuwen</string>
 </resources>

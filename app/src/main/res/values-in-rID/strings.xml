@@ -1017,7 +1017,7 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_node_count">%1$d server, %2$d dilewati</string>
     <string name="proton_sidecar_missing">Build ini tidak menyertakan pembantu Proton.</string>
     <string name="proton_2fa_required">Akun ini memerlukan kode 2FA.</string>
-    <string name="proton_auto_login">Masuk otomatis Proton</string>
+    <string name="proton_auto_login">Masuk otomatis</string>
     <string name="proton_auto_login_summary">Muat daftar server saat halaman ini dibuka memakai sesi Anda saat ini.</string>
     <string name="proton_auto_login_message">Masuk dulu: NB4A memakai ulang sesi itu dan tidak pernah menyimpan sandi Anda.</string>
     <string name="proton_warning_title">Anda sudah diperingatkan</string>
@@ -1047,4 +1047,8 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_signed_in_as">Masuk sebagai: %1$s</string>
     <string name="proton_signed_in_unknown">Masuk (sesi dipakai ulang, akun tidak dicatat)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">Daftar server</string>
+    <string name="proton_group_added">Grup %1$s ditambahkan</string>
+    <string name="proton_cached_at">Diperbarui %1$s</string>
+    <string name="proton_pull_to_refresh">Tarik ke bawah untuk menyegarkan</string>
 </resources>

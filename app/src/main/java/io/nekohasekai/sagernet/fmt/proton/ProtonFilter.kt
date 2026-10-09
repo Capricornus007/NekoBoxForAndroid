@@ -85,3 +85,12 @@ fun countryName(code: String): String = runCatching {
     if (code.length != 2) return@runCatching code
     Locale.Builder().setRegion(code).build().getDisplayCountry(Locale.getDefault())
 }.getOrNull()?.takeIf { it.isNotEmpty() } ?: code
+
+/** 清單列與匯入後的節點名稱共用同一個拼法，兩邊長得不一樣會讓人對不上號。 */
+fun ProtonNode.placeLabel(): String {
+    val place = listOfNotNull(
+        city.takeIf { it.isNotEmpty() },
+        country.takeIf { it.isNotEmpty() }?.let { countryName(it) },
+    ).joinToString(" · ")
+    return if (place.isEmpty()) name else "$name   $place"
+}

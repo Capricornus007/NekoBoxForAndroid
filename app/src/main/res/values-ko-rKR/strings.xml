@@ -998,7 +998,7 @@
     <string name="proton_node_count">서버 %1$d개, 건너뛴 %2$d개</string>
     <string name="proton_sidecar_missing">이 빌드에는 Proton 도우미가 포함되어 있지 않습니다.</string>
     <string name="proton_2fa_required">이 계정은 2FA 코드가 필요합니다.</string>
-    <string name="proton_auto_login">Proton 자동 로그인</string>
+    <string name="proton_auto_login">자동 로그인</string>
     <string name="proton_auto_login_summary">이 페이지를 열 때 현재 세션으로 서버 목록을 가져옵니다.</string>
     <string name="proton_auto_login_message">먼저 로그인하세요. NB4A는 세션을 다시 사용할 뿐 비밀번호를 저장하지 않습니다.</string>
     <string name="proton_warning_title">미리 알려드립니다</string>
@@ -1028,4 +1028,8 @@
     <string name="proton_signed_in_as">로그인 계정: %1$s</string>
     <string name="proton_signed_in_unknown">로그인됨(세션 이어받음, 계정 미기록)</string>
     <string name="proton_option_count">%1$s(%2$d)</string>
+    <string name="proton_servers">서버 목록</string>
+    <string name="proton_group_added">%1$s 그룹을 추가했습니다</string>
+    <string name="proton_cached_at">%1$s에 업데이트됨</string>
+    <string name="proton_pull_to_refresh">아래로 당겨 새로고침</string>
 </resources>

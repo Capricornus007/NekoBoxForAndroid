@@ -1006,7 +1006,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_node_count">サーバー %1$d 件、スキップ %2$d 件</string>
     <string name="proton_sidecar_missing">このビルドには Proton ヘルパーが含まれていません。</string>
     <string name="proton_2fa_required">このアカウントは 2FA コードが必要です。</string>
-    <string name="proton_auto_login">Proton 自動サインイン</string>
+    <string name="proton_auto_login">自動サインイン</string>
     <string name="proton_auto_login_summary">このページを開いたとき、現在のセッションでサーバー一覧を取得します。</string>
     <string name="proton_auto_login_message">先にサインインしてください。NB4A はセッションを再利用するだけで、パスワードは保存しません。</string>
     <string name="proton_warning_title">念のためお知らせ</string>
@@ -1036,4 +1036,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_signed_in_as">ログイン中：%1$s</string>
     <string name="proton_signed_in_unknown">ログイン中（セッションを引き継ぎ、アカウント名は未記録）</string>
     <string name="proton_option_count">%1$s（%2$d）</string>
+    <string name="proton_servers">サーバー一覧</string>
+    <string name="proton_group_added">%1$s グループを追加しました</string>
+    <string name="proton_cached_at">%1$s に更新</string>
+    <string name="proton_pull_to_refresh">下に引くと更新されます</string>
 </resources>

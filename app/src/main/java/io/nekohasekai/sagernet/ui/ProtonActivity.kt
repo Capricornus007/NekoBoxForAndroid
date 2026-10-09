@@ -14,27 +14,20 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.ArrayAdapter
-import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
-import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.databinding.ActivityProtonBinding
 import io.nekohasekai.sagernet.databinding.DialogProtonCaptchaBinding
 import io.nekohasekai.sagernet.fmt.proton.ProtonCaptchaChallenge
-import io.nekohasekai.sagernet.fmt.proton.ProtonFilter
-import io.nekohasekai.sagernet.fmt.proton.ProtonJson
+import io.nekohasekai.sagernet.fmt.proton.ProtonGroups
 import io.nekohasekai.sagernet.fmt.proton.ProtonLoginState
-import io.nekohasekai.sagernet.fmt.proton.ProtonNode
+import io.nekohasekai.sagernet.fmt.proton.ProtonNodeCache
 import io.nekohasekai.sagernet.fmt.proton.ProtonSidecar
-import io.nekohasekai.sagernet.fmt.proton.countryName
-import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -43,26 +36,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 class ProtonActivity : ThemedActivity() {
 
     private lateinit var binding: ActivityProtonBinding
-    private var nodes: List<ProtonNode> = emptyList()
-
-    // 一次只渲染這麼多筆，其餘用「顯示更多」逐頁加：1599 條全建 View 既翻不完也卡。
-    private val nodePage = 60
-    private var query = ""
-    private var shownLimit = nodePage
-
-    // 國家／城市／IPv6／排序都只對「已經抓到的清單」做過濾：再打一次網路換來的
-    // 只是同樣 1576 條，而且會讓人以為篩選很慢。
-    private var filter = ProtonFilter()
-    private var countryOptions = listOf<ProtonFilter.Option>()
-    private var cityOptions = listOf<ProtonFilter.Option>()
-    private val sortOptions by lazy {
-        listOf(
-            ProtonFilter.Sort.BALANCER to getString(R.string.proton_sort_balancer),
-            ProtonFilter.Sort.NAME to getString(R.string.proton_sort_name),
-            ProtonFilter.Sort.COUNTRY to getString(R.string.proton_country),
-            ProtonFilter.Sort.CITY to getString(R.string.proton_city),
-        )
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,56 +51,18 @@ class ProtonActivity : ThemedActivity() {
         if (!ProtonSidecar.isAvailable()) {
             binding.status.setText(R.string.proton_sidecar_missing)
             binding.signIn.isEnabled = false
-            binding.refresh.isEnabled = false
+            binding.signOut.isEnabled = false
+            binding.servers.isEnabled = false
             binding.autoLogin.isEnabled = false
             return
         }
 
         binding.signIn.setOnClickListener { signIn() }
         binding.signOut.setOnClickListener { signOut() }
-        binding.refresh.setOnClickListener { refresh() }
+        binding.servers.setOnClickListener { openServers() }
         applySignedInState(ProtonSidecar.hasSession())
 
-        binding.filterText.doAfterTextChanged {
-            query = it?.toString().orEmpty()
-            shownLimit = nodePage
-            renderNodes()
-        }
-        binding.countryFilter.setAdapter(labels(countryOptions))
-        binding.cityFilter.setAdapter(labels(cityOptions))
-        binding.sortFilter.setAdapter(
-            ArrayAdapter(this, android.R.layout.simple_list_item_1, sortOptions.map { it.second }),
-        )
-        binding.sortFilter.setText(sortOptions.first().second, false)
-        binding.countryFilter.setOnItemClickListener { _, _, position, _ ->
-            // 換國家要把城市重設：留著「东京」再選美國，清單會直接空掉。
-            val key = countryOptions.getOrNull(position)?.key ?: ProtonFilter.ALL
-            filter = filter.copy(country = key, city = ProtonFilter.ALL)
-            refreshPlaceOptions()
-            shownLimit = nodePage
-            renderNodes()
-        }
-        binding.cityFilter.setOnItemClickListener { _, _, position, _ ->
-            filter = filter.copy(city = cityOptions.getOrNull(position)?.key ?: ProtonFilter.ALL)
-            shownLimit = nodePage
-            renderNodes()
-        }
-        binding.sortFilter.setOnItemClickListener { _, _, position, _ ->
-            filter = filter.copy(sort = sortOptions.getOrNull(position)?.first ?: ProtonFilter.Sort.BALANCER)
-            shownLimit = nodePage
-            renderNodes()
-        }
-        binding.ipv6Only.setOnCheckedChangeListener { _, checked ->
-            filter = filter.copy(ipv6Only = checked)
-            shownLimit = nodePage
-            renderNodes()
-        }
-        binding.showMore.setOnClickListener {
-            shownLimit += nodePage
-            renderNodes()
-        }
-
-        // 自動登入只是「進頁自己取節點清單」，靠的是已經登進去的那個工作階段；
+        // 自動登入的其中一半是「沿用工作階段」、另一半是「進清單就自己更新」；
         // 沒工作階段就沒什麼可沿用的，所以不讓開，也不碰密碼。
         binding.autoLogin.isChecked = DataStore.protonAutoLogin
         binding.autoLogin.setOnCheckedChangeListener { _, checked ->
@@ -137,14 +72,37 @@ class ProtonActivity : ThemedActivity() {
                 DataStore.protonAutoLogin = false
             } else {
                 DataStore.protonAutoLogin = checked
-                if (checked) refresh()
             }
         }
 
-        // 開關關著就不主動打網路：只有開了自動登入，進頁才自己取節點。
+        // 開著自動登入又已經在線，這頁的表單就沒意義了：直接把人帶到伺服器清單。
         if (DataStore.protonWarningAccepted && DataStore.protonAutoLogin && ProtonSidecar.hasSession()) {
-            binding.status.setText(R.string.proton_signed_in)
-            refresh()
+            openServers()
+        }
+    }
+
+    private fun openServers() {
+        startActivity(Intent(this, ProtonServersActivity::class.java))
+    }
+
+    // 登入成功就把 Proton 分組建好（按延遲排序 + 啟用 selector），再把人帶到清單頁。
+    // 只在「這一次真的新建了」才 toast：重複進頁面一直跳同一句是噪音。
+    private fun prepareAndOpenServers() {
+        lifecycleScope.launch {
+            try {
+                val (_, created) = ProtonGroups.ensure()
+                if (created && !isFinishing && !isDestroyed) {
+                    Toast.makeText(
+                        this@ProtonActivity,
+                        getString(R.string.proton_group_added, ProtonGroups.NAME),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            } catch (e: Exception) {
+                // 建組失敗不擋進清單：加入節點時還會再試一次，這裡只留痕。
+                Logs.w("proton: failed to create the Proton group", e)
+            }
+            if (!isFinishing && !isDestroyed) openServers()
         }
     }
 
@@ -163,12 +121,13 @@ class ProtonActivity : ThemedActivity() {
     }
 
     // 登進去之後還留著帳號／密碼／登入鈕，等於畫面一直在問已經回答過的問題。
-    // 登入態只收掉輸入區，不動登出、自動登入開關、重新整理與節點清單。
+    // 登入態只收掉輸入區，留下「已登入誰」、登出、自動登入開關與進清單的入口。
     private fun applySignedInState(signedIn: Boolean) {
         val inputVisibility = if (signedIn) View.GONE else View.VISIBLE
         binding.accountLayout.visibility = inputVisibility
         binding.passwordLayout.visibility = inputVisibility
         binding.signIn.visibility = inputVisibility
+        binding.servers.visibility = if (signedIn) View.VISIBLE else View.GONE
         if (signedIn) {
             binding.twoFactorLayout.visibility = View.GONE
             binding.password.text = null
@@ -209,14 +168,12 @@ class ProtonActivity : ThemedActivity() {
         captchaType: String = "",
     ) {
         binding.signIn.isEnabled = false
-        binding.refresh.isEnabled = false
         binding.status.setText(R.string.proton_refresh)
 
         lifecycleScope.launch {
             val result = ProtonSidecar.login(account, password, twoFactor, captchaToken, captchaType)
             if (isFinishing || isDestroyed) return@launch
             binding.signIn.isEnabled = true
-            binding.refresh.isEnabled = true
             when {
                 result.ok -> {
                     // 密碼只活在這一次呼叫裡，登入成功就從畫面上抹掉；本機留下的只有
@@ -227,7 +184,7 @@ class ProtonActivity : ThemedActivity() {
                     DataStore.protonAccount = account
                     binding.status.setText(R.string.proton_signed_in)
                     applySignedInState(true)
-                    refresh()
+                    prepareAndOpenServers()
                 }
 
                 result.twoFactorRequired && !result.needsCaptcha() -> {
@@ -486,153 +443,10 @@ class ProtonActivity : ThemedActivity() {
         binding.autoLogin.isChecked = false
         DataStore.protonAutoLogin = false
         DataStore.protonAccount = ""
-        nodes = emptyList()
-        filter = ProtonFilter()
-        refreshPlaceOptions()
-        renderNodes()
+        // 清單是那個帳號的東西，登出去還留在磁碟上就是幫下一個翻手機的人留便條。
+        ProtonNodeCache.clear(cacheDir)
         binding.status.setText(R.string.proton_not_signed_in)
         applySignedInState(false)
-    }
-
-    private fun refresh() {
-        if (!ProtonSidecar.hasSession()) {
-            binding.autoLogin.isChecked = false
-            DataStore.protonAutoLogin = false
-            binding.status.setText(R.string.proton_not_signed_in)
-            return
-        }
-        binding.refresh.isEnabled = false
-        lifecycleScope.launch {
-            val result = ProtonSidecar.nodes()
-            if (isFinishing || isDestroyed) return@launch
-            binding.refresh.isEnabled = true
-            if (!result.ok) {
-                binding.status.text = result.error
-                return@launch
-            }
-            nodes = result.nodes
-            shownLimit = nodePage
-            refreshPlaceOptions()
-            binding.status.text =
-                getString(R.string.proton_node_count, result.nodes.size, result.dropped)
-            renderNodes()
-        }
-    }
-
-    // 1599 條靠捲動是不可用的：先過濾（文字／國家／城市／IPv6）再排序，最後只渲染前
-    // shownLimit 筆。過濾本身在 ProtonFilter 裡，那里才有辦法做 JVM 單測。
-    private fun visibleNodes(): List<ProtonNode> = filter.copy(query = query).apply(nodes)
-
-    private fun labels(options: List<ProtonFilter.Option>) = ArrayAdapter(
-        this,
-        android.R.layout.simple_list_item_1,
-        options.map { optionLabel(it) },
-    )
-
-    private fun optionLabel(option: ProtonFilter.Option) = if (option.key == ProtonFilter.ALL) {
-        option.label
-    } else {
-        getString(R.string.proton_option_count, option.label, option.count)
-    }
-
-    private fun optionText(key: String, options: List<ProtonFilter.Option>) = options.firstOrNull { it.key == key }?.let { optionLabel(it) } ?: ""
-
-    // 選項一律從已抓到的清單實算：寫死國家清單會跟帳號可用的節點對不上。
-    // 換國之後舊城市可能根本不存在，那種殘留選擇要自己收回去，不要留著一個篩不出東西的框。
-    private fun refreshPlaceOptions() {
-        countryOptions = listOf(
-            ProtonFilter.Option(ProtonFilter.ALL, nodes.size, getString(R.string.proton_all_countries)),
-        ) + ProtonFilter.countries(nodes)
-        if (filter.country != ProtonFilter.ALL && !ProtonFilter.hasCountry(nodes, filter.country)) {
-            filter = filter.copy(country = ProtonFilter.ALL, city = ProtonFilter.ALL)
-        }
-        cityOptions = listOf(
-            ProtonFilter.Option(ProtonFilter.ALL, 0, getString(R.string.proton_all_cities)),
-        ) + ProtonFilter.cities(nodes, filter.country)
-        if (filter.city != ProtonFilter.ALL && !ProtonFilter.hasCity(nodes, filter.city)) {
-            filter = filter.copy(city = ProtonFilter.ALL)
-        }
-        binding.countryFilter.setAdapter(labels(countryOptions))
-        binding.cityFilter.setAdapter(labels(cityOptions))
-        binding.countryFilter.setText(optionText(filter.country, countryOptions), false)
-        binding.cityFilter.setText(optionText(filter.city, cityOptions), false)
-    }
-
-    private fun renderNodes() {
-        binding.nodeList.removeAllViews()
-        val gap = (8 * resources.displayMetrics.density).toInt()
-        val visible = visibleNodes()
-        val hasList = nodes.isNotEmpty()
-        binding.filterLayout.visibility = if (hasList) View.VISIBLE else View.GONE
-        binding.placeFilterRow.visibility = if (hasList) View.VISIBLE else View.GONE
-        binding.sortFilterRow.visibility = if (hasList) View.VISIBLE else View.GONE
-        for (node in visible.take(shownLimit)) {
-            val button = MaterialButton(
-                this,
-                null,
-                com.google.android.material.R.attr.materialButtonOutlinedStyle,
-            )
-            button.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-            ).apply { bottomMargin = gap }
-            button.text = getString(R.string.proton_add) + " · " + nodeLabel(node)
-            button.setOnClickListener { import(node) }
-            binding.nodeList.addView(button)
-        }
-        val shown = minOf(shownLimit, visible.size)
-        binding.listCount.text = getString(R.string.proton_showing, shown, visible.size)
-        binding.listCount.visibility = if (visible.isEmpty()) View.GONE else View.VISIBLE
-        binding.showMore.visibility = if (visible.size > shown) View.VISIBLE else View.GONE
-    }
-
-    private fun nodeLabel(node: ProtonNode): String {
-        // Proton 只給兩位國家碼，這裡換成本機語言的國名；換不了就照原碼顯示，不猜。
-        val place = listOfNotNull(
-            node.city.takeIf { it.isNotEmpty() },
-            node.country.takeIf { it.isNotEmpty() }?.let { countryName(it) },
-        ).joinToString(" · ")
-        return if (place.isEmpty()) node.name else "${node.name}   $place"
-    }
-
-    private fun import(node: ProtonNode) {
-        binding.refresh.isEnabled = false
-        lifecycleScope.launch {
-            val pair = ProtonSidecar.keyPair()
-            if (isFinishing || isDestroyed) return@launch
-            if (!pair.valid) {
-                binding.refresh.isEnabled = true
-                binding.status.setText(R.string.proton_sidecar_missing)
-                return@launch
-            }
-            val address = if (node.supportsIPv6) {
-                "$CLIENT_IP/32, $CLIENT_IP_V6/128"
-            } else {
-                "$CLIENT_IP/32"
-            }
-            val dns = if (node.supportsIPv6) "$SERVER_IP, $SERVER_IP_V6" else SERVER_IP
-            try {
-                val conf = ProtonJson.wireGuardConf(node, pair.privateKey, address, dns)
-                val beans = RawUpdater.parseWireGuardConf(conf)
-                if (beans.isEmpty()) {
-                    if (!isFinishing && !isDestroyed) binding.status.setText(R.string.proton_no_nodes)
-                    return@launch
-                }
-                val bean = beans.first()
-                bean.name = nodeLabel(node)
-                ProfileManager.createProfile(DataStore.selectedGroupForImport(), bean)
-                if (!isFinishing && !isDestroyed) {
-                    binding.status.text = getString(R.string.proton_added, node.name)
-                }
-            } catch (e: Exception) {
-                Logs.w("proton import failed", e)
-                if (!isFinishing && !isDestroyed) {
-                    binding.status.text = e.localizedMessage ?: e.toString()
-                }
-            } finally {
-                if (!isFinishing && !isDestroyed) binding.refresh.isEnabled = true
-            }
-        }
     }
 
     companion object {
@@ -642,12 +456,5 @@ class ProtonActivity : ThemedActivity() {
 
         // 拿不到 App 內可載的頁面時最後的退路：官方登入頁。
         private const val PROTON_LOGIN_URL = "https://account.proton.me/login"
-
-        // Proton's own client constants: the in-tunnel address is fixed rather than
-        // assigned, and its DNS is the server side of that same pair.
-        private const val CLIENT_IP = "10.2.0.2"
-        private const val SERVER_IP = "10.2.0.1"
-        private const val CLIENT_IP_V6 = "2a07:b944::2:2"
-        private const val SERVER_IP_V6 = "2a07:b944::2:1"
     }
 }

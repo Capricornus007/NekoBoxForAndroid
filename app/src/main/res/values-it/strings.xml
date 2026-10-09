@@ -1005,7 +1005,7 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_node_count">%1$d server, %2$d ignorati</string>
     <string name="proton_sidecar_missing">Questa versione non include l\'assistente Proton.</string>
     <string name="proton_2fa_required">Questo account richiede un codice 2FA.</string>
-    <string name="proton_auto_login">Accesso automatico Proton</string>
+    <string name="proton_auto_login">Accesso automatico</string>
     <string name="proton_auto_login_summary">Carica l’elenco dei server all’apertura di questa pagina usando la sessione in corso.</string>
     <string name="proton_auto_login_message">Accedi prima: NB4A riutilizza quella sessione e non salva mai la tua password.</string>
     <string name="proton_warning_title">Avvertito prima</string>
@@ -1035,4 +1035,8 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_signed_in_as">Accesso effettuato come: %1$s</string>
     <string name="proton_signed_in_unknown">Accesso effettuato (sessione riutilizzata, account non registrato)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">Elenco server</string>
+    <string name="proton_group_added">Gruppo %1$s aggiunto</string>
+    <string name="proton_cached_at">Aggiornato %1$s</string>
+    <string name="proton_pull_to_refresh">Trascina verso il basso per aggiornare</string>
 </resources>

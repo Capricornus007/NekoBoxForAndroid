@@ -74,6 +74,9 @@ class ProtonNodesState(
     val nodes: List<ProtonNode> = emptyList(),
     val dropped: Int = 0,
     val error: String = "",
+    // 原始 payload 只從網路那條路帶回來，給磁碟快取用：存解析後的物件會逼這裡
+    // 再實作一套序列化，而讀回來時又得走第二套解析，兩套不一致最難查。
+    val raw: String = "",
 )
 
 // Parsing is kept free of process and Android types so it can be covered by JVM
@@ -173,6 +176,7 @@ object ProtonJson {
             nodes = nodes,
             dropped = obj.optInt("dropped"),
             error = if (nodes.isEmpty()) obj.optString("error", "no usable servers") else "",
+            raw = text,
         )
     }
 

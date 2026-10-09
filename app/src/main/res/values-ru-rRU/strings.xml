@@ -1066,7 +1066,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_node_count">Серверов: %1$d, пропущено: %2$d</string>
     <string name="proton_sidecar_missing">В этой сборке нет вспомогательного модуля Proton.</string>
     <string name="proton_2fa_required">Для этого аккаунта нужен код 2FA.</string>
-    <string name="proton_auto_login">Автовход в Proton</string>
+    <string name="proton_auto_login">Автовход</string>
     <string name="proton_auto_login_summary">Загружает список серверов при открытии этой страницы, используя текущую сессию.</string>
     <string name="proton_auto_login_message">Сначала войдите: NB4A повторно использует сессию и никогда не сохраняет ваш пароль.</string>
     <string name="proton_warning_title">Предупреждаем заранее</string>
@@ -1096,4 +1096,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_signed_in_as">Вы вошли как: %1$s</string>
     <string name="proton_signed_in_unknown">Вы вошли (сессия восстановлена, аккаунт не сохранён)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">Список серверов</string>
+    <string name="proton_group_added">Добавлена группа %1$s</string>
+    <string name="proton_cached_at">Обновлено %1$s</string>
+    <string name="proton_pull_to_refresh">Потяните вниз, чтобы обновить</string>
 </resources>

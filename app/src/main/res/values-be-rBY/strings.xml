@@ -1003,7 +1003,7 @@
     <string name="proton_node_count">Сервераў: %1$d, прапушчана: %2$d</string>
     <string name="proton_sidecar_missing">Гэтая зборка не змяшчае дапаможны модуль Proton.</string>
     <string name="proton_2fa_required">Гэтаму акаўнту патрэбны код 2FA.</string>
-    <string name="proton_auto_login">Аўтаўваход у Proton</string>
+    <string name="proton_auto_login">Аўтаўваход</string>
     <string name="proton_auto_login_summary">Загружвае спіс сервераў пры адкрыцці гэтай старонкі, выкарыстоўваючы сесію, у якую вы ўвайшлі.</string>
     <string name="proton_auto_login_message">Спачатку ўвайдзіце: NB4A паўторна выкарыстоўвае тую сесію і ніколі не захоўвае ваш пароль.</string>
     <string name="proton_warning_title">Папярэджваем загадзя</string>
@@ -1033,4 +1033,8 @@
     <string name="proton_signed_in_as">Вы ўвайшлі як: %1$s</string>
     <string name="proton_signed_in_unknown">Вы ўвайшлі (сесія адноўлена, уліковы запіс не захаваны)</string>
     <string name="proton_option_count">%1$s (%2$d)</string>
+    <string name="proton_servers">Спіс сервераў</string>
+    <string name="proton_group_added">Дададзена група %1$s</string>
+    <string name="proton_cached_at">Абноўлена %1$s</string>
+    <string name="proton_pull_to_refresh">Пацягніце ўніз, каб абнавіць</string>
 </resources>
