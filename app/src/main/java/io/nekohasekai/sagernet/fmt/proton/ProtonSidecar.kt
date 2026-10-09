@@ -86,6 +86,9 @@ class ProtonNodesState(
     val nodes: List<ProtonNode> = emptyList(),
     val dropped: Int = 0,
     val error: String = "",
+    // sidecar 給機器的穩定代碼，跟 error 那句人話分開：跳登入頁與顯示本地化文案都要靠它，
+    // 拿英文句子比對的話 Proton 一改措辭這條路就斷。目前只有 session_expired。
+    val code: String = "",
     // 原始 payload 只從網路那條路帶回來，給磁碟快取用：存解析後的物件會逼這裡
     // 再實作一套序列化，而讀回來時又得走第二套解析，兩套不一致最難查。
     val raw: String = "",
@@ -153,7 +156,11 @@ object ProtonJson {
         val obj = runCatching { JSONObject(text) }.getOrNull()
             ?: return ProtonNodesState(false, error = "sidecar returned no JSON")
         if (!obj.optBoolean("ok")) {
-            return ProtonNodesState(false, error = obj.optString("error", "unknown error"))
+            return ProtonNodesState(
+                false,
+                error = obj.optString("error", "unknown error"),
+                code = obj.optString("code", ""),
+            )
         }
         val array = obj.optJSONArray("servers") ?: return ProtonNodesState(
             false,
@@ -220,6 +227,10 @@ object ProtonJson {
 object ProtonSidecar {
 
     private const val EXECUTABLE_NAME = "libprotonvpn.so"
+
+    // sidecar nodesOutput.code 的唯一取值：工作階段被 Proton 擋掉。UI 認這個碼決定
+    // 「顯示哪句本地化文案」與「要不要把人導回登入頁」，不去比對 error 那句英文。
+    const val SESSION_EXPIRED = "session_expired"
 
     // The sidecar writes 0600 itself; this directory only keeps it out of backups.
     private val sessionFile: File by lazy {

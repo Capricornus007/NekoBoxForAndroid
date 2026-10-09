@@ -982,6 +982,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_sign_out">登出</string>
     <string name="proton_signed_in">已登入</string>
     <string name="proton_not_signed_in">未登入</string>
+    <string name="proton_session_expired">你的 Proton 工作階段已被拒絕，請重新登入。</string>
     <string name="proton_refresh">重新整理伺服器</string>
     <string name="proton_add">加入</string>
     <string name="proton_added">已加入 %s</string>

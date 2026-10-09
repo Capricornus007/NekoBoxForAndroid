@@ -1081,6 +1081,7 @@
     <string name="proton_sign_out">Sign out</string>
     <string name="proton_signed_in">Signed in</string>
     <string name="proton_not_signed_in">Not signed in</string>
+    <string name="proton_session_expired">Your Proton session was rejected. Please sign in again.</string>
     <string name="proton_refresh">Refresh servers</string>
     <string name="proton_add">Add</string>
     <string name="proton_added">Added %s</string>

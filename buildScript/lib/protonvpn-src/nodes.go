@@ -96,7 +96,15 @@ type nodesOutput struct {
 	// key, or offline), so the UI can tell "few nodes" from "broken response".
 	Dropped int    `json:"dropped"`
 	Error   string `json:"error,omitempty"`
+	// Code is the machine-readable twin of Error. Error is prose meant for a human
+	// (and Proton rewords things), so "route the user back to sign-in" must never be
+	// decided by matching an English sentence. Only session_expired exists today.
+	Code string `json:"code,omitempty"`
 }
+
+// codeSessionExpired means the stored uid/token was rejected outright. The one and
+// only recovery is a fresh sign-in, which is why the app needs to recognise it.
+const codeSessionExpired = "session_expired"
 
 func runNodes(args []string, stdout, stderr io.Writer) int {
 	command := flag.NewFlagSet("nodes", flag.ContinueOnError)
@@ -124,6 +132,9 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 
 	resp, err := fetchLogicalServers(ctx, *apiURL, cred)
 	if err != nil {
+		if errors.Is(err, errSessionExpired) {
+			return emitNodes(stdout, nodesOutput{Error: err.Error(), Code: codeSessionExpired})
+		}
 		return emitNodes(stdout, nodesOutput{Error: err.Error()})
 	}
 

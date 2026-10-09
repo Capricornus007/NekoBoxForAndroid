@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.text.format.DateUtils
@@ -57,6 +58,12 @@ class ProtonServersActivity : ThemedActivity() {
         )
     }
 
+    // 排序項沒有「這個地方有幾台」這種數目，count 一律給 0，由 OptionAdapter 負責留空，
+    // 這樣它才能跟國家／城市共用同一個 labels() 與同一份 item_proton_option 佈局。
+    private val sortItems by lazy {
+        sortOptions.map { ProtonFilter.Option(it.first.name, 0, it.second) }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProtonServersBinding.inflate(layoutInflater)
@@ -97,12 +104,9 @@ class ProtonServersActivity : ThemedActivity() {
             shownLimit += nodePage
             renderNodes()
         }
-        // 排序框也要裝 adapter：上一輪只補了回填標籤，結果框子裡有字、點下去卻開不出
-        // 清單——國家／城市那兩格能開就是因為它們在 refreshPlaceOptions() 裡設過。
-        // 排序項沒有「有幾台」這種數目，count 一律給 0，由 OptionAdapter 負責留空。
-        binding.sortFilter.setAdapter(
-            OptionAdapter(sortOptions.map { ProtonFilter.Option(it.first.name, 0, it.second) }),
-        )
+        // 排序框的 adapter 不在這裡設：實測證明「在 onCreate 就 setAdapter」的排序框點下去
+        // 只有箭頭翻、清單不出來，而同一畫面裡國家／城市兩格都點得開——它們的差異就是設
+        // adapter 的時機。所以排序也改到 refreshPlaceOptions() 裡，跟那兩格同時、同機制。
         renderSortLabel()
 
         if (!ProtonSidecar.isAvailable()) {
@@ -138,6 +142,14 @@ class ProtonServersActivity : ThemedActivity() {
             if (isFinishing || isDestroyed) return@launch
             binding.refreshLayout.isRefreshing = false
             if (!result.ok) {
+                if (result.code == ProtonSidecar.SESSION_EXPIRED) {
+                    // 過期不是一句要讀的錯誤，是一個用戶能修的狀態：給本地化文案並直接把他
+                    // 送回登入頁。只印一句英文的話，他會卡在舊清單前面不知道該做什麼。
+                    binding.status.setText(R.string.proton_session_expired)
+                    startActivity(Intent(this@ProtonServersActivity, ProtonActivity::class.java))
+                    finish()
+                    return@launch
+                }
                 // 抓失敗時手上有快取就留著舊清單，別把已經看得到的東西一起清掉。
                 binding.status.text = result.error
                 return@launch
@@ -216,6 +228,9 @@ class ProtonServersActivity : ThemedActivity() {
         }
         binding.countryFilter.setAdapter(labels(countryOptions))
         binding.cityFilter.setAdapter(labels(cityOptions))
+        // 與上面兩格同一個時機、同一個 labels()：實測過在 onCreate 裡設的排序框點下去只有
+        // 箭頭翻、清單不出來，換到這裡就與國家／城市一致。
+        binding.sortFilter.setAdapter(labels(sortItems))
         binding.countryFilter.setText(optionText(filter.country, countryOptions), false)
         binding.cityFilter.setText(optionText(filter.city, cityOptions), false)
     }

@@ -982,6 +982,7 @@
     <string name="proton_sign_out">登出</string>
     <string name="proton_signed_in">已登录</string>
     <string name="proton_not_signed_in">未登录</string>
+    <string name="proton_session_expired">你的 Proton 会话已被拒绝，请重新登录。</string>
     <string name="proton_refresh">刷新服务器</string>
     <string name="proton_add">添加</string>
     <string name="proton_added">已添加 %s</string>

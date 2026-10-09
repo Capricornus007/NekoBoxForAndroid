@@ -190,6 +190,12 @@ func TestNodesReportsAnExpiredSessionInsteadOfFakeNodes(t *testing.T) {
 	if out.Error != errSessionExpired.Error() {
 		t.Errorf("error = %q, want the re-login hint %q", out.Error, errSessionExpired.Error())
 	}
+	// The app routes back to the sign-in screen on Code, not on the English sentence:
+	// without this the field could silently disappear and leave the UI stuck on a
+	// message the user cannot act on.
+	if out.Code != codeSessionExpired {
+		t.Errorf("code = %q, want %q", out.Code, codeSessionExpired)
+	}
 }
 
 func TestNodesRefusesToInventNodesFromAnEmptyList(t *testing.T) {
