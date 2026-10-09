@@ -588,10 +588,10 @@ class ProtonActivity : ThemedActivity() {
 
     private fun nodeLabel(node: ProtonNode): String {
         // Proton 只給兩位國家碼，這裡換成本機語言的國名；換不了就照原碼顯示，不猜。
-        val place = listOf(
-            node.city,
+        val place = listOfNotNull(
+            node.city.takeIf { it.isNotEmpty() },
             node.country.takeIf { it.isNotEmpty() }?.let { countryName(it) },
-        ).filter { it.isNotEmpty() }.joinToString(" · ")
+        ).joinToString(" · ")
         return if (place.isEmpty()) node.name else "${node.name}   $place"
     }
 
