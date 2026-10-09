@@ -130,8 +130,8 @@
                 <data android:scheme="ssr" />
                 <data android:scheme="socks" />
                 <data android:scheme="socks4" />
-                <data android:scheme="socksa" />
-                <data android:scheme="sock5" />
+                <data android:scheme="socks4a" />
+                <data android:scheme="socks5" />
                 <data android:scheme="vmess" />
                 <data android:scheme="trojan" />
                 <data android:scheme="trojan-go" />
@@ -147,6 +147,13 @@
                 <data android:scheme="olcrtc" />
                 <data android:scheme="tuic" />
                 <data android:scheme="juicity" />
+                <!-- WireGuardFmt 認 wireguard:// 與 wg://（順序敏感：wg:// 是 awg:// 的子字串），
+                     awg:// 由同檔 53 行處理，vpn:// 是 AmneziaWireGuardImporter 的 AMNEZIA_SCHEME。
+                     這四個代碼都認得，之前 manifest 沒聲明，從別的 app 分享時根本不會出現。 -->
+                <data android:scheme="wg" />
+                <data android:scheme="wireguard" />
+                <data android:scheme="awg" />
+                <data android:scheme="vpn" />
 
             </intent-filter>
 

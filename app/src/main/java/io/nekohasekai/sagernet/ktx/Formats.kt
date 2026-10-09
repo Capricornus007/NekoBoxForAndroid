@@ -205,7 +205,16 @@ internal fun fakeSubscriptionNode(bean: AbstractBean): String? {
 
 suspend fun parseProxies(text: String, subscription: Boolean = false): List<AbstractBean> {
     val lines = text.linesNoComments()
-    val links = lines.flatMap { it.split(' ') }
+    // 一行內有多條連結確實存在（有些訂閱把幾條 ss:// 用空格排在同一行），所以不能單純取消拆分。
+    // 但無條件 split(' ') 會把「標題含空格的資訊行」和「備註含空格的連結」拆成假節點，
+    // 而下方 `if (entities.size > entitiesByLine.size)` 這個「誰多選誰」的判據又**永遠偏向
+    // 拆過的那份**（拆分只會增加條目數），等於假節點必勝。
+    // 所以這裡改成：只有「拆出來的每一段都自帶 scheme」才當作多連結行，否則整行保留。
+    // 這樣同時修掉兩個症狀：資訊行被拆成垃圾節點、以及 `ss://…#我的 節點` 的備註被截斷。
+    val links = lines.flatMap { line ->
+        val parts = line.split(' ').filter { it.isNotBlank() }
+        if (parts.size > 1 && parts.all { it.contains("://") }) parts else listOf(line)
+    }
     val linksByLine = lines
 
     val entities = ArrayList<AbstractBean>()
