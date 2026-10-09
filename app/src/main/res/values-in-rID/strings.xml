@@ -1042,11 +1042,11 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_ipv6_only">Hanya IPv6</string>
     <string name="proton_all_countries">Semua negara</string>
     <string name="proton_all_cities">Semua kota</string>
-    <string name="proton_sort_balancer">Urutan penyeimbang</string>
+    <string name="proton_sort_idle">Bebas</string>
+    <string name="proton_idle">bebas %1$d%%</string>
     <string name="proton_sort_name">Nama</string>
     <string name="proton_signed_in_as">Masuk sebagai: %1$s</string>
     <string name="proton_signed_in_unknown">Masuk (sesi dipakai ulang, akun tidak dicatat)</string>
-    <string name="proton_option_count">%1$s (%2$d)</string>
     <string name="proton_servers">Daftar server</string>
     <string name="proton_group_added">Grup %1$s ditambahkan</string>
     <string name="proton_cached_at">Diperbarui %1$s</string>

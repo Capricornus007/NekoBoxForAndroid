@@ -42,14 +42,15 @@ func runNodesWith(t *testing.T, apiURL, statePath string, extra ...string) (node
 }
 
 // serverList mirrors the wire format Proton's own client models declare: ID is a
-// string, the key lives on the connecting domain as X25519PublicKey, and there is
-// no load field on a logical server.
+// string, the key lives on the connecting domain as X25519PublicKey, and a logical
+// server carries Load (0-100). The penalties below deliberately disagree with the
+// loads so the test proves which one actually drives the order.
 const serverListFixture = `{"LogicalServers":[
- {"ID":"11","Name":"JP#2 空閒","Tier":2,"State":"up","ExitCountry":"jp","City":"Tokyo","Features":16,
+ {"ID":"11","Name":"JP#2 高載","Tier":2,"State":"up","ExitCountry":"jp","City":"Tokyo","Features":16,"Load":95,
   "StatusReference":{"Index":11,"Penalty":0.2,"Cost":1},
   "Servers":[{"Domain":"jp2.protonvpn.net","EntryIP":"1.2.3.5","Status":1,"X25519PublicKey":"BBBBAl==",
     "EntryPerProtocol":{"wireguard":{"IPv4":"1.2.3.55","Ports":[51820,443]}}}]},
- {"ID":"10","Name":"JP#1 拥挤","Tier":2,"State":"up","ExitCountry":"jp","City":"Osaka","Features":0,
+ {"ID":"10","Name":"JP#1 空閒","Tier":2,"State":"up","ExitCountry":"jp","City":"Osaka","Features":0,"Load":5,
   "StatusReference":{"Index":10,"Penalty":0.9,"Cost":3},
   "Servers":[{"Domain":"jp1.protonvpn.net","EntryIP":"1.2.3.4","Status":1,"X25519PublicKey":"AAAAAl=="}]},
  {"ID":"12","Name":"無公鑰","Tier":0,"State":"up","ExitCountry":"jp",
@@ -102,17 +103,21 @@ func TestNodesReadsProtonsRealFieldNames(t *testing.T) {
 	if out.Dropped != 3 {
 		t.Errorf("dropped = %d, want 3: %+v", out.Dropped, out.Servers)
 	}
-	// 11 carries penalty 0.2 and 10 carries 0.9, so the balancer order is 11 first.
-	if out.Servers[0].ID != "11" || out.Servers[1].ID != "10" {
-		t.Errorf("order = %s,%s; want penalty-ascending 11,10", out.Servers[0].ID, out.Servers[1].ID)
+	// 11 carries the lower penalty but the higher load, so this is the case where
+	// the two disagree: Load decides, because Penalty is not on the wire at all.
+	if out.Servers[0].ID != "10" || out.Servers[1].ID != "11" {
+		t.Errorf("order = %s,%s; want load-ascending 10,11", out.Servers[0].ID, out.Servers[1].ID)
 	}
-	if out.Servers[0].PublicKey != "BBBBAl==" {
-		t.Errorf("public key = %q, want the X25519PublicKey the API returned", out.Servers[0].PublicKey)
+	if out.Servers[0].Load != 5 || out.Servers[1].Load != 95 {
+		t.Errorf("load = %d,%d; want the API's 5,95 so the UI can show idle capacity", out.Servers[0].Load, out.Servers[1].Load)
 	}
-	if !out.Servers[0].IPv6 {
+	if out.Servers[1].PublicKey != "BBBBAl==" {
+		t.Errorf("public key = %q, want the X25519PublicKey the API returned", out.Servers[1].PublicKey)
+	}
+	if !out.Servers[1].IPv6 {
 		t.Error("Features bit 16 should surface as ipv6=true")
 	}
-	if out.Servers[1].IPv6 {
+	if out.Servers[0].IPv6 {
 		t.Error("Features 0 should surface as ipv6=false")
 	}
 }
@@ -139,7 +144,7 @@ func TestNodesPrefersTheWireGuardEntryAndItsFirstPort(t *testing.T) {
 	}
 
 	// Without a per-protocol record it falls back to EntryIP, then the default port.
-	if jp1 := out.Servers[1]; jp1.ID != "10" || jp1.Endpoint != "1.2.3.4" || jp1.Port != defaultWireGuardPort {
+	if jp1 := out.Servers[0]; jp1.ID != "10" || jp1.Endpoint != "1.2.3.4" || jp1.Port != defaultWireGuardPort {
 		t.Errorf("fallback gave id=%s endpoint=%q port=%d, want 10 / 1.2.3.4 / %d",
 			jp1.ID, jp1.Endpoint, jp1.Port, defaultWireGuardPort)
 	}
@@ -159,8 +164,8 @@ func TestNodesCountryFilterAndLimit(t *testing.T) {
 		t.Fatalf("US filter gave %d servers, want none: %+v", len(out.Servers), out.Servers)
 	}
 	out, _ = runNodesWith(t, srv.URL, statePath, "--limit", "1")
-	if len(out.Servers) != 1 || out.Servers[0].ID != "11" {
-		t.Fatalf("limit 1 gave %+v, want only the lowest-penalty 11", out.Servers)
+	if len(out.Servers) != 1 || out.Servers[0].ID != "10" {
+		t.Fatalf("limit 1 gave %+v, want only the least loaded 10", out.Servers)
 	}
 }
 

@@ -11,9 +11,9 @@ data class ProtonFilter(
     val country: String = ALL,
     val city: String = ALL,
     val ipv6Only: Boolean = false,
-    val sort: Sort = Sort.BALANCER,
+    val sort: Sort = Sort.IDLE,
 ) {
-    enum class Sort { BALANCER, NAME, COUNTRY, CITY }
+    enum class Sort { IDLE, NAME, COUNTRY, CITY }
 
     fun apply(nodes: List<ProtonNode>): List<ProtonNode> {
         val q = query.trim().lowercase()
@@ -27,21 +27,26 @@ data class ProtonFilter(
                 (!ipv6Only || node.supportsIPv6) &&
                 (
                     q.isEmpty() || node.name.lowercase().contains(q) ||
-                        node.city.lowercase().contains(q) || node.country.lowercase().contains(q)
+                        node.city.lowercase().contains(q) ||
+                        // 清單上看到的是「洛杉磯」，打字卻要猜 Los Angeles 是強人所難：
+                        // 本地化的名字也要能搜到。
+                        cityName(node.city).lowercase().contains(q) ||
+                        node.country.lowercase().contains(q)
                     )
         }
         return when (sort) {
-            // Proton 自己的排程分數（越低越空）；這是它客戶端用的同一個排序依據。
-            Sort.BALANCER -> matched.sortedBy { it.penalty }
+            // 空閒度（Proton 的 Load 反過來）優先。penalty 只當次鍵：實測 /vpn/logicals
+            // 對每一台都不回 StatusReference，也就是 penalty 恆為 0，單靠它等於沒排。
+            Sort.IDLE -> matched.sortedWith(compareBy({ it.loadRank }, { it.penalty }))
 
-            Sort.NAME -> matched.sortedWith(compareBy({ it.name.lowercase() }, { it.penalty }))
+            Sort.NAME -> matched.sortedWith(compareBy({ it.name.lowercase() }, { it.loadRank }))
 
             Sort.COUNTRY -> matched.sortedWith(
-                compareBy({ it.countryKey }, { it.city.lowercase() }, { it.penalty }),
+                compareBy({ it.countryKey }, { cityName(it.city).lowercase() }, { it.loadRank }),
             )
 
             Sort.CITY -> matched.sortedWith(
-                compareBy({ it.city.lowercase() }, { it.countryKey }, { it.penalty }),
+                compareBy({ cityName(it.city).lowercase() }, { it.countryKey }, { it.loadRank }),
             )
         }
     }
@@ -62,7 +67,7 @@ data class ProtonFilter(
                 .groupingBy { it.city.lowercase() }
                 .eachCount()
                 .map { (key, count) ->
-                    Option(key, count, nodes.first { it.city.lowercase() == key }.city)
+                    Option(key, count, cityName(nodes.first { it.city.lowercase() == key }.city))
                 }
                 .sortedWith(compareBy({ it.label }, { -it.count }))
         }
@@ -77,6 +82,9 @@ data class ProtonFilter(
 
 private val ProtonNode.countryKey: String get() = country.trim().uppercase(Locale.ROOT)
 
+// 沒有 load 的舊快取要排在最後，而不是被當成「最空」排到第一。
+private val ProtonNode.loadRank: Int get() = load.takeIf { it >= 0 } ?: Int.MAX_VALUE
+
 /**
  * 國家碼轉成本機語言的國名（Proton 只給 `ExitCountry` 兩位碼）。
  * 非 ISO 碼或空碼時 `Locale.Builder` 會丟例外，那種情況照原碼顯示，不猜。
@@ -89,7 +97,7 @@ fun countryName(code: String): String = runCatching {
 /** 清單列與匯入後的節點名稱共用同一個拼法，兩邊長得不一樣會讓人對不上號。 */
 fun ProtonNode.placeLabel(): String {
     val place = listOfNotNull(
-        city.takeIf { it.isNotEmpty() },
+        cityName(city).takeIf { it.isNotEmpty() },
         country.takeIf { it.isNotEmpty() }?.let { countryName(it) },
     ).joinToString(" · ")
     return if (place.isEmpty()) name else "$name   $place"

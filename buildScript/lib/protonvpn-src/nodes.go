@@ -29,13 +29,14 @@ var errSessionExpired = errors.New("stored session was rejected, please log in a
 // (ProtonVPN/android-app servers/api/{LogicalServer,ConnectingDomain}.kt), whose
 // @SerialName annotations are the wire format of /vpn/logicals.
 type logicalServer struct {
-	ID              string `json:"ID"`
-	Name            string `json:"Name"`
-	State           string `json:"State"`
-	Tier            int    `json:"Tier"`
-	Features        int    `json:"Features"`
-	Country         string `json:"ExitCountry"`
-	City            string `json:"City"`
+	ID              string  `json:"ID"`
+	Name            string  `json:"Name"`
+	State           string  `json:"State"`
+	Load            int     `json:"Load"`
+	Tier            int     `json:"Tier"`
+	Features        int     `json:"Features"`
+	Country         string  `json:"ExitCountry"`
+	City            string  `json:"City"`
 	Servers         []connectingDomain
 	StatusReference struct {
 		Penalty float64 `json:"Penalty"`
@@ -74,6 +75,7 @@ type logicalServersResp struct {
 type nodeView struct {
 	ID        string  `json:"id"`
 	Name      string  `json:"name"`
+	Load      int     `json:"load"`
 	Penalty   float64 `json:"penalty"`
 	Tier      int     `json:"tier"`
 	IPv6      bool    `json:"ipv6,omitempty"`
@@ -219,6 +221,7 @@ func selectNodes(resp *logicalServersResp, country string, limit int) ([]nodeVie
 		usable = append(usable, nodeView{
 			ID:        ls.ID,
 			Name:      ls.Name,
+			Load:      ls.Load,
 			Penalty:   ls.StatusReference.Penalty,
 			Tier:      ls.Tier,
 			IPv6:      ls.Features&featureIPv6 != 0,
@@ -231,9 +234,17 @@ func selectNodes(resp *logicalServersResp, country string, limit int) ([]nodeVie
 		})
 	}
 
-	// Proton ranks servers by the penalty its own balancer computes; the list has
-	// no load field, so that is the only ordering available here.
-	sort.SliceStable(usable, func(i, j int) bool { return usable[i].Penalty < usable[j].Penalty })
+	// Load is the only utilisation number /vpn/logicals actually fills in: a live
+	// capture of all 1610 servers for this account returned Load (0-100) on every
+	// one of them, while StatusReference came back empty on every one, which makes
+	// Penalty a constant zero. Sorting by Penalty alone therefore silently does
+	// nothing, so it only breaks ties here.
+	sort.SliceStable(usable, func(i, j int) bool {
+		if usable[i].Load != usable[j].Load {
+			return usable[i].Load < usable[j].Load
+		}
+		return usable[i].Penalty < usable[j].Penalty
+	})
 	if limit > 0 && len(usable) > limit {
 		usable = usable[:limit]
 	}

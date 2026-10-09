@@ -3,8 +3,10 @@ package io.nekohasekai.sagernet.ui
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
@@ -47,7 +49,7 @@ class ProtonServersActivity : ThemedActivity() {
 
     private val sortOptions by lazy {
         listOf(
-            ProtonFilter.Sort.BALANCER to getString(R.string.proton_sort_balancer),
+            ProtonFilter.Sort.IDLE to getString(R.string.proton_sort_idle),
             ProtonFilter.Sort.NAME to getString(R.string.proton_sort_name),
             ProtonFilter.Sort.COUNTRY to getString(R.string.proton_country),
             ProtonFilter.Sort.CITY to getString(R.string.proton_city),
@@ -80,7 +82,7 @@ class ProtonServersActivity : ThemedActivity() {
             renderNodes()
         }
         binding.sortFilter.setOnItemClickListener { _, _, position, _ ->
-            filter = filter.copy(sort = sortOptions.getOrNull(position)?.first ?: ProtonFilter.Sort.BALANCER)
+            filter = filter.copy(sort = sortOptions.getOrNull(position)?.first ?: ProtonFilter.Sort.IDLE)
             shownLimit = nodePage
             renderNodes()
         }
@@ -160,19 +162,27 @@ class ProtonServersActivity : ThemedActivity() {
 
     private fun visibleNodes(): List<ProtonNode> = filter.copy(query = query).apply(nodes)
 
-    private fun labels(options: List<ProtonFilter.Option>) = ArrayAdapter(
-        this,
-        android.R.layout.simple_list_item_1,
-        options.map { optionLabel(it) },
-    )
+    private fun labels(options: List<ProtonFilter.Option>) = OptionAdapter(options)
 
-    private fun optionLabel(option: ProtonFilter.Option) = if (option.key == ProtonFilter.ALL) {
-        option.label
-    } else {
-        getString(R.string.proton_option_count, option.label, option.count)
+    // 選中之後框子裡只留名字：數目是給清單挑東西用的資訊，留在框子裡只會讓長名字被截。
+    private fun optionText(key: String, options: List<ProtonFilter.Option>) = options.firstOrNull { it.key == key }?.label ?: ""
+
+    // 名稱與數目分兩格是必要的：同一個 TextView 設了 ellipsize，「剛果（金夏沙）」
+    // 這種長名字會把尾巴連同數目一起剪掉，而長名字恰恰最需要看到有幾台。
+    private inner class OptionAdapter(
+        options: List<ProtonFilter.Option>,
+    ) : ArrayAdapter<ProtonFilter.Option>(this, R.layout.item_proton_option, options) {
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = convertView ?: layoutInflater.inflate(R.layout.item_proton_option, parent, false)
+            val option = getItem(position)
+            view.findViewById<TextView>(R.id.optionLabel).text = option?.label.orEmpty()
+            view.findViewById<TextView>(R.id.optionCount).text = when {
+                option == null || option.key == ProtonFilter.ALL -> ""
+                else -> option.count.toString()
+            }
+            return view
+        }
     }
-
-    private fun optionText(key: String, options: List<ProtonFilter.Option>) = options.firstOrNull { it.key == key }?.let { optionLabel(it) } ?: ""
 
     private fun refreshPlaceOptions() {
         countryOptions = listOf(
@@ -212,7 +222,18 @@ class ProtonServersActivity : ThemedActivity() {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
             ).apply { bottomMargin = gap }
-            button.text = getString(R.string.proton_add) + " · " + node.placeLabel()
+            // 空閒度只在清單上出現：匯入之後的名字會跟著配置留下來，而這個數字每幾分鐘
+            // 就變一次，留在節點名稱裡只會變成一個過期的謊。
+            val idle = node.idlePercent
+            button.text = buildString {
+                append(getString(R.string.proton_add))
+                append(" · ")
+                append(node.placeLabel())
+                if (idle != null) {
+                    append("   ")
+                    append(getString(R.string.proton_idle, idle))
+                }
+            }
             button.setOnClickListener { import(node) }
             binding.nodeList.addView(button)
         }

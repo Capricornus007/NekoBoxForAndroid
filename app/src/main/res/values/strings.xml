@@ -1111,11 +1111,11 @@
     <string name="proton_ipv6_only">IPv6 only</string>
     <string name="proton_all_countries">All countries</string>
     <string name="proton_all_cities">All cities</string>
-    <string name="proton_sort_balancer">Balancer order</string>
+    <string name="proton_sort_idle">Idle</string>
+    <string name="proton_idle">idle %1$d%%</string>
     <string name="proton_sort_name">Name</string>
     <string name="proton_signed_in_as">Signed in as: %1$s</string>
     <string name="proton_signed_in_unknown">Signed in (session reused; account not recorded)</string>
-    <string name="proton_option_count">%1$s (%2$d)</string>
     <string name="proton_servers">Servers</string>
     <string name="proton_group_added">Group %1$s added</string>
     <string name="proton_cached_at">Updated %1$s</string>

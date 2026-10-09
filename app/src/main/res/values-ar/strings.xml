@@ -1000,11 +1000,11 @@
     <string name="proton_ipv6_only">IPv6 فقط</string>
     <string name="proton_all_countries">كل الدول</string>
     <string name="proton_all_cities">كل المدن</string>
-    <string name="proton_sort_balancer">ترتيب الموزّع</string>
+    <string name="proton_sort_idle">متاح</string>
+    <string name="proton_idle">متاح %1$d%%</string>
     <string name="proton_sort_name">الاسم</string>
     <string name="proton_signed_in_as">تم تسجيل الدخول باسم: %1$s</string>
     <string name="proton_signed_in_unknown">تم تسجيل الدخول (أُعيد استخدام الجلسة دون حفظ الحساب)</string>
-    <string name="proton_option_count">%1$s (%2$d)</string>
     <string name="proton_servers">قائمة الخوادم</string>
     <string name="proton_group_added">تمت إضافة المجموعة %1$s</string>
     <string name="proton_cached_at">تم التحديث %1$s</string>

@@ -932,11 +932,11 @@
     <string name="proton_ipv6_only">Толькі IPv6</string>
     <string name="proton_all_countries">Усе краіны</string>
     <string name="proton_all_cities">Усе гарады</string>
-    <string name="proton_sort_balancer">Парадак збалансавання</string>
+    <string name="proton_sort_idle">Свабодна</string>
+    <string name="proton_idle">свабодна %1$d%%</string>
     <string name="proton_sort_name">Імя</string>
     <string name="proton_signed_in_as">Вы ўвайшлі як: %1$s</string>
     <string name="proton_signed_in_unknown">Вы ўвайшлі (сесія адноўлена, уліковы запіс не захаваны)</string>
-    <string name="proton_option_count">%1$s (%2$d)</string>
     <string name="proton_servers">Спіс сервераў</string>
     <string name="proton_group_added">Дададзена група %1$s</string>
     <string name="proton_cached_at">Абноўлена %1$s</string>

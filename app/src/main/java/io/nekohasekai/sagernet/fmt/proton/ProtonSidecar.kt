@@ -21,7 +21,15 @@ data class ProtonNode(
     val endpoint: String,
     val publicKey: String,
     val port: Int,
-)
+    // Proton's own utilisation number, 0-100. -1 means "the payload did not carry
+    // it", which is what every cache file written before this field existed looks
+    // like; treating absent as 0 would rank those nodes as the emptiest there are.
+    // 放在最後是必要的：既有呼叫端是用位置建這個物件的。
+    val load: Int = -1,
+) {
+    // 空閒度是他在清單上真正要比的東西，負載只是它的反面。
+    val idlePercent: Int? get() = load.takeIf { it in 0..100 }?.let { 100 - it }
+}
 
 sealed class ProtonOutcome {
     class Success(val json: String) : ProtonOutcome()
@@ -160,6 +168,7 @@ object ProtonJson {
                 id = item.optString("id", ""),
                 name = item.optString("name", ""),
                 penalty = item.optDouble("penalty", 0.0),
+                load = if (item.has("load")) item.optInt("load", -1) else -1,
                 tier = item.optInt("tier"),
                 supportsIPv6 = item.optBoolean("ipv6"),
                 country = item.optString("country", ""),

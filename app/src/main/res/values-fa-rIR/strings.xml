@@ -1032,11 +1032,11 @@
     <string name="proton_ipv6_only">فقط IPv6</string>
     <string name="proton_all_countries">همه کشورها</string>
     <string name="proton_all_cities">همه شهرها</string>
-    <string name="proton_sort_balancer">ترتیب متعادل‌ساز</string>
+    <string name="proton_sort_idle">آزاد</string>
+    <string name="proton_idle">آزاد %1$d%%</string>
     <string name="proton_sort_name">نام</string>
     <string name="proton_signed_in_as">وارد شده به عنوان: %1$s</string>
     <string name="proton_signed_in_unknown">وارد شده (نشست بازیابی شد، حساب ثبت نشد)</string>
-    <string name="proton_option_count">%1$s (%2$d)</string>
     <string name="proton_servers">فهرست سرورها</string>
     <string name="proton_group_added">گروه %1$s افزوده شد</string>
     <string name="proton_cached_at">به‌روزرسانی %1$s</string>

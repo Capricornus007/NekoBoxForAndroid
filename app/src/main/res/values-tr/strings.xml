@@ -986,11 +986,11 @@
     <string name="proton_ipv6_only">Yalnızca IPv6</string>
     <string name="proton_all_countries">Tüm ülkeler</string>
     <string name="proton_all_cities">Tüm şehirler</string>
-    <string name="proton_sort_balancer">Dengeleyici sırası</string>
+    <string name="proton_sort_idle">Boş</string>
+    <string name="proton_idle">boş %1$d%%</string>
     <string name="proton_sort_name">Ad</string>
     <string name="proton_signed_in_as">Oturum açan hesap: %1$s</string>
     <string name="proton_signed_in_unknown">Oturum açık (oturum devralındı, hesap kaydedilmedi)</string>
-    <string name="proton_option_count">%1$s (%2$d)</string>
     <string name="proton_servers">Sunucu listesi</string>
     <string name="proton_group_added">%1$s grubu eklendi</string>
     <string name="proton_cached_at">%1$s güncellendi</string>

@@ -2,6 +2,7 @@ package io.nekohasekai.sagernet.fmt.proton
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,7 +56,7 @@ class ProtonSidecarParseTest {
         val state = ProtonJson.parseNodes(
             """
             {"ok":true,"dropped":3,"servers":[
-              {"id":"11","name":"JP#2","penalty":0.2,"tier":2,"ipv6":true,"country":"jp","city":"Tokyo",
+              {"id":"11","name":"JP#2","penalty":0.2,"load":35,"tier":2,"ipv6":true,"country":"jp","city":"Tokyo",
                "endpoint":"1.2.3.55","domain":"jp2.protonvpn.net","wgPublicKey":"BBBBAl==","port":51820},
               {"id":"10","name":"JP#1","penalty":0.9,"tier":2,"country":"jp","city":"Osaka",
                "endpoint":"1.2.3.4","wgPublicKey":"AAAAAl==","port":443}
@@ -68,6 +69,12 @@ class ProtonSidecarParseTest {
         assertEquals("11", state.nodes[0].id)
         assertEquals("BBBBAl==", state.nodes[0].publicKey)
         assertEquals(0.2, state.nodes[0].penalty, 0.0001)
+        assertEquals(35, state.nodes[0].load)
+        assertEquals(65, state.nodes[0].idlePercent)
+        // A payload from before the sidecar carried Load must not read as "emptyest
+        // server there is": absent is its own value.
+        assertEquals(-1, state.nodes[1].load)
+        assertNull(state.nodes[1].idlePercent)
         assertTrue(state.nodes[0].supportsIPv6)
         assertFalse(state.nodes[1].supportsIPv6)
         assertEquals(443, state.nodes[1].port)
