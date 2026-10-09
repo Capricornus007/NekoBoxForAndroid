@@ -117,6 +117,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var protonWarningAccepted by configurationStore.boolean(Key.PROTON_WARNING_ACCEPTED)
     var protonAutoLogin by configurationStore.boolean(Key.PROTON_AUTO_LOGIN)
 
+    // 只記「登進去的是哪個帳號」給 Proton 頁顯示；密碼、token 一律不進這裡。
+    var protonAccount by configurationStore.string(Key.PROTON_ACCOUNT) { "" }
+
     var showBottomBar by configurationStore.boolean(Key.SHOW_BOTTOM_BAR)
     var confirmProfileDelete by configurationStore.boolean(Key.CONFIRM_PROFILE_DELETE) { true }
     var groupLayoutMode by configurationStore.stringToInt(Key.GROUP_LAYOUT_MODE) { 0 }

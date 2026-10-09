@@ -1027,4 +1027,15 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="proton_captcha_unavailable">Proton ga ingen CAPTCHA som kan løses her.</string>
     <string name="proton_show_more">Vis flere</string>
     <string name="proton_showing">%1$d av %2$d servere</string>
+    <string name="proton_country">Land</string>
+    <string name="proton_city">By</string>
+    <string name="proton_sort">Rekkefølge</string>
+    <string name="proton_ipv6_only">Kun IPv6</string>
+    <string name="proton_all_countries">Alle land</string>
+    <string name="proton_all_cities">Alle byer</string>
+    <string name="proton_sort_balancer">Balanseringsrekkefølge</string>
+    <string name="proton_sort_name">Navn</string>
+    <string name="proton_signed_in_as">Logget inn som: %1$s</string>
+    <string name="proton_signed_in_unknown">Logget inn (økt gjenopprettet, konto ikke lagret)</string>
+    <string name="proton_option_count">%1$s (%2$d)</string>
 </resources>

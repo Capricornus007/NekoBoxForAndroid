@@ -1182,4 +1182,15 @@
     <string name="proton_captcha_unavailable">Proton no dio ningún CAPTCHA para resolver aquí.</string>
     <string name="proton_show_more">Mostrar más</string>
     <string name="proton_showing">%1$d de %2$d servidores</string>
+    <string name="proton_country">País</string>
+    <string name="proton_city">Ciudad</string>
+    <string name="proton_sort">Orden</string>
+    <string name="proton_ipv6_only">Solo IPv6</string>
+    <string name="proton_all_countries">Todos los países</string>
+    <string name="proton_all_cities">Todas las ciudades</string>
+    <string name="proton_sort_balancer">Orden de equilibrio</string>
+    <string name="proton_sort_name">Nombre</string>
+    <string name="proton_signed_in_as">Sesión iniciada como: %1$s</string>
+    <string name="proton_signed_in_unknown">Sesión iniciada (sesión reaprovechada, cuenta sin registrar)</string>
+    <string name="proton_option_count">%1$s (%2$d)</string>
 </resources>

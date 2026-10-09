@@ -11,6 +11,7 @@ object Key {
     const val PLUGIN_SIGNER_APPROVALS = "pluginSignerApprovals"
     const val PROTON_WARNING_ACCEPTED = "protonWarningAccepted"
     const val PROTON_AUTO_LOGIN = "protonAutoLogin"
+    const val PROTON_ACCOUNT = "protonAccount"
 
     /**
      * Staged in-app update release name (e.g. 1.4.2-mod-07).

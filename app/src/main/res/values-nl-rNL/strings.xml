@@ -1037,4 +1037,15 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="proton_captcha_unavailable">Proton gaf hier geen CAPTCHA om op te lossen.</string>
     <string name="proton_show_more">Meer weergeven</string>
     <string name="proton_showing">%1$d van %2$d servers</string>
+    <string name="proton_country">Land</string>
+    <string name="proton_city">Stad</string>
+    <string name="proton_sort">Volgorde</string>
+    <string name="proton_ipv6_only">Alleen IPv6</string>
+    <string name="proton_all_countries">Alle landen</string>
+    <string name="proton_all_cities">Alle steden</string>
+    <string name="proton_sort_balancer">Balancervolgorde</string>
+    <string name="proton_sort_name">Naam</string>
+    <string name="proton_signed_in_as">Ingelogd als: %1$s</string>
+    <string name="proton_signed_in_unknown">Ingelogd (sessie hervat, account niet opgeslagen)</string>
+    <string name="proton_option_count">%1$s (%2$d)</string>
 </resources>

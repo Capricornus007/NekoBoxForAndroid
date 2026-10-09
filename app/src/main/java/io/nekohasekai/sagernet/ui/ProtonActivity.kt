@@ -14,6 +14,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
@@ -27,10 +28,12 @@ import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.databinding.ActivityProtonBinding
 import io.nekohasekai.sagernet.databinding.DialogProtonCaptchaBinding
 import io.nekohasekai.sagernet.fmt.proton.ProtonCaptchaChallenge
+import io.nekohasekai.sagernet.fmt.proton.ProtonFilter
 import io.nekohasekai.sagernet.fmt.proton.ProtonJson
 import io.nekohasekai.sagernet.fmt.proton.ProtonLoginState
 import io.nekohasekai.sagernet.fmt.proton.ProtonNode
 import io.nekohasekai.sagernet.fmt.proton.ProtonSidecar
+import io.nekohasekai.sagernet.fmt.proton.countryName
 import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.launch
@@ -46,6 +49,20 @@ class ProtonActivity : ThemedActivity() {
     private val nodePage = 60
     private var query = ""
     private var shownLimit = nodePage
+
+    // 國家／城市／IPv6／排序都只對「已經抓到的清單」做過濾：再打一次網路換來的
+    // 只是同樣 1576 條，而且會讓人以為篩選很慢。
+    private var filter = ProtonFilter()
+    private var countryOptions = listOf<ProtonFilter.Option>()
+    private var cityOptions = listOf<ProtonFilter.Option>()
+    private val sortOptions by lazy {
+        listOf(
+            ProtonFilter.Sort.BALANCER to getString(R.string.proton_sort_balancer),
+            ProtonFilter.Sort.NAME to getString(R.string.proton_sort_name),
+            ProtonFilter.Sort.COUNTRY to getString(R.string.proton_country),
+            ProtonFilter.Sort.CITY to getString(R.string.proton_city),
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +90,35 @@ class ProtonActivity : ThemedActivity() {
 
         binding.filterText.doAfterTextChanged {
             query = it?.toString().orEmpty()
+            shownLimit = nodePage
+            renderNodes()
+        }
+        binding.countryFilter.setAdapter(labels(countryOptions))
+        binding.cityFilter.setAdapter(labels(cityOptions))
+        binding.sortFilter.setAdapter(
+            ArrayAdapter(this, android.R.layout.simple_list_item_1, sortOptions.map { it.second }),
+        )
+        binding.sortFilter.setText(sortOptions.first().second, false)
+        binding.countryFilter.setOnItemClickListener { _, _, position, _ ->
+            // 換國家要把城市重設：留著「东京」再選美國，清單會直接空掉。
+            val key = countryOptions.getOrNull(position)?.key ?: ProtonFilter.ALL
+            filter = filter.copy(country = key, city = ProtonFilter.ALL)
+            refreshPlaceOptions()
+            shownLimit = nodePage
+            renderNodes()
+        }
+        binding.cityFilter.setOnItemClickListener { _, _, position, _ ->
+            filter = filter.copy(city = cityOptions.getOrNull(position)?.key ?: ProtonFilter.ALL)
+            shownLimit = nodePage
+            renderNodes()
+        }
+        binding.sortFilter.setOnItemClickListener { _, _, position, _ ->
+            filter = filter.copy(sort = sortOptions.getOrNull(position)?.first ?: ProtonFilter.Sort.BALANCER)
+            shownLimit = nodePage
+            renderNodes()
+        }
+        binding.ipv6Only.setOnCheckedChangeListener { _, checked ->
+            filter = filter.copy(ipv6Only = checked)
             shownLimit = nodePage
             renderNodes()
         }
@@ -128,6 +174,23 @@ class ProtonActivity : ThemedActivity() {
             binding.password.text = null
             binding.twoFactor.text = null
         }
+        renderAccountLine(signedIn)
+    }
+
+    // 「登入的是誰」要一眼看得见。工作階段檔裡只有 UID/tokens（那是 sidecar 的隱私邊界，
+    // 它不存名稱），所以名稱是登入當時記下的；舊工作階段沒記過就誠實說沒記，不拿 UID 充數。
+    private fun renderAccountLine(signedIn: Boolean) {
+        if (!signedIn) {
+            binding.signedInAs.visibility = View.GONE
+            return
+        }
+        binding.signedInAs.visibility = View.VISIBLE
+        val account = DataStore.protonAccount
+        if (account.isEmpty()) {
+            binding.signedInAs.setText(R.string.proton_signed_in_unknown)
+        } else {
+            binding.signedInAs.text = getString(R.string.proton_signed_in_as, account)
+        }
     }
 
     private fun signIn() {
@@ -157,9 +220,11 @@ class ProtonActivity : ThemedActivity() {
             when {
                 result.ok -> {
                     // 密碼只活在這一次呼叫裡，登入成功就從畫面上抹掉；本機留下的只有
-                    // sidecar 自己寫的 0600 工作階段檔。
+                    // sidecar 自己寫的 0600 工作階段檔。帳號名稱另外記一筆，只為了讓
+                    // 這個頁面上看得見「現在登進去的是誰」——它不是秘密，但也不外傳。
                     binding.password.text = null
                     binding.twoFactorLayout.visibility = View.GONE
+                    DataStore.protonAccount = account
                     binding.status.setText(R.string.proton_signed_in)
                     applySignedInState(true)
                     refresh()
@@ -420,8 +485,11 @@ class ProtonActivity : ThemedActivity() {
         // 人都登出了，開關沒有理由還開著：留著它，下次進頁就是一次打不進去的請求。
         binding.autoLogin.isChecked = false
         DataStore.protonAutoLogin = false
+        DataStore.protonAccount = ""
         nodes = emptyList()
-        binding.nodeList.removeAllViews()
+        filter = ProtonFilter()
+        refreshPlaceOptions()
+        renderNodes()
         binding.status.setText(R.string.proton_not_signed_in)
         applySignedInState(false)
     }
@@ -444,32 +512,60 @@ class ProtonActivity : ThemedActivity() {
             }
             nodes = result.nodes
             shownLimit = nodePage
+            refreshPlaceOptions()
             binding.status.text =
                 getString(R.string.proton_node_count, result.nodes.size, result.dropped)
             renderNodes()
         }
     }
 
-    // 1599 條靠捲動是不可用的：先照搜尋字串（名稱／城市／國家）過濾，再按 Proton 自己的
-    // penalty（越低越空）排序，最後只渲染前 shownLimit 筆。一次建上千顆按鈕本身就是卡的來源。
-    private fun visibleNodes(): List<ProtonNode> {
-        val q = query.trim().lowercase()
-        val matched = if (q.isEmpty()) {
-            nodes
-        } else {
-            nodes.filter {
-                it.name.lowercase().contains(q) || it.city.lowercase().contains(q) ||
-                    it.country.lowercase().contains(q)
-            }
+    // 1599 條靠捲動是不可用的：先過濾（文字／國家／城市／IPv6）再排序，最後只渲染前
+    // shownLimit 筆。過濾本身在 ProtonFilter 裡，那里才有辦法做 JVM 單測。
+    private fun visibleNodes(): List<ProtonNode> = filter.copy(query = query).apply(nodes)
+
+    private fun labels(options: List<ProtonFilter.Option>) = ArrayAdapter(
+        this,
+        android.R.layout.simple_list_item_1,
+        options.map { optionLabel(it) },
+    )
+
+    private fun optionLabel(option: ProtonFilter.Option) = if (option.key == ProtonFilter.ALL) {
+        option.label
+    } else {
+        getString(R.string.proton_option_count, option.label, option.count)
+    }
+
+    private fun optionText(key: String, options: List<ProtonFilter.Option>) = options.firstOrNull { it.key == key }?.let { optionLabel(it) } ?: ""
+
+    // 選項一律從已抓到的清單實算：寫死國家清單會跟帳號可用的節點對不上。
+    // 換國之後舊城市可能根本不存在，那種殘留選擇要自己收回去，不要留著一個篩不出東西的框。
+    private fun refreshPlaceOptions() {
+        countryOptions = listOf(
+            ProtonFilter.Option(ProtonFilter.ALL, nodes.size, getString(R.string.proton_all_countries)),
+        ) + ProtonFilter.countries(nodes)
+        if (filter.country != ProtonFilter.ALL && !ProtonFilter.hasCountry(nodes, filter.country)) {
+            filter = filter.copy(country = ProtonFilter.ALL, city = ProtonFilter.ALL)
         }
-        return matched.sortedBy { it.penalty }
+        cityOptions = listOf(
+            ProtonFilter.Option(ProtonFilter.ALL, 0, getString(R.string.proton_all_cities)),
+        ) + ProtonFilter.cities(nodes, filter.country)
+        if (filter.city != ProtonFilter.ALL && !ProtonFilter.hasCity(nodes, filter.city)) {
+            filter = filter.copy(city = ProtonFilter.ALL)
+        }
+        binding.countryFilter.setAdapter(labels(countryOptions))
+        binding.cityFilter.setAdapter(labels(cityOptions))
+        binding.countryFilter.setText(optionText(filter.country, countryOptions), false)
+        binding.cityFilter.setText(optionText(filter.city, cityOptions), false)
     }
 
     private fun renderNodes() {
         binding.nodeList.removeAllViews()
         val gap = (8 * resources.displayMetrics.density).toInt()
         val visible = visibleNodes()
-        binding.filterLayout.visibility = if (nodes.isEmpty()) View.GONE else View.VISIBLE
+        val hasList = nodes.isNotEmpty()
+        binding.filterLayout.visibility = if (hasList) View.VISIBLE else View.GONE
+        binding.placeFilterRow.visibility = if (hasList) View.VISIBLE else View.GONE
+        binding.sortFilterRow.visibility = if (hasList) View.VISIBLE else View.GONE
         for (node in visible.take(shownLimit)) {
             val button = MaterialButton(
                 this,
@@ -491,7 +587,11 @@ class ProtonActivity : ThemedActivity() {
     }
 
     private fun nodeLabel(node: ProtonNode): String {
-        val place = listOf(node.city, node.country).filter { it.isNotEmpty() }.joinToString(" · ")
+        // Proton 只給兩位國家碼，這裡換成本機語言的國名；換不了就照原碼顯示，不猜。
+        val place = listOf(
+            node.city,
+            node.country.takeIf { it.isNotEmpty() }?.let { countryName(it) },
+        ).filter { it.isNotEmpty() }.joinToString(" · ")
         return if (place.isEmpty()) node.name else "${node.name}   $place"
     }
 

@@ -1014,4 +1014,15 @@
     <string name="proton_captcha_unavailable">Proton не дав CAPTCHA для проходження тут.</string>
     <string name="proton_show_more">Показати більше</string>
     <string name="proton_showing">%1$d із %2$d серверів</string>
+    <string name="proton_country">Країна</string>
+    <string name="proton_city">Місто</string>
+    <string name="proton_sort">Сортування</string>
+    <string name="proton_ipv6_only">Лише IPv6</string>
+    <string name="proton_all_countries">Усі країни</string>
+    <string name="proton_all_cities">Усі міста</string>
+    <string name="proton_sort_balancer">Порядок балансування</string>
+    <string name="proton_sort_name">Ім\'я</string>
+    <string name="proton_signed_in_as">Ви увійшли як: %1$s</string>
+    <string name="proton_signed_in_unknown">Ви увійшли (сесію відновлено, акаунт не збережено)</string>
+    <string name="proton_option_count">%1$s (%2$d)</string>
 </resources>

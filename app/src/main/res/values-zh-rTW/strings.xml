@@ -1006,4 +1006,15 @@
     <string name="proton_captcha_unavailable">Proton 沒有給可在這裡解的 CAPTCHA。</string>
     <string name="proton_show_more">顯示更多</string>
     <string name="proton_showing">顯示 %1$d / 共 %2$d 個伺服器</string>
+    <string name="proton_country">國家</string>
+    <string name="proton_city">城市</string>
+    <string name="proton_sort">排序</string>
+    <string name="proton_ipv6_only">只顯示 IPv6</string>
+    <string name="proton_all_countries">全部國家</string>
+    <string name="proton_all_cities">全部城市</string>
+    <string name="proton_sort_balancer">依 Proton 排程分數</string>
+    <string name="proton_sort_name">名稱</string>
+    <string name="proton_signed_in_as">已登入：%1$s</string>
+    <string name="proton_signed_in_unknown">已登入（沿用工作階段，未記錄帳號）</string>
+    <string name="proton_option_count">%1$s（%2$d）</string>
 </resources>

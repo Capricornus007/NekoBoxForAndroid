@@ -1030,4 +1030,15 @@
     <string name="proton_captcha_unavailable">Aucun CAPTCHA fourni par Proton pour ce réseau.</string>
     <string name="proton_show_more">Afficher plus</string>
     <string name="proton_showing">%1$d serveurs sur %2$d</string>
+    <string name="proton_country">Pays</string>
+    <string name="proton_city">Ville</string>
+    <string name="proton_sort">Tri</string>
+    <string name="proton_ipv6_only">IPv6 uniquement</string>
+    <string name="proton_all_countries">Tous les pays</string>
+    <string name="proton_all_cities">Toutes les villes</string>
+    <string name="proton_sort_balancer">Ordre du répartiteur</string>
+    <string name="proton_sort_name">Nom</string>
+    <string name="proton_signed_in_as">Connecté en tant que : %1$s</string>
+    <string name="proton_signed_in_unknown">Connecté (session réutilisée, compte non enregistré)</string>
+    <string name="proton_option_count">%1$s (%2$d)</string>
 </resources>

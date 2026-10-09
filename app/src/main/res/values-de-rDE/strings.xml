@@ -1026,4 +1026,15 @@
     <string name="proton_captcha_unavailable">Proton hat kein CAPTCHA zum Lösen geliefert.</string>
     <string name="proton_show_more">Mehr anzeigen</string>
     <string name="proton_showing">%1$d von %2$d Servern</string>
+    <string name="proton_country">Land</string>
+    <string name="proton_city">Stadt</string>
+    <string name="proton_sort">Sortierung</string>
+    <string name="proton_ipv6_only">Nur IPv6</string>
+    <string name="proton_all_countries">Alle Länder</string>
+    <string name="proton_all_cities">Alle Städte</string>
+    <string name="proton_sort_balancer">Ausgewogene Reihenfolge</string>
+    <string name="proton_sort_name">Name</string>
+    <string name="proton_signed_in_as">Angemeldet als: %1$s</string>
+    <string name="proton_signed_in_unknown">Angemeldet (Sitzung übernommen, Konto nicht gespeichert)</string>
+    <string name="proton_option_count">%1$s (%2$d)</string>
 </resources>

@@ -1036,4 +1036,15 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_captcha_unavailable">Proton non ha fornito un CAPTCHA da risolvere qui.</string>
     <string name="proton_show_more">Mostra altro</string>
     <string name="proton_showing">%1$d di %2$d server</string>
+    <string name="proton_country">Paese</string>
+    <string name="proton_city">Città</string>
+    <string name="proton_sort">Ordine</string>
+    <string name="proton_ipv6_only">Solo IPv6</string>
+    <string name="proton_all_countries">Tutti i paesi</string>
+    <string name="proton_all_cities">Tutte le città</string>
+    <string name="proton_sort_balancer">Ordine del bilanciatore</string>
+    <string name="proton_sort_name">Nome</string>
+    <string name="proton_signed_in_as">Accesso effettuato come: %1$s</string>
+    <string name="proton_signed_in_unknown">Accesso effettuato (sessione riutilizzata, account non registrato)</string>
+    <string name="proton_option_count">%1$s (%2$d)</string>
 </resources>

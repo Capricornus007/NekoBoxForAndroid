@@ -997,4 +997,15 @@
     <string name="proton_captcha_unavailable">Proton برای حل در اینجا CAPTCHA ارائه نکرد.</string>
     <string name="proton_show_more">نمایش بیشتر</string>
     <string name="proton_showing">%1$d از %2$d سرور</string>
+    <string name="proton_country">کشور</string>
+    <string name="proton_city">شهر</string>
+    <string name="proton_sort">مرتب‌سازی</string>
+    <string name="proton_ipv6_only">فقط IPv6</string>
+    <string name="proton_all_countries">همه کشورها</string>
+    <string name="proton_all_cities">همه شهرها</string>
+    <string name="proton_sort_balancer">ترتیب متعادل‌ساز</string>
+    <string name="proton_sort_name">نام</string>
+    <string name="proton_signed_in_as">وارد شده به عنوان: %1$s</string>
+    <string name="proton_signed_in_unknown">وارد شده (نشست بازیابی شد، حساب ثبت نشد)</string>
+    <string name="proton_option_count">%1$s (%2$d)</string>
 </resources>

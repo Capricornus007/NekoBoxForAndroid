@@ -1025,4 +1025,15 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_captcha_unavailable">Proton はここで解ける CAPTCHA を返しませんでした。</string>
     <string name="proton_show_more">もっと見る</string>
     <string name="proton_showing">%2$d 件中 %1$d のサーバー</string>
+    <string name="proton_country">国</string>
+    <string name="proton_city">都市</string>
+    <string name="proton_sort">並べ替え</string>
+    <string name="proton_ipv6_only">IPv6 のみ</string>
+    <string name="proton_all_countries">すべての国</string>
+    <string name="proton_all_cities">すべての都市</string>
+    <string name="proton_sort_balancer">バランサー順</string>
+    <string name="proton_sort_name">名前</string>
+    <string name="proton_signed_in_as">ログイン中：%1$s</string>
+    <string name="proton_signed_in_unknown">ログイン中（セッションを引き継ぎ、アカウント名は未記録）</string>
+    <string name="proton_option_count">%1$s（%2$d）</string>
 </resources>

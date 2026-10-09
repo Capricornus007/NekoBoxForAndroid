@@ -1022,4 +1022,15 @@
     <string name="proton_captcha_unavailable">Proton не даў CAPTCHA для вырашэння тут.</string>
     <string name="proton_show_more">Паказаць яшчэ</string>
     <string name="proton_showing">%1$d з %2$d сервераў</string>
+    <string name="proton_country">Краіна</string>
+    <string name="proton_city">Горад</string>
+    <string name="proton_sort">Сартаванне</string>
+    <string name="proton_ipv6_only">Толькі IPv6</string>
+    <string name="proton_all_countries">Усе краіны</string>
+    <string name="proton_all_cities">Усе гарады</string>
+    <string name="proton_sort_balancer">Парадак збалансавання</string>
+    <string name="proton_sort_name">Імя</string>
+    <string name="proton_signed_in_as">Вы ўвайшлі як: %1$s</string>
+    <string name="proton_signed_in_unknown">Вы ўвайшлі (сесія адноўлена, уліковы запіс не захаваны)</string>
+    <string name="proton_option_count">%1$s (%2$d)</string>
 </resources>
