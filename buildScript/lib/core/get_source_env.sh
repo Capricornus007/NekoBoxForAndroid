@@ -49,7 +49,10 @@
 # `ERROR network: update interfaces: ... netlinkrib: permission denied`，且介面清單永遠是空的：
 # bind_interface、network= 規則、default_network_strategy、閘道偵測全部拿不到資料。
 # 修法是接上 Kotlin 早就寫好的 getInterfaces()，落在 nb4a 這側（同一筆提交），不是調日誌等級。
-export COMMIT_SING_BOX="f0c8a4f17583df07877ff21159c0c9518098962a"
+# mod.39（3c9399de）：xhttp packet-up 上傳中斷時不再丟棄真正的錯。之前上傳 goroutine 只
+# `uploadPipeReader.Interrupt()` 就 return，呼叫端永遠只看到無從查考的 `io.ErrClosedPipe`；
+# 補上 cause 之後同一條飄紅立刻變成 `xHTTP packet-up POST failed: use of closed network connection`。
+export COMMIT_SING_BOX="3c9399de0766ee7c371b92791b30c9e9a1f0e398"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
@@ -58,7 +61,7 @@ export COMMIT_SING_BOX="f0c8a4f17583df07877ff21159c0c9518098962a"
 # 所以基號是 alpha.11。抬基號時這裡與 nb4a.properties 的 SINGBOX_VERSION 要一起改，
 # scripts/check-core-pins.sh 段 1c 就是抓這個的——「Update sing-box core」那條 bot
 # 已經自己算出 alpha.11，是這兩處拖著沒跟上。
-export VERSION_SING_BOX="1.15.0-alpha.11-mod.38"
+export VERSION_SING_BOX="1.15.0-alpha.11-mod.39"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
