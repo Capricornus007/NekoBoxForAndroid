@@ -66,6 +66,8 @@
     <string name="lan_sharing">LAN / Hotspot (Root)</string>
     <string name="lan_sharing_summary">Wi-Fi ve USB VPN uzerinden yonlendir</string>
     <string name="lan_sharing_requires_root">Root gerekli, kullanilamiyor</string>
+    <string name="root_waiting_grant">root izni bekleniyor</string>
+    <string name="root_denied">NB4A için root reddedildi</string>
     <string name="require_proxy_in_vpn">VPN modunda yerel proxy\'yi açık tut</string>
     <string name="require_proxy_in_vpn_sum">VPN modundayken yerel SOCKS/HTTP proxy portunu açık tut. Varsayılan olarak kapalı: VPN modunda bağlantı noktası genellikle gereksizdir ve açık bırakmak diğer uygulamaların erişmesine izin verir.</string>
     <string name="proxy_mode_inbound_auth">Proxy modunda yerel proxy\'yi doğrula</string>

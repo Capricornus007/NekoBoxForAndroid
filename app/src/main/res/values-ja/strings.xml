@@ -626,6 +626,8 @@
     <string name="lan_sharing">LAN共有</string>
     <string name="lan_sharing_summary">LANデバイスの接続を許可</string>
     <string name="lan_sharing_requires_root">LAN共有にはrootが必要</string>
+    <string name="root_waiting_grant">root 権限の許可待ち</string>
+    <string name="root_denied">NB4A は root を拒否されました</string>
     <string name="speed_test_mode">スピードテスト方式</string>
     <string name="speed_test_mode_download">ダウンロードのみ</string>
     <string name="speed_test_mode_download_upload">ダウンロード + アップロード</string>

@@ -301,6 +301,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="lan_sharing">LAN 分享</string>
     <string name="lan_sharing_summary">允許區域網路裝置連入</string>
     <string name="lan_sharing_requires_root">LAN 分享需要 Root 權限</string>
+    <string name="root_waiting_grant">請在 Root 管理 App 按允許</string>
+    <string name="root_denied">NB4A 已被拒絕 Root</string>
     <string name="deprecated">已棄用</string>
     <string name="connecting">連線中…</string>
     <string name="vpn_connected">已連線，點擊檢查連線</string>

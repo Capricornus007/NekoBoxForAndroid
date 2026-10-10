@@ -885,6 +885,8 @@
     <string name="mixed_auth_no_auth">Не зададзена (без аўтэнтыфікацыі)</string>
     <string name="lan_sharing">Агульны доступ па LAN</string>
     <string name="lan_sharing_requires_root">Агульны доступ па LAN патрабуе root</string>
+    <string name="root_waiting_grant">Чакаем дазволу root</string>
+    <string name="root_denied">NB4A адмоўлена ў root</string>
     <string name="lan_sharing_summary">Дазволіць падключэнне прылад лакальнай сеткі</string>
     <string name="plugin_approval_conflict_message">Гэты плагін прадастаўляюць некалькі ненадзейных пакетаў: %1$s\n\nВырашыце канфлікт, перш чым ухваляць пакет.</string>
     <string name="ws_max_early_data">Макс. early data</string>

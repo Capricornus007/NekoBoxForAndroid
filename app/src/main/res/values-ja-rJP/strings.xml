@@ -671,6 +671,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="invalid_amnezia_config">無効な AmneziaWG 設定</string>
     <string name="lan_sharing">LAN 共有</string>
     <string name="lan_sharing_requires_root">LAN 共有には root が必要</string>
+    <string name="root_waiting_grant">root 権限の許可待ち</string>
+    <string name="root_denied">NB4A は root を拒否されました</string>
     <string name="lan_sharing_summary">LAN デバイスの接続を許可</string>
     <string name="lifetime_traffic">累計トラフィック：%1$s↑ %2$s↓</string>
     <string name="mal_close">閉じる</string>

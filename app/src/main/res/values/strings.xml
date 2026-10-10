@@ -916,6 +916,8 @@
     <string name="invalid_amnezia_config">Invalid AmneziaWG config</string>
     <string name="lan_sharing">LAN Sharing</string>
     <string name="lan_sharing_requires_root">LAN sharing requires root</string>
+    <string name="root_waiting_grant">Waiting for root permission</string>
+    <string name="root_denied">NB4A was denied root</string>
     <string name="lan_sharing_summary">Allow LAN devices to connect</string>
     <string name="lifetime_traffic">Lifetime: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>

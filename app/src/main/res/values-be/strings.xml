@@ -127,6 +127,8 @@
     <string name="lan_sharing">Агульны доступ па LAN</string>
     <string name="lan_sharing_summary">Дазволіць падключэнне прылад лакальнай сеткі</string>
     <string name="lan_sharing_requires_root">Агульны доступ па LAN патрабуе root</string>
+    <string name="root_waiting_grant">Чакаем дазволу root</string>
+    <string name="root_denied">NB4A адмоўлена ў root</string>
     <string name="speed_test_mode">Рэжым тэсту хуткасці</string>
     <string name="speed_test_mode_download">Толькі спампоўка</string>
     <string name="speed_test_mode_download_upload">Спампоўка + аддача</string>

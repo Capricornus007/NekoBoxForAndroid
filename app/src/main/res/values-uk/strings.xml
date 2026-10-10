@@ -688,6 +688,8 @@
     <string name="lan_sharing">Спільний доступ через LAN</string>
     <string name="lan_sharing_summary">Дозволити підключення пристроїв локальної мережі</string>
     <string name="lan_sharing_requires_root">Спільний доступ через LAN потребує root</string>
+    <string name="root_waiting_grant">Очікування дозволу root</string>
+    <string name="root_denied">NB4A відмовлено у root</string>
     <string name="speed_test_mode">Режим тесту швидкості</string>
     <string name="speed_test_mode_download">Лише завантаження</string>
     <string name="speed_test_mode_download_upload">Завантаження + вивантаження</string>

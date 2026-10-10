@@ -71,6 +71,8 @@
     <string name="lan_sharing">LAN / Partage (Root)</string>
     <string name="lan_sharing_summary">Router Wi-Fi et USB via VPN</string>
     <string name="lan_sharing_requires_root">Acces Root requis, indisponible</string>
+    <string name="root_waiting_grant">En attente de l\'autorisation root</string>
+    <string name="root_denied">Root refusé pour NB4A</string>
     <string name="require_proxy_in_vpn">Conserver le proxy local en mode VPN</string>
     <string name="require_proxy_in_vpn_sum">Conserver le port du proxy local SOCKS/HTTP ouvert en mode VPN. Désactivé par défaut : en mode VPN, le port est généralement inutile et le laisser ouvert permet à d\'autres applications d\'y accéder.</string>
     <string name="proxy_mode_inbound_auth">Authentifier le proxy local en mode Proxy</string>

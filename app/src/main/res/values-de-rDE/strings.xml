@@ -677,6 +677,8 @@
     <string name="invalid_amnezia_config">Ungültige oder beschädigte Amnezia-Konfiguration</string>
     <string name="lan_sharing">LAN / Hotspot (Nur Root)</string>
     <string name="lan_sharing_requires_root">Root erforderlich, nicht verfugbar</string>
+    <string name="root_waiting_grant">Warte auf Root-Berechtigung</string>
+    <string name="root_denied">NB4A wurde Root verweigert</string>
     <string name="lan_sharing_summary">WLAN/USB uber VPN routen</string>
     <string name="lifetime_traffic">Gesamt: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>

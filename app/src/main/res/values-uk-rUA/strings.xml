@@ -687,6 +687,8 @@
     <string name="invalid_amnezia_config">Недійсна або пошкоджена конфігурація Amnezia</string>
     <string name="lan_sharing">LAN спільний доступ</string>
     <string name="lan_sharing_requires_root">LAN спільний доступ потребує root</string>
+    <string name="root_waiting_grant">Очікування дозволу root</string>
+    <string name="root_denied">NB4A відмовлено у root</string>
     <string name="lan_sharing_summary">Дозволити пристроям у LAN підключатися</string>
     <string name="lifetime_traffic">За весь час: %1$s↑ %2$s↓</string>
     <string name="mal_close">mal close</string>

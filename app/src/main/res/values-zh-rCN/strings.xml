@@ -666,6 +666,8 @@
     <string name="lan_sharing">局域网共享</string>
     <string name="lan_sharing_summary">允许局域网设备接入</string>
     <string name="lan_sharing_requires_root">局域网共享需要 Root</string>
+    <string name="root_waiting_grant">請在 Root 管理 App 按允許</string>
+    <string name="root_denied">NB4A 已被拒絕 Root</string>
     <string name="lines">%d 行</string>
     <string name="quick_clear_cache_restart">清除快取后重新启动</string>
     <string name="speed_test_finished_summary">完成：%1$d，失败：%2$d，已取消：%3$d</string>

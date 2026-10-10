@@ -684,6 +684,8 @@
     <string name="lan_sharing">Compartir en LAN</string>
     <string name="lan_sharing_summary">Permitir que los dispositivos de la red local se conecten</string>
     <string name="lan_sharing_requires_root">Compartir en LAN requiere root</string>
+    <string name="root_waiting_grant">Esperando permiso de root</string>
+    <string name="root_denied">Se denegó root a NB4A</string>
     <string name="speed_test_mode">Modo de test de velocidad</string>
     <string name="speed_test_mode_download">Solo descarga</string>
     <string name="speed_test_mode_download_upload">Descarga + subida</string>

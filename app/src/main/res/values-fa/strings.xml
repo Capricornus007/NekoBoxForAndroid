@@ -655,6 +655,8 @@
     <string name="lan_sharing">اشتراک LAN</string>
     <string name="lan_sharing_summary">اجازه دادن به دستگاه‌های شبکه محلی برای اتصال</string>
     <string name="lan_sharing_requires_root">اشتراک LAN به root نیاز دارد</string>
+    <string name="root_waiting_grant">در انتظار مجوز root</string>
+    <string name="root_denied">مجوز root برای NB4A رد شد</string>
     <string name="speed_test_mode">حالت تست سرعت</string>
     <string name="speed_test_mode_download">فقط دانلود</string>
     <string name="speed_test_mode_download_upload">دانلود + آپلود</string>

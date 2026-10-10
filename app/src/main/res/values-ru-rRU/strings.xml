@@ -688,6 +688,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="invalid_amnezia_config">Некорректная или повреждённая конфигурация Amnezia</string>
     <string name="lan_sharing">LAN доступ</string>
     <string name="lan_sharing_requires_root">LAN доступ требуется root</string>
+    <string name="root_waiting_grant">Ожидание разрешения root</string>
+    <string name="root_denied">NB4A отказано в root</string>
     <string name="lan_sharing_summary">Разрешить устройствам в LAN подключаться</string>
     <string name="lifetime_traffic">За всё время: %1$s↑ %2$s↓</string>
     <string name="mal_close">Закрыть</string>

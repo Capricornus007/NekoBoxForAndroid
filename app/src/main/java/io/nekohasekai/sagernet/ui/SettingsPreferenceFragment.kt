@@ -385,20 +385,39 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                     Logs.w(e)
                 }
                 // root 不可用時原本的狀態是「開關打開、什麼都沒發生、只在日誌留一行 warning」，
-                // 使用者會以為已經生效。探測 root 要起 su 進程（最多等 10 秒）不能放主執行緒，
+                // 使用者會以為已經生效。探測 root 要起 su 進程（可能要等人按允許）不能放主執行緒，
                 // 所以先讓它打開、探不到再退回並說明原因。
-                if (enabled && !RootManager.cachedRoot() && !RootManager.refresh()) {
-                    runOnMainDispatcher {
-                        (preference as SwitchPreferenceCompat).isChecked = false
-                        if (isAdded) {
-                            Toast.makeText(
-                                requireContext(),
-                                R.string.lan_sharing_requires_root,
-                                Toast.LENGTH_SHORT,
-                            ).show()
+                // 這裡要分三種失敗：沒装 su、被明確拒絕、以及 su 卡在授權視窗等人按允許——
+                // 後兩者給同一句話的話，使用者會以為自己「沒有 root」而去找別的方案。
+                if (enabled && !RootManager.cachedRoot()) {
+                    val status = RootManager.refreshDetailed {
+                        runOnMainDispatcher {
+                            if (isAdded) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    R.string.root_waiting_grant,
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            }
                         }
                     }
-                    return@runOnDefaultDispatcher
+                    if (status != RootManager.Status.GRANTED) {
+                        runOnMainDispatcher {
+                            (preference as SwitchPreferenceCompat).isChecked = false
+                            if (isAdded) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    when (status) {
+                                        RootManager.Status.DENIED -> R.string.root_denied
+                                        RootManager.Status.WAITING -> R.string.root_waiting_grant
+                                        else -> R.string.lan_sharing_requires_root
+                                    },
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            }
+                        }
+                        return@runOnDefaultDispatcher
+                    }
                 }
                 // 隧道沒在跑時不動作：此時沒有可分享的進程，設定留給下次連線由 lateInit 套用。
                 if (DataStore.serviceState.canStop) {

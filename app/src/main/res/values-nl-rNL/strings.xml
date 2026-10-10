@@ -900,6 +900,8 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
         heeft met uw Android geknoeid, waardoor de plug-in onbruikbaar is.</string>
     <string name="lan_sharing">LAN-delen</string>
     <string name="lan_sharing_requires_root">LAN-delen vereist root</string>
+    <string name="root_waiting_grant">Wachten op root-machtiging</string>
+    <string name="root_denied">Root geweigerd voor NB4A</string>
     <string name="lan_sharing_summary">LAN-apparaten toestaan om te verbinden</string>
     <string name="plugin_approval_conflict_message">Meer dan één onbetrouwbaar pakket biedt deze plug-in: %1$s\n\nLos het conflict op voordat u een pakket goedkeurt.</string>
     <string name="ws_max_early_data">Max. early data</string>

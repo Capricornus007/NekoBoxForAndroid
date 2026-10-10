@@ -67,6 +67,8 @@
     <string name="lan_sharing">LAN / Hotspot (Nur Root)</string>
     <string name="lan_sharing_summary">WLAN/USB uber VPN routen</string>
     <string name="lan_sharing_requires_root">Root erforderlich, nicht verfugbar</string>
+    <string name="root_waiting_grant">Warte auf Root-Berechtigung</string>
+    <string name="root_denied">NB4A wurde Root verweigert</string>
     <string name="require_proxy_in_vpn">Lokalen Proxy im VPN-Modus beibehalten</string>
     <string name="require_proxy_in_vpn_sum">Den lokalen SOCKS-/HTTP-Proxy-Port im VPN-Modus offen lassen. Standardmäßig deaktiviert: Im VPN-Modus wird der Port normalerweise nicht benötigt, und offen gelassen könnten andere Apps darauf zugreifen.</string>
     <string name="proxy_mode_inbound_auth">Lokalen Proxy im Proxy-Modus authentifizieren</string>

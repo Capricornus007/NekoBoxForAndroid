@@ -889,6 +889,8 @@
     <string name="speed_test_url_invalid">یک URL معتبر HTTP یا HTTPS وارد کنید</string>
     <string name="lan_sharing">اشتراک LAN</string>
     <string name="lan_sharing_requires_root">اشتراک LAN به root نیاز دارد</string>
+    <string name="root_waiting_grant">در انتظار مجوز root</string>
+    <string name="root_denied">مجوز root برای NB4A رد شد</string>
     <string name="lan_sharing_summary">اجازه دادن به دستگاه‌های شبکه محلی برای اتصال</string>
     <string name="plugin_approval_conflict_message">بیش از یک بسته نامعتبر این افزونه را فراهم می‌کند: %1$s\n\nقبل از تأیید یک بسته، تعارض را حل کنید.</string>
     <string name="ws_max_early_data">حداکثر early data</string>

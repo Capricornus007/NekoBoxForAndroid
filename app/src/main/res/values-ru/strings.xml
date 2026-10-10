@@ -701,6 +701,8 @@
     <string name="lan_sharing">Общий доступ по LAN</string>
     <string name="lan_sharing_summary">Разрешить подключение устройств из локальной сети</string>
     <string name="lan_sharing_requires_root">Общий доступ по LAN требует root</string>
+    <string name="root_waiting_grant">Ожидание разрешения root</string>
+    <string name="root_denied">NB4A отказано в root</string>
     <string name="speed_test_mode">Режим теста скорости</string>
     <string name="speed_test_mode_download">Только загрузка</string>
     <string name="speed_test_mode_download_upload">Загрузка + отдача</string>

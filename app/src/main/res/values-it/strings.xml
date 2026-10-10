@@ -821,6 +821,8 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="lan_sharing">Condivisione LAN</string>
     <string name="lan_sharing_summary">Consenti ai dispositivi LAN di connettersi</string>
     <string name="lan_sharing_requires_root">La condivisione LAN richiede i permessi di root</string>
+    <string name="root_waiting_grant">In attesa dell\'autorizzazione root</string>
+    <string name="root_denied">Root negato a NB4A</string>
     <string name="speed_test_mode">Modalità speed test</string>
     <string name="speed_test_mode_download">Solo download</string>
     <string name="speed_test_mode_download_upload">Download + upload</string>

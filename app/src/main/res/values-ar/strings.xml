@@ -52,6 +52,8 @@
     <string name="lan_sharing">مشاركة LAN (Root فقط)</string>
     <string name="lan_sharing_summary">توجيه Wi-Fi و USB عبر VPN</string>
     <string name="lan_sharing_requires_root">صلاحية Root غير متوفرة</string>
+    <string name="root_waiting_grant">بانتظار إذن root</string>
+    <string name="root_denied">رُفض منح root لـ NB4A</string>
     <string name="require_proxy_in_vpn">إبقاء الوكيل المحلي في وضع VPN</string>
     <string name="require_proxy_in_vpn_sum">إبقاء منفذ وكيل SOCKS/HTTP المحلي مفتوحًا أثناء وضع VPN. مُعطّل افتراضيًا: في وضع VPN لا يُحتاج للمنفذ عادةً وتركه مفتوحًا يسمح للتطبيقات الأخرى بالوصول إليه.</string>
     <string name="proxy_mode_inbound_auth">مصادقة الوكيل المحلي في وضع الوكيل</string>

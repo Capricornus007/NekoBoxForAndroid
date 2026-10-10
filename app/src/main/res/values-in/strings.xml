@@ -798,6 +798,8 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="lan_sharing">Berbagi LAN</string>
     <string name="lan_sharing_summary">Izinkan perangkat LAN terhubung</string>
     <string name="lan_sharing_requires_root">Berbagi LAN membutuhkan root</string>
+    <string name="root_waiting_grant">Menunggu izin root</string>
+    <string name="root_denied">Izin root untuk NB4A ditolak</string>
     <string name="speed_test_mode">Mode uji kecepatan</string>
     <string name="speed_test_mode_download">Hanya unduh</string>
     <string name="speed_test_mode_download_upload">Unduh + unggah</string>
