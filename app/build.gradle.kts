@@ -211,6 +211,39 @@ val buildProtonvpn = tasks.register("buildProtonvpn") {
     }
 }
 
+// eBPF 第三條路的 root core（libsingbox.so）。同一個道理：這支 sidecar 缺了，eBPF 模式
+// 按下去就是死的（探針跟隧道都要靠 `su -c libsingbox.so` 起一個有 CAP_BPF 的行程），
+// 所以這裡也不設計降級路徑。
+//
+// 代價要先講清楚：這顆是整個 sing-box（含 tailscale）靜態鏈成一個可執行檔，跟 libcore 裡
+// 那顆 libgojni.so 同量級（實測 arm64 46MB）。包是按 ABI 拆的，所以每顆發布包只多帶自己
+// 那一支，腳本最後會把 du 印進日誌，數字要是有問題看得見。
+val buildSingboxSidecar = tasks.register("buildSingboxSidecar") {
+    val sbAbis = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+    val scriptPath = rootProject.file("buildScript/lib/singbox-sidecar.sh").absolutePath
+    val rootPath = rootProject.projectDir.absolutePath
+    val appDirPath = projectDir.absolutePath
+    val soPaths = sbAbis.map { "$appDirPath/executableSo/$it/libsingbox.so" }
+    inputs.file(scriptPath)
+    outputs.files(soPaths)
+    doLast {
+        val missing = soPaths.any { !File(it).exists() }
+        if (missing || System.getenv("FORCE_SINGBOX") == "1") {
+            val proc = ProcessBuilder("bash", scriptPath)
+                .directory(File(rootPath))
+                .inheritIO()
+                .start()
+            val code = proc.waitFor()
+            if (code != 0) {
+                throw GradleException(
+                    "singbox-sidecar.sh failed with exit code $code: 缺 libsingbox.so 時 eBPF " +
+                        "第三條路完全起不來，所以這裡不允許跳過。",
+                )
+            }
+        }
+    }
+}
+
 tasks.named("preBuild") {
-    dependsOn(buildHevTun, buildProtonvpn)
+    dependsOn(buildHevTun, buildProtonvpn, buildSingboxSidecar)
 }

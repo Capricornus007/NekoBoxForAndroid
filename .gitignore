@@ -35,6 +35,11 @@ local.properties
 /.olcrtc-wrapper/
 /.protonvpn-build/
 /.protonvpn-wrapper/
+# sing-box sidecar 的暫來源樹（git worktree 或淺層克隆），每次跑完由腳本自己收掉。
+/.singbox-sidecar-build/
+# buildScript/lib/core/*.py 跑完留下的位元組碼，之前有一顆 .pyc 被誤提交進倉。
+__pycache__/
+*.pyc
 /buildScript/lib/olcrtc-src/go.sum
 /buildScript/lib/protonvpn-src/go.sum
 

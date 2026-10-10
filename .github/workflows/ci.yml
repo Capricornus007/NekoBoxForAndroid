@@ -181,8 +181,11 @@ jobs:
             buildScript/lib/olcrtc-src/go.mod \
             buildScript/lib/protonvpn.sh \
             buildScript/lib/protonvpn-src \
+            buildScript/lib/singbox-sidecar.sh \
+            buildScript/lib/core/get_source_env.sh \
             buildScript/init/env.sh \
             buildScript/init/env_ndk.sh \
+            libcore/build.sh \
             | sha1sum > sidecars_status
       - name: Sidecars Cache
         id: cache
@@ -211,6 +214,9 @@ jobs:
       - name: Proton Build
         if: steps.cache.outputs.cache-hit != 'true'
         run: ./run lib protonvpn
+      - name: Sing-box Sidecar Build
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: ./run lib singbox-sidecar
       - name: Upload Sidecars
         uses: actions/upload-artifact@v7 # v7
         with:
@@ -271,7 +277,7 @@ jobs:
       - name: Verify Sidecar Artifacts
         run: |
           for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-            for so in libmieru.so libmasterdnsvpn.so libnaive.so libolcrtc.so libprotonvpn.so; do
+            for so in libmieru.so libmasterdnsvpn.so libnaive.so libolcrtc.so libprotonvpn.so libsingbox.so; do
               if [ ! -f "app/executableSo/$abi/$so" ]; then
                 echo "Error: missing app/executableSo/$abi/$so (sidecar artifact missing)" >&2
                 exit 1
