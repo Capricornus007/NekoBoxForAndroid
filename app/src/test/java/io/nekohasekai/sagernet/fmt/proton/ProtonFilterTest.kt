@@ -29,6 +29,48 @@ class ProtonFilterTest {
         Locale.setDefault(savedLocale)
     }
 
+    // 拼音序要用實物釘，不能假設：Collator 的 zh 規則在 JVM 與 Android 上實作不同。
+    // 四個國家挑「阿、比、德、日」開頭：拼音是 a < bi < de < ri，碼位卻是 德(U+5FB0) <
+    // 日(U+65E5) < 比(U+6BD4) < 阿(U+963F)，剛好完全相反，照碼位排一定紅。
+    // 這四個字繁簡同形，是因为 JDK 內建的 zh 表對「只有繁體才有」的字（愛、韓）沒收拼音權重，
+    // 用它们當斷言會在 JVM 假紅——但 Android 用的是 ICU，繁體一樣走拼音，所以繁體那一條
+    // 另外在實機驗。斷言用兩位碼而不是譯名，避免被 CLDR 版本的字串差異假紅。
+    @Test
+    fun countriesFollowPinyinInChineseLocales() {
+        val saved = Locale.getDefault()
+        try {
+            val places = listOf(
+                node("a1", "JP#1", "JP", "Tokyo"),
+                node("a2", "DE#1", "DE", "Berlin"),
+                node("a3", "BE#1", "BE", "Brussels"),
+                node("a4", "AL#1", "AL", "Tirana"),
+            )
+            val expected = listOf("AL", "BE", "DE", "JP")
+            for (tag in listOf("zh-TW", "zh-CN")) {
+                Locale.setDefault(Locale.forLanguageTag(tag))
+                val options = ProtonFilter.countries(places)
+                assertEquals("tag=$tag keys", expected, options.map { it.key })
+                // 順帶確認這個語系下真的有譯名：國名若還是兩位大寫碼，上面那條就會退化成
+                // 排英文、測不到拼音。（不能只比長度，「日本」本身就只有兩格。）
+                val labels = options.map { it.label }
+                assertTrue("tag=$tag labels=$labels", labels.none { it.matches(Regex("^[A-Z]{2}$")) })
+            }
+        } finally {
+            Locale.setDefault(saved)
+        }
+    }
+
+    // 非中文語系不能被他牽動：英文下還是字母序。
+    @Test
+    fun countriesStayAlphabeticOutsideChinese() {
+        val places = listOf(
+            node("b1", "IE#1", "IE", "Dublin"),
+            node("b2", "AL#1", "AL", "Tirana"),
+            node("b3", "BE#1", "BE", "Brussels"),
+        )
+        assertEquals(listOf("AL", "BE", "IE"), ProtonFilter.countries(places).map { it.key })
+    }
+
     private fun node(
         id: String,
         name: String,

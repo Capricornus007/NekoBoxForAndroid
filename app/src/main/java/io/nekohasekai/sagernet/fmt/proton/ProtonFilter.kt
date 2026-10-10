@@ -43,12 +43,20 @@ data class ProtonFilter(
 
             Sort.NAME -> matched.sortedWith(compareBy({ it.name.lowercase() }, { it.loadRank }, { it.scoreRank }))
 
+            // 「按國家／按城市」排節點也要用同一條比較器：否則下拉裡看到的是拼音序，
+            // 清單本身卻還是碼位序，同一個名字在兩個地方排兩樣，比不排更難解釋。
             Sort.COUNTRY -> matched.sortedWith(
-                compareBy({ it.countryKey }, { cityName(it.city).lowercase() }, { it.loadRank }, { it.scoreRank }),
+                byPlaceName<ProtonNode> { countryName(it.countryKey) }
+                    .thenComparator { a, b -> comparePlaceNames(cityName(a.city), cityName(b.city)) }
+                    .thenBy { it.loadRank }
+                    .thenBy { it.scoreRank },
             )
 
             Sort.CITY -> matched.sortedWith(
-                compareBy({ cityName(it.city).lowercase() }, { it.countryKey }, { it.loadRank }, { it.scoreRank }),
+                byPlaceName<ProtonNode> { cityName(it.city) }
+                    .thenComparator { a, b -> comparePlaceNames(countryName(a.countryKey), countryName(b.countryKey)) }
+                    .thenBy { it.loadRank }
+                    .thenBy { it.scoreRank },
             )
         }
     }
@@ -59,7 +67,7 @@ data class ProtonFilter(
         fun countries(nodes: List<ProtonNode>): List<Option> = nodes.groupingBy { it.countryKey }
             .eachCount()
             .map { (key, count) -> Option(key, count, countryName(key)) }
-            .sortedWith(compareBy({ it.label }, { -it.count }))
+            .sortedWith(placeNameOrder())
 
         // 城市要跟著國家走，否則選了日本卻列出美國的城市。
         fun cities(nodes: List<ProtonNode>, country: String): List<Option> {
@@ -71,8 +79,11 @@ data class ProtonFilter(
                 .map { (key, count) ->
                     Option(key, count, cityName(nodes.first { it.city.lowercase() == key }.city))
                 }
-                .sortedWith(compareBy({ it.label }, { -it.count }))
+                .sortedWith(placeNameOrder())
         }
+
+        // 下拉的排序鍵：名稱用上面那條比較器，同名（不該發生，但防呆）再按台數多的排前面。
+        private fun placeNameOrder(): Comparator<Option> = byPlaceName<Option> { it.label }.thenByDescending { it.count }
 
         fun hasCountry(nodes: List<ProtonNode>, key: String) = nodes.any { it.countryKey == key.trim().uppercase(Locale.ROOT) }
 
@@ -83,6 +94,10 @@ data class ProtonFilter(
 }
 
 private val ProtonNode.countryKey: String get() = country.trim().uppercase(Locale.ROOT)
+
+// 按顯示名排序：中文走拼音序、其他語系走大小寫不敏感字母序。抽成一個函式是因為下拉與
+// 清單必須共用同一套，否則同一個名字在兩個地方會排出兩種順序。
+private fun <T> byPlaceName(key: (T) -> String): Comparator<T> = Comparator { a, b -> comparePlaceNames(key(a), key(b)) }
 
 // 沒有 load 的舊快取要排在最後，而不是被當成「最空」排到第一。
 private val ProtonNode.loadRank: Int get() = load.takeIf { it >= 0 } ?: Int.MAX_VALUE

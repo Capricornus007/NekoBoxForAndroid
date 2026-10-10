@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.fmt.proton
 
+import java.text.Collator
 import java.util.Locale
 
 /**
@@ -13,6 +14,21 @@ fun cityName(city: String): String {
     val locale = Locale.getDefault()
     if (locale.language != "zh") return city
     return (if (wantsSimplified(locale)) CITY_ZH_HANS else CITY_ZH_HANT)[city] ?: city
+}
+
+// 中文語系下顯示名要按我們唸的拼音排，不是 Unicode 碼位序：「愛爾蘭」的「愛」(U+611B)
+// 碼位比「阿爾巴尼亞」的「阿」(U+963F) 小，照碼位排會把 ài 排到 ā 前面，跟任何人翻字典
+// 的順序都不一樣。非中文語系維持大小寫不敏感的字母序。
+// 判斷語系要用跟 cityName 同一個 Locale.getDefault()，否則會出現「顯示的是中文、
+// 排的卻是英文序」這種對不上的情況。
+private val zhCollator: Collator by lazy { Collator.getInstance(Locale.CHINA) }
+
+// Collator 自己不是執行緒安全的（ICU 文件明寫），而快取重現與 UI 刷新可能落在不同協程，
+// 所以每次比對前先 clone 一份。排序量只有幾百筆，多這一次拷貝的成本可以忽略。
+fun comparePlaceNames(a: String, b: String): Int = if (Locale.getDefault().language != "zh") {
+    a.compareTo(b, ignoreCase = true)
+} else {
+    (zhCollator.clone() as Collator).compare(a, b)
 }
 
 // 只有繁中／簡中之間要分表，其他中文變體（含只帶 script 的 tag）都走繁中基準。
