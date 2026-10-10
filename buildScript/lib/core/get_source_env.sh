@@ -29,11 +29,15 @@
 # 抬到尖端的另一個原因是 libcore 已經把 sing-tun 換到 6d0ca107，而 sing-box 只有在
 # mod.33 之後的 go.mod 才帶同一條 replace；兩邊不一致時 APK 吃 libcore 那版、
 # sing-box 自己 CI 測的是另一版，scripts/check-core-pins.sh 段 1b/1e 就是抓這個的。
-export COMMIT_SING_BOX="6f3422e78ab85f40d0e0fbde13ed74fe6380e3b0"
+# mod.35（34727ed7）：吃進 eBPF inbound（cgroup+TC 引擎 10589 行 + protocol/ebpf 適配層）
+# 與 `ebpf-probe` CLI。go.mod 只多一個 github.com/cilium/ebpf v0.22.0，三條 replace 指針
+# （wireguard-go / sing-quic / sing）與 mod.34 完全相同，所以 check-core-pins.sh 段 1 不會
+# 因為這次抬版變紅。
+export COMMIT_SING_BOX="34727ed70472ff57c80ea617419fdec696a10bfd"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.34"
+export VERSION_SING_BOX="1.15.0-alpha.10-mod.35"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
