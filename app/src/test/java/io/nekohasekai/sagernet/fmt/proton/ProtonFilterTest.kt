@@ -71,6 +71,15 @@ class ProtonFilterTest {
         assertEquals(listOf("AL", "BE", "IE"), ProtonFilter.countries(places).map { it.key })
     }
 
+    // 下拉選完之後，控件會拿條目的 toString() 回填輸入框。data class 的預設
+    // toString 是 `Option(key=…, count=…, label=…)`，實測城市那格就顯示成
+    // `label=倫敦)`（前面被欄位寬度截掉）。這條釘住：toString 必須就是顯示名。
+    @Test
+    fun optionToStringIsTheDisplayLabel() {
+        val option = ProtonFilter.Option("london", 8, "倫敦")
+        assertEquals("倫敦", option.toString())
+    }
+
     private fun node(
         id: String,
         name: String,

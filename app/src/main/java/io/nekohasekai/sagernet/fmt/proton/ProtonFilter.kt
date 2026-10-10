@@ -90,7 +90,13 @@ data class ProtonFilter(
         fun hasCity(nodes: List<ProtonNode>, key: String) = nodes.any { it.city.lowercase() == key.trim().lowercase() }
     }
 
-    data class Option(val key: String, val count: Int, val label: String)
+    data class Option(val key: String, val count: Int, val label: String) {
+        // 選單控件選完會拿條目的 toString() 回填輸入框（城市那格就是踩這個：
+        // 顯示成 `label=倫敦)`，其實是 data class 預設的
+        // `Option(key=…, count=…, label=倫敦)` 被欄位寬度截掉前面）。
+        // 實作成顯示名之後，任何走 toString 的路徑都正確，內建過濾也改成比對顯示名。
+        override fun toString(): String = label
+    }
 }
 
 private val ProtonNode.countryKey: String get() = country.trim().uppercase(Locale.ROOT)
