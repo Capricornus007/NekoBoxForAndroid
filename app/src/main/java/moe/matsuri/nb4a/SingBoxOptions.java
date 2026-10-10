@@ -3426,6 +3426,92 @@ public class SingBoxOptions {
 
     }
 
+    public static class Inbound_EBPFOptions extends Inbound {
+
+        public String mode;
+
+        // Generate note: Listable
+        public List<String> network;
+
+        public Long udp_timeout;
+
+        public String dns_mode;
+
+        public Boolean bypass_private_address;
+
+        // Generate note: Listable
+        public List<String> bypass_rule_set;
+
+        public EBPFLocalOptions local;
+
+        public EBPFSharedOptions shared;
+
+    }
+
+    public static class EBPFLocalOptions extends SingBoxOption {
+
+        public String cgroup_path;
+
+        public String ipv6_mode;
+
+        // Generate note: Listable
+        public List<Integer> include_uid;
+
+        // Generate note: Listable
+        public List<String> include_uid_range;
+
+        // Generate note: Listable
+        public List<Integer> exclude_uid;
+
+        // Generate note: Listable
+        public List<String> exclude_uid_range;
+
+        // Generate note: Listable
+        public List<Integer> include_android_user;
+
+        // Generate note: Listable
+        public List<String> include_package;
+
+        // Generate note: Listable
+        public List<String> exclude_package;
+
+        public Long state_capacity;
+
+    }
+
+    public static class EBPFSharedOptions extends SingBoxOption {
+
+        // interface 是 Java 保留字，只能掛 @SerializedName 對到 sing-box 的鍵。
+        @SerializedName("interface")
+        // Generate note: Listable
+        public List<String> networkInterface;
+
+        public String ipv6_mode;
+
+        // Generate note: Listable
+        public List<String> include_source_cidr;
+
+        // Generate note: Listable
+        public List<String> exclude_source_cidr;
+
+        // Generate note: Listable
+        public List<String> include_mac_address;
+
+        // Generate note: Listable
+        public List<String> exclude_mac_address;
+
+        public Long state_capacity;
+
+        public EBPFSharedAdvancedOptions advanced;
+
+    }
+
+    public static class EBPFSharedAdvancedOptions extends SingBoxOption {
+
+        public Integer tc_priority;
+
+    }
+
     public static class Inbound_MixedOptions extends Inbound {
 
         // Generate note: nested type ListenOptions
