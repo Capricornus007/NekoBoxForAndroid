@@ -38,11 +38,17 @@
 # com.nb4a:bg 實測閃退兩次（20:11:32／20:19:49）就是它，logcat 裡是 Go panic 不是 native
 # crash。來源是合併 upstream/testing 時兩邊都留（上游的內聯迴圈 + 我方抽出来的 helper 呼叫）。
 # 這個缺陷自 67a13e407 起就在我們所有建置裡，所以裝機上那版 1.4.4-mod-10 也帶著它。
-export COMMIT_SING_BOX="c1dfeafd2b70ba1e42219e3f474b5a37c68b451f"
+# mod.37（0bd6e8e5）：libbox 的「刷介面清單失敗」在 Android 上降成 Debug。用戶機 neko.log
+# 每 3 秒噴一條 `ERROR network: update interfaces: ... netlinkrib: permission denied`，對應
+# logcat 是 `avc: denied { bind } tclass=netlink_route_socket bug=b/155595000`——Android 不給
+# 第三方 App 開 netlink route socket，是平台政策、不是我方缺陷；預設介面偵測走 Kotlin 那條
+# （log 裡的 source kotlin-fallback）本來就正常。改的只有 log 等級，因為每 3 秒一條 ERROR
+# 會把真正的錯誤淹掉（今晚查閃退就被干擾過）。
+export COMMIT_SING_BOX="0bd6e8e5026c35db7df1bb7ffeb9114b78323816"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.36"
+export VERSION_SING_BOX="1.15.0-alpha.10-mod.37"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
