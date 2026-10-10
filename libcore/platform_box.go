@@ -16,9 +16,12 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/sagernet/sing-box/adapter"
+	"github.com/sagernet/sing-box/constant"
 	sblog "github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	tun "github.com/sagernet/sing-tun"
+	"github.com/sagernet/sing/common"
+	"github.com/sagernet/sing/common/control"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/logger"
 )
@@ -127,11 +130,54 @@ func (w *boxPlatformInterfaceWrapper) CreateDefaultInterfaceMonitor(l logger.Log
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformNetworkInterfaces() bool {
-	return false
+	return true
 }
 
+// 上游從 metaphore 的 `Interfaces() = errors.New("wtf")` 起就一直回報「不支援平台介面清單」，
+// 害核心每次刷新都退回 Go 的 net.Interfaces() —— 而第三方 App 在 Android 上 bind netlink
+// route socket 會被 SELinux 擋（b/155595000），於是清單永遠是空的：除了每 3 秒一條
+// `update interfaces: route ip+net: netlinkrib: permission denied`，bind_interface、
+// network= 規則、default_network_strategy 與閘道偵測也全部拿不到資料。
+// Kotlin 那側的 getInterfaces()（NativeInterface.kt）其實早就把 index/MTU/位址/flags/
+// 類型/DNS/metered 都齊了，這裡只是把這條線接上。
 func (w *boxPlatformInterfaceWrapper) NetworkInterfaces() ([]adapter.NetworkInterface, error) {
-	return nil, E.New("android: platform network interfaces unsupported")
+	interfaceIterator, err := intfBox.GetInterfaces()
+	if err != nil {
+		return nil, err
+	}
+	var interfaces []adapter.NetworkInterface
+	for _, netInterface := range iteratorToArray[*NetworkInterface](interfaceIterator) {
+		var addresses []netip.Prefix
+		for _, address := range iteratorToArray[string](netInterface.Addresses) {
+			// 位址是 Kotlin 字串（Inet6Address.getHostAddress() 各 ROM 寫法不一），
+			// 解不動就跳過這一条，不能 Must —— panic 會直接打死 :bg。
+			prefix, prefixErr := netip.ParsePrefix(address)
+			if prefixErr != nil {
+				continue
+			}
+			addresses = append(addresses, prefix)
+		}
+		interfaces = append(interfaces, adapter.NetworkInterface{
+			Interface: control.Interface{
+				Index:     int(netInterface.Index),
+				MTU:       int(netInterface.MTU),
+				Name:      netInterface.Name,
+				Addresses: addresses,
+				Flags:     linkFlags(uint32(netInterface.Flags)),
+			},
+			Type:       constant.InterfaceType(netInterface.Type),
+			DNSServers: iteratorToArray[string](netInterface.DNSServer),
+			Expensive:  netInterface.Metered,
+		})
+	}
+	interfaces = common.UniqBy(interfaces, func(it adapter.NetworkInterface) string {
+		return it.Name
+	})
+	if len(interfaces) == 0 {
+		// 回錯讓核心保留上一份清單：清空會把預設介面的比對一起打掉。
+		return nil, E.New("android: empty interface enumeration")
+	}
+	return interfaces, nil
 }
 
 func (w *boxPlatformInterfaceWrapper) UnderNetworkExtension() bool {
