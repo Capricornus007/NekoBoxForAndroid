@@ -23,11 +23,17 @@
 # Android、iptables DNS hijack 被 input connmark 跳過、go stack 重寫、arm64 NEON checksum 等），
 # libcore 的 require 同時對齊 sing-box 的 7539c98。這批全是 Android 資料路徑上的修正，值得為它
 # 多跑一輪核心建置。
-export COMMIT_SING_BOX="e008139bf15828474866a717864a5fd6226515ae"
+# mod.33（e008139b）→ mod.34（6e9f774a）→ 尖端 6f3422e7：吃進 upstream/testing 的 39 筆
+# （forward NAT 重做成 UDP mapping + fragment、per-destination backpressure、protocol input
+# validation、scope cleanup 忽略 closed/canceled、naiveproxy 154.0.8037.49-2 等）。
+# 抬到尖端的另一個原因是 libcore 已經把 sing-tun 換到 6d0ca107，而 sing-box 只有在
+# mod.33 之後的 go.mod 才帶同一條 replace；兩邊不一致時 APK 吃 libcore 那版、
+# sing-box 自己 CI 測的是另一版，scripts/check-core-pins.sh 段 1b/1e 就是抓這個的。
+export COMMIT_SING_BOX="6f3422e78ab85f40d0e0fbde13ed74fe6380e3b0"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.32"
+export VERSION_SING_BOX="1.15.0-alpha.10-mod.34"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
