@@ -53,7 +53,12 @@ export COMMIT_SING_BOX="f0c8a4f17583df07877ff21159c0c9518098962a"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.38"
+# ⚠️ 基號跟著「上游 tag 是否已被 1.15.x 包含」走，不是跟著上一次寫的字串走：
+# 上游 v1.15.0-alpha.11 自 34480457f 起就在我們歷史裡（git tag --contains 可驗），
+# 所以基號是 alpha.11。抬基號時這裡與 nb4a.properties 的 SINGBOX_VERSION 要一起改，
+# scripts/check-core-pins.sh 段 1c 就是抓這個的——「Update sing-box core」那條 bot
+# 已經自己算出 alpha.11，是這兩處拖著沒跟上。
+export VERSION_SING_BOX="1.15.0-alpha.11-mod.38"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
