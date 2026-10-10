@@ -33,11 +33,16 @@
 # 與 `ebpf-probe` CLI。go.mod 只多一個 github.com/cilium/ebpf v0.22.0，三條 replace 指針
 # （wireguard-go / sing-quic / sing）與 mod.34 完全相同，所以 check-core-pins.sh 段 1 不會
 # 因為這次抬版變紅。
-export COMMIT_SING_BOX="34727ed70472ff57c80ea617419fdec696a10bfd"
+# mod.36（c1dfeafd）：修 `route.cachePacketBuffers` 把同一批 packet buffer 迭代兩次的缺陷
+# ——第二段拿到的是已歸池、Buffer 欄位已被清空的物件，IncRef() 直接打 nil。用戶機
+# com.nb4a:bg 實測閃退兩次（20:11:32／20:19:49）就是它，logcat 裡是 Go panic 不是 native
+# crash。來源是合併 upstream/testing 時兩邊都留（上游的內聯迴圈 + 我方抽出来的 helper 呼叫）。
+# 這個缺陷自 67a13e407 起就在我們所有建置裡，所以裝機上那版 1.4.4-mod-10 也帶著它。
+export COMMIT_SING_BOX="c1dfeafd2b70ba1e42219e3f474b5a37c68b451f"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
-export VERSION_SING_BOX="1.15.0-alpha.10-mod.35"
+export VERSION_SING_BOX="1.15.0-alpha.10-mod.36"
 export COMMIT_LIBNEKO="d5ae8b4d046a01a7686e43dda40ded4cda472fd8"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
