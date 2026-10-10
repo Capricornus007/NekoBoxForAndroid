@@ -403,6 +403,8 @@ object ProtocolRegistry {
         }
     }
 
+    val all: List<ProtocolDescriptor> get() = descriptors
+
     /** Descriptor for a persisted type id, or null for an unknown/dead id (matches old else-branch). */
     fun forType(type: Int): ProtocolDescriptor? = byType[type]
 

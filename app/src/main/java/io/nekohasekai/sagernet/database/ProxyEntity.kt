@@ -711,6 +711,9 @@ data class ProxyEntity(
         @Query("SELECT * FROM proxy_entities WHERE id in (:proxyIds)")
         fun getEntities(proxyIds: List<Long>): List<ProxyEntity>
 
+        @Query("UPDATE proxy_entities SET userOrder = :order WHERE id = :id")
+        fun updateOrder(id: Long, order: Long): Int
+
         @Query("SELECT COUNT(*) FROM proxy_entities WHERE groupId = :groupId")
         fun countByGroup(groupId: Long): Long
 

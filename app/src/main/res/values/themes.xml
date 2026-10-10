@@ -11,6 +11,9 @@
     </style>
 
     <style name="ThemeOverlay.SagerNet.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <!-- Palettes set the surface and its text colors but not the M3 container roles, so a
+             dark palette in day mode put its light text on the library's light container. -->
+        <item name="colorSurfaceContainerHigh">?attr/colorSurface</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.SagerNet.Dialog</item>
         <item name="buttonBarPositiveButtonStyle">
             @style/Widget.SagerNet.Button.TextButton.Dialog

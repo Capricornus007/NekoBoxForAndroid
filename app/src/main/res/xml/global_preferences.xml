@@ -144,6 +144,68 @@
             app:useSimpleSummaryProvider="true" />
     </io.nekohasekai.sagernet.widget.CollapsibleCategory>
 
+    <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/settings_protection">
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="killSwitch"
+            app:summary="@string/kill_switch_summary"
+            app:title="@string/kill_switch" />
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_fingerprint_24"
+            app:key="webrtcLeakProtection"
+            app:summary="@string/webrtc_leak_protection_summary"
+            app:title="@string/webrtc_leak_protection" />
+        <Preference
+            app:icon="@drawable/ic_baseline_vpn_key_24"
+            app:key="protectionAlwaysOn"
+            app:title="@string/protection_always_on" />
+        <Preference
+            app:icon="@drawable/ic_action_lock"
+            app:key="protectionLockdown"
+            app:title="@string/protection_lockdown" />
+        <Preference
+            app:icon="@drawable/baseline_developer_board_24"
+            app:key="protectionBattery"
+            app:title="@string/protection_battery" />
+        <Preference
+            app:icon="@drawable/ic_baseline_info_24"
+            app:key="protectionNotes"
+            app:selectable="false"
+            app:summary="@string/protection_notes"
+            app:title="@string/protection_notes_title" />
+        <PreferenceCategory app:title="@string/gps_spoofing">
+            <SwitchPreferenceCompat
+                app:defaultValue="false"
+                app:key="gpsSpoofing"
+                app:summary="@string/gps_spoofing_summary"
+                app:title="@string/gps_spoofing_switch" />
+            <Preference
+                app:icon="@drawable/ic_baseline_info_24"
+                app:key="gpsSpoofingNotice"
+                app:selectable="false"
+                app:summary="@string/gps_spoofing_navigation_notice"
+                app:title="@string/gps_spoofing_navigation_title" />
+            <Preference
+                app:isPreferenceVisible="false"
+                app:key="gpsSpoofingRemove"
+                app:summary="@string/gps_spoofing_remove_summary"
+                app:title="@string/gps_spoofing_remove" />
+            <EditTextPreference
+                app:dialogMessage="@string/gps_spoofing_coordinates_help"
+                app:key="gpsCoordinates"
+                app:title="@string/gps_spoofing_coordinates"
+                app:useSimpleSummaryProvider="true" />
+            <EditTextPreference
+                app:defaultValue="https://ipapi.co/json/"
+                app:dialogMessage="@string/gps_spoofing_lookup_help"
+                app:key="gpsLookupUrl"
+                app:title="@string/gps_spoofing_lookup"
+                app:useSimpleSummaryProvider="true" />
+        </PreferenceCategory>
+    </io.nekohasekai.sagernet.widget.CollapsibleCategory>
+
     <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/cag_route">
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_navigation_apps"
@@ -356,6 +418,16 @@
             app:title="@string/wake_reset_connections"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:icon="@drawable/ic_baseline_legend_toggle_24"
+            app:key="networkAutomation"
+            app:summary="@string/network_automation_summary"
+            app:title="@string/network_automation" />
+        <Preference
+            app:dependency="networkAutomation"
+            app:key="networkAutomationRules"
+            app:title="@string/network_automation_rules" />
+        <SwitchPreferenceCompat
             app:icon="@drawable/ic_action_lock_open"
             app:key="globalAllowInsecure"
             app:title="@string/global_allow_insecure" />
@@ -382,6 +454,11 @@
         <SwitchPreferenceCompat
             app:key="showBottomBar"
             app:title="@string/show_bottom_bar" />
+        <Preference
+            app:icon="@drawable/ic_device_developer_mode"
+            app:key="localControlApi"
+            app:summary="@string/local_api_summary"
+            app:title="@string/local_api_title" />
         <Preference
             app:icon="@drawable/baseline_undo_24"
             app:key="resetSettings"

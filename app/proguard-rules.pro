@@ -23,7 +23,7 @@
 -keep class org.yaml.snakeyaml.** { *; }
 
 -dontobfuscate
--keepattributes SourceFile
+-keepattributes SourceFile,LineNumberTable
 
 # Gson TypeToken 依赖运行时的泛型签名信息，R8 默认会剥掉 Signature
 # attribute，导致 TypeToken<List<T>> 之类解析失败直接崩溃（boristul 分支

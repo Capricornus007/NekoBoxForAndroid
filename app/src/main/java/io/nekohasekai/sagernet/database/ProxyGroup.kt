@@ -93,6 +93,9 @@ data class ProxyGroup(
         @Query("SELECT * FROM proxy_groups WHERE type = ${GroupType.SUBSCRIPTION}")
         suspend fun subscriptions(): List<ProxyGroup>
 
+        @Query("UPDATE proxy_groups SET userOrder = :order WHERE id = :id")
+        fun updateOrder(id: Long, order: Long): Int
+
         @Query("SELECT MAX(userOrder) + 1 FROM proxy_groups")
         fun nextOrder(): Long?
 

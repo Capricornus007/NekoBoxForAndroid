@@ -17,7 +17,9 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 20,
+    // hawkff 那條線停在 16、我方已經到 20：對方實體新增的欄位一律落到 21，
+    // 絕不改寫 16.json 這類歷史快照（會弄壞 14→20 那条遷移鏈）。
+    version = 21,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
@@ -37,6 +39,10 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
         AutoMigration(from = 14, to = 15),
         // v16: additive speed-test result columns on proxy_entities (dsf b6fd50cdb)
         AutoMigration(from = 15, to = 16),
+        // v21: hawkff 帶進來的附加欄位（proxy_entities.archivedData／tailscaleBean、
+        // proxy_groups.autoSelect、rules.dnsServer／dnsThroughOutbound）。純加欄位，
+        // Room 會照 20.json／21.json 自動生成 ALTER TABLE，既有資料不動。
+        AutoMigration(from = 20, to = 21),
     ],
 )
 @TypeConverters(value = [KryoConverters::class, GsonConverters::class])

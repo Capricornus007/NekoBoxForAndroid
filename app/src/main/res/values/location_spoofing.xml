@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gps_spoofing">GPS spoofing</string>
+    <string name="gps_spoofing_switch">Simulate location</string>
+    <string name="gps_spoofing_summary">Off by default. While the VPN is connected, apps get the approximate exit location or your coordinates. Takes effect on the next connection.</string>
+    <string name="gps_spoofing_navigation_title">Maps and navigation</string>
+    <string name="gps_spoofing_navigation_notice">Every app gets the simulated location, including Maps and navigation; Proxied apps settings do not apply. Before you navigate, tap Turn off in the notification. That turns this setting off until you turn it on again. Apps can keep the last simulated position until a new real fix. Turn spoofing off before you change the mock location app. After a force stop or a mock location app change, use Remove simulated location here.</string>
+    <string name="gps_spoofing_warning">Maps, navigation and every other app will get the simulated location. Android has no per-app exception. Some apps detect or ignore simulated locations. Before you navigate, tap Turn off in the notification. Turning it off there or swiping the notification away switches this setting off until you turn it on again. Afterwards, apps can show the last simulated position until the device gets a new real fix.\n\nTurn spoofing off before you choose another mock location app. After a mock location app change or a force stop, which also removes the notification, the app cannot tell whether a simulated location is still its own, so it asks before removing one: choose this app as the mock location app again and tap Remove simulated location in these settings.\n\nWithout coordinates, the app asks %1$s for the approximate location of the exit IP, through the selected server. That service sees the exit IP. The app never sends the device location. If the first lookup or the one after a server change fails, spoofing stops and the VPN stays connected. If a later check fails, apps keep the last checked location and the notification shows when it was checked.</string>
+    <string name="gps_spoofing_setup">In Developer options, choose this app under Select mock location app, then turn this on again.</string>
+    <string name="gps_spoofing_notifications">Allow notifications from this app first. The GPS spoofing notification holds the Turn off action.</string>
+    <string name="gps_spoofing_coordinates">Coordinates</string>
+    <string name="gps_spoofing_coordinates_help">Latitude and longitude in decimal degrees, separated by a comma, for example 52.52, 13.405. Leave empty to use the approximate exit location. With coordinates set, the app makes no lookups.</string>
+    <string name="gps_spoofing_lookup">Location service URL</string>
+    <string name="gps_spoofing_lookup_help">An HTTPS address that returns numeric latitude and longitude fields. The request goes only through the selected server, and the service sees the exit IP. The app repeats the lookup every five minutes and after you switch servers. When a repeat lookup fails, apps keep the last checked location.</string>
+    <string name="gps_spoofing_invalid_coordinates">Enter a latitude from -90 to 90 and a longitude from -180 to 180, separated by a comma, or leave the field empty.</string>
+    <string name="gps_spoofing_invalid_url">Use an HTTPS URL without a user name, password or fragment.</string>
+    <string name="gps_spoofing_active">GPS spoofing is on</string>
+    <string name="gps_spoofing_notice">Apps, including Maps, get a simulated location. Turn it off before you navigate. It stays off until you turn it on in settings.</string>
+    <string name="gps_spoofing_cached">GPS spoofing uses the last checked location</string>
+    <string name="gps_spoofing_cached_summary">The location service did not answer. Apps keep the exit location checked at %1$s, which may no longer match the exit IP. The app checks again in five minutes.</string>
+    <string name="gps_spoofing_updating">Updating the simulated location</string>
+    <string name="gps_spoofing_updating_summary">The server changed. Apps keep the previous simulated location until the new exit location arrives.</string>
+    <string name="gps_spoofing_turn_off">Turn off</string>
+    <string name="gps_spoofing_failed">GPS spoofing stopped</string>
+    <string name="gps_spoofing_failed_summary">Spoofing stopped and the VPN stays connected. Apps can show the last simulated position until the device gets a new real fix. Check the mock location app, notifications and the location service, then reconnect.</string>
+    <string name="gps_spoofing_stuck">A simulated location may remain</string>
+    <string name="gps_spoofing_stuck_summary">GPS spoofing stopped, but the app cannot confirm that its simulated location is gone. Open the app and tap Remove simulated location under Settings, Leak protection.</string>
+    <string name="gps_spoofing_remove">Remove simulated location</string>
+    <string name="gps_spoofing_remove_summary">A simulated location from this app may still be set, for example after a force stop or a mock location app change. Tap to remove it.</string>
+    <string name="gps_spoofing_remove_confirm">This removes the simulated location from the %1$s location providers and turns Simulate location off. Android does not show which app set them, so they may belong to another simulator app.</string>
+    <string name="gps_spoofing_remove_action">Remove</string>
+    <string name="gps_spoofing_remove_first">A simulated location from this app may still be set. Remove it before you turn Simulate location on.</string>
+    <string name="gps_spoofing_remove_setup">Only the mock location app can remove a simulated location. In Developer options, choose this app under Select mock location app, then try again.</string>
+    <string name="gps_spoofing_removed">Simulated location removed</string>
+    <string name="gps_spoofing_remove_failed">The simulated location was not removed. Check that this app is the mock location app, then try again.</string>
+    <string name="gps_spoofing_unsupported_title">GPS spoofing is unavailable</string>
+    <string name="gps_spoofing_unsupported">This device does not report how many times it has started. Without that count, the app cannot reliably remove a simulated location after it stops unexpectedly, so GPS spoofing stays off.</string>
+</resources>

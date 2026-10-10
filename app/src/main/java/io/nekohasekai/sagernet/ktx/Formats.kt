@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.ktx
 
 import com.google.gson.JsonParser
+import io.nekohasekai.sagernet.database.RoutingProfiles
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.Serializable
 import io.nekohasekai.sagernet.fmt.amneziawg.toAmneziaWGBean
@@ -24,7 +25,9 @@ import io.nekohasekai.sagernet.fmt.trojan_go.parseTrojanGo
 import io.nekohasekai.sagernet.fmt.trusttunnel.parseTrustTunnel
 import io.nekohasekai.sagernet.fmt.tuic.parseTuic
 import io.nekohasekai.sagernet.fmt.v2ray.parseV2Ray
+import io.nekohasekai.sagernet.fmt.v2ray.requireSupportedLinkOptions
 import io.nekohasekai.sagernet.fmt.wireguard.parseWireGuardLink
+import io.nekohasekai.sagernet.group.ImportReport
 import io.nekohasekai.sagernet.group.RawUpdater
 import moe.matsuri.nb4a.proxy.anytls.parseAnytls
 import moe.matsuri.nb4a.utils.JavaUtil.gson
@@ -203,13 +206,63 @@ internal fun fakeSubscriptionNode(bean: AbstractBean): String? {
     return promoNamePattern(bean.displayName())
 }
 
-suspend fun parseProxies(text: String, subscription: Boolean = false): List<AbstractBean> {
-    val lines = text.linesNoComments()
-    val links = lines.flatMap { it.split(' ') }
-    val linksByLine = lines
+private val LINK_SCHEME = Regex("^([A-Za-z][A-Za-z0-9+.-]*)://")
+
+// Start at the first whitespace character to avoid rescanning long runs.
+private val LINK_SEPARATOR = Regex("(?<!\\s)\\s+(?=[A-Za-z][A-Za-z0-9+.-]*://)")
+private val TELEGRAM_HOSTS = setOf("t.me", "telegram.me")
+private val TELEGRAM_NODES = setOf("proxy", "socks")
+
+/**
+ * The scheme of a link that describes a node, used to report one that did not import; null for
+ * other links: web pages, Telegram chat and channel links, routing links and words of a remark.
+ * Telegram's proxy and SOCKS links are nodes this app cannot import, and so is a web address with
+ * credentials, which is how HTTP proxy links look.
+ */
+internal fun linkNodeScheme(link: String): String? {
+    val scheme = LINK_SCHEME.find(link)?.groupValues?.get(1)?.lowercase() ?: return null
+    if (RoutingProfiles.isRoutingLink(link)) return null
+    return when (scheme) {
+        "http", "https" -> {
+            val url = link.toHttpUrlOrNull()
+            when {
+                url == null -> scheme.takeIf { '@' in link.substringAfter("://").substringBefore('/') }
+                url.host.lowercase() in TELEGRAM_HOSTS && url.pathSegments.firstOrNull() in TELEGRAM_NODES -> "telegram"
+                url.username.isNotEmpty() -> scheme
+                else -> null
+            }
+        }
+
+        "tg" -> scheme.takeIf { link.substringAfter("://").substringBefore('?').substringBefore('/').lowercase() in TELEGRAM_NODES }
+
+        else -> scheme
+    }
+}
+
+/**
+ * Parses share links, one per line or separated by spaces. Links that describe nodes but do not
+ * import are added to [report] by scheme.
+ */
+suspend fun parseProxies(
+    text: String,
+    report: ImportReport? = null,
+    subscription: Boolean = false,
+): List<AbstractBean> {
+    val linksByLine = text.linesNoComments()
+    fun String.hasUnsupportedOptions(): Boolean {
+        if (runCatching { requireSupportedLinkOptions(this) }.isSuccess) return false
+        val scheme = substringBefore("://").lowercase()
+        return (scheme != "http" && scheme != "https") || runCatching { parseHttp(this) }.isSuccess
+    }
+    // Keep a rejected link's query intact without discarding neighboring links.
+    val links = linksByLine.flatMap { line ->
+        line.split(LINK_SEPARATOR).flatMap { if (it.hasUnsupportedOptions()) listOf(it) else it.split(' ') }
+    }
 
     val entities = ArrayList<AbstractBean>()
     val entitiesByLine = ArrayList<AbstractBean>()
+    val failures = ArrayList<String?>()
+    val failuresByLine = ArrayList<String?>()
     // An http(s) link that fails to parse as an HTTP proxy is a subscription candidate.
     // Don't abort import immediately (issue #1128): a file may contain valid profile
     // links alongside a plain promo/Telegram URL. Remember the first candidate and only
@@ -231,10 +284,19 @@ suspend fun parseProxies(text: String, subscription: Boolean = false): List<Abst
         }
     }
 
-    fun String.parseLink(entities: ArrayList<AbstractBean>) {
+    fun String.parseLink(entities: ArrayList<AbstractBean>, failures: MutableList<String?>) {
         if (startsWith("clash://install-config?") || startsWith("sn://subscription?")) {
             throw SubscriptionFoundException(this)
         }
+        // Options that change which servers a connection accepts are refused here, for every
+        // scheme, before a parser that does not know them could drop them. A web address that is
+        // not an HTTP proxy link may be a subscription, and its query belongs to the provider.
+        if (hasUnsupportedOptions()) {
+            Logs.w("Link with unsupported options rejected")
+            failures += substringBefore("://").lowercase()
+            return
+        }
+        val parsed = entities.size
 
         if (startsWith("sn://")) {
             Logs.d("Trying universal parser")
@@ -423,13 +485,14 @@ suspend fun parseProxies(text: String, subscription: Boolean = false): List<Abst
                 Logs.w("AmneziaVPN parser rejected input")
             }
         }
+        if (entities.size == parsed) linkNodeScheme(this)?.let { failures += it }
     }
 
     for (link in links) {
-        link.parseLink(entities)
+        link.parseLink(entities, failures)
     }
     for (link in linksByLine) {
-        link.parseLink(entitiesByLine)
+        link.parseLink(entitiesByLine, failuresByLine)
     }
     // 訂閱路徑在入庫前剔除「資訊行／促銷行／沒有端點的假節點」（見 fakeSubscriptionNode）。
     // 這裡必須在 initializeDefaultValues()（下方對每顆都會跑）之前做：它會把空位址補成
@@ -479,8 +542,10 @@ suspend fun parseProxies(text: String, subscription: Boolean = false): List<Abst
         // 每個連結會被掃兩遍（逐空格與逐行），所以這個數是兩次掃描的合計，只作觀測用。
         Logs.w("promo guard: $promoSkipped http(s) link(s) rejected for lacking proxy evidence")
     }
-    val result = if (entities.size > entitiesByLine.size) entities else entitiesByLine
-    return result
+    val byTokens = entities.size > entitiesByLine.size ||
+        (entities.size == entitiesByLine.size && failures.size > failuresByLine.size)
+    report?.failed?.addAll(if (byTokens) failures else failuresByLine)
+    return if (byTokens) entities else entitiesByLine
 }
 
 fun <T : Serializable> T.applyDefaultValues(): T {

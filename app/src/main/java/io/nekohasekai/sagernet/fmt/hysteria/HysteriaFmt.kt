@@ -424,6 +424,7 @@ fun JSONObject.parseHysteria2Json(): HysteriaBean = HysteriaBean().apply {
     getTriStateBool("udp_fragment")?.also { udpFragment = it }
     // tls block (sni / insecure / Hysteria 2.10 ECH config list).
     optJSONObject("tls")?.also { tls ->
+        require(tls.getStr("pinSHA256") == null) { "unsupported certificate pin" }
         tls.getStr("sni")?.also { sni = it }
         tls.getBool("insecure")?.also { allowInsecure = it }
         tls.getStr("ech")?.also {

@@ -8,9 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
 import android.os.Build
 import android.text.format.Formatter
+import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -228,14 +230,23 @@ class ServiceNotification(
 
     private fun show() {
         val notification = builder.build()
-        if (Build.VERSION.SDK_INT >= 34) {
-            (service as Service).startForeground(
-                notificationId,
-                notification,
-                FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
-            )
-        } else {
-            (service as Service).startForeground(notificationId, notification)
+        try {
+            if (Build.VERSION.SDK_INT >= 34) {
+                (service as Service).startForeground(
+                    notificationId,
+                    notification,
+                    // systemExempted needs the VPN permission, which only the VPN service has to hold.
+                    if (service is VpnService) FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED else FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
+                )
+            } else {
+                (service as Service).startForeground(notificationId, notification)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(
+                SagerNet.application,
+                "startForeground: $e",
+                Toast.LENGTH_LONG,
+            ).show()
         }
     }
 

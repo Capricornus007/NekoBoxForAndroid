@@ -292,6 +292,15 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var useIECUnit by configurationStore.boolean(Key.USE_IEC_UNIT)
 
     val persistAcrossReboot by configurationStore.boolean(Key.PERSIST_ACROSS_REBOOT) { false }
+    var networkAutomation by configurationStore.boolean(Key.NETWORK_AUTOMATION) { false }
+    var automationPaused by configurationStore.boolean(Key.NETWORK_AUTOMATION_PAUSED) { false }
+    var networkAutomationBlocked by configurationStore.string(Key.NETWORK_AUTOMATION_BLOCKED)
+    var connectionDiagnostics by configurationStore.boolean(Key.CONNECTION_DIAGNOSTICS) { false }
+    var killSwitch by configurationStore.boolean(Key.KILL_SWITCH) { false }
+    var webrtcLeakProtection by configurationStore.boolean(Key.WEBRTC_LEAK_PROTECTION) { false }
+    var gpsSpoofing by configurationStore.boolean(Key.GPS_SPOOFING) { false }
+    var gpsCoordinates by configurationStore.string(Key.GPS_COORDINATES) { "" }
+    var gpsLookupUrl by configurationStore.string(Key.GPS_LOOKUP_URL) { "https://ipapi.co/json/" }
 
     var appendHttpProxy by configurationStore.boolean(Key.APPEND_HTTP_PROXY)
     var httpProxyBypass by configurationStore.string(Key.HTTP_PROXY_BYPASS) { DEFAULT_HTTP_PROXY_BYPASS }
@@ -479,6 +488,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var groupIsSelector by profileCacheStore.boolean(Key.GROUP_IS_SELECTOR)
 
     var subscriptionLink by profileCacheStore.string(Key.SUBSCRIPTION_LINK)
+    var subscriptionFormat by profileCacheStore.stringToInt(Key.SUBSCRIPTION_FORMAT) { 0 }
+    var subscriptionImportWarning by profileCacheStore.string(Key.SUBSCRIPTION_IMPORT_WARNING)
+    var subscriptionBackupLinks by profileCacheStore.string(Key.SUBSCRIPTION_BACKUP_LINKS)
     var subscriptionForceResolve by profileCacheStore.boolean(Key.SUBSCRIPTION_FORCE_RESOLVE)
     var subscriptionDeduplication by profileCacheStore.boolean(Key.SUBSCRIPTION_DEDUPLICATION)
     var subscriptionUpdateWhenConnectedOnly by profileCacheStore.boolean(Key.SUBSCRIPTION_UPDATE_WHEN_CONNECTED_ONLY)

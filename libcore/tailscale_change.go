@@ -51,7 +51,7 @@ func (c *TailscaleExitNodeChange) finalize(rollback bool) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.instance.access.Lock()
-	ctx, release, err := c.instance.admitTailscaleLocked()
+	ctx, release, err := c.instance.admitCoreWorkLocked()
 	c.instance.access.Unlock()
 	if err != nil {
 		return err

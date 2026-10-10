@@ -2,8 +2,6 @@ package io.nekohasekai.sagernet.ui
 
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.annotation.SuppressLint
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -33,7 +31,10 @@ import io.nekohasekai.sagernet.aidl.ISagerNetService
 import io.nekohasekai.sagernet.aidl.SpeedDisplayData
 import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.aidl.TrafficDataBatch
+import io.nekohasekai.sagernet.api.ApiUi
+import io.nekohasekai.sagernet.api.LocalApiAccess
 import io.nekohasekai.sagernet.bg.BaseService
+import io.nekohasekai.sagernet.bg.NetworkAutomationService
 import io.nekohasekai.sagernet.bg.SagerConnection
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.GroupManager
@@ -178,28 +179,16 @@ class MainActivity :
     override fun onResume() {
         super.onResume()
         MessageStore.setCurrentActivity(this)
+        ApiUi.attach(this)
+        LocalApiAccess.sync(this)
 
-        if (DataStore.hideFromRecentApps) {
-            applyHideFromRecentApps(DataStore.hideFromRecentApps)
-        }
-    }
-
-    fun applyHideFromRecentApps(hide: Boolean) {
-        try {
-            val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            val tasks = activityManager.appTasks
-            if (tasks.isNotEmpty()) {
-                val task = tasks[0]
-                task.setExcludeFromRecents(hide)
-            }
-        } catch (e: Exception) {
-            Logs.w("Failed to set excludeFromRecents: ${e.message}")
-        }
+        applyHideFromRecentApps(DataStore.hideFromRecentApps)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        LocalApiAccess.sync(this)
 
         if (handleSpecialIntent(intent)) return
 
@@ -717,6 +706,9 @@ class MainActivity :
     override fun onStart() {
         connection.updateConnectionId(SagerConnection.CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND)
         super.onStart()
+        // A visible app may start the watcher, which brings it back after a force stop or a
+        // refused background restart.
+        NetworkAutomationService.sync(applicationContext)
     }
 
     override fun onStop() {

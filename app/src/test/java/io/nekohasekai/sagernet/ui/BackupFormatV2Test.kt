@@ -178,6 +178,23 @@ class BackupFormatV2Test {
     }
 
     @Test
+    fun ruleDnsRoundTrip_preservesOptInAndAcceptsOlderBackups() {
+        val rule = RuleEntity(
+            packages = setOf("test.bank"),
+            outbound = 42L,
+            dnsThroughOutbound = true,
+            dnsServer = "https://203.0.113.53/dns-query",
+        )
+        val json = BackupFormatV2.encodeRule(rule)
+        assertEquals(rule, BackupFormatV2.decodeRule(json))
+        json.remove("dnsThroughOutbound")
+        json.remove("dnsServer")
+        assertEquals(rule.copy(dnsThroughOutbound = false, dnsServer = ""), BackupFormatV2.decodeRule(json))
+        json.put("dnsThroughOutbound", "invalid")
+        org.junit.Assert.assertThrows(org.json.JSONException::class.java) { BackupFormatV2.decodeRule(json) }
+    }
+
+    @Test
     fun settingsRoundTrip_preservesStringAndStringSetValues() {
         val settings = listOf(
             KeyValuePair("string-key").put("value"),

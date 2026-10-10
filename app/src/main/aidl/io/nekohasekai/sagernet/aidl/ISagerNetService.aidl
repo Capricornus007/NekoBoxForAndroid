@@ -30,4 +30,8 @@ interface ISagerNetService {
   // Live routed connections as JSON (ConnectionEntry array); closed ones too when the
   // bounded history is enabled through connection diagnostics.
   String connections(boolean includeClosed);
+
+  // Peer state of every running outbound of a WireGuard or AmneziaWG profile, as JSON:
+  // {"running": bool, "instances": [{"owner": profileId, "peers": [...]} or {"owner": profileId, "error": text}]}.
+  String wireguardStatus(long profileId);
 }

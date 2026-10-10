@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.ui
 
+import android.app.ActivityManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -83,6 +84,15 @@ fun Fragment.startFilesForResult(launcher: ActivityResultLauncher<String>, input
     } catch (_: SecurityException) {
     }
     snackbar(getString(R.string.file_manager_missing)).show()
+}
+
+fun Context.applyHideFromRecentApps(hide: Boolean) {
+    try {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        activityManager.appTasks.forEach { it.setExcludeFromRecents(hide) }
+    } catch (e: Exception) {
+        Logs.w("Failed to set excludeFromRecents: ${e.message}")
+    }
 }
 
 fun Fragment.needReload() {

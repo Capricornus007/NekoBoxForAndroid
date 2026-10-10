@@ -141,9 +141,14 @@ abstract class GroupUpdater {
          *
          * supervisorScope (Throne b7c1b911c): a caller that launches several of these in
          * parallel - "update all subscriptions" - must not have its other updates cancelled
-         * just because one group failed.
+         * just because one group failed. The optional [userInterface] lets a caller pass the
+         * dialog owner; it falls back to the current [GroupManager.userInterface].
          */
-        suspend fun executeUpdate(proxyGroup: ProxyGroup, byUser: Boolean): Boolean {
+        suspend fun executeUpdate(
+            proxyGroup: ProxyGroup,
+            byUser: Boolean,
+            userInterface: GroupManager.Interface? = GroupManager.userInterface,
+        ): Boolean {
             return supervisorScope {
                 if (!updating.add(proxyGroup.id)) {
                     // already updating this group in another run; skip quietly
@@ -157,7 +162,6 @@ abstract class GroupUpdater {
                     return@supervisorScope false
                 }
                 val connected = DataStore.serviceState.connected
-                val userInterface = GroupManager.userInterface
 
                 if (byUser && (
                         subscription.link?.startsWith(

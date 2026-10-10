@@ -16,6 +16,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONObject
 import java.net.URI
+import java.net.URLDecoder
 
 private val supportedKcpHeaderType = arrayOf(
     "none",
@@ -87,12 +88,47 @@ fun StandardV2RayBean.setTLS(boolean: Boolean) {
     security = if (boolean) "tls" else ""
 }
 
+/** Transports a share link may name; the core builds each of them. */
+private val SHARE_LINK_TRANSPORTS = setOf("tcp", "http", "kcp", "ws", "grpc", "httpupgrade", "xhttp", "quic")
+
+private class UnsupportedShareLinkException(message: String) : IllegalArgumentException(message)
+
+/**
+ * Xray share-link options this app cannot honor that change which servers a connection accepts:
+ * a pinned certificate (pcs), the names a certificate is checked against (vcn) and Finalmask
+ * traffic masking (fm). Without them a link would trust certificates its provider meant to
+ * refuse, or would not reach a server that expects masked traffic. Each may be empty.
+ */
+private val UNSUPPORTED_LINK_OPTIONS = listOf("pcs", "vcn", "fm")
+
+private fun decodeLinkComponent(value: String) = runCatching { URLDecoder.decode(value, "UTF-8") }.getOrDefault(value)
+
+/**
+ * Refuses a share link that carries an option from [UNSUPPORTED_LINK_OPTIONS] with a value. It
+ * runs before any of the link formats is tried, so another format cannot accept the link without
+ * it.
+ */
+internal fun requireSupportedLinkOptions(link: String) {
+    val query = link.substringBefore('#').substringAfter('?', "")
+    for (parameter in query.split('&')) {
+        val name = decodeLinkComponent(parameter.substringBefore('='))
+        if (name in UNSUPPORTED_LINK_OPTIONS && decodeLinkComponent(parameter.substringAfter('=', "")).isNotBlank()) {
+            throw UnsupportedShareLinkException("unsupported $name")
+        }
+    }
+}
+
 fun parseV2Ray(link: String): StandardV2RayBean {
+    requireSupportedLinkOptions(link)
+
     // Try parse stupid formats first
 
     if (!link.contains("?")) {
         try {
             return parseV2RayN(link)
+        } catch (e: UnsupportedShareLinkException) {
+            // A readable link with unsupported settings; the other formats would misread it.
+            throw e
         } catch (_: Exception) {
             Logs.i("V2RayN parser rejected input")
         }
@@ -286,8 +322,13 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
     type = when (rawType.lowercase()) {
         "splithttp", "xhttp" -> "xhttp"
         "h2" -> "http"
+        // Xray's newer name for its TCP transport.
+        "raw" -> "tcp"
         else -> if (url.queryParameter("headerType") == "http") "http" else rawType
     }
+    // An unknown transport would build as plain TCP or without TLS, which is not the
+    // node the link describes, so such a link is refused.
+    if (type !in SHARE_LINK_TRANSPORTS) error("unsupported transport")
 
     security = url.queryParameter("security")
     if (security.isNullOrBlank()) {
@@ -295,7 +336,11 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
     }
 
     when (security) {
+        "none" -> {}
+
         "tls", "reality" -> {
+            // REALITY's ML-DSA-65 server verification has no counterpart in the core.
+            if (!url.queryParameter("pqv").isNullOrBlank()) error("unsupported REALITY verification")
             security = if (security == "reality" || !url.queryParameter("pbk").isNullOrBlank()) "reality" else "tls"
             url.queryParameter("allowInsecure")?.let {
                 allowInsecure = it == "1" || it == "true"
@@ -336,6 +381,8 @@ fun StandardV2RayBean.parseDuckSoft(url: HttpUrl) {
                 }
             }
         }
+
+        else -> error("unsupported security")
     }
 
     when (type) {
@@ -518,6 +565,12 @@ fun parseV2RayN(link: String): VMessBean {
         return parseCsvVMess(result)
     }
     val bean = VMessBean()
+    // The JSON form carries the same options as the query of the other forms.
+    val options = runCatching { JSONObject(result) }.getOrNull()
+    for (name in UNSUPPORTED_LINK_OPTIONS) {
+        val value = options?.takeUnless { it.isNull(name) }?.opt(name)?.toString()
+        if (!value.isNullOrBlank()) throw UnsupportedShareLinkException("unsupported $name")
+    }
     val vmessQRCode = Gson().fromJson(result, VmessQRCode::class.java)
 
     // Although VmessQRCode fields are non null, looks like Gson may still create null fields
@@ -535,7 +588,13 @@ fun parseV2RayN(link: String): VMessBean {
     bean.encryption = vmessQRCode.scy
     bean.uuid = vmessQRCode.id
     bean.alterId = vmessQRCode.aid.toIntOrNull()
-    bean.type = if (vmessQRCode.net == "splithttp") "xhttp" else vmessQRCode.net
+    bean.type = when (val net = vmessQRCode.net) {
+        "splithttp" -> "xhttp"
+        "h2" -> "http"
+        "raw" -> "tcp"
+        else -> net
+    }
+    if (bean.type !in SHARE_LINK_TRANSPORTS) throw UnsupportedShareLinkException("unsupported transport")
     if (bean.type == "xhttp") {
         bean.xhttpMode = normalizeXhttpMode(vmessQRCode.mode)
         val extra = vmessQRCode.extra?.takeUnless { it.isJsonNull }?.let {
@@ -556,7 +615,11 @@ fun parseV2RayN(link: String): VMessBean {
             }
         }
     }
-    when (vmessQRCode.tls) {
+    // Gson stores an explicit JSON null despite the declared type.
+    val tls: String? = vmessQRCode.tls
+    when (tls) {
+        null, "", "none" -> {}
+
         "tls", "reality" -> {
             bean.security = "tls"
             bean.sni = vmessQRCode.sni
@@ -565,6 +628,8 @@ fun parseV2RayN(link: String): VMessBean {
             bean.utlsFingerprint = vmessQRCode.fp
             bean.applyECHParam(vmessQRCode.ech)
         }
+
+        else -> throw UnsupportedShareLinkException("unsupported security")
     }
 
     return bean

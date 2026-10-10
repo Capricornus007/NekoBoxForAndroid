@@ -12,6 +12,9 @@ __MACOSX/
 .pi-subagents/
 AGENTS.md
 
+# Python tooling
+__pycache__/
+
 # Gradle / Kotlin build state
 .gradle/
 .kotlin/
@@ -40,6 +43,8 @@ local.properties
 
 # Local config / generated app artifacts
 local.properties
+.env
+.env.*
 /app/libs/
 /app/src/main/assets/sing-box
 /service_account_credentials.json

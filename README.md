@@ -252,6 +252,20 @@ Only nodes are parsed; routing rules and other non-node fields are ignored.
 
 <br>
 
+## Local control API
+
+An optional token-authenticated loopback API controls profiles, subscriptions, routing, settings and service operations. See [API.md](API.md) for enrollment, command discovery and the Python client. It is off by default and keeps Android permission checks.
+
+## Usage and crash reporting
+
+
+### Account setup
+
+
+```properties
+```
+
+
 ## Credits
 
 Core:

@@ -1,40 +1,83 @@
 package io.nekohasekai.sagernet.group
 
+import android.app.Dialog
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.GroupManager
 import io.nekohasekai.sagernet.database.ProxyGroup
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
-import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.ui.ThemedActivity
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import java.lang.ref.WeakReference
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
-class GroupInterfaceAdapter(val context: ThemedActivity) : GroupManager.Interface {
-
-    override suspend fun confirm(message: String): Boolean {
-        return suspendCoroutine { cont ->
-            runOnMainDispatcher {
-                if (context.isFinishing || context.isDestroyed) {
-                    cont.resume(false)
-                    return@runOnMainDispatcher
-                }
-                try {
-                    MaterialAlertDialogBuilder(context).setTitle(R.string.confirm)
-                        .setMessage(message)
-                        .setPositiveButton(R.string.yes) { _, _ -> cont.resume(true) }
-                        .setNegativeButton(R.string.no) { _, _ -> cont.resume(false) }
-                        .setOnCancelListener { _ -> cont.resume(false) }
-                        .show()
-                } catch (e: Exception) {
-                    Logs.w(e)
-                    cont.resume(false)
-                }
-            }
+/**
+ * Shows the dialog [build] creates on [activity] and waits until it closes. [build] receives a
+ * callback that records the answer; the result is [dismissed] when the dialog closes without one,
+ * when the activity is gone or goes away, or when building it fails. The activity is referenced
+ * only while the dialog shows.
+ */
+internal suspend fun <T> awaitDialog(
+    activity: WeakReference<out ComponentActivity>,
+    dismissed: T,
+    build: (ComponentActivity, answer: (T) -> Unit) -> Dialog,
+): T = withContext(Dispatchers.Main.immediate) {
+    val host = activity.get()?.takeUnless { it.isFinishing || it.isDestroyed } ?: return@withContext dismissed
+    suspendCancellableCoroutine { continuation ->
+        var result = dismissed
+        val dialog = try {
+            build(host) { result = it }
+        } catch (e: Exception) {
+            Logs.w(e)
+            continuation.resume(dismissed)
+            return@suspendCancellableCoroutine
         }
+        // Destroying the activity removes the dialog's window without dismissing it.
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_DESTROY) dialog.dismiss()
+        }
+        dialog.setOnDismissListener {
+            host.lifecycle.removeObserver(observer)
+            if (continuation.isActive) continuation.resume(result)
+        }
+        host.lifecycle.addObserver(observer)
+        continuation.invokeOnCancellation { host.runOnUiThread { dialog.dismiss() } }
+        try {
+            dialog.show()
+        } catch (e: Exception) {
+            Logs.w(e)
+            host.lifecycle.removeObserver(observer)
+            if (continuation.isActive) continuation.resume(dismissed)
+        }
+    }
+}
+
+class GroupInterfaceAdapter(activity: ThemedActivity) : GroupManager.Interface {
+
+    // A pending update or dialog must not keep a finished activity alive.
+    private val activity = WeakReference(activity)
+
+    override suspend fun confirm(message: String): Boolean = awaitDialog(activity, false) { context, answer ->
+        MaterialAlertDialogBuilder(context).setTitle(R.string.confirm)
+            .setMessage(message)
+            .setPositiveButton(R.string.yes) { _, _ -> answer(true) }
+            .setNegativeButton(R.string.no, null)
+            .create()
+    }
+
+    override suspend fun alert(message: String) = awaitDialog(activity, Unit) { context, _ ->
+        MaterialAlertDialogBuilder(context).setTitle(R.string.ooc_warning)
+            .setMessage(message)
+            .setPositiveButton(android.R.string.ok, null)
+            .create()
     }
 
     override suspend fun onUpdateSuccess(
@@ -46,6 +89,7 @@ class GroupInterfaceAdapter(val context: ThemedActivity) : GroupManager.Interfac
         duplicate: List<String>,
         byUser: Boolean,
     ) {
+        val context = activity.get() ?: return
         if (changed == 0 && duplicate.isEmpty()) {
             if (byUser) {
                 onMainDispatcher {
@@ -100,6 +144,7 @@ class GroupInterfaceAdapter(val context: ThemedActivity) : GroupManager.Interfac
                         context.getString(R.string.group_updated, group.name, changed),
                     ).show()
                     delay(1000L)
+                    if (context.isFinishing || context.isDestroyed) return@onMainDispatcher
 
                     MaterialAlertDialogBuilder(context).setTitle(
                         context.getString(
@@ -117,6 +162,7 @@ class GroupInterfaceAdapter(val context: ThemedActivity) : GroupManager.Interfac
     }
 
     override suspend fun onUpdateFailure(group: ProxyGroup, message: String) {
+        val context = activity.get() ?: return
         onMainDispatcher {
             if (context.isFinishing || context.isDestroyed) return@onMainDispatcher
             try {
@@ -125,27 +171,6 @@ class GroupInterfaceAdapter(val context: ThemedActivity) : GroupManager.Interfac
                 throw e
             } catch (e: Exception) {
                 Logs.w(e)
-            }
-        }
-    }
-
-    override suspend fun alert(message: String) {
-        return suspendCoroutine { cont ->
-            runOnMainDispatcher {
-                if (context.isFinishing || context.isDestroyed) {
-                    cont.resume(Unit)
-                    return@runOnMainDispatcher
-                }
-                try {
-                    MaterialAlertDialogBuilder(context).setTitle(R.string.ooc_warning)
-                        .setMessage(message)
-                        .setPositiveButton(android.R.string.ok) { _, _ -> cont.resume(Unit) }
-                        .setOnCancelListener { _ -> cont.resume(Unit) }
-                        .show()
-                } catch (e: Exception) {
-                    Logs.w(e)
-                    cont.resume(Unit)
-                }
             }
         }
     }

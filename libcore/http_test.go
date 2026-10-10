@@ -363,3 +363,80 @@ func TestRaceHTTPRequestsRejectsNonOKAndClosesBody(t *testing.T) {
 	}
 	assertBodyClosed(t, body)
 }
+
+func TestCheckRedirectKeepsCustomHeadersOnlyOnTheSameHTTPSHost(t *testing.T) {
+	request := &httpRequest{request: http.Request{Header: http.Header{}}}
+	request.SetHeader("X-HWID", "device")
+	first, _ := http.NewRequest(http.MethodGet, "https://sub.example/path", nil)
+
+	cases := map[string]bool{
+		"https://sub.example/next":      true,
+		"https://SUB.example:443/next":  true,
+		"https://sub.example:8443/next": false,
+		"https://other.example/next":    false,
+		"https://sub.example.net/next":  false,
+		"https://a.sub.example/next":    false,
+	}
+	for target, kept := range cases {
+		redirect, _ := http.NewRequest(http.MethodGet, target, nil)
+		redirect.Header.Set("X-HWID", "device")
+		redirect.Header.Set("Authorization", "Basic dXNlcjpwYXNz")
+		redirect.Header.Set("Cookie", "session=1")
+		redirect.Header.Set("Referer", "https://sub.example/path")
+		redirect.Header.Set("User-Agent", "ua")
+		if err := request.checkRedirect(redirect, []*http.Request{first}); err != nil {
+			t.Fatalf("%s: %v", target, err)
+		}
+		for _, key := range []string{"X-HWID", "Authorization", "Cookie", "Referer"} {
+			if got := redirect.Header.Get(key) != ""; got != kept {
+				t.Fatalf("%s: %s kept = %v, want %v", target, key, got, kept)
+			}
+		}
+		if redirect.Header.Get("User-Agent") != "ua" {
+			t.Fatalf("%s: User-Agent was dropped", target)
+		}
+	}
+
+	// Leaving HTTPS stops the chain, also after an HTTPS hop of a chain that began in the clear.
+	for _, chain := range [][]string{
+		{"https://sub.example/path", "http://sub.example/next"},
+		{"https://sub.example/path", "https://other.example/next", "http://other.example/last"},
+		{"http://plain.example/path", "https://sub.example/next", "http://sub.example/last"},
+	} {
+		var via []*http.Request
+		for _, hop := range chain[:len(chain)-1] {
+			previous, _ := http.NewRequest(http.MethodGet, hop, nil)
+			via = append(via, previous)
+		}
+		redirect, _ := http.NewRequest(http.MethodGet, chain[len(chain)-1], nil)
+		if err := request.checkRedirect(redirect, via); !errors.Is(err, errRedirectDowngrade) {
+			t.Fatalf("%v: got %v, want a refused downgrade", chain, err)
+		}
+	}
+	// Back on the first origin after another one, the credentials return but the Referer, the
+	// intermediary's URL, does not.
+	relay, _ := http.NewRequest(http.MethodGet, "https://relay.example/hop", nil)
+	back, _ := http.NewRequest(http.MethodGet, "https://sub.example/final", nil)
+	back.Header.Set("X-HWID", "device")
+	back.Header.Set("Referer", "https://relay.example/hop")
+	if err := request.checkRedirect(back, []*http.Request{first, relay}); err != nil {
+		t.Fatal(err)
+	}
+	if back.Header.Get("Referer") != "" || back.Header.Get("X-HWID") == "" {
+		t.Fatal("return hop kept the intermediary Referer or lost the device header")
+	}
+
+	plain, _ := http.NewRequest(http.MethodGet, "http://plain.example/path", nil)
+	upgrade, _ := http.NewRequest(http.MethodGet, "http://plain.example/next", nil)
+	if err := request.checkRedirect(upgrade, []*http.Request{plain}); err != nil {
+		t.Fatalf("plain HTTP chain refused: %v", err)
+	}
+
+	via := make([]*http.Request, 10)
+	for i := range via {
+		via[i] = first
+	}
+	if err := request.checkRedirect(first, via); err == nil {
+		t.Fatal("ten redirects did not stop the chain")
+	}
+}

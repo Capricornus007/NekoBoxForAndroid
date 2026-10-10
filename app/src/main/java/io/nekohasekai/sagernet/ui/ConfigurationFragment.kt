@@ -50,6 +50,7 @@ import io.nekohasekai.sagernet.databinding.LayoutProgressListBinding
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.group.GroupUpdater
+import io.nekohasekai.sagernet.group.ImportPreview
 import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
@@ -490,6 +491,8 @@ class ConfigurationFragment @JvmOverloads constructor(
                                         .let(cursor::getString)
                                 }
                         val proxies = mutableListOf<AbstractBean>()
+                        var preview: ImportPreview? = null
+                        val skippedEntries = mutableListOf<String>()
                         if (fileName != null && fileName.endsWith(".zip")) {
                             // try parse wireguard zip (bounded per-entry + cumulative to stop
                             // a decompression bomb from exhausting memory)
@@ -505,8 +508,15 @@ class ConfigurationFragment @JvmOverloads constructor(
                                     // MAX_IMPORT_BYTES (defeats a many-entry zip bomb).
                                     val bytes = zip.readBytesBounded(remaining)
                                     remaining -= bytes.size
-                                    RawUpdater.parseRaw(bytes.toString(Charsets.UTF_8), entry.name)
-                                        ?.let { pl -> proxies.addAll(pl) }
+                                    try {
+                                        RawUpdater.parseRaw(bytes.toString(Charsets.UTF_8), entry.name)
+                                            ?.let { pl -> proxies.addAll(pl) }
+                                    } catch (e: SubscriptionFoundException) {
+                                        throw e
+                                    } catch (e: Exception) {
+                                        // One config that cannot be imported does not stop the others; it is named.
+                                        skippedEntries += getString(R.string.import_entry_failed, entry.name, e.readableMessage)
+                                    }
                                     zip.closeEntry()
                                 }
                             }
@@ -515,15 +525,27 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 requireContext().contentResolver.openInputStream(file)!!.use {
                                     it.readTextBounded()
                                 }
-                            RawUpdater.parseRaw(fileText, fileName ?: "")
-                                ?.let { pl -> proxies.addAll(pl) }
+                            RawUpdater.parseImport(fileText, fileName ?: "")?.let { parsed ->
+                                proxies.addAll(parsed.proxies)
+                                preview = ImportPreview.of(parsed)
+                            }
+                        }
+                        if (skippedEntries.isNotEmpty()) {
+                            onMainDispatcher {
+                                if (isAdded) {
+                                    MaterialAlertDialogBuilder(requireContext())
+                                        .setMessage(skippedEntries.joinToString("\n"))
+                                        .setPositiveButton(android.R.string.ok, null)
+                                        .show()
+                                }
+                            }
                         }
                         if (proxies.isEmpty()) {
                             onMainDispatcher {
                                 snackbar(getString(R.string.no_proxies_found_in_file)).show()
                             }
                         } else {
-                            import(proxies)
+                            confirmImport(preview, proxies)
                         }
                     } catch (e: SubscriptionFoundException) {
                         (requireActivity() as MainActivity).importSubscription(e.link.toUri())
@@ -536,6 +558,43 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
             }
         }
+
+    /** Show what the import keeps and drops before creating profiles. Sources without a preview (zip) import directly. */
+    private suspend fun confirmImport(preview: ImportPreview?, proxies: List<AbstractBean>) {
+        if (preview == null) return import(proxies)
+        onMainDispatcher {
+            if (!isAdded) return@onMainDispatcher
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.import_preview_title)
+                .setMessage(describe(preview))
+                .setPositiveButton(R.string.import_preview_confirm) { _, _ -> runOnDefaultDispatcher { import(proxies) } }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+    }
+
+    private fun describe(preview: ImportPreview): String = buildString {
+        append(getString(R.string.import_preview_accepted, preview.acceptedCount))
+        if (preview.accepted.isNotEmpty()) {
+            append(preview.accepted.entries.joinToString(", ", " (", ")") { "${it.key} ${it.value}" })
+        }
+        for ((reason, count) in preview.skipped) {
+            append('\n')
+            append(
+                getString(
+                    when (reason) {
+                        ImportPreview.Reason.BUILTIN -> R.string.import_preview_skipped_builtin
+                        ImportPreview.Reason.UNPARSED -> R.string.import_preview_skipped_unparsed
+                    },
+                    count,
+                ),
+            )
+        }
+        if (preview.behaviorDiffers) {
+            val sections = preview.dropped.joinToString(", ") { getString(it.title) }
+            append("\n\n").append(getString(R.string.import_preview_dropped, sections))
+        }
+    }
 
     suspend fun import(proxies: List<AbstractBean>) {
         val targetId = DataStore.selectedGroupForImport()
@@ -657,13 +716,13 @@ class ConfigurationFragment @JvmOverloads constructor(
                 } else {
                     runOnDefaultDispatcher {
                         try {
-                            val proxies = RawUpdater.parseRaw(text)
-                            if (proxies.isNullOrEmpty()) {
+                            val parsed = RawUpdater.parseImport(text)
+                            if (parsed == null) {
                                 onMainDispatcher {
                                     snackbar(getString(R.string.no_proxies_found_in_clipboard)).show()
                                 }
                             } else {
-                                import(proxies)
+                                confirmImport(ImportPreview.of(parsed), parsed.proxies)
                             }
                         } catch (e: SubscriptionFoundException) {
                             if (e.link.startsWith("sn://")) {

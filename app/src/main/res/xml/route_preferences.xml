@@ -66,4 +66,19 @@
             app:title="@string/rule_outbound"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
+    <PreferenceCategory app:title="@string/route_dns_title">
+        <SwitchPreference
+            app:defaultValue="false"
+            app:icon="@drawable/ic_action_dns"
+            app:key="routeDnsThroughOutbound"
+            app:summary="@string/route_dns_summary"
+            app:title="@string/route_dns_through_outbound" />
+        <EditTextPreference
+            app:dependency="routeDnsThroughOutbound"
+            app:icon="@drawable/ic_action_dns"
+            app:key="routeDnsServer"
+            app:dialogMessage="@string/route_dns_server_hint"
+            app:title="@string/route_dns_server"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
 </PreferenceScreen>

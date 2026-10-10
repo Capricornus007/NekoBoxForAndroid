@@ -124,7 +124,6 @@ dependencies {
     // missing compile-time annotation class into an error, so pin it as compileOnly here.
     // Version matches the one language-textmate 0.24.6 already ships at runtime.
     compileOnly("org.eclipse.jdt:org.eclipse.jdt.annotation:2.4.100")
-
     implementation("com.squareup.okhttp3:okhttp:5.5.0")
     implementation("org.yaml:snakeyaml:2.6")
     implementation("com.jakewharton:process-phoenix:3.0.0")

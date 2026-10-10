@@ -66,6 +66,11 @@ internal class TailscaleSessionController(
 
     // A service-mode handoff can leave both service objects bound in this process.
     companion object {
+        const val MAX_OWNER_SESSIONS = 2
+        const val MAX_SESSION_REQUESTS = 4
+        const val MAX_PEER_ID_LENGTH = 256
+        const val MAX_EXIT_SELECTION_LENGTH = 4096
+
         private val registryLock = Any()
         private val controllers = mutableSetOf<TailscaleSessionController>()
         private val mutation = Mutex()
@@ -154,7 +159,7 @@ internal class TailscaleSessionController(
                 if (previous.profileId != profileId || previous.identity != identity) return
                 if (!temporary || previous.temporary || previous.target != null) return
             }
-            if (deliverySessions.size >= 8 || deliverySessions.count { it.key.first == cb.asBinder() } >= 2) return
+            if (deliverySessions.size >= 8 || deliverySessions.count { it.key.first == cb.asBinder() } >= MAX_OWNER_SESSIONS) return
             previous?.let { retire(it) }
             val s = Session(cb, sessionId, profileId, identity, temporary, previous?.sequence ?: AtomicLong())
             deliverySessions.add(s)
@@ -272,7 +277,7 @@ internal class TailscaleSessionController(
     }
 
     private fun read(s: Session): ProxyEntity = TailscaleProfileStore.read(s.profileId).also {
-        check(it.uuid == s.identity && it.tailscaleBean!!.exitNode.orEmpty().length <= 4096) { "tailscale:conflict" }
+        check(it.uuid == s.identity && it.tailscaleBean!!.exitNode.orEmpty().length <= MAX_EXIT_SELECTION_LENGTH) { "tailscale:conflict" }
     }
 
     private fun checkRuntime(s: Session, snapshot: ProxyEntity): ProxyEntity = read(s).also {
@@ -363,7 +368,7 @@ internal class TailscaleSessionController(
             val s = sessions[cb.asBinder() to sessionId] ?: return
             if (destroyed || draining || !s.accepting || !registered(
                     cb.asBinder(),
-                ) || !s.job.isActive || requestId <= s.lastRequest || s.requests.size >= 4
+                ) || !s.job.isActive || requestId <= s.lastRequest || s.requests.size >= MAX_SESSION_REQUESTS
             ) {
                 return
             }
@@ -405,7 +410,7 @@ internal class TailscaleSessionController(
     }
 
     fun ping(cb: ISagerNetServiceCallback, sessionId: Long, requestId: Long, peerId: String, timeoutMs: Int) {
-        if (peerId.length > 256) return
+        if (peerId.length > MAX_PEER_ID_LENGTH) return
         request(cb, sessionId, requestId, "ping") { s, t ->
             if (t == null) {
                 result(s, requestId, pingResult(true, code = "tailscale:not-running"))
@@ -448,7 +453,7 @@ internal class TailscaleSessionController(
         ).put("done", done).put("sample", sample ?: JSONObject.NULL).put("errorCode", code).put("message", "")
 
     fun setExit(cb: ISagerNetServiceCallback, sessionId: Long, requestId: Long, peerId: String, expectedExit: String) {
-        if (peerId.length > 256 || expectedExit.length > 4096) return
+        if (peerId.length > MAX_PEER_ID_LENGTH || expectedExit.length > MAX_EXIT_SELECTION_LENGTH) return
         request(cb, sessionId, requestId, "exit") { s, t ->
             if (t == null) {
                 result(

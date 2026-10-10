@@ -51,6 +51,43 @@
             app:title="@string/group_subscription_link"
             app:useSimpleSummaryProvider="true" />
 
+        <Preference
+            app:icon="@drawable/ic_baseline_link_24"
+            app:isPreferenceVisible="false"
+            app:key="subscriptionOfferedLink"
+            app:title="@string/subscription_offered_link" />
+
+        <Preference
+            app:icon="@drawable/ic_baseline_link_24"
+            app:isPreferenceVisible="false"
+            app:key="subscriptionOfferedBackupLink"
+            app:title="@string/subscription_offered_backup_link" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_link_24"
+            app:key="subscriptionBackupLinks"
+            app:title="@string/subscription_backup_links" />
+
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:defaultValue="0"
+            app:entries="@array/subscription_formats"
+            app:entryValues="@array/int_array_4"
+            app:icon="@drawable/ic_baseline_import_contacts_24"
+            app:key="subscriptionFormat"
+            app:title="@string/subscription_format"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            app:selectable="false"
+            app:summary="@string/subscription_format_summary"
+            app:title="@string/subscription_format_note" />
+
+        <Preference
+            app:isPreferenceVisible="false"
+            app:key="subscriptionImportWarning"
+            app:selectable="false"
+            app:title="@string/subscription_import_warning_title" />
+
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_baseline_manage_search_24"
             app:key="subscriptionForceResolve"

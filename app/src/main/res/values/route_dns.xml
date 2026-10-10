@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="route_dns_title">Rule DNS</string>
+    <string name="route_dns_through_outbound">DNS through this proxy</string>
+    <string name="route_dns_summary">Off by default. Send matching DNS requests through the proxy selected in this rule, without fallback on failure. Applies to app and domain rules, even when DNS routing is off. Global mode ignores this rule. Apps using their own encrypted DNS keep their own resolver.</string>
+    <string name="route_dns_server">Custom DNS resolver</string>
+    <string name="route_dns_server_hint">Optional. Leave empty to use the remote DNS resolver from Settings through this proxy. Enter one DNS address or URL. Resolver hostnames use the normal bootstrap DNS. App rules need VPN mode and Android must identify the app behind the DNS request.</string>
+    <string name="route_dns_error">Cannot enable rule DNS</string>
+    <string name="route_dns_match_error">Use an app or domain rule without IP addresses, ports, network, protocol, source, custom JSON or IP rule sets. DNS requests do not carry those connection details.</string>
+    <string name="route_dns_proxy_error">Choose Proxy or Select Profile as the outbound to use DNS through a proxy.</string>
+    <string name="route_dns_server_error">Enter one supported remote DNS address or URL. Local DNS cannot go through a proxy.</string>
+    <string name="route_apps_unavailable">Rule %1$s is inactive: none of its applications are installed or accessible. Check its application selection.</string>
+    <string name="route_proxy_invalid">Profile %1$s contains invalid outbound settings.</string>
+    <string name="route_proxy_unavailable">Rule %1$s: the proxy or DNS settings are unavailable or invalid. Matching traffic is blocked. Repair the profile or edit the rule.</string>
+</resources>

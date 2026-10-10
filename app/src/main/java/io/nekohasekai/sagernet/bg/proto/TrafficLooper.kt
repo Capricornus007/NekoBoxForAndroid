@@ -330,12 +330,16 @@ class TrafficLooper(
                 mainRx,
             )
 
-            // broadcast (MainActivity)
+            // Visible UI and the enabled local API consume live traffic samples.
             if (data.state == BaseService.State.Connected &&
-                data.binder.callbackIdMap.containsValue(SagerConnection.CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND)
+                (
+                    data.binder.callbackIdMap.containsValue(SagerConnection.CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND) ||
+                        data.binder.callbackIdMap.containsValue(SagerConnection.CONNECTION_ID_LOCAL_API)
+                    )
             ) {
                 data.binder.broadcast { b ->
-                    if (data.binder.callbackIdMap[b.asBinder()] == SagerConnection.CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND) {
+                    val id = data.binder.callbackIdMap[b.asBinder()]
+                    if (id == SagerConnection.CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND || id == SagerConnection.CONNECTION_ID_LOCAL_API) {
                         b.cbSpeedUpdate(speed)
                         if (profileTrafficStatistics) {
                             val batch = ArrayList<TrafficData>(idMap.size)

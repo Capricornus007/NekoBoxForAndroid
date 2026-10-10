@@ -79,6 +79,28 @@ class IniConfigTest {
     }
 
     @Test
+    fun namesMatchWithoutCase_andHashStartsAComment_likeWg() {
+        val conf = """
+            [interface]
+            privatekey = key # the device key
+            [PEER]
+            AllowedIPs = 10.0.0.0/8, 192.168.0.0/16 # office
+        """.trimIndent()
+        val ini = IniConfig.parse(conf)
+        assertEquals("key", ini["Interface"]!!["PrivateKey"])
+        assertEquals(listOf("10.0.0.0/8, 192.168.0.0/16"), ini.getAll("Peer")!!.single().getAll("allowedips"))
+        assertEquals(listOf("interface", "PEER"), ini.sectionNames())
+        assertEquals(false, ini.hasUnrecognizedLines)
+    }
+
+    @Test
+    fun strayLines_areReported() {
+        assertEquals(true, IniConfig.parse("PublicKey = before any section\n[Peer]").hasUnrecognizedLines)
+        assertEquals(true, IniConfig.parse("[Peer]\nnot a pair").hasUnrecognizedLines)
+        assertEquals(false, IniConfig.parse(wgConf).hasUnrecognizedLines)
+    }
+
+    @Test
     fun amneziaObfuscationKeys_present() {
         val conf = """
             [Interface]

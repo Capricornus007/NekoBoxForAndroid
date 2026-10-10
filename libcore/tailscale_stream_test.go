@@ -243,7 +243,7 @@ func TestBoxCloseDrainsTailscaleOutsideAccess(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	instance := &BoxInstance{Box: &box.Box{}, ctx: ctx, cancel: cancel, state: boxStateStarted}
 	instance.access.Lock()
-	lifetime, release, err := instance.admitTailscaleLocked()
+	lifetime, release, err := instance.admitCoreWorkLocked()
 	instance.access.Unlock()
 	if err != nil {
 		t.Fatal(err)

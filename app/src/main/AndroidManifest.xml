@@ -17,8 +17,18 @@
          SecurityException。normal 權限、安裝即授予、不會彈窗。 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <!-- Only requested when a Wi-Fi name rule is added: Android hides the SSID without it. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Lists the app under Select mock location app; Android never grants it to the app. -->
+    <uses-permission
+        android:name="android.permission.ACCESS_MOCK_LOCATION"
+        tools:ignore="MockLocation,ProtectedPermissions" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
+    <!-- Proxy mode service, and the network automation watcher (off unless the user turns on
+         network automation). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -353,12 +363,17 @@
             android:configChanges="uiMode"
             android:theme="@style/Theme.SagerNet" />
 
+        <!-- Not systemExempted: Android 14 and later allow that type only with the VPN permission,
+             which a local proxy does not need. -->
         <service
             android:name="io.nekohasekai.sagernet.bg.ProxyService"
             android:exported="false"
-            android:foregroundServiceType="systemExempted"
-            android:process=":bg"
-            tools:ignore="ForegroundServicePermission" />
+            android:foregroundServiceType="specialUse"
+            android:process=":bg">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Runs the local proxy server the user started, which apps on the device connect through" />
+        </service>
 
         <service
             android:name="io.nekohasekai.sagernet.bg.VpnService"
@@ -371,6 +386,25 @@
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>
+        </service>
+
+        <service
+            android:name="io.nekohasekai.sagernet.api.LocalApiService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Provides the authenticated loopback app-control API while explicitly enabled" />
+        </service>
+
+        <service
+            android:name="io.nekohasekai.sagernet.bg.NetworkAutomationService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":bg">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Watches network changes to start or stop the VPN by network rules the user created" />
         </service>
 
         <service
@@ -406,6 +440,7 @@
             android:authorities="${applicationId}.androidx-startup"
             tools:node="remove" />
 
+
         <receiver
             android:name="io.nekohasekai.sagernet.BootReceiver"
             android:enabled="false"
@@ -417,6 +452,11 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name="io.nekohasekai.sagernet.bg.LocationTurnOffReceiver"
+            android:exported="false"
+            android:process=":bg" />
 
         <service
             android:name="androidx.room.MultiInstanceInvalidationService"

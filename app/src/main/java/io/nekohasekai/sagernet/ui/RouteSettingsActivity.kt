@@ -31,9 +31,11 @@ import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.database.RuleEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
+import io.nekohasekai.sagernet.fmt.validateDnsRouting
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
+import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.utils.PackageCache
 import io.nekohasekai.sagernet.widget.AppListPreference
@@ -76,6 +78,8 @@ class RouteSettingsActivity(
             else -> OutboundPreference.VALUE_SELECT_PROFILE.toInt()
         }
         DataStore.routePackages = packages.joinToString("\n")
+        DataStore.profileCacheStore.putBoolean(Key.ROUTE_DNS_THROUGH_OUTBOUND, dnsThroughOutbound)
+        DataStore.profileCacheStore.putString(Key.ROUTE_DNS_SERVER, dnsServer)
     }
 
     fun RuleEntity.serialize() {
@@ -96,6 +100,8 @@ class RouteSettingsActivity(
             else -> DataStore.routeOutboundRule
         }
         packages = DataStore.routePackages.split("\n").filter { it.isNotBlank() }.toSet()
+        dnsThroughOutbound = DataStore.profileCacheStore.getBoolean(Key.ROUTE_DNS_THROUGH_OUTBOUND, false)
+        dnsServer = DataStore.profileCacheStore.getString(Key.ROUTE_DNS_SERVER).orEmpty().trim()
 
         if (DataStore.editingId == 0L) {
             enabled = true
@@ -271,6 +277,19 @@ class RouteSettingsActivity(
             onMainDispatcher {
                 MaterialAlertDialogBuilder(this@RouteSettingsActivity).setTitle(R.string.empty_route)
                     .setMessage(R.string.empty_route_notice)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+            }
+            return
+        }
+
+        try {
+            RuleEntity().apply { serialize() }.validateDnsRouting()
+        } catch (e: IllegalArgumentException) {
+            onMainDispatcher {
+                MaterialAlertDialogBuilder(this@RouteSettingsActivity)
+                    .setTitle(R.string.route_dns_error)
+                    .setMessage(e.readableMessage)
                     .setPositiveButton(android.R.string.ok, null)
                     .show()
             }

@@ -113,6 +113,8 @@ internal object BackupFormatV2 {
         put("protocol", rule.protocol)
         put("ruleset", rule.ruleset)
         put("outbound", rule.outbound)
+        put("dnsThroughOutbound", rule.dnsThroughOutbound)
+        put("dnsServer", rule.dnsServer)
         put("packages", JSONArray().apply { rule.packages.sorted().forEach { put(it) } })
     }
 
@@ -131,6 +133,8 @@ internal object BackupFormatV2 {
         protocol = json.getString("protocol"),
         ruleset = json.getString("ruleset"),
         outbound = json.getLong("outbound"),
+        dnsThroughOutbound = if (json.has("dnsThroughOutbound")) json.getBoolean("dnsThroughOutbound") else false,
+        dnsServer = if (json.has("dnsServer")) json.getString("dnsServer") else "",
         packages = json.getJSONArray("packages").mapStrings().toSet(),
     )
 

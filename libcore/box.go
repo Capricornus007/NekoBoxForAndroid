@@ -113,10 +113,14 @@ type BoxInstance struct {
 	access sync.Mutex
 
 	*box.Box
-	// ctx is the instance context handed to admitted Tailscale workers; cancel tears it down.
+	// ctx is the instance context handed to admitted core workers; cancel tears it down.
 	ctx    context.Context
 	cancel context.CancelFunc
 	state  boxLifecycleState
+
+	// running mirrors boxStateStarted. It exists for the call sites written before the
+	// state machine landed (WireGuard peer status); new code should test state instead.
+	running bool
 
 	// startBox/closeBox indirect the underlying box lifecycle so the wrapper's
 	// state machine can be unit-tested without a real sing-box instance.
@@ -124,13 +128,14 @@ type BoxInstance struct {
 	closeBox func() error
 	startErr error
 
-	// tailscaleWork counts in-flight Tailscale status / ping / exit-node mutations. Close()
-	// cancels ctx and then drains it WITHOUT holding access, because a worker may still need
+	// coreWork counts in-flight core work admitted under access: Tailscale status / ping /
+	// exit-node mutations and outbound location lookups. Close() cancels ctx and then drains it
+	// WITHOUT holding access, because a worker may still need
 	// the lock to finish (see TestBoxCloseDrainsTailscaleOutsideAccess). closeDone lets a
 	// concurrent Close wait for the teardown already running instead of closing the native
 	// box twice.
-	tailscaleWork sync.WaitGroup
-	closeDone     chan struct{}
+	coreWork  sync.WaitGroup
+	closeDone chan struct{}
 
 	v2api        *boxapi.SbV2rayServer
 	connections  *connectionTracker
@@ -299,6 +304,9 @@ func (b *BoxInstance) Start() (err error) {
 
 	b.state = boxStateStarting
 	defer func() {
+		// running mirrors boxStateStarted: the call sites that still read it must see the
+		// same truth the state machine has once Start returns.
+		b.running = err == nil
 		if err != nil {
 			b.state = boxStateStartFailed
 			b.startErr = err
@@ -338,6 +346,7 @@ func (b *BoxInstance) Close() (err error) {
 	}
 	previousState := b.state
 	b.state = boxStateClosing
+	b.running = false
 	b.closeDone = make(chan struct{})
 	done := b.closeDone
 	b.access.Unlock()
@@ -348,7 +357,7 @@ func (b *BoxInstance) Close() (err error) {
 	if b.cancel != nil {
 		b.cancel()
 	}
-	b.tailscaleWork.Wait()
+	b.coreWork.Wait()
 
 	b.access.Lock()
 	defer b.access.Unlock()

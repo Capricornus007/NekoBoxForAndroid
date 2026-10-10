@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="local_api_title">Local control API</string>
+    <string name="local_api_summary">Control the app through an authenticated loopback connection</string>
+    <string name="local_api_warning">Enable an HTTP API on 127.0.0.1:9091. Anyone with its token can read proxy credentials, change profiles and settings, restore backups, and approve installed plugins. Keep the token private. Android permission checks still apply.</string>
+    <string name="local_api_enable">Enable API</string>
+    <string name="local_api_disable">Disable API</string>
+    <string name="local_api_enabled">Listening on 127.0.0.1:%1$d. Use the token to authenticate local requests. Disabling the API closes the listener without stopping the VPN.</string>
+    <string name="local_api_copy_token">Copy token</string>
+    <string name="local_api_token_copied">API token copied</string>
+    <string name="local_api_rotate">Replace token</string>
+    <string name="local_api_rotate_warning">Connected clients will need the new token. Operations already accepted may finish.</string>
+    <string name="local_api_notification">Local app control is enabled</string>
+    <string name="local_api_saved">API access updated</string>
+    <string name="local_api_start_failed">Could not start the local API. Check its configuration and whether its port is available.</string>
+</resources>

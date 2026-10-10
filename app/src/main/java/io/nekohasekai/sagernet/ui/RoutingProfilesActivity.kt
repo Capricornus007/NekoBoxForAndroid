@@ -1,0 +1,242 @@
+package io.nekohasekai.sagernet.ui
+
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.ViewGroup
+import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import io.nekohasekai.sagernet.R
+import io.nekohasekai.sagernet.SagerNet
+import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.RoutingProfiles
+import io.nekohasekai.sagernet.databinding.LayoutRoutingProfilesBinding
+import io.nekohasekai.sagernet.databinding.LayoutTwoLineItemBinding
+import io.nekohasekai.sagernet.ktx.FixedLinearLayoutManager
+import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.onMainDispatcher
+import io.nekohasekai.sagernet.ktx.readTextBounded
+import io.nekohasekai.sagernet.ktx.readableMessage
+import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
+
+class RoutingProfilesActivity : ThemedActivity() {
+
+    private lateinit var binding: LayoutRoutingProfilesBinding
+    private val adapter = ProfileAdapter()
+    private var pendingExport: RoutingProfiles.Profile? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = LayoutRoutingProfilesBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
+        supportActionBar?.apply {
+            setTitle(R.string.routing_profiles)
+            setDisplayHomeAsUpEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_navigation_close)
+        }
+        binding.recyclerView.layoutManager = FixedLinearLayoutManager(binding.recyclerView)
+        binding.recyclerView.adapter = adapter
+        adapter.reload()
+    }
+
+    override fun snackbarInternal(text: CharSequence): Snackbar = Snackbar.make(binding.coordinator, text, Snackbar.LENGTH_LONG)
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.routing_profiles_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_save_current -> askName(getString(R.string.routing_profile_save_current), "") { name ->
+                runOnDefaultDispatcher {
+                    RoutingProfiles.saveLiveAs(name)
+                    onMainDispatcher { adapter.reload() }
+                }
+            }
+
+            R.id.action_import_file -> importFile.launch("*/*")
+
+            R.id.action_import_clipboard -> importText(SagerNet.getClipboardText())
+
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return true
+    }
+
+    private val importFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri ?: return@registerForActivityResult
+        runOnDefaultDispatcher {
+            val text = try {
+                contentResolver.openInputStream(uri)?.use { it.readTextBounded() }
+            } catch (e: Exception) {
+                Logs.w(e)
+                null
+            }
+            onMainDispatcher { importText(text.orEmpty()) }
+        }
+    }
+
+    // Accepts export JSON, sn://routing/ links and Happ/INCY routing profiles alike. Replacing one
+    // of the user's profiles (and applying it live when that profile is active), or importing a
+    // provider profile with settings it cannot apply, needs a confirmation first.
+    private fun importText(text: String) {
+        val candidate = RoutingProfiles.parse(text)
+        if (candidate == null) {
+            snackbar(R.string.routing_profile_import_invalid).show()
+            return
+        }
+        val replaced = RoutingProfiles.replacementFor(candidate)
+        if (replaced == null && candidate.notes.isEmpty()) {
+            store(candidate)
+            return
+        }
+        val message = listOfNotNull(
+            replaced?.let {
+                getString(
+                    if (it.id == RoutingProfiles.activeId) R.string.routing_profile_replace_active_message else R.string.routing_profile_replace_message,
+                    it.name,
+                )
+            },
+            candidate.notes.takeIf { it.isNotEmpty() }?.let {
+                getString(R.string.routing_profile_not_applied, candidate.name, it.joinToString(", "))
+            },
+        ).joinToString("\n\n")
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.confirm)
+            .setMessage(message)
+            .setPositiveButton(R.string.yes) { _, _ -> store(candidate) }
+            .setNegativeButton(R.string.no, null)
+            .show()
+    }
+
+    private fun store(candidate: RoutingProfiles.Profile) {
+        runOnDefaultDispatcher {
+            val stored = runCatching { RoutingProfiles.store(candidate) }.onFailure { Logs.w(it) }.getOrNull()
+            onMainDispatcher {
+                adapter.reload()
+                if (stored?.id == RoutingProfiles.activeId && DataStore.serviceState.started) {
+                    snackbar(R.string.need_reload).setAction(R.string.apply) { SagerNet.reloadService() }.show()
+                }
+            }
+        }
+    }
+
+    private val exportFile = registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        val profile = pendingExport ?: return@registerForActivityResult
+        pendingExport = null
+        uri ?: return@registerForActivityResult
+        runOnDefaultDispatcher {
+            try {
+                val current = RoutingProfiles.exportable(profile.id) ?: profile
+                contentResolver.openOutputStream(uri)?.bufferedWriter()?.use {
+                    it.write(current.toExportJson().toString(2))
+                }
+            } catch (e: Exception) {
+                onMainDispatcher { snackbar(e.readableMessage).show() }
+            }
+        }
+    }
+
+    private fun askName(title: String, current: String, onName: (String) -> Unit) {
+        val input = EditText(this).apply { setText(current) }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(title)
+            .setView(input)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                input.text.toString().trim().takeIf { it.isNotEmpty() }?.let(onName)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun switchTo(profile: RoutingProfiles.Profile) {
+        runOnDefaultDispatcher {
+            RoutingProfiles.switchTo(profile.id)
+            onMainDispatcher {
+                adapter.reload()
+                if (DataStore.serviceState.started) {
+                    snackbar(R.string.need_reload).setAction(R.string.apply) { SagerNet.reloadService() }.show()
+                }
+            }
+        }
+    }
+
+    private fun showMenu(anchor: android.view.View, profile: RoutingProfiles.Profile) {
+        PopupMenu(this, anchor).apply {
+            menuInflater.inflate(R.menu.routing_profile_item_menu, menu)
+            menu.findItem(R.id.action_switch).isVisible = profile.id != RoutingProfiles.activeId
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.action_switch -> switchTo(profile)
+
+                    R.id.action_rename -> askName(getString(R.string.routing_profile_rename), profile.name) { name ->
+                        RoutingProfiles.rename(profile.id, name)
+                        adapter.reload()
+                    }
+
+                    R.id.action_export_clipboard -> runOnDefaultDispatcher {
+                        val link = (RoutingProfiles.exportable(profile.id) ?: profile).toLink()
+                        onMainDispatcher {
+                            snackbar(if (SagerNet.trySetPrimaryClip(link)) R.string.action_export_msg else R.string.action_export_err).show()
+                        }
+                    }
+
+                    R.id.action_export -> {
+                        pendingExport = profile
+                        exportFile.launch("routing-${profile.name}.json")
+                    }
+
+                    R.id.action_delete -> MaterialAlertDialogBuilder(this@RoutingProfilesActivity)
+                        .setTitle(R.string.confirm)
+                        .setMessage(getString(R.string.routing_profile_delete_message, profile.name))
+                        .setPositiveButton(R.string.yes) { _, _ ->
+                            RoutingProfiles.delete(profile.id)
+                            adapter.reload()
+                        }
+                        .setNegativeButton(R.string.no, null)
+                        .show()
+                }
+                true
+            }
+            show()
+        }
+    }
+
+    inner class ProfileAdapter : RecyclerView.Adapter<ProfileHolder>() {
+        private val profiles = ArrayList<RoutingProfiles.Profile>()
+
+        fun reload() {
+            profiles.clear()
+            profiles.addAll(RoutingProfiles.list())
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ProfileHolder(LayoutTwoLineItemBinding.inflate(layoutInflater, parent, false))
+
+        override fun getItemCount() = profiles.size
+
+        override fun onBindViewHolder(holder: ProfileHolder, position: Int) = holder.bind(profiles[position])
+    }
+
+    inner class ProfileHolder(private val binding: LayoutTwoLineItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(profile: RoutingProfiles.Profile) {
+            binding.title.text = profile.name
+            val rules = resources.getQuantityString(R.plurals.routing_profile_rules, profile.ruleCount, profile.ruleCount)
+            binding.summary.text = if (profile.id == RoutingProfiles.activeId) {
+                getString(R.string.routing_profile_active, rules)
+            } else {
+                rules
+            }
+            binding.root.setOnClickListener { showMenu(binding.more, profile) }
+            binding.more.setOnClickListener { showMenu(it, profile) }
+        }
+    }
+}

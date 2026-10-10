@@ -96,6 +96,13 @@ internal fun SingBoxOption.applyDomainStrategyIfSupported(domainStrategy: String
 
 private val ENDPOINT_TYPES = setOf("wireguard", "awg", "tailscale")
 
+// Mirrors libcore/box_include.go, except the legacy DNS type rejected by the core decoder.
+private val coreOutboundTypes = setOf(
+    "direct", "block", "selector", "urltest", "socks", "http", "shadowsocks", "shadowsocksr",
+    "vmess", "trojan", "tor", "ssh", "shadowtls", "vless", "anytls", "snell",
+    "hysteria", "tuic", "hysteria2", "juicity", "wireguard", "amneziawg",
+)
+
 private fun SingBoxOption.isGeneratedEndpoint(): Boolean = this is Endpoint && type in ENDPOINT_TYPES
 
 internal fun SingBoxOption.detourTo(nextTag: String) {
@@ -237,10 +244,16 @@ class ConfigBuildResult(
     val tailscaleEndpoints: Map<Long, TailscaleEndpoint> = emptyMap(),
     // Profile id -> the Tailscale profiles among its hops (group front/landing included).
     val profileTailscaleNodes: Map<Long, Set<Long>> = emptyMap(),
+    // WireGuard/AmneziaWG profile id -> its outbounds. A profile that is a hop of several chains
+    // runs once per chain, each instance with its own handshakes.
+    val wireguardInstances: Map<Long, List<WireGuardInstance>> = emptyMap(),
 ) {
     data class IndexEntity(var chain: LinkedHashMap<Int, ProxyEntity>)
 
     data class TailscaleEndpoint(val tag: String, val waitForExitNode: Boolean)
+
+    // ownerProfileId: the profile whose chain built this outbound.
+    data class WireGuardInstance(val tag: String, val ownerProfileId: Long)
 }
 
 private fun sanitizeDnsEntry(value: String): String = value.filterNot { it.isISOControl() }.trim()
@@ -250,7 +263,7 @@ private fun sanitizeDnsEntry(value: String): String = value.filterNot { it.isISO
 // zeros and malformed IPv6 forms) and one bad value would fail the whole config
 // load. Embedded-IPv4 IPv6 forms (::ffff:1.2.3.4) are not supported; write the
 // plain IPv4 address instead. Returns the address, or null when not usable.
-private fun parseHostsAddress(token: String): String? {
+internal fun parseHostsAddress(token: String): String? {
     val value = token.unwrapIPV6Host()
     if (!value.isIpAddress()) return null
     if (value.contains(':')) {
@@ -270,7 +283,7 @@ private fun parseHostsAddress(token: String): String? {
     return value
 }
 
-private fun parseHostsDomain(token: String): String? {
+internal fun parseHostsDomain(token: String): String? {
     var domain = sanitizeDnsEntry(token).removeSuffix(".")
     if (domain.isEmpty()) return null
     // Internationalized domains: convert to punycode, which is what arrives in
@@ -483,6 +496,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     val tailscaleProfiles = hashSetOf<Long>()
     val tailscaleEndpoints = HashMap<Long, ConfigBuildResult.TailscaleEndpoint>()
     val profileTailscaleNodes = HashMap<Long, Set<Long>>()
+    val wireguardInstances = LinkedHashMap<Long, MutableList<ConfigBuildResult.WireGuardInstance>>()
     if (buildSelector) {
         require(group.landingProxy?.let { SagerDatabase.proxyDao.getById(it) }?.requireBean() !is TailscaleBean) {
             SagerNet.application.getString(R.string.tailscale_selector_landing)
@@ -715,8 +729,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         // 这条“先→后”的边；引用在 buildDynamicGroup 声明完毕、首次调用发生前赋值。
         lateinit var buildDynamicGroupImpl: (ProxyEntity, Boolean) -> String
 
+        // returns outbound tag; selected: the main profile or a selector member, not a rule outbound
         @Suppress("UNCHECKED_CAST")
-        fun buildChain(chainId: Long, entity: ProxyEntity): String {
+        fun buildChain(chainId: Long, entity: ProxyEntity, selected: Boolean): String {
             // 动态分组（最快 / 瀑布）不做链路展平，改为构建 urltest 分组。
             // 静态候选仍交回 buildChain 构建，与 main 现有链路建置架构对齐。
             if (entity.type == ProxyEntity.TYPE_FASTEST ||
@@ -733,7 +748,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 val members = balancerMembers(balancerBean, entity.id)
                 val memberTags = ArrayList<String>()
                 members.forEach { member ->
-                    val tag = buildChain(member.id, member)
+                    val tag = buildChain(member.id, member, false)
                     memberTags.add(tag)
                     tagMap[member.id] = tag
                     trafficMap[tag] = listOf(member)
@@ -792,6 +807,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             val externalChainMap = LinkedHashMap<Int, ProxyEntity>()
             externalIndexMap.add(IndexEntity(externalChainMap))
             val chainOutbounds = ArrayList<SingBoxOption>()
+            val chainWireGuard = mutableListOf<Pair<Long, ConfigBuildResult.WireGuardInstance>>()
 
             var chainTagOut = ""
             val chainTag = "c-$chainId"
@@ -1016,6 +1032,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
                     _hack_config_map["tag"] = tagOut
                 }
+                if (bean is WireGuardBean || bean is AmneziaWGBean) {
+                    chainWireGuard += proxyEntity.id to ConfigBuildResult.WireGuardInstance(tagOut, entity.id)
+                }
 
                 bean.finalAddress = bean.serverAddress
                 bean.finalPort = bean.serverPort
@@ -1083,18 +1102,36 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 pastEntity = proxyEntity
             }
 
+            // Parse custom JSON before committing the chain, so malformed rule targets can be blocked.
+            chainOutbounds.forEach { outbound ->
+                val json = SingBoxOptions.toJsonTree(outbound)
+                fun stringField(key: String) = json[key]?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isString }?.asString
+                val port = json["server_port"]
+                val types = if (outbound is Endpoint) ENDPOINT_TYPES else coreOutboundTypes
+                require(
+                    stringField("type") in types &&
+                        stringField("tag") == outbound._hack_config_map["tag"] &&
+                        (!json.has("server") || !stringField("server").isNullOrBlank()) &&
+                        (
+                            port == null || (
+                                port.isJsonPrimitive && port.asJsonPrimitive.isNumber &&
+                                    port.asString.toIntOrNull()?.let { it in 1..65535 } == true
+                                )
+                            ),
+                ) { SagerNet.application.getString(R.string.route_proxy_invalid, entity.displayName()) }
+            }
             trafficMap[chainTagOut] = chainTrafficSet.toList()
             // Reserve only for a chain that built completely; a hop that fails later releases them.
             tailscaleProfiles += chainTailscaleProfiles
             tailscaleEndpoints += chainTailscaleEndpoints
+            chainWireGuard.forEach { (profileId, instance) -> wireguardInstances.getOrPut(profileId) { mutableListOf() } += instance }
             profileList.filter { it.requireBean() is TailscaleBean }.map { it.id }.toSet()
                 .takeIf { it.isNotEmpty() }?.let { profileTailscaleNodes[entity.id] = it }
             return chainTagOut
         }
 
-        // A broken chain fails the build when it is the selected profile. As a group member or a
-        // rule outbound it is left out with a warning, so the service still starts.
-        fun buildChainOrSkip(chainId: Long, entity: ProxyEntity): String? {
+        // A broken selected profile fails the build. Rules targeting skipped profiles become blocks.
+        fun buildChainOrSkip(chainId: Long, entity: ProxyEntity, selected: Boolean): String? {
             // buildChain appends to these as it goes; a hop that fails halfway must not leave an
             // outbound whose detour points at a tag that is never created, or a global tag for it.
             val appended = listOf<MutableList<*>>(
@@ -1104,19 +1141,37 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 externalIndexMap,
             ).map { it to it.size }
             val globalBefore = HashMap(globalOutbounds)
+            val namesBefore = readableNames.toSet()
+            val bypassBefore = bypassDNSBeans.toSet()
+            val forceDnsSize = domainListDNSDirectForce.size
+            val resolverBefore = perGroupResolver.toMap()
+            val groupHostsBefore = perGroupServerHosts.mapValues { it.value.toMutableSet() }
+            val hostResolversBefore = hostResolvers.mapValues { it.value.toMutableSet() }
+            val finalHostsBefore = nonCustomFinalHosts.toSet()
+            val credentialsBefore = localProxyCredentials.keys.toSet()
             return try {
-                buildChain(chainId, entity)
-            } catch (e: IllegalArgumentException) {
-                if (entity.id == proxy.id) throw e
+                buildChain(chainId, entity, selected)
+            } catch (e: Exception) {
+                if (entity.id == proxy.id || e is kotlinx.coroutines.CancellationException) throw e
                 for ((list, size) in appended) list.subList(size, list.size).clear()
                 globalOutbounds.clear()
                 globalOutbounds.putAll(globalBefore)
-                runOnMainDispatcher {
-                    Toast.makeText(
-                        SagerNet.application,
-                        e.readableMessage,
-                        Toast.LENGTH_LONG,
-                    ).show()
+                readableNames.retainAll(namesBefore)
+                bypassDNSBeans.retainAll(bypassBefore)
+                domainListDNSDirectForce.subList(forceDnsSize, domainListDNSDirectForce.size).clear()
+                perGroupResolver.clear()
+                perGroupResolver.putAll(resolverBefore)
+                perGroupServerHosts.clear()
+                perGroupServerHosts.putAll(groupHostsBefore)
+                hostResolvers.clear()
+                hostResolvers.putAll(hostResolversBefore)
+                nonCustomFinalHosts.retainAll(finalHostsBefore)
+                localProxyCredentials.keys.retainAll(credentialsBefore)
+                if (selected) {
+                    runOnMainDispatcher { Toast.makeText(SagerNet.application, e.readableMessage, Toast.LENGTH_LONG).show() }
+                } else {
+                    // Exception messages can contain credentials; the class and source location do not.
+                    Logs.w("Proxy ${entity.id} could not be built: ${e.javaClass.name} at ${e.stackTrace.firstOrNull()}")
                 }
                 null
             }
@@ -1150,7 +1205,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         candidate.type == ProxyEntity.TYPE_FASTEST ->
                         error("Unsupported nested dynamic proxy profile")
 
-                    else -> buildChain(candidate.id, candidate)
+                    else -> buildChain(candidate.id, candidate, false)
                 }
             }
 
@@ -1190,7 +1245,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             val list = group?.id?.let { SagerDatabase.proxyDao.getByGroup(it) } ?: listOf(proxy)
             list.forEach {
                 // 成員建置失敗只跳過該成員（buildChainOrSkip 會回滾半成品），主 profile 失敗才拋錯。
-                buildChainOrSkip(it.id, it)?.let { tag -> tagMap[it.id] = tag }
+                buildChainOrSkip(it.id, it, true)?.let { tag -> tagMap[it.id] = tag }
             }
             outbounds.add(
                 0,
@@ -1204,7 +1259,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             val balancerBean = proxy.requireBean() as BalancerBean
             val beans = balancerMembers(balancerBean, proxy.id)
             beans.forEach {
-                tagMap[it.id] = buildChain(it.id, it)
+                tagMap[it.id] = buildChain(it.id, it, false)
             }
             outbounds.add(
                 0,
@@ -1228,12 +1283,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 }
             }
         } else {
-            val mainTag = buildChain(0, proxy)
+            val mainTag = buildChain(0, proxy, true)
             tagMap[proxy.id] = mainTag
         }
 
         extraProxies.forEach { (key, p) ->
-            tagMap[key] = buildChain(key, p)
+            if (key !in tagMap) buildChainOrSkip(key, p, false)?.let { tagMap[key] = it }
         }
 
         val mainProxyTag = (if (buildSelector || useAutoSelect) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
@@ -1324,6 +1379,17 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 val uidList = effectivePackages.mapNotNull {
                     PackageCache[it]?.takeIf { uid -> uid >= 1000 }
                 }.toHashSet().toList()
+                // Dropping an unresolved app condition would turn an app rule into a broader rule.
+                if (rule.packages.isNotEmpty() && uidList.isEmpty()) {
+                    runOnMainDispatcher {
+                        Toast.makeText(
+                            SagerNet.application,
+                            SagerNet.application.getString(R.string.route_apps_unavailable, rule.displayName()),
+                            Toast.LENGTH_LONG,
+                        ).show()
+                    }
+                    continue
+                }
                 val ruleSets = mutableListOf<RuleSet>()
 
                 val ruleObj = Rule_DefaultOptions().apply {
@@ -1841,6 +1907,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             localProxyCredentials,
             tailscaleEndpoints,
             profileTailscaleNodes,
+            wireguardInstances,
         )
     }
 }

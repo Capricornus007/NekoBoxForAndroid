@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.InputType
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,6 +20,7 @@ import androidx.core.view.ViewCompat
 import androidx.preference.*
 import com.github.shadowsocks.plugin.Empty
 import com.github.shadowsocks.plugin.fragment.AlertDialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
@@ -27,6 +29,8 @@ import io.nekohasekai.sagernet.SubscriptionFilterMode
 import io.nekohasekai.sagernet.database.*
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
 import io.nekohasekai.sagernet.group.GroupUpdater
+import io.nekohasekai.sagernet.group.SubscriptionFormat
+import io.nekohasekai.sagernet.group.SubscriptionRecovery
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
@@ -36,6 +40,7 @@ import io.nekohasekai.sagernet.widget.ListListener
 import io.nekohasekai.sagernet.widget.OutboundPreference
 import kotlinx.parcelize.Parcelize
 import moe.matsuri.nb4a.ui.SimpleMenuPreference
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @Suppress("UNCHECKED_CAST")
 class GroupSettingsActivity(
@@ -46,6 +51,10 @@ class GroupSettingsActivity(
     private lateinit var frontProxyPreference: OutboundPreference
     private lateinit var landingProxyPreference: OutboundPreference
     var isUngrouped: Boolean = false
+
+    // Links the provider proposed in its last update; shown for approval, never fetched before.
+    private var pendingLinkOffer = ""
+    private var pendingBackupOffer = ""
 
     fun ProxyGroup.init() {
         DataStore.groupName = name.takeIf { !it.isNullOrBlank() } ?: if (ungrouped) {
@@ -67,15 +76,21 @@ class GroupSettingsActivity(
             if (landingProxy >= 0) OutboundPreference.VALUE_SELECT_PROFILE.toInt() else 0
 
         val subscription = subscription ?: SubscriptionBean().applyDefaultValues()
-        DataStore.subscriptionLink = subscription.link
-        DataStore.subscriptionForceResolve = subscription.forceResolve
-        DataStore.subscriptionDeduplication = subscription.deduplication
-        DataStore.subscriptionUpdateWhenConnectedOnly = subscription.updateWhenConnectedOnly
-        DataStore.subscriptionUserAgent = subscription.customUserAgent
-        DataStore.subscriptionAutoUpdate = subscription.autoUpdate
-        DataStore.subscriptionAutoUpdateDelay = subscription.autoUpdateDelay
-        DataStore.subscriptionFilterMode = subscription.filterMode
-        DataStore.subscriptionFilterRegex = subscription.filterRegex
+        DataStore.subscriptionLink = subscription.link!!
+        DataStore.subscriptionFormat = subscription.outputFormat ?: 0
+        DataStore.subscriptionImportWarning = subscription.importWarning.orEmpty()
+        DataStore.subscriptionBackupLinks = subscription.backupLinks.orEmpty()
+        pendingLinkOffer = subscription.offeredLink.orEmpty()
+        pendingBackupOffer = subscription.offeredBackupLink.orEmpty()
+        DataStore.subscriptionForceResolve = subscription.forceResolve!!
+        DataStore.subscriptionDeduplication = subscription.deduplication!!
+        DataStore.subscriptionUpdateWhenConnectedOnly = subscription.updateWhenConnectedOnly!!
+        DataStore.subscriptionUserAgent = subscription.customUserAgent!!
+        DataStore.subscriptionAutoUpdate = subscription.autoUpdate!!
+        DataStore.subscriptionAutoUpdateDelay = subscription.autoUpdateDelay!!
+        DataStore.subscriptionFilterMode = subscription.filterMode!!
+        DataStore.subscriptionFilterRegex = subscription.filterRegex!!
+        DataStore.subscriptionCustomDns = subscription.customDnsResolver ?: ""
         DataStore.subscriptionServerDns = subscription.serverDnsResolver ?: ""
     }
 
@@ -112,7 +127,19 @@ class GroupSettingsActivity(
         val isSubscription = type == GroupType.SUBSCRIPTION
         if (isSubscription) {
             subscription = (subscription ?: SubscriptionBean().applyDefaultValues()).apply {
+                // Only an accepted update records which request the stored profiles came from. A new
+                // User-Agent, or a switch between a link and a file, leaves that unknown, so the next
+                // update asks before it replaces profiles it does not match.
+                val userAgentChanged = customUserAgent.orEmpty().ifBlank { "" } != DataStore.subscriptionUserAgent.ifBlank { "" }
+                val kindChanged = link.orEmpty().startsWith("content://") != DataStore.subscriptionLink.startsWith("content://")
+                if ((lastUpdated ?: 0) > 0 && (userAgentChanged || kindChanged)) negotiatedFormat = SubscriptionFormat.CHANGED
                 link = DataStore.subscriptionLink
+                outputFormat = DataStore.subscriptionFormat
+                backupLinks = DataStore.subscriptionBackupLinks.lines().map { it.trim() }.filter { it.isNotEmpty() }.joinToString("\n")
+                // An accepted offer is now the link or a backup; one still pending stays.
+                val approved = backupLinks!!.lines() + link
+                if (offeredLink in approved) offeredLink = ""
+                if (offeredBackupLink in approved) offeredBackupLink = ""
                 forceResolve = DataStore.subscriptionForceResolve
                 deduplication = DataStore.subscriptionDeduplication
                 updateWhenConnectedOnly = DataStore.subscriptionUpdateWhenConnectedOnly
@@ -132,6 +159,66 @@ class GroupSettingsActivity(
 
     fun PreferenceFragmentCompat.createPreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.group_preferences)
+        findPreference<Preference>(Key.SUBSCRIPTION_IMPORT_WARNING)!!.apply {
+            summary = DataStore.subscriptionImportWarning
+            isVisible = DataStore.subscriptionImportWarning.isNotBlank()
+        }
+
+        val linkPreference = findPreference<EditTextPreference>(Key.SUBSCRIPTION_LINK)!!
+        val backupLinksPreference = findPreference<EditTextPreference>(Key.SUBSCRIPTION_BACKUP_LINKS)!!.apply {
+            summaryProvider = Preference.SummaryProvider<EditTextPreference> { preference ->
+                preference.text.orEmpty().trim().ifEmpty {
+                    getString(R.string.subscription_backup_links_summary, SubscriptionRecovery.MAX_BACKUP_LINKS)
+                }
+            }
+            setOnBindEditTextListener {
+                it.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            }
+            setOnPreferenceChangeListener { _, newValue ->
+                val links = (newValue as String).lines().map { it.trim() }.filter { it.isNotEmpty() }
+                val valid = links.size <= SubscriptionRecovery.MAX_BACKUP_LINKS && links.all(SubscriptionRecovery::isHttpsLink)
+                if (!valid) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.subscription_backup_links_invalid, SubscriptionRecovery.MAX_BACKUP_LINKS),
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
+                valid
+            }
+        }
+        fun backupLinks(links: List<String>, without: String) = links.map { it.trim() }
+            .filter { it != without && SubscriptionRecovery.isHttpsLink(it) }
+            .distinct()
+            .take(SubscriptionRecovery.MAX_BACKUP_LINKS)
+            .joinToString("\n")
+
+        // Accepting fills in the link or backups like typing them would; saving the group applies it.
+        fun offer(key: String, offered: String, accept: () -> Unit) = findPreference<Preference>(key)!!.apply {
+            isVisible = offered.isNotEmpty()
+            summary = offered
+            setOnPreferenceClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(title)
+                    .setMessage(getString(R.string.subscription_offer_message, offered, offered.toHttpUrlOrNull()?.host ?: offered))
+                    .setPositiveButton(R.string.subscription_offer_accept) { _, _ ->
+                        accept()
+                        isVisible = false
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+                true
+            }
+        }
+        offer(Key.SUBSCRIPTION_OFFERED_LINK, pendingLinkOffer) {
+            // The replaced link stays available as the first backup when it is HTTPS.
+            val previous = linkPreference.text.orEmpty()
+            linkPreference.text = pendingLinkOffer
+            backupLinksPreference.text = backupLinks(listOf(previous) + backupLinksPreference.text.orEmpty().lines(), pendingLinkOffer)
+        }
+        offer(Key.SUBSCRIPTION_OFFERED_BACKUP_LINK, pendingBackupOffer) {
+            backupLinksPreference.text = backupLinks(backupLinksPreference.text.orEmpty().lines() + pendingBackupOffer, linkPreference.text.orEmpty())
+        }
 
         frontProxyPreference = findPreference(Key.GROUP_FRONT_PROXY)!!
         frontProxyPreference.apply {

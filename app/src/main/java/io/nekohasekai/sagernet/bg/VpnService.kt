@@ -5,10 +5,12 @@ import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.net.ProxyInfo
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.os.PowerManager
+import androidx.core.app.NotificationCompat
 import io.nekohasekai.sagernet.*
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.fmt.LOCALHOST
@@ -91,19 +93,87 @@ class VpnService :
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (DataStore.serviceMode == Key.MODE_VPN) {
-            if (prepare(this) != null) {
-                startActivity(
-                    Intent(
-                        this,
-                        VpnRequestActivity::class.java,
-                    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                )
-            } else {
-                return super<BaseService.Interface>.onStartCommand(intent, flags, startId)
+            // Only SagerNet.startService marks a manual start. Any other start, by network
+            // automation, at boot, this service's own restart or Android starting its always-on
+            // VPN, never asks for VPN permission from the background.
+            val unattended = intent?.getBooleanExtra(Action.EXTRA_AUTOMATED, true) != false
+            when {
+                // A running service ignores a further start.
+                unattended && data.state != BaseService.State.Stopped -> return super<BaseService.Interface>.onStartCommand(intent, flags, startId)
+
+                unattended && takesOverAnotherVpn(intent) -> refuseUnattendedStart(NetworkAutomation.Blocked.OTHER_VPN)
+
+                prepare(this) == null -> return super<BaseService.Interface>.onStartCommand(intent, flags, startId)
+
+                unattended -> refuseUnattendedStart(NetworkAutomation.Blocked.VPN_PERMISSION)
+
+                else -> {
+                    startActivity(
+                        Intent(
+                            this,
+                            VpnRequestActivity::class.java,
+                        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    )
+                    // The consent screen starts the service again once the user agrees.
+                    answerForegroundDemand()
+                }
             }
         }
         stopRunner()
         return Service.START_NOT_STICKY
+    }
+
+    /**
+     * Whether a start that is not manual would take over another VPN, which prepare() does.
+     * - Android starting this app as its always-on VPN decided that itself.
+     * - A restart of a running session, such as a reload, that kept its tunnel up has nothing to
+     *   take over. One that closed it checks only the VPN carrying this app's own traffic, so the VPN
+     *   of another user or a work profile never ends the session. Before Android 11 that is unknown,
+     *   and a VPN of the same user that leaves this app out does not show at all; such a restart can
+     *   still take over.
+     * - Any other start, by a rule or at boot, holds back for every VPN Android reports.
+     */
+    internal fun takesOverAnotherVpn(intent: Intent?): Boolean = when {
+        intent?.action == SERVICE_INTERFACE -> false
+        // 我方在 142dddfc8 已把 stopGate 的 tun-hold（holdTun）拿掉，改成靠「重啟請求不遺失」
+        // 那套語意；hawkff 這行還在讀 holdTun，留下來會編不過，也等於把我們修掉的
+        // 「拆 TUN 期間死抓介面」行為帶回來。這裡按我方現行語意走。
+        data.restarting -> NetworkAutomation.otherVpnCarriesThisApp()
+        else -> NetworkAutomation.otherVpnActive()
+    }
+
+    private fun refuseUnattendedStart(reason: NetworkAutomation.Blocked) {
+        if (DataStore.networkAutomation) NetworkAutomation.blocked = reason
+        answerForegroundDemand()
+    }
+
+    /**
+     * startForegroundService demands a startForeground call even from a service that stops right
+     * away; without one Android ends the process. Without the VPN permission Android 14 and later
+     * refuse the systemExempted type, yet the attempt answers that demand, so its failure is only
+     * logged. The notice goes again at once, as the app or the tile may keep the service bound.
+     */
+    internal fun answerForegroundDemand() {
+        val notification = NotificationCompat.Builder(this, "service-vpn")
+            .setSmallIcon(R.drawable.ic_service_active)
+            .setContentTitle(getText(R.string.app_name))
+            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .build()
+        try {
+            if (Build.VERSION.SDK_INT >= 34) {
+                startForeground(ServiceNotification.notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED)
+            } else {
+                startForeground(ServiceNotification.notificationId, notification)
+            }
+        } catch (e: RuntimeException) {
+            Logs.w("VPN service stopped before reaching the foreground", e)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
     }
 
     inner class NullConnectionException :
@@ -319,9 +389,17 @@ class VpnService :
         builder?.setUnderlyingNetworks(networks) ?: setUnderlyingNetworks(networks)
     }
 
-    override fun onRevoke() = stopRunner()
+    // Android revoked the VPN: the user disconnected it in the system settings, or another VPN app
+    // took over. Network automation takes that as a manual stop. Called on a binder thread.
+    override fun onRevoke() {
+        runOnMainDispatcher {
+            NetworkAutomation.onUserStop(this@VpnService)
+            stopRunner()
+        }
+    }
 
     override fun onDestroy() {
+        data.locationSpoofing?.stop()
         DataStore.vpnService = null
         super.onDestroy()
         data.binder.close()

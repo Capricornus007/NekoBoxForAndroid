@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_format">Subscription format</string>
+    <string name="subscription_format_default">NekoBox default (prefers Clash/Mihomo)</string>
+    <string name="subscription_format_auto">Auto: find a format that works and keep it</string>
+    <string name="subscription_format_links">Share links / Base64</string>
+    <string name="subscription_format_singbox">sing-box outbounds</string>
+    <string name="subscription_format_note">Format requests</string>
+    <string name="subscription_format_summary">Providers pick a format from the User-Agent. Auto keeps requesting the format the current profiles came from and tries the others only when it stops working. A subscription without profiles first requests the same link once per format, at most three times, and keeps the format with the most profiles this app can import. Stored profiles that another format or User-Agent does not match are replaced only after you agree. A custom User-Agent replaces format requests, and a provider may ignore them. Routing, DNS and proxy groups are not imported.</string>
+    <string name="subscription_import_warning_title">Last update</string>
+    <string name="subscription_import_failed">Imported %1$d profiles. %2$d entries could not be imported: %3$s.</string>
+    <string name="subscription_import_unknown_entry">unrecognized</string>
+    <string name="subscription_import_dropped">Not used by this app: %s.</string>
+    <string name="subscription_kept_referenced">Kept %d profiles the provider no longer lists because they are selected or used by rules, chains or groups.</string>
+    <string name="subscription_kept_partial">Kept %d profiles the provider no longer lists because some entries could not be imported.</string>
+    <string name="subscription_served_by_backup">The main link failed; this update came from a backup link.</string>
+    <string name="subscription_routing_off_ignored">The provider asked to turn routing off. Routing was not changed.</string>
+    <string name="subscription_routing_rejected">The provider sent a routing profile that could not be read.</string>
+    <string name="subscription_representation_raw">sing-box outbounds</string>
+    <string name="subscription_representation_native">share links or Clash/Mihomo nodes</string>
+    <string name="subscription_representation_question">The provider now describes %1$d profiles as %2$s. Applying this update deletes them and adds new profiles: their traffic history and custom settings do not carry over. Profiles that are selected or used by rules, chains or groups stay. Apply the update?</string>
+    <string name="subscription_representation_kept">The provider now describes %1$d profiles as %2$s. The current profiles were kept; update this group manually to choose whether to replace them.</string>
+    <string name="subscription_request_changed_question">This update was requested differently from the stored profiles (another format, User-Agent or source), and %1$d of them do not match its nodes. Applying it deletes those profiles and adds new ones without their traffic history and custom settings. Profiles that are selected or used by rules, chains or groups stay. Apply the update?</string>
+    <string name="subscription_request_changed_kept">This update was requested differently from the stored profiles (another format, User-Agent or source), and %1$d of them do not match its nodes. The current profiles were kept; update this group manually to choose whether to replace them.</string>
+    <string name="subscription_peer_layout_question">This update combines WireGuard peers into fewer profiles. Applying it deletes %1$d unmatched profiles and their traffic history and custom settings. Selected profiles and profiles used by rules, chains or groups stay. Apply the update?</string>
+    <string name="subscription_peer_layout_kept">This update combines WireGuard peers into fewer profiles. Kept %1$d unmatched profiles; update this group manually to choose whether to replace them.</string>
+    <string name="subscription_no_compatible_format">No compatible profiles in the subscription. Request share links, Clash/Mihomo nodes or sing-box outbounds. Full Xray configurations are not supported. Existing profiles were kept.</string>
+    <string name="subscription_backup_links">Backup links</string>
+    <string name="subscription_backup_links_summary">HTTPS links tried in order, one per line, when the main link fails. Up to %d.</string>
+    <string name="subscription_backup_links_invalid">Enter up to %d https URLs, one per line.</string>
+    <string name="subscription_offered_link">Provider proposes a new link</string>
+    <string name="subscription_offered_backup_link">Provider proposes a backup link</string>
+    <string name="subscription_offer_message">Use %1$s? Updates will send this subscription\'s credentials and, if enabled, the device ID to %2$s. Save the group to apply.</string>
+    <string name="subscription_offer_accept">Use link</string>
+    <string name="routing_profile_not_applied">Routing profile \"%1$s\" was imported without: %2$s. DNS and other settings stay as they are, and the profile is not activated.</string>
+    <string-array name="subscription_formats">
+        <item>@string/subscription_format_default</item>
+        <item>@string/subscription_format_auto</item>
+        <item>@string/subscription_format_links</item>
+        <item>@string/subscription_format_singbox</item>
+    </string-array>
+</resources>
