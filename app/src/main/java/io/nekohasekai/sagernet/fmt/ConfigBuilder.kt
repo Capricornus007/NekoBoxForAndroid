@@ -73,6 +73,10 @@ import java.net.IDN
 
 const val TAG_MIXED = "mixed-in"
 
+// eBPF 第三條路的設備入站標籤（見 Key.MODE_EBPF）。沒有 VpnService，就沒有 tun，
+// 進程的連線是在內核裡被 cgroup/connect4 與 TC 改寫後送進這個入站的。
+const val TAG_EBPF = "ebpf-in"
+
 const val TAG_PROXY = "proxy"
 const val TAG_DIRECT = "direct"
 const val TAG_BYPASS = "bypass"
@@ -497,9 +501,16 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     val nonCustomFinalHosts = hashSetOf<String>()
     val groupCache = HashMap<Long, ProxyGroup?>()
     val isVPN = DataStore.serviceMode == Key.MODE_VPN
+    // eBPF 模式沒有 VpnService：裝置流量由內核裡的 eBPF 程式抓進 ebpf-in，
+    // 路由／DNS 規則對「裝置入站」的引用要跟著換標籤，否則掛在 tun-in 上的規則永遠命中不了。
+    val isEBPF = DataStore.serviceMode == Key.MODE_EBPF
     // hev 模式下没有 tun inbound，设备流量从 loopback 的 mixed 入站进来，
     // 路由/DNS 规则里的入站匹配要跟着改，否则规则挂在根本不存在的入站上。
-    val deviceInboundTag = if (isVPN && DataStore.enableHevTun) TAG_MIXED else "tun-in"
+    val deviceInboundTag = when {
+        isEBPF -> TAG_EBPF
+        isVPN && DataStore.enableHevTun -> TAG_MIXED
+        else -> "tun-in"
+    }
     val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST
     val remoteDns = DataStore.remoteDns.split("\n")
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }

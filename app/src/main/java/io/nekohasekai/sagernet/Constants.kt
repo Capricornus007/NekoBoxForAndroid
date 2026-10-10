@@ -36,6 +36,10 @@ object Key {
     const val MODE_VPN = "vpn"
     const val MODE_PROXY = "proxy"
 
+    // eBPF 是第三條路：不建 VpnService，改由 root 把 sing-box 當 sidecar 拉起來，
+    // 用 cgroup/connect4（本機）加 TC（共網）在內核裡改寫連線，所以一定要 root。
+    const val MODE_EBPF = "ebpf"
+
     const val LAN_SHARING = "lanSharing"
 
     const val GLOBAL_CUSTOM_CONFIG = "globalCustomConfig"
