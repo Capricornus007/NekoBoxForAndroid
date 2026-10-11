@@ -109,11 +109,16 @@ object EbpfProbe {
          */
         fun summary(): String = when (verdict) {
             Verdict.OK -> kernelRelease.ifBlank { "supported" }
+
             Verdict.UNSUPPORTED -> failures.firstOrNull()?.display
                 ?: error.ifBlank { "required feature missing" }
+
             Verdict.INCONCLUSIVE -> error.ifBlank { "some checks unanswered" }
+
             Verdict.NO_ROOT -> "root unavailable"
+
             Verdict.NO_SIDECAR -> "sing-box sidecar missing"
+
             Verdict.PROBE_FAILED -> error.ifBlank { "probe returned no report" }
         }
 
@@ -163,6 +168,7 @@ object EbpfProbe {
             return Report(Verdict.NO_SIDECAR, mode, false, "", "", "",
                 "no $SIDECAR_NAME in nativeLibraryDir", emptyList(), emptyList(), "")
         }
+
         if (!RootManager.isRootAvailable()) {
             return Report(Verdict.NO_ROOT, mode, false, "", "", "",
                 "su unavailable", emptyList(), emptyList(), "")
