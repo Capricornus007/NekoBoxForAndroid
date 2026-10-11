@@ -53,8 +53,8 @@ jobs:
         with:
           name: libcore-aar-ci
           path: app/libs
-      # 任何 gradle 呼叫都會跑 preBuild 的 buildProtonvpn：缺 .so 就現編，而這裡沒有
-      # Go 1.27，所以要把 sidecar 先放好（不能缺席，也不能讓它紅在環境上）。
+      # 任何 gradle 呼叫都會跑 preBuild 的 buildProtonvpn：缺 .so 就現編，而這個 job 沒裝 Go，
+      # 所以要把 sidecar 先放好（不能缺席，也不能讓它紅在環境上）。
       - name: Download Sidecars
         uses: actions/download-artifact@v8 # v8
         with:
@@ -136,11 +136,13 @@ jobs:
           path: |
             app/libs/libcore.aar
           key: ${{ hashFiles('.github/workflows/*', 'golang_status', 'libcore_status') }}-ci
-      - name: Install Golang
+      # Go 一律吃 feed 的 go-git = golang/go master tip（與用戶機同源）。
+      # 為什麼不用 actions/setup-go、裝不到為什麼要紅：理由寫在該 composite 裡
+      # （feed 倉 Capricornus007/repo 的 .github/actions/setup-feed-go），各倉不重複抄。
+      # composite 只適用 Linux x86_64，本倉所有 job 都是 ubuntu-latest，符合。
+      - name: Install Go from the feed (golang/go master tip)
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version: '1.27.1'
+        uses: Capricornus007/repo/.github/actions/setup-feed-go@master
       - name: Native Build
         if: steps.cache.outputs.cache-hit != 'true'
         env:
@@ -194,11 +196,9 @@ jobs:
           path: |
             app/executableSo
           key: ${{ hashFiles('.github/workflows/*', 'sidecars_status') }}-${{ env.MIERU_VERSION }}-${{ env.MDVPN_COMMIT }}-${{ env.NAIVE_VERSION }}-${{ env.OLCRTC_COMMIT }}-${{ env.PROTON_COMMIT }}-sidecars-ci
-      - name: Install Golang
+      - name: Install Go from the feed (golang/go master tip)
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version: '1.27.1'
+        uses: Capricornus007/repo/.github/actions/setup-feed-go@master
       - name: Mieru Build
         if: steps.cache.outputs.cache-hit != 'true'
         run: ./run lib mieru

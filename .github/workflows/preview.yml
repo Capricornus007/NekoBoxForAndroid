@@ -23,11 +23,13 @@ jobs:
           path: |
             app/libs/libcore.aar
           key: ${{ hashFiles('.github/workflows/*', 'golang_status', 'libcore_status') }}
-      - name: Install Golang
+      # Go 一律吃 feed 的 go-git = golang/go master tip（與用戶機同源）。
+      # 為什麼不用 actions/setup-go、裝不到為什麼要紅：理由寫在該 composite 裡
+      # （feed 倉 Capricornus007/repo 的 .github/actions/setup-feed-go），各倉不重複抄。
+      # composite 只適用 Linux x86_64，本倉所有 job 都是 ubuntu-latest，符合。
+      - name: Install Go from the feed (golang/go master tip)
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/setup-go@v7
-        with:
-          go-version: '1.27.1'
+        uses: Capricornus007/repo/.github/actions/setup-feed-go@master
       - name: Native Build
         if: steps.cache.outputs.cache-hit != 'true'
         run: ./run lib core
@@ -69,11 +71,10 @@ jobs:
           path: ~/.gradle
           key: gradle-oss-${{ hashFiles('**/*.gradle.kts') }}
       # 這條鏈沒有 sidecars job，而 preBuild 的 buildProtonvpn 缺 .so 就會自己編，
-      # 所以這裡要有 Go 1.27+：缺了編譯直接失敗、建置就紅（libprotonvpn.so 不允許缺席）。
-      - name: Install Golang
-        uses: actions/setup-go@v7
-        with:
-          go-version: '1.27.1'
+      # 所以這個 job 自己也要裝 Go（版本由 feed 的 composite 決定 = golang/go master tip，
+      # 不在本檔釘版本號）：缺了編譯直接失敗、建置就紅（libprotonvpn.so 不允許缺席）。
+      - name: Install Go from the feed (golang/go master tip)
+        uses: Capricornus007/repo/.github/actions/setup-feed-go@master
       - name: Gradle Build
         env:
           BUILD_PLUGIN: none

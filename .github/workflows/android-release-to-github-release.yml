@@ -40,13 +40,23 @@ jobs:
           java-version: '25'
           cache: gradle
 
-      - name: Set up Go
-        uses: actions/setup-go@v7
+      # Go 一律吃 feed 的 go-git = golang/go master tip（與用戶機同源），本檔不釘版本號。
+      # 理由（為何不用 actions/setup-go、裝不到為什麼要紅）寫在該 composite 裡：
+      # feed 倉 Capricornus007/repo 的 .github/actions/setup-feed-go。
+      - name: Install Go from the feed (golang/go master tip)
+        uses: Capricornus007/repo/.github/actions/setup-feed-go@master
+
+      # composite 不管 module 快取。原本這層快取是 setup-go 的 cache-dependency-path 給的，
+      # 依賴清單照抄（libcore/go.sum + libcore/go.mod），不要因為換工具鏈來源就把它弄丟。
+      - name: Cache Go modules
+        uses: actions/cache@v6
         with:
-          go-version: '1.27.1'
-          cache-dependency-path: |
-            libcore/go.sum
-            libcore/go.mod
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('libcore/go.sum', 'libcore/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-go-mod-
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4

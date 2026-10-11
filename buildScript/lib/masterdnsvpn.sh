@@ -70,9 +70,14 @@ if ! command -v go >/dev/null 2>&1; then
   echo "Error: go not found on PATH (MasterDnsVPN needs Go 1.25+)." >&2
   exit 1
 fi
-GO_VER="$(go env GOVERSION 2>/dev/null | sed 's/^go//')"
+GO_VER="$(go env GOVERSION 2>/dev/null | sed -e 's/^go//' -e 's/[^0-9.].*$//')"
 GO_MAJOR="${GO_VER%%.*}"
-GO_REST="${GO_VER#*.}"; GO_MINOR="${GO_REST%%.*}"
+GO_MINOR="$(printf '%s' "$GO_VER" | cut -d. -f2)"
+# 解析不出數字就要紅，不要靜默放過：尖端那顆 GOVERSION 是 go1.28-devel_<sha>（外加
+# 建置日期那串），舊寫法會把 "28-devel_…" 丟進 [ -lt ]，bash 回 "integer expression
+# expected"、條件式非零 → 這個「太舊就中止」的閘門等於沒裝（2026-10-11 實測）。
+case "$GO_MAJOR" in ''|*[!0-9]*) echo "Error: can't parse go version: $(go env GOVERSION)" >&2; exit 1;; esac
+case "$GO_MINOR" in ''|*[!0-9]*) echo "Error: can't parse go version: $(go env GOVERSION)" >&2; exit 1;; esac
 if [ "${GO_MAJOR:-0}" -lt 1 ] || { [ "${GO_MAJOR:-0}" -eq 1 ] && [ "${GO_MINOR:-0}" -lt 25 ]; }; then
   echo "Error: Go $GO_VER is too old; MasterDnsVPN needs Go 1.25+." >&2
   exit 1
