@@ -303,6 +303,15 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="lan_sharing_requires_root">LAN 分享需要 Root 權限</string>
     <string name="root_waiting_grant">請在 Root 管理 App 按允許</string>
     <string name="root_denied">NB4A 已被拒絕 Root</string>
+    <string name="ebpf_diagnostics">eBPF 內核探針</string>
+    <string name="ebpf_diagnostics_summary_idle">尚未探測。</string>
+    <string name="ebpf_diagnostics_running">探測中…</string>
+    <string name="ebpf_diagnostics_copy">複製診斷結果</string>
+    <string name="ebpf_diagnostics_copied">已複製到剪貼簿</string>
+    <string name="ebpf_root_unavailable">找不到 root</string>
+    <string name="ebpf_no_sidecar">這個建置裡沒有 sing-box</string>
+    <string name="ebpf_probe_no_answer">探針沒有回應</string>
+    <string name="ebpf_probe_inconclusive">部分檢查沒有結果</string>
     <string name="deprecated">已棄用</string>
     <string name="connecting">連線中…</string>
     <string name="vpn_connected">已連線，點擊檢查連線</string>

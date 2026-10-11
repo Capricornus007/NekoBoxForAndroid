@@ -38,6 +38,16 @@ object Key {
 
     // eBPF 是第三條路：不建 VpnService，改由 root 把 sing-box 當 sidecar 拉起來，
     // 用 cgroup/connect4（本機）加 TC（共網）在內核裡改寫連線，所以一定要 root。
+    //
+    // 這個值現在**還不能**被選取，兩件事都卡在上游，不是漏做：
+    //   1. 服務模式選單（@array/service_modes）沒有列它 —— 啟動路徑還沒做（任務 #160：
+    //      root 拉起 libsingbox.so run、寫 config、停服務與狀態機），放進去就是一顆
+    //      按了什麼都不會發生的按鈕，而且會把 DataStore.serviceMode 存成選不回來的值。
+    //   2. ConfigBuilder 也還沒有生成 type=ebpf 的入站 —— 那要等 sing-box 上游把 eBPF
+    //      inbound 併進主線、再把 COMMIT_SING_BOX 抬到那一版；現在的核心認不得
+    //      "type": "ebpf"，生成了就在解 config 階段整條連線起不來（比不支援更糟）。
+    //      現階段只做了裝置入站的標籤映射（ConfigBuilder 的 TAG_EBPF / deviceInboundTag），
+    //      使用者能碰到的只有設定頁那顆 eBPF 探針（root/ 套件）。
     const val MODE_EBPF = "ebpf"
 
     const val LAN_SHARING = "lanSharing"

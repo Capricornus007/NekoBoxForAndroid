@@ -668,6 +668,15 @@
     <string name="lan_sharing_requires_root">Root gerekli, kullanilamiyor</string>
     <string name="root_waiting_grant">root izni bekleniyor</string>
     <string name="root_denied">NB4A için root reddedildi</string>
+    <string name="ebpf_diagnostics">eBPF çekirdek sondası</string>
+    <string name="ebpf_diagnostics_summary_idle">Henüz denenmedi.</string>
+    <string name="ebpf_diagnostics_running">Deneniyor…</string>
+    <string name="ebpf_diagnostics_copy">Tanılama verilerini kopyala</string>
+    <string name="ebpf_diagnostics_copied">Panoya kopyalandı</string>
+    <string name="ebpf_root_unavailable">root kullanılamıyor</string>
+    <string name="ebpf_no_sidecar">sing-box bu derlemede yok</string>
+    <string name="ebpf_probe_no_answer">Sonda yanıt vermedi</string>
+    <string name="ebpf_probe_inconclusive">Bazı denemeler yanıtsız</string>
     <string name="lan_sharing_summary">Wi-Fi ve USB VPN uzerinden yonlendir</string>
     <string name="lifetime_traffic">Tüm zamanlar: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>

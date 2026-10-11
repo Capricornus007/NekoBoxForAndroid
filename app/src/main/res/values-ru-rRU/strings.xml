@@ -690,6 +690,15 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="lan_sharing_requires_root">LAN доступ требуется root</string>
     <string name="root_waiting_grant">Ожидание разрешения root</string>
     <string name="root_denied">NB4A отказано в root</string>
+    <string name="ebpf_diagnostics">Проверка ядра eBPF</string>
+    <string name="ebpf_diagnostics_summary_idle">Ещё не проверялась.</string>
+    <string name="ebpf_diagnostics_running">Проверка…</string>
+    <string name="ebpf_diagnostics_copy">Копировать диагностику</string>
+    <string name="ebpf_diagnostics_copied">Скопировано в буфер обмена</string>
+    <string name="ebpf_root_unavailable">root недоступен</string>
+    <string name="ebpf_no_sidecar">sing-box отсутствует в этой сборке</string>
+    <string name="ebpf_probe_no_answer">Проверка не ответила</string>
+    <string name="ebpf_probe_inconclusive">Часть проверок без ответа</string>
     <string name="lan_sharing_summary">Разрешить устройствам в LAN подключаться</string>
     <string name="lifetime_traffic">За всё время: %1$s↑ %2$s↓</string>
     <string name="mal_close">Закрыть</string>

@@ -668,6 +668,15 @@
     <string name="lan_sharing_requires_root">局域网共享需要 Root</string>
     <string name="root_waiting_grant">請在 Root 管理 App 按允許</string>
     <string name="root_denied">NB4A 已被拒絕 Root</string>
+    <string name="ebpf_diagnostics">eBPF 内核探针</string>
+    <string name="ebpf_diagnostics_summary_idle">尚未探测。</string>
+    <string name="ebpf_diagnostics_running">探测中…</string>
+    <string name="ebpf_diagnostics_copy">复制诊断结果</string>
+    <string name="ebpf_diagnostics_copied">已复制到剪贴板</string>
+    <string name="ebpf_root_unavailable">找不到 root</string>
+    <string name="ebpf_no_sidecar">此构建中没有 sing-box</string>
+    <string name="ebpf_probe_no_answer">探针没有回应</string>
+    <string name="ebpf_probe_inconclusive">部分检查没有结果</string>
     <string name="lines">%d 行</string>
     <string name="quick_clear_cache_restart">清除快取后重新启动</string>
     <string name="speed_test_finished_summary">完成：%1$d，失败：%2$d，已取消：%3$d</string>

@@ -20,6 +20,7 @@ import io.nekohasekai.sagernet.bg.RuleAssetUpdater
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.ktx.*
+import io.nekohasekai.sagernet.root.EbpfProbe
 import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.root.RootManager
 import io.nekohasekai.sagernet.utils.AppLocale
@@ -32,6 +33,16 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private lateinit var isProxyApps: SwitchPreferenceCompat
     private lateinit var globalCustomConfig: EditConfigPreference
+
+    // 最近一次 eBPF 探針的完整結果（要複製的就是這串）與那幾行顯示文字；null ＝ 還沒探過。
+    // 探一次要起三回 su 進程，不存起來的話「複製」那顆只能重探或報空；顯示也要在偏好頁
+    // 重建後還原，否則畫面回到「尚未探測」而複製出來的卻是舊結果，兩者對不上。
+    private var ebpfDiagnosticsText: String? = null
+    private var ebpfDiagnosticsSummary: String? = null
+    private var ebpfProbeDiagnostics: Preference? = null
+
+    // 按複製時還沒探過：置旗，等探完的那次回主執行緒時直接複製，不再要使用者按第二次。
+    private var ebpfCopyAfterProbe = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -86,6 +97,111 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    /**
+     * 按下去才探，不在開頁時探：探針需要 root，而已 root 的機器可能就在這一步彈出 su
+     * 授權窗 —— 那該由使用者自己的點擊觸發，而不是他打開設定頁就被問一次。
+     *
+     * 三層分開講，缺任何一層都不能說 eBPF 能用：
+     *   1. root（su）到不到 —— 沒有 root 就沒有探針，這層失敗時不假裝問過內核；
+     *   2. sidecar（libsingbox.so）在不在包裡 —— 缺了是我方建置／這台機 ABI 的問題；
+     *   3. 內核能力，**逐 mode 一條**：local 要 cgroup/connect4、shared-network 只要 TC，
+     *      「只能共網、不能本機」是真實存在的中間態，合成一句「不支持」就是說謊。
+     *
+     * 沒有 root 的機器這一項照樣顯示、照樣可按（#151/#161 要求）：藏起來的話使用者連
+     * 「原來是我的機器沒 root」都不知道，而按下去要知道為什麼不行正是這顆按鈕的全部價值。
+     * 內核版本號一律不參與判定（使用者自述「我根本沒法測試」，寫死號只會誤殺回補過
+     * bpf 特性的廠商內核）；能說的只有探針實際問到的東西。
+     */
+    private fun runEbpfDiagnostics(preference: Preference) {
+        preference.summary = getString(R.string.ebpf_diagnostics_running)
+        runOnDefaultDispatcher {
+            // su 這條要起進程、還可能等人按允許：主執行緒上跑就是 ANR。
+            // 卡在授權窗時要提示，不然使用者只會看到「探測中」卡在那裡。
+            val root = RootManager.refreshDetailed {
+                runOnMainDispatcher {
+                    if (isAdded) {
+                        Toast.makeText(requireContext(), R.string.root_waiting_grant, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            val sidecarPresent = EbpfProbe.sidecarPresent()
+            val reports = if (root == RootManager.Status.GRANTED && sidecarPresent) {
+                EbpfProbe.Mode.entries.map { EbpfProbe.probe(it) }
+            } else {
+                emptyList()
+            }
+            // 取字串要 context（Fragment#getContext 在脱离後是 null，requireContext() 就會throw），
+            // 所以格式化一律回到主執行緒做，背景那段只碰 su 與檔案。
+            runOnMainDispatcher {
+                if (!isAdded) return@runOnMainDispatcher
+                val header = listOf(ebpfRootLine(root), ebpfSidecarLine(sidecarPresent))
+                val summary = (header + reports.map { it.line(ebpfVerdictReason(it.verdict)) })
+                    .joinToString("\n")
+                preference.summary = summary
+                ebpfDiagnosticsSummary = summary
+                ebpfDiagnosticsText = ebpfDiagnosticPayload(header, reports)
+                Logs.d("eBPF diagnostics: $summary")
+                if (ebpfCopyAfterProbe) {
+                    ebpfCopyAfterProbe = false
+                    copyEbpfDiagnostics()
+                }
+            }
+        }
+    }
+
+    // 三層裡只有「內核能力」那層的 detail 是核心回來的英文診斷資料（跟日誌同類、不譯）；
+    // root／sidecar／問不到這三種是我們的判斷，必須講使用者的語言。
+    private fun ebpfRootLine(status: RootManager.Status): String = when (status) {
+        RootManager.Status.GRANTED -> "root  ✓"
+        RootManager.Status.UNAVAILABLE -> "root  ✗ ${getString(R.string.ebpf_root_unavailable)}"
+        RootManager.Status.DENIED -> "root  ✗ ${getString(R.string.root_denied)}"
+        RootManager.Status.WAITING -> "root  ✗ ${getString(R.string.root_waiting_grant)}"
+    }
+
+    private fun ebpfSidecarLine(present: Boolean): String = if (present) {
+        "sing-box  ✓"
+    } else {
+        "sing-box  ✗ ${getString(R.string.ebpf_no_sidecar)}"
+    }
+
+    private fun ebpfVerdictReason(verdict: EbpfProbe.Verdict): String = when (verdict) {
+        EbpfProbe.Verdict.NO_SIDECAR -> getString(R.string.ebpf_no_sidecar)
+        EbpfProbe.Verdict.PROBE_FAILED -> getString(R.string.ebpf_probe_no_answer)
+        EbpfProbe.Verdict.INCONCLUSIVE -> getString(R.string.ebpf_probe_inconclusive)
+        EbpfProbe.Verdict.NO_ROOT -> getString(R.string.ebpf_root_unavailable)
+        // OK／UNSUPPORTED 的 reason 走 Report.summary()（內核號 or 核心的英文細節）。
+        else -> ""
+    }
+
+    /** 貼回來要能判根因：頭兩層 + 每個 mode 的判定 + findings + 原始 JSON。 */
+    private fun ebpfDiagnosticPayload(
+        header: List<String>,
+        reports: List<EbpfProbe.Report>,
+    ): String = buildString {
+        appendLine("NB4A ${SagerNet.appVersionNameForDisplay} / Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
+        appendLine("device ${Build.MANUFACTURER} ${Build.MODEL}")
+        header.forEach { appendLine(it) }
+        reports.forEach { appendLine(it.diagnosticBlock(ebpfVerdictReason(it.verdict))) }
+    }
+
+    private fun copyEbpfDiagnostics() {
+        val text = ebpfDiagnosticsText
+        if (text == null) {
+            // 還沒探過：先探、探完自動複製。叫使用者「先按上面那顆」是多餘的一步，
+            // 而且他多半不知道哪顆才是探針；按了複製卻只拿到一句「請先探測」更糟。
+            ebpfCopyAfterProbe = true
+            ebpfProbeDiagnostics?.let { runEbpfDiagnostics(it) }
+            Toast.makeText(requireContext(), R.string.ebpf_diagnostics_running, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val copied = SagerNet.trySetPrimaryClip(text)
+        Toast.makeText(
+            requireContext(),
+            if (copied) R.string.ebpf_diagnostics_copied else R.string.copy_failed,
+            Toast.LENGTH_SHORT,
+        ).show()
     }
 
     private fun sanitizeDnsPreferenceValue(value: String): String = value.lines().joinToString("\n") { line ->
@@ -145,6 +261,18 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val httpProxyBypass = findPreference<EditTextPreference>(Key.HTTP_PROXY_BYPASS)!!
         val dnsHosts = findPreference<EditTextPreference>(Key.DNS_HOSTS)!!
         val serviceMode = findPreference<Preference>(Key.SERVICE_MODE)!!
+        val ebpfDiagnostics = findPreference<Preference>("ebpfDiagnostics")!!
+        ebpfProbeDiagnostics = ebpfDiagnostics
+        ebpfDiagnosticsSummary?.let { ebpfDiagnostics.summary = it }
+        ebpfDiagnostics.setOnPreferenceClickListener {
+            runEbpfDiagnostics(ebpfDiagnostics)
+            true
+        }
+        val ebpfDiagnosticsCopy = findPreference<Preference>("ebpfDiagnosticsCopy")!!
+        ebpfDiagnosticsCopy.setOnPreferenceClickListener {
+            copyEbpfDiagnostics()
+            true
+        }
         val appendHttpProxy = findPreference<SwitchPreferenceCompat>(Key.APPEND_HTTP_PROXY)!!
         val strictRoute = findPreference<SwitchPreferenceCompat>(Key.STRICT_ROUTE)!!
         val speedTestMode = findPreference<SimpleMenuPreference>(Key.SPEED_TEST_MODE)!!

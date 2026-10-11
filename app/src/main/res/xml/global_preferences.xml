@@ -40,6 +40,24 @@
             app:key="serviceMode"
             app:title="@string/service_mode"
             app:useSimpleSummaryProvider="true" />
+        <!-- 唯讀診斷：按下去用 root 叫 sidecar 跑 ebpf-probe，三個模式各問一次（root／
+             sidecar／內核能力三層分開講，內核那層逐 mode 一條）。
+             這裡刻意**只**有診斷、沒有開關，兩個阻塞都還沒解：
+               1. 服務模式選單不放 eBPF —— 啟動路徑（root 拉起 sidecar、寫 config、
+                  停服務那一整套）還沒做（任務 #160），放了就是一顆按了什麼都不會發生的按鈕；
+               2. ConfigBuilder 也不生成 type=ebpf 的入站 —— 那要等 sing-box 上游合併
+                  eBPF inbound 並把 COMMIT_SING_BOX 抬到含 protocol/ebpf 的版（任務 #151/#161），
+                  現在生成的東西核心認不得，只會讓連線在解 config 時就失敗。
+             沒有 root 的機器這兩項照樣顯示、照樣可按：按下去要講得出「為什麼現在不行」。 -->
+        <Preference
+            app:icon="@drawable/ic_device_developer_mode"
+            app:key="ebpfDiagnostics"
+            app:summary="@string/ebpf_diagnostics_summary_idle"
+            app:title="@string/ebpf_diagnostics" />
+        <Preference
+            app:icon="@drawable/ic_content_copy"
+            app:key="ebpfDiagnosticsCopy"
+            app:title="@string/ebpf_diagnostics_copy" />
         <SwitchPreferenceCompat
             app:defaultValue="false"
             app:icon="@drawable/ic_communication_phonelink_ring"

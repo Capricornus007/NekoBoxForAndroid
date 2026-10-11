@@ -673,6 +673,15 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="lan_sharing_requires_root">LAN 共有には root が必要</string>
     <string name="root_waiting_grant">root 権限の許可待ち</string>
     <string name="root_denied">NB4A は root を拒否されました</string>
+    <string name="ebpf_diagnostics">eBPF カーネルプローブ</string>
+    <string name="ebpf_diagnostics_summary_idle">まだ計測していません。</string>
+    <string name="ebpf_diagnostics_running">計測中…</string>
+    <string name="ebpf_diagnostics_copy">診断情報をコピー</string>
+    <string name="ebpf_diagnostics_copied">クリップボードにコピーしました</string>
+    <string name="ebpf_root_unavailable">root を利用できません</string>
+    <string name="ebpf_no_sidecar">このビルドに sing-box がありません</string>
+    <string name="ebpf_probe_no_answer">プローブが応答しません</string>
+    <string name="ebpf_probe_inconclusive">一部の確認が未回答です</string>
     <string name="lan_sharing_summary">LAN デバイスの接続を許可</string>
     <string name="lifetime_traffic">累計トラフィック：%1$s↑ %2$s↓</string>
     <string name="mal_close">閉じる</string>

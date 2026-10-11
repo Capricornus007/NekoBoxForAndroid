@@ -199,6 +199,15 @@
     <string name="route_manage_assets">Manage Route Assets</string>
     <string name="route_assets">Assets</string>
     <string name="route_rules_provider">Rule Assets Provider</string>
+    <string name="ebpf_diagnostics">eBPF kernel probe</string>
+    <string name="ebpf_diagnostics_summary_idle">Not probed yet.</string>
+    <string name="ebpf_diagnostics_running">Probing…</string>
+    <string name="ebpf_diagnostics_copy">Copy diagnostics</string>
+    <string name="ebpf_diagnostics_copied">Copied to clipboard</string>
+    <string name="ebpf_root_unavailable">Root unavailable</string>
+    <string name="ebpf_no_sidecar">sing-box not in this build</string>
+    <string name="ebpf_probe_no_answer">Probe did not answer</string>
+    <string name="ebpf_probe_inconclusive">Some checks unanswered</string>
     <string name="route_rules_official">Official</string>
     <string name="route_asset_status">Local version: %s</string>
     <string name="route_asset_no_update">No update</string>

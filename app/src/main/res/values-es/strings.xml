@@ -686,6 +686,15 @@
     <string name="lan_sharing_requires_root">Compartir en LAN requiere root</string>
     <string name="root_waiting_grant">Esperando permiso de root</string>
     <string name="root_denied">Se denegó root a NB4A</string>
+    <string name="ebpf_diagnostics">Sonda del kernel eBPF</string>
+    <string name="ebpf_diagnostics_summary_idle">Aún sin probar.</string>
+    <string name="ebpf_diagnostics_running">Probando…</string>
+    <string name="ebpf_diagnostics_copy">Copiar diagnóstico</string>
+    <string name="ebpf_diagnostics_copied">Copiado al portapapeles</string>
+    <string name="ebpf_root_unavailable">root no disponible</string>
+    <string name="ebpf_no_sidecar">sing-box no está en esta compilación</string>
+    <string name="ebpf_probe_no_answer">La sonda no respondió</string>
+    <string name="ebpf_probe_inconclusive">Algunas comprobaciones sin respuesta</string>
     <string name="speed_test_mode">Modo de test de velocidad</string>
     <string name="speed_test_mode_download">Solo descarga</string>
     <string name="speed_test_mode_download_upload">Descarga + subida</string>

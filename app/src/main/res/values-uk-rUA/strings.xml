@@ -689,6 +689,15 @@
     <string name="lan_sharing_requires_root">LAN спільний доступ потребує root</string>
     <string name="root_waiting_grant">Очікування дозволу root</string>
     <string name="root_denied">NB4A відмовлено у root</string>
+    <string name="ebpf_diagnostics">Перевірка ядра eBPF</string>
+    <string name="ebpf_diagnostics_summary_idle">Ще не перевірялася.</string>
+    <string name="ebpf_diagnostics_running">Перевірка…</string>
+    <string name="ebpf_diagnostics_copy">Копіювати діагностику</string>
+    <string name="ebpf_diagnostics_copied">Скопійовано в буфер обміну</string>
+    <string name="ebpf_root_unavailable">root недоступний</string>
+    <string name="ebpf_no_sidecar">sing-box відсутній у цій збірці</string>
+    <string name="ebpf_probe_no_answer">Перевірка не відповіла</string>
+    <string name="ebpf_probe_inconclusive">Деякі перевірки без відповіді</string>
     <string name="lan_sharing_summary">Дозволити пристроям у LAN підключатися</string>
     <string name="lifetime_traffic">За весь час: %1$s↑ %2$s↓</string>
     <string name="mal_close">mal close</string>

@@ -657,6 +657,15 @@
     <string name="lan_sharing_requires_root">اشتراک LAN به root نیاز دارد</string>
     <string name="root_waiting_grant">در انتظار مجوز root</string>
     <string name="root_denied">مجوز root برای NB4A رد شد</string>
+    <string name="ebpf_diagnostics">آزمون هستهٔ eBPF</string>
+    <string name="ebpf_diagnostics_summary_idle">هنوز آزمایش نشده است.</string>
+    <string name="ebpf_diagnostics_running">در حال آزمون…</string>
+    <string name="ebpf_diagnostics_copy">کپی اطلاعات تشخیصی</string>
+    <string name="ebpf_diagnostics_copied">در کلیپ‌بورد کپی شد</string>
+    <string name="ebpf_root_unavailable">root در دسترس نیست</string>
+    <string name="ebpf_no_sidecar">sing-box در این بیلد وجود ندارد</string>
+    <string name="ebpf_probe_no_answer">آزمون پاسخی نداد</string>
+    <string name="ebpf_probe_inconclusive">برخی بررسی‌ها بی‌پاسخ است</string>
     <string name="speed_test_mode">حالت تست سرعت</string>
     <string name="speed_test_mode_download">فقط دانلود</string>
     <string name="speed_test_mode_download_upload">دانلود + آپلود</string>

@@ -679,6 +679,15 @@
     <string name="lan_sharing_requires_root">Root erforderlich, nicht verfugbar</string>
     <string name="root_waiting_grant">Warte auf Root-Berechtigung</string>
     <string name="root_denied">NB4A wurde Root verweigert</string>
+    <string name="ebpf_diagnostics">eBPF-Kernel-Test</string>
+    <string name="ebpf_diagnostics_summary_idle">Noch nicht geprüft.</string>
+    <string name="ebpf_diagnostics_running">Prüfung läuft…</string>
+    <string name="ebpf_diagnostics_copy">Diagnose kopieren</string>
+    <string name="ebpf_diagnostics_copied">In Zwischenablage kopiert</string>
+    <string name="ebpf_root_unavailable">Root nicht verfügbar</string>
+    <string name="ebpf_no_sidecar">sing-box fehlt in diesem Build</string>
+    <string name="ebpf_probe_no_answer">Test hat nicht geantwortet</string>
+    <string name="ebpf_probe_inconclusive">Einige Prüfungen ohne Ergebnis</string>
     <string name="lan_sharing_summary">WLAN/USB uber VPN routen</string>
     <string name="lifetime_traffic">Gesamt: %1$s↑ %2$s↓</string>
     <string name="mal_close">Close</string>

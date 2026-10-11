@@ -624,6 +624,15 @@
     <string name="lan_sharing_requires_root">LAN 공유에는 root가 필요합니다</string>
     <string name="root_waiting_grant">root 권한 승인 대기 중</string>
     <string name="root_denied">NB4A가 root 권한을 거부했습니다</string>
+    <string name="ebpf_diagnostics">eBPF 커널 프로브</string>
+    <string name="ebpf_diagnostics_summary_idle">아직 점검하지 않았습니다.</string>
+    <string name="ebpf_diagnostics_running">점검 중…</string>
+    <string name="ebpf_diagnostics_copy">진단 정보 복사</string>
+    <string name="ebpf_diagnostics_copied">클립보드에 복사했습니다</string>
+    <string name="ebpf_root_unavailable">root 사용 불가</string>
+    <string name="ebpf_no_sidecar">이 빌드에 sing-box가 없습니다</string>
+    <string name="ebpf_probe_no_answer">프로브가 응답하지 않습니다</string>
+    <string name="ebpf_probe_inconclusive">일부 검사가 응답 없음</string>
     <string name="speed_test_mode">속도 테스트 모드</string>
     <string name="speed_test_mode_download">다운로드만</string>
     <string name="speed_test_mode_download_upload">다운로드 + 업로드</string>

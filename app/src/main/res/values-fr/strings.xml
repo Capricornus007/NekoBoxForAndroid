@@ -73,6 +73,15 @@
     <string name="lan_sharing_requires_root">Acces Root requis, indisponible</string>
     <string name="root_waiting_grant">En attente de l\'autorisation root</string>
     <string name="root_denied">Root refusé pour NB4A</string>
+    <string name="ebpf_diagnostics">Sonde noyau eBPF</string>
+    <string name="ebpf_diagnostics_summary_idle">Aucune sonde exécutée.</string>
+    <string name="ebpf_diagnostics_running">Sondage en cours…</string>
+    <string name="ebpf_diagnostics_copy">Copier le diagnostic</string>
+    <string name="ebpf_diagnostics_copied">Copié dans le presse-papiers</string>
+    <string name="ebpf_root_unavailable">root indisponible</string>
+    <string name="ebpf_no_sidecar">sing-box absent de cette version</string>
+    <string name="ebpf_probe_no_answer">La sonde n\'a pas répondu</string>
+    <string name="ebpf_probe_inconclusive">Certaines vérifications sans réponse</string>
     <string name="require_proxy_in_vpn">Conserver le proxy local en mode VPN</string>
     <string name="require_proxy_in_vpn_sum">Conserver le port du proxy local SOCKS/HTTP ouvert en mode VPN. Désactivé par défaut : en mode VPN, le port est généralement inutile et le laisser ouvert permet à d\'autres applications d\'y accéder.</string>
     <string name="proxy_mode_inbound_auth">Authentifier le proxy local en mode Proxy</string>

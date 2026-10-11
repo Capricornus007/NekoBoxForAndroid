@@ -800,6 +800,15 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="lan_sharing_requires_root">Berbagi LAN membutuhkan root</string>
     <string name="root_waiting_grant">Menunggu izin root</string>
     <string name="root_denied">Izin root untuk NB4A ditolak</string>
+    <string name="ebpf_diagnostics">Probe kernel eBPF</string>
+    <string name="ebpf_diagnostics_summary_idle">Belum diuji.</string>
+    <string name="ebpf_diagnostics_running">Menguji…</string>
+    <string name="ebpf_diagnostics_copy">Salin diagnostik</string>
+    <string name="ebpf_diagnostics_copied">Disalin ke papan klip</string>
+    <string name="ebpf_root_unavailable">root tidak tersedia</string>
+    <string name="ebpf_no_sidecar">sing-box tidak ada di build ini</string>
+    <string name="ebpf_probe_no_answer">Probe tidak memberi jawaban</string>
+    <string name="ebpf_probe_inconclusive">Sebagian pemeriksaan tanpa jawaban</string>
     <string name="speed_test_mode">Mode uji kecepatan</string>
     <string name="speed_test_mode_download">Hanya unduh</string>
     <string name="speed_test_mode_download_upload">Unduh + unggah</string>
