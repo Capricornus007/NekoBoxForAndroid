@@ -66,7 +66,7 @@ object EbpfProbe {
             get() = !isRequiredFailure &&
                 (status == STATUS_FAIL || status == STATUS_WARN || status == STATUS_UNKNOWN)
 
-        // 顯示用：feature 是上游的稳定标识，detail 才是要給使用者看的那句。
+        // 顯示用：feature 是上游的穩定標識，detail 才是要給使用者看的那句。
         val display: String get() = detail.ifBlank { feature }
     }
 
@@ -209,7 +209,7 @@ object EbpfProbe {
         val failures = findings.filter { it.isRequiredFailure }
         val warnings = findings.filter { it.worthShowing }
         val summary = o.optJSONObject(KEY_SUMMARY)
-        // required_failures 是 Go 側 RequiredFailures() 的序列化值：判準同一条，不另起爐灶。
+        // required_failures 是 Go 側 RequiredFailures() 的序列化值：判準同一條，不另起爐灶。
         // summary 缺席時退回自己數 findings，兩條路都要比「看 result 字串」更早下定論。
         val requiredFailures = summary?.optInt(KEY_REQUIRED_FAILURES, -1)
             ?.takeIf { it >= 0 } ?: failures.size

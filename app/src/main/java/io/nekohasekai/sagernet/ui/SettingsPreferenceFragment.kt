@@ -132,7 +132,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             } else {
                 emptyList()
             }
-            // 取字串要 context（Fragment#getContext 在脱离後是 null，requireContext() 就會throw），
+            // 取字串要 context（Fragment#getContext 在脫離後是 null，requireContext() 就會 throw），
             // 所以格式化一律回到主執行緒做，背景那段只碰 su 與檔案。
             runOnMainDispatcher {
                 if (!isAdded) return@runOnMainDispatcher
