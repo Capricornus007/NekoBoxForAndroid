@@ -44,12 +44,23 @@ object EbpfProbe {
 
     /** 探針問不到明確答案時的原因，UI 靠它決定該說哪一句話。 */
     enum class Verdict {
-        OK,                 // 內核過得去（required_failures == 0 且 result=supported）
-        UNSUPPORTED,        // 內核缺必要特性（required_failures > 0，附 failures 明細）
-        INCONCLUSIVE,       // 沒被證明不能用、但有些檢查回 UNKNOWN（權限不足或要看實跑）
-        NO_ROOT,            // 沒有 su／被拒／卡在授權窗（細分見 RootManager.Status）
-        NO_SIDECAR,         // 包裡沒有 libsingbox.so（這台機的 ABI 沒被建置覆蓋）
-        PROBE_FAILED,       // sidecar 在，但探針回不來（非零退出、吐不出 JSON、或建置少 tag）
+        // 內核過得去（required_failures == 0 且 result=supported）
+        OK,
+
+        // 內核缺必要特性（required_failures > 0，附 failures 明細）
+        UNSUPPORTED,
+
+        // 沒被證明不能用、但有些檢查回 UNKNOWN（權限不足或要看實跑）
+        INCONCLUSIVE,
+
+        // 沒有 su／被拒／卡在授權窗（細分見 RootManager.Status）
+        NO_ROOT,
+
+        // 包裡沒有 libsingbox.so（這台機的 ABI 沒被建置覆蓋）
+        NO_SIDECAR,
+
+        // sidecar 在，但探針回不來（非零退出、吐不出 JSON、或建置少 with_ebpf tag）
+        PROBE_FAILED,
     }
 
     data class Finding(
