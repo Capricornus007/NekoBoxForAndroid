@@ -1,6 +1,6 @@
 module olcrtc-socks
 
-go 1.27.1
+go 1.28
 
 require (
 	github.com/openlibrecommunity/olcrtc v0.0.0
