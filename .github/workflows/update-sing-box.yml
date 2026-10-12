@@ -40,41 +40,46 @@ jobs:
               buildScript/lib/core/get_source_env.sh
           fi
 
-      - name: Sync displayed core version with upstream release
+      - name: Bump the -mod counter in BOTH core-version records
         id: version
-        shell: bash
         run: |
           set -euo pipefail
-          # The displayed version must track the newest upstream release on the tracked
-          # branch line, keeping the local -mod.N suffix so builds stay distinguishable
-          # from official ones.
-          #
-          # Prefer the newest *stable* tag, but fall back to the newest tag of any kind
-          # when the tracked line has no stable release yet. The fork tracks 1.15.x, and
-          # upstream has only ever cut v1.15.0-alpha.* on that line (no v1.15.0 stable as
-          # of 2026-09-18) — the old stable-only `grep -vE 'alpha|beta|rc'` filtered every
-          # tag out, leaving $upstream empty and tripping `test -n` (run 35276186828, exit 1).
-          # The fork already pins v1.15.0-alpha.4, so a pre-release line must resolve here.
-          branch=$(grep -E '^SINGBOX_BRANCH=' nb4a.properties | cut -d= -f2 | tr -d '\r[:space:]')
-          line=${branch%.x}
-          all=$(git ls-remote --tags --refs https://github.com/SagerNet/sing-box.git "refs/tags/v${line}.*" \
-            | sed 's#.*refs/tags/##' | sort -V)
-          # `|| true` is load-bearing: the step runs under `set -euo pipefail`, so a
-          # `grep` with no match aborts the whole assignment (that, not `test -n`, is
-          # what killed run 35276186828 — the log shows exit 1 before any echo output).
-          upstream=$(printf '%s\n' "$all" | { grep -vE 'alpha|beta|rc' || true; } | tail -n1)
-          [ -n "$upstream" ] || upstream=$(printf '%s\n' "$all" | tail -n1)
-          test -n "$upstream"
+          # 為什麼不再「跟著上游最新 tag 算基號」（2026-10-12 實測推翻舊做法）：
+          #   bot 之前把基號設成上游最新的 v1.15.0-alpha.12，但 `git merge-base --is-ancestor`
+          #   實測 alpha.12 **不在**我們 pin 的 3c9399de（也不在當時 tip 0e77408b）的祖先鏈上，
+          #   也就是那顆二進位裡根本沒有 alpha.12 的內容——顯示出來就是謊言。
+          #   看守 scripts/check-core-pins.sh 段 1c 因此把 run #58 判紅（它同時也只改了一處）。
+          # 現在的規矩：
+          #   1) 基號（vX.Y.Z-alpha.N）只有真的把上游那段併進來的人才抬，bot 不碰。
+          #      抬基號時依用戶 2026-10-11 的裁定，`-mod` 計數歸 1（跨基線不累積）。
+          #   2) bot 只負責：pin 有動 → `-mod.N` 遞增，而且**兩處一起寫**
+          #      （nb4a.properties 的 SINGBOX_VERSION 是真正被 -X 注入二進位的那個；
+          #       buildScript/lib/core/get_source_env.sh 的 VERSION_SING_BOX 是同一件事的另一份記錄）。
+          #   3) pin 沒動就不改版本，避免無謂提交。
+          ENV_FILE=buildScript/lib/core/get_source_env.sh
           current=$(grep -E '^SINGBOX_VERSION=' nb4a.properties | cut -d= -f2 | tr -d '\r[:space:]')
-          mod=$(printf '%s' "$current" | grep -oE -- '-mod\.[0-9]+$' || true)
-          want="${upstream}${mod}"
-          echo "current=$current  upstream=$upstream  want=$want"
-          if [ "$current" = "$want" ]; then
+          current=${current#v}
+          test -n "$current"
+          base=$(printf '%s' "$current" | sed -E 's/-mod\.[0-9]+$//')
+          n=$(printf '%s' "$current" | grep -oE -- '-mod\.[0-9]+$' | grep -oE '[0-9]+$' || true)
+          if [ "${{ steps.core.outputs.changed }}" != "true" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            sed -i -E "s/^SINGBOX_VERSION=.*/SINGBOX_VERSION=${want}/" nb4a.properties
+            echo ">> pin 沒動，版本字串保持 $current"
+            exit 0
           fi
+          n=$(( ${n:-0} + 1 ))
+          want="${base}-mod.${n}"
+          echo ">> 版本字串：$current → $want（只抬 -mod，基號 $base 由人決定）"
+          sed -i -E "s/^SINGBOX_VERSION=.*/SINGBOX_VERSION=v${want}/" nb4a.properties
+          sed -i -E "s/^export VERSION_SING_BOX=.*/export VERSION_SING_BOX=\"${want}\"/" "$ENV_FILE"
+          # 當場自證兩處一致，別再讓看守去發現第三遍
+          a=$(grep -oP '^SINGBOX_VERSION=\K[^ ]+' nb4a.properties | tr -d '\r' | sed 's/^v//')
+          b=$(grep -oP '^export VERSION_SING_BOX="\K[^"]+' "$ENV_FILE" | tr -d '\r')
+          if [ "$a" != "$b" ]; then
+            echo "::error::兩處版本字串寫完仍不一致：nb4a.properties=$a get_source_env.sh=$b"
+            exit 1
+          fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Set up Java
         if: steps.core.outputs.changed == 'true' || steps.version.outputs.changed == 'true'
