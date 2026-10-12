@@ -168,9 +168,13 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private fun ebpfVerdictReason(verdict: EbpfProbe.Verdict): String = when (verdict) {
         EbpfProbe.Verdict.NO_SIDECAR -> getString(R.string.ebpf_no_sidecar)
+
         EbpfProbe.Verdict.PROBE_FAILED -> getString(R.string.ebpf_probe_no_answer)
+
         EbpfProbe.Verdict.INCONCLUSIVE -> getString(R.string.ebpf_probe_inconclusive)
+
         EbpfProbe.Verdict.NO_ROOT -> getString(R.string.ebpf_root_unavailable)
+
         // OK／UNSUPPORTED 的 reason 走 Report.summary()（內核號 or 核心的英文細節）。
         else -> ""
     }

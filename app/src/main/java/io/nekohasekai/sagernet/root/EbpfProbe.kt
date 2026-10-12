@@ -165,19 +165,23 @@ object EbpfProbe {
     fun probe(mode: Mode): Report {
         val exe = sidecarFile()
         if (exe == null) {
-            return Report(Verdict.NO_SIDECAR, mode, false, "", "", "",
-                "no $SIDECAR_NAME in nativeLibraryDir", emptyList(), emptyList(), "")
+            return Report(
+                Verdict.NO_SIDECAR, mode, false, "", "", "",
+                "no $SIDECAR_NAME in nativeLibraryDir", emptyList(), emptyList(), "",
+            )
         }
 
         if (!RootManager.isRootAvailable()) {
-            return Report(Verdict.NO_ROOT, mode, false, "", "", "",
-                "su unavailable", emptyList(), emptyList(), "")
+            return Report(
+                Verdict.NO_ROOT, mode, false, "", "", "",
+                "su unavailable", emptyList(), emptyList(), "",
+            )
         }
 
         // 路徑要引號包住：nativeLibraryDir 理論上不會有空格，但這是 root 命令列，
         // 拼錯一次就是拿錯檔案或執行到別的東西。
         val result = RootShell.exec(
-            "${exe.absolutePath.quotepath()} ebpf-probe --mode ${mode.wire.quotepath()}"
+            "${exe.absolutePath.quotepath()} ebpf-probe --mode ${mode.wire.quotepath()}",
         )
         // RootShell 把 stderr 併進來了（探針前若有 log 行會混在裡面）。
         // WriteKernelProbeReportJSON 用的是縮排 encoder，所以報告是**多行**的，
@@ -185,9 +189,11 @@ object EbpfProbe {
         val json = extractJsonObject(result.output)
         if (json == null) {
             Logs.w("EbpfProbe: ${mode.wire} 沒拿到 JSON（rc=${result.code}）：${result.output.trim()}")
-            return Report(Verdict.PROBE_FAILED, mode, false, "", "", "",
+            return Report(
+                Verdict.PROBE_FAILED, mode, false, "", "", "",
                 "rc=${result.code} ${result.output.trim().take(MAX_ERROR_CHARS)}",
-                emptyList(), emptyList(), result.output)
+                emptyList(), emptyList(), result.output,
+            )
         }
         return parse(json, mode, result.output)
     }
@@ -217,8 +223,10 @@ object EbpfProbe {
         }
     } catch (e: Exception) {
         Logs.e("EbpfProbe: JSON 解析失敗", e)
-        Report(Verdict.PROBE_FAILED, mode, false, "", "", "",
-            e.message ?: e.javaClass.simpleName, emptyList(), emptyList(), raw)
+        Report(
+            Verdict.PROBE_FAILED, mode, false, "", "", "",
+            e.message ?: e.javaClass.simpleName, emptyList(), emptyList(), raw,
+        )
     }
 
     private fun parseCliShape(o: JSONObject, mode: Mode, raw: String): Report {
@@ -234,8 +242,11 @@ object EbpfProbe {
         val error = o.optString(KEY_ERROR).ifBlank { o.optString(KEY_ACTIVE_STATE_ERROR) }
         val verdict = when {
             requiredFailures > 0 -> Verdict.UNSUPPORTED
+
             result == RESULT_SUPPORTED -> Verdict.OK
+
             result == RESULT_INCONCLUSIVE -> Verdict.INCONCLUSIVE
+
             // 含 cmd_ebpf_probe_stub.go 的 {"result":"unsupported","error":"…without the
             // with_ebpf tag…"}：required_failures 是 0、findings 是空的，那「unsupported」
             // 講的是我方建置少了 tag，不是使用者的內核不行——兩者絕不能混。

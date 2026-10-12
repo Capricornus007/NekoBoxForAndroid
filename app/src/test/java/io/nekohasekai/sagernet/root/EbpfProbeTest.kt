@@ -107,7 +107,7 @@ class EbpfProbeTest {
         // 顯示的是那句人話（detail），不是 feature id。
         assertEquals(
             "local  ✗  BPF_CGROUP_INET4_CONNECT is not attachable: Operation not supported",
-            r.line()
+            r.line(),
         )
     }
 
