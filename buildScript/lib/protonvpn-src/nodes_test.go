@@ -136,6 +136,36 @@ func TestNodesReadsProtonsRealFieldNames(t *testing.T) {
 	}
 }
 
+// TestNodesAcceptsTheCapitalisedWireGuardKey 釘住 2026-10-13 逆推官方 APK 查出來的缺陷：
+// 客戶端查的鍵是大寫開頭的 "WireGuard"，我方只比對小寫 "wireguard" 時會永遠查不到、
+// 靜默退回 EntryIP＋預設埠 51820（表面能用，其實沒吃到協商過的埠）。
+func TestNodesAcceptsTheCapitalisedWireGuardKey(t *testing.T) {
+	const payload = `{"LogicalServers":[
+	 {"ID":"21","Name":"JP#21 大寫鍵","Tier":2,"State":"up","ExitCountry":"jp","City":"Tokyo",
+	  "Features":0,"Load":7,"Score":8.0,
+	  "StatusReference":{"Index":21,"Penalty":0.3,"Cost":1},
+	  "Servers":[{"Domain":"jp21.protonvpn.net","EntryIP":"1.2.3.9","Status":1,
+	    "X25519PublicKey":"FFFFAl==",
+	    "EntryPerProtocol":{"WireGuard":{"IPv4":"1.2.3.77","Ports":[51821,443]}}}]}
+	]}`
+	srv, _ := mockServer(t, payload, http.StatusOK)
+	defer srv.Close()
+
+	out, code := runNodesWith(t, srv.URL, writeTestSession(t, t.TempDir()))
+	if code != 0 || !out.OK || len(out.Servers) != 1 {
+		t.Fatalf("nodes failed: code=%d out=%+v", code, out)
+	}
+	got := out.Servers[0]
+	// 查表命中才會拿到 per-protocol 的 IPv4 與它的第一個埠；退回 fallback 會是
+	// EntryIP 1.2.3.9 ＋預設 51820，那正是這條測試要擋住的行為。
+	if got.Endpoint != "1.2.3.77" {
+		t.Errorf("endpoint = %q, want the per-protocol IPv4 1.2.3.77 (fallback would be 1.2.3.9)", got.Endpoint)
+	}
+	if got.Port != 51821 {
+		t.Errorf("port = %d, want the entry's first port 51821 (fallback would be 51820)", got.Port)
+	}
+}
+
 func TestNodesPrefersTheWireGuardEntryAndItsFirstPort(t *testing.T) {
 	srv, _ := mockServer(t, serverListFixture, http.StatusOK)
 	defer srv.Close()

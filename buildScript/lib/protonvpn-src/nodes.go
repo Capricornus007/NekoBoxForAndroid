@@ -63,10 +63,24 @@ type serverEntryInfo struct {
 	Ports []int  `json:"Ports"`
 }
 
-// wireGuardEntry is the per-protocol record Proton keys "wireguard".
+// wireGuardEntry 取 WireGuard 那條 per-protocol 記錄。
+// ⚠️ 鍵的大小寫不能寫死：2026-10-13 逆推官方 APK（ch.protonvpn.android 5.20.74.0）查實
+//   客戶端查的是**大寫開頭**的 "WireGuard"——`ConnectingDomain.java:235` 用
+//   `protocol.getApiName()` 當鍵，而 `getApiName()` 是「VPN 名＋傳輸名」直接串接
+//   （所以那側還有 WireGuardUDP／WireGuardTCP／WireGuardTLS，Stealth 就是最後一把）。
+//   我方先前只比對小寫 "wireguard" ⇒ 查表永遠落空、靜默退回 EntryIP＋預設埠 51820，
+//   表面上「能用」其實是沒吃到協商過的埠。改成先精確命中、再不分大小寫逐鍵找，
+//   兩種上游寫法都拿得到；真的查不到才走原本的 fallback。
 func (d connectingDomain) wireGuardEntry() (serverEntryInfo, bool) {
-	e, ok := d.EntryPerProtocol[protocolWireGuardName]
-	return e, ok
+	if e, ok := d.EntryPerProtocol[protocolWireGuardName]; ok {
+		return e, true
+	}
+	for k, e := range d.EntryPerProtocol {
+		if strings.EqualFold(k, protocolWireGuardName) {
+			return e, true
+		}
+	}
+	return serverEntryInfo{}, false
 }
 
 const protocolWireGuardName = "wireguard"
