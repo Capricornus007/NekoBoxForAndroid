@@ -1022,6 +1022,10 @@
     <string name="proton_city">المدينة</string>
     <string name="proton_sort">الترتيب</string>
     <string name="proton_ipv6_only">IPv6 فقط</string>
+    <string name="proton_needs_ovpn_config">هذا الخادم يقدم OpenVPN/ProTun فقط؛ الاستيراد غير مدعوم حالياً</string>
+    <string name="proton_no_match">لا توجد خوادم تطابق عوامل التصفية هذه</string>
+    <string name="proton_all_protocols">كل البروتوكولات</string>
+    <string name="proton_protocol">البروتوكول</string>
     <string name="proton_all_countries">كل الدول</string>
     <string name="proton_all_cities">كل المدن</string>
     <string name="proton_sort_idle">متاح</string>

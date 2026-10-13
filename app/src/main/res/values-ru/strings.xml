@@ -1025,6 +1025,10 @@
     <string name="proton_city">Город</string>
     <string name="proton_sort">Сортировка</string>
     <string name="proton_ipv6_only">Только IPv6</string>
+    <string name="proton_needs_ovpn_config">Этот сервер предлагает только OpenVPN/ProTun; импорт пока не поддерживается</string>
+    <string name="proton_no_match">Нет серверов, соответствующих этим фильтрам</string>
+    <string name="proton_all_protocols">Все протоколы</string>
+    <string name="proton_protocol">Протокол</string>
     <string name="proton_all_countries">Все страны</string>
     <string name="proton_all_cities">Все города</string>
     <string name="proton_sort_idle">Свободно</string>

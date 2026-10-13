@@ -30,9 +30,63 @@ data class ProtonNode(
     // -1 也是「payload 沒帶這個欄位」（舊快取）的意思，不能當成 0，那是「最好」。
     // 兩個新欄位都放在最後是必要的：既有呼叫端是用位置建這個物件的。
     val score: Double = -1.0,
+    // 這台能走哪些協定，正規化小寫：wireguard／stealth／openvpn／protun／smart，
+    // 上游不認識的鍵名原樣小寫送出（sidecar 的 protocolCaps）。空清單只代表「這份 payload
+    // 沒帶這欄」＝舊 sidecar 寫的舊快取，不能解讀成「什麼都不支援」，也不能憑 wgPublicKey
+    // 補一個 wireguard 進去：那正是「拿推論冒充資料」，清單會假裝筛對了。
+    val protocols: List<String> = emptyList(),
+    // Proton 的 Secure Core（流量先過中繼再到出口）。證據是官方 APK 反編譯出來的
+    // Server.java：isSecureCoreServer() => d0(features, 1)，跟 isIPv6Supported()
+    // 的 d0(features, 16) 同一個 features 位元遮罩、不同位。
+    val secureCore: Boolean = false,
 ) {
     // 空閒度是他在清單上真正要比的東西，負載只是它的反面。
     val idlePercent: Int? get() = load.takeIf { it in 0..100 }?.let { 100 - it }
+
+    // wgPublicKey 有值才能直接建 WireGuard 剖面；OpenVPN／ProTun 那條要的是 .ovpn 材料，
+    // 目前是「列得出來、點下去會告知還沒接」的狀態。
+    val hasWireGuardKey: Boolean get() = publicKey.isNotEmpty()
+
+    /**
+     * 「這台能不能走 [want]」。協定清單有就以清單為準；清單是空的（＝舊 sidecar 寫的舊快取）
+     * 時只對 wireguard 退化到 wgPublicKey 判斷——這不是猜：上游 nodes.go 的 protocolCaps
+     * 本來就是 `if d.X25519PublicKey != "" { seen["wireguard"] = true }`，同一份資料、
+     * 同一條推導。其他協定不能這樣補，缺資料時寧可篩不出來，也不要宣稱支援。
+     */
+    fun canUse(want: String): Boolean = when {
+        protocols.isNotEmpty() -> protocols.any { it.equals(want, ignoreCase = true) }
+        want == PROTOCOL_WIREGUARD -> hasWireGuardKey
+        else -> false
+    }
+
+    companion object {
+        const val PROTOCOL_WIREGUARD = "wireguard"
+        const val PROTOCOL_STEALTH = "stealth"
+        const val PROTOCOL_OPENVPN = "openvpn"
+        const val PROTOCOL_PROTUN = "protun"
+        const val PROTOCOL_SMART = "smart"
+
+        // 下拉的固定順序，跟 sidecar 的 protocolOrder 一致；來源是官方 APK 的
+        // Transmission/VPN 鍵名（WireGuardTLS 之類拆出 stealth）。
+        val PROTOCOL_ORDER = listOf(
+            PROTOCOL_WIREGUARD,
+            PROTOCOL_STEALTH,
+            PROTOCOL_OPENVPN,
+            PROTOCOL_PROTUN,
+            PROTOCOL_SMART,
+        )
+
+        // 協定名是專有名詞，不進語系檔（全局規則 35）；上游不認識的鍵原樣顯示，
+        // 那種情況寧可有個看得見的怪名字，也不要把它翻譯成某個已知的協定。
+        fun protocolLabel(key: String) = when (key.lowercase()) {
+            PROTOCOL_WIREGUARD -> "WireGuard"
+            PROTOCOL_STEALTH -> "Stealth"
+            PROTOCOL_OPENVPN -> "OpenVPN"
+            PROTOCOL_PROTUN -> "ProTun"
+            PROTOCOL_SMART -> "Smart"
+            else -> key
+        }
+    }
 }
 
 sealed class ProtonOutcome {
@@ -170,11 +224,15 @@ object ProtonJson {
         val nodes = ArrayList<ProtonNode>(array.length())
         for (i in 0 until array.length()) {
             val item = array.optJSONObject(i) ?: continue
+            // 協定清單要先讀：下面決定「沒有 wgPublicKey」算不算壞節點。
+            val protocols = stringList(item.optJSONArray("protocols"))
             // A node without a key or endpoint cannot be dialed; the sidecar is
             // supposed to drop those, and this is the second line of defence.
             val publicKey = item.optString("wgPublicKey", "")
             val endpoint = item.optString("endpoint", "").ifEmpty { item.optString("domain", "") }
-            if (publicKey.isEmpty() || endpoint.isEmpty()) continue
+            // 舊的第二道防線要求「一定要有 WG 金鑰」，那會把 sidecar 這一輪特意留下來、
+            // 只能走 OpenVPN／ProTun 的機器在這裡整個倒掉，等於篩選白做。
+            if (endpoint.isEmpty() || (publicKey.isEmpty() && protocols.isEmpty())) continue
             nodes += ProtonNode(
                 id = item.optString("id", ""),
                 name = item.optString("name", ""),
@@ -187,7 +245,11 @@ object ProtonJson {
                 city = item.optString("city", ""),
                 endpoint = endpoint.substringBeforeLast(':', endpoint),
                 publicKey = publicKey,
-                port = item.optInt("port", DEFAULT_PORT),
+                // 51820 是 WireGuard 的預設埠，不是 Proton 的：sidecar 對「非 WG 且沒帶埠」
+                // 刻意回 0（JSON 端 omitempty 整個省略），這時不能替 OpenVPN 機器臆造埠號。
+                port = item.optInt("port", if (publicKey.isNotEmpty()) DEFAULT_PORT else 0),
+                protocols = protocols,
+                secureCore = item.optBoolean("secureCore"),
             )
         }
         // An empty list is a failure, not a success with nothing in it: the UI

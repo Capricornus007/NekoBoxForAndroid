@@ -1121,6 +1121,13 @@
     <string name="proton_city">City</string>
     <string name="proton_sort">Sort</string>
     <string name="proton_ipv6_only">IPv6 only</string>
+    <string name="proton_protocol">Protocol</string>
+    <!-- Secure Core 是 Proton 的功能專有名詞，不翻譯（連同下拉裡的 WireGuard／Stealth／
+         ProTun 等協定名一起，那些直接寫在 ProtonNode.protocolLabel 裡、不進語系檔）。 -->
+    <string name="proton_secure_core" translatable="false">Secure Core</string>
+    <string name="proton_all_protocols">All protocols</string>
+    <string name="proton_no_match">No servers match these filters</string>
+    <string name="proton_needs_ovpn_config">This server only offers OpenVPN/ProTun; importing it isn\'t supported yet</string>
     <string name="proton_all_countries">All countries</string>
     <string name="proton_all_cities">All cities</string>
     <string name="proton_sort_idle">Idle</string>

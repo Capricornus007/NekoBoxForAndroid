@@ -1052,6 +1052,10 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_city">Città</string>
     <string name="proton_sort">Ordine</string>
     <string name="proton_ipv6_only">Solo IPv6</string>
+    <string name="proton_needs_ovpn_config">Questo server offre solo OpenVPN/ProTun; l\'importazione non è ancora supportata</string>
+    <string name="proton_no_match">Nessun server corrisponde a questi filtri</string>
+    <string name="proton_all_protocols">Tutti i protocolli</string>
+    <string name="proton_protocol">Protocollo</string>
     <string name="proton_all_countries">Tutti i paesi</string>
     <string name="proton_all_cities">Tutte le città</string>
     <string name="proton_sort_idle">Libero</string>

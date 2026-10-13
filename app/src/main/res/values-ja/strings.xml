@@ -871,6 +871,10 @@
     <string name="proton_city">都市</string>
     <string name="proton_sort">並べ替え</string>
     <string name="proton_ipv6_only">IPv6 のみ</string>
+    <string name="proton_needs_ovpn_config">このサーバーは OpenVPN/ProTun のみ対応しており、インポートはまだサポートされていません</string>
+    <string name="proton_no_match">このフィルターに一致するサーバーはありません</string>
+    <string name="proton_all_protocols">すべてのプロトコル</string>
+    <string name="proton_protocol">プロトコル</string>
     <string name="proton_all_countries">すべての国</string>
     <string name="proton_all_cities">すべての都市</string>
     <string name="proton_sort_idle">空き</string>

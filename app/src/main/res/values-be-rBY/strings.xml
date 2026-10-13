@@ -1050,6 +1050,10 @@
     <string name="proton_city">Горад</string>
     <string name="proton_sort">Сартаванне</string>
     <string name="proton_ipv6_only">Толькі IPv6</string>
+    <string name="proton_needs_ovpn_config">Гэты сервер працуе толькі з OpenVPN/ProTun; імпарт пакуль не падтрымліваецца</string>
+    <string name="proton_no_match">Няма сервераў, якія адпавядаюць гэтым фільтрам</string>
+    <string name="proton_all_protocols">Усе пратаколы</string>
+    <string name="proton_protocol">Пратакол</string>
     <string name="proton_all_countries">Усе краіны</string>
     <string name="proton_all_cities">Усе гарады</string>
     <string name="proton_sort_idle">Свабодна</string>

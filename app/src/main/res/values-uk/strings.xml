@@ -1042,6 +1042,10 @@
     <string name="proton_city">Місто</string>
     <string name="proton_sort">Сортування</string>
     <string name="proton_ipv6_only">Лише IPv6</string>
+    <string name="proton_needs_ovpn_config">Цей сервер пропонує лише OpenVPN/ProTun; імпорт поки не підтримується</string>
+    <string name="proton_no_match">Немає серверів, що відповідають цим фільтрам</string>
+    <string name="proton_all_protocols">Усі протоколи</string>
+    <string name="proton_protocol">Протокол</string>
     <string name="proton_all_countries">Усі країни</string>
     <string name="proton_all_cities">Усі міста</string>
     <string name="proton_sort_idle">Вільно</string>

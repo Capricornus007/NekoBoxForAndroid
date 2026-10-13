@@ -1036,6 +1036,10 @@
     <string name="proton_city">城市</string>
     <string name="proton_sort">排序</string>
     <string name="proton_ipv6_only">仅显示 IPv6</string>
+    <string name="proton_needs_ovpn_config">这台服务器只提供 OpenVPN/ProTun；暂不支持导入</string>
+    <string name="proton_no_match">没有符合这些筛选条件的服务器</string>
+    <string name="proton_all_protocols">全部协议</string>
+    <string name="proton_protocol">协议</string>
     <string name="proton_all_countries">全部国家</string>
     <string name="proton_all_cities">全部城市</string>
     <string name="proton_sort_idle">空闲度</string>

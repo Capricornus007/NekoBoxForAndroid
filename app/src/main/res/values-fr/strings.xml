@@ -1058,6 +1058,10 @@
     <string name="proton_city">Ville</string>
     <string name="proton_sort">Tri</string>
     <string name="proton_ipv6_only">IPv6 uniquement</string>
+    <string name="proton_needs_ovpn_config">Ce serveur ne propose que OpenVPN/ProTun ; l\'importation n\'est pas encore prise en charge</string>
+    <string name="proton_no_match">Aucun serveur ne correspond à ces filtres</string>
+    <string name="proton_all_protocols">Tous les protocoles</string>
+    <string name="proton_protocol">Protocole</string>
     <string name="proton_all_countries">Tous les pays</string>
     <string name="proton_all_cities">Toutes les villes</string>
     <string name="proton_sort_idle">Libre</string>

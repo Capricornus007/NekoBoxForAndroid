@@ -2,6 +2,7 @@ package io.nekohasekai.sagernet.fmt.proton
 
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -17,7 +18,7 @@ class ProtonFilterTest {
     private lateinit var savedLocale: Locale
 
     // 城市排序現在吃 cityName()，而它看預設語系。這台機器的系統語系是中文，不釘死
-    // 的話「按城市排序」會变成中文筆畫序，斷言就變成跟著環境飄。
+    // 的話「按城市排序」會變成中文筆畫序，斷言就變成跟著環境飄。
     @Before
     fun pinLocale() {
         savedLocale = Locale.getDefault()
@@ -32,8 +33,8 @@ class ProtonFilterTest {
     // 拼音序要用實物釘，不能假設：Collator 的 zh 規則在 JVM 與 Android 上實作不同。
     // 四個國家挑「阿、比、德、日」開頭：拼音是 a < bi < de < ri，碼位卻是 德(U+5FB0) <
     // 日(U+65E5) < 比(U+6BD4) < 阿(U+963F)，剛好完全相反，照碼位排一定紅。
-    // 這四個字繁簡同形，是因为 JDK 內建的 zh 表對「只有繁體才有」的字（愛、韓）沒收拼音權重，
-    // 用它们當斷言會在 JVM 假紅——但 Android 用的是 ICU，繁體一樣走拼音，所以繁體那一條
+    // 這四個字繁簡同形，是因為 JDK 內建的 zh 表對「只有繁體才有」的字（愛、韓）沒收拼音權重，
+    // 用它們當斷言會在 JVM 假紅——但 Android 用的是 ICU，繁體一樣走拼音，所以繁體那一條
     // 另外在實機驗。斷言用兩位碼而不是譯名，避免被 CLDR 版本的字串差異假紅。
     @Test
     fun countriesFollowPinyinInChineseLocales() {
@@ -89,6 +90,9 @@ class ProtonFilterTest {
         load: Int = -1,
         score: Double = -1.0,
         ipv6: Boolean = false,
+        protocols: List<String> = listOf(ProtonNode.PROTOCOL_WIREGUARD),
+        secureCore: Boolean = false,
+        publicKey: String = "key-$id",
     ) = ProtonNode(
         id = id,
         name = name,
@@ -100,8 +104,10 @@ class ProtonFilterTest {
         country = country,
         city = city,
         endpoint = "10.0.0.$id",
-        publicKey = "key-$id",
+        publicKey = publicKey,
         port = 51820,
+        protocols = protocols,
+        secureCore = secureCore,
     )
 
     // 負載與 penalty 刻意排成相反的兩組：預設排序若偷偷退回去吃 penalty，這裡會紅。
@@ -239,5 +245,118 @@ class ProtonFilterTest {
         } finally {
             Locale.setDefault(saved)
         }
+    }
+
+    // ===== 協定維度（#211）=====
+    //
+    // 這組測試釘的是這支功能最容易做錯的一件事：「ALL」被偷偷當成 WireGuard。
+    // Proton 有一批機器根本沒有 WG 金鑰（只講 OpenVPN／ProTun），篩選條件一寫錯，
+    // 那批機器就整批從清單消失——而畫面上看起來只是「今天沒有這台」。
+    private val protocolNodes = listOf(
+        node("p1", "WG#1", "JP", "Tokyo", protocols = listOf(ProtonNode.PROTOCOL_WIREGUARD)),
+        node(
+            "p2",
+            "STEALTH#1",
+            "US",
+            "Los Angeles",
+            protocols = listOf(ProtonNode.PROTOCOL_WIREGUARD, ProtonNode.PROTOCOL_STEALTH),
+        ),
+        node(
+            "p3",
+            "OVPN#1",
+            "DE",
+            "Berlin",
+            protocols = listOf(ProtonNode.PROTOCOL_OPENVPN),
+            publicKey = "",
+        ),
+        node("p4", "LEGACY#1", "FR", "Paris", protocols = emptyList()),
+    )
+
+    @Test
+    fun `ALL protocol keeps every server including openvpn-only ones`() {
+        assertEquals(listOf("p1", "p2", "p3", "p4"), ids(ProtonFilter().apply(protocolNodes)))
+    }
+
+    @Test
+    fun `filtering by protocol keeps only servers that speak it`() {
+        assertEquals(
+            listOf("p3"),
+            ids(ProtonFilter(protocol = ProtonNode.PROTOCOL_OPENVPN).apply(protocolNodes)),
+        )
+        assertEquals(
+            listOf("p1", "p2", "p4"),
+            ids(ProtonFilter(protocol = ProtonNode.PROTOCOL_WIREGUARD).apply(protocolNodes)),
+        )
+        assertEquals(
+            listOf("p2"),
+            ids(ProtonFilter(protocol = ProtonNode.PROTOCOL_STEALTH).apply(protocolNodes)),
+        )
+        // 鍵的來源大小寫不固定（上游那把是小寫，但兩邊不能靠運氣對齊）。
+        assertEquals(
+            listOf("p3"),
+            ids(ProtonFilter(protocol = "OpenVPN").apply(protocolNodes)),
+        )
+    }
+
+    @Test
+    fun `a server that never reported protocols is wireguard only`() {
+        val legacy = node("l1", "OLD#1", "JP", "Tokyo", protocols = emptyList())
+        // 退化判斷的根據是 sidecar 的 protocolCaps：X25519PublicKey 非空就是 wireguard，
+        // 同一份資料、同一條推導，不是新增的假設。
+        assertTrue(legacy.canUse(ProtonNode.PROTOCOL_WIREGUARD))
+        // 其他協定不能這樣補：缺資料就宣稱支援，等于生出一台連不上的剖面。
+        assertFalse(legacy.canUse(ProtonNode.PROTOCOL_OPENVPN))
+        assertFalse(legacy.canUse(ProtonNode.PROTOCOL_STEALTH))
+        // 沒有金鑰也沒有協定清單的（不該出現，防呆）兩個都不算。
+        val blank = node("l2", "OLD#2", "JP", "Tokyo", protocols = emptyList(), publicKey = "")
+        assertFalse(blank.canUse(ProtonNode.PROTOCOL_WIREGUARD))
+    }
+
+    @Test
+    fun `protocol dropdown counts use the same ruler as the filter`() {
+        val options = ProtonFilter.protocols(protocolNodes)
+        // 一台可以同時被計入多個協定，所以這裡是逐鍵 count，不是把節點分桶。
+        assertEquals(
+            listOf(
+                ProtonNode.PROTOCOL_WIREGUARD to 3L,
+                ProtonNode.PROTOCOL_STEALTH to 1L,
+                ProtonNode.PROTOCOL_OPENVPN to 1L,
+            ),
+            options.map { it.key to it.count.toLong() },
+        )
+        // ProTun／Smart 這帳號一台都沒有 → 條目整個不出現，而不是列個 0 讓人點了看空白。
+        assertTrue(options.none { it.key == ProtonNode.PROTOCOL_PROTUN })
+        // 數字與實際篩出來的結果必須一致（兩邊算法不一樣的話這裡會紅）。
+        options.forEach { option ->
+            assertEquals(
+                "count=${option.count} but filter returned different",
+                option.count.toLong(),
+                ProtonFilter(protocol = option.key).apply(protocolNodes).size.toLong(),
+            )
+        }
+        // 顯示名是專有名詞，不進語系檔。
+        assertEquals("WireGuard", ProtonNode.protocolLabel(ProtonNode.PROTOCOL_WIREGUARD))
+        assertEquals("Stealth", ProtonNode.protocolLabel(ProtonNode.PROTOCOL_STEALTH))
+        assertEquals("ProTun", ProtonNode.protocolLabel(ProtonNode.PROTOCOL_PROTUN))
+        // 上游發明的新協定照原樣顯示，不翻譯成某個已知的。
+        assertEquals("quantum", ProtonNode.protocolLabel("quantum"))
+    }
+
+    @Test
+    fun `secure core is its own dimension`() {
+        val mixed = listOf(
+            node("s1", "SC#1", "JP", "Tokyo", secureCore = true),
+            node("s2", "PL#1", "US", "Los Angeles"),
+        )
+        assertEquals(listOf("s1"), ids(ProtonFilter(secureCoreOnly = true).apply(mixed)))
+        assertEquals(listOf("s1", "s2"), ids(ProtonFilter().apply(mixed)))
+    }
+
+    @Test
+    fun `protocol filter composes with country and search`() {
+        assertEquals(listOf("p3"), ids(ProtonFilter(country = "DE", protocol = ProtonNode.PROTOCOL_OPENVPN).apply(protocolNodes)))
+        // 國家選到別家時，OpenVPN 那格就該是空的——這是最容易誤會成「篩選壞了」的組合。
+        assertTrue(ProtonFilter(country = "JP", protocol = ProtonNode.PROTOCOL_OPENVPN).apply(protocolNodes).isEmpty())
+        assertEquals(listOf("p2"), ids(ProtonFilter(query = "stealth", protocol = ProtonNode.PROTOCOL_STEALTH).apply(protocolNodes)))
     }
 }

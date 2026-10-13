@@ -1025,6 +1025,10 @@
     <string name="proton_city">شهر</string>
     <string name="proton_sort">مرتب‌سازی</string>
     <string name="proton_ipv6_only">فقط IPv6</string>
+    <string name="proton_needs_ovpn_config">این سرور فقط OpenVPN/ProTun را ارائه می‌دهد؛ وارد کردن آن هنوز پشتیبانی نمی‌شود</string>
+    <string name="proton_no_match">هیچ سروری با این فیلترها مطابقت ندارد</string>
+    <string name="proton_all_protocols">همه پروتکل‌ها</string>
+    <string name="proton_protocol">پروتکل</string>
     <string name="proton_all_countries">همه کشورها</string>
     <string name="proton_all_cities">همه شهرها</string>
     <string name="proton_sort_idle">آزاد</string>

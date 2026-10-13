@@ -968,6 +968,10 @@
     <string name="proton_city">Stadt</string>
     <string name="proton_sort">Sortierung</string>
     <string name="proton_ipv6_only">Nur IPv6</string>
+    <string name="proton_needs_ovpn_config">Dieser Server bietet nur OpenVPN/ProTun; Import wird noch nicht unterstützt</string>
+    <string name="proton_no_match">Keine Server entsprechen diesen Filtern</string>
+    <string name="proton_all_protocols">Alle Protokolle</string>
+    <string name="proton_protocol">Protokoll</string>
     <string name="proton_all_countries">Alle Länder</string>
     <string name="proton_all_cities">Alle Städte</string>
     <string name="proton_sort_idle">Frei</string>

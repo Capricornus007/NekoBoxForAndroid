@@ -1037,6 +1037,10 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_city">城市</string>
     <string name="proton_sort">排序</string>
     <string name="proton_ipv6_only">只顯示 IPv6</string>
+    <string name="proton_needs_ovpn_config">這台伺服器只提供 OpenVPN／ProTun；暫不支持匯入</string>
+    <string name="proton_no_match">沒有符合這些篩選條件的伺服器</string>
+    <string name="proton_all_protocols">全部協定</string>
+    <string name="proton_protocol">協定</string>
     <string name="proton_all_countries">全部國家</string>
     <string name="proton_all_cities">全部城市</string>
     <string name="proton_sort_idle">空閒度</string>

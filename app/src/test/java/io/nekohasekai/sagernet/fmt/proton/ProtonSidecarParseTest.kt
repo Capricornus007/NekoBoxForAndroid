@@ -246,4 +246,72 @@ class ProtonSidecarParseTest {
         assertTrue(conf.contains("Address = 10.2.0.2/32, 2a07:b944::2:2/128"))
         assertTrue(conf.contains("DNS = 10.2.0.1, 2a07:b944::2:1"))
     }
+
+    /**
+     * sidecar 這一輪開始會把「這台講哪些協定」跟 Secure Core 位元一起交出來，
+     * 而且**不再丟掉沒有 WG 金鑰的機器**。Kotlin 這邊的第二道防線必須跟著放寬，
+     * 否則整批 OpenVPN／ProTun 機器會在解析階段又被倒掉，篩選等於沒做。
+     */
+    @Test
+    fun readsProtocolCapsAndKeepsServersWithoutAWireGuardKey() {
+        val state = ProtonJson.parseNodes(
+            """
+            {"ok":true,"dropped":0,"servers":[
+              {"id":"1","name":"US#1","penalty":0,"load":10,"score":3.1,"tier":2,
+               "country":"us","city":"New York","endpoint":"1.2.3.4","wgPublicKey":"AAAAAl==","port":51820,
+               "protocols":["wireguard","stealth"],"secureCore":true},
+              {"id":"2","name":"SE#1","penalty":0,"tier":2,
+               "country":"se","city":"Stockholm","domain":"se1.protonvpn.net",
+               "protocols":["openvpn","protun","smart"]}
+            ]}
+            """.trimIndent(),
+        )
+        assertEquals(2, state.nodes.size)
+        val wg = state.nodes[0]
+        assertEquals(listOf("wireguard", "stealth"), wg.protocols)
+        assertTrue(wg.secureCore)
+        assertTrue(wg.canUse(ProtonNode.PROTOCOL_STEALTH))
+
+        val ovpn = state.nodes[1]
+        assertEquals("", ovpn.publicKey)
+        assertEquals(listOf("openvpn", "protun", "smart"), ovpn.protocols)
+        assertFalse("這台不是 Secure Core", ovpn.secureCore)
+        assertTrue(ovpn.canUse(ProtonNode.PROTOCOL_OPENVPN))
+        assertFalse("沒有 WG 金鑰不能假稱能走 WireGuard", ovpn.canUse(ProtonNode.PROTOCOL_WIREGUARD))
+        // domain 那條路要照樣當端點用（sidecar 對某些機器只給域名）。
+        assertEquals("se1.protonvpn.net", ovpn.endpoint)
+        // 51820 是 WireGuard 的預設埠，不是 Proton 的：非 WG 又沒帶埠時必須留 0，
+        // 生一個「埠號 51820」的假資料比留空更壞。
+        assertEquals(0, ovpn.port)
+        assertEquals(51820, wg.port)
+    }
+
+    /** 舊 sidecar 寫的舊快取沒有 protocols 欄位：不能當成「什麼都不支援」，也不能亂補。 */
+    @Test
+    fun legacyPayloadWithoutProtocolFieldFallsBackToWireGuardOnly() {
+        val node = ProtonJson.parseNodes(
+            """{"ok":true,"servers":[{"id":"9","name":"JP#9","endpoint":"1.2.3.9","wgPublicKey":"IIIIAl=="}]}""",
+        ).nodes.single()
+        assertTrue(node.protocols.isEmpty())
+        assertTrue(node.canUse(ProtonNode.PROTOCOL_WIREGUARD))
+        assertFalse(node.canUse(ProtonNode.PROTOCOL_OPENVPN))
+        assertFalse(node.secureCore)
+        // 舊快取沒帶埠時，有 WG 金鑰仍然用 WG 的預設埠（這是既有行為，不能回歸）。
+        assertEquals(ProtonJson.DEFAULT_PORT, node.port)
+    }
+
+    /** 既沒金鑰又沒協定的機器，兩邊都判定不可用 → 解析階段就丟，不進清單。 */
+    @Test
+    fun dropsServersWithNeitherKeyNorProtocol() {
+        val state = ProtonJson.parseNodes(
+            """
+            {"ok":true,"servers":[
+              {"id":"1","name":"BAD","endpoint":"1.2.3.4"},
+              {"id":"2","name":"OK","endpoint":"1.2.3.5","protocols":["openvpn"]}
+            ]}
+            """.trimIndent(),
+        )
+        assertEquals(1, state.nodes.size)
+        assertEquals("2", state.nodes[0].id)
+    }
 }

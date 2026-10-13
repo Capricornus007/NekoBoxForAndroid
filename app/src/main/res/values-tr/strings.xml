@@ -1008,6 +1008,10 @@
     <string name="proton_city">Şehir</string>
     <string name="proton_sort">Sıralama</string>
     <string name="proton_ipv6_only">Yalnızca IPv6</string>
+    <string name="proton_needs_ovpn_config">Bu sunucu yalnızca OpenVPN/ProTun sunuyor; içe aktarma henüz desteklenmiyor</string>
+    <string name="proton_no_match">Bu filtrelerle eşleşen sunucu yok</string>
+    <string name="proton_all_protocols">Tüm protokoller</string>
+    <string name="proton_protocol">Protokol</string>
     <string name="proton_all_countries">Tüm ülkeler</string>
     <string name="proton_all_cities">Tüm şehirler</string>
     <string name="proton_sort_idle">Boş</string>

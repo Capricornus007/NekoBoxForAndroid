@@ -11,6 +11,12 @@ data class ProtonFilter(
     val country: String = ALL,
     val city: String = ALL,
     val ipv6Only: Boolean = false,
+    // 協定篩選：值就是 sidecar 那欄的正規化小寫鍵（wireguard／stealth／openvpn／
+    // protun／smart，外加上游不認識的鍵名）。ALL 必須是「不加這一維」，
+    // 絕不能偷偷當成 wireguard：否則只讲 OpenVPN 的那批機器會整個從清單消失，
+    // 而那正是這支功能要解決的問題。
+    val protocol: String = ALL,
+    val secureCoreOnly: Boolean = false,
     val sort: Sort = Sort.IDLE,
 ) {
     enum class Sort { IDLE, NAME, COUNTRY, CITY }
@@ -21,10 +27,13 @@ data class ProtonFilter(
         // 同一份資料算出來的，任何一處沒對齊就會篩出半份清單。
         val wantCountry = country.trim().uppercase(Locale.ROOT)
         val wantCity = city.trim().lowercase()
+        val wantProtocol = protocol.trim().lowercase()
         val matched = nodes.filter { node ->
             (wantCountry == ALL || node.countryKey == wantCountry) &&
                 (wantCity == ALL || node.city.lowercase() == wantCity) &&
                 (!ipv6Only || node.supportsIPv6) &&
+                (!secureCoreOnly || node.secureCore) &&
+                (wantProtocol == ALL || node.canUse(wantProtocol)) &&
                 (
                     q.isEmpty() || node.name.lowercase().contains(q) ||
                         node.city.lowercase().contains(q) ||
@@ -88,6 +97,18 @@ data class ProtonFilter(
         fun hasCountry(nodes: List<ProtonNode>, key: String) = nodes.any { it.countryKey == key.trim().uppercase(Locale.ROOT) }
 
         fun hasCity(nodes: List<ProtonNode>, key: String) = nodes.any { it.city.lowercase() == key.trim().lowercase() }
+
+        // 協定跟國家／城市不同：一台可以同時被計入好幾個（WG＋Stealth＋ProTun），
+        // 所以逐個鍵自己數一遍，而不是把節點分到某一個桶裡。計數一律走 canUse，
+        // 跟上面 apply() 同一把尺——兩邊算法不同的話，下拉寫「3 台」點下去卻列出 5 台。
+        fun protocols(nodes: List<ProtonNode>): List<Option> {
+            val keys = LinkedHashSet(ProtonNode.PROTOCOL_ORDER)
+            nodes.forEach { keys.addAll(it.protocols.map { name -> name.lowercase() }) }
+            return keys.map { key -> Option(key, nodes.count { it.canUse(key) }, ProtonNode.protocolLabel(key)) }
+                .filter { it.count > 0 }
+        }
+
+        fun hasProtocol(nodes: List<ProtonNode>, key: String) = nodes.any { it.canUse(key.trim().lowercase()) }
     }
 
     data class Option(val key: String, val count: Int, val label: String) {

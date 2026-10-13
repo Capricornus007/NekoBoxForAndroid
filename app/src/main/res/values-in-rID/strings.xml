@@ -1064,6 +1064,10 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_city">Kota</string>
     <string name="proton_sort">Urutan</string>
     <string name="proton_ipv6_only">Hanya IPv6</string>
+    <string name="proton_needs_ovpn_config">Server ini hanya menyediakan OpenVPN/ProTun; impor belum didukung</string>
+    <string name="proton_no_match">Tidak ada server yang cocok dengan filter ini</string>
+    <string name="proton_all_protocols">Semua protokol</string>
+    <string name="proton_protocol">Protokol</string>
     <string name="proton_all_countries">Semua negara</string>
     <string name="proton_all_cities">Semua kota</string>
     <string name="proton_sort_idle">Bebas</string>

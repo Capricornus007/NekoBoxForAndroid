@@ -47,6 +47,7 @@ class ProtonServersActivity : ThemedActivity() {
     private var filter = ProtonFilter()
     private var countryOptions = listOf<ProtonFilter.Option>()
     private var cityOptions = listOf<ProtonFilter.Option>()
+    private var protocolOptions = listOf<ProtonFilter.Option>()
     private var fetching = false
 
     private val sortOptions by lazy {
@@ -78,14 +79,24 @@ class ProtonServersActivity : ThemedActivity() {
             renderNodes()
         }
         binding.countryFilter.setOnItemClickListener { _, _, position, _ ->
-            // 換國家要把城市重設：留著「东京」再選美國，清單會直接空掉。
+            // 換國家要把城市重設：留著「東京」再選美國，清單會直接空掉。
             filter = filter.copy(country = countryOptions.getOrNull(position)?.key ?: ProtonFilter.ALL, city = ProtonFilter.ALL)
-            refreshPlaceOptions()
+            refreshFilterOptions()
             shownLimit = nodePage
             renderNodes()
         }
         binding.cityFilter.setOnItemClickListener { _, _, position, _ ->
             filter = filter.copy(city = cityOptions.getOrNull(position)?.key ?: ProtonFilter.ALL)
+            shownLimit = nodePage
+            renderNodes()
+        }
+        binding.protocolFilter.setOnItemClickListener { _, _, position, _ ->
+            filter = filter.copy(protocol = protocolOptions.getOrNull(position)?.key ?: ProtonFilter.ALL)
+            shownLimit = nodePage
+            renderNodes()
+        }
+        binding.secureCoreOnly.setOnCheckedChangeListener { _, checked ->
+            filter = filter.copy(secureCoreOnly = checked)
             shownLimit = nodePage
             renderNodes()
         }
@@ -106,7 +117,7 @@ class ProtonServersActivity : ThemedActivity() {
         }
         // 排序框的 adapter 不在這裡設：實測證明「在 onCreate 就 setAdapter」的排序框點下去
         // 只有箭頭翻、清單不出來，而同一畫面裡國家／城市兩格都點得開——它們的差異就是設
-        // adapter 的時機。所以排序也改到 refreshPlaceOptions() 裡，跟那兩格同時、同機制。
+        // adapter 的時機。所以排序也改到 refreshFilterOptions() 裡，跟那兩格同時、同機制。
         renderSortLabel()
 
         if (!ProtonSidecar.isAvailable()) {
@@ -181,7 +192,7 @@ class ProtonServersActivity : ThemedActivity() {
         binding.status.setOnClickListener(null)
         nodes = state.nodes
         shownLimit = nodePage
-        refreshPlaceOptions()
+        refreshFilterOptions()
         val count = getString(R.string.proton_node_count, state.nodes.size, state.dropped)
         binding.status.text = if (fromCache) {
             count + " · " + getString(
@@ -230,7 +241,7 @@ class ProtonServersActivity : ThemedActivity() {
         binding.sortFilter.setText(sortOptions.first { it.first == filter.sort }.second, false)
     }
 
-    private fun refreshPlaceOptions() {
+    private fun refreshFilterOptions() {
         countryOptions = listOf(
             ProtonFilter.Option(ProtonFilter.ALL, nodes.size, getString(R.string.proton_all_countries)),
         ) + ProtonFilter.countries(nodes)
@@ -250,6 +261,16 @@ class ProtonServersActivity : ThemedActivity() {
         binding.sortFilter.setAdapter(labels(sortItems))
         binding.countryFilter.setText(optionText(filter.country, countryOptions), false)
         binding.cityFilter.setText(optionText(filter.city, cityOptions), false)
+        // 協定那格按「全部節點」計數（跟國家一樣不隨已選的國家縮），否則選了某個國家之後
+        // 數字會跟著跳，看起來像篩選壞了。
+        protocolOptions = listOf(
+            ProtonFilter.Option(ProtonFilter.ALL, nodes.size, getString(R.string.proton_all_protocols)),
+        ) + ProtonFilter.protocols(nodes)
+        if (filter.protocol != ProtonFilter.ALL && !ProtonFilter.hasProtocol(nodes, filter.protocol)) {
+            filter = filter.copy(protocol = ProtonFilter.ALL)
+        }
+        binding.protocolFilter.setAdapter(labels(protocolOptions))
+        binding.protocolFilter.setText(optionText(filter.protocol, protocolOptions), false)
     }
 
     private fun renderNodes() {
@@ -259,6 +280,7 @@ class ProtonServersActivity : ThemedActivity() {
         val hasList = nodes.isNotEmpty()
         binding.filterLayout.visibility = if (hasList) View.VISIBLE else View.GONE
         binding.placeFilterRow.visibility = if (hasList) View.VISIBLE else View.GONE
+        binding.protocolFilterRow.visibility = if (hasList) View.VISIBLE else View.GONE
         binding.sortFilterRow.visibility = if (hasList) View.VISIBLE else View.GONE
         binding.refreshHint.visibility = if (hasList) View.VISIBLE else View.GONE
         for (node in visible.take(shownLimit)) {
@@ -291,11 +313,21 @@ class ProtonServersActivity : ThemedActivity() {
         val shown = minOf(shownLimit, visible.size)
         binding.listCount.text = getString(R.string.proton_showing, shown, visible.size)
         binding.listCount.visibility = if (visible.isEmpty()) View.GONE else View.VISIBLE
+        // 有清單卻篩到空，要講一句話：否則整頁消失看起來像當機，而不是「條件太苛刻」。
+        // 用 listCount 同一格是刻意的——status 那行此时正顯示「共 N 台・快取於…」，
+        // 蓋過去會變成「明明有節點卻寫無可用伺服器」。
+        binding.noMatch.visibility = if (hasList && visible.isEmpty()) View.VISIBLE else View.GONE
         binding.showMore.visibility = if (visible.size > shown) View.VISIBLE else View.GONE
     }
 
     private fun import(node: ProtonNode) {
         lifecycleScope.launch {
+            // 只講 OpenVPN／ProTun 的那批機器沒有 WG 金鑰，不能硬生一份 peer 空白、
+            // 點下去必定連不上的 WireGuard 剖面；生出來比不生更壞。
+            if (!node.hasWireGuardKey) {
+                if (!isFinishing && !isDestroyed) binding.status.setText(R.string.proton_needs_ovpn_config)
+                return@launch
+            }
             val pair = ProtonSidecar.keyPair()
             if (isFinishing || isDestroyed) return@launch
             if (!pair.valid) {

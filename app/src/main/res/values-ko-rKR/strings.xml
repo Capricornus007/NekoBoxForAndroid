@@ -1045,6 +1045,10 @@
     <string name="proton_city">도시</string>
     <string name="proton_sort">정렬</string>
     <string name="proton_ipv6_only">IPv6 전용</string>
+    <string name="proton_needs_ovpn_config">이 서버는 OpenVPN/ProTun만 제공합니다. 가져오기는 아직 지원되지 않습니다</string>
+    <string name="proton_no_match">이 필터와 일치하는 서버가 없습니다</string>
+    <string name="proton_all_protocols">모든 프로토콜</string>
+    <string name="proton_protocol">프로토콜</string>
     <string name="proton_all_countries">모든 국가</string>
     <string name="proton_all_cities">모든 도시</string>
     <string name="proton_sort_idle">유휴</string>
