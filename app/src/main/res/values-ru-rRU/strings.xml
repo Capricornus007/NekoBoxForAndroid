@@ -807,6 +807,19 @@ www.example.com 1.1.1.1 1.1.1.2</string>
 
     <string name="action_auto_lowest_latency">Автовыбор узла с наименьшей задержкой (URL-Test)</string>
     <string name="route_preset_title">Готовые шаблоны правил маршрутизации</string>
+    <string name="route_rule_packages_regex">Регулярное выражение имени пакета</string>
+    <string name="route_rule_packages_regex_hint">Шаблон, напр. ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">Добавить</string>
+    <string name="route_rule_packages_regex_dialog_message">Только синтаксис Go RE2: без упреждающих проверок, обратных ссылок и запятых. Переключатель в настройках маршрутизации должен быть включен.</string>
+    <string name="route_rule_packages_regex_error_blank">Сначала введите шаблон</string>
+    <string name="route_rule_packages_regex_error_invalid">Недопустимый шаблон</string>
+    <string name="route_rule_packages_regex_error_unsupported">Синтаксис не поддерживается RE2</string>
+    <string name="route_rule_packages_regex_error_separator">Запятую здесь сохранить нельзя</string>
+    <string name="route_rule_packages_regex_error_duplicate">Уже добавлено</string>
+    <string name="rule_packages_regex_item">Регулярное выражение: %1$s</string>
+    <string name="route_rule_packages_regex_count">Регулярных выражений: %1$d</string>
+    <string name="route_packages_regex">Правила пакетов по регулярному выражению</string>
+    <string name="route_packages_regex_summary">Маршруты применяются при совпадении имени пакета с регулярным выражением. Если выключено, эти записи игнорируются.</string>
     <string name="preset_bypass_cn_apps">Шаблон: обход популярных местных приложений</string>
     <string name="preset_proxy_foreign_apps">Шаблон: популярные международные приложения через прокси</string>
     <string name="preset_applied_toast">Правила шаблона успешно добавлены</string>

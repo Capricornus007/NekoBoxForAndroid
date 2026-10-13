@@ -297,6 +297,10 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var httpProxyBypass by configurationStore.string(Key.HTTP_PROXY_BYPASS) { DEFAULT_HTTP_PROXY_BYPASS }
     var dnsHosts by configurationStore.string(Key.DNS_HOSTS) { "" }
     var strictRoute by configurationStore.boolean(Key.STRICT_ROUTE) { true }
+
+    // 分應用規則裡「re:」開頭的正則條目要不要寫進配置。預設關：關著時這些條目整個忽略
+    // （不進 user_id，也不進 package_name_regex），生成的配置跟從前逐位元組相同。
+    var routePackagesRegex by configurationStore.boolean(Key.ROUTE_PACKAGES_REGEX) { false }
     var connectionTestURL by configurationStore.string(Key.CONNECTION_TEST_URL) {
         SagerNet.application.getString(R.string.default_connection_test_url)
     }

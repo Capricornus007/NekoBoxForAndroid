@@ -56,6 +56,7 @@ import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.ktx.unwrapIPV6Host
 import io.nekohasekai.sagernet.utils.PackageCache
+import io.nekohasekai.sagernet.utils.RulePackages
 import moe.matsuri.nb4a.*
 import moe.matsuri.nb4a.SingBoxOptions.*
 import moe.matsuri.nb4a.SingBoxOptionsUtil
@@ -1310,7 +1311,11 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             route.final_ = mainProxyTag
         } else {
             for (rule in extraRules) {
-                if (rule.packages.isNotEmpty()) {
+                // 「re:」開頭的條目是用正則比對套件名，要不要生效由全域開關 routePackagesRegex 決定。
+                // 開關關著（預設）時這些條目整個丟掉，下面這串流程拿到的清單跟從前一模一樣，
+                // 輸出的 JSON 逐位元組不變。
+                val rulePackages = RulePackages.split(rule.packages, DataStore.routePackagesRegex)
+                if (rulePackages.plain.isNotEmpty() || rulePackages.regex.isNotEmpty()) {
                     PackageCache.awaitLoadSync()
                     // 這句讲的是「這條規則要 VPN 模式」，跟規則裡有幾個套件無關。放在 map 裡會
                     // 按套件數重覆彈窗（一條預設的 Google Play 規則就有五個套件 → 彈五次）。
@@ -1325,7 +1330,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 // own f1ac98919：分應用規則勾了 Google Play 商店時，實際拉封包的是系統下載管理器與
                 // GMS，一併納進套件清單，否則 Play 的下載連線進不了這條規則的隧道（卡在 0%）。
                 // 與 VpnService 白名單那側補的同一組套件對齊。
-                val effectivePackages = rule.packages.toMutableSet()
+                val effectivePackages = rulePackages.plain.toMutableSet()
                 if (effectivePackages.contains("com.android.vending")) {
                     effectivePackages.add("com.android.providers.downloads")
                     effectivePackages.add("com.android.providers.downloads.ui")
@@ -1342,6 +1347,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         PackageCache.awaitLoadSync()
                         user_id = uidList
                     }
+                    // 正則條目：去前綴後交給核心的 package_name_regex，由核心自己比對套件名。
+                    // 不能由 App 先翻成 UID——還沒安裝、或叫不出名字的套件就永遠比不中。
+                    // 走 RulePackages.applyRegexToRule，跟單元測試驗的是同一條路。
+                    RulePackages.applyRegexToRule(this, rule.packages, DataStore.routePackagesRegex)
                     var domainList: List<String>? = null
                     if (rule.domains.isNotBlank()) {
                         domainList = rule.domains.listByLineOrComma()

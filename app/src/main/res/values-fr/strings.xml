@@ -826,6 +826,19 @@
 
     <string name="action_auto_lowest_latency">Sélection auto de la latence la plus basse (URL-Test)</string>
     <string name="route_preset_title">Modèles de règles de routage</string>
+    <string name="route_rule_packages_regex">Regex du nom du paquet</string>
+    <string name="route_rule_packages_regex_hint">Motif, ex. : ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">Ajouter</string>
+    <string name="route_rule_packages_regex_dialog_message">Syntaxe Go RE2 uniquement : pas de lookahead, pas de référence arrière, pas de virgule. Nécessite l\'option des paramètres de routage.</string>
+    <string name="route_rule_packages_regex_error_blank">Saisissez d\'abord un motif</string>
+    <string name="route_rule_packages_regex_error_invalid">Motif invalide</string>
+    <string name="route_rule_packages_regex_error_unsupported">Syntaxe non prise en charge par RE2</string>
+    <string name="route_rule_packages_regex_error_separator">La virgule ne peut pas être enregistrée ici</string>
+    <string name="route_rule_packages_regex_error_duplicate">Déjà ajouté</string>
+    <string name="rule_packages_regex_item">Regex : %1$s</string>
+    <string name="route_rule_packages_regex_count">%1$d regex</string>
+    <string name="route_packages_regex">Règles de paquets par regex</string>
+    <string name="route_packages_regex_summary">Applique les règles qui correspondent aux noms de paquets par regex. Désactivé, ces entrées sont ignorées.</string>
     <string name="preset_bypass_cn_apps">Modèle : contourner les applis locales courantes</string>
     <string name="preset_proxy_foreign_apps">Modèle : applis internationales courantes via proxy</string>
     <string name="preset_applied_toast">Règles du modèle ajoutées avec succès</string>

@@ -463,6 +463,19 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="route_for">%s 的規則</string>
     <string name="route_need_vpn">路由規則 %s 依賴 VPN 才能生效，因此
         被忽略。</string>
+    <string name="route_rule_packages_regex">套件名稱正則</string>
+    <string name="route_rule_packages_regex_hint">正則表達式，例如 ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">加入</string>
+    <string name="route_rule_packages_regex_dialog_message">僅支援 Go RE2 語法：不支援先行斷言、反向引用與逗號。請在路由設定開啟該開關才會生效。</string>
+    <string name="route_rule_packages_regex_error_blank">請先輸入正則</string>
+    <string name="route_rule_packages_regex_error_invalid">正則無效</string>
+    <string name="route_rule_packages_regex_error_unsupported">RE2 不支援此語法</string>
+    <string name="route_rule_packages_regex_error_separator">此處無法儲存逗號</string>
+    <string name="route_rule_packages_regex_error_duplicate">已加入</string>
+    <string name="rule_packages_regex_item">正則：%1$s</string>
+    <string name="route_rule_packages_regex_count">%1$d 條正則</string>
+    <string name="route_packages_regex">正則套件規則</string>
+    <string name="route_packages_regex_summary">以正則比對套件名稱來套用分流規則。關閉時忽略這些條目。</string>
     <string name="profile_traffic_statistics">設定檔流量統計</string>
     <string name="profile_traffic_statistics_summary">停用時，已使用的流量將不會
         被計算</string>

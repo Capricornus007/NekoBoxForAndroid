@@ -31,6 +31,7 @@ import io.nekohasekai.sagernet.ktx.crossFadeFrom
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.utils.PackageCache
+import io.nekohasekai.sagernet.utils.RulePackages
 import io.nekohasekai.sagernet.widget.ListListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -92,8 +93,7 @@ class AppListActivity : ThemedActivity() {
 
         override fun onClick(v: View?) {
             if (isProxiedApp(item)) proxiedUids.delete(item.uid) else proxiedUids[item.uid] = true
-            DataStore.routePackages = apps.filter { isProxiedApp(it) }
-                .joinToString("\n") { it.packageName }
+            saveRoutePackages(apps.filter { isProxiedApp(it) }.joinToString("\n") { it.packageName })
             appsAdapter.notifyItemRangeChanged(0, appsAdapter.itemCount, SWITCH)
         }
     }
@@ -171,6 +171,15 @@ class AppListActivity : ThemedActivity() {
             val uid = app.applicationInfo?.uid ?: continue
             proxiedUids[uid] = true
         }
+    }
+
+    /**
+     * 這一頁每次勾選都是把整包清單重寫一遍，而它只認得「已安裝的 App」，直接覆寫會連同規則裡的
+     * 正則條目（`re:` 開頭，見 RulePackages）一起抹掉。寫 routePackages 一律走這個出口：既有
+     * 正則條目會被撿回來。手上沒有正則條目時寫進去的就是原本那串，行為跟從前完全相同。
+     */
+    private fun saveRoutePackages(value: String) {
+        DataStore.routePackages = RulePackages.preserveRegex(DataStore.routePackages, value)
     }
 
     private fun isProxiedApp(app: ProxiedApp) = proxiedUids[app.uid]
@@ -253,8 +262,7 @@ class AppListActivity : ThemedActivity() {
                             proxiedUids[app.uid] = true
                         }
                     }
-                    DataStore.routePackages = apps.filter { isProxiedApp(it) }
-                        .joinToString("\n") { it.packageName }
+                    saveRoutePackages(apps.filter { isProxiedApp(it) }.joinToString("\n") { it.packageName })
                     apps = apps.sortedWith(compareBy({ !isProxiedApp(it) }, { it.name.toString() }))
                     onMainDispatcher {
                         applyFilter()
@@ -270,8 +278,7 @@ class AppListActivity : ThemedActivity() {
                             proxiedUids[app.uid] = true
                         }
                     }
-                    DataStore.routePackages = apps.filter { isProxiedApp(it) }
-                        .joinToString("\n") { it.packageName }
+                    saveRoutePackages(apps.filter { isProxiedApp(it) }.joinToString("\n") { it.packageName })
                     apps = apps.sortedWith(compareBy({ !isProxiedApp(it) }, { it.name.toString() }))
                     onMainDispatcher {
                         applyFilter()
@@ -289,8 +296,7 @@ class AppListActivity : ThemedActivity() {
                             proxiedUids[app.uid] = true
                         }
                     }
-                    DataStore.routePackages = apps.filter { isProxiedApp(it) }
-                        .joinToString("\n") { it.packageName }
+                    saveRoutePackages(apps.filter { isProxiedApp(it) }.joinToString("\n") { it.packageName })
                     apps = apps.sortedWith(compareBy({ !isProxiedApp(it) }, { it.name.toString() }))
                     onMainDispatcher {
                         applyFilter()
@@ -303,7 +309,9 @@ class AppListActivity : ThemedActivity() {
             R.id.action_clear_selections -> {
                 runOnDefaultDispatcher {
                     proxiedUids.clear()
-                    DataStore.routePackages = ""
+                    // 「清空選取」清的是 App 勾選；規則裡的正則條目由規則頁那個對話框管，
+                    // 不在這裡跟著一起抹掉。
+                    saveRoutePackages("")
                     apps = apps.sortedWith(compareBy({ !isProxiedApp(it) }, { it.name.toString() }))
                     onMainDispatcher {
                         applyFilter()
@@ -328,7 +336,7 @@ class AppListActivity : ThemedActivity() {
                     val i = proxiedAppString.indexOf('\n')
                     try {
                         val apps = if (i < 0) "" else proxiedAppString.substring(i + 1)
-                        DataStore.routePackages = apps
+                        saveRoutePackages(apps)
                         Snackbar.make(
                             binding.list,
                             R.string.action_import_msg,

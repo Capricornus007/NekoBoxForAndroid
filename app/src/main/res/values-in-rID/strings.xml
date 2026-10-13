@@ -789,6 +789,19 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
 
     <string name="action_auto_lowest_latency">Pilih latensi terendah otomatis (URL-Test)</string>
     <string name="route_preset_title">Preset aturan perutean</string>
+    <string name="route_rule_packages_regex">Regex nama paket</string>
+    <string name="route_rule_packages_regex_hint">Pola, cth. ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">Tambah</string>
+    <string name="route_rule_packages_regex_dialog_message">Hanya sintaksis RE2 Go: tanpa lookahead, tanpa backreference, tanpa koma. Memerlukan sakelar di Pengaturan Rute agar berlaku.</string>
+    <string name="route_rule_packages_regex_error_blank">Isi pola terlebih dulu</string>
+    <string name="route_rule_packages_regex_error_invalid">Pola tidak valid</string>
+    <string name="route_rule_packages_regex_error_unsupported">Sintaksis tidak didukung RE2</string>
+    <string name="route_rule_packages_regex_error_separator">Koma tidak bisa disimpan di sini</string>
+    <string name="route_rule_packages_regex_error_duplicate">Sudah ditambahkan</string>
+    <string name="rule_packages_regex_item">Regex: %1$s</string>
+    <string name="route_rule_packages_regex_count">%1$d regex</string>
+    <string name="route_packages_regex">Aturan paket dengan regex</string>
+    <string name="route_packages_regex_summary">Terapkan rute yang cocok dengan nama paket menggunakan regex. Jika dimatikan, entri itu diabaikan.</string>
     <string name="preset_bypass_cn_apps">Preset: Lewati aplikasi domestik populer</string>
     <string name="preset_proxy_foreign_apps">Preset: Aplikasi global populer via proxy</string>
     <string name="preset_applied_toast">Aturan preset berhasil ditambahkan</string>

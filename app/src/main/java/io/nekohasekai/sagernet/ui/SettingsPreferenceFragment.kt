@@ -279,6 +279,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
         val appendHttpProxy = findPreference<SwitchPreferenceCompat>(Key.APPEND_HTTP_PROXY)!!
         val strictRoute = findPreference<SwitchPreferenceCompat>(Key.STRICT_ROUTE)!!
+        val routePackagesRegex = findPreference<SwitchPreferenceCompat>(Key.ROUTE_PACKAGES_REGEX)!!
         val speedTestMode = findPreference<SimpleMenuPreference>(Key.SPEED_TEST_MODE)!!
         val speedTestTimeout = findPreference<EditTextPreference>(Key.SPEED_TEST_TIMEOUT_MS)!!
         val showDirectSpeed = findPreference<SwitchPreferenceCompat>(Key.SHOW_DIRECT_SPEED)!!
@@ -441,6 +442,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         httpProxyBypass.onPreferenceChangeListener = reloadListener
         dnsHosts.onPreferenceChangeListener = reloadListener
         strictRoute.onPreferenceChangeListener = reloadListener
+        routePackagesRegex.onPreferenceChangeListener = reloadListener
         httpProxyBypass.setOnBindEditTextListener { editText ->
             editText.inputType = EditorInfo.TYPE_CLASS_TEXT or
                 EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE or

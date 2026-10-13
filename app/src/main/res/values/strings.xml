@@ -1133,4 +1133,19 @@
     <string name="proton_cached_at">Updated %1$s</string>
     <string name="proton_pull_to_refresh">Pull down to refresh</string>
     <string name="dns_lookup_failed">Unable to resolve %1$s (DNS problem, not a dead node)</string>
+
+    <!-- 分應用規則的「套件名正則」：規則裡以 re: 開頭的條目，用正則比對套件名而不是固定清單 -->
+    <string name="route_rule_packages_regex">Package name regex</string>
+    <string name="route_rule_packages_regex_hint">Pattern, e.g. ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">Add</string>
+    <string name="route_rule_packages_regex_dialog_message">Go RE2 syntax only: no lookahead, no backreference, no comma. Needs the switch in Route Settings to take effect.</string>
+    <string name="route_rule_packages_regex_error_blank">Type a pattern first</string>
+    <string name="route_rule_packages_regex_error_invalid">Invalid pattern</string>
+    <string name="route_rule_packages_regex_error_unsupported">Syntax not supported by RE2</string>
+    <string name="route_rule_packages_regex_error_separator">Comma cannot be stored here</string>
+    <string name="route_rule_packages_regex_error_duplicate">Already added</string>
+    <string name="rule_packages_regex_item">Regex: %1$s</string>
+    <string name="route_rule_packages_regex_count">%1$d regex</string>
+    <string name="route_packages_regex">Regex package rules</string>
+    <string name="route_packages_regex_summary">Apply routes that match package names by regex. Off ignores those entries.</string>
 </resources>

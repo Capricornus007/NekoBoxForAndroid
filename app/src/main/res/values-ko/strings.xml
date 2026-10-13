@@ -608,6 +608,19 @@
 
     <string name="action_auto_lowest_latency">최저 지연 노드 자동 선택 (URL-Test)</string>
     <string name="route_preset_title">라우팅 규칙 프리셋</string>
+    <string name="route_rule_packages_regex">패키지 이름 정규식</string>
+    <string name="route_rule_packages_regex_hint">패턴, 예: ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">추가</string>
+    <string name="route_rule_packages_regex_dialog_message">Go RE2 문법만 지원: 전방 탐색, 역참조, 쉼표 사용 불가. 적용하려면 라우팅 설정의 스위치를 켜세요.</string>
+    <string name="route_rule_packages_regex_error_blank">먼저 패턴을 입력하세요</string>
+    <string name="route_rule_packages_regex_error_invalid">잘못된 패턴입니다</string>
+    <string name="route_rule_packages_regex_error_unsupported">RE2에서 지원되지 않는 문법입니다</string>
+    <string name="route_rule_packages_regex_error_separator">쉼표는 여기에 저장할 수 없습니다</string>
+    <string name="route_rule_packages_regex_error_duplicate">이미 추가됨</string>
+    <string name="rule_packages_regex_item">정규식: %1$s</string>
+    <string name="route_rule_packages_regex_count">정규식 %1$d개</string>
+    <string name="route_packages_regex">정규식 패키지 규칙</string>
+    <string name="route_packages_regex_summary">패키지 이름을 정규식으로 일치하는 라우팅을 적용합니다. 꺼 두면 해당 항목을 무시합니다.</string>
     <string name="preset_bypass_cn_apps">프리셋: 자주 쓰는 국내 앱 직접 연결</string>
     <string name="preset_proxy_foreign_apps">프리셋: 자주 쓰는 해외 앱 프록시 연결</string>
     <string name="preset_applied_toast">프리셋 규칙이 추가되었습니다</string>

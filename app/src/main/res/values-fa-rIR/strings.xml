@@ -785,6 +785,19 @@
 
     <string name="action_auto_lowest_latency">انتخاب خودکار کم‌ترین تأخیر (URL-Test)</string>
     <string name="route_preset_title">قالب‌های آماده قواعد مسیریابی</string>
+    <string name="route_rule_packages_regex">Regex نام بسته</string>
+    <string name="route_rule_packages_regex_hint">الگو، مثال: ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">افزودن</string>
+    <string name="route_rule_packages_regex_dialog_message">فقط نحو Go RE2: بدون lookahead، بدون ارجاع معکوس و بدون کاما. نیازمند روشن کردن کلید در تنظیمات مسیریابی است.</string>
+    <string name="route_rule_packages_regex_error_blank">ابتدا یک الگو وارد کنید</string>
+    <string name="route_rule_packages_regex_error_invalid">الگو نامعتبر است</string>
+    <string name="route_rule_packages_regex_error_unsupported">این نحو توسط RE2 پشتیبانی نمی‌شود</string>
+    <string name="route_rule_packages_regex_error_separator">کاما در اینجا ذخیره نمی‌شود</string>
+    <string name="route_rule_packages_regex_error_duplicate">قبلاً افزوده شده است</string>
+    <string name="rule_packages_regex_item">Regex: %1$s</string>
+    <string name="route_rule_packages_regex_count">%1$d Regex</string>
+    <string name="route_packages_regex">قانون‌های بسته با Regex</string>
+    <string name="route_packages_regex_summary">قانون‌هایی را اعمال می‌کند که نام بسته‌ها را با Regex مطابقت می‌دهند. در حالت خاموش این موارد نادیده گرفته می‌شوند.</string>
     <string name="preset_bypass_cn_apps">قالب: دور زدن برنامه‌های داخلی پرکاربرد</string>
     <string name="preset_proxy_foreign_apps">قالب: برنامه‌های بین‌المللی پرکاربرد از طریق پروکسی</string>
     <string name="preset_applied_toast">قواعد قالب با موفقیت اضافه شد</string>

@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.room.*
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.ktx.app
+import io.nekohasekai.sagernet.utils.RulePackages
 import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "rules")
@@ -43,10 +44,21 @@ data class RuleEntity(
         if (protocol.isNotBlank()) summary += app.getString(R.string.rule_summary_protocol, protocol)
         if (ruleset.isNotBlank()) summary += "$ruleset\n"
         if (packages.isNotEmpty()) {
-            summary += app.getString(
-                R.string.apps_message,
-                packages.size,
-            ) + "\n"
+            // 「re:」開頭的是正則條目，不是 App，單獨計數；一般套件名那行跟從前一模一樣。
+            val plainCount = packages.count { !RulePackages.isRegexEntry(it) }
+            val regexCount = packages.size - plainCount
+            if (plainCount > 0) {
+                summary += app.getString(
+                    R.string.apps_message,
+                    plainCount,
+                ) + "\n"
+            }
+            if (regexCount > 0) {
+                summary += app.getString(
+                    R.string.route_rule_packages_regex_count,
+                    regexCount,
+                ) + "\n"
+            }
         }
         val lines = summary.trim().split("\n")
         return if (lines.size > 3) {

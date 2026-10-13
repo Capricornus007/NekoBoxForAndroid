@@ -800,6 +800,19 @@ www.example.com 1.1.1.1 1.1.1.2</string>
 
     <string name="action_auto_lowest_latency">最低遅延ノードを自動選択 (URL-Test)</string>
     <string name="route_preset_title">ルーティングルールのプリセット</string>
+    <string name="route_rule_packages_regex">パッケージ名の正規表現</string>
+    <string name="route_rule_packages_regex_hint">パターン（例: ^com.google.android.gms.*）</string>
+    <string name="route_rule_packages_regex_add">追加</string>
+    <string name="route_rule_packages_regex_dialog_message">GoのRE2構文のみ対応。先読み・バックリファレンス・カンマは使用できません。反映にはルート設定のスイッチを有効にする必要があります。</string>
+    <string name="route_rule_packages_regex_error_blank">まずパターンを入力してください</string>
+    <string name="route_rule_packages_regex_error_invalid">無効なパターン</string>
+    <string name="route_rule_packages_regex_error_unsupported">RE2がサポートしていない構文です</string>
+    <string name="route_rule_packages_regex_error_separator">カンマはここに保存できません</string>
+    <string name="route_rule_packages_regex_error_duplicate">追加済みです</string>
+    <string name="rule_packages_regex_item">正規表現: %1$s</string>
+    <string name="route_rule_packages_regex_count">正規表現 %1$d件</string>
+    <string name="route_packages_regex">正規表現によるパッケージルール</string>
+    <string name="route_packages_regex_summary">パッケージ名を正規表現で一致させるルールを適用します。オフにするとこれらの項目は無視されます。</string>
     <string name="preset_bypass_cn_apps">プリセット：よく使う国内アプリを直接接続</string>
     <string name="preset_proxy_foreign_apps">プリセット：よく使う海外アプリをプロキシ経由</string>
     <string name="preset_applied_toast">プリセットのルールを追加しました</string>

@@ -625,6 +625,19 @@
 
     <string name="action_auto_lowest_latency">自動優選最低延遲節點 (URL-Test)</string>
     <string name="route_preset_title">分流規則一鍵預設</string>
+    <string name="route_rule_packages_regex">套件名稱正則</string>
+    <string name="route_rule_packages_regex_hint">正則表達式，例如 ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">加入</string>
+    <string name="route_rule_packages_regex_dialog_message">僅支援 Go RE2 語法：不支援先行斷言、反向引用與逗號。請在路由設定開啟該開關才會生效。</string>
+    <string name="route_rule_packages_regex_error_blank">請先輸入正則</string>
+    <string name="route_rule_packages_regex_error_invalid">正則無效</string>
+    <string name="route_rule_packages_regex_error_unsupported">RE2 不支援此語法</string>
+    <string name="route_rule_packages_regex_error_separator">此處無法儲存逗號</string>
+    <string name="route_rule_packages_regex_error_duplicate">已加入</string>
+    <string name="rule_packages_regex_item">正則：%1$s</string>
+    <string name="route_rule_packages_regex_count">%1$d 條正則</string>
+    <string name="route_packages_regex">正則套件規則</string>
+    <string name="route_packages_regex_summary">以正則比對套件名稱來套用分流規則。關閉時忽略這些條目。</string>
     <string name="preset_bypass_cn_apps">預設：常用國內應用直連白名單 (微信/支付寶/淘寶/抖音等)</string>
     <string name="preset_proxy_foreign_apps">預設：常用海外應用走代理 (Telegram/YouTube/Twitter/ChatGPT等)</string>
     <string name="preset_applied_toast">預設分流規則已成功加入</string>

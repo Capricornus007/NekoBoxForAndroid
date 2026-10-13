@@ -403,6 +403,19 @@
     <string name="route_for">دستورالعمل برای %s</string>
 
     <string name="route_need_vpn">دستورالعمل مسیریابی %s متکی به اجرای VPN است، بنابراین نادیده گرفته می‌شود.</string>
+    <string name="route_rule_packages_regex">عبارت باقاعده نام بسته</string>
+    <string name="route_rule_packages_regex_hint">الگو، مثلاً ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">اضافه کردن</string>
+    <string name="route_rule_packages_regex_dialog_message">فقط نحو Go RE2: بدون lookahead، بدون ارجاع معکوس، بدون کاما. برای اعمال باید کلید آن در تنظیمات مسیر روشن باشد.</string>
+    <string name="route_rule_packages_regex_error_blank">ابتدا یک الگو وارد کنید</string>
+    <string name="route_rule_packages_regex_error_invalid">الگو نامعتبر است</string>
+    <string name="route_rule_packages_regex_error_unsupported">نحو توسط RE2 پشتیبانی نمی‌شود</string>
+    <string name="route_rule_packages_regex_error_separator">کاما اینجا ذخیره نمی‌شود</string>
+    <string name="route_rule_packages_regex_error_duplicate">قبلاً اضافه شده است</string>
+    <string name="rule_packages_regex_item">عبارت باقاعده: %1$s</string>
+    <string name="route_rule_packages_regex_count">%1$d عبارت باقاعده</string>
+    <string name="route_packages_regex">دستورالعمل‌های بسته با عبارت باقاعده</string>
+    <string name="route_packages_regex_summary">دستورالعمل‌هایی را اعمال می‌کند که نام بسته‌ها را با عبارت باقاعده مطابقت می‌دهند. در حالت خاموش این موارد نادیده گرفته می‌شوند.</string>
 
     <string name="profile_traffic_statistics">آمار ترافیک پراکسی</string>
     <string name="profile_traffic_statistics_summary">در صورت غیرفعال شدن، ترافیک استفاده شده پراکسی محاسبه نخواهد شد</string>

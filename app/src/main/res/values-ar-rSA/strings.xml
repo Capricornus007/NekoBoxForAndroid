@@ -803,6 +803,19 @@
 
     <string name="action_auto_lowest_latency">الاختيار التلقائي لأقل زمن استجابة (URL-Test)</string>
     <string name="route_preset_title">قوالب قواعد التوجيه الجاهزة</string>
+    <string name="route_rule_packages_regex">تعبير نمطي لاسم الحزمة</string>
+    <string name="route_rule_packages_regex_hint">نمط، مثل: ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">إضافة</string>
+    <string name="route_rule_packages_regex_dialog_message">صياغة Go RE2 فقط: بدون lookahead، بدون مرجع خلفي، بدون فاصلة. يلزم تفعيل المفتاح في إعدادات المسار ليعمل.</string>
+    <string name="route_rule_packages_regex_error_blank">اكتب نمطًا أولًا</string>
+    <string name="route_rule_packages_regex_error_invalid">نمط غير صالح</string>
+    <string name="route_rule_packages_regex_error_unsupported">صياغة غير مدعومة من RE2</string>
+    <string name="route_rule_packages_regex_error_separator">لا يمكن حفظ الفاصلة هنا</string>
+    <string name="route_rule_packages_regex_error_duplicate">تمت إضافتها بالفعل</string>
+    <string name="rule_packages_regex_item">تعبير نمطي: %1$s</string>
+    <string name="route_rule_packages_regex_count">%1$d تعبير نمطي</string>
+    <string name="route_packages_regex">قواعد الحزم بالتعبير النمطي</string>
+    <string name="route_packages_regex_summary">يطبّق قواعد تطابق أسماء الحزم بالتعبير النمطي. عند الإيقاف تُتجاهل هذه الإدخالات.</string>
     <string name="preset_bypass_cn_apps">قالب: تجاوز التطبيقات المحلية الشائعة</string>
     <string name="preset_proxy_foreign_apps">قالب: توجيه التطبيقات العالمية الشائعة عبر الوكيل</string>
     <string name="preset_applied_toast">تمت إضافة قواعد القالب بنجاح</string>

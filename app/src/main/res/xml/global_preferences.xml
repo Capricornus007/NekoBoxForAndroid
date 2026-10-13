@@ -168,6 +168,13 @@
             app:key="proxyApps"
             app:summary="@string/proxied_apps_summary"
             app:title="@string/proxied_apps" />
+        <!-- 預設關：關著時規則裡「re:」開頭的正則條目整個不進配置，輸出跟從前逐位元組相同。 -->
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:icon="@drawable/baseline_wrap_text_24"
+            app:key="routePackagesRegex"
+            app:summary="@string/route_packages_regex_summary"
+            app:title="@string/route_packages_regex" />
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_baseline_legend_toggle_24"
             app:key="bypassLan"

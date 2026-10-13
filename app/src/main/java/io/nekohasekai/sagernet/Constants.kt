@@ -91,6 +91,9 @@ object Key {
     const val DNS_HOSTS = "dnsHosts"
     const val STRICT_ROUTE = "strictRoute"
 
+    // 分應用規則裡「re:」開頭的正則條目要不要寫進配置（全域開關，預設關）。
+    const val ROUTE_PACKAGES_REGEX = "routePackagesRegex"
+
     const val CONNECTION_TEST_URL = "connectionTestURL"
     const val CONNECTION_TEST_CONCURRENT = "connectionTestConcurrent"
     const val CONNECTION_TEST_TIMEOUT = "connectionTestTimeout"
@@ -265,6 +268,9 @@ object Key {
     const val ROUTE_RULESET = "routeRuleset"
     const val ROUTE_OUTBOUND = "routeOutbound"
     const val ROUTE_PACKAGES = "routePackages"
+
+    // 規則編輯頁上「用正則表達式比對套件名」那列（值跟 routePackages 存在同一個清單裡）。
+    const val ROUTE_PACKAGES_REGEX_LIST = "routePackagesRegexList"
 
     const val GROUP_NAME = "groupName"
     const val GROUP_TYPE = "groupType"

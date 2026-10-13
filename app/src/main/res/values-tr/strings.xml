@@ -538,6 +538,19 @@
 
     <string name="action_auto_lowest_latency">En düşük gecikmeyi otomatik seç (URL-Test)</string>
     <string name="route_preset_title">Yönlendirme kuralı hazır ayarları</string>
+    <string name="route_rule_packages_regex">Paket adı düzenli ifadesi</string>
+    <string name="route_rule_packages_regex_hint">Desen, ör. ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">Ekle</string>
+    <string name="route_rule_packages_regex_dialog_message">Yalnızca Go RE2 sözdizimi: ileri bakış yok, geri başvuru yok, virgül yok. Yürürlük için Rota Ayarları\'ndaki anahtarı açın.</string>
+    <string name="route_rule_packages_regex_error_blank">Önce bir desen yazın</string>
+    <string name="route_rule_packages_regex_error_invalid">Geçersiz desen</string>
+    <string name="route_rule_packages_regex_error_unsupported">Sözdizimi RE2 tarafından desteklenmiyor</string>
+    <string name="route_rule_packages_regex_error_separator">Virgül buraya kaydedilemez</string>
+    <string name="route_rule_packages_regex_error_duplicate">Zaten eklendi</string>
+    <string name="rule_packages_regex_item">Düzenli ifade: %1$s</string>
+    <string name="route_rule_packages_regex_count">%1$d düzenli ifade</string>
+    <string name="route_packages_regex">Düzenli ifade paket kuralları</string>
+    <string name="route_packages_regex_summary">Paket adlarını düzenli ifadelerle eşleştiren rotaları uygular. Kapalıyken bu girdiler yok sayılır.</string>
     <string name="preset_bypass_cn_apps">Hazır ayar: Yaygın yerel uygulamaları atla</string>
     <string name="preset_proxy_foreign_apps">Hazır ayar: Yaygın uluslararası uygulamalar proxy üzerinden</string>
     <string name="preset_applied_toast">Hazır ayar kuralları eklendi</string>

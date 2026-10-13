@@ -16,6 +16,10 @@
             app:icon="@drawable/ic_baseline_legend_toggle_24"
             app:key="routePackages"
             app:title="@string/apps" />
+        <io.nekohasekai.sagernet.widget.PackageRegexPreference
+            app:icon="@drawable/baseline_wrap_text_24"
+            app:key="routePackagesRegexList"
+            app:title="@string/route_rule_packages_regex" />
         <EditTextPreference
             app:icon="@drawable/ic_baseline_domain_24"
             app:key="routeDomain"

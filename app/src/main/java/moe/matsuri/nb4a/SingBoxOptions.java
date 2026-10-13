@@ -5291,6 +5291,12 @@ public class SingBoxOptions {
         // Generate note: Listable
         public List<String> package_name;
 
+        // 分應用規則的正則比對（sing-box option.Rule 的 PackageNameRegex，json: package_name_regex）。
+        // 產生器沒寫进來，手工補上：欄位是 null 時 Gson 不會輸出這個 key，所以不設它的時候
+        // 配置跟從前逐位元組相同。
+        // Generate note: Listable
+        public List<String> package_name_regex;
+
         // Generate note: Listable
         public List<String> user;
 

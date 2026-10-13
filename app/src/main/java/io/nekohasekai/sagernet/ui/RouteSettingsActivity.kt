@@ -31,14 +31,18 @@ import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.database.RuleEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
+import io.nekohasekai.sagernet.databinding.LayoutPackagesRegexDialogBinding
+import io.nekohasekai.sagernet.databinding.LayoutPackagesRegexItemBinding
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.utils.PackageCache
+import io.nekohasekai.sagernet.utils.RulePackages
 import io.nekohasekai.sagernet.widget.AppListPreference
 import io.nekohasekai.sagernet.widget.ListListener
 import io.nekohasekai.sagernet.widget.OutboundPreference
+import io.nekohasekai.sagernet.widget.PackageRegexPreference
 import kotlinx.parcelize.Parcelize
 import moe.matsuri.nb4a.ui.EditConfigPreference
 
@@ -143,14 +147,18 @@ class RouteSettingsActivity(
         ActivityResultContracts.StartActivityForResult(),
     ) { (_, _) ->
         apps.postUpdate()
+        // App 清單那一頁也可能透過剪貼簿匯動到正則條目，摘要一起刷新，別讓兩列不同步。
+        packagesRegex.postUpdate()
     }
 
     lateinit var outbound: OutboundPreference
     lateinit var apps: AppListPreference
+    lateinit var packagesRegex: PackageRegexPreference
 
     fun PreferenceFragmentCompat.viewCreated(view: View, savedInstanceState: Bundle?) {
         outbound = findPreference(Key.ROUTE_OUTBOUND)!!
         apps = findPreference(Key.ROUTE_PACKAGES)!!
+        packagesRegex = findPreference(Key.ROUTE_PACKAGES_REGEX_LIST)!!
 
         outbound.setOnPreferenceChangeListener { _, newValue ->
             if (newValue.toString() == OutboundPreference.VALUE_SELECT_PROFILE) {
@@ -179,6 +187,90 @@ class RouteSettingsActivity(
             )
             true
         }
+
+        packagesRegex.setOnPreferenceClickListener {
+            showPackagesRegexDialog()
+            true
+        }
+    }
+
+    /**
+     * 「用正則表達式比對套件名」的編輯框：上面一個輸入欄加一顆新增按鈕，下面列出現有的條目、
+     * 每條都能刪。條目跟一般套件名同住 routePackages 這串清單，靠 `re:` 前綴辨認，所以不需要
+     * 新的資料庫欄位。寫入會經過 profileCacheStore 的變更通知，頁面照樣標成「有未存檔的修改」。
+     *
+     * 非法正則在這裡就擋掉（空字串、含逗號、核心不支援的語法、編譯不過），不寫進清單；留著它
+     * 進配置只會讓核心載入整份配置失敗。
+     */
+    private fun showPackagesRegexDialog() {
+        val dialogBinding = LayoutPackagesRegexDialogBinding.inflate(layoutInflater)
+
+        fun currentRegex(): List<String> = RulePackages.regexLines(DataStore.routePackages)
+
+        fun persist(regex: List<String>) {
+            DataStore.routePackages = RulePackages.join(
+                RulePackages.plainLines(DataStore.routePackages),
+                regex,
+            )
+            apps.postUpdate()
+            packagesRegex.postUpdate()
+        }
+
+        fun render() {
+            dialogBinding.regexListContainer.removeAllViews()
+            for (entry in currentRegex()) {
+                val rowBinding = LayoutPackagesRegexItemBinding.inflate(
+                    layoutInflater,
+                    dialogBinding.regexListContainer,
+                    false,
+                )
+                rowBinding.regexPatternText.text = getString(
+                    R.string.rule_packages_regex_item,
+                    RulePackages.patternOf(entry),
+                )
+                rowBinding.regexDeleteButton.setOnClickListener {
+                    persist(currentRegex().filterNot { it == entry })
+                    render()
+                }
+                dialogBinding.regexListContainer.addView(rowBinding.root)
+            }
+        }
+
+        fun showError(messageRes: Int) {
+            dialogBinding.regexPatternLayout.error = getString(messageRes)
+        }
+
+        dialogBinding.regexAddButton.setOnClickListener {
+            val pattern = dialogBinding.regexPatternField.text?.toString()?.trim().orEmpty()
+            val error = RulePackages.checkPattern(pattern)
+            if (error != RulePackages.PatternError.NONE) {
+                showError(
+                    when (error) {
+                        RulePackages.PatternError.BLANK -> R.string.route_rule_packages_regex_error_blank
+                        RulePackages.PatternError.SEPARATOR -> R.string.route_rule_packages_regex_error_separator
+                        RulePackages.PatternError.UNSUPPORTED -> R.string.route_rule_packages_regex_error_unsupported
+                        else -> R.string.route_rule_packages_regex_error_invalid
+                    },
+                )
+                return@setOnClickListener
+            }
+            if (currentRegex().any { RulePackages.patternOf(it) == pattern }) {
+                showError(R.string.route_rule_packages_regex_error_duplicate)
+                return@setOnClickListener
+            }
+            persist(currentRegex() + RulePackages.regexEntry(pattern))
+            dialogBinding.regexPatternField.setText("")
+            dialogBinding.regexPatternLayout.error = null
+            render()
+        }
+
+        render()
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.route_rule_packages_regex)
+            .setMessage(R.string.route_rule_packages_regex_dialog_message)
+            .setView(dialogBinding.root)
+            .setPositiveButton(R.string.close, null)
+            .show()
     }
 
     fun displayPreferenceDialog(preference: Preference): Boolean = false

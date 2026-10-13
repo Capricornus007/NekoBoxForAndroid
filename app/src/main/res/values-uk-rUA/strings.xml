@@ -807,6 +807,19 @@
 
     <string name="action_auto_lowest_latency">Автовибір вузла з найменшою затримкою (URL-Test)</string>
     <string name="route_preset_title">Готові шаблони правил маршрутизації</string>
+    <string name="route_rule_packages_regex">Регулярний вираз назви пакета</string>
+    <string name="route_rule_packages_regex_hint">Шаблон, напр. ^com.google.android.gms.*</string>
+    <string name="route_rule_packages_regex_add">Додати</string>
+    <string name="route_rule_packages_regex_dialog_message">Лише синтаксис Go RE2: без перегляду наперед, без зворотних посилань, без ком. Увімкніть перемикач у налаштуваннях маршрутизації, щоб це діяло.</string>
+    <string name="route_rule_packages_regex_error_blank">Спочатку введіть шаблон</string>
+    <string name="route_rule_packages_regex_error_invalid">Недійсний шаблон</string>
+    <string name="route_rule_packages_regex_error_unsupported">Синтаксис не підтримується RE2</string>
+    <string name="route_rule_packages_regex_error_separator">Кому тут зберегти не можна</string>
+    <string name="route_rule_packages_regex_error_duplicate">Вже додано</string>
+    <string name="rule_packages_regex_item">Регулярний вираз: %1$s</string>
+    <string name="route_rule_packages_regex_count">Регулярних виразів: %1$d</string>
+    <string name="route_packages_regex">Правила пакетів за регулярним виразом</string>
+    <string name="route_packages_regex_summary">Маршрути застосовуються, коли назва пакета збігається з регулярним виразом. Якщо вимкнено, ці записи ігноруються.</string>
     <string name="preset_bypass_cn_apps">Шаблон: обхід популярних місцевих застосунків</string>
     <string name="preset_proxy_foreign_apps">Шаблон: популярні міжнародні застосунки через проксі</string>
     <string name="preset_applied_toast">Правила шаблона успішно додано</string>
