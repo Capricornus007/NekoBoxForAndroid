@@ -10,6 +10,21 @@
 # 所以這裡是這條鏈上第一處真的設到編碼的地方。
 export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:+$JAVA_TOOL_OPTIONS }-Dfile.encoding=UTF-8"
 
+# 自有 fork 模組走「跳過 sumdb 查驗」，但**不**關 GOSUMDB、也不改 GOPROXY。
+# 原因（CI Build #665/#666 實測，Native Build (LibCore) 全紅在
+# `gomobile-matsuri: go mod tidy -v failed`）：
+#   github.com/Capricornus007/{sing-tun,quic-go,sing,...} 那些 10-11 之後的偽版本，
+#   其 go.mod 宣告 `go 1.28`，而 Google 的 sumdb 後端跑的是舊 toolchain，回
+#   「not found: … requires go >= 1.28 (go version not available)」404。模組本身
+#   mirror 服務得到（goproxy.cn 抓得到 zip），死在「查驗雜湊」這一步，所以只要
+#   對我們自己的 fork 跳過 sumdb 就通，別的地方照舊驗。
+# 這不比现状更不安全：這些倉是用戶本人所有，而且 go.sum 裡已經釘死 h1；
+# 關掉整個 GOSUMDB 才會把第三方模組也一起放掉，那不做。
+# 本機 A/B 實測（同一模組、各自全新的 GOMODCACHE）：
+#   GONOSUMDB=''                    → 404 verifying go.mod（重現 CI 的錯）
+#   GONOSUMDB='github.com/Capricornus007/*' → rc=0
+export GONOSUMDB="${GONOSUMDB:+$GONOSUMDB,}github.com/Capricornus007/*"
+
 source ./env_java.sh || true
 source ../buildScript/init/env_ndk.sh
 
