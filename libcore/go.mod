@@ -179,24 +179,24 @@ require (
 	lukechampine.com/blake3 v1.3.0 // indirect
 )
 
-replace github.com/matsuridayo/libneko => github.com/Capricornus007/libneko v0.0.0-20260902104842-d5ae8b4d046a
+replace github.com/matsuridayo/libneko => github.com/Capricornus007/libneko v0.0.0-20261011114030-1dad84547be5
 
 replace github.com/amnezia-vpn/amneziawg-go/v3 => github.com/Capricornus007/amneziawg-go/v3 v3.1.20261008-mod.4
 
 replace github.com/sagernet/sing-box => ../../sing-box
 
-replace github.com/sagernet/sing-vmess => github.com/Capricornus007/sing-vmess v0.2.9-0.20260930034700-237367371d4f
+replace github.com/sagernet/sing-vmess => github.com/Capricornus007/sing-vmess v0.2.9-0.20261011114144-67133d592b6c
 
 // sing-juicity was renamed dyhkwong -> exclavenetwork at v0.1.x; the import path
 // in libcore stays dyhkwong. v0.1.4 targets quic-go v0.59 / sing v0.8 / sing-quic v0.6.1.
 replace github.com/dyhkwong/sing-juicity => github.com/exclavenetwork/sing-juicity v0.1.4
 
-replace github.com/sagernet/sing-snell => github.com/Capricornus007/sing-snell v0.0.0-20261001053801-d9bd2c6eb6a0
+replace github.com/sagernet/sing-snell => github.com/Capricornus007/sing-snell v0.0.0-20261011114123-e5b3ee6fad8f
 
 replace github.com/sagernet/wireguard-go => ../../wireguard-go
 
 // replace github.com/sagernet/sing-quic => github.com/matsuridayo/sing-quic v0.0.0-20241009042333-b49ce60d9b36
-replace github.com/sagernet/sing-quic => github.com/Capricornus007/sing-quic v0.7.1-0.20261002195826-1f4a0d0c6d9f
+replace github.com/sagernet/sing-quic => github.com/Capricornus007/sing-quic v0.7.1-0.20261011115443-8947bb00ad6f
 
 // replace github.com/sagernet/sing => ../../sing
 
@@ -207,19 +207,19 @@ replace github.com/sagernet/sing-quic => github.com/Capricornus007/sing-quic v0.
 // sing-quic: SagerNet 版には sing-box 1.14.x が必要とする realm PortMapping が含まれる。
 // replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
 
-replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20261009032739-6d0ca10783af
+replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.4-0.20261011114137-fb9960f3f013
 
-replace github.com/sagernet/quic-go => github.com/Capricornus007/quic-go v0.61.0-sing-box-mod.9.0.20261001054000-283264781fe5
+replace github.com/sagernet/quic-go => github.com/Capricornus007/quic-go v0.61.0-sing-box-mod.9.0.20261011114042-1c134d1ddc90
 
-replace github.com/sagernet/sing-mux => github.com/Capricornus007/sing-mux v0.3.7-0.20260930034700-6914b581bc52
+replace github.com/sagernet/sing-mux => github.com/Capricornus007/sing-mux v0.3.7-0.20261011114110-2f028a4e3109
 
-replace github.com/metacubex/utls => github.com/Capricornus007/utls v1.8.8-0.20261002220414-54ac95484371
+replace github.com/metacubex/utls => github.com/Capricornus007/utls v1.8.8-0.20261011114211-17d25c53af2c
 
 replace github.com/exclavenetwork/sing-juicity => ../../sing-juicity
 
 replace github.com/xchacha20-poly1305/sing-trusttunnel => ../../sing-trusttunnel
 
-replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.5-0.20260930040615-6fa792f31fbf
+replace github.com/sagernet/sing => github.com/Capricornus007/sing v0.9.5-0.20261011114049-3800f68a5a7f
 
 // sing-shadowquic 復刻到自有 fork（與 sing 家族其他包一致），跟 Capricornus007/sing-shadowquic main。
 replace github.com/exclavenetwork/sing-shadowquic => github.com/Capricornus007/sing-shadowquic v0.0.0-20260904152941-03a261e772e4
@@ -232,4 +232,4 @@ replace gvisor.dev/gvisor => github.com/Capricornus007/gvisor-awg v0.0.0-2026090
 // 同一個理由：libcore/tailscale*.go 直接 import github.com/sagernet/tailscale/{ipn,net/tsaddr,net/netmon}，
 // 而 sing-box 已把該模組換成我方 fork。少了這條，APK 裡的 tailscale 就會編上游原版，
 // 跟 sing-box/protocol/tailscale 測過的不是同一份代碼。
-replace github.com/sagernet/tailscale => github.com/Capricornus007/tailscale v1.102.1-sing-box-1.14-mod.5.0.20260928041336-0b9fafb0a134
+replace github.com/sagernet/tailscale => github.com/Capricornus007/tailscale v1.102.1-sing-box-1.14-mod.5.0.20261011114205-89721ce6c460
