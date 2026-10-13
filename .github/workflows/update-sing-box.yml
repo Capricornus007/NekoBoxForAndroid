@@ -102,6 +102,7 @@ jobs:
         run: |
           ./run lib core
           bash ./scripts/verify-elf-alignment.sh app/libs/libcore.aar
+          bash ./scripts/verify-core-protocols.sh app/libs/libcore.aar
           ./run init action gradle
           ./gradlew spotlessCheck testOssDebugUnitTest --no-daemon
 

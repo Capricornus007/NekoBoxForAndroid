@@ -126,6 +126,7 @@ func nekoboxAndroidEndpointRegistry() *endpoint.Registry {
 
 	wireguard.RegisterEndpoint(registry)
 	tailscale.RegisterEndpoint(registry)
+	nekoboxAndroidOpenVPNEndpoint(registry)
 
 	return registry
 }
@@ -144,6 +145,7 @@ func nekoboxAndroidDNSTransportRegistry(localTransport LocalDNSTransport) *dns.T
 	quic.RegisterTransport(registry)
 	quic.RegisterHTTP3Transport(registry)
 	tailscale.RegistryTransport(registry)
+	nekoboxAndroidOpenVPNDNSTransport(registry)
 
 	if localTransport == nil {
 		local.RegisterTransport(registry)

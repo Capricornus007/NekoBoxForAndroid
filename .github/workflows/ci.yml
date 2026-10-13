@@ -150,6 +150,8 @@ jobs:
         run: ./run lib core
       - name: Verify 16 KB ELF alignment
         run: bash ./scripts/verify-elf-alignment.sh app/libs/libcore.aar
+      - name: Verify core protocol coverage
+        run: bash ./scripts/verify-core-protocols.sh app/libs/libcore.aar
       - name: Verify LibCore API classes
         run: |
           test -s app/libs/libcore.aar
