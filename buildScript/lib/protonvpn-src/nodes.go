@@ -21,8 +21,10 @@ const (
 	protonAccept     = "application/vnd.proton.api.v3+json"
 )
 
-// errSessionExpired is reported instead of attempting a refresh: refreshing means
-// re-running SRP, which belongs to login, not to every read command.
+// errSessionExpired is the *last* stage, not the first: a 401/403 from the API first
+// triggers a token renewal (refresh.go), and this error only stands when that renewal
+// was impossible or itself rejected. Wording stays "log in again" because at that
+// point it is the only thing left that can help.
 var errSessionExpired = errors.New("stored session was rejected, please log in again")
 
 // Field names and types follow Proton's own client models
@@ -131,6 +133,21 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 	defer cancel()
 
 	resp, err := fetchLogicalServers(ctx, *apiURL, cred)
+	if err != nil && errors.Is(err, errSessionExpired) {
+		// 401/403 先當作「access token 到期」處理：用存著的 RefreshToken 換一張再試一次，
+		// 換到的寫回狀態檔。只有連換都換不到、或換完仍然被拒，才是真的要重登。
+		refreshed, rerr := refreshSession(ctx, *apiURL, *statePath, cred)
+		switch {
+		case rerr != nil && !isAuthRejection(rerr):
+			// 網路斷/5xx 不能報成「工作階段失效」：那樣 App 會把人踢回登入頁，
+			// 而他的帳密其實沒問題（2026-10-13 用戶看到的就是這種誤判的後果）。
+			return emitNodes(stdout, nodesOutput{Error: rerr.Error()})
+		case rerr != nil:
+			return emitNodes(stdout, nodesOutput{Error: errSessionExpired.Error(), Code: codeSessionExpired})
+		default:
+			resp, err = fetchLogicalServers(ctx, *apiURL, refreshed)
+		}
+	}
 	if err != nil {
 		if errors.Is(err, errSessionExpired) {
 			return emitNodes(stdout, nodesOutput{Error: err.Error(), Code: codeSessionExpired})

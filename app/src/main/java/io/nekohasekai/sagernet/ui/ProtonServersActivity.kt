@@ -143,11 +143,12 @@ class ProtonServersActivity : ThemedActivity() {
             binding.refreshLayout.isRefreshing = false
             if (!result.ok) {
                 if (result.code == ProtonSidecar.SESSION_EXPIRED) {
-                    // 過期不是一句要讀的錯誤，是一個用戶能修的狀態：給本地化文案並直接把他
-                    // 送回登入頁。只印一句英文的話，他會卡在舊清單前面不知道該做什麼。
-                    binding.status.setText(R.string.proton_session_expired)
-                    startActivity(Intent(this@ProtonServersActivity, ProtonActivity::class.java))
-                    finish()
+                    // 以前這裡直接 startActivity(ProtonActivity) + finish()。搭配
+                    // ProtonActivity 的「自動登入＝進頁就跳清單」，兩頁會互相把對方拉起來、
+                    // 而且每一邊都 finish() 自己 → 返回堆疊永遠只有一頁，用戶按返回沒反應、
+                    // 只看到畫面在两页之间反复跳（2026-10-13 用戶實測：「根本無法返回」）。
+                    // 現在改成：留在本頁、保留已經看到的清單，把訊息變成可點，由他決定要不要去登入。
+                    showSessionExpired()
                     return@launch
                 }
                 // 抓失敗時手上有快取就留著舊清單，別把已經看得到的東西一起清掉。
@@ -161,7 +162,23 @@ class ProtonServersActivity : ThemedActivity() {
         }
     }
 
+    // 訊息本身可點、點了才去登入頁：文案已經寫著「請重新登入」，不需要再多一條字串，
+    // 也不需要在他沒按任何東西的時候自己換頁。
+    private fun showSessionExpired() {
+        binding.status.apply {
+            setText(R.string.proton_session_expired)
+            isClickable = true
+            setOnClickListener {
+                startActivity(Intent(this@ProtonServersActivity, ProtonActivity::class.java))
+            }
+        }
+    }
+
     private fun showNodes(state: io.nekohasekai.sagernet.fmt.proton.ProtonNodesState, fromCache: Boolean) {
+        // 上一輪如果是「工作階段被拒」，狀態列當時被設成可點；現在有內容了就要收回去，
+        // 否則清單正常顯示著、點它卻會把他帶去登入頁。
+        binding.status.isClickable = false
+        binding.status.setOnClickListener(null)
         nodes = state.nodes
         shownLimit = nodePage
         refreshPlaceOptions()

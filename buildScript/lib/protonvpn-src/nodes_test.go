@@ -68,6 +68,15 @@ func mockServer(t *testing.T, body string, status int) (*httptest.Server, func()
 	t.Helper()
 	var hits int
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// 401/403 現在會先觸發一次 token 換新（refresh.go），所以這條路徑也要有答案：
+		// 一律拒絕，讓「連換都換不到」的測試仍然走到 session_expired，而不是把
+		// 未預期的路徑當成測試失敗。
+		if r.URL.Path == "/auth/v4/refresh" {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			_, _ = w.Write([]byte(`{"Code":10013,"Error":"Invalid refresh token"}`))
+			return
+		}
 		hits++
 		if r.URL.Path != "/vpn/logicals" {
 			t.Errorf("path = %q, want /vpn/logicals", r.URL.Path)
