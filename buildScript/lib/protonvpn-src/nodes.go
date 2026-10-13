@@ -50,6 +50,21 @@ type logicalServer struct {
 // Server features, from the same constants file: bit 4 marks IPv6 support.
 const featureIPv6 = 16
 
+// featureSecureCore 是 Proton 標記 Secure-Core 的 bit，值 1。
+// 這條不是推論，是實物證據：官方 APK ch.protonvpn.android 5.20.74.0（aapt2 badging 查實
+// versionName='5.20.74.0'，反編譯產物在 jadx/sources）的
+// com/protonvpn/android/servers/Server.java 裡逐條寫著
+//
+//	isSecureCoreServer() => a.a.d0(this.features, 1)
+//	isIPv6Supported()    => a.a.d0(this.features, 16)   // 與上方 featureIPv6 = 16 對得上
+//	isTor()              => d0(features, 2)   isP2pServer()     => d0(features, 4)
+//	isStreamingServer()  => d0(features, 8)   isGatewayServer() => d0(features, 32)
+//
+// d0 的實作在 a/a.java：`return (i9 & i10) == i10`，就是掩碼測試。同一支檔、同一個 d0，
+// 它給 IPv6 用的掩碼是 16，跟我們早已落地並驗證過的 featureIPv6 = 16 精確對上，代表這張
+// bit 表跟既有那欄出自同一份模型，不是湊出來的數字。
+const featureSecureCore = 1
+
 type connectingDomain struct {
 	EntryIP          string                     `json:"EntryIP"`
 	Domain           string                     `json:"Domain"`
@@ -65,12 +80,16 @@ type serverEntryInfo struct {
 
 // wireGuardEntry 取 WireGuard 那條 per-protocol 記錄。
 // ⚠️ 鍵的大小寫不能寫死：2026-10-13 逆推官方 APK（ch.protonvpn.android 5.20.74.0）查實
-//   客戶端查的是**大寫開頭**的 "WireGuard"——`ConnectingDomain.java:235` 用
-//   `protocol.getApiName()` 當鍵，而 `getApiName()` 是「VPN 名＋傳輸名」直接串接
-//   （所以那側還有 WireGuardUDP／WireGuardTCP／WireGuardTLS，Stealth 就是最後一把）。
-//   我方先前只比對小寫 "wireguard" ⇒ 查表永遠落空、靜默退回 EntryIP＋預設埠 51820，
-//   表面上「能用」其實是沒吃到協商過的埠。改成先精確命中、再不分大小寫逐鍵找，
-//   兩種上游寫法都拿得到；真的查不到才走原本的 fallback。
+//
+//	客戶端查的是**大寫開頭**的 "WireGuard"——`ConnectingDomain.java:235` 用
+//	`protocol.getApiName()` 當鍵，而 `getApiName()` 是「VPN 名＋傳輸名」直接串接
+//	（所以那側還有 WireGuardUDP／WireGuardTCP／WireGuardTLS，Stealth 就是最後一把）。
+//	我方先前只比對小寫 "wireguard" ⇒ 查表永遠落空、靜默退回 EntryIP＋預設埠 51820，
+//	表面上「能用」其實是沒吃到協商過的埠。改成先精確命中、再不分大小寫逐鍵找，
+//	兩種上游寫法都拿得到；真的查不到才走原本的 fallback。
+//	2026-10-14 補第三步：既然現在會把協定能力輸出給 UI，就必須連 WireGuardUDP／
+//	WireGuardTCP／WireGuardTLS 這種「VPN 名＋傳輸名」的鍵也當成 WireGuard 的記錄來用，
+//	否則一邊宣稱 wireguard 可用、一邊又退回 EntryIP＋51820，等於自打嘴巴。
 func (d connectingDomain) wireGuardEntry() (serverEntryInfo, bool) {
 	if e, ok := d.EntryPerProtocol[protocolWireGuardName]; ok {
 		return e, true
@@ -80,10 +99,158 @@ func (d connectingDomain) wireGuardEntry() (serverEntryInfo, bool) {
 			return e, true
 		}
 	}
-	return serverEntryInfo{}, false
+	return d.protocolEntryNamed(protocolWireGuardName)
 }
 
 const protocolWireGuardName = "wireguard"
+
+// 協定正規化名。值全部小寫，Kotlin／UI 那側就拿這些字串當篩選鍵。
+const (
+	protocolOpenVPNName = "openvpn"
+	protocolProTunName  = "protun"
+	protocolStealthName = "stealth"
+	protocolSmartName   = "smart"
+)
+
+// protocolOrder 決定 Protocols 輸出的順序：固定順序加上前綴去重，清單才有可比對性，
+// App 那側也不會因為 Go map 的隨機迭代順序而每次畫面排序不同。
+var protocolOrder = []string{
+	protocolWireGuardName,
+	protocolStealthName,
+	protocolOpenVPNName,
+	protocolProTunName,
+	protocolSmartName,
+}
+
+// transportTLS 是 Transmission 那半段的其中一個值。官方 APK 的反編譯產物裡
+// ProtocolSelection.STEALTH = new ProtocolSelection(VpnProtocol.WireGuard, TLS)，
+// 而 getApiName() 是 `vpn.getApiName() + transmission.name()` 直接串接
+// （transmission 是 UDP／TCP／TLS 三個值），所以「Stealth」在 wire format 上就是
+// 鍵名尾端的 TLS，不是另一把獨立的金鑰。
+const transportTLS = "tls"
+
+// splitProtocolKey 把 EntryPerProtocol 的鍵拆成「VPN 名＋傳輸名」兩半，一律不分大小寫
+// （教訓見上方 wireGuardEntry 的註解：鍵的大小寫不能寫死）。認不出來的 VPN 名就把整串
+// 小寫當 VPN 名回傳，讓上游哪天新增協定時資訊先保留下來，而不是靜默丟掉。
+func splitProtocolKey(key string) (vpn string, transport string) {
+	lower := strings.ToLower(strings.TrimSpace(key))
+	for _, name := range protocolOrder {
+		if strings.HasPrefix(lower, name) {
+			return name, strings.TrimPrefix(lower, name)
+		}
+	}
+	return lower, ""
+}
+
+// protocolCaps 從一台伺服器的 per-protocol 鍵推導協定集合，順帶取出 Secure-Core。
+// 三個刻意的设计：
+//  1. X25519PublicKey 有值但 EntryPerProtocol 沒帶 WireGuard 鍵時也算 wireguard——
+//     舊形狀的 payload（只有公鑰、沒有 per-protocol 表）不能退化成「這台沒有 WG」。
+//  2. 尾端是 TLS 的鍵除了它自己的 VPN 名以外，還算一份 stealth（見上方 transportTLS 的證據）。
+//  3. 結果去重、依 protocolOrder 排序；不認識的鍵名以小寫原樣排在最後。
+func protocolCaps(d connectingDomain, ls logicalServer) ([]string, bool) {
+	seen := make(map[string]bool, len(d.EntryPerProtocol)+1)
+	if d.X25519PublicKey != "" {
+		seen[protocolWireGuardName] = true
+	}
+	for key := range d.EntryPerProtocol {
+		vpn, transport := splitProtocolKey(key)
+		if vpn == "" {
+			continue
+		}
+		seen[vpn] = true
+		if transport == transportTLS {
+			seen[protocolStealthName] = true
+		}
+	}
+	protocols := make([]string, 0, len(seen))
+	for _, name := range protocolOrder {
+		if seen[name] {
+			protocols = append(protocols, name)
+		}
+	}
+	var unknown []string
+	for name := range seen {
+		known := false
+		for _, want := range protocolOrder {
+			if want == name {
+				known = true
+				break
+			}
+		}
+		if !known {
+			unknown = append(unknown, name)
+		}
+	}
+	sort.Strings(unknown)
+	protocols = append(protocols, unknown...)
+	if len(protocols) == 0 {
+		// 沒有線索就回 nil（JSON 端 omitempty 會整個省略欄位），不要吐一個空陣列
+		// 讓 UI 誤會成「有清單但裡面沒東西」。
+		return nil, ls.Features&featureSecureCore != 0
+	}
+	return protocols, ls.Features&featureSecureCore != 0
+}
+
+// providesProtocol 判斷某個鍵是否屬於某個正規化協定（stealth 認尾端 TLS 或鍵名本身）。
+func providesProtocol(key, name string) bool {
+	vpn, transport := splitProtocolKey(key)
+	if vpn == name {
+		return true
+	}
+	return name == protocolStealthName && transport == transportTLS
+}
+
+// transportRank 決定同一協定有好多把鍵時先採哪一條：沒後綴（最老也最正規的形狀）優先，
+// 接著 UDP、TCP、TLS。排序後再比鍵名，是為了同一份 payload 每次解析都拿到同一個埠——
+// Go map 的迭代順序是亂數，直接取第一把的話埠會跟著飄，測試也就沒法比對。
+func transportRank(transport string) int {
+	switch transport {
+	case "":
+		return 0
+	case "udp":
+		return 1
+	case "tcp":
+		return 2
+	case transportTLS:
+		return 3
+	default:
+		return 4
+	}
+}
+
+// protocolEntryNamed 取該協定在 EntryPerProtocol 裡的記錄。
+func (d connectingDomain) protocolEntryNamed(name string) (serverEntryInfo, bool) {
+	var keys []string
+	for key := range d.EntryPerProtocol {
+		if providesProtocol(key, name) {
+			keys = append(keys, key)
+		}
+	}
+	if len(keys) == 0 {
+		return serverEntryInfo{}, false
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		_, ti := splitProtocolKey(keys[i])
+		_, tj := splitProtocolKey(keys[j])
+		if ri, rj := transportRank(ti), transportRank(tj); ri != rj {
+			return ri < rj
+		}
+		return keys[i] < keys[j]
+	})
+	return d.EntryPerProtocol[keys[0]], true
+}
+
+// dialProtocolOrder 是「這條線要實際拨出去」時挑協定記錄的順序，與 protocolOrder（報能力
+// 用的順序）不同：stealth 擺最後，因為它的 per-protocol 記錄其實是上面某個協定的 TLS 變體
+// （WireGuardTLS／OpenVPNTLS），基礎協定那把先選得到才輪到它。
+var dialProtocolOrder = []string{
+	protocolWireGuardName,
+	protocolOpenVPNName,
+	protocolProTunName,
+	protocolSmartName,
+	protocolStealthName,
+}
 
 type logicalServersResp struct {
 	LogicalServers []logicalServer `json:"LogicalServers"`
@@ -103,13 +270,23 @@ type nodeView struct {
 	Domain    string  `json:"domain,omitempty"`
 	PublicKey string  `json:"wgPublicKey,omitempty"`
 	Port      int     `json:"port,omitempty"`
+	// Protocols 與 SecureCore 必須加在尾端：ProtonNode 那側與既有測試有按位置構造物件的
+	// 呼叫端，插在中間會靜默錯位（欄位全部對到旁邊那個）。協定名是正規化後的小寫
+	// （wireguard／stealth／openvpn／protun／smart，上游不認識的鍵名原樣小寫送出），
+	// UI 的「依協定篩選」就以這欄為準；wgPublicKey 留空但 Protocols 有值的那種，
+	// 就是「這台只能走別協定」而不是「壞掉的節點」。
+	Protocols  []string `json:"protocols,omitempty"`
+	SecureCore bool     `json:"secureCore,omitempty"`
 }
 
 type nodesOutput struct {
 	OK      bool       `json:"ok"`
 	Servers []nodeView `json:"servers,omitempty"`
-	// Dropped counts servers that came back but cannot be used (no WireGuard
-	// key, or offline), so the UI can tell "few nodes" from "broken response".
+	// Dropped counts servers that came back but cannot be used at all — no WireGuard
+	// key *and* no per-protocol entry to dial, or the group is offline. A node that
+	// only speaks OpenVPN/ProTun is NOT dropped: it lands in Servers with an empty
+	// wgPublicKey and its protocols listed, so the UI can tell "few nodes" from
+	// "broken response" without hiding perfectly dialable servers.
 	Dropped int    `json:"dropped"`
 	Error   string `json:"error,omitempty"`
 	// Code is the machine-readable twin of Error. Error is prose meant for a human
@@ -229,9 +406,10 @@ func fetchLogicalServers(ctx context.Context, apiURL string, cred storedCredenti
 	return &out, nil
 }
 
-// selectNodes keeps only entries that can actually be dialed: a load-balancing
-// group whose connecting domain carries no X25519 key is worse than no entry,
-// because the UI would offer a node that cannot connect.
+// selectNodes 丢掉的是「回來了但完全不可用」的那台：既沒有能拨的 WireGuard domain，
+// 也沒有任何帶 per-protocol 條目的 domain。協定能力由 nodeView.Protocols 表達，所以
+// 「只有 OpenVPN／ProTun」的伺服器要照常進清單（wgPublicKey 留空），不能算丟棄——
+// Dropped 這欄的用途還是讓 UI 分得出「節點少」與「回應壞了」。
 func selectNodes(resp *logicalServersResp, country string, limit int) ([]nodeView, int) {
 	var usable []nodeView
 	dropped := 0
@@ -245,6 +423,7 @@ func selectNodes(resp *logicalServersResp, country string, limit int) ([]nodeVie
 			continue
 		}
 		var chosen *connectingDomain
+		wireGuardChosen := false
 		for i := range ls.Servers {
 			d := &ls.Servers[i]
 			if d.X25519PublicKey == "" {
@@ -255,27 +434,68 @@ func selectNodes(resp *logicalServersResp, country string, limit int) ([]nodeVie
 				continue
 			}
 			chosen = d
+			wireGuardChosen = true
 			break
+		}
+		if chosen == nil {
+			// 沒有可用的 WG domain 不等於這台不能用：退而選「有 per-protocol 條目、
+			// 也講得出位址、又沒被明確標成離線」的那一台，靠 Protocols 說明它能用什麼。
+			for i := range ls.Servers {
+				d := &ls.Servers[i]
+				if len(d.EntryPerProtocol) == 0 {
+					continue
+				}
+				if d.Status != nil && *d.Status == 0 {
+					continue
+				}
+				if d.EntryIP == "" && d.Domain == "" {
+					continue
+				}
+				chosen = d
+				break
+			}
 		}
 		if chosen == nil {
 			dropped++
 			continue
 		}
+		protocols, secureCore := protocolCaps(*chosen, ls)
 		entry, hasEntry := chosen.wireGuardEntry()
+		if !hasEntry && !wireGuardChosen {
+			// 非 WG 那條路：位址與埠要用它自己協定協商出來的記錄，不能沿用 EntryIP＋51820。
+			// 依 dialProtocolOrder 挑（stealth 是別的協定的 TLS 變體，排最後）；上游塞了
+			// 不認識的協定名時再照 protocols 的順序補一次，別靜默退回 EntryIP。
+			for _, name := range dialProtocolOrder {
+				if e, ok := chosen.protocolEntryNamed(name); ok {
+					entry, hasEntry = e, true
+					break
+				}
+			}
+			if !hasEntry {
+				for _, name := range protocols {
+					if e, ok := chosen.protocolEntryNamed(name); ok {
+						entry, hasEntry = e, true
+						break
+					}
+				}
+			}
+		}
 		usable = append(usable, nodeView{
-			ID:        ls.ID,
-			Name:      ls.Name,
-			Load:      ls.Load,
-			Score:     ls.Score,
-			Penalty:   ls.StatusReference.Penalty,
-			Tier:      ls.Tier,
-			IPv6:      ls.Features&featureIPv6 != 0,
-			Country:   ls.Country,
-			City:      ls.City,
-			Endpoint:  chosen.entry(entry, hasEntry),
-			Domain:    chosen.Domain,
-			PublicKey: chosen.X25519PublicKey,
-			Port:      chosen.port(entry, hasEntry),
+			ID:         ls.ID,
+			Name:       ls.Name,
+			Load:       ls.Load,
+			Score:      ls.Score,
+			Penalty:    ls.StatusReference.Penalty,
+			Tier:       ls.Tier,
+			IPv6:       ls.Features&featureIPv6 != 0,
+			Country:    ls.Country,
+			City:       ls.City,
+			Endpoint:   chosen.entry(entry, hasEntry),
+			Domain:     chosen.Domain,
+			PublicKey:  chosen.X25519PublicKey,
+			Port:       chosen.port(entry, hasEntry, wireGuardChosen),
+			Protocols:  protocols,
+			SecureCore: secureCore,
 		})
 	}
 
@@ -311,13 +531,19 @@ func (d connectingDomain) entry(entry serverEntryInfo, hasEntry bool) string {
 	return d.Domain
 }
 
-func (d connectingDomain) port(entry serverEntryInfo, hasEntry bool) int {
+// port 取協定協商出來的埠。51820 是 WireGuard 的慣用預設埠，只有真的按 WG 選中時
+// 才准 fallback 到它；OpenVPN／ProTun 那一側回 0（JSON 的 omitempty 會省略 port），
+// 寧可讓 Kotlin 那側自己決定預設值，也不能憑空填一個 WG 的埠進去。
+func (d connectingDomain) port(entry serverEntryInfo, hasEntry bool, wireGuard bool) int {
 	if hasEntry {
 		for _, port := range entry.Ports {
 			if port > 0 && port <= 65535 {
 				return port
 			}
 		}
+	}
+	if !wireGuard {
+		return 0
 	}
 	return defaultWireGuardPort
 }

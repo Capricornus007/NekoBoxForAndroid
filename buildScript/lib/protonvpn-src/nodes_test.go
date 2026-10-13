@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -294,5 +295,195 @@ func TestNodesReportsACaptchaRequestWithoutLeakingTheToken(t *testing.T) {
 	}
 	if strings.Contains(out.Error, "HVSTART123") {
 		t.Errorf("the challenge token leaked into the node-list error: %q", out.Error)
+	}
+}
+
+func serverWithID(t *testing.T, servers []nodeView, id string) nodeView {
+	t.Helper()
+	for _, s := range servers {
+		if s.ID == id {
+			return s
+		}
+	}
+	t.Fatalf("server %s missing from %+v", id, servers)
+	return nodeView{}
+}
+
+// 協定能力就藏在 EntryPerProtocol 的鍵裡，而官方 APK（ch.protonvpn.android 5.20.74.0）的
+// ProtocolSelection.getApiName() 是「VPN 名＋傳輸名」串接，鍵名是大寫開頭的
+// WireGuardUDP／WireGuardTCP／WireGuardTLS 這一型；STEALTH = WireGuard + TLS，
+// 所以尾端的 TLS 要另外算一份 stealth。這條釘住三件事：
+// wireguard、openvpn、stealth 必須同時出現，且 WG 的位址/埠要吃到帶後綴那把鍵。
+func TestNodesReportsProtocolsFromThePerProtocolKeys(t *testing.T) {
+	const payload = `{"LogicalServers":[
+	 {"ID":"31","Name":"HK#31 多協定","Tier":2,"State":"up","ExitCountry":"hk","City":"Hong Kong",
+	  "Features":1,"Load":8,"Score":7.0,
+	  "StatusReference":{"Index":31,"Penalty":0.2,"Cost":1},
+	  "Servers":[{"Domain":"hk31.protonvpn.net","EntryIP":"10.0.0.31","Status":1,"X25519PublicKey":"GGGGAl==",
+	    "EntryPerProtocol":{
+	      "WireGuardUDP":{"IPv4":"10.0.0.131","Ports":[51820]},
+	      "OpenVPNTLS":{"IPv4":"10.0.0.231","Ports":[443]}}}]}
+	]}`
+	srv, _ := mockServer(t, payload, http.StatusOK)
+	defer srv.Close()
+
+	out, code := runNodesWith(t, srv.URL, writeTestSession(t, t.TempDir()))
+	if code != 0 || !out.OK || len(out.Servers) != 1 {
+		t.Fatalf("nodes failed: code=%d out=%+v", code, out)
+	}
+	got := out.Servers[0]
+	want := []string{protocolWireGuardName, protocolStealthName, protocolOpenVPNName}
+	if !slices.Equal(got.Protocols, want) {
+		t.Errorf("protocols = %v, want %v (order is fixed so the UI can compare)", got.Protocols, want)
+	}
+	if !got.SecureCore {
+		t.Error("Features bit 1 should surface as secureCore=true (isSecureCoreServer in the official client)")
+	}
+	// 帶後綴的 WireGuardUDP 也是 WireGuard 的記錄：查表命中才会拿到 10.0.0.131/51820，
+	// 退回 EntryIP 會得到 10.0.0.31，那正是這條要擋住的行為。
+	if got.Endpoint != "10.0.0.131" || got.Port != 51820 {
+		t.Errorf("endpoint/port = %q/%d, want the WireGuardUDP entry 10.0.0.131/51820", got.Endpoint, got.Port)
+	}
+	if got.PublicKey != "GGGGAl==" {
+		t.Errorf("public key = %q, want the WG key carried through as usual", got.PublicKey)
+	}
+}
+
+// 舊形狀的 payload（只有 X25519PublicKey、完全沒有 per-protocol 表）不能因為「查不到鍵」
+// 就退化成「這台不能用 WireGuard」。
+func TestNodesLegacyShapeWithoutPerProtocolStillCountsAsWireGuard(t *testing.T) {
+	const payload = `{"LogicalServers":[
+	 {"ID":"32","Name":"TW#32 舊形狀","Tier":2,"State":"up","ExitCountry":"tw","City":"Taipei",
+	  "Features":0,"Load":3,"Score":4.0,
+	  "StatusReference":{"Index":32,"Penalty":0.1,"Cost":1},
+	  "Servers":[{"Domain":"tw32.protonvpn.net","EntryIP":"10.0.0.32","Status":1,"X25519PublicKey":"HHHHAL=="}]}
+	]}`
+	srv, _ := mockServer(t, payload, http.StatusOK)
+	defer srv.Close()
+
+	out, code := runNodesWith(t, srv.URL, writeTestSession(t, t.TempDir()))
+	if code != 0 || !out.OK || len(out.Servers) != 1 {
+		t.Fatalf("nodes failed: code=%d out=%+v", code, out)
+	}
+	got := out.Servers[0]
+	if !slices.Equal(got.Protocols, []string{protocolWireGuardName}) {
+		t.Errorf("protocols = %v, want [%s]", got.Protocols, protocolWireGuardName)
+	}
+	if got.SecureCore {
+		t.Error("Features 0 must not report secureCore")
+	}
+	if got.Endpoint != "10.0.0.32" || got.Port != defaultWireGuardPort {
+		t.Errorf("fallback = %q/%d, want EntryIP plus the WireGuard default %d",
+			got.Endpoint, got.Port, defaultWireGuardPort)
+	}
+}
+
+// 只有 OpenVPN 鍵、完全沒有 WG 公鑰的伺服器必須照常進清單：wgPublicKey 留空、
+// 由 protocols 說明它能用什麼，而且這不算「回應壞了」，dropped 不能因為它增加。
+func TestNodesKeepsAServerWithoutAWireGuardKeyInList(t *testing.T) {
+	const payload = `{"LogicalServers":[
+	 {"ID":"33","Name":"JP#33 只有 OpenVPN","Tier":2,"State":"up","ExitCountry":"jp","City":"Tokyo",
+	  "Features":16,"Load":6,"Score":5.0,
+	  "StatusReference":{"Index":33,"Penalty":0.2,"Cost":1},
+	  "Servers":[{"Domain":"jp33.protonvpn.net","EntryIP":"10.0.0.33","Status":1,
+	    "EntryPerProtocol":{
+	      "OpenVPNTLS":{"IPv4":"10.0.0.233","Ports":[443]},
+	      "OpenVPNUDP":{"IPv4":"10.0.0.133","Ports":[1194,54123]}}}]}
+	]}`
+	srv, _ := mockServer(t, payload, http.StatusOK)
+	defer srv.Close()
+
+	out, code := runNodesWith(t, srv.URL, writeTestSession(t, t.TempDir()))
+	if code != 0 || !out.OK {
+		t.Fatalf("an OpenVPN-only server must not fail the listing: code=%d out=%+v", code, out)
+	}
+	if len(out.Servers) != 1 {
+		t.Fatalf("got %d servers, want the OpenVPN-only one kept: %+v", len(out.Servers), out.Servers)
+	}
+	if out.Dropped != 0 {
+		t.Errorf("dropped = %d, want 0: only-OpenVPN is a capability, not a broken response", out.Dropped)
+	}
+	got := out.Servers[0]
+	if got.PublicKey != "" {
+		t.Errorf("wgPublicKey = %q, want it empty when the API sent no X25519 key", got.PublicKey)
+	}
+	if !slices.Equal(got.Protocols, []string{protocolStealthName, protocolOpenVPNName}) {
+		t.Errorf("protocols = %v, want [%s %s]", got.Protocols, protocolStealthName, protocolOpenVPNName)
+	}
+	// 位址與埠要用它自己協定的記錄，而且不能憑空套 WireGuard 的 51820。
+	// 同協定兩把鍵時 UDP 排在 TLS 前面，所以拿 10.0.0.133/1194。
+	if got.Endpoint != "10.0.0.133" || got.Port != 1194 {
+		t.Errorf("endpoint/port = %q/%d, want the OpenVPNUDP entry 10.0.0.133/1194", got.Endpoint, got.Port)
+	}
+	if !got.IPv6 {
+		t.Error("Features bit 16 should still surface as ipv6=true")
+	}
+}
+
+// Secure-Core 是 Features 的另一個 bit（1），與 IPv6 那把（16）各自獨立，
+// 兩個都開（17）時雨都要報 true。
+func TestNodesSurfacesTheSecureCoreFeatureBit(t *testing.T) {
+	const payload = `{"LogicalServers":[
+	 {"ID":"41","Name":"SE#41 Secure-Core","Tier":2,"State":"up","ExitCountry":"se","City":"Stockholm",
+	  "Features":1,"Load":10,"Score":3.0,
+	  "Servers":[{"Domain":"se41.protonvpn.net","EntryIP":"10.0.0.41","Status":1,"X25519PublicKey":"IIIACl=="}]},
+	 {"ID":"42","Name":"SE#42 兩開","Tier":2,"State":"up","ExitCountry":"se","City":"Stockholm",
+	  "Features":17,"Load":11,"Score":3.0,
+	  "Servers":[{"Domain":"se42.protonvpn.net","EntryIP":"10.0.0.42","Status":1,"X25519PublicKey":"JJJACl=="}]},
+	 {"ID":"43","Name":"SE#43 只有 IPv6","Tier":2,"State":"up","ExitCountry":"se","City":"Stockholm",
+	  "Features":16,"Load":12,"Score":3.0,
+	  "Servers":[{"Domain":"se43.protonvpn.net","EntryIP":"10.0.0.43","Status":1,"X25519PublicKey":"KKKACl=="}]}
+	]}`
+	srv, _ := mockServer(t, payload, http.StatusOK)
+	defer srv.Close()
+
+	out, code := runNodesWith(t, srv.URL, writeTestSession(t, t.TempDir()))
+	if code != 0 || !out.OK || len(out.Servers) != 3 {
+		t.Fatalf("nodes failed: code=%d out=%+v", code, out)
+	}
+	cases := []struct {
+		id     string
+		secure bool
+		ipv6   bool
+	}{
+		{"41", true, false},
+		{"42", true, true},
+		{"43", false, true},
+	}
+	for _, c := range cases {
+		got := serverWithID(t, out.Servers, c.id)
+		if got.SecureCore != c.secure {
+			t.Errorf("server %s secureCore = %v, want %v", c.id, got.SecureCore, c.secure)
+		}
+		if got.IPv6 != c.ipv6 {
+			t.Errorf("server %s ipv6 = %v, want %v", c.id, got.IPv6, c.ipv6)
+		}
+	}
+}
+
+// protocolCaps 的直接單元測試：不分大小寫、去重、固定順序，認不認識的鍵名以小寫保留。
+func TestProtocolCapsIsCaseInsensitiveDedupedAndOrdered(t *testing.T) {
+	caps, secureCore := protocolCaps(connectingDomain{
+		EntryPerProtocol: map[string]serverEntryInfo{
+			"wireguardtcp": {},
+			"WireGuardUDP": {},
+			"WireGuardTLS": {},
+			"Stealth":      {},
+			"ProTunTCP":    {},
+			"FooBar":       {},
+		},
+	}, logicalServer{Features: featureSecureCore | featureIPv6})
+	want := []string{protocolWireGuardName, protocolStealthName, protocolProTunName, "foobar"}
+	if !slices.Equal(caps, want) {
+		t.Errorf("caps = %v, want %v", caps, want)
+	}
+	if !secureCore {
+		t.Error("bit 1 must read as secureCore even when other bits are set")
+	}
+
+	// 什麼都沒有時回 nil，讓 JSON 端把 protocols 整個省略，而不是吐一個空陣列。
+	empty, _ := protocolCaps(connectingDomain{}, logicalServer{})
+	if empty != nil {
+		t.Errorf("caps = %v, want nil for a domain with no signal at all", empty)
 	}
 }
