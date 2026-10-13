@@ -1067,4 +1067,5 @@
     <string name="proton_group_added">Groupe %1$s ajouté</string>
     <string name="proton_cached_at">Mis à jour %1$s</string>
     <string name="proton_pull_to_refresh">Faites glisser vers le bas pour actualiser</string>
+    <string name="dns_lookup_failed">Impossible de résoudre %1$s (problème DNS, pas le nœud)</string>
 </resources>

@@ -1058,4 +1058,5 @@
     <string name="proton_group_added">تمت إضافة المجموعة %1$s</string>
     <string name="proton_cached_at">تم التحديث %1$s</string>
     <string name="proton_pull_to_refresh">اسحب للأسفل للتحديث</string>
+    <string name="dns_lookup_failed">تعذّر حل %1$s (مشكلة DNS وليس مشكلة في العقدة)</string>
 </resources>

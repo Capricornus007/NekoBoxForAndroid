@@ -1017,4 +1017,5 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="proton_group_added">Groep %1$s toegevoegd</string>
     <string name="proton_cached_at">Bijgewerkt %1$s</string>
     <string name="proton_pull_to_refresh">Trek naar beneden om te vernieuwen</string>
+    <string name="dns_lookup_failed">%1$s kan niet worden opgelost (DNS-probleem, niet de node)</string>
 </resources>

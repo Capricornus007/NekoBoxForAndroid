@@ -1035,4 +1035,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_group_added">已新增 %1$s 分組</string>
     <string name="proton_cached_at">更新於 %1$s</string>
     <string name="proton_pull_to_refresh">下拉可更新清單</string>
+    <string name="dns_lookup_failed">無法解析 %1$s（DNS 問題，並非節點故障）</string>
 </resources>

@@ -1062,4 +1062,5 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_group_added">Grup %1$s ditambahkan</string>
     <string name="proton_cached_at">Diperbarui %1$s</string>
     <string name="proton_pull_to_refresh">Tarik ke bawah untuk menyegarkan</string>
+    <string name="dns_lookup_failed">Gagal mengurai %1$s (masalah DNS, bukan node)</string>
 </resources>

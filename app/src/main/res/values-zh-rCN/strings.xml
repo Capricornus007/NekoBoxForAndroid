@@ -1034,4 +1034,5 @@
     <string name="proton_group_added">已新增 %1$s 分组</string>
     <string name="proton_cached_at">更新于 %1$s</string>
     <string name="proton_pull_to_refresh">下拉可更新列表</string>
+    <string name="dns_lookup_failed">无法解析 %1$s（是 DNS 问题，不是节点坏了）</string>
 </resources>

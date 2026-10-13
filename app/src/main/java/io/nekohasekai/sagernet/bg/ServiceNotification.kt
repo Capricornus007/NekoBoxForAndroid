@@ -100,6 +100,12 @@ class ServiceNotification(
                     ),
                 )
                 it.setContentText(speedSimple)
+                // 無條件 BigTextStyle：原本只有開「顯示直連速率」那條分支會 setStyle，
+                // 於是一般情況下通知欄收在一行、要手往下拉才看得到完整內容。BigTextStyle
+                // 讓系統在有空間時直接展開，使用者不用拉。代價講清楚：每輪刷速率都走
+                // 重繪面積較大的 big 樣式（這支每 1 秒呼叫一次 postNotificationSpeedUpdate），
+                // 但內容本來就在變，不是额外多畫一份。
+                it.setStyle(NotificationCompat.BigTextStyle().bigText(speedSimple))
             }
             it.setSubText(
                 service.getString(

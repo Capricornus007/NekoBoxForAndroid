@@ -1043,4 +1043,5 @@
     <string name="proton_group_added">%1$s 그룹을 추가했습니다</string>
     <string name="proton_cached_at">%1$s에 업데이트됨</string>
     <string name="proton_pull_to_refresh">아래로 당겨 새로고침</string>
+    <string name="dns_lookup_failed">%1$s 해석 실패 (노드 고장이 아니라 DNS 문제)</string>
 </resources>

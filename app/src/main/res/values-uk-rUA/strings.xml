@@ -1061,4 +1061,5 @@
     <string name="proton_group_added">Додано групу %1$s</string>
     <string name="proton_cached_at">Оновлено %1$s</string>
     <string name="proton_pull_to_refresh">Потягніть донизу, щоб оновити</string>
+    <string name="dns_lookup_failed">Не вдалося розв\'язати %1$s (проблема DNS, а не вузла)</string>
 </resources>

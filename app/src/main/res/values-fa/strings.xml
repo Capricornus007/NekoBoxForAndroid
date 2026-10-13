@@ -1023,4 +1023,5 @@
     <string name="proton_group_added">گروه %1$s افزوده شد</string>
     <string name="proton_cached_at">به‌روزرسانی %1$s</string>
     <string name="proton_pull_to_refresh">برای تازه‌سازی به پایین بکشید</string>
+    <string name="dns_lookup_failed">نام %1$s پیدا نشد (مشکل DNS است، نه گره)</string>
 </resources>

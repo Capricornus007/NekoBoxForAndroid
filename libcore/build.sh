@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# 對齊 gradle.properties:9（`org.gradle.jvmargs=… -Dfile.encoding=UTF-8`）：那條只管 **Gradle 自己的
+# JVM**，而本腳本是 shell 直接起 gomobile/javac，吃的是環境預設編碼。CI 容器與本機都可能
+# LANG 未設（POSIX/C 環境），那時 javac 的預設 platform encoding 不是 UTF-8，非 ASCII 字串
+# （生成的 Java 桩、註解、資源鍵）就會以錯編碼進 class 檔——這種壞法不會報錯，只在執行期變亂碼。
+# JAVA_TOOL_OPTIONS 會被**任何**被啟動的 JVM 讀到，所以一條就蓋住整條鏈；它同時會印一行
+# "Picked up JAVA_TOOL_OPTIONS: …" 到 stderr，這是正常現象，不是錯誤。
+# 本腳本先前 `source ./env_java.sh || true` 那行其實是空轉（倉裡沒有 env_java.sh，被 || true 吞掉），
+# 所以這裡是這條鏈上第一處真的設到編碼的地方。
+export JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS:+$JAVA_TOOL_OPTIONS }-Dfile.encoding=UTF-8"
+
 source ./env_java.sh || true
 source ../buildScript/init/env_ndk.sh
 

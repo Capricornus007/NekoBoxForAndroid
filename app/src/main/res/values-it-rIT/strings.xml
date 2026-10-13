@@ -1062,4 +1062,5 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_group_added">Gruppo %1$s aggiunto</string>
     <string name="proton_cached_at">Aggiornato %1$s</string>
     <string name="proton_pull_to_refresh">Trascina verso il basso per aggiornare</string>
+    <string name="dns_lookup_failed">Impossibile risolvere %1$s (problema DNS, non il nodo)</string>
 </resources>

@@ -1013,4 +1013,5 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="proton_group_added">Grupo %1$s adicionado</string>
     <string name="proton_cached_at">Atualizado %1$s</string>
     <string name="proton_pull_to_refresh">Puxe para baixo para atualizar</string>
+    <string name="dns_lookup_failed">Não foi possível resolver %1$s (problema de DNS, não do nó)</string>
 </resources>

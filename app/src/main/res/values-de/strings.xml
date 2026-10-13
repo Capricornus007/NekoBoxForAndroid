@@ -966,4 +966,5 @@
     <string name="proton_group_added">Gruppe %1$s hinzugefügt</string>
     <string name="proton_cached_at">Aktualisiert %1$s</string>
     <string name="proton_pull_to_refresh">Zum Aktualisieren nach unten ziehen</string>
+    <string name="dns_lookup_failed">%1$s konnte nicht aufgelöst werden (DNS-Problem, nicht der Knoten)</string>
 </resources>

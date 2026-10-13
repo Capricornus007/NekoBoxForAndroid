@@ -1208,4 +1208,5 @@
     <string name="proton_group_added">Añadido el grupo %1$s</string>
     <string name="proton_cached_at">Actualizado %1$s</string>
     <string name="proton_pull_to_refresh">Desliza hacia abajo para actualizar</string>
+    <string name="dns_lookup_failed">No se puede resolver %1$s (problema de DNS, no del nodo)</string>
 </resources>

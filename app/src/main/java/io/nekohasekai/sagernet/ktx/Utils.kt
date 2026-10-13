@@ -84,6 +84,27 @@ inline fun <T> Iterable<T>.forEachTry(action: (T) -> Unit) {
 val Throwable.readableMessage
     get() = localizedMessage.takeIf { !it.isNullOrBlank() } ?: javaClass.simpleName
 
+// 核心解析「節點自己的域名」失敗時回的是 `lookup hkg-03.example.com: context deadline exceeded`
+// 這種形，字面上完全看不出是「DNS 沒解出来」還是「節點死了」——用戶看到的症狀是「全部節點超時」，
+// 而真兇常常只是上游 DNS 有一條死的（本機 AGH 就發生過）。所以把域名點出來。
+// ⚠️ 這裡只認 `lookup <name>: <原因>` 這個核心寫死的形（Go net.Resolver 的 *DNSError 文案），
+//    不去猜其他錯誤；比對不到就照舊走 readableMessage，不會把別的錯誤也改寫成 DNS。
+private val DNS_LOOKUP_FAILURE =
+    Regex("""lookup\s+([^\s:]+):\s+(context deadline exceeded|no such host|i/o timeout|server misbehaving|dial\s.*failed)""")
+
+val Throwable.dnsLookupDomain: String?
+    get() {
+        // 自己走 cause 鏈，不用 generateSequence：這裡的 `this` 是屬性 getter 的接收者，
+        // 放進 lambda 會被內層 `it` 遮掉（實測編譯報 Unresolved reference 'it'）。
+        var t: Throwable? = this
+        while (t != null) {
+            t.message?.let { m -> DNS_LOOKUP_FAILURE.find(m) }?.let { return it.groupValues[1] }
+            if (t === t.cause) break // 防自引用 cause 造成死循環
+            t = t.cause
+        }
+        return null
+    }
+
 /**
  * https://android.googlesource.com/platform/prebuilts/runtime/+/94fec32/appcompat/hiddenapi-light-greylist.txt#9466
  */

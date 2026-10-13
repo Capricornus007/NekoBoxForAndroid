@@ -1006,4 +1006,5 @@
     <string name="proton_group_added">%1$s grubu eklendi</string>
     <string name="proton_cached_at">%1$s güncellendi</string>
     <string name="proton_pull_to_refresh">Yenilemek için aşağı çekin</string>
+    <string name="dns_lookup_failed">%1$s çözümlenemedi (düğüm değil, DNS sorunu)</string>
 </resources>

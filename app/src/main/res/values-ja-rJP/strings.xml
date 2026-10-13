@@ -1051,4 +1051,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_group_added">%1$s グループを追加しました</string>
     <string name="proton_cached_at">%1$s に更新</string>
     <string name="proton_pull_to_refresh">下に引くと更新されます</string>
+    <string name="dns_lookup_failed">%1$s を解決できません（ノードではなくDNSの問題）</string>
 </resources>

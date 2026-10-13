@@ -1111,4 +1111,5 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_group_added">Добавлена группа %1$s</string>
     <string name="proton_cached_at">Обновлено %1$s</string>
     <string name="proton_pull_to_refresh">Потяните вниз, чтобы обновить</string>
+    <string name="dns_lookup_failed">Не удаётся разрешить %1$s (проблема DNS, а не узла)</string>
 </resources>

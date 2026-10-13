@@ -952,4 +952,5 @@
     <string name="proton_group_added">Дададзена група %1$s</string>
     <string name="proton_cached_at">Абноўлена %1$s</string>
     <string name="proton_pull_to_refresh">Пацягніце ўніз, каб абнавіць</string>
+    <string name="dns_lookup_failed">Не атрымліваецца вырашыць %1$s (праблема DNS, а не вузла)</string>
 </resources>

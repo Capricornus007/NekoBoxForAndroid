@@ -130,6 +130,13 @@ class TrafficLooper(
     // For balancer: track the previously selected child tag
     private var balancerLastChildTag = ""
 
+    // 「策略組目前連哪台」的被動顯示用：核心標籤 → 該節點顯示名。只在建立 trafficMap 那一刻
+    // 填一次（來源就是迴圈本來就在讀的 ProxyEntity），切換時不查 DB、不輪詢、不發 HTTP。
+    private val tagDisplayNames = mutableMapOf<String, String>()
+
+    // 上一次貼到通知的整串標題（含「· 目前節點」），用來判斷要不要重貼。
+    private var balancerShownTitle = ""
+
     // Non-blocking entry for the JNI selector callback (NativeInterface). Posts the request;
     // it is applied on the loop coroutine via applySelect(). Never touches the maps directly.
     fun selectMain(id: Long) {
@@ -253,8 +260,11 @@ class TrafficLooper(
                 idMap[-1] = itemBypass
                 //
                 val tags = hashSetOf(TAG_PROXY, TAG_BYPASS)
+                tagDisplayNames.clear()
+                balancerShownTitle = ""
                 proxy.config.trafficMap.forEach { (tag, ents) ->
                     tags.add(tag)
+                    ents.firstOrNull()?.let { tagDisplayNames[tag] = it.displayName() }
                     for (ent in ents) {
                         val item = TrafficUpdater.TrafficLooperData(
                             tag = tag,
@@ -290,6 +300,16 @@ class TrafficLooper(
                         // Set current child's tag to "proxy" to share the same delta
                         tagMap[balancerNow]?.tag = TAG_PROXY
                         balancerLastChildTag = balancerNow
+                        // 只在「顯示內容真的變了」時重貼標題：比的是整串標題，所以
+                        // 換設定檔（base 變）與 balancer 自己切子節點（child 變）都會更新，
+                        // 而節點沒變時不會每輪重繪通知。
+                        val desired = tagDisplayNames[balancerNow]?.let {
+                            "${proxy.displayProfileName} · $it"
+                        } ?: proxy.displayProfileName
+                        if (desired != balancerShownTitle) {
+                            balancerShownTitle = desired
+                            data.notification?.postNotificationTitle(desired)
+                        }
                     }
                 } catch (_: Exception) {
                     // getBalancerNow may not be available in older libcore builds

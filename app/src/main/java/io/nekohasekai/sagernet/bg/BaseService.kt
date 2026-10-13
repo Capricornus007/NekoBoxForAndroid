@@ -416,9 +416,18 @@ class BaseService {
                 } catch (e: Exception) {
                     Logs.w(e)
                     onMainDispatcher {
+                        val ctx = this@Interface as Context
+                        // 節點域名解不了的時候，不要把整串 Go 的 DNSError 丟給用戶看：
+                        // 那讀起來像「節點死了」，實際要修的是 DNS（本機 AGH 有一條死上游就是這樣）。
+                        val dnsDomain = e.dnsLookupDomain
+                        val reason = if (dnsDomain != null) {
+                            ctx.getString(R.string.dns_lookup_failed, dnsDomain)
+                        } else {
+                            e.readableMessage
+                        }
                         stopRunner(
                             false,
-                            "${(this@Interface as Context).getString(R.string.service_failed)}: ${e.readableMessage}",
+                            "${ctx.getString(R.string.service_failed)}: $reason",
                         )
                     }
                 }
