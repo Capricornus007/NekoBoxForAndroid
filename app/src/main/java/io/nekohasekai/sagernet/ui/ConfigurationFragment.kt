@@ -77,6 +77,7 @@ import io.nekohasekai.sagernet.ui.profile.MasterDnsVpnSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.MieruSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.NaiveSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.OlcrtcSettingsActivity
+import io.nekohasekai.sagernet.ui.profile.OpenVPNSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.SSHSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ShadowQUICSettingsActivity
 import io.nekohasekai.sagernet.ui.profile.ShadowsocksRSettingsActivity
@@ -779,6 +780,10 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             R.id.action_new_masque -> {
                 startActivity(Intent(requireActivity(), MasqueSettingsActivity::class.java))
+            }
+
+            R.id.action_new_openvpn -> {
+                startActivity(Intent(requireActivity(), OpenVPNSettingsActivity::class.java))
             }
 
             R.id.action_new_ssh -> {

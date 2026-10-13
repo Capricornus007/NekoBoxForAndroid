@@ -1,0 +1,326 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        app:icon="@drawable/ic_social_emoji_symbols"
+        app:key="name"
+        app:title="@string/profile_name"
+        app:useSimpleSummaryProvider="true" />
+
+    <PreferenceCategory app:title="@string/proxy_cat">
+
+        <EditTextPreference
+            app:dialogMessage="@string/openvpn_one_per_line"
+            app:icon="@drawable/ic_baseline_layers_24"
+            app:key="servers"
+            app:title="@string/openvpn_servers"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:defaultValue="udp"
+            app:entries="@array/openvpn_transport_value"
+            app:entryValues="@array/openvpn_transport_value"
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="transport"
+            app:title="@string/openvpn_transport"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="remoteRandom"
+            app:title="@string/openvpn_remote_random" />
+        <EditTextPreference
+            app:icon="@drawable/ic_social_emoji_symbols"
+            app:key="username"
+            app:title="@string/username"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_social_emoji_symbols"
+            app:key="password"
+            app:title="@string/password" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/openvpn_cat_credentials">
+
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="ca"
+            app:title="@string/openvpn_ca"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="clientCert"
+            app:title="@string/openvpn_client_cert"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="clientKey"
+            app:title="@string/openvpn_client_key" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:entries="@array/openvpn_control_wrap_value"
+            app:entryValues="@array/openvpn_control_wrap_value"
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="controlWrapType"
+            app:title="@string/openvpn_control_wrap"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="controlWrapKey"
+            app:title="@string/openvpn_control_wrap_key" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:entries="@array/openvpn_direction_value"
+            app:entryValues="@array/openvpn_direction_value"
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="controlWrapDirection"
+            app:title="@string/openvpn_control_wrap_direction"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="staticKey"
+            app:title="@string/openvpn_static_key" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:entries="@array/openvpn_direction_value"
+            app:entryValues="@array/openvpn_direction_value"
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="keyDirection"
+            app:title="@string/openvpn_key_direction"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/openvpn_cat_crypto">
+
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="cipher"
+            app:title="@string/openvpn_cipher"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="dataCiphers"
+            app:title="@string/openvpn_data_ciphers"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="dataCiphersFallback"
+            app:title="@string/openvpn_data_ciphers_fallback"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="auth"
+            app:title="@string/openvpn_auth"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_layers_24"
+            app:key="compression"
+            app:title="@string/openvpn_compression"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_layers_24"
+            app:key="compressionLzo"
+            app:title="@string/openvpn_compression_lzo"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_layers_24"
+            app:key="allowCompression"
+            app:title="@string/openvpn_allow_compression"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="replayWindow"
+            app:title="@string/openvpn_replay_window"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="replayWindowTime"
+            app:title="@string/openvpn_replay_window_time"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="mssFix"
+            app:title="@string/openvpn_mss_fix"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="fragment"
+            app:title="@string/openvpn_fragment"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/baseline_public_24"
+            app:key="mtu"
+            app:title="@string/mtu"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/openvpn_cat_network">
+
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:entries="@array/openvpn_topology_value"
+            app:entryValues="@array/openvpn_topology_value"
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="topology"
+            app:title="@string/openvpn_topology"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:dialogMessage="@string/openvpn_one_per_line"
+            app:icon="@drawable/ic_baseline_layers_24"
+            app:key="routes"
+            app:title="@string/openvpn_routes"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="redirectGateway"
+            app:title="@string/openvpn_redirect_gateway" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_layers_24"
+            app:key="redirectGatewayFlags"
+            app:title="@string/openvpn_redirect_gateway_flags"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="redirectPrivate"
+            app:title="@string/openvpn_redirect_private" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="blockIPv6"
+            app:title="@string/openvpn_block_ipv6" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_domain_24"
+            app:key="routeNoPull"
+            app:title="@string/openvpn_route_no_pull" />
+        <EditTextPreference
+            app:dialogMessage="@string/openvpn_one_per_line"
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="pullFilters"
+            app:title="@string/openvpn_pull_filters"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/openvpn_cat_timers">
+
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="pingInterval"
+            app:title="@string/openvpn_ping_interval"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="pingRestart"
+            app:title="@string/openvpn_ping_restart"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="handshakeWindow"
+            app:title="@string/openvpn_handshake_window"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="tlsTimeout"
+            app:title="@string/openvpn_tls_timeout"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="renegotiateInterval"
+            app:title="@string/openvpn_renegotiate_interval"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="renegotiateDisabled"
+            app:title="@string/openvpn_renegotiate_disabled" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="explicitExitNotify"
+            app:title="@string/openvpn_explicit_exit_notify"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:entries="@array/openvpn_auth_retry_value"
+            app:entryValues="@array/openvpn_auth_retry_value"
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="authRetry"
+            app:title="@string/openvpn_auth_retry"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="staticChallenge"
+            app:title="@string/openvpn_static_challenge"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="staticChallengeEcho"
+            app:title="@string/openvpn_static_challenge_echo" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/openvpn_cat_verification">
+
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="tlsServerName"
+            app:title="@string/openvpn_tls_server_name"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:entries="@array/openvpn_name_type_value"
+            app:entryValues="@array/openvpn_name_type_value"
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="tlsServerNameType"
+            app:title="@string/openvpn_tls_server_name_type"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:entries="@array/openvpn_remote_cert_tls_value"
+            app:entryValues="@array/openvpn_remote_cert_tls_value"
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="remoteCertificateTls"
+            app:title="@string/openvpn_remote_certificate_tls"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:entries="@array/openvpn_remote_cert_tls_value"
+            app:entryValues="@array/openvpn_remote_cert_tls_value"
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="nsCertificateType"
+            app:title="@string/openvpn_ns_certificate_type"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:dialogMessage="@string/openvpn_one_per_line"
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="peerFingerprint"
+            app:title="@string/openvpn_peer_fingerprint"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="remoteCertificateKu"
+            app:title="@string/openvpn_remote_certificate_ku"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="remoteCertificateEku"
+            app:title="@string/openvpn_remote_certificate_eku"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="tlsCipher"
+            app:title="@string/openvpn_tls_cipher"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="tlsGroups"
+            app:title="@string/openvpn_tls_groups"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:entries="@array/openvpn_tls_version_value"
+            app:entryValues="@array/openvpn_tls_version_value"
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="tlsVersionMin"
+            app:title="@string/openvpn_tls_version_min"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference
+            app:entries="@array/openvpn_tls_version_value"
+            app:entryValues="@array/openvpn_tls_version_value"
+            app:icon="@drawable/ic_baseline_compare_arrows_24"
+            app:key="tlsVersionMax"
+            app:title="@string/openvpn_tls_version_max"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/openvpn_cat_custom">
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="customOutboundJson"
+            app:title="@string/custom_outbound_json" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -7,6 +7,7 @@ import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.masque.MasqueBean
+import io.nekohasekai.sagernet.fmt.openvpn.parseOpenVPNConfig
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.socks.SOCKSBean
 import io.nekohasekai.sagernet.fmt.v2ray.VMessBean
@@ -14,6 +15,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -451,6 +453,80 @@ class ConfigBuilderGoldenTest {
         assertTrue(tls.getBoolean("insecure"))
 
         assertResultMaps(result = build(profile, forTest = true), profile = profile)
+    }
+
+    /**
+     * `.ovpn` 剖面進配置的收口測試：OpenVPN 在核心那邊是 **endpoint**，所以它必須出現在
+     * `endpoints`、不能留在 `outbounds`（`finalizeRootConfig` 的搬移靠 ENDPOINT_TYPES），
+     * 而且要證明 bean 經過 Room／Kryo 存取之後欄位沒跑位（serialize 與 deserialize 對稱）。
+     */
+    @Test
+    fun openVPNProfile_emitsEndpointWithCoreKeys() {
+        val parsed = parseOpenVPNConfig(
+            """
+            client
+            dev tun
+            proto udp
+            remote tw-tls-001.protonvpn.com 443 udp
+            remote-random
+            auth-user-pass
+            cipher AES-256-GCM
+            auth SHA512
+            keepalive 10 30
+            reneg-sec 0
+            remote-cert-tls server
+            key-direction 1
+            <ca>
+            CAPEM
+            </ca>
+            <tls-auth>
+            WRAPKEY
+            </tls-auth>
+            """.trimIndent(),
+            username = "proton-user",
+            password = "s3cret",
+        )
+        val profile = addProfile(addGroup(), parsed.bean)
+        val reloaded = ConfigBuilderTestEnv.io { SagerDatabase.proxyDao.getById(profile.id) }
+        assertNotNull("openVPNBean 必須能被 Room 讀回來", reloaded)
+        assertTrue("type 必須是 TYPE_OPENVPN", reloaded!!.type == ProxyEntity.TYPE_OPENVPN)
+        assertNotNull("Kryo 還原後 bean 不能是 null", reloaded.openVPNBean)
+
+        val root = JSONObject(build(reloaded, forTest = true).config)
+        val endpoints = objects(root.getJSONArray("endpoints"))
+        val endpoint = endpoints.single { it.getString("type") == "openvpn" }
+        assertTrue(
+            "openvpn 不能留在 outbounds",
+            objects(root.getJSONArray("outbounds")).none { it.optString("type") == "openvpn" },
+        )
+
+        for (key in listOf(
+            "tag", "mode", "network", "servers", "remote_random", "cipher", "auth",
+            "ping_interval", "ping_restart", "renegotiate_disabled", "username", "password", "tls",
+        )) {
+            assertTrue("missing endpoint key: $key", endpoint.has(key))
+        }
+        assertEquals("tls", endpoint.getString("mode"))
+        assertEquals("udp", endpoint.getString("network"))
+        assertTrue(endpoint.getBoolean("renegotiate_disabled"))
+        assertEquals("proton-user", endpoint.getString("username"))
+        val server = endpoint.getJSONArray("servers").getJSONObject(0)
+        assertEquals("tw-tls-001.protonvpn.com", server.getString("server"))
+        assertEquals(443, server.getInt("server_port"))
+        assertEquals("udp", server.getString("network"))
+
+        val tls = endpoint.getJSONObject("tls")
+        assertTrue(tls.getJSONArray("certificate").getString(0).contains("CAPEM"))
+        assertEquals("server", tls.getString("remote_certificate_tls"))
+        val wrap = tls.getJSONObject("control_wrap")
+        assertEquals("tls_auth", wrap.getString("type"))
+        assertEquals("client", wrap.getString("direction"))
+        assertTrue(wrap.getJSONArray("key").getString(0).contains("WRAPKEY"))
+
+        // 沒帶 detour 的生成 endpoint 一律掛到 direct，否則核心起不來。
+        val directTag = objects(root.getJSONArray("outbounds"))
+            .first { it.getString("type") == "direct" }.getString("tag")
+        assertEquals(directTag, endpoint.getString("detour"))
     }
 
     private fun addGroup(isSelector: Boolean = false) = ConfigBuilderTestEnv.io {

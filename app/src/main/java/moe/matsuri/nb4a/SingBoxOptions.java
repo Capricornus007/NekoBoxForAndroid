@@ -204,6 +204,165 @@ public class SingBoxOptions {
 
     }
 
+    // 對照 sing-box 的 option/openvpn.go：只列 OpenVPNClientEndpointOptions（NB4A 做客戶端），
+    // 欄位名與 enum 可接受值必須跟那邊一字不差，否則核心解配置時直接報 unknown field。
+    public static class Endpoint_OpenVPNRemoteOptions extends SingBoxOption {
+
+        public String server;
+
+        public Integer server_port;
+
+        public String network;
+
+    }
+
+    public static class Endpoint_OpenVPNPullFilterOptions extends SingBoxOption {
+
+        public String action;
+
+        public String text;
+
+    }
+
+    public static class Endpoint_OpenVPNControlWrapOptions extends SingBoxOption {
+
+        public String type;
+
+        public List<String> key;
+
+        public String key_path;
+
+        // 核心規定 direction 只能配 tls_auth（protocol/openvpn/client.go:229/234）。
+        public String direction;
+
+    }
+
+    public static class Endpoint_OpenVPNClientTLSOptions extends SingBoxOption {
+
+        public String server_name;
+
+        public String server_name_type;
+
+        public List<String> certificate;
+
+        public List<String> client_certificate;
+
+        public List<String> client_key;
+
+        public List<String> peer_fingerprint;
+
+        public List<String> remote_certificate_ku;
+
+        public String remote_certificate_eku;
+
+        public String remote_certificate_tls;
+
+        public String ns_certificate_type;
+
+        public String version_min;
+
+        public String version_max;
+
+        public String cipher;
+
+        public String groups;
+
+        public Endpoint_OpenVPNControlWrapOptions control_wrap;
+
+    }
+
+    public static class Endpoint_OpenVPNOptions extends Endpoint {
+
+        public Boolean system;
+
+        public String name;
+
+        public Integer mtu;
+
+        public String mode;
+
+        public String network;
+
+        public List<Endpoint_OpenVPNRemoteOptions> servers;
+
+        public Boolean remote_random;
+
+        public List<String> address;
+
+        public String topology;
+
+        public String username;
+
+        public String password;
+
+        public String auth_retry;
+
+        public String static_challenge;
+
+        public Boolean static_challenge_echo;
+
+        public List<String> static_key;
+
+        public String key_direction;
+
+        public Endpoint_OpenVPNClientTLSOptions tls;
+
+        public String cipher;
+
+        public List<String> data_ciphers;
+
+        public String data_ciphers_fallback;
+
+        public String auth;
+
+        public Integer mss_fix;
+
+        public Integer fragment;
+
+        public Integer replay_window;
+
+        public String replay_window_time;
+
+        public String compression;
+
+        public String compression_lzo;
+
+        public String allow_compression;
+
+        public Boolean route_no_pull;
+
+        public List<Endpoint_OpenVPNPullFilterOptions> pull_filters;
+
+        public List<String> routes;
+
+        public Boolean redirect_gateway;
+
+        public List<String> redirect_gateway_flags;
+
+        public Boolean redirect_private;
+
+        public Boolean block_ipv6;
+
+        public String ping_interval;
+
+        public String ping_restart;
+
+        public String handshake_window;
+
+        public String tls_timeout;
+
+        public String renegotiate_interval;
+
+        public Boolean renegotiate_disabled;
+
+        public Integer explicit_exit_notify;
+
+        public String detour;
+
+        public String bind_interface;
+
+    }
+
     public static class DomainResolveOptions extends SingBoxOption {
 
         public String server;

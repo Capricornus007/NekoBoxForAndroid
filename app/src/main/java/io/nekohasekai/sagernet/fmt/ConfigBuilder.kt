@@ -27,6 +27,8 @@ import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.juicity.buildSingBoxOutboundJuicityBean
 import io.nekohasekai.sagernet.fmt.masque.MasqueBean
 import io.nekohasekai.sagernet.fmt.masque.buildSingBoxOutboundMasqueBean
+import io.nekohasekai.sagernet.fmt.openvpn.OpenVPNBean
+import io.nekohasekai.sagernet.fmt.openvpn.buildSingBoxEndpointOpenVPNBean
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowquic.buildSingBoxOutboundShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
@@ -99,7 +101,7 @@ internal fun SingBoxOption.applyDomainStrategyIfSupported(domainStrategy: String
     }
 }
 
-private val ENDPOINT_TYPES = setOf("wireguard", "awg", "tailscale")
+private val ENDPOINT_TYPES = setOf("wireguard", "awg", "tailscale", "openvpn")
 
 private fun SingBoxOption.isGeneratedEndpoint(): Boolean = this is Endpoint && type in ENDPOINT_TYPES
 
@@ -958,6 +960,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
                         is ShadowsocksRBean ->
                             buildSingBoxOutboundShadowsocksRBean(bean)
+
+                        is OpenVPNBean ->
+                            buildSingBoxEndpointOpenVPNBean(bean)
 
                         is WireGuardBean ->
                             buildSingBoxEndpointWireGuardBean(bean)

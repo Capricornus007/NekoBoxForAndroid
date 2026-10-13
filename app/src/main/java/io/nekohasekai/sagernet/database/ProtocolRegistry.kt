@@ -20,6 +20,7 @@ import io.nekohasekai.sagernet.fmt.mieru.MieruBean
 import io.nekohasekai.sagernet.fmt.naive.NaiveBean
 import io.nekohasekai.sagernet.fmt.naive.toUri
 import io.nekohasekai.sagernet.fmt.olcrtc.OlcrtcBean
+import io.nekohasekai.sagernet.fmt.openvpn.OpenVPNBean
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.toUri
@@ -277,6 +278,15 @@ object ProtocolRegistry {
             displayType = { "MASQUE" },
             settingsActivityClass = MasqueSettingsActivity::class.java,
             toStandardLink = { (it as MasqueBean).toMasqueUri() },
+        ),
+        ProtocolDescriptor(
+            type = ProxyEntity.TYPE_OPENVPN,
+            deserialize = { KryoConverters.openVPNDeserialize(it) },
+            beanClass = OpenVPNBean::class.java,
+            getBean = { it.openVPNBean },
+            setBean = { e, b -> e.openVPNBean = b as OpenVPNBean? },
+            displayType = { "OpenVPN" },
+            settingsActivityClass = OpenVPNSettingsActivity::class.java,
         ),
         ProtocolDescriptor(
             type = ProxyEntity.TYPE_SHADOWTLS,

@@ -13,6 +13,7 @@ import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria1Json
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria2Json
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
+import io.nekohasekai.sagernet.fmt.openvpn.parseOpenVPNConfig
 import io.nekohasekai.sagernet.fmt.parseSingBoxEndpoint
 import io.nekohasekai.sagernet.fmt.parseSingBoxOutbound
 import io.nekohasekai.sagernet.fmt.shadowsocks.ShadowsocksBean
@@ -592,8 +593,27 @@ object RawUpdater : GroupUpdater() {
     }
 
     @Suppress("UNCHECKED_CAST")
+    private fun looksLikeOpenVPN(text: String): Boolean {
+        val lines = text.lineSequence().map(String::trim)
+        val hasRemote = lines.any { it.startsWith("remote ") || it.startsWith("server ") }
+        return hasRemote && (
+            text.contains("<ca>") || text.contains("<tls-auth>") ||
+                text.contains("<tls-crypt>") || text.contains("<static-key>")
+            )
+    }
+
     suspend fun parseRaw(text: String, fileName: String = "", rawDepth: Int = 0): List<AbstractBean>? {
         val proxies = mutableListOf<AbstractBean>()
+
+        // `.ovpn` 檔案匯入：核心把 OpenVPN 做成 endpoint，一個檔案就是一個剖面，
+        // 所以走獨立分支、不進下面的格式探測。
+        if (fileName.endsWith(".ovpn", ignoreCase = true) || looksLikeOpenVPN(text)) {
+            val result = parseOpenVPNConfig(text)
+            if (fileName.isNotBlank()) {
+                result.bean.name = fileName.substringBeforeLast('.')
+            }
+            return listOf(result.bean)
+        }
 
         try {
             val amneziaProfiles = if (AmneziaWireGuardImporter.isAmneziaVpn(text)) {

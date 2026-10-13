@@ -21,6 +21,7 @@ import io.nekohasekai.sagernet.fmt.mieru.buildMieruConfig
 import io.nekohasekai.sagernet.fmt.naive.NaiveBean
 import io.nekohasekai.sagernet.fmt.naive.buildNaiveConfig
 import io.nekohasekai.sagernet.fmt.olcrtc.OlcrtcBean
+import io.nekohasekai.sagernet.fmt.openvpn.OpenVPNBean
 import io.nekohasekai.sagernet.fmt.shadowquic.ShadowQUICBean
 import io.nekohasekai.sagernet.fmt.shadowsocks.*
 import io.nekohasekai.sagernet.fmt.shadowsocksr.ShadowsocksRBean
@@ -105,6 +106,7 @@ data class ProxyEntity(
     var shadowQuicBean: ShadowQUICBean? = null,
     var trustTunnelBean: TrustTunnelBean? = null,
     @ColumnInfo(defaultValue = "NULL") var masqueBean: MasqueBean? = null,
+    @ColumnInfo(defaultValue = "NULL") var openVPNBean: OpenVPNBean? = null,
     var sshBean: SSHBean? = null,
     var wgBean: WireGuardBean? = null,
     var shadowTLSBean: ShadowTLSBean? = null,
@@ -164,6 +166,9 @@ data class ProxyEntity(
 
         // MASQUE / Cloudflare WARP endpoint（option/masque.go）。35 為目前最後一個未佔用的 id。
         const val TYPE_MASQUE = 35
+
+        // OpenVPN endpoint（option/openvpn.go，.ovpn 匯入）。36 為目前最後一個未佔用的 id。
+        const val TYPE_OPENVPN = 36
 
         const val TYPE_CONFIG = 998
 
@@ -266,6 +271,7 @@ data class ProxyEntity(
                 TYPE_SHADOWQUIC -> shadowQuicBean = KryoConverters.shadowQuicDeserialize(byteArray)
                 TYPE_TRUSTTUNNEL -> trustTunnelBean = KryoConverters.trustTunnelDeserialize(byteArray)
                 TYPE_MASQUE -> masqueBean = KryoConverters.masqueDeserialize(byteArray)
+                TYPE_OPENVPN -> openVPNBean = KryoConverters.openVPNDeserialize(byteArray)
                 TYPE_SHADOWTLS -> shadowTLSBean = KryoConverters.shadowTLSDeserialize(byteArray)
                 TYPE_ANYTLS -> anyTLSBean = KryoConverters.anyTLSDeserialize(byteArray)
                 TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST -> chainBean = KryoConverters.chainDeserialize(byteArray)
@@ -293,6 +299,7 @@ data class ProxyEntity(
         TYPE_SHADOWQUIC -> "ShadowQUIC"
         TYPE_TRUSTTUNNEL -> "TrustTunnel"
         TYPE_MASQUE -> "MASQUE"
+        TYPE_OPENVPN -> "OpenVPN"
         TYPE_SHADOWTLS -> "ShadowTLS"
         TYPE_ANYTLS -> "AnyTLS"
         TYPE_CHAIN -> chainName
@@ -329,6 +336,7 @@ data class ProxyEntity(
             TYPE_SHADOWQUIC -> shadowQuicBean
             TYPE_TRUSTTUNNEL -> trustTunnelBean
             TYPE_MASQUE -> masqueBean
+            TYPE_OPENVPN -> openVPNBean
             TYPE_SHADOWTLS -> shadowTLSBean
             TYPE_ANYTLS -> anyTLSBean
             TYPE_CHAIN, TYPE_WATERFALL, TYPE_FASTEST -> chainBean
@@ -498,6 +506,7 @@ data class ProxyEntity(
         shadowQuicBean = null
         trustTunnelBean = null
         masqueBean = null
+        openVPNBean = null
         shadowTLSBean = null
         anyTLSBean = null
         chainBean = null
@@ -622,6 +631,11 @@ data class ProxyEntity(
             is MasqueBean -> {
                 type = TYPE_MASQUE
                 masqueBean = bean
+            }
+
+            is OpenVPNBean -> {
+                type = TYPE_OPENVPN
+                openVPNBean = bean
             }
 
             is OlcrtcBean -> {

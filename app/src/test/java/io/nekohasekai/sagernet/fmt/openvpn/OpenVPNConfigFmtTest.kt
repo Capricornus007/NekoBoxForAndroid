@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.fmt.openvpn
 
+import moe.matsuri.nb4a.SingBoxOptions
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -22,6 +23,9 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35], application = android.app.Application::class)
 class OpenVPNConfigFmtTest {
+
+    /** 釘的是「實際會寫進 sing-box 配置的那份 JSON」，所以一律經過 endpoint builder 再取 JSON 樹。 */
+    private fun OpenVPNParseResult.endpoint(): JSONObject = JSONObject(SingBoxOptions.toJsonTree(buildSingBoxEndpointOpenVPNBean(bean)).toString())
 
     private val caBlock = """
         <ca>
@@ -68,7 +72,7 @@ class OpenVPNConfigFmtTest {
     @Test
     fun mapsRemotesToServersAndNetwork() {
         val result = parseOpenVPNConfig(protonLike())
-        val endpoint = result.endpoint
+        val endpoint = result.endpoint()
         assertEquals("openvpn", endpoint.getString("type"))
         assertEquals("tls", endpoint.getString("mode"))
         assertEquals("udp", endpoint.getString("network"))
@@ -84,7 +88,7 @@ class OpenVPNConfigFmtTest {
     /** 核心規定 TLS 模式的 tls-auth 只能走 tls.control_wrap，塞 static_key 會被直接拒絕。 */
     @Test
     fun tlsAuthBecomesControlWrapNotStaticKey() {
-        val endpoint = parseOpenVPNConfig(protonLike()).endpoint
+        val endpoint = parseOpenVPNConfig(protonLike()).endpoint()
         assertFalse(endpoint.has("static_key"))
         assertFalse(endpoint.has("key_direction"))
         val wrap = endpoint.getJSONObject("tls").getJSONObject("control_wrap")
@@ -113,7 +117,7 @@ class OpenVPNConfigFmtTest {
             -----END PRIVATE KEY-----
             </key>
             """.trimIndent(),
-        ).endpoint
+        ).endpoint()
         val tls = endpoint.getJSONObject("tls")
         assertTrue(tls.getJSONArray("certificate").getString(0).contains("MIIBAAAADEADBEEF"))
         assertTrue(tls.getJSONArray("client_certificate").getString(0).contains("CLIENTCERT"))
@@ -134,7 +138,7 @@ class OpenVPNConfigFmtTest {
             </tls-crypt>
             """.trimIndent(),
         )
-        val wrap = result.endpoint.getJSONObject("tls").getJSONObject("control_wrap")
+        val wrap = result.endpoint().getJSONObject("tls").getJSONObject("control_wrap")
         assertEquals("tls_crypt", wrap.getString("type"))
         assertFalse(wrap.has("direction"))
         assertTrue(result.warnings.any { it.contains("key-direction") })
@@ -142,7 +146,7 @@ class OpenVPNConfigFmtTest {
 
     @Test
     fun durationsAndNumbersUseCoreFormats() {
-        val endpoint = parseOpenVPNConfig(protonLike()).endpoint
+        val endpoint = parseOpenVPNConfig(protonLike()).endpoint()
         assertEquals("10s", endpoint.getString("ping_interval"))
         assertEquals("30s", endpoint.getString("ping_restart"))
         assertEquals("77s", endpoint.getString("handshake_window"))
@@ -156,7 +160,7 @@ class OpenVPNConfigFmtTest {
     /** `reneg-sec 0` 是「不重握手」，不能吐成 "0s" 讓核心以為要定時重握手。 */
     @Test
     fun zeroRenegotiationBecomesDisabledFlag() {
-        val endpoint = parseOpenVPNConfig(protonLike()).endpoint
+        val endpoint = parseOpenVPNConfig(protonLike()).endpoint()
         assertFalse(endpoint.has("renegotiate_interval"))
         assertTrue(endpoint.getBoolean("renegotiate_disabled"))
     }
@@ -170,7 +174,7 @@ class OpenVPNConfigFmtTest {
             ping
             ping-restart abc
             """.trimIndent(),
-        ).endpoint
+        ).endpoint()
         assertFalse(endpoint.has("ping_interval"))
         assertFalse(endpoint.has("ping_restart"))
     }
@@ -187,7 +191,7 @@ class OpenVPNConfigFmtTest {
             redirect-gateway def1
             block-ipv6
             """.trimIndent(),
-        ).endpoint
+        ).endpoint()
         val filters = endpoint.getJSONArray("pull_filters")
         assertEquals(2, filters.length())
         assertEquals("ignore", filters.getJSONObject(0).getString("action"))
@@ -206,7 +210,7 @@ class OpenVPNConfigFmtTest {
     fun authUserPassAsksForCredentialsAndInjectsThem() {
         val needs = parseOpenVPNConfig(protonLike("auth-user-pass"))
         assertTrue(needs.needsCredentials)
-        assertFalse(needs.endpoint.has("username"))
+        assertFalse(needs.endpoint().has("username"))
 
         val filled = parseOpenVPNConfig(
             protonLike("auth-user-pass"),
@@ -214,8 +218,8 @@ class OpenVPNConfigFmtTest {
             password = "s3cret",
         )
         assertFalse(filled.needsCredentials)
-        assertEquals("proton-user", filled.endpoint.getString("username"))
-        assertEquals("s3cret", filled.endpoint.getString("password"))
+        assertEquals("proton-user", filled.endpoint().getString("username"))
+        assertEquals("s3cret", filled.endpoint().getString("password"))
     }
 
     /** tap 模式核心做不了，必須講清楚而不是靜默降級。 */
@@ -227,7 +231,7 @@ class OpenVPNConfigFmtTest {
             remote example.com 1194
             """.trimIndent(),
         )
-        assertEquals("tls", result.endpoint.getString("mode"))
+        assertEquals("tls", result.endpoint().getString("mode"))
         assertTrue(result.warnings.any { it.contains("tap") })
     }
 
@@ -258,7 +262,7 @@ class OpenVPNConfigFmtTest {
 
             remote example.com 1194 udp
             """.trimIndent(),
-        ).endpoint
+        ).endpoint()
         assertEquals(1, endpoint.getJSONArray("servers").length())
     }
 
@@ -287,7 +291,7 @@ class OpenVPNConfigFmtTest {
             remote example.com 443 tcp-client
             $caBlock
             """.trimIndent(),
-        ).endpoint
+        ).endpoint()
         assertEquals("tcp", endpoint.getString("network"))
         assertEquals("tcp", endpoint.getJSONArray("servers").getJSONObject(0).getString("network"))
     }
@@ -306,31 +310,30 @@ class OpenVPNConfigFmtTest {
             -----END OpenVPN Static key V1-----
             </static-key>
             """.trimIndent(),
-        ).endpoint
+        ).endpoint()
         assertEquals("static_key", endpoint.getString("mode"))
         assertEquals("server", endpoint.getString("key_direction"))
         assertTrue(endpoint.getJSONArray("static_key").getString(0).contains("ccdd"))
     }
 
+    /** endpoint 的 tag 由 ConfigBuilder 依剖面 tag 指派，解析器不自己編 tag。 */
     @Test
-    fun tagIsHonoured() {
-        assertEquals(
-            "proton-openvpn",
-            parseOpenVPNConfig("remote example.com 1194", tag = "proton-openvpn")
-                .endpoint.getString("tag"),
-        )
+    fun parserDoesNotInventTags() {
+        val endpoint = parseOpenVPNConfig("remote example.com 1194").endpoint()
+        assertFalse(endpoint.has("tag"))
+        assertEquals("openvpn", endpoint.getString("type"))
     }
 
     /** 產物必須是可直接塞進 `endpoints` 陣列的 JSON，不含核心不收的未知欄位。 */
     @Test
     fun outputIsValidSingleEndpointObject() {
-        val endpoint = parseOpenVPNConfig(protonLike()).endpoint
+        val endpoint = parseOpenVPNConfig(protonLike()).endpoint()
         val array = JSONObject().put("endpoints", org.json.JSONArray().put(endpoint))
         assertTrue(array.toString().contains("\"type\":\"openvpn\""))
         val allowed = setOf(
             "type", "tag", "mode", "network", "servers", "remote_random", "cipher", "auth",
             "mss_fix", "explicit_exit_notify", "ping_interval", "ping_restart",
-            "handshake_window", "renegotiate_disabled", "tls",
+            "handshake_window", "renegotiate_disabled", "replay_window", "tls",
         )
         endpoint.keys().forEach {
             assertTrue("核心不收的欄位：$it", allowed.contains(it))

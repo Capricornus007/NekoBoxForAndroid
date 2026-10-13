@@ -80,6 +80,7 @@
         <activity android:name="io.nekohasekai.sagernet.ui.profile.ShadowQUICSettingsActivity" />
         <activity android:name="io.nekohasekai.sagernet.ui.profile.TrustTunnelSettingsActivity" />
         <activity android:name="io.nekohasekai.sagernet.ui.profile.MasqueSettingsActivity" />
+        <activity android:name="io.nekohasekai.sagernet.ui.profile.OpenVPNSettingsActivity" />
 
         <activity
             android:name="io.nekohasekai.sagernet.ui.MainActivity"

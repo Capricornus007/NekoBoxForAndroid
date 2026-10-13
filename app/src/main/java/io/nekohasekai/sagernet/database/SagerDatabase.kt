@@ -17,7 +17,7 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 20,
+    version = 21,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
@@ -201,6 +201,17 @@ abstract class SagerDatabase : RoomDatabase() {
         }
     }
 
+    /**
+     * Version 21: additive `openVPNBean` column on proxy_entities for the OpenVPN endpoint
+     * profile (option/openvpn.go, .ovpn import). Matches the @ColumnInfo(defaultValue = "NULL")
+     * on the entity field, same as Migration19To20.
+     */
+    object Migration20To21 : Migration(20, 21) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `proxy_entities` ADD COLUMN `openVPNBean` BLOB DEFAULT NULL")
+        }
+    }
+
     companion object {
         val instance by lazy {
             SagerNet.application.getDatabasePath(Key.DB_PROFILE).parentFile?.mkdirs()
@@ -221,6 +232,7 @@ abstract class SagerDatabase : RoomDatabase() {
                     Migration17To18,
                     Migration18To19,
                     Migration19To20,
+                    Migration20To21,
                 )
                 // Plan 027 Stage 3: the main-thread-DB allowance is behind a build flag so it can
                 // be removed once the app runs StrictMode-clean (debug already ships with it off).
