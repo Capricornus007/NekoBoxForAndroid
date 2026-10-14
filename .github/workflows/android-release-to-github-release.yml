@@ -127,7 +127,11 @@ jobs:
 
           Fixes official GeoIP updates and first-run geo routing with checksum-verified bundled GeoIP/GeoSite databases. Session traffic keeps updating when speed display is disabled; dynamic group candidates retain their own TCP/UDP traffic. Includes optional proxy-only subscription/route updates and password-encrypted local/shared/WebDAV backups. Backup restoration commits profiles, routes and settings through one SQLite connection.
 
-          JVM, Go race, real database, TCP/UDP and two-file restore tests run in this pipeline. Physical-device VPN/DNS/battery behavior and full AWG compatibility remain to be verified.
+          Generated DNS configurations now use typed DNS/FakeIP servers, explicit remote proxy detours and domain_resolver. IPv4/IPv6 strategies and custom resolver overrides are preserved. Platform DNS callbacks complete promptly; DoH/H3 URL query parameters are preserved. Full user JSON configurations remain user-managed.
+
+          Fixes AWG header/signature corruption by WG reserved-byte rewriting, configures AWG parameters before interface startup and synchronizes socket creation. Supports AWG parameters on the modern WireGuard endpoint path as well as legacy outbounds. Invalid numeric and multiline parameters are rejected; startup errors no longer contain the private-key IPC configuration.
+
+          JVM, Go race, real database, DNS routing, two-peer WG/AWG/AWG2, TCP/UDP and two-file restore tests run in this pipeline. Physical-device VPN/DNS/battery behavior, the system-stack packet-handler path and all AWG variants remain outside these checks.
           NOTES
           OPTIONS=()
           if [ "$NEKO_DEV_BUILD" = 1 ]; then OPTIONS+=(--prerelease --latest=false); fi
