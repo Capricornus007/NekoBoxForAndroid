@@ -127,7 +127,9 @@ jobs:
 
           Fixes official GeoIP updates and first-run geo routing with checksum-verified bundled GeoIP/GeoSite databases. Session traffic keeps updating when speed display is disabled; dynamic group candidates retain their own TCP/UDP traffic. Includes optional proxy-only subscription/route updates and password-encrypted local/shared/WebDAV backups. Backup restoration commits profiles, routes and settings through one SQLite connection.
 
-          Generated DNS configurations now use typed DNS/FakeIP servers, explicit remote proxy detours and domain_resolver. IPv4/IPv6 strategies and custom resolver overrides are preserved. Platform DNS callbacks complete promptly; DoH/H3 URL query parameters are preserved. Full user JSON configurations remain user-managed.
+          Fixes the dev.3 startup regression "domain resolver not found: dns-direct" for domain-address profiles when DNS servers are replaced by JSON overrides. Generated outbounds follow the effective DNS rules or user default_domain_resolver instead of forcing a fixed server reference. Includes regression tests for outbound[101], custom DNS and explicit user resolvers.
+
+          Generated DNS configurations use typed DNS/FakeIP servers and explicit remote proxy detours. IPv4/IPv6 strategies and custom resolver overrides are preserved. Platform DNS callbacks complete promptly; DoH/H3 URL query parameters are preserved. Full user JSON configurations remain user-managed.
 
           Fixes AWG header/signature corruption by WG reserved-byte rewriting, configures AWG parameters before interface startup and synchronizes socket creation. Supports AWG parameters on the modern WireGuard endpoint path as well as legacy outbounds. Invalid numeric and multiline parameters are rejected; startup errors no longer contain the private-key IPC configuration.
 
