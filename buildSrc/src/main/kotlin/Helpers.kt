@@ -147,9 +147,7 @@ fun Project.setupAppCommon() {
                 }
 
                 ciDebugKey != null -> {
-                    if (System.getenv("NEKO_DEV_BUILD") == "1") {
-                        getByName("release").signingConfig = ciDebugKey
-                    }
+                    getByName("release").signingConfig = ciDebugKey
                     getByName("debug").signingConfig = ciDebugKey
                 }
             }
@@ -162,7 +160,7 @@ fun Project.requireReleaseSignature() {
         if (name.startsWith("package") && name.endsWith("Release")) {
             doFirst {
                 check(android.buildTypes.getByName("release").signingConfig != null) {
-                    "Release signing is required. Configure a private key or NEKO_DEV_BUILD=1 for a development build."
+                    "Signing is required. Configure a private key or restore app/debug.keystore."
                 }
             }
         }

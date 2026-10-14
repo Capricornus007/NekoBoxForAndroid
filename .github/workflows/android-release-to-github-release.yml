@@ -60,11 +60,14 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           if [ -n "$KEYSTORE_BASE64" ]; then
-            test -n "$KEYSTORE_PASS" && test -n "$ALIAS_NAME" && test -n "$ALIAS_PASS"
+            if [ -z "$KEYSTORE_PASS" ] || [ -z "$ALIAS_NAME" ] || [ -z "$ALIAS_PASS" ]; then
+              echo "KEYSTORE_BASE64 requires KEYSTORE_PASS, ALIAS_NAME and ALIAS_PASS."
+              exit 1
+            fi
+            umask 077
             printf '%s' "$KEYSTORE_BASE64" | base64 --decode > release.keystore
-          elif [ "$NEKO_DEV_BUILD" != 1 ]; then
-            echo "A private release signing key is required outside dev."
-            exit 1
+          else
+            rm -f release.keystore
           fi
       - name: Prepare pinned core dependencies and tools
         run: ./buildScript/lib/core/init.sh
