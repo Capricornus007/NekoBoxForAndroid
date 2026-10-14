@@ -55,6 +55,9 @@ func (p *platformLocalDNSTransport) Close() error {
 }
 
 func (p *platformLocalDNSTransport) Exchange(ctx context.Context, message *mDNS.Msg) (*mDNS.Msg, error) {
+	if len(message.Question) != 1 {
+		return nil, E.New("expected one DNS question")
+	}
 	if p.raw && rawQueryFunc != nil {
 		// Raw - Android 10 及以上才有
 
@@ -145,6 +148,7 @@ func (c *ExchangeContext) Success(result string) {
 	}), func(it string) netip.Addr {
 		return M.ParseSocksaddrHostPort(it, 0).Unwrap().Addr
 	})
+	c.done()
 }
 
 func (c *ExchangeContext) RawSuccess(result []byte) {
