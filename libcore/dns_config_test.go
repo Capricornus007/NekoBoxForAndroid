@@ -25,6 +25,7 @@ import (
 	"github.com/sagernet/sing/common/logger"
 	M "github.com/sagernet/sing/common/metadata"
 	"github.com/sagernet/sing/common/x/list"
+	"github.com/sagernet/sing/protocol/socks"
 	"github.com/sagernet/sing/protocol/socks/socks5"
 	"github.com/sagernet/sing/service"
 )
@@ -352,5 +353,56 @@ func TestFallbackDNSUsesSelectedPathWithoutResolverLoop(t *testing.T) {
 	}
 	if dnsCalls.Load() != 3 {
 		t.Fatal("missing DNS requests")
+	}
+}
+
+func TestVirtualDNSIsHijackedBeforeLANBypass(t *testing.T) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	port := listener.Addr().(*net.TCPAddr).Port
+	_ = listener.Close()
+	configuration := map[string]any{
+		"dns":       map[string]any{"servers": []any{map[string]any{"type": "local", "tag": "dns-local"}, map[string]any{"type": "fakeip", "tag": "dns-fake", "inet4_range": "198.18.0.0/15", "inet6_range": "fc00::/18"}}, "rules": []any{map[string]any{"server": "dns-fake", "strategy": "ipv4_only"}}},
+		"inbounds":  []any{map[string]any{"type": "socks", "tag": "test-in", "listen": "127.0.0.1", "listen_port": port}},
+		"outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}, map[string]any{"type": "direct", "tag": "bypass"}},
+		"route":     map[string]any{"rules": []any{map[string]any{"port": 53, "action": "hijack-dns"}, map[string]any{"protocol": "dns", "action": "hijack-dns"}, map[string]any{"ip_is_private": true, "outbound": "bypass"}}, "final": "direct"},
+	}
+	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry())
+	service.MustRegister[platform.Interface](ctx, dnsTestPlatform{})
+	data, _ := json.Marshal(configuration)
+	var options option.Options
+	if err = options.UnmarshalJSONContext(ctx, data); err != nil {
+		t.Fatal(err)
+	}
+	instance, err := box.New(box.Options{Context: ctx, Options: options})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer instance.Close()
+	if err = instance.Start(); err != nil {
+		t.Fatal(err)
+	}
+	for _, destination := range []string{"172.19.0.2:53", "[fdfe:dcba:9876::2]:53"} {
+		conn, err := net.DialTimeout("tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(port)), time.Second)
+		if err != nil {
+			t.Fatal(err)
+		}
+		_ = conn.SetDeadline(time.Now().Add(time.Second))
+		if _, err = socks.ClientHandshake5(conn, socks5.CommandConnect, M.ParseSocksaddr(destination), "", ""); err != nil {
+			conn.Close()
+			t.Fatal(err)
+		}
+		dnsConn := &mDNS.Conn{Conn: conn}
+		if err = dnsConn.WriteMsg(new(mDNS.Msg).SetQuestion("virtual-dns.test.", mDNS.TypeA)); err != nil {
+			conn.Close()
+			t.Fatal(err)
+		}
+		response, err := dnsConn.ReadMsg()
+		_ = conn.Close()
+		if err != nil || response == nil || len(response.Answer) != 1 {
+			t.Fatalf("virtual DNS %s bypassed interception: %v", destination, err)
+		}
 	}
 }

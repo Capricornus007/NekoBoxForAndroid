@@ -121,6 +121,8 @@ jobs:
             exit 1
           fi
           cat > release-notes.txt <<'NOTES'
+          Use dev.5.1 or newer for direct fallback. dev.5-157 placed the LAN bypass before DNS interception; dev.5.1 restores DNS priority and tests real TCP DNS requests to both virtual IPv4 and IPv6 DNS addresses.
+
           Package: com.isaiandco.neko (without .debug). Export a backup from the old app and import it into this package before uninstalling the old app.
 
           Development builds use the repository's public test signing key unless private CI signing is configured. APKs are non-debuggable release builds. BUILD-MANIFEST.json records the actual signer, source and toolchain; SHA256SUMS.txt records asset hashes.

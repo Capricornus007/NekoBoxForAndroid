@@ -986,6 +986,13 @@ fun buildConfig(
         if (forTest) {
             dns.rules = listOf()
         } else {
+            if (useDirectFallback) {
+                route.rules.add(0, Rule_DefaultOptions().apply {
+                    outbound = TAG_BYPASS
+                    ip_is_private = true
+                })
+            }
+            // DNS interception must precede LAN: the virtual DNS IP is private.
             route.rules.add(0, Rule_DefaultOptions().apply {
                 protocol = listOf("dns")
                 action = "hijack-dns"
@@ -996,12 +1003,6 @@ fun buildConfig(
             })
             if (DataStore.bypassLanInCore) {
                 route.rules.add(Rule_DefaultOptions().apply {
-                    outbound = TAG_BYPASS
-                    ip_is_private = true
-                })
-            }
-            if (useDirectFallback) {
-                route.rules.add(0, Rule_DefaultOptions().apply {
                     outbound = TAG_BYPASS
                     ip_is_private = true
                 })
