@@ -302,3 +302,46 @@ func TestLogicalTunGuardInActualCore(t *testing.T) {
 		})
 	}
 }
+
+func TestProxyOnlyNeverFallsBackOnConnectionOrHandshakeFailure(t *testing.T) {
+	for _, handshake := range []bool{false, true} {
+		t.Run(fmt.Sprint(handshake), func(t *testing.T) {
+			hits := make(chan struct{}, 1)
+			direct := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { hits <- struct{}{} }))
+			defer direct.Close()
+			socks, err := net.Listen("tcp", "127.0.0.1:0")
+			if err != nil {
+				t.Fatal(err)
+			}
+			port := int32(socks.Addr().(*net.TCPAddr).Port)
+			if handshake {
+				defer socks.Close()
+				go func() {
+					c, err := socks.Accept()
+					if err == nil {
+						defer c.Close()
+						_, _ = c.Write([]byte{5, 255})
+					}
+				}()
+			} else {
+				_ = socks.Close()
+			}
+			client := NewHttpClient()
+			defer client.Close()
+			if err = client.RequireSocks5(port, "user", "password"); err != nil {
+				t.Fatal(err)
+			}
+			client.TryH3Direct() // strict policy also overrides a later direct H3 request
+			request := client.NewRequest()
+			_ = request.SetURL(direct.URL)
+			if _, err = request.Execute(); err == nil || !strings.Contains(err.Error(), "proxy-only download") {
+				t.Fatalf("wrong error: %v", err)
+			}
+			select {
+			case <-hits:
+				t.Fatal("leaked direct request")
+			default:
+			}
+		})
+	}
+}

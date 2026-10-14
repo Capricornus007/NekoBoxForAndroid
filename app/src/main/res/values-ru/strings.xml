@@ -537,4 +537,6 @@
     <string name="clash_api_token_summary">Показать или скопировать токен доступа к панели</string>
     <string name="confirm_stop_service">Остановить работающий прокси?</string>
     <string name="confirm_clear_cache">Остановить прокси, очистить кэш ядра и перезапустить приложение?</string>
+    <string name="downloads_proxy_only">Обновления только через прокси</string>
+    <string name="downloads_proxy_only_summary">Для обновления подписок и GeoIP/GeoSite нужен работающий локальный SOCKS-прокси. Прямое подключение отключено.</string>
 </resources>

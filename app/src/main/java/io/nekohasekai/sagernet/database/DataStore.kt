@@ -89,6 +89,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var groupLayoutMode by configurationStore.stringToInt(Key.GROUP_LAYOUT_MODE) { 0 }
 
     var allowInsecureOnRequest by configurationStore.boolean(Key.ALLOW_INSECURE_ON_REQUEST)
+    var downloadsProxyOnly by configurationStore.boolean(Key.DOWNLOADS_PROXY_ONLY)
     var networkChangeResetConnections by configurationStore.boolean(Key.NETWORK_CHANGE_RESET_CONNECTIONS) { true }
     var restartProfileOnNetworkChange by configurationStore.boolean(
         Key.RESTART_PROFILE_ON_NETWORK_CHANGE

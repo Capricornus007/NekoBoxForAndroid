@@ -83,6 +83,7 @@ object Key {
 
     const val TUN_IMPLEMENTATION = "tunImplementation"
     const val PROFILE_TRAFFIC_STATISTICS = "profileTrafficStatistics"
+    const val DOWNLOADS_PROXY_ONLY = "downloadsProxyOnly"
 
     const val PROFILE_DIRTY = "profileDirty"
     const val PROFILE_ID = "profileId"

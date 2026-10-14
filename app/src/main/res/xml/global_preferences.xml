@@ -297,8 +297,6 @@
             app:key="enableClashAPI"
             app:summary="@string/enable_clash_api_summary"
             app:title="@string/enable_clash_api" />
-        <Preference app:key="clashApiSecret" app:dependency="enableClashAPI"
-            app:title="@string/clash_api_token" app:summary="@string/clash_api_token_summary" />
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:icon="@drawable/ic_baseline_flip_camera_android_24"
@@ -324,6 +322,11 @@
         <SwitchPreferenceCompat
             app:key="allowInsecureOnRequest"
             app:title="@string/allow_insecure_on_request_sum" />
+        <SwitchPreferenceCompat
+            app:key="downloadsProxyOnly"
+            app:defaultValue="false"
+            app:title="@string/downloads_proxy_only"
+            app:summary="@string/downloads_proxy_only_summary" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="1.2"
             app:entries="@array/app_tls_version"

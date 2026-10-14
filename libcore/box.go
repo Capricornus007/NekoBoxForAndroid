@@ -71,6 +71,7 @@ type BoxInstance struct {
 	access sync.Mutex
 
 	*box.Box
+	ctx    context.Context
 	cancel context.CancelFunc
 	state  int
 
@@ -113,6 +114,7 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 
 	b = &BoxInstance{
 		Box:          instance,
+		ctx:          ctx,
 		cancel:       cancel,
 		pauseManager: service.FromContext[pause.Manager](ctx),
 	}
@@ -206,6 +208,18 @@ func (b *BoxInstance) SetV2rayStats(outbounds string) {
 		Outbounds: strings.Split(outbounds, "\n"),
 	})
 	b.Box.Router().AppendTracker(b.v2api.StatsService())
+	service.MustRegister[adapter.OutboundStatsTracker](b.ctx, b.v2api.StatsService().(adapter.OutboundStatsTracker))
+}
+
+func (b *BoxInstance) QuerySessionStats(direct bool, direction string) int64 {
+	if b.v2api == nil {
+		return 0
+	}
+	category := "proxy"
+	if direct {
+		category = "direct"
+	}
+	return b.v2api.QueryStats(fmt.Sprintf("session>>>%s>>>traffic>>>%s", category, direction))
 }
 
 func (b *BoxInstance) QueryStats(tag, direct string) int64 {
@@ -227,9 +241,6 @@ func UrlTest(i *BoxInstance, link string, timeout int32) (latency int32, err err
 	var connectionTracker adapter.ConnectionTracker
 	// test i
 	if i != nil {
-		if i.v2api != nil {
-			connectionTracker = i.v2api.StatsService()
-		}
 		return speedtest.UrlTest(boxapi.CreateProxyHttpClient(i.Box, connectionTracker), link, timeout, speedtest.UrlTestStandard_RTT)
 	}
 	// test direct

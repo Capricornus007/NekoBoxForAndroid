@@ -574,12 +574,7 @@ fun buildConfig(
                 wait_for_initial = true
             })
 
-            trafficMap[groupTag] = buildList {
-                add(entity)
-                candidateTags.forEach { tag ->
-                    addAll(trafficMap[tag].orEmpty())
-                }
-            }.distinctBy { it.id }
+            trafficMap[groupTag] = listOf(entity)
             return groupTag
         }
 

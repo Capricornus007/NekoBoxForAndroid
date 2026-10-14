@@ -725,4 +725,6 @@
     <string name="clash_api_token_summary">Show or copy the dashboard access token</string>
     <string name="confirm_stop_service">Stop the running proxy?</string>
     <string name="confirm_clear_cache">Stop the proxy, clear the core cache and restart the app?</string>
+    <string name="downloads_proxy_only">Updates only through proxy</string>
+    <string name="downloads_proxy_only_summary">Subscription and GeoIP/GeoSite updates require the running local SOCKS proxy. Direct fallback is disabled.</string>
 </resources>

@@ -94,7 +94,6 @@ class NativeInterface : BoxPlatformInterface, NB4AInterface {
                 val ent = SagerDatabase.proxyDao.getById(id) ?: return@runOnDefaultDispatcher
                 // traffic & title
                 data.proxy?.apply {
-                    looper?.selectMain(id)
                     displayProfileName = ServiceNotification.genTitle(ent)
                     data.notification?.postNotificationTitle(displayProfileName)
                 }

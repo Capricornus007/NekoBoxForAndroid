@@ -14,6 +14,7 @@ git checkout --detach "$COMMIT_SING_BOX"
 git restore --source="$COMMIT_SING_BOX" --worktree -- .
 python3 "$PROJECT_ROOT"/buildScript/lib/core/patch_sing_box_awg.py "$(pwd)"
 python3 "$PROJECT_ROOT"/buildScript/lib/core/patch_sing_box_balancers.py "$(pwd)"
+python3 "$PROJECT_ROOT"/buildScript/lib/core/patch_sing_box_traffic.py "$(pwd)"
 popd
 
 ####

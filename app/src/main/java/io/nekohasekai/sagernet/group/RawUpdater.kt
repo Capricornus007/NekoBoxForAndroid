@@ -97,8 +97,12 @@ object RawUpdater : GroupUpdater() {
         } else {
 
             val response = Libcore.newHttpClient().apply {
+                if (DataStore.downloadsProxyOnly) {
+                requireSocks5(DataStore.socksPort, DataStore.mixedUsername, DataStore.mixedPassword)
+            } else {
                 trySocks5(DataStore.socksPort, DataStore.mixedUsername, DataStore.mixedPassword)
-                tryH3Direct()
+            }
+                if (!DataStore.downloadsProxyOnly) tryH3Direct()
                 when (DataStore.appTLSVersion) {
                     "1.3" -> restrictedTLS()
                 }

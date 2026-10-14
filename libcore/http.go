@@ -35,6 +35,7 @@ type HTTPClient interface {
 	PinnedTLS12()
 	PinnedSHA256(sumHex string)
 	TrySocks5(port int32, username, password string)
+	RequireSocks5(port int32, username, password string) error
 	TryH3Direct()
 	KeepAlive()
 	NewRequest() HTTPRequest
@@ -71,6 +72,7 @@ type httpClient struct {
 	h1h2Client    http.Client
 	trySocks5     bool
 	tryH3Direct   bool
+	requireSocks5 bool
 }
 
 func NewHttpClient() HTTPClient {
@@ -126,6 +128,9 @@ func (c *httpClient) TrySocks5(port int32, username, password string) {
 				if socksConn != nil {
 					_ = socksConn.Close()
 				}
+				if c.requireSocks5 {
+					return nil, fmt.Errorf("proxy-only download: SOCKS5 unavailable: %w", err)
+				}
 				if c.tryH3Direct {
 					return nil, errFailConnectSocks5
 				}
@@ -140,6 +145,9 @@ func (c *httpClient) TrySocks5(port int32, username, password string) {
 			if err != nil {
 				if socksConn != nil {
 					_ = socksConn.Close()
+				}
+				if c.requireSocks5 {
+					return nil, fmt.Errorf("proxy-only download: SOCKS5 handshake failed: %w", err)
 				}
 				if c.tryH3Direct {
 					return nil, errFailConnectSocks5
@@ -156,6 +164,15 @@ func (c *httpClient) TrySocks5(port int32, username, password string) {
 
 func (c *httpClient) TryH3Direct() {
 	c.tryH3Direct = true
+}
+
+func (c *httpClient) RequireSocks5(port int32, username, password string) error {
+	if port < 1 || port > 65535 {
+		return fmt.Errorf("invalid SOCKS5 port")
+	}
+	c.requireSocks5 = true
+	c.TrySocks5(port, username, password)
+	return nil
 }
 
 func (c *httpClient) KeepAlive() {
@@ -240,7 +257,7 @@ func (r *httpRequest) Execute() (result HTTPResponse, err error) {
 	response, err := r.h1h2Client.Do(&r.request)
 	if err != nil {
 		// trySocks5 && tryH3Direct
-		if r.tryH3Direct && errors.Is(err, errFailConnectSocks5) {
+		if !r.requireSocks5 && r.tryH3Direct && errors.Is(err, errFailConnectSocks5) {
 			return r.doH3Direct()
 		}
 		return nil, err
