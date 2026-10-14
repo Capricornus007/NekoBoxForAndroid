@@ -360,24 +360,25 @@ class ConfigurationFragment @JvmOverloads constructor(
                     val proxies = mutableListOf<AbstractBean>()
                     if (fileName != null && fileName.endsWith(".zip")) {
                         // try parse wireguard zip
-                        val zip =
-                            ZipInputStream(requireContext().contentResolver.openInputStream(file)!!)
-                        while (true) {
-                            val entry = zip.nextEntry ?: break
-                            if (entry.isDirectory) continue
-                            val fileText = zip.bufferedReader().readText()
-                            RawUpdater.parseRaw(fileText, entry.name)
-                                ?.let { pl -> proxies.addAll(pl) }
-                            zip.closeEntry()
-                        }
-                        zip.closeQuietly()
-                    } else {
-                        val fileText =
-                            requireContext().contentResolver.openInputStream(file)!!.use {
-                                it.bufferedReader().readText()
+                        ZipInputStream(requireContext().contentResolver.openInputStream(file)!!).use { zip ->
+                            var total = 0
+                            var entries = 0
+                            while (true) {
+                                val entry = zip.nextEntry ?: break
+                                require(++entries <= 10_000) { "Too many ZIP entries" }
+                                if (entry.isDirectory) continue
+                                val bytes = zip.readBytesLimited(MAX_SUBSCRIPTION_BYTES - total)
+                                total += bytes.size
+                                RawUpdater.parseRaw(bytes.toString(Charsets.UTF_8), entry.name)
+                                    ?.let { proxies.addAll(it) }
+                                zip.closeEntry()
                             }
-                        RawUpdater.parseRaw(fileText, fileName ?: "")
-                            ?.let { pl -> proxies.addAll(pl) }
+                        }
+                    } else {
+                        val fileText = requireContext().contentResolver.openInputStream(file)!!.use {
+                            it.readBytesLimited(MAX_SUBSCRIPTION_BYTES).toString(Charsets.UTF_8)
+                        }
+                        RawUpdater.parseRaw(fileText, fileName ?: "")?.let { proxies.addAll(it) }
                     }
                     if (proxies.isEmpty()) onMainDispatcher {
                         snackbar(getString(R.string.no_proxies_found_in_file)).show()
@@ -1514,41 +1515,15 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
             }
             
-            private fun moveLinear(from: Int, to: Int) {
-                val first = getItemAt(from)
-                var previousOrder = first.userOrder
-                val (step, range) = if (from < to) Pair(1, from until to) else Pair(
-                    -1, to + 1 downTo from
-                )
-                for (i in range) {
-                    val next = getItemAt(i + step)
-                    val order = next.userOrder
-                    next.userOrder = previousOrder
-                    previousOrder = order
-                    configurationIdList[i] = next.id
-                    updated.add(next)
-                }
-                first.userOrder = previousOrder
-                configurationIdList[to] = first.id
-                updated.add(first)
-                notifyItemMoved(from, to)
-            }
-            
-            private fun moveDualColumn(from: Int, to: Int) {
-                val draggedItemId = configurationIdList[from]
+            private fun moveLinear(from: Int, to: Int) = moveDualColumn(from, to)
 
-                configurationIdList.removeAt(from)
-                configurationIdList.add(to, draggedItemId)
-                
-                for (i in configurationIdList.indices) {
-                    val item = getItem(configurationIdList[i])
-                    val newOrder = (i + 1).toLong()
-                    if (item.userOrder != newOrder) {
-                        item.userOrder = newOrder
-                        updated.add(item)
-                    }
+            private fun moveDualColumn(from: Int, to: Int) {
+                configurationIdList.add(to, configurationIdList.removeAt(from))
+                configurationIdList.forEachIndexed { index, id ->
+                    val item = getItem(id)
+                    val order = index + 1L
+                    if (item.userOrder != order) { item.userOrder = order; updated.add(item) }
                 }
-                
                 notifyItemMoved(from, to)
             }
 
@@ -1598,16 +1573,16 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             override suspend fun onUpdated(profile: ProxyEntity, noTraffic: Boolean) {
                 if (profile.groupId != proxyGroup.id) return
-                val index = configurationIdList.indexOf(profile.id)
-                if (index < 0) return
                 configurationListView.post {
+                    val index = configurationIdList.indexOf(profile.id)
+                    if (index < 0) return@post
+                    val oldProfile = configurationList[profile.id]
                     if (::undoManager.isInitialized) {
                         undoManager.flush()
                     }
                     configurationList[profile.id] = profile
                     notifyItemChanged(index)
                     //
-                    val oldProfile = configurationList[profile.id]
                     if (noTraffic && oldProfile != null) {
                         runOnDefaultDispatcher {
                             onUpdated(
@@ -1623,28 +1598,21 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
 
             override suspend fun onUpdated(data: TrafficData) {
-                try {
+                onMainDispatcher {
                     val index = configurationIdList.indexOf(data.id)
-                    if (index != -1) {
+                    if (index >= 0) {
                         val holder = layoutManager.findViewByPosition(index)
-                            ?.let { configurationListView.getChildViewHolder(it) } as ConfigurationHolder?
-                        if (holder != null) {
-                            onMainDispatcher {
-                                holder.bind(holder.entity, data)
-                            }
-                        }
+                            ?.let { configurationListView.getChildViewHolder(it) } as? ConfigurationHolder
+                        holder?.bind(holder.entity, data)
                     }
-                } catch (e: Exception) {
-                    Logs.w(e)
                 }
             }
 
             override suspend fun onRemoved(groupId: Long, profileId: Long) {
                 if (groupId != proxyGroup.id) return
-                val index = configurationIdList.indexOf(profileId)
-                if (index < 0) return
-
                 configurationListView.post {
+                    val index = configurationIdList.indexOf(profileId)
+                    if (index < 0) return@post
                     configurationIdList.removeAt(index)
                     configurationList.remove(profileId)
                     notifyItemRemoved(index)
@@ -1680,8 +1648,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                     }
                 }
 
-                configurationList.clear()
-                configurationList.putAll(newProfiles.associateBy { it.id })
+                val newProfileMap = newProfiles.associateBy { it.id }
                 val newProfileIds = newProfiles.map { it.id }
 
                 var selectedProfileIndex = -1
@@ -1692,6 +1659,8 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
 
                 configurationListView.post {
+                    configurationList.clear()
+                    configurationList.putAll(newProfileMap)
                     configurationIdList.clear()
                     configurationIdList.addAll(newProfileIds)
                     notifyDataSetChanged()

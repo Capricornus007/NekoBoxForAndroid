@@ -533,4 +533,8 @@
 <string name="amoled_theme_summary">Использовать абсолютно черный фон в темной теме</string>
 <string name="app_theme">Цвет акцента</string>
     <string name="authenticated_http_proxy_unavailable">HTTP-прокси Android VPN не поддерживает обязательные логин и пароль.</string>
+    <string name="clash_api_token">Токен Clash API</string>
+    <string name="clash_api_token_summary">Показать или скопировать токен доступа к панели</string>
+    <string name="confirm_stop_service">Остановить работающий прокси?</string>
+    <string name="confirm_clear_cache">Остановить прокси, очистить кэш ядра и перезапустить приложение?</string>
 </resources>

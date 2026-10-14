@@ -143,7 +143,7 @@ class ChainBeanTest {
             ).map { it.displayName() },
         )
         assertEquals(
-            listOf("ГЕРМАНИЯ"),
+            listOf("🇩🇪 ⚡ Германия", "ГЕРМАНИЯ"),
             FastestCandidateResolver.filterRegexCandidates(
                 candidates,
                 "германия",

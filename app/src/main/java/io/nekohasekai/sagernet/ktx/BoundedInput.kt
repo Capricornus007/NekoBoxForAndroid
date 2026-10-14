@@ -12,7 +12,8 @@ fun InputStream.readBytesLimited(limit: Int): ByteArray {
     val buffer = ByteArray(8192)
     var total = 0
     while (true) {
-        val read = read(buffer, 0, minOf(buffer.size, limit - total + 1))
+        val remaining = limit - total
+        val read = read(buffer, 0, if (remaining >= buffer.size) buffer.size else remaining + 1)
         if (read == -1) return output.toByteArray()
         require(read > 0) { "Input stream made no progress" }
         require(read <= limit - total) { "Input exceeds $limit bytes" }

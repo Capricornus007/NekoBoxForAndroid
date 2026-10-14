@@ -426,7 +426,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                         Logs.e("WebDAV restore - GET error: $errorBody")
                         throw Exception("Download failed (${response.code}): ${response.message}")
                     }
-                    response.body?.bytes() ?: throw Exception("Empty backup file")
+                    response.body?.byteStream()?.use { it.readBytesLimited(MAX_BACKUP_BYTES) } ?: throw Exception("Empty backup file")
                 }
 
                 Logs.d("WebDAV restore - Successfully downloaded backup file, size: ${content.size}")

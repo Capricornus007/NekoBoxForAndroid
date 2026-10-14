@@ -721,4 +721,8 @@
     <string name="amoled_theme_summary">Pure black background in dark mode</string>
     <string name="app_theme">Accent Color</string>
     <string name="authenticated_http_proxy_unavailable">Android VPN HTTP proxy does not support the required username and password.</string>
+    <string name="clash_api_token">Clash API token</string>
+    <string name="clash_api_token_summary">Show or copy the dashboard access token</string>
+    <string name="confirm_stop_service">Stop the running proxy?</string>
+    <string name="confirm_clear_cache">Stop the proxy, clear the core cache and restart the app?</string>
 </resources>

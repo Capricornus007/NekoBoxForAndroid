@@ -216,31 +216,32 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         modernTLS()
                         trySocks5(DataStore.socksPort, DataStore.mixedUsername, DataStore.mixedPassword)
                     }
-                    val response = client.newRequest().apply {
-                        if (checkPreview) {
-                            setURL("https://api.github.com/repos/starifly/NekoBoxForAndroid/releases/tags/preview")
-                        } else {
-                            setURL("https://api.github.com/repos/starifly/NekoBoxForAndroid/releases/latest")
+                    val development = BuildConfig.VERSION_NAME.contains("-dev") || isPreview
+                    val candidate = try {
+                        val response = client.newRequest().apply {
+                            setURL("https://api.github.com/repos/ISAIandCO/NekoBox_SF/releases?per_page=20")
+                        }.execute()
+                        val releases = org.json.JSONArray(Util.getStringBox(response.contentString)).filterIsInstance<JSONObject>()
+                        var found: Pair<JSONObject, JSONObject>? = null
+                        for (release in releases) {
+                            if (release.optBoolean("draft") || (release.optBoolean("prerelease") && !checkPreview && !development)) continue
+                            val asset = release.getJSONArray("assets").filterIsInstance<JSONObject>()
+                                .firstOrNull { it.optString("name") == "BUILD-MANIFEST.json" } ?: continue
+                            val manifestResponse = client.newRequest().apply { setURL(asset.getString("browser_download_url")) }.execute()
+                            val manifest = JSONObject(Util.getStringBox(manifestResponse.contentString))
+                            if (manifest.optString("application_id") != BuildConfig.APPLICATION_ID ||
+                                manifest.optInt("version_code", -1) < BuildConfig.VERSION_CODE ||
+                                !manifest.optString("commit").matches(Regex("[0-9a-f]{40}"))) continue
+                            found = release to manifest
+                            break
                         }
-                    }.execute()
-                    val release = JSONObject(Util.getStringBox(response.contentString))
-                    val releaseName = release.getString("name")
-                    val releaseUrl = release.getString("html_url")
-                    var haveUpdate = releaseName.isNotBlank()
-                    haveUpdate = if (isPreview) {
-                        if (checkPreview) {
-                            haveUpdate && releaseName != BuildConfig.PRE_VERSION_NAME
-                        } else {
-                            // User: 1.3.9 pre-1.4.0 Stable: 1.3.9 -> No update
-                            haveUpdate && releaseName != BuildConfig.VERSION_NAME
-                        }
-                    } else {
-                        // User: 1.4.0 Preview: pre-1.4.0 -> No update
-                        // User: 1.4.0 Preview: pre-1.4.1 -> Update
-                        // User: 1.4.0 Stable: 1.4.0 -> No update
-                        // User: 1.4.0 Stable: 1.4.1 -> Update
-                        haveUpdate && !releaseName.contains(BuildConfig.VERSION_NAME)
-                    }
+                        found
+                    } finally { client.close() }
+                    val releaseName = candidate?.first?.optString("name").orEmpty()
+                    val releaseUrl = candidate?.first?.optString("html_url").orEmpty()
+                    val manifest = candidate?.second
+                    val haveUpdate = manifest != null && (manifest.getInt("version_code") > BuildConfig.VERSION_CODE ||
+                        ((development || checkPreview) && manifest.getString("commit") != BuildConfig.SOURCE_COMMIT))
                     runOnMainDispatcher {
                         if (haveUpdate) {
                             val context = requireContext()

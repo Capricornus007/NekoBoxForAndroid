@@ -1,10 +1,8 @@
 #!/bin/bash
-set -e
-
-source "buildScript/init/env.sh"
-ENV_NB4A=1
-source "buildScript/lib/core/get_source_env.sh"
-pushd ..
+set -eo pipefail
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+source "$PROJECT_ROOT/buildScript/lib/core/get_source_env.sh"
+pushd "$PROJECT_ROOT/.."
 
 ####
 
@@ -12,9 +10,10 @@ if [ ! -d "sing-box" ]; then
   git clone --no-checkout https://github.com/starifly/sing-box.git
 fi
 pushd sing-box
-git checkout "$COMMIT_SING_BOX"
-python3 ../NekoBox_SF/buildScript/lib/core/patch_sing_box_awg.py "$(pwd)"
-python3 ../NekoBox_SF/buildScript/lib/core/patch_sing_box_balancers.py "$(pwd)"
+git checkout --detach "$COMMIT_SING_BOX"
+git restore --source="$COMMIT_SING_BOX" --worktree -- .
+python3 "$PROJECT_ROOT"/buildScript/lib/core/patch_sing_box_awg.py "$(pwd)"
+python3 "$PROJECT_ROOT"/buildScript/lib/core/patch_sing_box_balancers.py "$(pwd)"
 popd
 
 ####
@@ -23,7 +22,8 @@ if [ ! -d "libneko" ]; then
   git clone --no-checkout https://github.com/starifly/libneko.git
 fi
 pushd libneko
-git checkout "$COMMIT_LIBNEKO"
+git checkout --detach "$COMMIT_LIBNEKO"
+git restore --source="$COMMIT_LIBNEKO" --worktree -- .
 popd
 
 ####
@@ -32,7 +32,8 @@ if [ ! -d "wireguard-go" ]; then
   git clone --no-checkout https://github.com/amnezia-vpn/amneziawg-go.git wireguard-go
 fi
 pushd wireguard-go
-git checkout "$COMMIT_WIREGUARD_GO"
+git checkout --detach "$COMMIT_WIREGUARD_GO"
+git restore --source="$COMMIT_WIREGUARD_GO" --worktree -- .
 # Keep import path compatible with sing-box (expects github.com/sagernet/wireguard-go).
 sed -i '1s|^module .*|module github.com/sagernet/wireguard-go|' go.mod
 grep -rl 'github.com/amnezia-vpn/amneziawg-go/' . | xargs sed -i 's|github.com/amnezia-vpn/amneziawg-go/|github.com/sagernet/wireguard-go/|g'

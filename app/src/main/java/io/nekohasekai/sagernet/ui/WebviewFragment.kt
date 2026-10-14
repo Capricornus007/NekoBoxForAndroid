@@ -50,6 +50,11 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
             mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
         }
         mWebView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean =
+                request?.url?.let { normalizePanelUrl(it.toString()) == null } ?: true
+            @Deprecated("Deprecated in Java")
+            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean =
+                url?.let { normalizePanelUrl(it) == null } ?: true
             override fun onReceivedError(
                 view: WebView?, request: WebResourceRequest?, error: WebResourceError?
             ) {
@@ -83,28 +88,47 @@ class WebviewFragment : ToolbarFragment(R.layout.layout_webview), Toolbar.OnMenu
                             return@setPositiveButton
                         }
                         DataStore.yacdURL = safeUrl
-                        mWebView.loadUrl(safeUrl)
+                        loadSafeUrl(safeUrl)
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()
             }
             R.id.close -> {
-                mWebView.onPause()
-                mWebView.removeAllViews()
-                mWebView.destroy()
+                requireActivity().onBackPressedDispatcher.onBackPressed()
             }
         }
         return true
     }
 
+    override fun onDestroyView() {
+        if (::mWebView.isInitialized) {
+            mWebView.stopLoading()
+            mWebView.webViewClient = WebViewClient()
+            mWebView.removeAllViews()
+            mWebView.destroy()
+        }
+        super.onDestroyView()
+    }
+
     private fun loadSafeUrl(url: String) {
         val safeUrl = normalizePanelUrl(url) ?: defaultPanelUrl
         DataStore.yacdURL = safeUrl
-        mWebView.loadUrl(safeUrl)
+        val uri = Uri.parse(safeUrl)
+        val dashboard = isLoopbackHost(uri.host) && uri.port == 9090 && (uri.path == "/ui" || uri.path == "/ui/")
+        val loadUrl = if (dashboard) uri.buildUpon().clearQuery().apply {
+            uri.queryParameterNames.filterNot { it in setOf("hostname", "port", "secret") }.forEach { name ->
+                uri.getQueryParameters(name).forEach { appendQueryParameter(name, it) }
+            }
+            appendQueryParameter("hostname", uri.host)
+            appendQueryParameter("port", "9090")
+            appendQueryParameter("secret", DataStore.clashApiSecret)
+        }.build().toString() else safeUrl
+        mWebView.loadUrl(loadUrl)
     }
 
     private fun normalizePanelUrl(rawUrl: String): String? {
         val parsed = runCatching { Uri.parse(rawUrl.trim()) }.getOrNull() ?: return null
+        if (parsed.host.isNullOrBlank() || parsed.encodedUserInfo != null) return null
         val scheme = parsed.scheme?.lowercase() ?: return null
         if (scheme != "http" && scheme != "https") return null
         if (scheme == "http" && !isLoopbackHost(parsed.host)) return null

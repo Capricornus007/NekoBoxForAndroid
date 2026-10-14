@@ -118,7 +118,6 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
         }
 
         if (startsWith("sn://")) {
-            Logs.d("Try parse universal link: $this")
             runCatching {
                 entities.add(parseUniversal(this))
             }.onFailure {
@@ -128,14 +127,12 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
                 "socks5://"
             )
         ) {
-            Logs.d("Try parse socks link: $this")
             runCatching {
                 entities.add(parseSOCKS(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (matches("(http|https)://.*".toRegex())) {
-            Logs.d("Try parse http link: $this")
             runCatching {
                 entities.add(parseHttp(this))
             }.onFailure {
@@ -150,84 +147,72 @@ suspend fun parseProxies(text: String): List<AbstractBean> {
                 throw (SubscriptionFoundException(clashUrl))
             }
         } else if (startsWith("vmess://")) {
-            Logs.d("Try parse v2ray link: $this")
             runCatching {
                 entities.add(parseV2Ray(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("vless://")) {
-            Logs.d("Try parse vless link: $this")
             runCatching {
                 entities.add(parseV2Ray(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("trojan://")) {
-            Logs.d("Try parse trojan link: $this")
             runCatching {
                 entities.add(parseTrojan(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("trojan-go://")) {
-            Logs.d("Try parse trojan-go link: $this")
             runCatching {
                 entities.add(parseTrojanGo(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("ss://")) {
-            Logs.d("Try parse shadowsocks link: $this")
             runCatching {
                 entities.add(parseShadowsocks(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("ssr://")) {
-            Logs.d("Try parse shadowsocksr link: $this")
             runCatching {
                 entities.add(parseShadowsocksR(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("naive+")) {
-            Logs.d("Try parse naive link: $this")
             runCatching {
                 entities.add(parseNaive(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("hysteria://")) {
-            Logs.d("Try parse hysteria1 link: $this")
             runCatching {
                 entities.add(parseHysteria1(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("hysteria2://") || startsWith("hy2://")) {
-            Logs.d("Try parse hysteria2 link: $this")
             runCatching {
                 entities.add(parseHysteria2(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("tuic://")) {
-            Logs.d("Try parse TUIC link: $this")
             runCatching {
                 entities.add(parseTuic(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("juicity://")) {
-            Logs.d("Try parse Juicity link: $this")
             runCatching {
                 entities.add(parseJuicity(this))
             }.onFailure {
                 Logs.w(it)
             }
         } else if (startsWith("anytls://")) {
-            Logs.d("Try parse anytls link: $this")
             runCatching {
                 entities.add(parseAnytls(this))
             }.onFailure {

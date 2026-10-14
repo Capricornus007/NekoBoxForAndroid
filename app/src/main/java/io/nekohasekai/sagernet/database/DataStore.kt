@@ -82,6 +82,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     }
 
     var appTLSVersion by configurationStore.string(Key.APP_TLS_VERSION)
+    var clashApiSecret by configurationStore.string(Key.CLASH_API_SECRET) { Util.generateCryptoSecurePassword(32) }
     var enableClashAPI by configurationStore.boolean(Key.ENABLE_CLASH_API)
     var showBottomBar by configurationStore.boolean(Key.SHOW_BOTTOM_BAR)
     var confirmProfileDelete by configurationStore.boolean(Key.CONFIRM_PROFILE_DELETE) { true }
@@ -152,6 +153,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     }
 
     fun initGlobal() {
+        if (configurationStore.getString(Key.CLASH_API_SECRET).isNullOrBlank()) {
+            clashApiSecret = Util.generateCryptoSecurePassword(32)
+        }
         if (configurationStore.getString(Key.MIXED_PORT) == null) {
             mixedPort = mixedPort
         }

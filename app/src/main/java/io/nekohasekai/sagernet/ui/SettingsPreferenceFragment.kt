@@ -152,6 +152,14 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val resolveDestination = findPreference<SwitchPreferenceCompat>(Key.RESOLVE_DESTINATION)!!
         val acquireWakeLock = findPreference<SwitchPreferenceCompat>(Key.ACQUIRE_WAKE_LOCK)!!
         val hideFromRecentApps = findPreference<SwitchPreferenceCompat>(Key.HIDE_FROM_RECENT_APPS)!!
+        findPreference<Preference>(Key.CLASH_API_SECRET)!!.setOnPreferenceClickListener {
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.clash_api_token).setMessage(DataStore.clashApiSecret)
+                .setPositiveButton(android.R.string.copy) { _, _ ->
+                    SagerNet.trySetPrimaryClip(DataStore.clashApiSecret, sensitive = true)
+                }.setNegativeButton(android.R.string.cancel, null).show()
+            true
+        }
         val enableClashAPI = findPreference<SwitchPreferenceCompat>(Key.ENABLE_CLASH_API)!!
         enableClashAPI.setOnPreferenceChangeListener { _, newValue ->
             (activity as MainActivity?)?.refreshNavMenu(newValue as Boolean)

@@ -71,6 +71,14 @@ def main():
         """\twgDevice := device.NewDevice(e.tunDevice, bind, logger)\n""",
     )
 
+    device_factory = root / "transport" / "wireguard" / "device.go"
+    patch_file(
+        device_factory,
+        "func NewDevice(options DeviceOptions) (Device, error) {\n",
+        "func NewDevice(options DeviceOptions) (Device, error) {\n\tif options.System && options.Handler != nil {\n\t\treturn nil, fmt.Errorf(\"AmneziaWG system stack with a packet handler is unsupported\")\n\t}\n",
+    )
+    patch_file(device_factory, 'import (\n', 'import (\n\t"fmt"\n')
+
     # Keep with_gvisor builds compiling against amneziawg-go API
     device_system_stack = root / "transport" / "wireguard" / "device_system_stack.go"
     patch_file(

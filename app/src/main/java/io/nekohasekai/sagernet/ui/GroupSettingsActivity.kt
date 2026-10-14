@@ -109,6 +109,7 @@ class GroupSettingsActivity(
 
         frontProxyPreference = findPreference(Key.GROUP_FRONT_PROXY)!!
         frontProxyPreference.apply {
+            value = DataStore.frontProxyTmp.toString()
             setEntries(R.array.front_proxy_entry)
             setEntryValues(R.array.front_proxy_value)
             setOnPreferenceChangeListener { _, newValue ->
@@ -124,6 +125,7 @@ class GroupSettingsActivity(
         }
         landingProxyPreference = findPreference(Key.GROUP_LANDING_PROXY)!!
         landingProxyPreference.apply {
+            value = DataStore.landingProxyTmp.toString()
             setEntries(R.array.front_proxy_entry)
             setEntryValues(R.array.front_proxy_value)
             setOnPreferenceChangeListener { _, newValue ->

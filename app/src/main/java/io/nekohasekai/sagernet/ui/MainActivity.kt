@@ -180,7 +180,11 @@ class MainActivity : ThemedActivity(),
         val fromShortcut = intent.getBooleanExtra(EXTRA_CLEAR_CACHE_AND_RESTART, false)
         if (!fromShortcut && intent.action != ACTION_CLEAR_CACHE_AND_RESTART) return false
 
-        clearAppCacheAndRestart()
+        intent.removeExtra(EXTRA_CLEAR_CACHE_AND_RESTART)
+        intent.action = null
+        MaterialAlertDialogBuilder(this).setMessage(R.string.confirm_clear_cache)
+            .setPositiveButton(android.R.string.ok) { _, _ -> clearAppCacheAndRestart() }
+            .setNegativeButton(android.R.string.cancel, null).show()
         return true
     }
 

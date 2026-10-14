@@ -315,10 +315,13 @@ class AssetsActivity : ThemedActivity() {
             response.writeTo(cacheFile.canonicalPath)
 
             if (fileName.endsWith(".xz")) {
-                Libcore.unxz(cacheFile.absolutePath, file.absolutePath)
-                cacheFile.delete()
+                val expanded = File(file.parentFile, fileName + ".expanded")
+                try {
+                    Libcore.unxz(cacheFile.absolutePath, expanded.absolutePath)
+                    Libcore.installRouteAsset(expanded.absolutePath, file.absolutePath)
+                } finally { expanded.delete(); cacheFile.delete() }
             } else {
-                cacheFile.renameTo(file)
+                Libcore.installRouteAsset(cacheFile.absolutePath, file.absolutePath)
             }
 
             versionFile.writeText(tagName)
@@ -354,7 +357,7 @@ class AssetsActivity : ThemedActivity() {
             val cacheFile = File(file.parentFile, fileName + ".tmp")
             cacheFile.parentFile?.mkdirs()
             response.writeTo(cacheFile.canonicalPath)
-            cacheFile.renameTo(file)
+            Libcore.installRouteAsset(cacheFile.absolutePath, file.absolutePath)
 
             val currentDate = java.text.SimpleDateFormat("yyyyMMdd").format(java.util.Date())
             versionFile.writeText(currentDate)
