@@ -17,6 +17,7 @@ class OutboundDomainStrategyTest {
             outbound.applyDomainStrategyIfSupported("prefer_ipv4")
 
             assertFalse(outbound.asMap().containsKey("domain_strategy"))
+            assertFalse(outbound.asMap().containsKey("domain_resolver"))
         }
     }
 
@@ -28,6 +29,16 @@ class OutboundDomainStrategyTest {
 
         outbound.applyDomainStrategyIfSupported("prefer_ipv4")
 
-        assertEquals("prefer_ipv4", outbound.asMap()["domain_strategy"])
+        assertEquals(mapOf("server" to "dns-direct", "strategy" to "prefer_ipv4"), outbound.asMap()["domain_resolver"])
+        assertFalse(outbound.asMap().containsKey("domain_strategy"))
+    }
+
+    @Test fun preservesUserResolverAndLegacyStrategyOverrides() {
+        val custom = CustomSingBoxOption("""{"type":"socks","domain_resolver":{"server":"user-dns","strategy":"ipv6_only"}}""")
+        custom.applyDomainStrategyIfSupported("prefer_ipv4")
+        assertEquals(mapOf("server" to "user-dns", "strategy" to "ipv6_only"), custom.asMap()["domain_resolver"])
+        val legacy = CustomSingBoxOption("""{"type":"socks","domain_strategy":"ipv6_only"}""")
+        legacy.applyDomainStrategyIfSupported("prefer_ipv4")
+        assertEquals(mapOf("server" to "dns-direct", "strategy" to "ipv6_only"), legacy.asMap()["domain_resolver"])
     }
 }

@@ -58,9 +58,14 @@ const val LOCALHOST = "127.0.0.1"
 private val GROUP_OUTBOUND_TYPES = setOf("selector", "urltest")
 
 internal fun SingBoxOption.applyDomainStrategyIfSupported(domainStrategy: String) {
-    val outboundType = asMap()["type"] as? String
-    if (outboundType !in GROUP_OUTBOUND_TYPES) {
-        _hack_config_map["domain_strategy"] = domainStrategy
+    val options = asMap()
+    val outboundType = options["type"] as? String
+    if (outboundType !in GROUP_OUTBOUND_TYPES && options["domain_resolver"] == null) {
+        val strategy = options["domain_strategy"] as? String ?: domainStrategy
+        _hack_config_map["domain_resolver"] = buildMap {
+            put("server", "dns-direct")
+            if (strategy.isNotBlank()) put("strategy", strategy)
+        }
     }
 }
 
@@ -927,33 +932,23 @@ fun buildConfig(
         }
 
         dns.servers.add(DNSServerOptions().apply {
-            address = "rcode://success"
-            tag = "dns-block"
-        })
-
-        dns.servers.add(DNSServerOptions().apply {
-            address = "local"
-            tag = "dns-local"
-            detour = TAG_DIRECT
+            _hack_config_map.putAll(dnsServerConfig("local", "dns-local", "", TAG_DIRECT))
         })
 
         directDNS.firstOrNull().let {
             dns.servers.add(DNSServerOptions().apply {
-                address = it ?: throw Exception("No direct DNS, check your settings!")
-                tag = "dns-direct"
-                detour = TAG_DIRECT
-                address_resolver = "dns-local"
-                strategy = autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy(tag))
+                _hack_config_map.putAll(dnsServerConfig(
+                    it ?: error("No direct DNS, check your settings!"), "dns-direct", "dns-local", TAG_DIRECT
+                ))
             })
         }
 
         remoteDns.firstOrNull().let {
             if (!forTest) {
                 dns.servers.add(DNSServerOptions().apply {
-                    address = it ?: throw Exception("No remote DNS, check your settings!")
-                    tag = "dns-remote"
-                    address_resolver = "dns-direct"
-                    strategy = autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy(tag))
+                    _hack_config_map.putAll(dnsServerConfig(
+                        it ?: error("No remote DNS, check your settings!"), "dns-remote", "dns-direct", mainProxyTag
+                    ))
                 })
             }
         }
@@ -989,15 +984,11 @@ fun buildConfig(
                 action = "reject"
             })
             if (useFakeDns) {
-                dns.fakeip = DNSFakeIPOptions().apply {
-                    enabled = true
-                    inet4_range = "198.18.0.0/15"
-                    inet6_range = "fc00::/18"
-                }
                 dns.servers.add(DNSServerOptions().apply {
-                    address = "fakeip"
-                    tag = "dns-fake"
-                    strategy = "ipv4_only"
+                    _hack_config_map.putAll(mapOf(
+                        "type" to "fakeip", "tag" to "dns-fake",
+                        "inet4_range" to "198.18.0.0/15", "inet6_range" to "fc00::/18"
+                    ))
                 })
                 dns.rules.add(DNSRule_DefaultOptions().apply {
                     inbound = listOf("tun-in")
@@ -1017,6 +1008,26 @@ fun buildConfig(
                 })
             }
         }
+        val dnsStrategies = mapOf(
+            "dns-direct" to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")),
+            "dns-remote" to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-remote")),
+            "dns-fake" to "ipv4_only",
+        )
+        dns.rules = dns.rules.toMutableList().apply {
+            filterIsInstance<DNSRule_DefaultOptions>().forEach { rule ->
+                if (rule.server == "dns-block") {
+                    rule.server = null
+                    rule._hack_config_map.putAll(mapOf("action" to "predefined", "rcode" to "NOERROR"))
+                } else dnsStrategies[rule.server]?.let { strategy ->
+                    rule._hack_config_map["strategy"] = strategy
+                }
+            }
+            add(DNSRule_DefaultOptions().apply {
+                server = dns.final_
+                _hack_config_map["strategy"] = dnsStrategies[server] ?: ""
+            })
+        }
+        route._hack_config_map["default_domain_resolver"] = "dns-direct"
         if (!forTest && isVPN) route.rules.add(0, virtualDnsTlsRejectRule())
         route.rules.addAll(0, buildPerAppTunGuardRules())
 

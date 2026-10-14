@@ -87,6 +87,7 @@ object AmneziaWireGuardImporter {
             i3 = iface.get("I3").orEmpty()
             i4 = iface.get("I4").orEmpty()
             i5 = iface.get("I5").orEmpty()
+            validateAmneziaParameters()
         }
 
         return peers.mapNotNull { peer ->
@@ -291,7 +292,9 @@ object AmneziaWireGuardImporter {
     private fun hasIniOption(conf: String, key: String): Boolean =
         Regex("(?im)^\\s*${Regex.escape(key)}\\s*=").containsMatchIn(conf)
 
-    private fun IniSection.intValue(key: String): Int = get(key)?.toIntOrNull() ?: 0
+    private fun IniSection.intValue(key: String): Int = get(key)?.let {
+        requireNotNull(it.toIntOrNull()) { "Invalid integer for $key" }
+    } ?: 0
 
     private fun JsonObject.stringValue(key: String): String? =
         get(key)?.takeIf { it.isJsonPrimitive }?.asString?.takeIf(String::isNotBlank)

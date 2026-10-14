@@ -69,6 +69,15 @@ class AmneziaWireGuardImporterTest {
     }
 
     @Test
+    fun rejectsInvalidAwgNumbersInsteadOfSilentlyUsingZero() {
+        for (replacement in listOf("Jc = invalid", "Jc = -1", "Jc = 2147483648", "Jc = 6\nJmin = 100\nJmax = 50")) {
+            assertThrows(IllegalArgumentException::class.java) {
+                AmneziaWireGuardImporter.parseWireGuard(regularWireGuardConf().replace("[Peer]", "$replacement\n[Peer]"))
+            }
+        }
+    }
+
+    @Test
     fun explicitMtuWinsForAwg() {
         val profile = AmneziaWireGuardImporter.parseWireGuard(
             awgConf().replace("Jc = 6", "MTU = 1360\nJc = 6"),
