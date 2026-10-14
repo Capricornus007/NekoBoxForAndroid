@@ -13,6 +13,8 @@ import io.nekohasekai.sagernet.*
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.fmt.LOCALHOST
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
+import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
+import io.nekohasekai.sagernet.fmt.wireguard.normalizeWireGuardLocalAddresses
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.VpnRequestActivity
 import io.nekohasekai.sagernet.utils.Subnet
@@ -133,6 +135,13 @@ class VpnService : BaseVpnService(),
             builder.addRoute("0.0.0.0", 0)
             if (ipv6Mode != IPv6Mode.DISABLE) {
                 builder.addRoute("::", 0)
+            }
+        }
+        val wireguard = data.proxy?.profile?.requireBean() as? WireGuardBean
+        if (DataStore.bypassLan && wireguard?.useConfigRoutes == true) {
+            normalizeWireGuardLocalAddresses(wireguard.allowedIPs).forEach {
+                val subnet = Subnet.fromString(it)!!
+                if (ipv6Mode != IPv6Mode.DISABLE || ':' !in it) builder.addRoute(subnet.address.hostAddress!!, subnet.prefixSize)
             }
         }
 

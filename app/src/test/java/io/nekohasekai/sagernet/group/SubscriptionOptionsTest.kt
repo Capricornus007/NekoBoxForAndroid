@@ -17,7 +17,7 @@ class SubscriptionOptionsTest {
             parseSubscriptionHeaders("Authorization: Bearer fixture\nExample-Api-Key: a:b"))
     }
     @Test fun headersRejectInjectionAmbiguityAndTransportOverrides() {
-        for (text in listOf("Bad Name: x", "Host: evil", "X-Key: a\rx", "X-Key: a\u0000", "X: a\nx: b", "Transfer-Encoding: chunked", "no separator", "A: " + "x".repeat(8192))) {
+        for (text in listOf(" : x", "Bad Name: x", "Host: evil", "X-Key: a\rx", "X-Key: a\u0000", "X: a\nx: b", "Transfer-Encoding: chunked", "no separator", "A: " + "x".repeat(8192))) {
             assertThrows(IllegalArgumentException::class.java) { parseSubscriptionHeaders(text) }
         }
     }

@@ -11,6 +11,29 @@ import java.util.Base64
 import java.util.zip.Deflater
 
 class AmneziaWireGuardImporterTest {
+    @Test fun preservesNetworkOptionsWithoutApplyingThemAutomatically() {
+        val config = """
+            [Interface]
+            PrivateKey = fixture
+            Address = 10.0.0.2/32
+            DNS = 10.0.0.1, 1.1.1.1
+            [Peer]
+            PublicKey = peer-fixture
+            Endpoint = 192.0.2.1:51820
+            AllowedIPs = 10.0.0.0/24, fd00::/64
+            PersistentKeepalive = 25
+        """.trimIndent()
+        val bean = AmneziaWireGuardImporter.parseWireGuard(config).single()
+        assertEquals("10.0.0.1, 1.1.1.1", bean.dnsServers)
+        assertEquals("10.0.0.0/24, fd00::/64", bean.allowedIPs)
+        assertEquals(25, bean.persistentKeepalive)
+        assertEquals(false, bean.useConfigRoutes)
+        val restored = bean.clone()
+        assertEquals(bean.dnsServers, restored.dnsServers)
+        assertEquals(bean.allowedIPs, restored.allowedIPs)
+        assertEquals(25, restored.persistentKeepalive)
+        assertThrows(IllegalArgumentException::class.java) { AmneziaWireGuardImporter.parseWireGuard(config.replace("= 25", "= -1")) }
+    }
 
     @Test
     fun parsesAwg2ConfWithEmptyJunkFieldsAndMultiplePeers() {

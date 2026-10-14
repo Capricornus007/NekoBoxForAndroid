@@ -6,6 +6,20 @@ import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class WireGuardFmtTest {
+    @Test fun keepaliveRetainsFullTunnelUnlessImportedRoutesAreEnabled() {
+        val bean = WireGuardBean().applyDefaultValues().apply {
+            localAddress = "10.0.0.2/32"
+            allowedIPs = "10.0.0.0/24, fd00::/64"
+            persistentKeepalive = 25
+        }
+        fun peer(): Map<*, *> = (buildSingBoxOutboundWireguardBean(bean)._hack_config_map["peers"] as List<*>).single() as Map<*, *>
+        assertEquals(listOf("0.0.0.0/0", "::/0"), peer()["allowed_ips"])
+        assertEquals(25, peer()["persistent_keepalive_interval"])
+        bean.useConfigRoutes = true
+        assertEquals(listOf("10.0.0.0/24", "fd00::/64"), peer()["allowed_ips"])
+        bean.persistentKeepalive = 65536
+        assertThrows(IllegalArgumentException::class.java) { peer() }
+    }
 
     @Test
     fun outboundNormalizesBareAddressesFromExistingProfiles() {

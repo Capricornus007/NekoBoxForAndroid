@@ -18,6 +18,10 @@ public class WireGuardBean extends AbstractBean {
     public String peerPreSharedKey;
     public Integer mtu;
     public String reserved;
+    public String dnsServers;
+    public String allowedIPs;
+    public Integer persistentKeepalive;
+    public Boolean useConfigRoutes;
     public Integer jc;
     public Integer jmin;
     public Integer jmax;
@@ -44,6 +48,10 @@ public class WireGuardBean extends AbstractBean {
         if (peerPreSharedKey == null) peerPreSharedKey = "";
         if (mtu == null) mtu = 1420;
         if (reserved == null) reserved = "";
+        if (dnsServers == null) dnsServers = "";
+        if (allowedIPs == null) allowedIPs = "";
+        if (persistentKeepalive == null) persistentKeepalive = 0;
+        if (useConfigRoutes == null) useConfigRoutes = false;
         if (jc == null) jc = 0;
         if (jmin == null) jmin = 0;
         if (jmax == null) jmax = 0;
@@ -64,7 +72,7 @@ public class WireGuardBean extends AbstractBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(3);
+        output.writeInt(4);
         super.serialize(output);
         output.writeString(localAddress);
         output.writeString(privateKey);
@@ -88,6 +96,10 @@ public class WireGuardBean extends AbstractBean {
         output.writeString(i3);
         output.writeString(i4);
         output.writeString(i5);
+        output.writeString(dnsServers);
+        output.writeString(allowedIPs);
+        output.writeInt(persistentKeepalive);
+        output.writeBoolean(useConfigRoutes);
     }
 
     @Override
@@ -119,6 +131,12 @@ public class WireGuardBean extends AbstractBean {
             i3 = input.readString();
             i4 = input.readString();
             i5 = input.readString();
+        }
+        if (version >= 4) {
+            dnsServers = input.readString();
+            allowedIPs = input.readString();
+            persistentKeepalive = input.readInt();
+            useConfigRoutes = input.readBoolean();
         }
         initializeDefaultValues();
     }

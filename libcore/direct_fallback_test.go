@@ -2,6 +2,7 @@ package libcore
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net"
 	"net/http"
@@ -96,12 +97,32 @@ func TestDirectFallbackSwitchesTCPUDPAndIsolatesControlHistory(t *testing.T) {
 	}))
 	defer server.Close()
 	g, direct, proxy, history := newFallbackTest(t, server.URL, time.Hour)
+	assertReason := func(want string) {
+		content, err := json.Marshal(g.SelectionDiagnostics())
+		if err != nil {
+			t.Fatal(err)
+		}
+		var state struct {
+			TCP struct {
+				Reason    string    `json:"reason"`
+				Current   string    `json:"current"`
+				ChangedAt time.Time `json:"changed_at"`
+			} `json:"tcp"`
+		}
+		if err = json.Unmarshal(content, &state); err != nil {
+			t.Fatal(err)
+		}
+		if state.TCP.Reason != want || state.TCP.ChangedAt.IsZero() || state.TCP.Current != g.Now() {
+			t.Fatalf("diagnostics=%s", content)
+		}
+	}
 	if err := g.PostStart(); err != nil {
 		t.Fatal(err)
 	}
 	if g.Now() != "direct" {
 		t.Fatalf("initial=%s", g.Now())
 	}
+	assertReason("initial-selection")
 	fallbackPayload(t, g, "direct")
 	for _, code := range []int32{403, 451, 503} {
 		status.Store(code)
@@ -111,6 +132,7 @@ func TestDirectFallbackSwitchesTCPUDPAndIsolatesControlHistory(t *testing.T) {
 			t.Fatalf("HTTP%d selected %s", code, g.Now())
 		}
 		fallbackPayload(t, g, "proxy")
+		assertReason("control-site-unreachable")
 	}
 	if proxy.probes.Load() != 0 {
 		t.Fatal("fallback proxy was probed against control site")
@@ -118,6 +140,7 @@ func TestDirectFallbackSwitchesTCPUDPAndIsolatesControlHistory(t *testing.T) {
 	status.Store(200)
 	g.CheckOutbounds()
 	fallbackPayload(t, g, "direct")
+	assertReason("direct-recovered")
 	if g.Now() != "direct" || direct.packets.Load() != 2 || proxy.packets.Load() != 3 {
 		t.Fatal("TCP/UDP did not switch back")
 	}

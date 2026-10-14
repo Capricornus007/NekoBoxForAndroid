@@ -10,4 +10,5 @@ interface ISagerNetService {
   oneway void unregisterCallback(in ISagerNetServiceCallback cb);
 
   int urlTest();
+  String getRuntimeDiagnostics();
 }

@@ -88,6 +88,7 @@ object RawUpdater : GroupUpdater() {
         byUser: Boolean
     ) {
 
+        val groupSnapshot = KryoConverters.serialize(proxyGroup)
         val link = subscription.link
         var proxies: List<AbstractBean>
         if (link.startsWith("content://")) {
@@ -235,6 +236,10 @@ object RawUpdater : GroupUpdater() {
             }
         }
         SagerDatabase.instance.withTransaction {
+        val currentGroup = SagerDatabase.groupDao.getById(proxyGroup.id)
+        check(currentGroup != null && groupSnapshot.contentEquals(KryoConverters.serialize(currentGroup))) {
+            app.getString(R.string.subscription_changed_during_update)
+        }
         val current = SagerDatabase.proxyDao.getByGroup(proxyGroup.id)
         check(current.size == snapshots.size && current.all {
             snapshots[it.id]?.contentEquals(KryoConverters.serialize(it.requireBean())) == true
@@ -252,6 +257,7 @@ object RawUpdater : GroupUpdater() {
                 // 更新订阅，保留自定义覆写设置
                 bean.customOutboundJson = existsBean.customOutboundJson
                 bean.customConfigJson = existsBean.customConfigJson
+                if (bean is WireGuardBean && existsBean is WireGuardBean) bean.useConfigRoutes = existsBean.useConfigRoutes
                 when {
                     existsBean != bean || existsBean.name != bean.name -> {
                         changed++

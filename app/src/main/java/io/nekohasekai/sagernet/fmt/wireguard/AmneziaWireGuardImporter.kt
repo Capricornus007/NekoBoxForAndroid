@@ -69,6 +69,7 @@ object AmneziaWireGuardImporter {
 
         val template = WireGuardBean().applyDefaultValues().apply {
             localAddress = addresses.joinToString("\n")
+            dnsServers = iface.getAll("DNS").joinToString("\n")
             this.privateKey = privateKey
             mtu = explicitMtu ?: if (isAmnezia) AMNEZIA_MOBILE_MTU else mtu
             jc = iface.intValue("Jc")
@@ -99,6 +100,12 @@ object AmneziaWireGuardImporter {
                 serverPort = endpoint.port
                 peerPublicKey = publicKey
                 peerPreSharedKey = peer.get("PresharedKey").orEmpty()
+                allowedIPs = peer.getAll("AllowedIPs").joinToString("\n")
+                persistentKeepalive = peer.get("PersistentKeepalive")?.let {
+                    it.toIntOrNull()?.takeIf { seconds -> seconds in 0..65535 }
+                        ?: throw IllegalArgumentException("Invalid PersistentKeepalive")
+                } ?: 0
+                if (allowedIPs.isNotBlank()) normalizeWireGuardLocalAddresses(allowedIPs)
                 initializeDefaultValues()
             }
         }.ifEmpty {

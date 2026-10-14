@@ -28,6 +28,8 @@ fun genReserved(anyStr: String): String {
 
 fun buildSingBoxOutboundWireguardBean(bean: WireGuardBean): SingBoxOptions.Outbound_WireGuardOptions {
     bean.validateAmneziaParameters()
+    require(bean.persistentKeepalive in 0..65535) { "PersistentKeepalive must be between 0 and 65535 seconds" }
+    val allowed = if (bean.useConfigRoutes == true) normalizeWireGuardLocalAddresses(bean.allowedIPs) else listOf("0.0.0.0/0", "::/0")
     return SingBoxOptions.Outbound_WireGuardOptions().apply {
         type = "wireguard"
         server = bean.serverAddress
@@ -38,6 +40,16 @@ fun buildSingBoxOutboundWireguardBean(bean: WireGuardBean): SingBoxOptions.Outbo
         pre_shared_key = normalizeBase64Key(bean.peerPreSharedKey)
         mtu = bean.mtu
         if (bean.reserved.isNotBlank()) reserved = genReserved(bean.reserved)
+        if (bean.useConfigRoutes == true || bean.persistentKeepalive > 0) {
+            _hack_config_map["peers"] = listOf(linkedMapOf<String, Any>(
+                "server" to bean.serverAddress,
+                "server_port" to bean.serverPort,
+                "public_key" to normalizeBase64Key(bean.peerPublicKey),
+                "pre_shared_key" to normalizeBase64Key(bean.peerPreSharedKey),
+                "allowed_ips" to allowed,
+                "persistent_keepalive_interval" to bean.persistentKeepalive,
+            ).apply { if (bean.reserved.isNotBlank()) put("reserved", genReserved(bean.reserved)) })
+        }
         if (bean.isAmneziaWG) {
             _hack_config_map["jc"] = bean.jc
             _hack_config_map["jmin"] = bean.jmin

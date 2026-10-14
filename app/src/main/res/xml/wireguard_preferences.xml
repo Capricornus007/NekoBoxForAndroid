@@ -50,6 +50,15 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/wireguard_imported_options">
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+            app:key="dnsServers" app:title="DNS" app:useSimpleSummaryProvider="true" />
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+            app:key="allowedIPs" app:title="AllowedIPs" app:useSimpleSummaryProvider="true" />
+        <EditTextPreference app:key="persistentKeepalive" app:title="PersistentKeepalive" app:defaultValue="0" app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat app:key="useConfigRoutes" app:title="@string/wireguard_use_config_routes" app:summary="@string/wireguard_use_config_routes_summary" />
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/amneziawg_category">
         <EditTextPreference
             app:defaultValue="0"

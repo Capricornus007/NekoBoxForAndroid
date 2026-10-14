@@ -2,8 +2,21 @@ package io.nekohasekai.sagernet.ktx
 
 import org.junit.Assert.*
 import org.junit.Test
+import com.google.gson.JsonParser
 
 class DiagnosticRedactionTest {
+    @Test fun previewKeepsValidJsonAndHidesNestedSecrets() {
+        val source = """{"outbounds":[{"type":"http","password":"secret phrase","tls":{"private_key":["private-fixture"]},"transport":{"headers":{"Example-Api-Key":"header-fixture"}}}],"url":"https://example.test/account-fixture"}"""
+        val preview = redactConfigJson(source)
+        val parsed = JsonParser.parseString(preview)
+        assertEquals("http", parsed.asJsonObject["outbounds"].asJsonArray[0].asJsonObject["type"].asString)
+        for (secret in listOf("secret phrase", "private-fixture", "header-fixture", "account-fixture")) assertFalse(preview.contains(secret))
+    }
+    @Test fun hidesEscapedHeaderValues() {
+        val result = redactDiagnostic("""{"customHeaders":"Example-Key: a\"quoted-secret","password":"escaped\\secret"}""")
+        assertFalse(result.contains("quoted-secret"))
+        assertFalse(result.contains("escaped"))
+    }
     @Test fun hidesCredentialsInUris() {
         assertFalse(redactDiagnostic("failure vless://my-uuid@host:443?token=secret").contains("my-uuid"))
     }

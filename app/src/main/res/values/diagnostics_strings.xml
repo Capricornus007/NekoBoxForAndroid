@@ -1,0 +1,16 @@
+<resources>
+    <string name="profile_diagnostics">Check configuration and routes</string>
+    <string name="diagnostics_config_valid">Configuration accepted by the core</string>
+    <string name="diagnostics_config_invalid">Configuration error</string>
+    <string name="diagnostics_listener_without_auth">Listener accessible from LAN without a password:</string>
+    <string name="diagnostics_no_groups">Group decisions are available for a running profile with dynamic groups.</string>
+    <string name="diagnostics_initial_selection">Initial selection</string>
+    <string name="diagnostics_no_probe">No candidate passed the availability check</string>
+    <string name="diagnostics_control_unreachable">Control website unavailable through direct access</string>
+    <string name="diagnostics_direct_recovered">Direct access restored</string>
+    <string name="diagnostics_previous_unavailable">Previous candidate unavailable</string>
+    <string name="diagnostics_priority_available">Higher priority candidate available</string>
+    <string name="diagnostics_lower_latency">Lower latency candidate selected</string>
+    <string name="diagnostics_no_candidate">No compatible candidate</string>
+    <string name="diagnostics_refresh">Refresh</string>
+</resources>

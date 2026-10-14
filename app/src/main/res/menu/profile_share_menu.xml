@@ -32,6 +32,7 @@
             <item
                 android:id="@+id/action_config_export_clipboard"
                 android:title="@string/action_export_clipboard" />
+            <item android:id="@+id/action_profile_diagnostics" android:title="@string/profile_diagnostics" />
             <item
                 android:id="@+id/action_config_export_file"
                 android:title="@string/action_export_file" />

@@ -29,6 +29,7 @@ import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean
 import io.nekohasekai.sagernet.fmt.v2ray.buildSingBoxOutboundStandardV2RayBean
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.fmt.wireguard.buildSingBoxOutboundWireguardBean
+import io.nekohasekai.sagernet.fmt.wireguard.normalizeWireGuardLocalAddresses
 import io.nekohasekai.sagernet.ktx.isIpAddress
 import io.nekohasekai.sagernet.ktx.mkPort
 import io.nekohasekai.sagernet.utils.PackageCache
@@ -171,7 +172,8 @@ fun buildConfig(
         if (forTest) mapOf() else SagerDatabase.proxyDao.getEntities(extraRules.mapNotNull { rule ->
             rule.outbound.takeIf { it > 0 && it != proxy.id }
         }.toHashSet().toList()).associateBy { it.id }
-    val buildSelector = !forTest && group?.isSelector == true && !forExport
+    val importedWireGuard = (proxy.requireBean() as? WireGuardBean)?.takeIf { it.useConfigRoutes == true && !forTest }
+    val buildSelector = !forTest && group?.isSelector == true && !forExport && importedWireGuard == null
     val userDNSRuleList = mutableListOf<DNSRule_DefaultOptions>()
     val domainListDNSDirectForce = mutableListOf<String>()
     val bypassDNSBeans = hashSetOf<AbstractBean>()
@@ -180,7 +182,7 @@ fun buildConfig(
     val isVPN = DataStore.serviceMode == Key.MODE_VPN
     val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST
     val needLocalProxyInbounds = !isVPN || DataStore.allowAccess
-    val remoteDns = DataStore.remoteDns.split("\n")
+    val remoteDns = (importedWireGuard?.dnsServers?.takeIf { it.isNotBlank() } ?: DataStore.remoteDns).split('\n', ',')
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
     val directDNS = DataStore.directDns.split("\n")
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
@@ -270,16 +272,15 @@ fun buildConfig(
                 sniff_override_destination = needSniffOverride
                 when (ipv6Mode) {
                     IPv6Mode.DISABLE -> {
-                        inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
+                        _hack_config_map["address"] = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
                     }
 
                     IPv6Mode.ONLY -> {
-                        inet6_address = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
+                        _hack_config_map["address"] = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
                     }
 
                     else -> {
-                        inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
-                        inet6_address = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
+                        _hack_config_map["address"] = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28", VpnService.PRIVATE_VLAN6_CLIENT + "/126")
                     }
                 }
                 if (DataStore.proxyApps) {
@@ -623,6 +624,7 @@ fun buildConfig(
 
         val mainProxyTag = (if (buildSelector) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
         route.final_ = mainProxyTag
+        if (importedWireGuard != null) route.final_ = TAG_BYPASS
 
         fun buildPerAppTunGuardRules(): List<Rule> {
             if (forTest || !isVPN || !DataStore.proxyApps) return emptyList()
@@ -1008,6 +1010,12 @@ fun buildConfig(
                 })
             }
             // DNS interception must precede LAN: the virtual DNS IP is private.
+            if (importedWireGuard != null) {
+                route.rules.add(0, Rule_DefaultOptions().apply {
+                    ip_cidr = normalizeWireGuardLocalAddresses(importedWireGuard.allowedIPs)
+                    outbound = mainProxyTag
+                })
+            }
             route.rules.add(0, Rule_DefaultOptions().apply {
                 protocol = listOf("dns")
                 action = "hijack-dns"

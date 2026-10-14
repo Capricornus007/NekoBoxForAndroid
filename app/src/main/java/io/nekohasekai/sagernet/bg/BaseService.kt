@@ -156,6 +156,12 @@ class BaseService {
             }
         }
 
+        override fun getRuntimeDiagnostics(): String {
+            val proxy = data?.proxy ?: return "{\"groups\":[]}"
+            if (!proxy.isInitialized()) return "{\"groups\":[]}"
+            return proxy.box.runtimeDiagnostics()
+        }
+
         fun stateChanged(s: State, msg: String?) = launch {
             val profileName = profileName
             broadcast { it.stateChanged(s.ordinal, profileName, msg) }

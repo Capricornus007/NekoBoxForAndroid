@@ -2027,6 +2027,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                             entity.requireBean().toUniversalLink()
                         )
 
+                        R.id.action_profile_diagnostics -> (activity as MainActivity).showProfileDiagnostics(entity)
                         R.id.action_config_export_clipboard -> export(entity.exportConfig().first)
                         R.id.action_config_export_file -> {
                             val cfg = entity.exportConfig()

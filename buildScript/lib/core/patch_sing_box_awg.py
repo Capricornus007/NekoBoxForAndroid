@@ -54,6 +54,16 @@ def main():
 
     protocol_init = root / "protocol" / "wireguard" / "init.go"
     patch_file(
+        wireguard_option,
+        "type LegacyWireGuardPeer struct {\n\tServerOptions\n",
+        "type LegacyWireGuardPeer struct {\n\tServerOptions\n\tPersistentKeepaliveInterval uint16 `json:\"persistent_keepalive_interval,omitempty\"`\n",
+    )
+    patch_file(
+        root / "protocol" / "wireguard" / "outbound.go",
+        "\t\t\t// PersistentKeepaliveInterval: time.Duration(it.PersistentKeepaliveInterval),",
+        "\t\t\tPersistentKeepaliveInterval: it.PersistentKeepaliveInterval,",
+    )
+    patch_file(
         protocol_init,
         """\t"github.com/sagernet/wireguard-go/conn"\n""",
         "",

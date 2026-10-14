@@ -2,11 +2,12 @@ package io.nekohasekai.sagernet.group
 
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.KryoConverters
+import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import java.security.MessageDigest
 import java.util.Locale
 
 internal fun parseSubscriptionHeaders(text: String): Map<String, String> {
-    require(text.length <= 8192) { "HTTP headers exceed 8 KiB" }
+    require(text.toByteArray(Charsets.UTF_8).size <= 8192) { "HTTP headers exceed 8 KiB" }
     val headers = linkedMapOf<String, String>()
     for (line in text.lineSequence()) {
         if (line.isBlank()) continue
@@ -14,7 +15,7 @@ internal fun parseSubscriptionHeaders(text: String): Map<String, String> {
         require(separator > 0) { "Expected Header-Name: value" }
         val name = line.substring(0, separator).trim().lowercase(Locale.ROOT)
         val value = line.substring(separator + 1).trim()
-        require(name.all { it in 'a'..'z' || it in '0'..'9' || it in "!#$%&'*+-.^_`|~" }) { "Invalid HTTP header name" }
+        require(name.isNotEmpty() && name.all { it in 'a'..'z' || it in '0'..'9' || it in "!#$%&'*+-.^_`|~" }) { "Invalid HTTP header name" }
         require(value.none { it < ' ' || it == '\u007f' }) { "Invalid HTTP header value" }
         require(name !in setOf("host", "content-length", "connection", "transfer-encoding", "proxy-authorization", "upgrade", "trailer", "te")) { "Reserved HTTP header: $name" }
         require(!headers.containsKey(name)) { "Duplicate HTTP header: $name" }
@@ -29,6 +30,7 @@ internal fun subscriptionFingerprint(bean: AbstractBean): String {
         name = ""
         customOutboundJson = ""
         customConfigJson = ""
+        if (this is WireGuardBean) useConfigRoutes = false
     }
     val digest = MessageDigest.getInstance("SHA-256").digest(KryoConverters.serialize(copy))
     return bean.javaClass.name + ":" + digest.joinToString("") { "%02x".format(it) }

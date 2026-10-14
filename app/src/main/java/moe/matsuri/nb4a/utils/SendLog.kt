@@ -8,11 +8,12 @@ import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
-import io.nekohasekai.sagernet.ktx.use
+import io.nekohasekai.sagernet.ktx.redactDiagnostic
+import io.nekohasekai.sagernet.ktx.readBytesLimited
+import io.nekohasekai.sagernet.ktx.MAX_SUBSCRIPTION_BYTES
 import io.nekohasekai.sagernet.utils.CrashHandler
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 
 object SendLog {
@@ -27,22 +28,22 @@ object SendLog {
 
         report += "Logcat: \n\n"
 
-        logFile.writeText(report)
+        logFile.writeText(redactDiagnostic(report))
 
         try {
-            Runtime.getRuntime().exec(arrayOf("logcat", "-d")).inputStream.use(
-                FileOutputStream(
-                    logFile, true
-                )
-            )
+            val process = Runtime.getRuntime().exec(arrayOf("logcat", "-d"))
+            try {
+                val text = process.inputStream.use { it.readBytesLimited(MAX_SUBSCRIPTION_BYTES).toString(Charsets.UTF_8) }
+                logFile.appendText(redactDiagnostic(text))
+            } finally { process.destroy() }
             logFile.appendText("\n")
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Logs.w(e)
-            logFile.appendText("Export logcat error: " + CrashHandler.formatThrowable(e))
+            logFile.appendText(redactDiagnostic("Export logcat error: " + CrashHandler.formatThrowable(e)))
         }
 
         logFile.appendText("\n")
-        logFile.appendBytes(getNekoLog(0))
+        logFile.appendText(redactDiagnostic(getNekoLog(MAX_SUBSCRIPTION_BYTES.toLong()).toString(Charsets.UTF_8)))
 
         context.startActivity(
             Intent.createChooser(
