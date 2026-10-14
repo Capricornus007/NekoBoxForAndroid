@@ -13,4 +13,5 @@
     <string name="diagnostics_lower_latency">Выбран узел с меньшей задержкой</string>
     <string name="diagnostics_no_candidate">Нет подходящего узла</string>
     <string name="diagnostics_refresh">Обновить</string>
+    <string name="diagnostics_no_app_guard">В конфигурации ядра не найдены блокирующие правила UID/пакетов. Проверьте ограничения приложений, особенно в пользовательском JSON.</string>
 </resources>

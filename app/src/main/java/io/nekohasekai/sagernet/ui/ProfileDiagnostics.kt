@@ -46,6 +46,19 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
                         report.append("\n\n").append(getString(R.string.diagnostics_listener_without_auth)).append(" ").append(inbound.optString("tag"))
                     }
                 }
+
+                fun hasAppGuard(rule: JSONObject): Boolean {
+                    fun appCondition(rule: JSONObject): Boolean {
+                        if (rule.has("user_id") || rule.has("package_name")) return true
+                        val children = rule.optJSONArray("rules") ?: return false
+                        return (0 until children.length()).any { index -> children.optJSONObject(index)?.let(::appCondition) == true }
+                    }
+                    return rule.optString("action") == "reject" && appCondition(rule)
+                }
+                val routeRules = json.optJSONObject("route")?.optJSONArray("rules")
+                val hasTun = inbounds != null && (0 until inbounds.length()).any { inbounds.optJSONObject(it)?.optString("type") == "tun" }
+                val guarded = routeRules != null && (0 until routeRules.length()).any { routeRules.optJSONObject(it)?.let(::hasAppGuard) == true }
+                if (hasTun && DataStore.proxyApps && !guarded) report.append("\n\n").append(getString(R.string.diagnostics_no_app_guard))
                 val runtime = if (profile.id == DataStore.currentProfile && DataStore.serviceState.started) {
                     runCatching { connection.service?.runtimeDiagnostics }.getOrNull()
                 } else null

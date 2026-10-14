@@ -46,7 +46,7 @@ func (s *URLTest) SelectionDiagnostics() map[string]any {
     if g == nil { return map[string]any{"tag": s.Tag(), "state": "not-started"} }
     candidates := make([]map[string]any, 0)
     for index, outbound := range g.outbounds {
-        if index >= 64 { break }
+        if index >= 64 && outbound != g.selectedOutboundTCP.Load() && outbound != g.selectedOutboundUDP.Load() { continue }
         candidate := map[string]any{"tag": outbound.Tag(), "reachable": false}
         if history, available := managedURLTestHistory(g, outbound, N.NetworkTCP); available {
             candidate["reachable"] = true

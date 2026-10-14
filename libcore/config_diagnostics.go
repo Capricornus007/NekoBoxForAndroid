@@ -54,6 +54,30 @@ func CheckConfig(config string, localTransport LocalDNSTransport) (err error) {
 			return err
 		}
 	}
+
+	var routing struct {
+		Route struct {
+			Final string
+			Rules []json.RawMessage
+		}
+	}
+	if err := json.Unmarshal([]byte(config), &routing); err != nil { return err }
+	if routing.Route.Final != "" {
+		if err := visit(routing.Route.Final); err != nil { return err }
+	}
+	var checkRules func([]json.RawMessage) error
+	checkRules = func(rules []json.RawMessage) error {
+		for _, raw := range rules {
+			var rule struct { Action, Outbound string; Rules []json.RawMessage }
+			if err := json.Unmarshal(raw, &rule); err != nil { return err }
+			if (rule.Action == "" || rule.Action == "route") && rule.Outbound != "" {
+				if err := visit(rule.Outbound); err != nil { return err }
+			}
+			if err := checkRules(rule.Rules); err != nil { return err }
+		}
+		return nil
+	}
+	if err := checkRules(routing.Route.Rules); err != nil { return err }
 	return nil
 }
 

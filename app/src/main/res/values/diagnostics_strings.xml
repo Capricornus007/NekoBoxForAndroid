@@ -13,4 +13,5 @@
     <string name="diagnostics_lower_latency">Lower latency candidate selected</string>
     <string name="diagnostics_no_candidate">No compatible candidate</string>
     <string name="diagnostics_refresh">Refresh</string>
+    <string name="diagnostics_no_app_guard">No rejecting UID/package rule found in the core configuration. Check app restrictions, especially in custom JSON.</string>
 </resources>

@@ -41,6 +41,8 @@ func TestConfigValidationDoesNotStartListenersOrReplaceActiveInstance(t *testing
 		t.Fatalf("invalid resolver accepted: %v", err)
 	}
 	for _, config := range []string{
+		`{"outbounds":[{"type":"direct","tag":"direct"}],"route":{"final":"missing"}}`,
+		`{"outbounds":[{"type":"direct","tag":"direct"}],"route":{"rules":[{"type":"logical","mode":"and","rules":[{"domain":["example.test"]}],"action":"route","outbound":"missing"}]}}`,
 		`{"outbounds":[{"type":"selector","tag":"group","outbounds":["missing"]}]}`,
 		`{"outbounds":[{"type":"selector","tag":"first","outbounds":["second"]},{"type":"selector","tag":"second","outbounds":["first"]}]}`,
 	} {
