@@ -955,9 +955,7 @@ fun buildConfig(
         if (useDirectFallback) {
             // Keep dns-direct independent: proxy endpoints and the control probe
             // must not resolve through the group that depends on their results.
-            val address = directDNS.firstOrNull()?.takeUnless { it == "local" }
-                ?: remoteDns.firstOrNull()?.takeUnless { it == "local" }
-                ?: "https://dns.google/dns-query"
+            val address = directFallbackDnsAddress(directDNS.firstOrNull(), remoteDns.firstOrNull())
             dns.servers.add(DNSServerOptions().apply {
                 _hack_config_map.putAll(dnsServerConfig(
                     address, DNS_DIRECT_FALLBACK, "dns-local", TAG_DIRECT_FALLBACK

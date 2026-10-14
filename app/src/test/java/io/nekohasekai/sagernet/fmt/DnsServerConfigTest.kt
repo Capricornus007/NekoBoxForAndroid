@@ -5,6 +5,35 @@ import org.junit.Test
 import moe.matsuri.nb4a.SingBoxOptions.DNSRule_DefaultOptions
 
 class DnsServerConfigTest {
+    @Test fun bareLocalhostUsesAndroidSystemDNSRatherThanLoopbackUDP() {
+        for (address in listOf("local", "localhost", " LocalHost ", "LOCAL")) {
+            assertEquals(address, mapOf("type" to "local", "tag" to "dns-direct"),
+                dnsServerConfig(address, "dns-direct", "dns-local", "direct"))
+        }
+    }
+
+    @Test fun explicitLoopbackServersKeepTheirTransportAndPort() {
+        for (address in listOf("127.0.0.1", "[::1]", "udp://localhost", "localhost:5353")) {
+            val server = dnsServerConfig(address, "custom-dns", "dns-local", "direct")
+            assertEquals("udp", server["type"])
+            assertNotNull(server["server"])
+        }
+        assertEquals(5353, dnsServerConfig("localhost:5353", "custom-dns", "dns-local", "direct")["server_port"])
+    }
+
+    @Test fun systemDNSAliasesDoNotDisableTheProxyDetourOfFallbackDNS() {
+        val remote = "https://dns.example.test/custom"
+        for (direct in listOf("local", "localhost", " LocalHost ")) {
+            val server = dnsServerConfig(directFallbackDnsAddress(direct, remote),
+                DNS_DIRECT_FALLBACK, "dns-local", TAG_DIRECT_FALLBACK)
+            assertEquals("https", server["type"])
+            assertEquals("dns.example.test", server["server"])
+            assertEquals(TAG_DIRECT_FALLBACK, server["detour"])
+        }
+        assertEquals("https://dns.google/dns-query", directFallbackDnsAddress("localhost", "LOCAL"))
+        assertEquals("udp://localhost:5353", directFallbackDnsAddress("udp://localhost:5353", remote))
+    }
+
     @Test fun blockedResponseDropsFieldsOnlySupportedByDnsRouteActions() {
         val rule = DNSRule_DefaultOptions().apply {
             server = "dns-block"

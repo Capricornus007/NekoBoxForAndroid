@@ -7,4 +7,5 @@
     <string name="direct_fallback_interval">Интервал проверки (секунды)</string>
     <string name="direct_fallback_invalid_url">Введите корректный HTTP- или HTTPS-URL без учётных данных и фрагмента.</string>
     <string name="direct_fallback_invalid_interval">Интервал проверки должен быть от 5 до 3600 секунд.</string>
+    <string name="dns_server_input_help">local или localhost — системный DNS Android в основной сети. Если DNS-сервер запущен на самом устройстве, укажите явно udp://127.0.0.1:53.</string>
 </resources>

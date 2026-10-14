@@ -7,4 +7,5 @@
     <string name="direct_fallback_interval">Check interval (seconds)</string>
     <string name="direct_fallback_invalid_url">Enter a valid HTTP or HTTPS URL without credentials or a fragment.</string>
     <string name="direct_fallback_invalid_interval">The check interval must be from 5 to 3600 seconds.</string>
+    <string name="dns_server_input_help">local or localhost uses Android DNS on the underlying network. To use a DNS server running on this device, specify udp://127.0.0.1:53 explicitly.</string>
 </resources>
