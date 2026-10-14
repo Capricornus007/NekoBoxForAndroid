@@ -7,10 +7,27 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Validate the complete staged database before atomically replacing the current one.
 func InstallRouteAsset(staged, destination string) error {
+	return withAssetLock(destination, func() error { return installRouteAsset(staged, destination) })
+}
+
+func InstallRouteAssetVersion(staged, destination, version string) error {
+	if len(version) == 0 || len(version) > 128 {
+		return fmt.Errorf("invalid asset version")
+	}
+	return withAssetLock(destination, func() error {
+		if err := installRouteAsset(staged, destination); err != nil {
+			return err
+		}
+		return writeAssetVersion(strings.TrimSuffix(destination, ".db")+".version.txt", version)
+	})
+}
+
+func installRouteAsset(staged, destination string) error {
 	info, err := os.Stat(staged)
 	if err != nil {
 		return err
@@ -28,7 +45,30 @@ func InstallRouteAsset(staged, destination string) error {
 			reader.Close()
 			return fmt.Errorf("expected sing-geoip database")
 		}
-		err = reader.Verify()
+		// SagerNet intentionally omits the optional description. Verify is
+		// stricter than the MMDB specification; retain its structural checks
+		// using a validation-only copy, without changing the database.
+		checked := *reader
+		if len(checked.Metadata.Description) == 0 {
+			checked.Metadata.Description = map[string]string{"en": "sing-geoip"}
+		}
+		err = checked.Verify()
+		if err == nil {
+			networks := reader.Networks(maxminddb.SkipAliasedNetworks)
+			for networks.Next() {
+				var country string
+				if _, err = networks.Network(&country); err != nil {
+					break
+				}
+				if country == "" {
+					err = fmt.Errorf("empty GeoIP country")
+					break
+				}
+			}
+			if err == nil {
+				err = networks.Err()
+			}
+		}
 		closeErr := reader.Close()
 		if err != nil {
 			return err

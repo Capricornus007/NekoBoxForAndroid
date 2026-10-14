@@ -2,6 +2,7 @@ package io.nekohasekai.sagernet.ktx
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -18,8 +19,14 @@ fun Fragment.alert(text: String) = requireContext().alert(text)
 
 fun AlertDialog.tryToShow() {
     try {
-        val activity = context as Activity
-        if (!activity.isFinishing) {
+        var owner = context
+        while (owner is ContextWrapper && owner !is Activity) {
+            val base = owner.baseContext
+            if (base === owner) return
+            owner = base
+        }
+        val activity = owner as? Activity ?: return
+        if (!activity.isFinishing && !activity.isDestroyed) {
             show()
         }
     } catch (e: Exception) {

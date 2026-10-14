@@ -29,6 +29,7 @@ manifest = {
     'java': run('java', '-version'),
     'ndk': ndk.read_text().strip(),
     'source_pins': pins,
+    'bundled_route_assets': json.loads((root / 'buildScript/route-assets.json').read_text()),
     'core_patch_sha256': patches,
     'resolved_modules': run('go', 'list', '-m', 'all', cwd=root / 'libcore').splitlines(),
     'signing_certificate_sha256': certificate,

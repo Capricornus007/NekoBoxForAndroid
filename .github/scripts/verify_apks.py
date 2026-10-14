@@ -2,6 +2,7 @@
 """Verify the actual release APKs, including native 16 KiB page compatibility."""
 import hashlib
 import json
+import lzma
 import os
 from pathlib import Path
 import re
@@ -12,6 +13,7 @@ import zipfile
 
 root = Path(__file__).resolve().parents[2]
 properties = dict(line.split('=', 1) for line in (root / 'nb4a.properties').read_text().splitlines() if '=' in line)
+route_assets = json.loads((root / 'buildScript/route-assets.json').read_text())
 tools = Path(os.environ['ANDROID_HOME']) / 'build-tools' / '35.0.1'
 directory = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'app/build/outputs/apk/oss/release'
 abis = {'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'}
@@ -35,6 +37,11 @@ for apk in apks:
     signers.add(signer[1])
     run(tools / 'zipalign', '-c', '-P', '16', '4', apk)
     with zipfile.ZipFile(apk) as archive:
+        for name, pin in route_assets.items():
+            prefix = f'assets/sing-box/{name}'
+            assert archive.read(prefix + '.version.txt').decode().strip() == pin['version'], f'Wrong bundled version: {name}'
+            database = lzma.decompress(archive.read(prefix + '.db.xz'))
+            assert hashlib.sha256(database).hexdigest() == pin['sha256'], f'Wrong bundled database: {name}'
         libraries = [name for name in archive.namelist() if name.startswith('lib/') and name.endswith('.so')]
         actual_abis = {name.split('/')[1] for name in libraries}
         assert len(actual_abis) == 1 and actual_abis <= abis, f'Wrong ABI contents: {apk}'

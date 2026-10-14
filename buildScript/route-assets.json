@@ -1,0 +1,12 @@
+{
+  "geoip": {
+    "repository": "SagerNet/sing-geoip",
+    "version": "20261012",
+    "sha256": "f24050f4ce11783cd632fe3982f24895d959fa01afc8fab6ca8a6a3615b5de56"
+  },
+  "geosite": {
+    "repository": "SagerNet/sing-geosite",
+    "version": "20261009101206",
+    "sha256": "4c96a06de63d11985026ad387072c7263e0cc0d378a1171c28c62ae0cbc79013"
+  }
+}
