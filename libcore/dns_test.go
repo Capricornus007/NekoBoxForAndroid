@@ -3,6 +3,7 @@ package libcore
 import (
 	"context"
 	"errors"
+	"net"
 	"net/netip"
 	"testing"
 	"time"
@@ -70,5 +71,39 @@ func TestLocalDNSFailureAndCancellation(t *testing.T) {
 	}
 	if _, err := transport.Exchange(context.Background(), new(mDNS.Msg)); err == nil {
 		t.Fatal("accepted empty DNS question")
+	}
+}
+
+type rawNetworkDNS struct{ testLocalDNS }
+
+func (*rawNetworkDNS) Raw() bool            { return true }
+func (*rawNetworkDNS) NetworkHandle() int64 { return 42 }
+
+func TestPlatformRawDNSUsesUnderlyingNetworkHandle(t *testing.T) {
+	previous := rawQueryFunc
+	defer func() { rawQueryFunc = previous }()
+	rawQueryFunc = func(networkHandle int64, payload []byte) ([]byte, error) {
+		if networkHandle != 42 {
+			t.Fatalf("DNS used network handle %d instead of underlying network", networkHandle)
+		}
+		request := new(mDNS.Msg)
+		if err := request.Unpack(payload); err != nil {
+			return nil, err
+		}
+		response := new(mDNS.Msg).SetReply(request)
+		q := request.Question[0]
+		if q.Qtype == mDNS.TypeA {
+			response.Answer = []mDNS.RR{&mDNS.A{Hdr: mDNS.RR_Header{Name: q.Name, Rrtype: mDNS.TypeA, Class: mDNS.ClassINET}, A: net.ParseIP("192.0.2.10")}}
+		} else {
+			response.Answer = []mDNS.RR{&mDNS.AAAA{Hdr: mDNS.RR_Header{Name: q.Name, Rrtype: mDNS.TypeAAAA, Class: mDNS.ClassINET}, AAAA: net.ParseIP("2001:db8::10")}}
+		}
+		return response.Pack()
+	}
+	transport := newPlatformTransport(&rawNetworkDNS{}, "dns-direct", option.LocalDNSServerOptions{})
+	for _, qtype := range []uint16{mDNS.TypeA, mDNS.TypeAAAA} {
+		response, err := transport.Exchange(context.Background(), new(mDNS.Msg).SetQuestion("bootstrap.test.", qtype))
+		if err != nil || len(response.Answer) != 1 || response.Answer[0].Header().Rrtype != qtype {
+			t.Fatalf("raw DNS type %d failed: %v", qtype, err)
+		}
 	}
 }

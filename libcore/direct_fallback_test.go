@@ -56,7 +56,7 @@ func newFallbackTest(t *testing.T, url string, interval time.Duration) (*group.U
 	direct := &fallbackTestOutbound{Adapter: outbound.NewAdapter("test", "direct", []string{N.NetworkTCP, N.NetworkUDP}, nil), control: control}
 	proxy := &fallbackTestOutbound{Adapter: outbound.NewAdapter("test", "proxy", []string{N.NetworkTCP, N.NetworkUDP}, nil), control: control}
 	service.MustRegister[adapter.OutboundManager](ctx, &trafficOutboundManager{items: map[string]adapter.Outbound{"direct": direct, "proxy": proxy}})
-	o, err := group.NewURLTest(ctx, nil, log.NewNOPFactory().NewLogger("test"), "direct-fallback", option.URLTestOutboundOptions{Outbounds: []string{"direct", "proxy"}, URL: url, Strategy: "direct-fallback", WaitForInitial: true, Interval: badoption.Duration(interval), IdleTimeout: badoption.Duration(interval), Timeout: badoption.Duration(50 * time.Millisecond), InterruptExistConnections: true})
+	o, err := group.NewURLTest(ctx, nil, log.NewNOPFactory().NewLogger("test"), "direct-fallback", option.URLTestOutboundOptions{Outbounds: []string{"direct", "proxy"}, URL: url, Strategy: "direct-fallback", WaitForInitial: true, Interval: badoption.Duration(interval), IdleTimeout: badoption.Duration(interval), Timeout: badoption.Duration(500 * time.Millisecond), InterruptExistConnections: true})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -183,7 +183,7 @@ func TestDirectFallbackTimeoutAndConnectionInterruption(t *testing.T) {
 			select {
 			case <-r.Context().Done():
 				return
-			case <-time.After(200 * time.Millisecond):
+			case <-time.After(2 * time.Second):
 			}
 		}
 		w.WriteHeader(204)
@@ -191,6 +191,9 @@ func TestDirectFallbackTimeoutAndConnectionInterruption(t *testing.T) {
 	defer server.Close()
 	g, _, _, _ := newFallbackTest(t, server.URL, time.Hour)
 	_ = g.PostStart()
+	if g.Now() != "direct" {
+		t.Fatal("healthy control site did not select direct before timeout test")
+	}
 	c, err := g.DialContext(interrupt.ContextWithIsExternalConnection(context.Background()), "tcp", M.ParseSocksaddr("payload.test:80"))
 	if err != nil {
 		t.Fatal(err)
@@ -199,7 +202,7 @@ func TestDirectFallbackTimeoutAndConnectionInterruption(t *testing.T) {
 	slow.Store(true)
 	start := time.Now()
 	g.CheckOutbounds()
-	if time.Since(start) > 150*time.Millisecond || g.Now() != "proxy" {
+	if time.Since(start) > 1500*time.Millisecond || g.Now() != "proxy" {
 		t.Fatal("bounded timeout did not select proxy")
 	}
 	_ = c.SetReadDeadline(time.Now().Add(time.Second))

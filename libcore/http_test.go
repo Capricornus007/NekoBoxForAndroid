@@ -291,7 +291,9 @@ func TestLogicalTunGuardInActualCore(t *testing.T) {
 		reject        bool
 	}{
 		{"selected", "tun-in", 12345, 443, false}, {"owner", "tun-in", 20001, 443, false},
-		{"unselected", "tun-in", 23456, 443, true}, {"socks", "socks-in", 23456, 443, false}, {"http", "http-in", 23456, 443, false},
+		{"unselected", "tun-in", 23456, 443, true},
+		{"unselected DNS", "tun-in", 23456, 53, true}, {"unselected DoT", "tun-in", 23456, 853, true},
+		{"work profile", "tun-in", 112345, 443, true}, {"work profile DNS", "tun-in", 112345, 53, true}, {"unknown DNS", "tun-in", -1, 53, true}, {"socks", "socks-in", 23456, 443, false}, {"http", "http-in", 23456, 443, false},
 		{"dns", "tun-in", 1000, 53, false}, {"dot", "tun-in", 1051, 853, false}, {"system other", "tun-in", 1000, 443, true}, {"unknown", "tun-in", -1, 443, true},
 	} {
 		t.Run(test.name, func(t *testing.T) {

@@ -129,6 +129,8 @@ jobs:
 
           Fixes official GeoIP updates and first-run geo routing with checksum-verified bundled GeoIP/GeoSite databases. Session traffic keeps updating when speed display is disabled; dynamic group candidates retain their own TCP/UDP traffic. Includes optional proxy-only subscription/route updates and password-encrypted local/shared/WebDAV backups. Backup restoration commits profiles, routes and settings through one SQLite connection.
 
+          Fixes directDns=localhost without a custom DNS block: bare local/localhost now selects Android system DNS on the underlying network, instead of UDP queries to an absent loopback DNS server. Explicit loopback DNS URLs and ports retain their meaning. Direct-fallback DNS also recognizes both system-DNS aliases and retains its proxy detour. TUN UID/package guards remain in place; tests cover DNS probes by unselected/work-profile UIDs, native platform DNS network handles, A/AAAA bootstrap and recovery through direct/proxy paths.
+
           Restores multiline editors for route/DNS lists, WireGuard addresses, ALPN, certificates, SSH keys, HTTP headers, ECH and HWID parameters. Fixes dropped individual Hysteria hopping ports and FakeDNS in IPv6 modes.
 
           Adds an optional reachability-based proxy fallback for generated direct routes. A direct HEAD probe of the configured control URL selects direct access when reachable and the current proxy when unavailable; recovery restores direct access. LAN remains direct, routed DNS follows the selected path and proxy bootstrap stays independent. Default: disabled, HTTPS kernel.org, 30-second interval, 3-second timeout. Switching reconnects existing flows. This is a network control-site check, not a retry for each destination.

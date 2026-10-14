@@ -249,6 +249,15 @@ func TestTypedFakeIPRespectsIPv6Modes(t *testing.T) {
 }
 
 func TestFallbackDNSUsesSelectedPathWithoutResolverLoop(t *testing.T) {
+	testFallbackDNSBootstrap(t, false)
+}
+
+func TestFallbackDNSWithAndroidPlatformBootstrap(t *testing.T) {
+	testFallbackDNSBootstrap(t, true)
+}
+
+func testFallbackDNSBootstrap(t *testing.T, usePlatform bool) {
+
 	var controlStatus, proxyCalls, dnsCalls atomic.Int32
 	controlStatus.Store(204)
 	controlSite := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(int(controlStatus.Load())) }))
@@ -276,7 +285,11 @@ func TestFallbackDNSUsesSelectedPathWithoutResolverLoop(t *testing.T) {
 			return
 		}
 		response := new(mDNS.Msg).SetReply(request)
-		response.Answer = []mDNS.RR{&mDNS.A{Hdr: mDNS.RR_Header{Name: request.Question[0].Name, Rrtype: mDNS.TypeA, Class: mDNS.ClassINET, Ttl: 1}, A: net.ParseIP("203.0.113.10")}}
+		if request.Question[0].Qtype == mDNS.TypeAAAA {
+			response.Answer = []mDNS.RR{&mDNS.AAAA{Hdr: mDNS.RR_Header{Name: request.Question[0].Name, Rrtype: mDNS.TypeAAAA, Class: mDNS.ClassINET, Ttl: 1}, AAAA: net.ParseIP("2001:db8::10")}}
+		} else {
+			response.Answer = []mDNS.RR{&mDNS.A{Hdr: mDNS.RR_Header{Name: request.Question[0].Name, Rrtype: mDNS.TypeA, Class: mDNS.ClassINET, Ttl: 1}, A: net.ParseIP("203.0.113.10")}}
+		}
 		data, _ := response.Pack()
 		w.Header().Set("Content-Type", "application/dns-message")
 		_, _ = w.Write(data)
@@ -307,18 +320,34 @@ func TestFallbackDNSUsesSelectedPathWithoutResolverLoop(t *testing.T) {
 		_, _ = io.Copy(upstream, rw)
 	}))
 	defer proxy.Close()
+	var platformCalls atomic.Int32
+	var platformDNS LocalDNSTransport
+	directServer := map[string]any{"type": "udp", "tag": "dns-direct", "server": "127.0.0.1", "server_port": udp.LocalAddr().(*net.UDPAddr).Port}
+	bootstrapTag, strategy, proxyHost := "dns-direct", "ipv4_only", "127.0.0.1"
+	if usePlatform {
+		directServer = map[string]any{"type": "local", "tag": "dns-direct"}
+		bootstrapTag, strategy, proxyHost = "dns-local", "prefer_ipv4", "proxy.example.test"
+		platformDNS = &testLocalDNS{lookup: func(exchange *ExchangeContext, network string) {
+			platformCalls.Add(1)
+			if network == "ip6" {
+				exchange.Success("")
+			} else {
+				exchange.Success("127.0.0.1")
+			}
+		}}
+	}
 	configuration := map[string]any{
 		"dns": map[string]any{"servers": []any{
-			map[string]any{"type": "udp", "tag": "dns-direct", "server": "127.0.0.1", "server_port": udp.LocalAddr().(*net.UDPAddr).Port},
-			map[string]any{"type": "https", "tag": "dns-direct-fallback", "server": "127.0.0.1", "server_port": doh.Listener.Addr().(*net.TCPAddr).Port, "detour": "direct-fallback", "domain_resolver": "dns-direct", "tls": map[string]any{"enabled": true, "insecure": true}},
-		}, "rules": []any{map[string]any{"outbound": []string{"any"}, "server": "dns-direct"}, map[string]any{"server": "dns-direct-fallback", "strategy": "ipv4_only", "disable_cache": true}}},
+			map[string]any{"type": "local", "tag": "dns-local"}, directServer,
+			map[string]any{"type": "https", "tag": "dns-direct-fallback", "server": "resolver.example.test", "server_port": doh.Listener.Addr().(*net.TCPAddr).Port, "detour": "direct-fallback", "domain_resolver": bootstrapTag, "tls": map[string]any{"enabled": true, "insecure": true}},
+		}, "rules": []any{map[string]any{"outbound": []string{"any"}, "server": "dns-direct"}, map[string]any{"server": "dns-direct-fallback", "strategy": strategy, "disable_cache": true}}},
 		"outbounds": []any{
 			map[string]any{"type": "direct", "tag": "direct"},
-			map[string]any{"type": "http", "tag": "proxy", "server": "127.0.0.1", "server_port": proxy.Listener.Addr().(*net.TCPAddr).Port},
+			map[string]any{"type": "http", "tag": "proxy", "server": proxyHost, "domain_strategy": "ipv4_only", "server_port": proxy.Listener.Addr().(*net.TCPAddr).Port},
 			map[string]any{"type": "urltest", "tag": "direct-fallback", "outbounds": []string{"direct", "proxy"}, "strategy": "direct-fallback", "url": controlURL, "interval": "1h", "idle_timeout": "1h", "timeout": "1s", "wait_for_initial": true, "interrupt_exist_connections": true},
 		}, "route": map[string]any{"final": "proxy"},
 	}
-	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry())
+	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(platformDNS), nekoboxAndroidServiceRegistry())
 	service.MustRegister[platform.Interface](ctx, dnsTestPlatform{})
 	content, _ := json.Marshal(configuration)
 	var options option.Options
@@ -337,11 +366,17 @@ func TestFallbackDNSUsesSelectedPathWithoutResolverLoop(t *testing.T) {
 	for i, status := range []int32{204, 451, 204} {
 		controlStatus.Store(status)
 		outbound.(interface{ CheckOutbounds() }).CheckOutbounds()
-		qctx, cancel := context.WithTimeout(ctx, time.Second)
-		response, err := service.FromContext[adapter.DNSRouter](ctx).Exchange(qctx, new(mDNS.Msg).SetQuestion("fallback.test.", mDNS.TypeA), adapter.DNSQueryOptions{})
-		cancel()
-		if err != nil || len(response.Answer) != 1 {
-			t.Fatalf("DNS at HTTP%d: %v", status, err)
+		queryTypes := []uint16{mDNS.TypeA}
+		if usePlatform {
+			queryTypes = append(queryTypes, mDNS.TypeAAAA)
+		}
+		for _, queryType := range queryTypes {
+			qctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+			response, err := service.FromContext[adapter.DNSRouter](ctx).Exchange(qctx, new(mDNS.Msg).SetQuestion("fallback.test.", queryType), adapter.DNSQueryOptions{})
+			cancel()
+			if err != nil || len(response.Answer) != 1 || response.Answer[0].Header().Rrtype != queryType {
+				t.Fatalf("DNS type %d at HTTP%d: %v (selected=%s, platform=%d, proxy=%d, replies=%d)", queryType, status, err, outbound.(adapter.OutboundGroup).Now(), platformCalls.Load(), proxyCalls.Load(), dnsCalls.Load())
+			}
 		}
 		expected := int32(0)
 		if i > 0 {
@@ -351,7 +386,14 @@ func TestFallbackDNSUsesSelectedPathWithoutResolverLoop(t *testing.T) {
 			t.Fatalf("wrong DNS path at HTTP%d: proxy calls=%d", status, proxyCalls.Load())
 		}
 	}
-	if dnsCalls.Load() != 3 {
+	expectedCalls := int32(3)
+	if usePlatform {
+		expectedCalls = 6
+		if platformCalls.Load() == 0 {
+			t.Fatal("Android platform bootstrap was bypassed")
+		}
+	}
+	if dnsCalls.Load() != expectedCalls {
 		t.Fatal("missing DNS requests")
 	}
 }
