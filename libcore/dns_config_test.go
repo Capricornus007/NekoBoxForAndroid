@@ -40,7 +40,7 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
 		response := new(mDNS.Msg).SetReply(request)
 		if request.Question[0].Qtype == mDNS.TypeA {
 			address := net.ParseIP("192.0.2.10")
-			if request.Question[0].Name == "dns.example.test." {
+			if request.Question[0].Name == "dns.example.test." || request.Question[0].Name == "proxy.example.test." {
 				address = net.ParseIP("127.0.0.1")
 			}
 			response.Answer = []mDNS.RR{&mDNS.A{Hdr: mDNS.RR_Header{Name: request.Question[0].Name, Rrtype: mDNS.TypeA, Class: mDNS.ClassINET, Ttl: 60}, A: address}}
@@ -126,13 +126,14 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
 			},
 			"rules": []any{
 				map[string]any{"domain": []string{"blocked.test"}, "action": "predefined", "rcode": "NOERROR"},
+				map[string]any{"outbound": []string{"any"}, "server": "dns-direct", "strategy": "ipv4_only"},
 				map[string]any{"domain_suffix": []string{"internal.test"}, "server": "dns-direct", "strategy": "ipv4_only"},
 				map[string]any{"inbound": []string{"tun-in"}, "query_type": []string{"A", "AAAA"}, "server": "dns-fake", "strategy": "ipv4_only", "disable_cache": true},
 				map[string]any{"server": "dns-remote", "strategy": "ipv4_only"},
 			}, "final": "dns-remote",
 		},
-		"outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}, map[string]any{"type": "socks", "tag": "proxy", "server": "127.0.0.1", "server_port": proxy.Addr().(*net.TCPAddr).Port}},
-		"route":     map[string]any{"final": "proxy", "default_domain_resolver": "dns-direct"},
+		"outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}, map[string]any{"type": "socks", "tag": "proxy", "server": "proxy.example.test", "server_port": proxy.Addr().(*net.TCPAddr).Port, "domain_strategy": "ipv4_only"}},
+		"route":     map[string]any{"final": "proxy"},
 	}
 	content, _ := json.Marshal(configuration)
 	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry())

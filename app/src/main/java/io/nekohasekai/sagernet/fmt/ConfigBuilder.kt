@@ -61,11 +61,9 @@ internal fun SingBoxOption.applyDomainStrategyIfSupported(domainStrategy: String
     val options = asMap()
     val outboundType = options["type"] as? String
     if (outboundType !in GROUP_OUTBOUND_TYPES && options["domain_resolver"] == null) {
-        val strategy = options["domain_strategy"] as? String ?: domainStrategy
-        _hack_config_map["domain_resolver"] = buildMap {
-            put("server", "dns-direct")
-            if (strategy.isNotBlank()) put("strategy", strategy)
-        }
+        // The pinned 1.12 core resolves through DNS rules or the user's default
+        // resolver. A fixed server reference becomes stale after JSON overrides.
+        _hack_config_map["domain_strategy"] = options["domain_strategy"] as? String ?: domainStrategy
     }
 }
 
@@ -1026,7 +1024,6 @@ fun buildConfig(
                 _hack_config_map["strategy"] = dnsStrategies[server] ?: ""
             })
         }
-        route._hack_config_map["default_domain_resolver"] = "dns-direct"
         if (!forTest && isVPN) route.rules.add(0, virtualDnsTlsRejectRule())
         route.rules.addAll(0, buildPerAppTunGuardRules())
 
