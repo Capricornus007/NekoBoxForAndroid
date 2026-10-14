@@ -17,8 +17,24 @@ func TestNekoBindingModuleGraph(t *testing.T) {
 	if mainDir == "" {
 		t.Fatal("NEKO_BIND_MAIN_MODULE is required")
 	}
+	originalFiles := make(map[string][]byte)
+	for _, name := range []string{"go.mod", "go.sum"} {
+		data, err := os.ReadFile(filepath.Join(mainDir, name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		originalFiles[name] = data
+	}
+	t.Cleanup(func() {
+		for name, want := range originalFiles {
+			got, err := os.ReadFile(filepath.Join(mainDir, name))
+			if err != nil || !bytes.Equal(got, want) {
+				t.Errorf("binding module check modified %s: %v", name, err)
+			}
+		}
+	})
 	t.Setenv("GOWORK", "off")
-	t.Setenv("GOFLAGS", "-mod=mod")
+	t.Setenv("GOFLAGS", "-mod=readonly")
 	run := func(dir string, args ...string) string {
 		t.Helper()
 		cmd := exec.Command("go", args...)
