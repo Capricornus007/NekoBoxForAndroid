@@ -96,7 +96,7 @@ fun Project.setupCommon() {
                     }
                 }
                 getByName("debug") {
-                    applicationIdSuffix = "debug"
+                    applicationIdSuffix = null
                     debuggable(true)
                     jniDebuggable(true)
                 }
@@ -147,7 +147,22 @@ fun Project.setupAppCommon() {
                 }
 
                 ciDebugKey != null -> {
+                    if (System.getenv("NEKO_DEV_BUILD") == "1") {
+                        getByName("release").signingConfig = ciDebugKey
+                    }
                     getByName("debug").signingConfig = ciDebugKey
+                }
+            }
+        }
+    }
+}
+
+fun Project.requireReleaseSignature() {
+    tasks.configureEach {
+        if (name.startsWith("package") && name.endsWith("Release")) {
+            doFirst {
+                check(android.buildTypes.getByName("release").signingConfig != null) {
+                    "Release signing is required. Configure a private key or NEKO_DEV_BUILD=1 for a development build."
                 }
             }
         }
@@ -157,16 +172,21 @@ fun Project.setupAppCommon() {
 fun Project.setupApp() {
     val pkgName = requireMetadata().getProperty("PACKAGE_NAME")
     val verName = requireMetadata().getProperty("VERSION_NAME")
+    val sourceCommit = System.getenv("GITHUB_SHA") ?: runCatching {
+        providers.exec { commandLine("git", "rev-parse", "HEAD") }.standardOutput.asText.get().trim()
+    }.getOrDefault("unknown")
     val verCode = (requireMetadata().getProperty("VERSION_CODE").toInt()) * 5
     android.apply {
         defaultConfig {
             applicationId = pkgName
+            buildConfigField("String", "SOURCE_COMMIT", "\"$sourceCommit\"")
             versionCode = verCode
             versionName = verName
             buildConfigField("String", "PRE_VERSION_NAME", "\"\"")
         }
     }
     setupAppCommon()
+    requireReleaseSignature()
 
     android.apply {
         this as AbstractAppExtension

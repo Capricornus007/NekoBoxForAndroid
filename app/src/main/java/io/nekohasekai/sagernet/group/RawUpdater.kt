@@ -33,8 +33,7 @@ import moe.matsuri.nb4a.utils.Util
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
-import org.yaml.snakeyaml.TypeDescription
-import org.yaml.snakeyaml.Yaml
+import androidx.room.withTransaction
 import org.yaml.snakeyaml.error.YAMLException
 import androidx.core.net.toUri
 
@@ -91,15 +90,14 @@ object RawUpdater : GroupUpdater() {
         var proxies: List<AbstractBean>
         if (link.startsWith("content://")) {
             val contentText = app.contentResolver.openInputStream(link.toUri())
-                ?.bufferedReader()
-                ?.readText()
+                ?.use { it.readBytesLimited(MAX_SUBSCRIPTION_BYTES).toString(Charsets.UTF_8) }
 
             proxies = contentText?.let { parseRaw(contentText) }
                 ?: error(app.getString(R.string.no_proxies_found_in_subscription))
         } else {
 
             val response = Libcore.newHttpClient().apply {
-                trySocks5(DataStore.mixedPort)
+                trySocks5(DataStore.socksPort, DataStore.mixedUsername, DataStore.mixedPassword)
                 tryH3Direct()
                 when (DataStore.appTLSVersion) {
                     "1.3" -> restrictedTLS()
@@ -285,6 +283,7 @@ object RawUpdater : GroupUpdater() {
 
     @Suppress("UNCHECKED_CAST")
     suspend fun parseRaw(text: String, fileName: String = ""): List<AbstractBean>? {
+        require(text.length <= MAX_SUBSCRIPTION_BYTES) { "Subscription is too large" }
 
         val proxies = mutableListOf<AbstractBean>()
 
@@ -312,9 +311,7 @@ object RawUpdater : GroupUpdater() {
 
             try {
 
-                val yaml = Yaml().apply {
-                    addTypeDescription(TypeDescription(String::class.java, "str"))
-                }.loadAs(text, Map::class.java)
+                val yaml = parseClashYaml(text)
 
                 val globalClientFingerprint = yaml["global-client-fingerprint"]?.toString() ?: ""
 
