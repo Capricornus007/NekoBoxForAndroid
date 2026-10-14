@@ -4476,6 +4476,13 @@ public class SingBoxOptions {
 
     }
 
+    public static class Rule_LogicalOptions extends Rule {
+        public String mode;
+        public List<Rule> rules;
+        public Boolean invert;
+        public String action;
+    }
+
     public static class Rule_DefaultOptions extends Rule {
 
         // Generate note: Listable

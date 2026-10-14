@@ -150,6 +150,9 @@ abstract class GroupUpdater {
                 try {
                     RawUpdater.doUpdate(proxyGroup, subscription, userInterface, byUser)
                     true
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    finishUpdate(proxyGroup)
+                    throw cancelled
                 } catch (e: Throwable) {
                     Logs.w(e)
                     userInterface?.onUpdateFailure(proxyGroup, e.readableMessage)

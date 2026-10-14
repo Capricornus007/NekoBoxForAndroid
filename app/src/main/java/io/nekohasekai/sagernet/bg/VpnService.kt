@@ -29,7 +29,7 @@ class VpnService : BaseVpnService(),
         const val FAKEDNS_VLAN4_CLIENT = "198.18.0.0"
         const val PRIVATE_VLAN6_CLIENT = "fdfe:dcba:9876::1"
         const val PRIVATE_VLAN6_ROUTER = "fdfe:dcba:9876::2"
-        private val ANDROID_DNS_PACKAGES = listOf(
+        internal val ANDROID_DNS_PACKAGES = listOf(
             "android",
             "com.android.resolv",
             "com.google.android.resolv",
@@ -207,9 +207,7 @@ class VpnService : BaseVpnService(),
             }
         }
 
-if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && DataStore.appendHttpProxy) {
-    builder.setHttpProxy(ProxyInfo.buildDirectProxy(LOCALHOST, DataStore.httpPort))
-}
+// Android cannot provide the authentication required by our HTTP proxy to VPN clients.
 
         metered = DataStore.meteredNetwork
         if (Build.VERSION.SDK_INT >= 29) builder.setMetered(metered)

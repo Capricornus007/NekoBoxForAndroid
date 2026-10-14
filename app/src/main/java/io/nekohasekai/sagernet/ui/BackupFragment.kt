@@ -437,7 +437,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                     ZipInputStream(content.inputStream()).use { zis ->
                         zis.nextEntry?.let { entry ->
                             if (entry.name.endsWith(".json")) {
-                                zis.readBytes().toString(Charsets.UTF_8)
+                                zis.readBytesLimited(MAX_BACKUP_BYTES).toString(Charsets.UTF_8)
                             } else {
                                 throw Exception("Invalid backup file format")
                             }
@@ -523,8 +523,8 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
     fun Parcelable.toBase64Str(): String {
         val parcel = Parcel.obtain()
-        writeToParcel(parcel, 0)
         try {
+            writeToParcel(parcel, 0)
             return Util.b64EncodeUrlSafe(parcel.marshall())
         } finally {
             parcel.recycle()
@@ -626,14 +626,14 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                     ZipInputStream(BufferedInputStream(input)).use { zis ->
                         zis.nextEntry?.let { entry ->
                             if (entry.name.endsWith(".json")) {
-                                zis.readBytes().toString(Charsets.UTF_8)
+                                zis.readBytesLimited(MAX_BACKUP_BYTES).toString(Charsets.UTF_8)
                             } else {
                                 throw Exception("Invalid backup file format")
                             }
                         } ?: throw Exception("Invalid backup file format")
                     }
                 } else {
-                    input.readBytes().toString(Charsets.UTF_8)
+                    input.readBytesLimited(MAX_BACKUP_BYTES).toString(Charsets.UTF_8)
                 }
             }
 
@@ -692,60 +692,69 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
     fun finishImport(
         content: JSONObject, profile: Boolean, rule: Boolean, setting: Boolean
     ) {
-        if (profile && content.has("profiles")) {
-            val profiles = mutableListOf<ProxyEntity>()
-            val jsonProfiles = content.getJSONArray("profiles")
-            for (i in 0 until jsonProfiles.length()) {
-                val data = Util.b64Decode(jsonProfiles[i] as String)
+        require(content.optInt("version", 1) == 1) { "Unsupported backup version" }
+        fun <T> records(key: String, create: (Parcel) -> T): List<T> {
+            val records = content.getJSONArray(key)
+            require(records.length() <= 100_000) { "Too many backup records" }
+            return (0 until records.length()).map { index ->
+                val encoded = records.getString(index)
+                require(encoded.length <= 6 * 1024 * 1024) { "Backup record is too large" }
+                val bytes = Util.b64Decode(encoded)
+                require(bytes.size <= 4 * 1024 * 1024) { "Backup record is too large" }
                 val parcel = Parcel.obtain()
-                parcel.unmarshall(data, 0, data.size)
-                parcel.setDataPosition(0)
-                profiles.add(ProxyEntity.CREATOR.createFromParcel(parcel))
-                parcel.recycle()
+                try {
+                    parcel.unmarshall(bytes, 0, bytes.size)
+                    parcel.setDataPosition(0)
+                    create(parcel)
+                } finally { parcel.recycle() }
             }
-            SagerDatabase.proxyDao.reset()
-            SagerDatabase.proxyDao.insert(profiles)
-
-            val groups = mutableListOf<ProxyGroup>()
-            val jsonGroups = content.getJSONArray("groups")
-            for (i in 0 until jsonGroups.length()) {
-                val data = Util.b64Decode(jsonGroups[i] as String)
-                val parcel = Parcel.obtain()
-                parcel.unmarshall(data, 0, data.size)
-                parcel.setDataPosition(0)
-                groups.add(ProxyGroup.CREATOR.createFromParcel(parcel))
-                parcel.recycle()
-            }
-            SagerDatabase.groupDao.reset()
-            SagerDatabase.groupDao.insert(groups)
         }
-        if (rule && content.has("rules")) {
-            val rules = mutableListOf<RuleEntity>()
-            val jsonRules = content.getJSONArray("rules")
-            for (i in 0 until jsonRules.length()) {
-                val data = Util.b64Decode(jsonRules[i] as String)
-                val parcel = Parcel.obtain()
-                parcel.unmarshall(data, 0, data.size)
-                parcel.setDataPosition(0)
-                rules.add(ParcelizeBridge.createRule(parcel))
-                parcel.recycle()
-            }
-            SagerDatabase.rulesDao.reset()
-            SagerDatabase.rulesDao.insert(rules)
+        val profiles = if (profile && content.has("profiles")) records("profiles") { ProxyEntity.CREATOR.createFromParcel(it) } else null
+        val groups = if (profiles != null) records("groups") { ProxyGroup.CREATOR.createFromParcel(it) } else null
+        val rules = if (rule && content.has("rules")) records("rules") { ParcelizeBridge.createRule(it) } else null
+        val settings = if (setting && content.has("settings")) records("settings") { KeyValuePair.CREATOR.createFromParcel(it) } else null
+        if (profiles != null && groups != null) {
+            require(profiles.map { it.id }.distinct().size == profiles.size) { "Duplicate profile IDs" }
+            require(groups.map { it.id }.distinct().size == groups.size) { "Duplicate group IDs" }
+            val groupIds = groups.map { it.id }.toSet()
+            require(profiles.all { it.groupId in groupIds }) { "Profile refers to a missing group" }
+            profiles.forEach { it.requireBean() }
         }
-        if (setting && content.has("settings")) {
-            val settings = mutableListOf<KeyValuePair>()
-            val jsonSettings = content.getJSONArray("settings")
-            for (i in 0 until jsonSettings.length()) {
-                val data = Util.b64Decode(jsonSettings[i] as String)
-                val parcel = Parcel.obtain()
-                parcel.unmarshall(data, 0, data.size)
-                parcel.setDataPosition(0)
-                settings.add(KeyValuePair.CREATOR.createFromParcel(parcel))
-                parcel.recycle()
+        if (rules != null) require(rules.map { it.id }.distinct().size == rules.size) { "Duplicate rule IDs" }
+        if (settings != null) require(settings.map { it.key }.distinct().size == settings.size) { "Duplicate settings keys" }
+        val previousSettings = if (settings != null) PublicDatabase.kvPairDao.all() else null
+        var settingsCommitted = false
+        try {
+            SagerDatabase.instance.runInTransaction {
+                if (profiles != null && groups != null) {
+                    SagerDatabase.proxyDao.reset()
+                    SagerDatabase.groupDao.reset()
+                    SagerDatabase.groupDao.insert(groups)
+                    SagerDatabase.proxyDao.insert(profiles)
+                }
+                if (rules != null) {
+                    SagerDatabase.rulesDao.reset()
+                    SagerDatabase.rulesDao.insert(rules)
+                }
+                if (settings != null) {
+                    PublicDatabase.instance.runInTransaction {
+                        PublicDatabase.kvPairDao.reset()
+                        PublicDatabase.kvPairDao.insert(settings)
+                    }
+                    settingsCommitted = true
+                }
             }
-            PublicDatabase.kvPairDao.reset()
-            PublicDatabase.kvPairDao.insert(settings)
+        } catch (failure: Exception) {
+            // ponytail: separate DBs cannot be crash-atomic; compensate for a profile commit failure.
+            if (settingsCommitted && previousSettings != null) {
+                runCatching {
+                    PublicDatabase.instance.runInTransaction {
+                        PublicDatabase.kvPairDao.reset()
+                        PublicDatabase.kvPairDao.insert(previousSettings)
+                    }
+                }.onFailure { failure.addSuppressed(it) }
+            }
+            throw failure
         }
     }
 

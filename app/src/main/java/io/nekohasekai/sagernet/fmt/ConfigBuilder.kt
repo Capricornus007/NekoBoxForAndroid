@@ -170,7 +170,7 @@ fun buildConfig(
     val bypassDNSBeans = hashSetOf<AbstractBean>()
     val isVPN = DataStore.serviceMode == Key.MODE_VPN
     val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST
-    val needLocalProxyInbounds = !isVPN || DataStore.allowAccess || DataStore.appendHttpProxy
+    val needLocalProxyInbounds = !isVPN || DataStore.allowAccess
     val remoteDns = DataStore.remoteDns.split("\n")
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
     val directDNS = DataStore.directDns.split("\n")
@@ -605,45 +605,32 @@ fun buildConfig(
         val mainProxyTag = (if (buildSelector) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
         route.final_ = mainProxyTag
 
-        fun buildPerAppTunGuardRules(): List<Rule_DefaultOptions> {
-            if (forTest || !isVPN || DataStore.globalMode || !DataStore.proxyApps) {
-                return emptyList()
-            }
-
+        fun buildPerAppTunGuardRules(): List<Rule> {
+            if (forTest || !isVPN || !DataStore.proxyApps) return emptyList()
             PackageCache.awaitLoadSync()
-
-            val selectedUids = DataStore.individual
-                .lineSequence()
-                .map { it.trim() }
+            val selectedUids = DataStore.individual.lineSequence().map { it.trim() }
                 .filter { it.isNotEmpty() }
-                .mapNotNull { pkg -> PackageCache[pkg]?.takeIf { uid -> uid >= 1000 } }
-                .toCollection(linkedSetOf())
-
-            return buildList {
-                if (DataStore.bypass) {
-                    if (selectedUids.isNotEmpty()) {
-                        add(Rule_DefaultOptions().apply {
-                            inbound = listOf("tun-in")
-                            user_id = selectedUids.toList()
-                            action = "reject"
-                        })
-                    }
-                } else {
-                    if (selectedUids.isEmpty()) {
-                        add(Rule_DefaultOptions().apply {
-                            inbound = listOf("tun-in")
-                            action = "reject"
-                        })
-                    } else {
-                        add(Rule_DefaultOptions().apply {
-                            inbound = listOf("tun-in")
-                            user_id = selectedUids.toList()
-                            invert = true
-                            action = "reject"
-                        })
-                    }
+                .mapNotNull { PackageCache[it]?.takeIf { uid -> uid >= 1000 } }.toSet()
+            if (DataStore.bypass) return if (selectedUids.isEmpty()) emptyList() else listOf(
+                Rule_DefaultOptions().apply {
+                    inbound = listOf("tun-in"); user_id = selectedUids.toList(); action = "reject"
                 }
-            }
+            )
+            val allowedUids = (selectedUids + android.os.Process.myUid()).toList()
+            val resolverUids = (VpnService.ANDROID_DNS_PACKAGES.mapNotNull { PackageCache[it] } + listOf(1000, 1051)).distinct()
+            return listOf(Rule_LogicalOptions().apply {
+                type = "logical"; mode = "and"; action = "reject"
+                rules = listOf(
+                    Rule_DefaultOptions().apply { inbound = listOf("tun-in") },
+                    Rule_LogicalOptions().apply {
+                        type = "logical"; mode = "or"; invert = true
+                        rules = listOf(
+                            Rule_DefaultOptions().apply { user_id = allowedUids },
+                            Rule_DefaultOptions().apply { user_id = resolverUids; port = listOf(53, 853) }
+                        )
+                    }
+                )
+            })
         }
 
         if (!forTest && DataStore.globalMode) {
@@ -760,6 +747,10 @@ fun buildConfig(
                         protocol = rule.protocol.listByLineOrComma()
                     }
 
+                    val canMakeDnsRule = !domainList.isNullOrEmpty() || (uidList.isNotEmpty() &&
+                        rule.ip.isBlank() && rule.port.isBlank() && rule.sourcePort.isBlank() &&
+                        rule.network.isBlank() && rule.source.isBlank() && rule.protocol.isBlank() &&
+                        rule.ruleset.isBlank() && rule.config.isBlank())
                     fun makeDnsRuleObj(): DNSRule_DefaultOptions {
                         return DNSRule_DefaultOptions().apply {
                             if (uidList.isNotEmpty()) user_id = uidList
@@ -769,13 +760,14 @@ fun buildConfig(
 
                     when (rule.outbound) {
                         -1L -> {
-                            userDNSRuleList += makeDnsRuleObj().apply { server = "dns-direct" }
+                            if (canMakeDnsRule) userDNSRuleList += makeDnsRuleObj().apply { server = "dns-direct" }
 
                             if (rule_set != null && rulesetTags.isNotEmpty()) {
                                 for (tag in rule_set) {
                                     val tagInfo = rulesetTags.find { it.first == tag }
                                     if (tag.startsWith("ruleset-") && tagInfo != null && !tagInfo.second) {
                                         userDNSRuleList += DNSRule_DefaultOptions().apply {
+                                            if (uidList.isNotEmpty()) user_id = uidList
                                             rule_set = mutableListOf(tag)
                                             server = "dns-direct"
                                         }
@@ -786,13 +778,13 @@ fun buildConfig(
 
                         0L -> {
                             if (useFakeDns) {
-                                userDNSRuleList += makeDnsRuleObj().apply {
+                                if (canMakeDnsRule) userDNSRuleList += makeDnsRuleObj().apply {
                                     server = "dns-fake"
                                     inbound = listOf("tun-in")
                                     query_type = listOf("A", "AAAA")
                                 }
                             } else {
-                                userDNSRuleList += makeDnsRuleObj().apply {
+                                if (canMakeDnsRule) userDNSRuleList += makeDnsRuleObj().apply {
                                     server = "dns-remote"
                                 }
                             }
@@ -803,14 +795,16 @@ fun buildConfig(
                                     if (tag.startsWith("ruleset-") && tagInfo != null && !tagInfo.second) {
                                         if (useFakeDns) {
                                             userDNSRuleList += DNSRule_DefaultOptions().apply {
-                                                rule_set = mutableListOf(tag)
+                                                if (uidList.isNotEmpty()) user_id = uidList
+                                            rule_set = mutableListOf(tag)
                                                 server = "dns-fake"
                                                 inbound = listOf("tun-in")
                                                 query_type = listOf("A", "AAAA")
                                             }
                                         } else {
                                             userDNSRuleList += DNSRule_DefaultOptions().apply {
-                                                rule_set = mutableListOf(tag)
+                                                if (uidList.isNotEmpty()) user_id = uidList
+                                            rule_set = mutableListOf(tag)
                                                 server = "dns-remote"
                                             }
                                         }
@@ -820,7 +814,7 @@ fun buildConfig(
                         }
 
                         -2L -> {
-                            userDNSRuleList += makeDnsRuleObj().apply {
+                            if (canMakeDnsRule) userDNSRuleList += makeDnsRuleObj().apply {
                                 server = "dns-block"
                                 disable_cache = true
                             }
@@ -830,6 +824,7 @@ fun buildConfig(
                                     val tagInfo = rulesetTags.find { it.first == tag }
                                     if (tag.startsWith("ruleset-") && tagInfo != null && !tagInfo.second) {
                                         userDNSRuleList += DNSRule_DefaultOptions().apply {
+                                            if (uidList.isNotEmpty()) user_id = uidList
                                             rule_set = mutableListOf(tag)
                                             server = "dns-block"
                                             disable_cache = true
@@ -868,7 +863,6 @@ fun buildConfig(
                 }
             }
 
-            route.rules.addAll(buildPerAppTunGuardRules())
         }
 
         if (route.rule_set != null) {
@@ -1027,6 +1021,8 @@ fun buildConfig(
                 })
             }
         }
+        route.rules.addAll(0, buildPerAppTunGuardRules())
+
 
         if (!forTest) {
             val hasVlessTlsOutbound = outbounds.any { outbound ->

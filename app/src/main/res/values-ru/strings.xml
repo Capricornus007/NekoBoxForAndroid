@@ -532,4 +532,5 @@
 <string name="amoled_theme">Чисто черный фон (AMOLED)</string>
 <string name="amoled_theme_summary">Использовать абсолютно черный фон в темной теме</string>
 <string name="app_theme">Цвет акцента</string>
+    <string name="authenticated_http_proxy_unavailable">HTTP-прокси Android VPN не поддерживает обязательные логин и пароль.</string>
 </resources>

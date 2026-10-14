@@ -95,6 +95,7 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 	var options option.Options
 	err = options.UnmarshalJSONContext(ctx, []byte(config))
 	if err != nil {
+		cancel()
 		return nil, fmt.Errorf("decode config: %v", err)
 	}
 
@@ -136,6 +137,13 @@ func (b *BoxInstance) Start() (err error) {
 		return b.Box.Start()
 	}
 	return errors.New("already started")
+}
+
+// CancelStart is independent of the start/close mutex so a blocked startup can be interrupted.
+func (b *BoxInstance) CancelStart() {
+	if b.cancel != nil {
+		b.cancel()
+	}
 }
 
 func (b *BoxInstance) Close() (err error) {

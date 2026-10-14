@@ -26,7 +26,7 @@ import moe.matsuri.nb4a.utils.Util
 object DataStore : OnPreferenceDataStoreChangeListener {
 
     @Volatile
-    var serviceState = BaseService.State.Idle
+    @Volatile var serviceState = BaseService.State.Idle
 
     val configurationStore = RoomPreferenceDataStore(PublicDatabase.kvPairDao)
     val profileCacheStore = RoomPreferenceDataStore(TempDatabase.profileCacheDao)

@@ -45,7 +45,8 @@ class BaseService {
     interface ExpectedException
 
     class Data internal constructor(private val service: Interface) {
-        var state = State.Stopped
+        @Volatile var state = State.Stopped
+        var networkSignature: String? = null
         var proxy: ProxyInstance? = null
         var notification: ServiceNotification? = null
 
@@ -265,10 +266,13 @@ class BaseService {
             data.changeState(State.Stopping)
 
             runOnMainDispatcher {
-                data.connectingJob?.cancelAndJoin() // ensure stop connecting first
+                val connectingJob = data.connectingJob
+                connectingJob?.cancel()
+                data.proxy?.cancelStart()
+                connectingJob?.join()
                 // we use a coroutineScope here to allow clean-up in parallel
                 coroutineScope {
-                    killProcesses()
+                    withContext(Dispatchers.IO) { killProcesses() }
                     val data = data
                     if (data.closeReceiverRegistered) {
                         unregisterReceiver(data.receiver)
@@ -315,10 +319,20 @@ class BaseService {
                 SagerNet.underlyingNetwork = network
                 DataStore.vpnService?.updateUnderlyingNetwork()
                 val link = network?.let { SagerNet.connectivity.getLinkProperties(it) }
-                    ?: return@start
-                val oldName = upstreamInterfaceName
-                val newName = link.interfaceName ?: return@start
-                upstreamInterfaceName = newName
+                if (link == null) { upstreamInterfaceName = null; return@start }
+                val newName = buildString {
+                    append(network).append('|').append(link.interfaceName)
+                    append('|').append(link.linkAddresses.map { it.toString() }.sorted())
+                    append('|').append(link.dnsServers.map { it.hostAddress }.sortedBy { it })
+                    append('|').append(link.routes.map { it.toString() }.sorted())
+                    append('|').append(link.domains).append('|').append(link.mtu)
+                    if (Build.VERSION.SDK_INT >= 28) {
+                        append('|').append(link.isPrivateDnsActive).append('|').append(link.privateDnsServerName)
+                    }
+                }
+                val oldName = data.networkSignature
+                data.networkSignature = newName
+                upstreamInterfaceName = link.interfaceName
                 when (networkChangeAction(
                     oldName,
                     newName,
@@ -421,9 +435,9 @@ class BaseService {
                 try {
                     notification.postNotificationTitle(notificationTitle)
 
-                    Executable.killAll()    // clean up old processes
+                    withContext(Dispatchers.IO) { Executable.killAll() }
                     preInit()
-                    proxy.init()
+                    withContext(Dispatchers.IO) { proxy.init() }
                     DataStore.currentProfile = profile.id
 
                     proxy.processes = GuardedProcessPool {
@@ -431,7 +445,7 @@ class BaseService {
                         stopRunner(false, it.readableMessage)
                     }
 
-                    startProcesses()
+                    withContext(Dispatchers.IO) { startProcesses() }
                     data.changeState(State.Connected)
 
                     lateInit()

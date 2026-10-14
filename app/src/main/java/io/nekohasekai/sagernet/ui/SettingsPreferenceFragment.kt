@@ -175,7 +175,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         httpPort.onPreferenceChangeListener = reloadListener
         mixedUsername.onPreferenceChangeListener = reloadListener
         mixedPassword.onPreferenceChangeListener = reloadListener
-        appendHttpProxy.onPreferenceChangeListener = reloadListener
+        appendHttpProxy.isEnabled = false
+        appendHttpProxy.summary = getString(R.string.authenticated_http_proxy_unavailable)
         strictRoute.onPreferenceChangeListener = reloadListener
         showDirectSpeed.onPreferenceChangeListener = reloadListener
         trafficSniffing.onPreferenceChangeListener = reloadListener

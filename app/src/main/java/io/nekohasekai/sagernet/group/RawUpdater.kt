@@ -162,8 +162,13 @@ object RawUpdater : GroupUpdater() {
             Logs.d("After filter (mode=$filterMode): ${proxies.size}")
         }
 
-        val exists = SagerDatabase.proxyDao.getByGroup(proxyGroup.id)
         val duplicate = ArrayList<String>()
+        val added = mutableListOf<String>()
+        val updated = mutableMapOf<String, String>()
+        var deleted: List<String> = emptyList()
+        var changed = 0
+        SagerDatabase.instance.withTransaction {
+        val exists = SagerDatabase.proxyDao.getByGroup(proxyGroup.id)
         if (subscription.deduplication) {
             Logs.d("Before deduplication: ${proxies.size}")
             val uniqueProxies = LinkedHashSet<Protocols.Deduplication>()
@@ -209,12 +214,9 @@ object RawUpdater : GroupUpdater() {
         Logs.d("toReplace profiles: ${toReplace.size}")
 
         val toUpdate = ArrayList<ProxyEntity>()
-        val added = mutableListOf<String>()
-        val updated = mutableMapOf<String, String>()
-        val deleted = toDelete.map { it.displayName() }
-
+        deleted = toDelete.map { it.displayName() }
         var userOrder = 1L
-        var changed = toDelete.size
+        changed = toDelete.size
         for ((name, bean) in nameMap.entries) {
             if (toReplace.contains(name)) {
                 val entity = toReplace[name]!!
@@ -225,6 +227,7 @@ object RawUpdater : GroupUpdater() {
                 when {
                     existsBean != bean -> {
                         changed++
+                        entity.userOrder = userOrder
                         entity.putBean(bean)
                         toUpdate.add(entity)
                         updated[entity.displayName()] = name
@@ -274,6 +277,7 @@ object RawUpdater : GroupUpdater() {
 
         subscription.lastUpdated = (System.currentTimeMillis() / 1000).toInt()
         SagerDatabase.groupDao.updateGroup(proxyGroup)
+        }
         finishUpdate(proxyGroup)
 
         userInterface?.onUpdateSuccess(

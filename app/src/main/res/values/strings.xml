@@ -720,4 +720,5 @@
     <string name="amoled_theme">AMOLED Dark Theme</string>
     <string name="amoled_theme_summary">Pure black background in dark mode</string>
     <string name="app_theme">Accent Color</string>
+    <string name="authenticated_http_proxy_unavailable">Android VPN HTTP proxy does not support the required username and password.</string>
 </resources>
