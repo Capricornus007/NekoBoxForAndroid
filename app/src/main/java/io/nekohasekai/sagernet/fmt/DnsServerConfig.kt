@@ -1,7 +1,14 @@
 package io.nekohasekai.sagernet.fmt
 
+import moe.matsuri.nb4a.SingBoxOptions.DNSRule_DefaultOptions
 import java.net.URI
 import java.util.Locale
+
+internal fun DNSRule_DefaultOptions.useBlockedDNSResponse() {
+    server = null
+    disable_cache = null
+    _hack_config_map.putAll(mapOf("action" to "predefined", "rcode" to "NOERROR"))
+}
 
 // Typed DNS transports dial directly by default, so remote detours stay explicit.
 internal fun dnsServerConfig(address: String, tag: String, bootstrap: String, detour: String): Map<String, Any> {

@@ -1016,8 +1016,7 @@ fun buildConfig(
         dns.rules = dns.rules.toMutableList().apply {
             filterIsInstance<DNSRule_DefaultOptions>().forEach { rule ->
                 if (rule.server == "dns-block") {
-                    rule.server = null
-                    rule._hack_config_map.putAll(mapOf("action" to "predefined", "rcode" to "NOERROR"))
+                    rule.useBlockedDNSResponse()
                 } else dnsStrategies[rule.server]?.let { strategy ->
                     rule._hack_config_map["strategy"] = strategy
                 }

@@ -1,6 +1,7 @@
 package libcore
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"io"
@@ -22,12 +23,14 @@ import (
 	"github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common/control"
 	"github.com/sagernet/sing/common/logger"
+	M "github.com/sagernet/sing/common/metadata"
 	"github.com/sagernet/sing/common/x/list"
+	"github.com/sagernet/sing/protocol/socks/socks5"
 	"github.com/sagernet/sing/service"
 )
 
 func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
-	var udpCalls, httpsCalls atomic.Int32
+	var udpCalls, httpsCalls, proxyCalls atomic.Int32
 	udp, err := net.ListenPacket("udp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
@@ -69,6 +72,50 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
 	}))
 	defer https.Close()
 	httpsPort, _ := strconv.Atoi(strings.Split(https.Listener.Addr().String(), ":")[1])
+	proxy, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer proxy.Close()
+	go func() {
+		conn, err := proxy.Accept()
+		if err != nil {
+			return
+		}
+		defer conn.Close()
+		_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
+		reader := bufio.NewReader(conn)
+		if _, err = socks5.ReadAuthRequest(reader); err != nil {
+			t.Error(err)
+			return
+		}
+		if err = socks5.WriteAuthResponse(conn, socks5.AuthResponse{Method: socks5.AuthTypeNotRequired}); err != nil {
+			t.Error(err)
+			return
+		}
+		request, err := socks5.ReadRequest(reader)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		proxyCalls.Add(1)
+		if request.Command != socks5.CommandConnect || request.Destination != M.SocksaddrFromNet(https.Listener.Addr()) {
+			t.Errorf("unexpected proxy destination: %s", request.Destination)
+			return
+		}
+		upstream, err := net.DialTimeout("tcp", request.Destination.String(), time.Second)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer upstream.Close()
+		if err = socks5.WriteResponse(conn, socks5.Response{ReplyCode: socks5.ReplyCodeSuccess}); err != nil {
+			t.Error(err)
+			return
+		}
+		go func() { _, _ = io.Copy(conn, upstream) }()
+		_, _ = io.Copy(upstream, reader)
+	}()
 	configuration := map[string]any{
 		"dns": map[string]any{
 			"servers": []any{
@@ -84,7 +131,7 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
 				map[string]any{"server": "dns-remote", "strategy": "ipv4_only"},
 			}, "final": "dns-remote",
 		},
-		"outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}, map[string]any{"type": "direct", "tag": "proxy", "domain_resolver": "dns-direct"}},
+		"outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}, map[string]any{"type": "socks", "tag": "proxy", "server": "127.0.0.1", "server_port": proxy.Addr().(*net.TCPAddr).Port}},
 		"route":     map[string]any{"final": "proxy", "default_domain_resolver": "dns-direct"},
 	}
 	content, _ := json.Marshal(configuration)
@@ -116,13 +163,13 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
 	if response := query("host.internal.test.", ""); len(response.Answer) != 1 || response.Answer[0].(*mDNS.A).A.String() != "192.0.2.10" {
 		t.Fatal("direct DNS routing failed")
 	}
-	if httpsCalls.Load() != 0 {
+	if httpsCalls.Load() != 0 || proxyCalls.Load() != 0 {
 		t.Fatal("direct DNS leaked to remote server")
 	}
 	if response := query("www.example.test.", ""); len(response.Answer) != 1 || response.Answer[0].(*mDNS.A).A.String() != "203.0.113.10" {
 		t.Fatal("remote HTTPS DNS failed")
 	}
-	if udpCalls.Load() < 2 || httpsCalls.Load() != 1 {
+	if udpCalls.Load() < 2 || httpsCalls.Load() != 1 || proxyCalls.Load() != 1 {
 		t.Fatal("remote DNS hostname did not bootstrap through direct DNS")
 	}
 	if response := query("fake.example.test.", "tun-in"); len(response.Answer) != 1 || !netip.MustParsePrefix("198.18.0.0/15").Contains(netip.MustParseAddr(response.Answer[0].(*mDNS.A).A.String())) {

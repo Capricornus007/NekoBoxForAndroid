@@ -2,8 +2,24 @@ package io.nekohasekai.sagernet.fmt
 
 import org.junit.Assert.*
 import org.junit.Test
+import moe.matsuri.nb4a.SingBoxOptions.DNSRule_DefaultOptions
 
 class DnsServerConfigTest {
+    @Test fun blockedResponseDropsFieldsOnlySupportedByDnsRouteActions() {
+        val rule = DNSRule_DefaultOptions().apply {
+            server = "dns-block"
+            disable_cache = true
+            domain = listOf("blocked.test")
+        }
+        rule.useBlockedDNSResponse()
+        val options = rule.asMap()
+        assertFalse(options.containsKey("server"))
+        assertFalse(options.containsKey("disable_cache"))
+        assertEquals("predefined", options["action"])
+        assertEquals("NOERROR", options["rcode"])
+        assertEquals(listOf("blocked.test"), options["domain"])
+    }
+
     @Test fun remoteHttpsUsesProxyAndKeepsQueryString() {
         val server = dnsServerConfig("https://dns.example.test:8443/custom?key=example", "dns-remote", "dns-direct", "selected-group")
         assertEquals("https", server["type"])
