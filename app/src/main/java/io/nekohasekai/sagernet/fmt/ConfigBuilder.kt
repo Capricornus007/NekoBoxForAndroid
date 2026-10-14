@@ -1017,6 +1017,7 @@ fun buildConfig(
                 })
             }
         }
+        if (!forTest && isVPN) route.rules.add(0, virtualDnsTlsRejectRule())
         route.rules.addAll(0, buildPerAppTunGuardRules())
 
 

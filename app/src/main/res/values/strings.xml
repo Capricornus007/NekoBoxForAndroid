@@ -727,4 +727,8 @@
     <string name="confirm_clear_cache">Stop the proxy, clear the core cache and restart the app?</string>
     <string name="downloads_proxy_only">Updates only through proxy</string>
     <string name="downloads_proxy_only_summary">Subscription and GeoIP/GeoSite updates require the running local SOCKS proxy. Direct fallback is disabled.</string>
+    <string name="backup_encryption_password">Backup password (optional)</string>
+    <string name="backup_encryption_summary">At least 8 characters protects exported, shared and WebDAV backups. Leave empty for an unencrypted backup. The password is not saved.</string>
+    <string name="backup_password_short">Use at least 8 characters for the backup password.</string>
+    <string name="backup_decrypt_failed">Incorrect password or damaged backup. Nothing was restored.</string>
 </resources>

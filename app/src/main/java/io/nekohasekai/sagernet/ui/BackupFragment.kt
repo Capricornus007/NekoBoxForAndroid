@@ -7,6 +7,14 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.provider.OpenableColumns
 import android.view.View
+import android.text.InputType
+import android.widget.EditText
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
@@ -53,7 +61,6 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
     private lateinit var binding: LayoutBackupBinding
     private lateinit var backupData: ByteArray
-    private var isWebDAVBackup = false
     private var isBackupInProgress = false
     private var isRestoreInProgress = false
     private var currentJob: kotlinx.coroutines.Job? = null
@@ -61,6 +68,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
     private var restoreJob: kotlinx.coroutines.Job? = null
 
     override fun onDestroyView() {
+        if (::binding.isInitialized) binding.backupPassword.text?.clear()
         super.onDestroyView()
         snackbar?.dismiss()
         snackbar = null
@@ -106,50 +114,61 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = LayoutBackupBinding.bind(view)
+        this.binding = binding
 
         binding.actionExport.setOnClickListener {
-            runOnDefaultDispatcher {
-                backupData = doBackup(
-                    binding.backupConfigurations.isChecked,
-                    binding.backupRules.isChecked,
-                    binding.backupSettings.isChecked
-                )
-                onMainDispatcher {
-                    startFilesForResult(
-                        exportSettings, "nekobox_backup_${Date().toLocaleString()}.json"
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+                try {
+                    backupData = doBackup(
+                        binding.backupConfigurations.isChecked,
+                        binding.backupRules.isChecked,
+                        binding.backupSettings.isChecked
                     )
+                    onMainDispatcher {
+                        startFilesForResult(
+                            exportSettings, "nekobox_backup_${Date().toLocaleString()}.${backupExtension(backupData)}"
+                        )
+                    }
+                } catch (error: Exception) {
+                    onMainDispatcher { snackbar(error.readableMessage).show() }
                 }
             }
         }
+
 
         binding.actionShare.setOnClickListener {
-            runOnDefaultDispatcher {
-                backupData = doBackup(
-                    binding.backupConfigurations.isChecked,
-                    binding.backupRules.isChecked,
-                    binding.backupSettings.isChecked
-                )
-                app.cacheDir.mkdirs()
-                val cacheFile = File(
-                    app.cacheDir, "nekobox_backup_${Date().toLocaleString()}.json"
-                )
-                cacheFile.writeBytes(backupData)
-                onMainDispatcher {
-                    startActivity(
-                        Intent.createChooser(
-                            Intent(Intent.ACTION_SEND).setType("application/json")
-                                .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                .putExtra(
-                                    Intent.EXTRA_STREAM, FileProvider.getUriForFile(
-                                        app, BuildConfig.APPLICATION_ID + ".cache", cacheFile
-                                    )
-                                ), app.getString(R.string.abc_shareactionprovider_share_with)
-                        )
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+                try {
+                    backupData = doBackup(
+                        binding.backupConfigurations.isChecked,
+                        binding.backupRules.isChecked,
+                        binding.backupSettings.isChecked
                     )
-                }
+                    app.cacheDir.mkdirs()
+                    val cacheFile = File(
+                        app.cacheDir, "nekobox_backup_${Date().toLocaleString()}.${backupExtension(backupData)}"
+                    )
+                    cacheFile.writeBytes(backupData)
+                    onMainDispatcher {
+                        startActivity(
+                            Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).setType(if (BackupEncryption.isEncrypted(backupData)) "application/octet-stream" else "application/json")
+                                    .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    .putExtra(
+                                        Intent.EXTRA_STREAM, FileProvider.getUriForFile(
+                                            app, BuildConfig.APPLICATION_ID + ".cache", cacheFile
+                                        )
+                                    ), app.getString(R.string.abc_shareactionprovider_share_with)
+                            )
+                        )
+                    }
 
+                } catch (error: Exception) {
+                    onMainDispatcher { snackbar(error.readableMessage).show() }
+                }
             }
         }
+
 
         binding.actionImportFile.setOnClickListener {
             startFilesForResult(importFile, "*/*")
@@ -162,7 +181,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         binding.webdavSettings.setOnClickListener {
             startActivity(Intent(requireContext(), WebDAVSettingsActivity::class.java))
         }
-        
+
         binding.backupToWebdav.setOnClickListener {
             if (DataStore.webdavServer.isNullOrEmpty()) {
                 showMessage(R.string.webdav_server_empty)
@@ -170,7 +189,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
             }
             backupToWebDAV()
         }
-        
+
         binding.restoreFromWebdav.setOnClickListener {
             if (DataStore.webdavServer.isNullOrEmpty()) {
                 showMessage(R.string.webdav_server_empty)
@@ -189,14 +208,13 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         val activity = requireActivity()
         runOnDefaultDispatcher {
             try {
-                isWebDAVBackup = true
                 val backupData = doBackup(
                     true,  // 备份配置和分组
                     true,  // 备份路由规则
-                    true   // 备份设置
+                    true,  // 备份设置
+                    zipped = true
                 )
-                isWebDAVBackup = false
-                
+
                 val client = OkHttpClient()
 
                 // 规范化 URL
@@ -206,7 +224,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                 // 使用英文格式的时间戳作为文件名，修改后缀为 .zip
                 val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
                 val version = BuildConfig.VERSION_NAME
-                val fileName = "nekobox_backup_${version}_$timestamp.zip"
+                val fileName = "nekobox_backup_${version}_$timestamp.${backupExtension(backupData, zipped = true)}"
 
                 // 确保 baseUrl 是有效的 URL
                 if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
@@ -282,7 +300,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                 // 上传文件时使用正确的 Content-Type
                 val putRequest = Request.Builder()
                     .url(fileUrl)
-                    .put(backupData.toRequestBody("application/zip".toMediaType()))
+                    .put(backupData.toRequestBody((if (BackupEncryption.isEncrypted(backupData)) "application/octet-stream" else "application/zip").toMediaType()))
                     .apply {
                         header("Authorization", Credentials.basic(
                             DataStore.webdavUsername ?: "",
@@ -304,7 +322,6 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                     MessageStore.showMessage(activity, R.string.webdav_backup_success)
                 }
             } catch (e: Exception) {
-                isWebDAVBackup = false  // 确保发生异常时也重置标志
                 Logs.w(e)
 
                 val errorMessage = try {
@@ -316,7 +333,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                 } catch (ex: Exception) {
                     "WebDAV backup failed: ${e.message ?: ""}"
                 }
-                
+
                 onMainDispatcher {
                     MessageStore.showMessage(activity, errorMessage)
                 }
@@ -375,21 +392,21 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
                     val responseBody = response.body?.string() ?: throw Exception("Empty response")
                     Logs.d("WebDAV restore - Directory listing: $responseBody")
-                    
+
                     val patterns = listOf(
-                        """<D:href>[^<]*?nekobox_backup_[^<]*?\d{8}_\d{6}\.(json|zip)</D:href>""".toRegex(),
-                        """<d:href>[^<]*?nekobox_backup_[^<]*?\d{8}_\d{6}\.(json|zip)</d:href>""".toRegex(),
-                        """<href>[^<]*?nekobox_backup_[^<]*?\d{8}_\d{6}\.(json|zip)</href>""".toRegex()
+                        """<D:href>[^<]*?nekobox_backup_[^<]*?\d{8}_\d{6}\.(json|zip|nbk)</D:href>""".toRegex(),
+                        """<d:href>[^<]*?nekobox_backup_[^<]*?\d{8}_\d{6}\.(json|zip|nbk)</d:href>""".toRegex(),
+                        """<href>[^<]*?nekobox_backup_[^<]*?\d{8}_\d{6}\.(json|zip|nbk)</href>""".toRegex()
                     )
-                    
+
                     val backupFiles = mutableListOf<String>()
-                    
+
                     for (pattern in patterns) {
                         val matches = pattern.findAll(responseBody)
                         matches.forEach { match ->
                             val href = match.value
                             Logs.d("WebDAV restore - Found backup file with pattern ${pattern.pattern}: $href")
-                            val fileName = """nekobox_backup_[^<]*?\d{8}_\d{6}\.(json|zip)""".toRegex()
+                            val fileName = """nekobox_backup_[^<]*?\d{8}_\d{6}\.(json|zip|nbk)""".toRegex()
                                 .find(href)?.value
                             if (fileName != null) {
                                 backupFiles.add(fileName)
@@ -397,7 +414,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                         }
                         if (backupFiles.isNotEmpty()) break
                     }
-                    
+
                     Logs.d("WebDAV restore - Found ${backupFiles.size} backup files: ${backupFiles.joinToString()}")
 
                     backupFiles.maxByOrNull { fileName ->
@@ -431,22 +448,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
                 Logs.d("WebDAV restore - Successfully downloaded backup file, size: ${content.size}")
 
-                // 根据文件类型处理内容
-                val backupContent = if (latestBackup.endsWith(".zip")) {
-                    // ZIP 文件处理
-                    ZipInputStream(content.inputStream()).use { zis ->
-                        zis.nextEntry?.let { entry ->
-                            if (entry.name.endsWith(".json")) {
-                                zis.readBytesLimited(MAX_BACKUP_BYTES).toString(Charsets.UTF_8)
-                            } else {
-                                throw Exception("Invalid backup file format")
-                            }
-                        } ?: throw Exception("Invalid backup file format")
-                    }
-                } else {
-                    // JSON 文件处理
-                    content.toString(Charsets.UTF_8)
-                }
+                val backupContent = decodeBackup(content)
 
                 // 解析并导入备份数据
                 val json = JSONObject(backupContent)
@@ -531,67 +533,121 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         }
     }
 
-    private fun doBackup(
+    private suspend fun doBackup(
         profile: Boolean,
         rule: Boolean,
-        setting: Boolean
+        setting: Boolean,
+        zipped: Boolean = false,
     ): ByteArray {
-        val out = JSONObject().apply {
-            put("version", 1)
-            if (profile) {
-                put("profiles", JSONArray().apply {
-                    SagerDatabase.proxyDao.getAll().forEach {
-                        put(it.toBase64Str())
-                    }
-                })
-
-                put("groups", JSONArray().apply {
-                    SagerDatabase.groupDao.allGroups().forEach {
-                        put(it.toBase64Str())
-                    }
-                })
-            }
-            if (rule) {
-                put("rules", JSONArray().apply {
-                    SagerDatabase.rulesDao.allRules().forEach {
-                        put(it.toBase64Str())
-                    }
-                })
-            }
-            if (setting) {
-                put("settings", JSONArray().apply {
-                    PublicDatabase.kvPairDao.all().forEach {
-                        put(it.toBase64Str())
-                    }
-                })
-            }
+        val password = onMainDispatcher {
+            check(isAdded && view != null) { "Backup screen closed" }
+            binding.backupPassword.text?.toString()?.toCharArray() ?: charArrayOf()
         }
+        try {
+            require(password.isEmpty() || password.size >= 8) { getString(R.string.backup_password_short) }
+            val out = JSONObject().apply {
+                put("version", 1)
+                if (profile) {
+                    put("profiles", JSONArray().apply {
+                        SagerDatabase.proxyDao.getAll().forEach {
+                            put(it.toBase64Str())
+                        }
+                    })
 
-        val jsonContent = out.toStringPretty()
-        return if (isWebDAVBackup) {
-            ByteArrayOutputStream().use { bos ->
-                ZipOutputStream(bos).use { zos ->
-                    zos.setLevel(Deflater.BEST_COMPRESSION)
-                    
-                    val entry = ZipEntry("nekobox_backup.json").apply {
-                        method = ZipEntry.DEFLATED
-                    }
-                    
-                    // 写入数据
-                    zos.putNextEntry(entry)
-                    val bytes = jsonContent.toByteArray(Charsets.UTF_8)
-                    zos.write(bytes)
-                    zos.closeEntry()
-                    
-                    // 确保所有数据都被写入和压缩
-                    zos.finish()
+                    put("groups", JSONArray().apply {
+                        SagerDatabase.groupDao.allGroups().forEach {
+                            put(it.toBase64Str())
+                        }
+                    })
                 }
-                bos.toByteArray()
+                if (rule) {
+                    put("rules", JSONArray().apply {
+                        SagerDatabase.rulesDao.allRules().forEach {
+                            put(it.toBase64Str())
+                        }
+                    })
+                }
+                if (setting) {
+                    put("settings", JSONArray().apply {
+                        PublicDatabase.kvPairDao.all().forEach {
+                            put(it.toBase64Str())
+                        }
+                    })
+                }
             }
-        } else {
-            // 本地导出和分享功能使用 JSON 格式
-            jsonContent.toByteArray()
-        }
+
+            val jsonBytes = out.toStringPretty().toByteArray(Charsets.UTF_8)
+            require(jsonBytes.size <= MAX_BACKUP_BYTES) { "Backup exceeds size limit" }
+            val payload = if (zipped) {
+                ByteArrayOutputStream().use { bos ->
+                    ZipOutputStream(bos).use { zos ->
+                        zos.setLevel(Deflater.BEST_COMPRESSION)
+
+                        val entry = ZipEntry("nekobox_backup.json").apply {
+                            method = ZipEntry.DEFLATED
+                        }
+
+                        // 写入数据
+                        zos.putNextEntry(entry)
+                        zos.write(jsonBytes)
+                        zos.closeEntry()
+
+                        // 确保所有数据都被写入和压缩
+                        zos.finish()
+                    }
+                    bos.toByteArray()
+                }
+            } else {
+                jsonBytes
+            }
+            require(payload.size <= MAX_BACKUP_BYTES) { "Backup exceeds size limit" }
+            return if (password.isEmpty()) payload else BackupEncryption.encrypt(payload, password)
+        } finally { password.fill('\u0000') }
+    }
+
+    private fun backupExtension(bytes: ByteArray, zipped: Boolean = false) =
+        if (BackupEncryption.isEncrypted(bytes)) "nbk" else if (zipped) "zip" else "json"
+
+    private suspend fun decodeBackup(bytes: ByteArray): String {
+        val payload = if (BackupEncryption.isEncrypted(bytes)) {
+            val password = onMainDispatcher {
+                suspendCancellableCoroutine<CharArray> { continuation ->
+                    val input = EditText(requireContext()).apply {
+                        inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                        isSaveEnabled = false
+                        hint = getString(R.string.password)
+                    }
+                    val dialog = MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.backup_encryption_password)
+                        .setView(input)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            val password = input.text.toString().toCharArray()
+                            input.text.clear()
+                            if (continuation.isActive) continuation.resume(password) else password.fill('\u0000')
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .create()
+                    dialog.setOnDismissListener {
+                        input.text.clear()
+                        if (continuation.isActive) continuation.resumeWithException(kotlinx.coroutines.CancellationException("Restore cancelled"))
+                    }
+                    continuation.invokeOnCancellation { input.post { dialog.dismiss() } }
+                    dialog.show()
+                }
+            }
+            try {
+                BackupEncryption.decrypt(bytes, password)
+            } catch (failure: java.security.GeneralSecurityException) {
+                error(getString(R.string.backup_decrypt_failed))
+            } finally { password.fill('\u0000') }
+        } else bytes
+        return if (payload.size >= 2 && payload[0] == 0x50.toByte() && payload[1] == 0x4b.toByte()) {
+            ZipInputStream(payload.inputStream()).use { zip ->
+                val entry = zip.nextEntry ?: error("Empty backup archive")
+                require(entry.name.endsWith(".json")) { "Invalid backup archive" }
+                zip.readBytesLimited(MAX_BACKUP_BYTES).toString(Charsets.UTF_8)
+            }
+        } else payload.toString(Charsets.UTF_8)
     }
 
     val importFile = registerForActivityResult(ActivityResultContracts.GetContent()) { file ->
@@ -613,7 +669,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
             .substringAfterLast('/')
             .substringAfter(':')
 
-        if (!fileName.endsWith(".json") && !fileName.endsWith(".zip")) {
+        if (!fileName.endsWith(".json") && !fileName.endsWith(".zip") && !fileName.endsWith(".nbk")) {
             onMainDispatcher {
                 snackbar(getString(R.string.backup_not_file, fileName)).show()
             }
@@ -621,21 +677,10 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         }
 
         try {
-            val content = requireContext().contentResolver.openInputStream(file)!!.use { input ->
-                if (fileName.endsWith(".zip")) {
-                    ZipInputStream(BufferedInputStream(input)).use { zis ->
-                        zis.nextEntry?.let { entry ->
-                            if (entry.name.endsWith(".json")) {
-                                zis.readBytesLimited(MAX_BACKUP_BYTES).toString(Charsets.UTF_8)
-                            } else {
-                                throw Exception("Invalid backup file format")
-                            }
-                        } ?: throw Exception("Invalid backup file format")
-                    }
-                } else {
-                    input.readBytesLimited(MAX_BACKUP_BYTES).toString(Charsets.UTF_8)
-                }
+            val bytes = requireContext().contentResolver.openInputStream(file)!!.use { input ->
+                input.readBytesLimited(MAX_BACKUP_BYTES)
             }
+            val content = decodeBackup(bytes)
 
             val json = JSONObject(content)
             onMainDispatcher {
@@ -722,41 +767,20 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         }
         if (rules != null) require(rules.map { it.id }.distinct().size == rules.size) { "Duplicate rule IDs" }
         if (settings != null) require(settings.map { it.key }.distinct().size == settings.size) { "Duplicate settings keys" }
-        val previousSettings = if (settings != null) PublicDatabase.kvPairDao.all() else null
-        var settingsCommitted = false
-        try {
-            SagerDatabase.instance.runInTransaction {
-                if (profiles != null && groups != null) {
-                    SagerDatabase.proxyDao.reset()
-                    SagerDatabase.groupDao.reset()
-                    SagerDatabase.groupDao.insert(groups)
-                    SagerDatabase.proxyDao.insert(profiles)
-                }
-                if (rules != null) {
-                    SagerDatabase.rulesDao.reset()
-                    SagerDatabase.rulesDao.insert(rules)
-                }
-                if (settings != null) {
-                    PublicDatabase.instance.runInTransaction {
-                        PublicDatabase.kvPairDao.reset()
-                        PublicDatabase.kvPairDao.insert(settings)
-                    }
-                    settingsCommitted = true
-                }
+        BackupRestore.commit(settings) {
+            if (profiles != null && groups != null) {
+                SagerDatabase.proxyDao.reset()
+                SagerDatabase.groupDao.reset()
+                SagerDatabase.groupDao.insert(groups)
+                SagerDatabase.proxyDao.insert(profiles)
             }
-        } catch (failure: Exception) {
-            // ponytail: separate DBs cannot be crash-atomic; compensate for a profile commit failure.
-            if (settingsCommitted && previousSettings != null) {
-                runCatching {
-                    PublicDatabase.instance.runInTransaction {
-                        PublicDatabase.kvPairDao.reset()
-                        PublicDatabase.kvPairDao.insert(previousSettings)
-                    }
-                }.onFailure { failure.addSuppressed(it) }
+            if (rules != null) {
+                SagerDatabase.rulesDao.reset()
+                SagerDatabase.rulesDao.insert(rules)
             }
-            throw failure
         }
     }
+
 
     private fun showMessage(message: String) {
         MessageStore.showMessage(message)

@@ -68,6 +68,21 @@
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/backup_encryption_password"
+                    app:helperText="@string/backup_encryption_summary">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/backup_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:saveEnabled="false"
+                        android:maxLength="1024" />
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/action_share"
                     style="@style/Widget.Material3.Button.TonalButton"

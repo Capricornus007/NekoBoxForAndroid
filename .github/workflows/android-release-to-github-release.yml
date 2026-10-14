@@ -70,6 +70,8 @@ jobs:
         run: ./buildScript/lib/core/init.sh
       - name: Bundle pinned GeoIP and GeoSite databases
         run: ./buildScript/lib/assets.sh
+      - name: Test two-database backup restore
+        run: python3 buildScript/tests/test_restore_transaction.py
       - name: Test Go core with race detection
         working-directory: libcore
         env:
@@ -123,7 +125,9 @@ jobs:
 
           Development builds use the repository's public test signing key unless private CI signing is configured. APKs are non-debuggable release builds. BUILD-MANIFEST.json records the actual signer, source and toolchain; SHA256SUMS.txt records asset hashes.
 
-          Includes safe bounded imports, authenticated SOCKS downloads, redirect protections, transactional data updates, cancellable background startup, per-app TUN/DNS routing, authenticated Clash API and staged route assets. Android device VPN flows still require testing.
+          Fixes official GeoIP updates and first-run geo routing with checksum-verified bundled GeoIP/GeoSite databases. Session traffic keeps updating when speed display is disabled; dynamic group candidates retain their own TCP/UDP traffic. Includes optional proxy-only subscription/route updates and password-encrypted local/shared/WebDAV backups. Backup restoration commits profiles, routes and settings through one SQLite connection.
+
+          JVM, Go race, real database, TCP/UDP and two-file restore tests run in this pipeline. Physical-device VPN/DNS/battery behavior and full AWG compatibility remain to be verified.
           NOTES
           OPTIONS=()
           if [ "$NEKO_DEV_BUILD" = 1 ]; then OPTIONS+=(--prerelease --latest=false); fi

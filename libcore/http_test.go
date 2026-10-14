@@ -345,3 +345,29 @@ func TestProxyOnlyNeverFallsBackOnConnectionOrHandshakeFailure(t *testing.T) {
 		})
 	}
 }
+
+func TestVirtualDNSDoesNotDialDoTThroughLAN(t *testing.T) {
+	var options option.Rule
+	const config = `{"inbound":["tun-in"],"ip_cidr":["172.19.0.2/32","fdfe:dcba:9876::2/128"],"port":[853],"action":"reject"}`
+	if err := json.Unmarshal([]byte(config), &options); err != nil {
+		t.Fatal(err)
+	}
+	guard, err := rule.NewRule(context.Background(), log.NewNOPFactory().NewLogger("test"), options, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer guard.Close()
+	for _, test := range []struct {
+		inbound, destination string
+		reject               bool
+	}{
+		{"tun-in", "172.19.0.2:853", true}, {"tun-in", "[fdfe:dcba:9876::2]:853", true},
+		{"tun-in", "172.19.0.2:53", false}, {"tun-in", "8.8.8.8:853", false},
+		{"tun-in", "[2001:4860:4860::8888]:853", false}, {"socks-in", "172.19.0.2:853", false},
+	} {
+		metadata := &adapter.InboundContext{Inbound: test.inbound, Destination: M.ParseSocksaddr(test.destination)}
+		if got := guard.Match(metadata); got != test.reject {
+			t.Fatalf("%s/%s reject=%v, want %v", test.inbound, test.destination, got, test.reject)
+		}
+	}
+}
