@@ -135,6 +135,10 @@ func TestRedirectStripsDeviceHeadersAndCredentials(t *testing.T) {
 				t.Errorf("leaked %s", key)
 			}
 		}
+		if r.URL.Path == "/" {
+			http.Redirect(w, r, "/second", http.StatusFound)
+			return
+		}
 		_, _ = io.WriteString(w, "ok")
 	}))
 	defer destination.Close()

@@ -1,9 +1,9 @@
-name: Android release to GitHub Releases
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+name: Android Release APK
 
 on:
+  push:
+    branches: [dev]
+    paths-ignore: ['**/*.md']
   workflow_dispatch:
     inputs:
       tag:
@@ -14,121 +14,112 @@ on:
         description: Release title. Leave empty to auto-generate.
         required: false
         type: string
-  release:
-    types:
-      - published
 
 permissions:
   contents: write
 
 concurrency:
-  group: android-release-github-release-${{ github.ref }}
+  group: android-release-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+  NEKO_DEV_BUILD: ${{ github.ref_name == 'dev' && '1' || '0' }}
+  KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+  ALIAS_NAME: ${{ secrets.ALIAS_NAME }}
+  ALIAS_PASS: ${{ secrets.ALIAS_PASS }}
 
 jobs:
   build-and-publish:
-    runs-on: ubuntu-latest
-
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build]')
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
-
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: '17'
           cache: gradle
-
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
-          go-version: '1.24.9'
-          cache-dependency-path: |
-            libcore/go.sum
-            libcore/go.mod
-
+          go-version: '1.26.9'
+          cache-dependency-path: libcore/go.sum
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v4
-
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4
       - name: Install required Android packages
         run: |
-          sdkmanager --install \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.1" \
-            "ndk;25.0.8775105"
-
-      - name: Make scripts executable
-        run: |
-          chmod +x ./gradlew ./run
-          chmod +x buildScript/lib/core.sh buildScript/lib/core/init.sh buildScript/lib/core/build.sh
-          chmod +x buildScript/lib/core/get_source.sh buildScript/init/env.sh buildScript/init/env_ndk.sh
-          chmod +x libcore/init.sh libcore/build.sh
-
-      - name: Resolve release metadata
-        id: meta
+          sdkmanager --install "platform-tools" "platforms;android-21" "platforms;android-35" "build-tools;35.0.1" "ndk;28.0.13004108"
+          chmod +x gradlew buildScript/lib/core.sh buildScript/lib/core/init.sh buildScript/lib/core/build.sh buildScript/lib/core/get_source.sh libcore/init.sh libcore/build.sh
+      - name: Configure release signing
         shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          VERSION_NAME=$(grep '^VERSION_NAME=' nb4a.properties | cut -d= -f2-)
-          DEFAULT_TAG="v${VERSION_NAME}-${GITHUB_RUN_NUMBER}"
-          DEFAULT_TITLE="NekoBox_SF ${VERSION_NAME}"
-
-          if [ "${{ github.event_name }}" = "release" ]; then
-            TAG="${{ github.event.release.tag_name }}"
-            TITLE="${{ github.event.release.name }}"
-            if [ -z "$TITLE" ]; then
-              TITLE="$DEFAULT_TITLE"
-            fi
-          else
-            TAG='${{ inputs.tag }}'
-            TITLE='${{ inputs.title }}'
-            if [ -z "$TAG" ]; then
-              TAG="$DEFAULT_TAG"
-            fi
-            if [ -z "$TITLE" ]; then
-              TITLE="$DEFAULT_TITLE"
-            fi
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            test -n "$KEYSTORE_PASS" && test -n "$ALIAS_NAME" && test -n "$ALIAS_PASS"
+            printf '%s' "$KEYSTORE_BASE64" | base64 --decode > release.keystore
+          elif [ "$NEKO_DEV_BUILD" != 1 ]; then
+            echo "A private release signing key is required outside dev."
+            exit 1
           fi
-
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "title=$TITLE" >> "$GITHUB_OUTPUT"
-
-      - name: Build libcore AAR
-        run: ./buildScript/lib/core.sh
-
-      - name: Verify libcore AAR exists
-        run: test -f app/libs/libcore.aar
-
-      - name: Build installable OSS debug APK
-        run: ./gradlew --no-daemon :app:assembleOssDebug
-
-      - name: Collect release assets
+      - name: Prepare pinned core dependencies and tools
+        run: ./buildScript/lib/core/init.sh
+      - name: Test Go core with race detection
+        working-directory: libcore
+        shell: bash
+        run: go test -race -tags=with_conntrack,with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api . github.com/sagernet/sing-box/protocol/group 2>&1 | tee ../go-test.log
+      - name: Build libcore AAR once
+        run: ./buildScript/lib/core/build.sh
+      - name: Test and build release APKs
+        run: ./gradlew --no-daemon :app:testOssReleaseUnitTest :app:assembleOssRelease
+      - name: Verify and collect release assets
         shell: bash
         run: |
           mkdir -p release-assets
-          find app/build/outputs/apk/oss/debug -type f -name "*.apk" -print -exec cp -v {} release-assets/ \;
-          test -n "$(find release-assets -maxdepth 1 -type f -name "*.apk" -print -quit)" || { echo "No OSS debug APK files found"; exit 1; }
-          (
-            cd release-assets
-            sha256sum *.apk > SHA256SUMS.txt
-          )
-
-      - name: Create release when started manually
-        if: github.event_name == 'workflow_dispatch'
+          python3 .github/scripts/verify_apks.py app/build/outputs/apk/oss/release release-assets/APK-VERIFICATION.json
+          cp app/build/outputs/apk/oss/release/*.apk release-assets/
+          python3 .github/scripts/build_manifest.py release-assets/BUILD-MANIFEST.json release-assets/APK-VERIFICATION.json
+          (cd release-assets && sha256sum *.apk BUILD-MANIFEST.json APK-VERIFICATION.json > SHA256SUMS.txt)
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: test-reports
+          path: |
+            app/build/reports/tests/
+            app/build/test-results/
+            go-test.log
+          if-no-files-found: ignore
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-apks
+          path: release-assets/
+      - name: Publish GitHub release
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_TITLE: ${{ inputs.title }}
         run: |
-          if ! gh release view "${{ steps.meta.outputs.tag }}" >/dev/null 2>&1; then
-            gh release create "${{ steps.meta.outputs.tag }}" \
-              --title "${{ steps.meta.outputs.title }}" \
-              --notes "Automated Android release build uploaded by GitHub Actions."
+          VERSION_NAME=$(sed -n 's/^VERSION_NAME=//p' nb4a.properties)
+          TAG=${INPUT_TAG:-v${VERSION_NAME}-${GITHUB_RUN_NUMBER}}
+          TITLE=${INPUT_TITLE:-NekoBox_SF ${VERSION_NAME}}
+          git check-ref-format "refs/tags/$TAG"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; refusing to overwrite it."
+            exit 1
           fi
+          cat > release-notes.txt <<'NOTES'
+          Package: com.isaiandco.neko (without .debug). Export a backup from the old app and import it into this package before uninstalling the old app.
 
-      - name: Upload APKs to GitHub Release
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload "${{ steps.meta.outputs.tag }}" release-assets/* --clobber
+          Development builds use the repository's public test signing key unless private CI signing is configured. APKs are non-debuggable release builds. BUILD-MANIFEST.json records the actual signer, source and toolchain; SHA256SUMS.txt records asset hashes.
+
+          Includes safe bounded imports, authenticated SOCKS downloads, redirect protections, transactional data updates, cancellable background startup, per-app TUN/DNS routing, authenticated Clash API and staged route assets. Android device VPN flows still require testing.
+          NOTES
+          OPTIONS=()
+          if [ "$NEKO_DEV_BUILD" = 1 ]; then OPTIONS+=(--prerelease --latest=false); fi
+          gh release create "$TAG" release-assets/* --target "$GITHUB_SHA" --title "$TITLE" --notes-file release-notes.txt "${OPTIONS[@]}"

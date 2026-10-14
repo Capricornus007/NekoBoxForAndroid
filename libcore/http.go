@@ -261,7 +261,14 @@ func checkHTTPRedirect(req *http.Request, via []*http.Request) error {
 	if previous.Scheme == "https" && req.URL.Scheme != "https" {
 		return errors.New("refusing an HTTPS downgrade")
 	}
-	if previous.Scheme != req.URL.Scheme || !strings.EqualFold(previous.Host, req.URL.Host) {
+	// net/http rebuilds redirect headers from the initial request on every hop.
+	// Once the chain leaves that origin, keep stripping them on subsequent hops.
+	original := via[0].URL
+	crossOrigin := httpOrigin(req.URL) != httpOrigin(original)
+	for _, hop := range via {
+		crossOrigin = crossOrigin || httpOrigin(hop.URL) != httpOrigin(original)
+	}
+	if crossOrigin {
 		for key := range req.Header {
 			if strings.HasPrefix(strings.ToLower(key), "x-") {
 				req.Header.Del(key)
@@ -272,6 +279,18 @@ func checkHTTPRedirect(req *http.Request, via []*http.Request) error {
 		}
 	}
 	return nil
+}
+
+func httpOrigin(u *url.URL) string {
+	port := u.Port()
+	if port == "" {
+		if u.Scheme == "https" {
+			port = "443"
+		} else {
+			port = "80"
+		}
+	}
+	return strings.ToLower(u.Scheme) + "://" + net.JoinHostPort(strings.ToLower(u.Hostname()), port)
 }
 
 type cleanupBody struct {

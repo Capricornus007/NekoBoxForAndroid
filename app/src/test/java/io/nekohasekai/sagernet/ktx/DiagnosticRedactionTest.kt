@@ -12,7 +12,7 @@ class DiagnosticRedactionTest {
         listOf("secret phrase", "abcdef", "key-value").forEach { assertFalse(result.contains(it)) }
     }
     @Test fun hidesPemBlocksButKeepsUsefulErrors() {
-        val result = redactDiagnostic("timeout\n-----BEGIN PRIVATE KEY-----\nprivate-data\n-----END PRIVATE KEY-----")
+        val result = redactDiagnostic("timeout\nprivate_key=-----BEGIN PRIVATE KEY-----\nprivate-data\n-----END PRIVATE KEY-----")
         assertTrue(result.contains("timeout")); assertFalse(result.contains("private-data"))
     }
 }
