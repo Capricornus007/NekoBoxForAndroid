@@ -1,5 +1,8 @@
 package io.nekohasekai.sagernet.ui
 
+import io.nekohasekai.sagernet.ktx.MAX_SUBSCRIPTION_BYTES
+import io.nekohasekai.sagernet.ktx.readBytesLimited
+
 import android.content.DialogInterface
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
