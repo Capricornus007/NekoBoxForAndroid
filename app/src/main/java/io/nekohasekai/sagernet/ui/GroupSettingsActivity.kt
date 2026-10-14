@@ -25,6 +25,8 @@ import io.nekohasekai.sagernet.SubscriptionFilterMode
 import io.nekohasekai.sagernet.database.*
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
 import io.nekohasekai.sagernet.group.GroupUpdater
+import io.nekohasekai.sagernet.group.parseSubscriptionHeaders
+import io.nekohasekai.sagernet.fmt.dnsServerConfig
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
@@ -62,6 +64,8 @@ class GroupSettingsActivity(
         DataStore.subscriptionUserAgent = subscription.customUserAgent
         DataStore.subscriptionSendHwid = subscription.sendHwid
         DataStore.subscriptionCustomHwidParams = subscription.customHwidParams
+        DataStore.subscriptionServerDns = subscription.serverDnsResolver
+        DataStore.subscriptionHeaders = subscription.customHeaders
         DataStore.subscriptionAutoUpdate = subscription.autoUpdate
         DataStore.subscriptionAutoUpdateDelay = subscription.autoUpdateDelay
         DataStore.subscriptionFilterMode = subscription.filterMode
@@ -87,6 +91,8 @@ class GroupSettingsActivity(
                 customUserAgent = DataStore.subscriptionUserAgent
                 sendHwid = DataStore.subscriptionSendHwid
                 customHwidParams = DataStore.subscriptionCustomHwidParams
+                serverDnsResolver = DataStore.subscriptionServerDns.trim()
+                customHeaders = DataStore.subscriptionHeaders
                 autoUpdate = DataStore.subscriptionAutoUpdate
                 autoUpdateDelay = DataStore.subscriptionAutoUpdateDelay
                 filterMode = DataStore.subscriptionFilterMode
@@ -182,6 +188,22 @@ class GroupSettingsActivity(
         subscriptionAutoUpdate.setOnPreferenceChangeListener { _, newValue ->
             subscriptionAutoUpdateDelay.isEnabled = (newValue as Boolean)
             true
+        }
+
+        fun validateInput(key: String, validate: (String) -> Unit) {
+            findPreference<EditTextPreference>(key)!!.setOnPreferenceChangeListener { _, value ->
+                try {
+                    validate(value as String)
+                    true
+                } catch (e: IllegalArgumentException) {
+                    Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
+                    false
+                }
+            }
+        }
+        validateInput(Key.SUBSCRIPTION_HEADERS) { parseSubscriptionHeaders(it) }
+        validateInput(Key.SUBSCRIPTION_SERVER_DNS) {
+            if (it.isNotBlank()) dnsServerConfig(it, "check", "dns-local", "direct")
         }
 
         val subscriptionFilterMode =

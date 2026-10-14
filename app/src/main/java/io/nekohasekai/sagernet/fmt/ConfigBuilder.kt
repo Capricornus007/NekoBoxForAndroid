@@ -5,6 +5,7 @@ import io.nekohasekai.sagernet.*
 import io.nekohasekai.sagernet.bg.VpnService
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
+import io.nekohasekai.sagernet.database.ProxyGroup
 import io.nekohasekai.sagernet.database.ProxyEntity.Companion.TYPE_CONFIG
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.ConfigBuildResult.IndexEntity
@@ -174,6 +175,8 @@ fun buildConfig(
     val userDNSRuleList = mutableListOf<DNSRule_DefaultOptions>()
     val domainListDNSDirectForce = mutableListOf<String>()
     val bypassDNSBeans = hashSetOf<AbstractBean>()
+    val subscriptionResolvers = linkedMapOf<String, String>()
+    val subscriptionGroups = mutableMapOf<Long, ProxyGroup?>()
     val isVPN = DataStore.serviceMode == Key.MODE_VPN
     val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST
     val needLocalProxyInbounds = !isVPN || DataStore.allowAccess
@@ -458,7 +461,21 @@ fun buildConfig(
                         }
                     }
                     _hack_custom_config = bean.customOutboundJson
-                    applyDomainStrategyIfSupported(
+                    val resolver = subscriptionGroups.getOrPut(proxyEntity.groupId) {
+                        SagerDatabase.groupDao.getById(proxyEntity.groupId)
+                    }?.subscription?.serverDnsResolver.orEmpty().trim()
+                    val outboundMap = asMap()
+                    val serverHost = outboundMap["server"] as? String
+                    if (resolver.isNotEmpty() && !proxyEntity.needExternal() &&
+                        !serverHost.isNullOrBlank() && !serverHost.isIpAddress() &&
+                        outboundMap["domain_resolver"] == null && outboundMap["type"] !in GROUP_OUTBOUND_TYPES) {
+                        val resolverTag = "dns-sub-${proxyEntity.groupId}"
+                        subscriptionResolvers[resolverTag] = resolver
+                        _hack_config_map["domain_resolver"] = mapOf(
+                            "server" to resolverTag,
+                            "strategy" to (outboundMap["domain_strategy"] ?: defaultServerDomainStrategy),
+                        )
+                    } else applyDomainStrategyIfSupported(
                         if (forTest) "" else defaultServerDomainStrategy
                     )
                     _hack_config_map["tag"] = tagOut
@@ -1075,6 +1092,7 @@ fun buildConfig(
     }.let {
         val configMap = it.asMap()
         Util.mergeJSON(configMap, proxy.requireBean().customConfigJson)
+        applySubscriptionDns(configMap, subscriptionResolvers)
         ConfigBuildResult(
             gson.toJson(configMap),
             externalIndexMap,

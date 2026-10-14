@@ -21,6 +21,8 @@ public class SubscriptionBean extends Serializable {
     public String customUserAgent;
     public Boolean sendHwid;
     public String customHwidParams;
+    public String serverDnsResolver;
+    public String customHeaders;
     public Boolean autoUpdate;
     public Integer autoUpdateDelay;
     public Integer lastUpdated;
@@ -48,7 +50,7 @@ public class SubscriptionBean extends Serializable {
 
     @Override
     public void serializeToBuffer(ByteBufferOutput output) {
-        output.writeInt(3);
+        output.writeInt(4);
 
         output.writeInt(type);
 
@@ -71,10 +73,13 @@ public class SubscriptionBean extends Serializable {
         // v3
         output.writeBoolean(sendHwid);
         output.writeString(customHwidParams);
+        // v4: do not reuse upstream v3, occupied by this fork's HWID fields.
+        output.writeString(serverDnsResolver);
+        output.writeString(customHeaders);
     }
 
     public void serializeForShare(ByteBufferOutput output) {
-        output.writeInt(1);
+        output.writeInt(2);
 
         output.writeInt(type);
 
@@ -86,6 +91,8 @@ public class SubscriptionBean extends Serializable {
         output.writeString(customUserAgent);
         output.writeBoolean(sendHwid);
         output.writeString(customHwidParams);
+        output.writeString(serverDnsResolver);
+        output.writeString(customHeaders);
     }
 
     @Override
@@ -112,6 +119,10 @@ public class SubscriptionBean extends Serializable {
             sendHwid = input.readBoolean();
             customHwidParams = input.readString();
         }
+        if (version >= 4) {
+            serverDnsResolver = input.readString();
+            customHeaders = input.readString();
+        }
     }
 
     public void deserializeFromShare(ByteBufferInput input) {
@@ -127,6 +138,10 @@ public class SubscriptionBean extends Serializable {
             sendHwid = input.readBoolean();
             customHwidParams = input.readString();
         }
+        if (version >= 2) {
+            serverDnsResolver = input.readString();
+            customHeaders = input.readString();
+        }
     }
 
     @Override
@@ -140,6 +155,8 @@ public class SubscriptionBean extends Serializable {
         if (customUserAgent == null) customUserAgent = "";
         if (sendHwid == null) sendHwid = false;
         if (customHwidParams == null) customHwidParams = "";
+        if (serverDnsResolver == null) serverDnsResolver = "";
+        if (customHeaders == null) customHeaders = "";
         if (autoUpdate == null) autoUpdate = false;
         if (autoUpdateDelay == null) autoUpdateDelay = 1440;
         if (lastUpdated == null) lastUpdated = 0;

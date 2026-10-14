@@ -195,8 +195,11 @@ func (c *httpClient) Close() {
 
 type httpRequest struct {
 	*httpClient
-	request http.Request
+	request       http.Request
+	customHeaders []string
 }
+
+type customHTTPHeadersKey struct{}
 
 func (r *httpRequest) AllowInsecure() {
 	r.tls.InsecureSkipVerify = true
@@ -224,6 +227,7 @@ func (r *httpRequest) SetMethod(method string) {
 
 func (r *httpRequest) SetHeader(key string, value string) {
 	r.request.Header.Set(key, value)
+	r.customHeaders = append(r.customHeaders, key)
 }
 
 func (r *httpRequest) SetUserAgent(userAgent string) {
@@ -250,6 +254,7 @@ func (r *httpRequest) Execute() (result HTTPResponse, err error) {
 			err = fmt.Errorf("http execute: %v", value)
 		}
 	}()
+	r.request = *r.request.WithContext(context.WithValue(r.request.Context(), customHTTPHeadersKey{}, append([]string(nil), r.customHeaders...)))
 	// full direct
 	if r.tryH3Direct && !r.trySocks5 {
 		return r.doH3Direct()
@@ -264,6 +269,7 @@ func (r *httpRequest) Execute() (result HTTPResponse, err error) {
 	}
 	httpResp := &httpResponse{Response: response}
 	if response.StatusCode != http.StatusOK {
+		defer response.Body.Close()
 		return nil, errors.New(httpResp.errorString())
 	}
 	return httpResp, nil
@@ -286,6 +292,11 @@ func checkHTTPRedirect(req *http.Request, via []*http.Request) error {
 		crossOrigin = crossOrigin || httpOrigin(hop.URL) != httpOrigin(original)
 	}
 	if crossOrigin {
+		if custom, ok := via[0].Context().Value(customHTTPHeadersKey{}).([]string); ok {
+			for _, key := range custom {
+				req.Header.Del(key)
+			}
+		}
 		for key := range req.Header {
 			if strings.HasPrefix(strings.ToLower(key), "x-") {
 				req.Header.Del(key)

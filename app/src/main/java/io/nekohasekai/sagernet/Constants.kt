@@ -183,6 +183,8 @@ object Key {
     const val SUBSCRIPTION_USER_AGENT = "subscriptionUserAgent"
     const val SUBSCRIPTION_SEND_HWID = "subscriptionSendHwid"
     const val SUBSCRIPTION_CUSTOM_HWID_PARAMS = "subscriptionCustomHwidParams"
+    const val SUBSCRIPTION_SERVER_DNS = "subscriptionServerDns"
+    const val SUBSCRIPTION_HEADERS = "subscriptionHeaders"
     const val SUBSCRIPTION_AUTO_UPDATE = "subscriptionAutoUpdate"
     const val SUBSCRIPTION_AUTO_UPDATE_DELAY = "subscriptionAutoUpdateDelay"
     const val SUBSCRIPTION_FILTER_MODE = "subscriptionFilterMode"

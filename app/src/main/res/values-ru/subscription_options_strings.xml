@@ -1,0 +1,8 @@
+<resources>
+    <string name="subscription_server_dns">DNS для серверов подписки</string>
+    <string name="subscription_headers">HTTP-заголовки</string>
+    <string name="subscription_headers_summary">По одному Name: value на строку. Значения скрыты и не передаются при перенаправлении на другой сайт.</string>
+    <string name="subscription_remove_referenced">Обновление удалит профили, используемые маршрутами или группами:\n%1$s\n\nУдалить их? Существующие ссылки перестанут работать.</string>
+    <string name="subscription_requires_manual_update">Обновление удаляет используемые профили. Обновите подписку вручную для просмотра изменений.</string>
+    <string name="subscription_changed_during_update">Во время просмотра обновления профили изменились. Повторите обновление.</string>
+</resources>

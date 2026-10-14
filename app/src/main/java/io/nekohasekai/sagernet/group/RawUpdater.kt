@@ -6,6 +6,8 @@ import android.provider.Settings
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SubscriptionFilterMode
 import io.nekohasekai.sagernet.database.*
+import io.nekohasekai.sagernet.fmt.internal.ChainBean
+import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.fmt.AbstractBean
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
@@ -118,6 +120,7 @@ object RawUpdater : GroupUpdater() {
                         setHeader(key, value)
                     }
                 }
+                parseSubscriptionHeaders(subscription.customHeaders).forEach { (key, value) -> setHeader(key, value) }
             }.execute()
             proxies = parseRaw(Util.getStringBox(response.contentString))
                 ?: error(app.getString(R.string.no_proxies_found))
@@ -171,7 +174,6 @@ object RawUpdater : GroupUpdater() {
         val updated = mutableMapOf<String, String>()
         var deleted: List<String> = emptyList()
         var changed = 0
-        SagerDatabase.instance.withTransaction {
         val exists = SagerDatabase.proxyDao.getByGroup(proxyGroup.id)
         if (subscription.deduplication) {
             Logs.d("Before deduplication: ${proxies.size}")
@@ -205,17 +207,38 @@ object RawUpdater : GroupUpdater() {
 
         Logs.d("Unique profiles: ${nameMap.size}")
 
-        val toDelete = ArrayList<ProxyEntity>()
-        val toReplace = exists.mapNotNull { entity ->
-            val name = entity.displayName()
-            if (nameMap.contains(name)) name to entity else let {
-                toDelete.add(entity)
-                null
+        val snapshots = exists.associate { it.id to KryoConverters.serialize(it.requireBean()) }
+        val matches = matchSubscriptionProfiles(
+            exists.associate { it.id to (it.displayName() to subscriptionFingerprint(it.requireBean())) },
+            nameMap.mapValues { subscriptionFingerprint(it.value) },
+        )
+        val byId = exists.associateBy { it.id }
+        val toReplace = matches.mapValues { byId.getValue(it.value) }
+        val retained = matches.values.toSet()
+        val toDelete = exists.filter { it.id !in retained }
+        val referenced = mutableSetOf(DataStore.selectedProxy)
+        SagerDatabase.rulesDao.allRules().forEach { referenced.add(it.outbound) }
+        SagerDatabase.groupDao.allGroups().forEach {
+            referenced.add(it.frontProxy)
+            referenced.add(it.landingProxy)
+        }
+        SagerDatabase.proxyDao.getAll().forEach {
+            (it.requireBean() as? ChainBean)?.proxies?.let(referenced::addAll)
+        }
+        val protectedRemovals = toDelete.filter { it.id in referenced }
+        if (protectedRemovals.isNotEmpty()) {
+            check(byUser && userInterface != null) { app.getString(R.string.subscription_requires_manual_update) }
+            val names = protectedRemovals.take(20).joinToString("\n") { it.displayName() }
+            if (!userInterface.confirm(app.getString(R.string.subscription_remove_referenced, names))) {
+                finishUpdate(proxyGroup)
+                return
             }
-        }.toMap()
-
-        Logs.d("toDelete profiles: ${toDelete.size}")
-        Logs.d("toReplace profiles: ${toReplace.size}")
+        }
+        SagerDatabase.instance.withTransaction {
+        val current = SagerDatabase.proxyDao.getByGroup(proxyGroup.id)
+        check(current.size == snapshots.size && current.all {
+            snapshots[it.id]?.contentEquals(KryoConverters.serialize(it.requireBean())) == true
+        }) { app.getString(R.string.subscription_changed_during_update) }
 
         val toUpdate = ArrayList<ProxyEntity>()
         deleted = toDelete.map { it.displayName() }
@@ -225,16 +248,17 @@ object RawUpdater : GroupUpdater() {
             if (toReplace.contains(name)) {
                 val entity = toReplace[name]!!
                 val existsBean = entity.requireBean()
+                val oldName = entity.displayName()
                 // 更新订阅，保留自定义覆写设置
                 bean.customOutboundJson = existsBean.customOutboundJson
                 bean.customConfigJson = existsBean.customConfigJson
                 when {
-                    existsBean != bean -> {
+                    existsBean != bean || existsBean.name != bean.name -> {
                         changed++
                         entity.userOrder = userOrder
                         entity.putBean(bean)
                         toUpdate.add(entity)
-                        updated[entity.displayName()] = name
+                        updated[oldName] = name
 
                         Logs.d("Updated profile: $name")
                     }

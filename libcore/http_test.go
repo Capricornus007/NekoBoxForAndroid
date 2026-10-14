@@ -158,6 +158,53 @@ func TestRedirectStripsDeviceHeadersAndCredentials(t *testing.T) {
 	_, _ = response.GetContent()
 }
 
+func TestCustomHeadersStayOnOriginalOrigin(t *testing.T) {
+	for _, h3Fallback := range []bool{false, true} {
+		t.Run(fmt.Sprint(h3Fallback), func(t *testing.T) {
+			destination := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Header.Get("Example-Api-Key") != "" {
+					t.Error("custom credential crossed origin")
+				}
+				if r.URL.Path == "/" {
+					http.Redirect(w, r, "/last", http.StatusFound)
+					return
+				}
+				_, _ = io.WriteString(w, "ok")
+			}))
+			defer destination.Close()
+			origin := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Header.Get("Example-Api-Key") != "fixture" {
+					t.Error("same-origin credential lost")
+				}
+				if r.URL.Path == "/" {
+					http.Redirect(w, r, "/same", http.StatusFound)
+					return
+				}
+				http.Redirect(w, r, destination.URL, http.StatusFound)
+			}))
+			defer origin.Close()
+			client := NewHttpClient()
+			defer client.Close()
+			if h3Fallback {
+				client.TryH3Direct()
+			}
+			request := client.NewRequest()
+			if err := request.SetURL(origin.URL); err != nil {
+				t.Fatal(err)
+			}
+			request.SetHeader("Example-Api-Key", "fixture")
+			response, err := request.Execute()
+			if err != nil {
+				t.Fatal(err)
+			}
+			body, err := response.GetContent()
+			if err != nil || string(body) != "ok" {
+				t.Fatalf("body=%q, error=%v", body, err)
+			}
+		})
+	}
+}
+
 func TestRejectsHTTPSDowngradeAndRedirectLoop(t *testing.T) {
 	via, _ := http.NewRequest("GET", "https://example.test", nil)
 	next, _ := http.NewRequest("GET", "http://example.test", nil)
