@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">Резервный прокси для прямых маршрутов</string>
+    <string name="direct_fallback_summary">Если контрольный сайт недоступен напрямую, прямые маршруты идут через выбранный прокси. При восстановлении возвращается прямое соединение. Локальная сеть остаётся прямой. Текущие соединения переподключаются.</string>
+    <string name="direct_fallback_url">URL контрольного сайта</string>
+    <string name="direct_fallback_url_summary">Укажите HTTPS-сайт вне белого списка. Ответ HEAD 2xx/3xx означает доступность; тайм-аут — 3 секунды. Работает для конфигураций, созданных приложением.</string>
+    <string name="direct_fallback_interval">Интервал проверки (секунды)</string>
+    <string name="direct_fallback_invalid_url">Введите корректный HTTP- или HTTPS-URL без учётных данных и фрагмента.</string>
+    <string name="direct_fallback_invalid_interval">Интервал проверки должен быть от 5 до 3600 секунд.</string>
+</resources>

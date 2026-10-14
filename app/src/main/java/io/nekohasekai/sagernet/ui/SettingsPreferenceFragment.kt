@@ -20,6 +20,7 @@ import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.requestPinClearCacheShortcut
 import io.nekohasekai.sagernet.utils.Theme
 import moe.matsuri.nb4a.ui.*
+import io.nekohasekai.sagernet.fmt.directFallbackConfig
 import java.io.File
 
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
@@ -186,6 +187,28 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         trafficSniffing.onPreferenceChangeListener = reloadListener
         bypassLan.onPreferenceChangeListener = reloadListener
         bypassLanInCore.onPreferenceChangeListener = reloadListener
+        findPreference<SwitchPreferenceCompat>(Key.DIRECT_FALLBACK)!!.onPreferenceChangeListener = reloadListener
+        findPreference<EditTextPreference>(Key.DIRECT_FALLBACK_URL)!!.setOnPreferenceChangeListener { preference, value ->
+            try {
+                directFallbackConfig("proxy", value.toString(), DataStore.directFallbackInterval)
+                reloadListener.onPreferenceChange(preference, value)
+            } catch (_: IllegalArgumentException) {
+                Toast.makeText(requireContext(), R.string.direct_fallback_invalid_url, Toast.LENGTH_LONG).show()
+                false
+            }
+        }
+        findPreference<EditTextPreference>(Key.DIRECT_FALLBACK_INTERVAL)!!.apply {
+            setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+            setOnPreferenceChangeListener { preference, value ->
+                val seconds = value.toString().toIntOrNull()
+                if (seconds != null && seconds in 5..3600) {
+                    reloadListener.onPreferenceChange(preference, value)
+                } else {
+                    Toast.makeText(requireContext(), R.string.direct_fallback_invalid_interval, Toast.LENGTH_LONG).show()
+                    false
+                }
+            }
+        }
         mtu.onPreferenceChangeListener = reloadListener
 
         val concurrentDial = findPreference<SwitchPreferenceCompat>(Key.CONCURRENT_DIAL)!!

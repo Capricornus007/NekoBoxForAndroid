@@ -98,7 +98,7 @@
             app:key="subscriptionSendHwid"
             app:summary="@string/subscription_send_hwid_summary"
             app:title="@string/subscription_send_hwid" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:icon="@drawable/ic_baseline_grid_3x3_24"
             app:key="subscriptionCustomHwidParams"
             app:summary="@string/subscription_custom_hwid_params_summary"

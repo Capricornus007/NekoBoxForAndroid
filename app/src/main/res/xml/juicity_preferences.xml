@@ -33,7 +33,7 @@
             app:key="serverSNI"
             app:title="@string/sni"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             app:icon="@drawable/ic_baseline_push_pin_24"
             app:key="serverPinnedCertChainSha256"
             app:title="@string/pinned_certchain_sha256"

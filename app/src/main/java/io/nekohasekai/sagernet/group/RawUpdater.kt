@@ -52,7 +52,7 @@ object RawUpdater : GroupUpdater() {
             )
         } else {
             buildMap {
-                customParams.split(',').forEach { pair ->
+                customParams.split(',', '\n').forEach { pair ->
                     val trimmed = pair.trim()
                     val separator = trimmed.indexOf('=')
                     if (separator <= 0) return@forEach

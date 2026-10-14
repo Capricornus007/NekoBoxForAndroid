@@ -205,3 +205,152 @@ func (dnsTestMonitor) RegisterCallback(tun.DefaultInterfaceUpdateCallback) *list
 }
 func (dnsTestMonitor) DefaultInterface() *control.Interface { return nil }
 func (dnsTestMonitor) AndroidVPNEnabled() bool              { return false }
+
+func TestTypedFakeIPRespectsIPv6Modes(t *testing.T) {
+	for _, strategy := range []string{"prefer_ipv6", "ipv6_only"} {
+		t.Run(strategy, func(t *testing.T) {
+			ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry())
+			service.MustRegister[platform.Interface](ctx, dnsTestPlatform{})
+			data := map[string]any{"dns": map[string]any{"servers": []any{map[string]any{"type": "local", "tag": "dns-local"}, map[string]any{"type": "fakeip", "tag": "dns-fake", "inet4_range": "198.18.0.0/15", "inet6_range": "fc00::/18"}}, "rules": []any{map[string]any{"server": "dns-fake", "strategy": strategy}}}, "outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}}}
+			content, _ := json.Marshal(data)
+			var options option.Options
+			if err := options.UnmarshalJSONContext(ctx, content); err != nil {
+				t.Fatal(err)
+			}
+			instance, err := box.New(box.Options{Context: ctx, Options: options})
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer instance.Close()
+			if err = instance.Start(); err != nil {
+				t.Fatal(err)
+			}
+			for _, qtype := range []uint16{mDNS.TypeA, mDNS.TypeAAAA} {
+				response, err := service.FromContext[adapter.DNSRouter](ctx).Exchange(ctx, new(mDNS.Msg).SetQuestion("fake.test.", qtype), adapter.DNSQueryOptions{})
+				if err != nil {
+					t.Fatal(err)
+				}
+				if qtype == mDNS.TypeA && strategy == "ipv6_only" {
+					if len(response.Answer) != 0 {
+						t.Fatal("IPv6-only returned IPv4")
+					}
+					continue
+				}
+				if len(response.Answer) != 1 {
+					t.Fatal("missing FakeIP answer")
+				}
+				if qtype == mDNS.TypeAAAA && !netip.MustParsePrefix("fc00::/18").Contains(netip.MustParseAddr(response.Answer[0].(*mDNS.AAAA).AAAA.String())) {
+					t.Fatal("missing fake IPv6 address")
+				}
+			}
+		})
+	}
+}
+
+func TestFallbackDNSUsesSelectedPathWithoutResolverLoop(t *testing.T) {
+	var controlStatus, proxyCalls, dnsCalls atomic.Int32
+	controlStatus.Store(204)
+	controlSite := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(int(controlStatus.Load())) }))
+	defer controlSite.Close()
+	udp, err := net.ListenPacket("udp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	bootstrap := &mDNS.Server{PacketConn: udp, Handler: mDNS.HandlerFunc(func(w mDNS.ResponseWriter, r *mDNS.Msg) {
+		response := new(mDNS.Msg).SetReply(r)
+		if r.Question[0].Qtype == mDNS.TypeA {
+			response.Answer = []mDNS.RR{&mDNS.A{Hdr: mDNS.RR_Header{Name: r.Question[0].Name, Rrtype: mDNS.TypeA, Class: mDNS.ClassINET, Ttl: 1}, A: net.ParseIP("127.0.0.1")}}
+		}
+		_ = w.WriteMsg(response)
+	})}
+	go func() { _ = bootstrap.ActivateAndServe() }()
+	defer bootstrap.Shutdown()
+	controlURL := "http://control.example.test:" + strconv.Itoa(controlSite.Listener.Addr().(*net.TCPAddr).Port)
+	doh := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		dnsCalls.Add(1)
+		body, _ := io.ReadAll(r.Body)
+		request := new(mDNS.Msg)
+		if err := request.Unpack(body); err != nil {
+			t.Error(err)
+			return
+		}
+		response := new(mDNS.Msg).SetReply(request)
+		response.Answer = []mDNS.RR{&mDNS.A{Hdr: mDNS.RR_Header{Name: request.Question[0].Name, Rrtype: mDNS.TypeA, Class: mDNS.ClassINET, Ttl: 1}, A: net.ParseIP("203.0.113.10")}}
+		data, _ := response.Pack()
+		w.Header().Set("Content-Type", "application/dns-message")
+		_, _ = w.Write(data)
+	}))
+	defer doh.Close()
+	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "CONNECT" || r.Host != doh.Listener.Addr().String() {
+			t.Error("unexpected proxy request")
+			w.WriteHeader(403)
+			return
+		}
+		proxyCalls.Add(1)
+		upstream, err := net.Dial("tcp", r.Host)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer upstream.Close()
+		conn, rw, err := w.(http.Hijacker).Hijack()
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		defer conn.Close()
+		_, _ = rw.WriteString("HTTP/1.1 200 Connection Established\r\n\r\n")
+		_ = rw.Flush()
+		go func() { _, _ = io.Copy(conn, upstream) }()
+		_, _ = io.Copy(upstream, rw)
+	}))
+	defer proxy.Close()
+	configuration := map[string]any{
+		"dns": map[string]any{"servers": []any{
+			map[string]any{"type": "udp", "tag": "dns-direct", "server": "127.0.0.1", "server_port": udp.LocalAddr().(*net.UDPAddr).Port},
+			map[string]any{"type": "https", "tag": "dns-direct-fallback", "server": "127.0.0.1", "server_port": doh.Listener.Addr().(*net.TCPAddr).Port, "detour": "direct-fallback", "domain_resolver": "dns-direct", "tls": map[string]any{"enabled": true, "insecure": true}},
+		}, "rules": []any{map[string]any{"outbound": []string{"any"}, "server": "dns-direct"}, map[string]any{"server": "dns-direct-fallback", "strategy": "ipv4_only", "disable_cache": true}}},
+		"outbounds": []any{
+			map[string]any{"type": "direct", "tag": "direct"},
+			map[string]any{"type": "http", "tag": "proxy", "server": "127.0.0.1", "server_port": proxy.Listener.Addr().(*net.TCPAddr).Port},
+			map[string]any{"type": "urltest", "tag": "direct-fallback", "outbounds": []string{"direct", "proxy"}, "strategy": "direct-fallback", "url": controlURL, "interval": "1h", "idle_timeout": "1h", "timeout": "1s", "wait_for_initial": true, "interrupt_exist_connections": true},
+		}, "route": map[string]any{"final": "proxy"},
+	}
+	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry())
+	service.MustRegister[platform.Interface](ctx, dnsTestPlatform{})
+	content, _ := json.Marshal(configuration)
+	var options option.Options
+	if err := options.UnmarshalJSONContext(ctx, content); err != nil {
+		t.Fatal(err)
+	}
+	instance, err := box.New(box.Options{Context: ctx, Options: options})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer instance.Close()
+	if err = instance.Start(); err != nil {
+		t.Fatal(err)
+	}
+	outbound, _ := instance.Outbound().Outbound("direct-fallback")
+	for i, status := range []int32{204, 451, 204} {
+		controlStatus.Store(status)
+		outbound.(interface{ CheckOutbounds() }).CheckOutbounds()
+		qctx, cancel := context.WithTimeout(ctx, time.Second)
+		response, err := service.FromContext[adapter.DNSRouter](ctx).Exchange(qctx, new(mDNS.Msg).SetQuestion("fallback.test.", mDNS.TypeA), adapter.DNSQueryOptions{})
+		cancel()
+		if err != nil || len(response.Answer) != 1 {
+			t.Fatalf("DNS at HTTP%d: %v", status, err)
+		}
+		expected := int32(0)
+		if i > 0 {
+			expected = 1
+		}
+		if proxyCalls.Load() != expected {
+			t.Fatalf("wrong DNS path at HTTP%d: proxy calls=%d", status, proxyCalls.Load())
+		}
+	}
+	if dnsCalls.Load() != 3 {
+		t.Fatal("missing DNS requests")
+	}
+}

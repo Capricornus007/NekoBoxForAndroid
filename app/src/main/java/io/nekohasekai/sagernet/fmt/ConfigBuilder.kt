@@ -115,7 +115,10 @@ fun buildConfig(
     val globalOutbounds = HashMap<Long, String>()
     val tunBypassPackages = linkedSetOf<String>()
     val tunBypassUserIds = linkedSetOf<Int>()
-    val readableNames = mutableSetOf(TAG_DIRECT, TAG_BYPASS, TAG_BLOCK, TAG_FRAGMENT, TAG_MIXED, TAG_PROXY)
+    val readableNames = mutableSetOf(TAG_DIRECT, TAG_BYPASS, TAG_BLOCK, TAG_FRAGMENT, TAG_MIXED, TAG_PROXY, TAG_DIRECT_FALLBACK)
+    val useDirectFallback = !forTest && DataStore.directFallback
+    val directRouteTag = if (useDirectFallback) TAG_DIRECT_FALLBACK else TAG_BYPASS
+    val directRouteDNS = if (useDirectFallback) DNS_DIRECT_FALLBACK else "dns-direct"
     val group = SagerDatabase.groupDao.getById(proxy.groupId)
 
     fun ProxyEntity.resolveChainInternal(): MutableList<ProxyEntity> {
@@ -759,7 +762,7 @@ fun buildConfig(
 
                     when (rule.outbound) {
                         -1L -> {
-                            if (canMakeDnsRule) userDNSRuleList += makeDnsRuleObj().apply { server = "dns-direct" }
+                            if (canMakeDnsRule) userDNSRuleList += makeDnsRuleObj().apply { server = directRouteDNS }
 
                             if (rule_set != null && rulesetTags.isNotEmpty()) {
                                 for (tag in rule_set) {
@@ -768,7 +771,7 @@ fun buildConfig(
                                         userDNSRuleList += DNSRule_DefaultOptions().apply {
                                             if (uidList.isNotEmpty()) user_id = uidList
                                             rule_set = mutableListOf(tag)
-                                            server = "dns-direct"
+                                            server = directRouteDNS
                                         }
                                     }
                                 }
@@ -836,7 +839,7 @@ fun buildConfig(
 
                     outbound = when (val outId = rule.outbound) {
                         0L -> mainProxyTag
-                        -1L -> TAG_BYPASS
+                        -1L -> directRouteTag
                         -2L -> TAG_BLOCK
                         else -> if (outId == proxy.id) mainProxyTag else tagMap[outId] ?: ""
                     }
@@ -886,6 +889,14 @@ fun buildConfig(
             outbounds.add(Outbound().apply {
                 tag = freedom
                 type = "direct"
+            })
+        }
+
+        if (useDirectFallback) {
+            outbounds.add(Outbound().apply {
+                _hack_config_map.putAll(directFallbackConfig(
+                    mainProxyTag, DataStore.directFallbackUrl, DataStore.directFallbackInterval
+                ))
             })
         }
 
@@ -941,6 +952,19 @@ fun buildConfig(
             })
         }
 
+        if (useDirectFallback) {
+            // Keep dns-direct independent: proxy endpoints and the control probe
+            // must not resolve through the group that depends on their results.
+            val address = directDNS.firstOrNull()?.takeUnless { it == "local" }
+                ?: remoteDns.firstOrNull()?.takeUnless { it == "local" }
+                ?: "https://dns.google/dns-query"
+            dns.servers.add(DNSServerOptions().apply {
+                _hack_config_map.putAll(dnsServerConfig(
+                    address, DNS_DIRECT_FALLBACK, "dns-local", TAG_DIRECT_FALLBACK
+                ))
+            })
+        }
+
         remoteDns.firstOrNull().let {
             if (!forTest) {
                 dns.servers.add(DNSServerOptions().apply {
@@ -972,6 +996,12 @@ fun buildConfig(
             })
             if (DataStore.bypassLanInCore) {
                 route.rules.add(Rule_DefaultOptions().apply {
+                    outbound = TAG_BYPASS
+                    ip_is_private = true
+                })
+            }
+            if (useDirectFallback) {
+                route.rules.add(0, Rule_DefaultOptions().apply {
                     outbound = TAG_BYPASS
                     ip_is_private = true
                 })
@@ -1008,8 +1038,9 @@ fun buildConfig(
         }
         val dnsStrategies = mapOf(
             "dns-direct" to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")),
+            DNS_DIRECT_FALLBACK to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")),
             "dns-remote" to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-remote")),
-            "dns-fake" to "ipv4_only",
+            "dns-fake" to genDomainStrategy(true),
         )
         dns.rules = dns.rules.toMutableList().apply {
             filterIsInstance<DNSRule_DefaultOptions>().forEach { rule ->

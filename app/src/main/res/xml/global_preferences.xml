@@ -124,6 +124,22 @@
 
     <PreferenceCategory app:title="@string/cag_route">
         <SwitchPreferenceCompat
+            app:key="directFallback"
+            app:title="@string/direct_fallback"
+            app:summary="@string/direct_fallback_summary" />
+        <EditTextPreference
+            app:key="directFallbackUrl"
+            app:dependency="directFallback"
+            app:defaultValue="https://www.kernel.org"
+            app:title="@string/direct_fallback_url"
+            app:summary="@string/direct_fallback_url_summary" />
+        <EditTextPreference
+            app:key="directFallbackInterval"
+            app:dependency="directFallback"
+            app:defaultValue="30"
+            app:title="@string/direct_fallback_interval"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
             app:icon="@drawable/ic_navigation_apps"
             app:key="proxyApps"
             app:summary="@string/proxied_apps_summary"

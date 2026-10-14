@@ -22,7 +22,7 @@
             app:key="serverAddress"
             app:title="@string/server_address"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:icon="@drawable/ic_maps_directions_boat"
             app:key="serverPorts"
             app:title="@string/server_port"

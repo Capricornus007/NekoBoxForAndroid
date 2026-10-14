@@ -38,6 +38,9 @@ object Key {
 
     const val BYPASS_LAN = "bypassLan"
     const val BYPASS_LAN_IN_CORE = "bypassLanInCore"
+    const val DIRECT_FALLBACK = "directFallback"
+    const val DIRECT_FALLBACK_URL = "directFallbackUrl"
+    const val DIRECT_FALLBACK_INTERVAL = "directFallbackInterval"
     const val CONCURRENT_DIAL = "concurrentDial"
 
     const val MIXED_PORT = "mixedPort" // migration source

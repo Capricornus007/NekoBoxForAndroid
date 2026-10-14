@@ -16,6 +16,7 @@ python3 "$PROJECT_ROOT"/buildScript/lib/core/patch_sing_box_awg.py "$(pwd)"
 python3 "$PROJECT_ROOT"/buildScript/lib/core/patch_sing_box_balancers.py "$(pwd)"
 python3 "$PROJECT_ROOT"/buildScript/lib/core/patch_sing_box_traffic.py "$(pwd)"
 python3 "$PROJECT_ROOT"/buildScript/lib/core/patch_sing_box_dns.py "$(pwd)"
+python3 "$PROJECT_ROOT"/buildScript/lib/core/patch_sing_box_direct_fallback.py "$(pwd)"
 popd
 
 ####
