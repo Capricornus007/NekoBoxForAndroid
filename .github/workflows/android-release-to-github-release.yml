@@ -81,7 +81,7 @@ jobs:
       - name: Build libcore AAR once
         run: ./buildScript/lib/core/build.sh
       - name: Test and build release APKs
-        run: ./gradlew --no-daemon :app:testOssReleaseUnitTest :app:assembleOssRelease
+        run: ./gradlew --no-daemon --no-build-cache -Pksp.incremental=false -Pkotlin.incremental=false -Pkotlin.compiler.execution.strategy=in-process :app:testOssReleaseUnitTest :app:assembleOssRelease
       - name: Verify and collect release assets
         shell: bash
         run: |
