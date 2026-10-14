@@ -16,34 +16,34 @@
             app:icon="@drawable/ic_baseline_legend_toggle_24"
             app:key="routePackages"
             app:title="@string/apps" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:icon="@drawable/ic_baseline_domain_24"
             app:key="routeDomain"
             app:title="domain"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:icon="@drawable/ic_baseline_add_road_24"
             app:key="routeIP"
             app:title="dst ip"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:icon="@drawable/ic_maps_directions_boat"
             app:key="routePort"
             app:title="dst port"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:icon="@drawable/ic_baseline_local_bar_24"
             app:key="routeSource"
             app:title="src ip"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:icon="@drawable/ic_baseline_home_24"
             app:key="routeSourcePort"
             app:title="src port"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:icon="@drawable/ic_baseline_rule_folder_24"
             app:key="routeRuleset"
             app:title="RuleSet(.srs)"
@@ -55,7 +55,7 @@
             app:key="routeNetwork"
             app:title="network"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:icon="@drawable/ic_baseline_layers_24"
             app:key="routeProtocol"
             app:title="protocol"

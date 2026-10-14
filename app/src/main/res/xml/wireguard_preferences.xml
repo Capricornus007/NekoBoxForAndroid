@@ -17,7 +17,7 @@
             app:key="serverPort"
             app:title="@string/server_port"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:icon="@drawable/ic_baseline_domain_24"
             app:key="localAddress"
             app:title="@string/wireguard_local_address"
