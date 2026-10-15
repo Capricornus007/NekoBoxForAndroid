@@ -268,6 +268,7 @@ class RouteSettingsActivity(
             return
         }
 
+        io.nekohasekai.sagernet.database.NetworkSettingsHistory.capture()
         val editingId = DataStore.editingId
         if (editingId == 0L) {
             if (intent.hasExtra(EXTRA_PACKAGE_NAME)) {

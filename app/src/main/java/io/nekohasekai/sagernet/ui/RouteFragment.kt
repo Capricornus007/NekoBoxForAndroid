@@ -110,6 +110,7 @@ class RouteFragment : ToolbarFragment(R.layout.layout_route), Toolbar.OnMenuItem
                     .setMessage(R.string.clear_profiles_message)
                     .setPositiveButton(R.string.yes) { _, _ ->
                         runOnDefaultDispatcher {
+                            io.nekohasekai.sagernet.database.NetworkSettingsHistory.capture()
                             SagerDatabase.rulesDao.reset()
                             DataStore.rulesFirstCreate = false
                             ruleAdapter.reload()
@@ -197,6 +198,7 @@ class RouteFragment : ToolbarFragment(R.layout.layout_route), Toolbar.OnMenuItem
 
         fun commitMove() = runOnDefaultDispatcher {
             if (updated.isNotEmpty()) {
+                io.nekohasekai.sagernet.database.NetworkSettingsHistory.capture()
                 SagerDatabase.rulesDao.updateRules(updated.toList())
                 updated.clear()
                 needReload()
@@ -291,6 +293,7 @@ class RouteFragment : ToolbarFragment(R.layout.layout_route), Toolbar.OnMenuItem
                 enableSwitch.isChecked = rule.enabled
                 enableSwitch.setOnCheckedChangeListener { _, isChecked ->
                     runOnDefaultDispatcher {
+                        io.nekohasekai.sagernet.database.NetworkSettingsHistory.capture()
                         rule.enabled = isChecked
                         SagerDatabase.rulesDao.updateRule(rule)
                         onMainDispatcher {

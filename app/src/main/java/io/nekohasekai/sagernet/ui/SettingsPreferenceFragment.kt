@@ -10,11 +10,16 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.preference.*
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.NetworkSettingsHistory
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.requestPinClearCacheShortcut
@@ -27,6 +32,15 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private lateinit var isProxyApps: SwitchPreferenceCompat
     private lateinit var globalCustomConfig: EditConfigPreference
+    private var checkpointTaken = false
+
+    private fun checkpoint() {
+        if (!checkpointTaken) {
+            NetworkSettingsHistory.capture()
+            checkpointTaken = true
+            findPreference<Preference>("restoreNetworkSettings")?.isEnabled = true
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -34,6 +48,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private val reloadListener = Preference.OnPreferenceChangeListener { _, _ ->
+        checkpoint()
         needReload()
         true
     }
@@ -42,6 +57,28 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = DataStore.configurationStore
         DataStore.initGlobal()
         addPreferencesFromResource(R.xml.global_preferences)
+        findPreference<Preference>("restoreNetworkSettings")!!.apply {
+            isEnabled = NetworkSettingsHistory.available()
+            setOnPreferenceClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.restore_network_settings)
+                    .setMessage(R.string.restore_network_settings_confirm)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            try {
+                                withContext(Dispatchers.IO) { NetworkSettingsHistory.restore() }
+                                if (DataStore.serviceState.started) SagerNet.reloadService(force = true)
+                                activity?.recreate()
+                            } catch (e: Exception) {
+                                Logs.d("Network settings restore failed", e)
+                                context?.let { Toast.makeText(it, R.string.restore_network_settings_failed, Toast.LENGTH_LONG).show() }
+                            }
+                        }
+                    }.show()
+                true
+            }
+        }
 
         val dynamicColors = findPreference<SwitchPreferenceCompat>(Key.DYNAMIC_COLORS)!!
         dynamicColors.isEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S

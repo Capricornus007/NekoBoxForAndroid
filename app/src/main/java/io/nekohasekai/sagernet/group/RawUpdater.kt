@@ -123,8 +123,14 @@ object RawUpdater : GroupUpdater() {
                 }
                 parseSubscriptionHeaders(subscription.customHeaders).forEach { (key, value) -> setHeader(key, value) }
             }.execute()
-            proxies = parseRaw(Util.getStringBox(response.contentString))
-                ?: error(app.getString(R.string.no_proxies_found))
+            val content = Util.getStringBox(response.contentString)
+            val contentType = Util.getStringBox(response.getHeader("Content-Type"))
+                .filter { it.isLetterOrDigit() || it in "/;= ._-" }.take(100)
+            Logs.d("Subscription response: bytes=${content.toByteArray().size}, content-type=$contentType")
+            val problem = subscriptionResponseProblem(content)
+            if (problem != null) throw subscriptionResponseError(problem)
+            proxies = parseRaw(content)?.takeIf { it.isNotEmpty() }
+                ?: throw subscriptionResponseError(SubscriptionResponseProblem.UNSUPPORTED)
 
             subscription.subscriptionUserinfo =
                 Util.getStringBox(response.getHeader("Subscription-Userinfo"))
@@ -317,6 +323,16 @@ object RawUpdater : GroupUpdater() {
         userInterface?.onUpdateSuccess(
             proxyGroup, changed, added, updated, deleted, duplicate, byUser
         )
+    }
+
+    private fun subscriptionResponseError(problem: SubscriptionResponseProblem): SubscriptionResponseException {
+        val resource = when (problem) {
+            SubscriptionResponseProblem.EMPTY -> R.string.subscription_response_empty
+            SubscriptionResponseProblem.HTML -> R.string.subscription_response_html
+            SubscriptionResponseProblem.JSON_ERROR -> R.string.subscription_response_json_error
+            SubscriptionResponseProblem.UNSUPPORTED -> R.string.subscription_response_unsupported
+        }
+        return SubscriptionResponseException(problem, app.getString(resource))
     }
 
     @Suppress("UNCHECKED_CAST")

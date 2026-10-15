@@ -1,0 +1,9 @@
+<resources>
+    <string name="subscription_response_empty">Сервер подписки вернул пустой ответ.</string>
+    <string name="subscription_response_html">Сервер вернул веб-страницу вместо подписки. Проверьте ссылку и учётную запись у провайдера.</string>
+    <string name="subscription_response_json_error">Сервер вернул ошибку JSON вместо подписки.</string>
+    <string name="subscription_response_unsupported">В ответе не найдены профили поддерживаемого формата.</string>
+    <string name="restore_network_settings">Вернуть предыдущие настройки сети</string>
+    <string name="restore_network_settings_confirm">Восстановить предыдущие DNS, маршруты и параметры подключения?</string>
+    <string name="restore_network_settings_failed">Не удалось восстановить настройки сети. Возможно, используемые профили были удалены.</string>
+</resources>

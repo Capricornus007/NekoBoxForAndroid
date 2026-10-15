@@ -205,8 +205,8 @@ class SagerNet : Application(),
             application, Intent(application, SagerConnection.serviceClass)
         )
 
-        fun reloadService() =
-            application.sendBroadcast(Intent(Action.RELOAD).setPackage(application.packageName))
+        fun reloadService(force: Boolean = false) =
+            application.sendBroadcast(Intent(Action.RELOAD).setPackage(application.packageName).putExtra("force", force))
 
         fun stopService() =
             application.sendBroadcast(Intent(Action.CLOSE).setPackage(application.packageName))

@@ -356,6 +356,10 @@
             app:key="showBottomBar"
             app:title="@string/show_bottom_bar" />
         <Preference
+            app:key="restoreNetworkSettings"
+            app:icon="@drawable/baseline_undo_24"
+            app:title="@string/restore_network_settings" />
+        <Preference
             app:icon="@drawable/baseline_undo_24"
             app:key="resetSettings"
             app:title="@string/reset_settings" />

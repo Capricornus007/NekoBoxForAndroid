@@ -154,7 +154,10 @@ abstract class GroupUpdater {
                     finishUpdate(proxyGroup)
                     throw cancelled
                 } catch (e: Throwable) {
-                    Logs.w(e)
+                    if (e is SubscriptionResponseException) {
+                        Logs.d("Subscription import failed: ${e.problem}", e)
+                        Logs.w(app.getString(R.string.no_proxies_found))
+                    } else Logs.w(e)
                     userInterface?.onUpdateFailure(proxyGroup, e.readableMessage)
                     finishUpdate(proxyGroup)
                     false

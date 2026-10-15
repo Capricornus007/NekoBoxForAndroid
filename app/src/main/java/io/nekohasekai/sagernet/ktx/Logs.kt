@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.ktx
 
 import libcore.Libcore
+import io.nekohasekai.sagernet.database.DataStore
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -16,11 +17,11 @@ object Logs {
     // level int use logrus.go
 
     fun d(message: String) {
-        print("[Debug] [${mkTag()}] $message")
+        if (DataStore.logLevel in 3..4) print("[Debug] [${mkTag()}] $message")
     }
 
     fun d(message: String, exception: Throwable) {
-        print("[Debug] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
+        if (DataStore.logLevel in 3..4) print("[Debug] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
     }
 
     fun i(message: String) {
