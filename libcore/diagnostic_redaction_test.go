@@ -25,3 +25,12 @@ func TestNativeLogRedactionBeforeWriting(t *testing.T) {
 		t.Fatal("lost error context")
 	}
 }
+
+func TestDiagnosticRedactionMasksAWGHeaderProtectionKey(t *testing.T) {
+	const secret = "AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE="
+	for _, name := range []string{"HeaderProtectionKey", "header_protection_key"} {
+		if strings.Contains(redactDiagnostic(name+"="+secret), secret) {
+			t.Fatal("AWG header key exposed")
+		}
+	}
+}

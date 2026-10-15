@@ -20,6 +20,8 @@ require (
 
 require github.com/metacubex/utls v1.8.7
 
+require github.com/amnezia-vpn/amneziawg-go/v3 v3.1.20260828 // indirect
+
 require (
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
@@ -78,7 +80,6 @@ require (
 	github.com/sagernet/sing-usbip v0.0.0-20260817040617-28bd42667eca // indirect
 	github.com/sagernet/sing-vmess v0.2.9-0.20260929152519-9b95ab8c9478 // indirect
 	github.com/sagernet/smux v1.5.50-sing-box-mod.1 // indirect
-	github.com/sagernet/wireguard-go v0.0.8-0.20260929150556-6731c7387c81 // indirect
 	github.com/sagernet/ws v0.0.0-20231204124109-acfe8907c854 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/vishvananda/netns v0.0.5 // indirect
@@ -107,8 +108,6 @@ require (
 replace github.com/matsuridayo/libneko => ../../libneko
 
 replace github.com/sagernet/sing-box => ../../sing-box-114
-
-replace github.com/sagernet/wireguard-go => ../../wireguard-go
 
 replace github.com/sagernet/sing-vmess => github.com/starifly/sing-vmess v0.2.8-mod.1
 

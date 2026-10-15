@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="amneziawg_range_hint">Число или диапазон, например 25 или 25-30. Пустое поле — значение протокола по умолчанию. Время в секундах; MaxHandshakeAttempts — количество попыток; ContentPaddingAddition — байты.</string>
+    <string name="amneziawg_header_key_hint">Ключ сервера длиной 32 байта (Base64 или HEX). Для защиты заголовков S1, S2, S3 и S4 должны быть не меньше 12 байт.</string>
+    <string name="amneziawg_random_trailers_hint">Случайные дополнения к пакетам (AWG 3.1).</string>
+    <string name="amneziawg_disable_cookies_hint">Отключить cookies протокола. Включайте только если этого требует конфигурация сервера.</string>
+</resources>

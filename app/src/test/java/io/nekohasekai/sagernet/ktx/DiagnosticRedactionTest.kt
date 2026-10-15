@@ -28,4 +28,12 @@ class DiagnosticRedactionTest {
         val result = redactDiagnostic("timeout\nprivate_key=-----BEGIN PRIVATE KEY-----\nprivate-data\n-----END PRIVATE KEY-----")
         assertTrue(result.contains("timeout")); assertFalse(result.contains("private-data"))
     }
+    @org.junit.Test fun hidesAwg31HeaderProtectionKeysInLogsAndPreviews() {
+        val key="AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE="
+        for (name in listOf("HeaderProtectionKey","header_protection_key")) {
+            org.junit.Assert.assertFalse(redactDiagnostic("$name=$key").contains(key))
+            org.junit.Assert.assertFalse(redactConfigJson("{\"$name\":\"$key\"}").contains(key))
+        }
+    }
+
 }

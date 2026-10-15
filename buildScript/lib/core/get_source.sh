@@ -50,16 +50,7 @@ popd
 
 ####
 
-if [ ! -d "wireguard-go" ]; then
-  git clone --no-checkout https://github.com/amnezia-vpn/amneziawg-go.git wireguard-go
-fi
-pushd wireguard-go
-git checkout --detach "$COMMIT_WIREGUARD_GO"
-git restore --source="$COMMIT_WIREGUARD_GO" --worktree -- .
-# Keep import path compatible with sing-box (expects github.com/sagernet/wireguard-go).
-sed -i '1s|^module .*|module github.com/sagernet/wireguard-go|' go.mod
-grep -rl 'github.com/amnezia-vpn/amneziawg-go/' . | xargs sed -i 's|github.com/amnezia-vpn/amneziawg-go/|github.com/sagernet/wireguard-go/|g'
-popd
+# AmneziaWG is fetched as the pinned official v3 Go module (see libcore/go.mod).
 
 ####
 
