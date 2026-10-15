@@ -6687,10 +6687,10 @@ index af8826b89..c53defcf1 100644
 +}
 diff --git a/protocol/group/direct_fallback.go b/protocol/group/direct_fallback.go
 new file mode 100644
-index 000000000..1187ad964
+index 000000000..1224c75a5
 --- /dev/null
 +++ b/protocol/group/direct_fallback.go
-@@ -0,0 +1,112 @@
+@@ -0,0 +1,126 @@
 +package group
 +
 +import (
@@ -6757,25 +6757,34 @@ index 000000000..1187ad964
 +	}
 +	required := max(1, g.fallback.required)
 +	type probe struct {
++		index int
 +		delay uint16
 +		err   error
 +	}
 +	results := make(chan probe, len(links))
 +	testCtx, cancel := context.WithTimeout(ctx, g.timeout)
 +	defer cancel()
-+	for _, link := range links {
++	for index, link := range links {
 +		go func() {
 +			delay, err := urltest.URLTestReachable(testCtx, link, g.outbounds[0])
-+			results <- probe{delay, err}
++			results <- probe{index, delay, err}
 +		}()
++	}
++	sites := make([]map[string]any, len(links))
++	for index, link := range links {
++		parsed, _ := url.Parse(link)
++		sites[index] = map[string]any{"host": parsed.Host, "state": "not-checked"}
 +	}
 +	successes := 0
 +	var delay uint16
 +	for completed := 0; completed < len(links); completed++ {
 +		select {
 +		case result := <-results:
++			sites[result.index]["state"] = "unreachable"
 +			if result.err == nil {
 +				successes++
++				sites[result.index]["state"] = "reachable"
++				sites[result.index]["rtt_ms"] = result.delay
 +				delay = max(delay, result.delay)
 +			}
 +		case <-testCtx.Done():
@@ -6791,6 +6800,11 @@ index 000000000..1187ad964
 +	direct := g.outbounds[0]
 +	available := g.history.LoadURLTestHistory(direct.Tag()) != nil
 +	enabled := g.fallback.apply(successes >= required, available)
++	g.fallbackDiagnostics.Store(map[string]any{
++		"sites": sites, "checked_at": time.Now(), "successes": successes, "required": required,
++		"failed_rounds": g.fallback.failedRounds, "healthy_rounds": g.fallback.healthyRounds,
++		"failure_threshold": g.fallback.failures, "recovery_threshold": g.fallback.recoveries,
++	})
 +	result := make(map[string]uint16)
 +	if enabled {
 +		if successes >= required {
@@ -7009,7 +7023,7 @@ index c3aaec5a9..3d603ab9b 100644
 +
 +func RealTag(_ adapter.OutboundManager, detour adapter.Outbound) string { return legacyRealTag(detour) }
 diff --git a/protocol/group/urltest.go b/protocol/group/urltest.go
-index bc50ab70d..d33fa390a 100644
+index bc50ab70d..9575daf92 100644
 --- a/protocol/group/urltest.go
 +++ b/protocol/group/urltest.go
 @@ -2,7 +2,6 @@ package group
@@ -7231,7 +7245,7 @@ index bc50ab70d..d33fa390a 100644
  	if outbound == nil {
  		outbound, _ = s.group.Select(N.NetworkUDP)
  	}
-@@ -189,25 +183,35 @@ func (s *URLTest) ListenPacket(ctx context.Context, destination M.Socksaddr) (ne
+@@ -189,25 +183,36 @@ func (s *URLTest) ListenPacket(ctx context.Context, destination M.Socksaddr) (ne
  	}
  	conn, err := outbound.ListenPacket(ctx, destination)
  	if err == nil {
@@ -7265,12 +7279,13 @@ index bc50ab70d..d33fa390a 100644
 +	initialReady                 chan struct{}
 +	initialDone                  chan struct{}
 +	fallback                     directFallbackPolicy
++	fallbackDiagnostics          common.TypedValue[map[string]any]
  	ctx                          context.Context
 +	router                       adapter.Router
  	outbound                     adapter.OutboundManager
  	pause                        pause.Manager
  	pauseCallback                *list.Element[pause.Callback]
-@@ -217,21 +221,26 @@ type URLTestGroup struct {
+@@ -217,21 +222,26 @@ type URLTestGroup struct {
  	interval                     time.Duration
  	tolerance                    uint16
  	idleTimeout                  time.Duration
@@ -7302,7 +7317,7 @@ index bc50ab70d..d33fa390a 100644
  	if interval == 0 {
  		interval = C.DefaultURLTestInterval
  	}
-@@ -241,15 +250,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -241,15 +251,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	if idleTimeout == 0 {
  		idleTimeout = C.DefaultURLTestIdleTimeout
  	}
@@ -7340,7 +7355,7 @@ index bc50ab70d..d33fa390a 100644
  		outbound:                     outboundManager,
  		logger:                       logger,
  		outbounds:                    outbounds,
-@@ -257,6 +284,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -257,6 +285,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  		interval:                     interval,
  		tolerance:                    tolerance,
  		idleTimeout:                  idleTimeout,
@@ -7350,7 +7365,7 @@ index bc50ab70d..d33fa390a 100644
  		history:                      history,
  		close:                        make(chan struct{}),
  		pause:                        service.FromContext[pause.Manager](ctx),
-@@ -265,59 +295,127 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -265,59 +296,127 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	}, nil
  }
  
@@ -7497,7 +7512,7 @@ index bc50ab70d..d33fa390a 100644
  				minDelay = history.Delay
  			}
  		}
-@@ -326,7 +424,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -326,7 +425,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  		if !common.Contains(detour.Network(), network) {
  			continue
  		}
@@ -7506,7 +7521,7 @@ index bc50ab70d..d33fa390a 100644
  		if history == nil {
  			continue
  		}
-@@ -347,180 +445,299 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -347,180 +446,299 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  	return minOutbound, true
  }
  
@@ -7900,7 +7915,7 @@ index bc50ab70d..d33fa390a 100644
 +	}
 +	return map[string]any{"tag": s.Tag(), "strategy": g.strategy, "url": g.link,
 +		"tcp": g.tcpSelection.Load(), "udp": g.udpSelection.Load(),
-+		"candidates": candidates, "candidate_count": len(g.outbounds)}
++		"candidates": candidates, "candidate_count": len(g.outbounds), "fallback": g.fallbackDiagnostics.Load()}
 +}
 +
 +func URLTestOutbounds(ctx context.Context, outboundManager adapter.OutboundManager, history *urltest.HistoryStorage, logger log.Logger, outbounds []adapter.Outbound, link string, interval time.Duration, force bool) map[string]uint16 {
@@ -10520,7 +10535,7 @@ index c0ece0a2d..cf74fd24a 100644
 +	return nil
 +}
 diff --git a/protocol/wireguard/endpoint.go b/protocol/wireguard/endpoint.go
-index c80cf86fa..05c0c28f7 100644
+index c80cf86fa..de4b71171 100644
 --- a/protocol/wireguard/endpoint.go
 +++ b/protocol/wireguard/endpoint.go
 @@ -4,14 +4,11 @@ import (
@@ -10779,7 +10794,7 @@ index c80cf86fa..05c0c28f7 100644
  		destinationAddresses, err := w.dnsRouter.Lookup(ctx, destination.Fqdn, adapter.DNSQueryOptions{})
  		if err != nil {
  			return nil, err
-@@ -290,50 +228,27 @@ func (w *Endpoint) DialContext(ctx context.Context, network string, destination
+@@ -290,50 +228,31 @@ func (w *Endpoint) DialContext(ctx context.Context, network string, destination
  	return w.endpoint.DialContext(ctx, network, destination)
  }
  
@@ -10840,8 +10855,11 @@ index c80cf86fa..05c0c28f7 100644
 -		return false
 -	}
 -	return w.endpoint.Lookup(address) != nil
--}
 +func (w *Endpoint) WireGuardDiagnostics() map[string]any { return w.endpoint.Diagnostics() }
++
++func (w *Endpoint) ProbeMTU(ctx context.Context, destination netip.Addr) map[string]any {
++	return w.endpoint.ProbeMTU(ctx, destination)
+ }
 diff --git a/protocol/wireguard/init.go b/protocol/wireguard/init.go
 new file mode 100644
 index 000000000..0b280a906
@@ -10851,10 +10869,10 @@ index 000000000..0b280a906
 +package wireguard
 diff --git a/protocol/wireguard/outbound.go b/protocol/wireguard/outbound.go
 new file mode 100644
-index 000000000..188a60c64
+index 000000000..95e714dfb
 --- /dev/null
 +++ b/protocol/wireguard/outbound.go
-@@ -0,0 +1,187 @@
+@@ -0,0 +1,191 @@
 +package wireguard
 +
 +import (
@@ -11042,6 +11060,10 @@ index 000000000..188a60c64
 +}
 +
 +func (o *Outbound) WireGuardDiagnostics() map[string]any { return o.endpoint.Diagnostics() }
++
++func (o *Outbound) ProbeMTU(ctx context.Context, destination netip.Addr) map[string]any {
++	return o.endpoint.ProbeMTU(ctx, destination)
++}
 diff --git a/protocol/wireguard/port.go b/protocol/wireguard/port.go
 new file mode 100644
 index 000000000..088a523bd
@@ -17689,8 +17711,192 @@ index 006010aeb..c2ad1b778 100644
 +	PersistentKeepaliveInterval string
  	Reserved                    []uint8
  }
+diff --git a/transport/wireguard/mtu_probe.go b/transport/wireguard/mtu_probe.go
+new file mode 100644
+index 000000000..f685a5b3d
+--- /dev/null
++++ b/transport/wireguard/mtu_probe.go
+@@ -0,0 +1,178 @@
++package wireguard
++
++import (
++	"bytes"
++	"context"
++	"crypto/rand"
++	"encoding/binary"
++	"net/netip"
++	"time"
++)
++
++type mtuWaiter struct {
++	source, destination netip.Addr
++	identity            []byte
++	size                int
++	reply               chan struct{}
++}
++
++func probeChecksum(data []byte) uint16 {
++	var sum uint32
++	for len(data) >= 2 {
++		sum += uint32(binary.BigEndian.Uint16(data))
++		data = data[2:]
++	}
++	if len(data) > 0 {
++		sum += uint32(data[0]) << 8
++	}
++	for sum>>16 != 0 {
++		sum = (sum & 65535) + (sum >> 16)
++	}
++	return ^uint16(sum)
++}
++func probePacket(source, destination netip.Addr, size int) ([]byte, []byte, error) {
++	headerSize := 20
++	if source.Is6() {
++		headerSize = 40
++	}
++	packet := make([]byte, size)
++	body := packet[headerSize:]
++	if _, err := rand.Read(body[4:]); err != nil {
++		return nil, nil, err
++	}
++	if source.Is4() {
++		packet[0], packet[8], packet[9], body[0] = 0x45, 64, 1, 8
++		binary.BigEndian.PutUint16(packet[2:], uint16(size))
++		binary.BigEndian.PutUint16(packet[6:], 0x4000)
++		s, d := source.As4(), destination.As4()
++		copy(packet[12:], s[:])
++		copy(packet[16:], d[:])
++		binary.BigEndian.PutUint16(packet[10:], probeChecksum(packet[:20]))
++		binary.BigEndian.PutUint16(body[2:], probeChecksum(body))
++	} else {
++		packet[0], packet[6], packet[7], body[0] = 0x60, 58, 64, 128
++		binary.BigEndian.PutUint16(packet[4:], uint16(len(body)))
++		s, d := source.As16(), destination.As16()
++		copy(packet[8:], s[:])
++		copy(packet[24:], d[:])
++		pseudo := make([]byte, 40+len(body))
++		copy(pseudo, s[:])
++		copy(pseudo[16:], d[:])
++		binary.BigEndian.PutUint32(pseudo[32:], uint32(len(body)))
++		pseudo[39] = 58
++		copy(pseudo[40:], body)
++		binary.BigEndian.PutUint16(body[2:], probeChecksum(pseudo))
++	}
++	return packet, append([]byte(nil), body[4:24]...), nil
++}
++func (w *mtuWaiter) consume(packet []byte) bool {
++	if len(packet) != w.size {
++		return false
++	}
++	var body []byte
++	if w.source.Is4() {
++		if len(packet) < 44 || packet[0] != 0x45 || packet[9] != 1 || binary.BigEndian.Uint16(packet[2:]) != uint16(len(packet)) || binary.BigEndian.Uint16(packet[6:])&0x3fff != 0 || netip.AddrFrom4([4]byte(packet[12:16])) != w.destination || netip.AddrFrom4([4]byte(packet[16:20])) != w.source {
++			return false
++		}
++		if probeChecksum(packet[:20]) != 0 {
++			return false
++		}
++		body = packet[20:]
++		if body[0] != 0 || body[1] != 0 || probeChecksum(body) != 0 {
++			return false
++		}
++	} else {
++		if len(packet) < 64 || packet[0]>>4 != 6 || packet[6] != 58 || int(binary.BigEndian.Uint16(packet[4:])) != len(packet)-40 || netip.AddrFrom16([16]byte(packet[8:24])) != w.destination || netip.AddrFrom16([16]byte(packet[24:40])) != w.source {
++			return false
++		}
++		body = packet[40:]
++		if body[0] != 129 || body[1] != 0 {
++			return false
++		}
++		pseudo := make([]byte, 40+len(body))
++		copy(pseudo, packet[8:40])
++		binary.BigEndian.PutUint32(pseudo[32:], uint32(len(body)))
++		pseudo[39] = 58
++		copy(pseudo[40:], body)
++		if probeChecksum(pseudo) != 0 {
++			return false
++		}
++	}
++	if !bytes.Equal(body[4:24], w.identity) {
++		return false
++	}
++	select {
++	case w.reply <- struct{}{}:
++	default:
++	}
++	return true
++}
++
++// Verifies inner IP sizes, not the outer UDP path MTU. Never changes MTU or the
++// TUN return owner; interception is limited to the probe's random echo identity.
++func (e *Endpoint) ProbeMTU(ctx context.Context, destination netip.Addr) map[string]any {
++	report := map[string]any{"state": "unknown", "configured_mtu": e.options.MTU}
++	if e.returnDevice == nil || !e.SupportsPacketFlow() || !e.Allows(destination) {
++		report["state"] = "unsupported"
++		return report
++	}
++	source, source6 := e.PortAddresses()
++	if destination.Is6() {
++		source = source6
++	}
++	if !source.IsValid() || source.Is4() != destination.Is4() {
++		report["state"] = "unsupported"
++		return report
++	}
++	if !e.returnDevice.probing.CompareAndSwap(false, true) {
++		report["state"] = "busy"
++		return report
++	}
++	defer e.returnDevice.probing.Store(false)
++	sizes := []int{576, 1200, 1280, 1320, 1360, 1400, 1420, int(e.options.MTU)}
++	if destination.Is6() {
++		sizes[0] = 1280
++	}
++	samples := make([]map[string]any, 0, 8)
++	largest, previous := 0, 0
++	for _, size := range sizes {
++		if size <= previous || size > int(e.options.MTU) || size > 9000 {
++			continue
++		}
++		previous = size
++		packet, identity, err := probePacket(source, destination, size)
++		if err != nil {
++			break
++		}
++		waiter := &mtuWaiter{source, destination, identity, size, make(chan struct{}, 1)}
++		e.returnDevice.probe.Store(waiter)
++		started := time.Now()
++		received := false
++		if err = e.WritePackets([][]byte{packet}); err == nil {
++			timer := time.NewTimer(time.Second)
++			select {
++			case <-waiter.reply:
++				received = true
++			case <-timer.C:
++			case <-ctx.Done():
++			}
++			timer.Stop()
++		}
++		e.returnDevice.probe.CompareAndSwap(waiter, nil)
++		sample := map[string]any{"size": size, "received": received}
++		if received {
++			largest = size
++			sample["rtt_ms"] = time.Since(started).Milliseconds()
++		}
++		samples = append(samples, sample)
++		if ctx.Err() != nil {
++			break
++		}
++	}
++	report["samples"] = samples
++	if largest > 0 {
++		report["state"] = "verified-inner-packet"
++		report["largest_verified"] = largest
++	}
++	return report
++}
 diff --git a/transport/wireguard/port.go b/transport/wireguard/port.go
-index f410bad52..5aa189085 100644
+index f410bad52..9c3922c40 100644
 --- a/transport/wireguard/port.go
 +++ b/transport/wireguard/port.go
 @@ -7,109 +7,85 @@ import (
@@ -17764,7 +17970,9 @@ index f410bad52..5aa189085 100644
 -		refs[i] = device.InputPacketRef{
 -			Destination:  destination,
 -			PacketSlices: packetSlices[i : i+1],
--		}
++		if !e.Allows(destination) {
++			return E.New("WireGuard destination outside allowed IPs")
+ 		}
 -		packetRefs = append(packetRefs, &refs[i])
 -	}
 -	if len(packetRefs) == 0 {
@@ -17786,19 +17994,17 @@ index f410bad52..5aa189085 100644
 -			source = e.tunDevice.Inet4Address()
 -		} else {
 -			source = e.tunDevice.Inet6Address()
-+		if !e.Allows(destination) {
-+			return E.New("WireGuard destination outside allowed IPs")
++		if err := writer.enqueuePacket(packet); err != nil {
++			return err
  		}
 -		reply, replyOk := tun.BuildUnreachable(packet, source, state.headroom)
 -		if replyOk {
 -			replies = append(replies, reply)
-+		if err := writer.enqueuePacket(packet); err != nil {
-+			return err
- 		}
- 	}
+-		}
+-	}
 -	if len(replies) > 0 {
 -		state.returnPath.ReturnPackets(replies)
--	}
+ 	}
  	return nil
  }
 -
@@ -17848,15 +18054,41 @@ index f410bad52..5aa189085 100644
  	}
  	return nil
  }
-@@ -118,7 +94,6 @@ type returnPathState struct {
+@@ -118,40 +94,60 @@ type returnPathState struct {
  	returnPath tun.Return
  	headroom   int
  }
 -
  type returnDeviceWrapper struct {
  	Device
- 	state atomic.Pointer[returnPathState]
-@@ -131,27 +106,29 @@ func (d *returnDeviceWrapper) Write(bufs [][]byte, offset int) (int, error) {
+-	state atomic.Pointer[returnPathState]
++	state   atomic.Pointer[returnPathState]
++	probe   atomic.Pointer[mtuWaiter]
++	probing atomic.Bool
+ }
+ 
+ func (d *returnDeviceWrapper) Write(bufs [][]byte, offset int) (int, error) {
++	originalCount := len(bufs)
++	if waiter := d.probe.Load(); waiter != nil {
++		remaining := make([][]byte, 0, len(bufs))
++		for _, packet := range bufs {
++			if offset < 0 || offset > len(packet) {
++				return 0, E.New("invalid decrypted packet offset")
++			}
++			if !waiter.consume(packet[offset:]) {
++				remaining = append(remaining, packet)
++			}
++		}
++		bufs = remaining
++		if len(bufs) == 0 {
++			return originalCount, nil
++		}
++	}
+ 	state := d.state.Load()
+ 	if state == nil || len(bufs) == 0 {
+-		return d.Device.Write(bufs, offset)
++		count, err := d.Device.Write(bufs, offset)
++		return originalCount - len(bufs) + count, err
  	}
  	packets := make([][]byte, len(bufs))
  	for i, packet := range bufs {
@@ -17878,7 +18110,7 @@ index f410bad52..5aa189085 100644
 -	}
 -	if len(unconsumed) == len(bufs) {
 -		return d.Device.Write(bufs, offset)
-+		return len(bufs), nil
++		return originalCount, nil
  	}
  	remaining := make([][]byte, 0, len(unconsumed))
 -	searchIndex := 0
@@ -17899,5 +18131,5 @@ index f410bad52..5aa189085 100644
  	}
 -	return d.Device.Write(remaining, offset)
 +	_, err := d.Device.Write(remaining, 0)
-+	return len(bufs), err
++	return originalCount, err
  }

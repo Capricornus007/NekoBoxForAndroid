@@ -57,6 +57,9 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = DataStore.configurationStore
         DataStore.initGlobal()
         addPreferencesFromResource(R.xml.global_preferences)
+        findPreference<Preference>("networkProfilesScreen")!!.setOnPreferenceClickListener {
+            startActivity(android.content.Intent(requireContext(), NetworkProfilesActivity::class.java)); true
+        }
         findPreference<Preference>("restoreNetworkSettings")!!.apply {
             isEnabled = NetworkSettingsHistory.available()
             setOnPreferenceClickListener {

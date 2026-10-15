@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.ui
 
+import androidx.room.withTransaction
 import android.content.Intent
 import android.os.Bundle
 import android.text.format.Formatter
@@ -361,6 +362,22 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
                     startFilesForResult(exportProfiles, "profiles_${proxyGroup.displayName()}.txt")
                 }
 
+                R.id.action_undo_subscription -> {
+                    runOnDefaultDispatcher {
+                        val revision = SubscriptionHistory.revision(SagerDatabase.proxyDao.getByGroup(proxyGroup.id))
+                        if (GroupManager.userInterface?.confirm(getString(R.string.subscription_undo_confirm)) != true) return@runOnDefaultDispatcher
+                        try {
+                            SagerDatabase.instance.withTransaction { SubscriptionHistory.restore(proxyGroup.id, revision) }
+                            SubscriptionHistory.delete(proxyGroup.id)
+                            GroupManager.postUpdate(proxyGroup.id)
+                            GroupManager.postReload(proxyGroup.id)
+                            SagerNet.reloadService(true)
+                        } catch (e: Exception) {
+                            onMainDispatcher { activity.snackbar(redactDiagnostic(e.readableMessage)).show() }
+                        }
+                    }
+                }
+
                 R.id.action_clear -> {
                     MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.confirm)
                         .setMessage(R.string.clear_profiles_message)
@@ -405,6 +422,10 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
 
                 if (proxyGroup.type != GroupType.SUBSCRIPTION) {
                     popup.menu.removeItem(R.id.action_share_subscription)
+                }
+                popup.menu.findItem(R.id.action_undo_subscription).apply {
+                    isVisible = proxyGroup.type == GroupType.SUBSCRIPTION
+                    isEnabled = SubscriptionHistory.available(proxyGroup.id) && proxyGroup.id !in GroupUpdater.updating
                 }
                 popup.setOnMenuItemClickListener(this)
                 popup.show()

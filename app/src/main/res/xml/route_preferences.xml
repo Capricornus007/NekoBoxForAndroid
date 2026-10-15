@@ -65,5 +65,9 @@
             app:key="routeOutbound"
             app:title="outbound"
             app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.SimpleMenuPreference app:key="routeFallbackMode"
+            app:title="@string/route_fallback_mode" app:summary="@string/route_fallback_hint"
+            app:entries="@array/route_fallback_entries" app:entryValues="@array/route_fallback_values" />
+        <Preference app:key="routeFallbackProfile" app:title="@string/route_fallback_profile" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -3,6 +3,7 @@ package io.nekohasekai.sagernet.fmt
 import android.widget.Toast
 import io.nekohasekai.sagernet.*
 import io.nekohasekai.sagernet.bg.VpnService
+import io.nekohasekai.sagernet.database.RuleEntity
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.ProxyGroup
@@ -120,7 +121,6 @@ fun buildConfig(
     val readableNames = mutableSetOf(TAG_DIRECT, TAG_BYPASS, TAG_BLOCK, TAG_FRAGMENT, TAG_MIXED, TAG_PROXY, TAG_DIRECT_FALLBACK)
     val useDirectFallback = !forTest && DataStore.directFallback
     val directRouteTag = if (useDirectFallback) TAG_DIRECT_FALLBACK else TAG_BYPASS
-    val directRouteDNS = if (useDirectFallback) DNS_DIRECT_FALLBACK else "dns-direct"
     val group = SagerDatabase.groupDao.getById(proxy.groupId)
 
     fun ProxyEntity.resolveChainInternal(): MutableList<ProxyEntity> {
@@ -169,9 +169,23 @@ fun buildConfig(
 
     val extraRules = if (forTest) listOf() else SagerDatabase.rulesDao.enabledRules()
     val extraProxies =
-        if (forTest) mapOf() else SagerDatabase.proxyDao.getEntities(extraRules.mapNotNull { rule ->
-            rule.outbound.takeIf { it > 0 && it != proxy.id }
+        if (forTest) mapOf() else SagerDatabase.proxyDao.getEntities(extraRules.flatMap { rule ->
+            listOf(rule.outbound, rule.fallbackProfile.takeIf { rule.outbound == -1L && rule.fallbackMode == 3 } ?: 0L).filter { it > 0 && it != proxy.id }
         }.toHashSet().toList()).associateBy { it.id }
+    val needsGlobalFallback = useDirectFallback || extraRules.any { it.outbound == -1L && it.fallbackMode == 2 }
+    val ruleFallbacks = extraRules.filter { it.outbound == -1L && it.fallbackMode == 3 }
+        .associate { it.id to "direct-fallback-rule-${it.id}" }
+    val fallbackDnsTags = linkedMapOf<String, String>().apply {
+        if (needsGlobalFallback) put(TAG_DIRECT_FALLBACK, DNS_DIRECT_FALLBACK)
+        ruleFallbacks.values.forEach { put(it, "dns-$it") }
+    }
+    fun ruleDirectTag(rule: RuleEntity): String = when (rule.fallbackMode) {
+        1 -> TAG_BYPASS
+        2 -> TAG_DIRECT_FALLBACK
+        3 -> ruleFallbacks.getValue(rule.id)
+        else -> directRouteTag
+    }
+    fun ruleDirectDns(rule: RuleEntity) = fallbackDnsTags[ruleDirectTag(rule)] ?: "dns-direct"
     val importedWireGuard = (proxy.requireBean() as? WireGuardBean)?.takeIf { it.useConfigRoutes == true && !forTest }
     val buildSelector = !forTest && group?.isSelector == true && !forExport && importedWireGuard == null
     val userDNSRuleList = mutableListOf<DNSRule_DefaultOptions>()
@@ -182,9 +196,10 @@ fun buildConfig(
     val isVPN = DataStore.serviceMode == Key.MODE_VPN
     val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST
     val needLocalProxyInbounds = !isVPN || DataStore.allowAccess
-    val remoteDns = (importedWireGuard?.dnsServers?.takeIf { it.isNotBlank() } ?: DataStore.remoteDns).split('\n', ',')
+    val networkPolicy = if (forTest || forExport) null else io.nekohasekai.sagernet.database.NetworkProfiles.select().policy
+    val remoteDns = (networkPolicy?.remoteDns?.takeIf { it.isNotBlank() } ?: importedWireGuard?.dnsServers?.takeIf { it.isNotBlank() } ?: DataStore.remoteDns).split('\n', ',')
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
-    val directDNS = DataStore.directDns.split("\n")
+    val directDNS = (networkPolicy?.directDns?.takeIf { it.isNotBlank() } ?: DataStore.directDns).split("\n")
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
     val enableDnsRouting = DataStore.enableDnsRouting
     val useFakeDns = DataStore.enableFakeDns && !forTest
@@ -769,7 +784,7 @@ fun buildConfig(
 
                     when (rule.outbound) {
                         -1L -> {
-                            if (canMakeDnsRule) userDNSRuleList += makeDnsRuleObj().apply { server = directRouteDNS }
+                            if (canMakeDnsRule) userDNSRuleList += makeDnsRuleObj().apply { server = ruleDirectDns(rule) }
 
                             if (rule_set != null && rulesetTags.isNotEmpty()) {
                                 for (tag in rule_set) {
@@ -778,7 +793,7 @@ fun buildConfig(
                                         userDNSRuleList += DNSRule_DefaultOptions().apply {
                                             if (uidList.isNotEmpty()) user_id = uidList
                                             rule_set = mutableListOf(tag)
-                                            server = directRouteDNS
+                                            server = ruleDirectDns(rule)
                                         }
                                     }
                                 }
@@ -846,7 +861,7 @@ fun buildConfig(
 
                     outbound = when (val outId = rule.outbound) {
                         0L -> mainProxyTag
-                        -1L -> directRouteTag
+                        -1L -> ruleDirectTag(rule)
                         -2L -> TAG_BLOCK
                         else -> if (outId == proxy.id) mainProxyTag else tagMap[outId] ?: ""
                     }
@@ -899,12 +914,22 @@ fun buildConfig(
             })
         }
 
-        if (useDirectFallback) {
+        if (needsGlobalFallback) {
             outbounds.add(Outbound().apply {
                 _hack_config_map.putAll(directFallbackConfig(
                     mainProxyTag, DataStore.directFallbackUrl, DataStore.directFallbackInterval,
                     DataStore.directFallbackRequired, DataStore.directFallbackFailures, DataStore.directFallbackRecoveries
                 ))
+            })
+        }
+
+        for (rule in extraRules.filter { it.id in ruleFallbacks }) {
+            val backupTag = if (rule.fallbackProfile == proxy.id) mainProxyTag else tagMap[rule.fallbackProfile]
+            require(!backupTag.isNullOrBlank()) { "Fallback profile is missing for route ${rule.displayName()}" }
+            outbounds.add(Outbound().apply {
+                _hack_config_map.putAll(directFallbackConfig(backupTag, DataStore.directFallbackUrl,
+                    DataStore.directFallbackInterval, DataStore.directFallbackRequired, DataStore.directFallbackFailures,
+                    DataStore.directFallbackRecoveries, ruleFallbacks.getValue(rule.id)))
             })
         }
 
@@ -960,13 +985,13 @@ fun buildConfig(
             })
         }
 
-        if (useDirectFallback) {
+        for ((fallbackTag, dnsTag) in fallbackDnsTags) {
             // Keep dns-direct independent: proxy endpoints and the control probe
             // must not resolve through the group that depends on their results.
             val address = directFallbackDnsAddress(directDNS.firstOrNull(), remoteDns.firstOrNull())
             dns.servers.add(DNSServerOptions().apply {
                 _hack_config_map.putAll(dnsServerConfig(
-                    address, DNS_DIRECT_FALLBACK, "dns-local", TAG_DIRECT_FALLBACK
+                    address, dnsTag, "dns-local", fallbackTag
                 ))
             })
         }
@@ -992,7 +1017,7 @@ fun buildConfig(
         if (forTest) {
             dns.rules = listOf()
         } else {
-            if (useDirectFallback) {
+            if (fallbackDnsTags.isNotEmpty()) {
                 route.rules.add(0, Rule_DefaultOptions().apply {
                     outbound = TAG_BYPASS
                     ip_is_private = true
@@ -1054,7 +1079,7 @@ fun buildConfig(
             DNS_DIRECT_FALLBACK to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")),
             "dns-remote" to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-remote")),
             "dns-fake" to genDomainStrategy(true),
-        )
+        ) + fallbackDnsTags.values.associateWith { autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")) }
         dns.rules = dns.rules.toMutableList().apply {
             filterIsInstance<DNSRule_DefaultOptions>().forEach { rule ->
                 if (rule.server == "dns-block") {

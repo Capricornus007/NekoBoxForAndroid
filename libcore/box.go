@@ -69,7 +69,8 @@ func ResetAllConnections(system bool) {
 }
 
 type BoxInstance struct {
-	access sync.Mutex
+	access  sync.Mutex
+	probeWG sync.WaitGroup
 
 	*box.Box
 	ctx    context.Context
@@ -183,6 +184,7 @@ func (b *BoxInstance) Close() (err error) {
 	if b.cancel != nil {
 		b.cancel()
 	}
+	b.probeWG.Wait()
 	if b.Box != nil {
 		b.Box.Close()
 	}

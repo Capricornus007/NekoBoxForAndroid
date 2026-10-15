@@ -223,20 +223,52 @@ object RawUpdater : GroupUpdater() {
         val toReplace = matches.mapValues { byId.getValue(it.value) }
         val retained = matches.values.toSet()
         val toDelete = exists.filter { it.id !in retained }
-        val referenced = mutableSetOf(DataStore.selectedProxy)
-        SagerDatabase.rulesDao.allRules().forEach { referenced.add(it.outbound) }
-        SagerDatabase.groupDao.allGroups().forEach {
-            referenced.add(it.frontProxy)
-            referenced.add(it.landingProxy)
-        }
-        SagerDatabase.proxyDao.getAll().forEach {
-            (it.requireBean() as? ChainBean)?.proxies?.let(referenced::addAll)
+        val referenced = SubscriptionHistory.referencedProfiles()
+        val hasProfileChanges = toDelete.isNotEmpty() || nameMap.entries.withIndex().any { (index, entry) ->
+            val previous = toReplace[entry.key]
+            previous == null || previous.userOrder != index + 1L || subscriptionChanges(previous.requireBean(), entry.value).isNotEmpty()
         }
         val protectedRemovals = toDelete.filter { it.id in referenced }
         if (protectedRemovals.isNotEmpty()) {
             check(byUser && userInterface != null) { app.getString(R.string.subscription_requires_manual_update) }
             val names = protectedRemovals.take(20).joinToString("\n") { it.displayName() }
             if (!userInterface.confirm(app.getString(R.string.subscription_remove_referenced, names))) {
+                finishUpdate(proxyGroup)
+                return
+            }
+        }
+        if (byUser && userInterface != null) {
+            val lines = mutableListOf<String>()
+            var additions = 0
+            var modifications = 0
+            for ((name, bean) in nameMap) {
+                val previous = toReplace[name]
+                if (previous == null) {
+                    additions++
+                    if (lines.size < 100) lines += "+ ${name.take(160)}"
+                } else {
+                    val categories = subscriptionChanges(previous.requireBean(), bean)
+                    if (categories.isNotEmpty()) {
+                        modifications++
+                        val labels = categories.map { category -> app.getString(when (category) {
+                            "name" -> R.string.subscription_field_name
+                            "address" -> R.string.subscription_field_address
+                            "dns" -> R.string.subscription_field_dns
+                            "allowed_ips" -> R.string.subscription_field_allowed_ips
+                            "tls" -> R.string.subscription_field_tls
+                            "credentials" -> R.string.subscription_field_credentials
+                            "protocol" -> R.string.subscription_field_protocol
+                            else -> R.string.subscription_field_parameters
+                        }) }
+                        if (lines.size < 100) lines += "~ ${name.take(160)}: ${labels.joinToString()}"
+                    }
+                }
+            }
+            toDelete.forEach { if (lines.size < 100) lines += "− ${it.displayName().take(160)}" }
+            if (additions + modifications + toDelete.size > 0 && !userInterface.confirm(
+                app.getString(R.string.subscription_preview, additions, modifications, toDelete.size) +
+                    "\n\n" + lines.joinToString("\n") + "\n\n" + app.getString(R.string.subscription_preview_hint)
+            )) {
                 finishUpdate(proxyGroup)
                 return
             }
@@ -250,6 +282,8 @@ object RawUpdater : GroupUpdater() {
         check(current.size == snapshots.size && current.all {
             snapshots[it.id]?.contentEquals(KryoConverters.serialize(it.requireBean())) == true
         }) { app.getString(R.string.subscription_changed_during_update) }
+
+        if (hasProfileChanges) SubscriptionHistory.capture(currentGroup, current)
 
         val toUpdate = ArrayList<ProxyEntity>()
         deleted = toDelete.map { it.displayName() }

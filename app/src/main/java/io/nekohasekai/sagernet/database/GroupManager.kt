@@ -98,6 +98,7 @@ object GroupManager {
     }
 
     suspend fun deleteGroup(groupId: Long) {
+        SubscriptionHistory.delete(groupId)
         SagerDatabase.groupDao.deleteById(groupId)
         SagerDatabase.proxyDao.deleteByGroup(groupId)
         iterator { groupRemoved(groupId) }
@@ -105,6 +106,7 @@ object GroupManager {
     }
 
     suspend fun deleteGroup(group: List<ProxyGroup>) {
+        group.forEach { SubscriptionHistory.delete(it.id) }
         SagerDatabase.groupDao.deleteGroup(group)
         SagerDatabase.proxyDao.deleteByGroup(group.map { it.id }.toLongArray())
         for (proxyGroup in group) iterator { groupRemoved(proxyGroup.id) }

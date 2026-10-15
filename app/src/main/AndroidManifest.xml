@@ -11,6 +11,9 @@
 
     <uses-permission android:name="${applicationId}.SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
@@ -69,6 +72,7 @@
             android:name="android.app.shortcuts"
             android:resource="@xml/shortcuts" />
 
+        <activity android:name="io.nekohasekai.sagernet.ui.NetworkProfilesActivity" android:exported="false" />
         <activity
             android:name="io.nekohasekai.sagernet.ui.BlankActivity"
             android:configChanges="uiMode" />

@@ -14,6 +14,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.aidl.ISagerNetService
 import io.nekohasekai.sagernet.aidl.ISagerNetServiceCallback
 import io.nekohasekai.sagernet.bg.proto.ProxyInstance
+import io.nekohasekai.sagernet.database.NetworkProfiles
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.ktx.*
@@ -47,6 +48,7 @@ class BaseService {
     class Data internal constructor(private val service: Interface) {
         @Volatile var state = State.Stopped
         var networkSignature: String? = null
+        var networkPolicySignature: String? = null
         var proxy: ProxyInstance? = null
         var notification: ServiceNotification? = null
 
@@ -324,6 +326,15 @@ class BaseService {
                 if (DataStore.baseService !== this@Interface) return@start
                 SagerNet.underlyingNetwork = network
                 DataStore.vpnService?.updateUnderlyingNetwork()
+                val policySelection = NetworkProfiles.select(network)
+                val previousPolicy = data.networkPolicySignature
+                if (network != null && policySelection.identity != "unavailable") {
+                    data.networkPolicySignature = policySelection.identity
+                    if (previousPolicy != null && previousPolicy != policySelection.identity) {
+                        policySelection.policy?.let { DataStore.selectedProxy = it.profileId }
+                        scheduleNetworkProfileRestart("network-policy", "network-policy")
+                    }
+                }
                 val link = network?.let { SagerNet.connectivity.getLinkProperties(it) }
                 if (link == null) { upstreamInterfaceName = null; return@start }
                 val newName = buildString {
@@ -394,6 +405,9 @@ class BaseService {
 
             // A database read must not consume the foreground-service promotion deadline.
             val notification = ensureForegroundNotification(getString(R.string.app_name))
+            val policySelection = NetworkProfiles.select()
+            data.networkPolicySignature = policySelection.identity
+            policySelection.policy?.let { DataStore.selectedProxy = it.profileId }
             val profile = SagerDatabase.proxyDao.getById(DataStore.selectedProxy)
             if (profile == null) { // gracefully shutdown: https://stackoverflow.com/q/47337857/2245107
                 stopRunner(false, getString(R.string.profile_empty))

@@ -1,0 +1,49 @@
+<resources>
+  <string name="subscription_preview">Предпросмотр: +%1$d · изменено %2$d · удалено %3$d</string>
+  <string name="subscription_preview_hint">Применить изменения? Предыдущую версию профилей можно будет восстановить. Значения ключей и паролей скрыты. Показано до 100 изменений.</string>
+  <string name="subscription_undo">Предыдущая версия подписки</string>
+  <string name="subscription_undo_confirm">Восстановить профили до последнего обновления подписки? Текущие правки профилей этой группы будут заменены. Счётчики трафика сохранятся.</string>
+  <string name="subscription_undo_referenced">Добавленный обновлением профиль используется. Перед откатом выберите другой профиль и уберите ссылки на него из маршрутов и групп.</string>
+  <string name="subscription_field_name">название</string>
+  <string name="subscription_field_address">адрес/порт сервера</string>
+  <string name="subscription_field_dns">DNS</string>
+  <string name="subscription_field_allowed_ips">AllowedIPs</string>
+  <string name="subscription_field_tls">TLS</string>
+  <string name="subscription_field_credentials">ключи/пароли (скрыты)</string>
+  <string name="subscription_field_protocol">протокол</string>
+  <string name="subscription_field_parameters">параметры протокола</string>
+  <string name="diagnostics_overview">Конфигурация</string>
+  <string name="diagnostics_loading">Проверка…</string>
+  <string name="diagnostics_live_state">Текущее состояние соединения</string>
+  <string name="diagnostics_active_tests">Проверки сети</string>
+  <string name="diagnostics_probe_hint">Проверки запускаются по кнопке. Они создают соединения с указанным адресом напрямую и через прокси.</string>
+  <string name="diagnostics_filter_app">Пакет приложения или UID</string>
+  <string name="diagnostics_filter_domain">Домен или адрес назначения</string>
+  <string name="diagnostics_filter_node">Исходящий маршрут или узел</string>
+  <string name="diagnostics_no_matching_events">Нет совпадений среди последних 128 событий.</string>
+  <string name="diagnostics_fallback_rounds">Неудачные раунды: %1$d/%2$d · восстановление: %3$d/%4$d</string>
+  <string name="diagnostics_reachable">доступен</string>
+  <string name="diagnostics_unreachable">недоступен</string>
+  <string name="diagnostics_not_checked">не проверено в этом раунде</string>
+  <string name="route_fallback_mode">Резервирование прямого маршрута</string>
+  <string name="route_fallback_hint">Используются контрольные сайты и пороги из общих настроек резервирования. Локальные адреса идут напрямую. Пользовательский JSON маршрута может переопределить эту политику.</string>
+  <string name="route_fallback_profile">Резервный профиль</string>
+  <string name="route_fallback_missing">Выберите существующий профиль</string>
+  <string name="network_profiles">Профили для сетей</string>
+  <string name="network_profiles_enable">Выбирать профиль и DNS по сети</string>
+  <string name="network_profiles_summary">Применяется при запуске VPN и смене сети. Точный SSID имеет приоритет над общим Wi-Fi. Пустые поля DNS наследуют общие настройки. Без доступа к SSID используется общий Wi-Fi. Полные пользовательские конфигурации сохраняют свой DNS.</string>
+  <string name="network_profiles_ssid_permission">Разрешить доступ к SSID (необязательно)</string>
+  <string name="network_profiles_mobile">Мобильная сеть</string>
+  <string name="network_profiles_add">Добавить профиль сети</string>
+  <string name="network_profiles_edit">Настроить профиль сети</string>
+  <string name="network_profiles_ssid">SSID (пусто = любой Wi-Fi)</string>
+  <string name="network_profiles_remote_dns">DNS через прокси (пусто = наследовать)</string>
+  <string name="network_profiles_direct_dns">Прямой DNS (пусто = наследовать)</string>
+  <string name="network_profiles_invalid">Некорректный DNS, профиль или повторяющееся условие сети.</string>
+  <string-array name="route_fallback_entries">
+    <item>Наследовать общую настройку</item>
+    <item>Всегда напрямую</item>
+    <item>Напрямую → текущий прокси</item>
+    <item>Напрямую → резервный профиль</item>
+  </string-array>
+</resources>

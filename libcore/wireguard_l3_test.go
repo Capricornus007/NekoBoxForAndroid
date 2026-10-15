@@ -1,6 +1,7 @@
 package libcore
 
 import (
+	"context"
 	"encoding/binary"
 	"net/netip"
 	"testing"
@@ -100,6 +101,27 @@ func testWireGuardIPPackets(t *testing.T, peers [2]*wg.Endpoint, addresses, addr
 			}
 		case <-time.After(8 * time.Second):
 			t.Fatal("no encrypted ICMP echo reply")
+		}
+	}
+	for _, destination := range []netip.Addr{addresses[1].Addr(), addresses6[1].Addr()} {
+		ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
+		report := peers[0].ProbeMTU(ctx, destination)
+		cancel()
+		if report["state"] != "verified-inner-packet" || report["largest_verified"] != 1408 {
+			t.Fatalf("MTU probe failed: %v", report)
+		}
+		// The existing TUN owner is still attached, and ordinary ICMP is not intercepted.
+		if err := peers[0].AttachReturn(path); err != nil {
+			t.Fatal("probe replaced TUN return owner")
+		}
+		packet := wgEchoPacket(addresses[0].Addr(), addresses[1].Addr())
+		if err := peers[0].WritePackets([][]byte{packet}); err != nil {
+			t.Fatal(err)
+		}
+		select {
+		case <-path.packets:
+		case <-time.After(3 * time.Second):
+			t.Fatal("probe stole unrelated reply")
 		}
 	}
 	if err := peers[0].WritePackets([][]byte{{0x45}}); err == nil {

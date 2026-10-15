@@ -14,7 +14,7 @@ import io.nekohasekai.sagernet.ktx.Logs
 object NetworkSettingsHistory {
     private val file get() = AtomicFile(File(SagerNet.application.noBackupFilesDir, "network-settings-previous.json"))
     private val keys = setOf(
-        Key.REMOTE_DNS, Key.DIRECT_DNS, Key.ENABLE_DNS_ROUTING, Key.ENABLE_FAKEDNS,
+        "networkProfilesEnabled", "networkProfiles", Key.REMOTE_DNS, Key.DIRECT_DNS, Key.ENABLE_DNS_ROUTING, Key.ENABLE_FAKEDNS,
         Key.IPV6_MODE, Key.MTU, Key.TUN_IMPLEMENTATION, Key.STRICT_ROUTE,
         Key.BYPASS_LAN, Key.BYPASS_LAN_IN_CORE, Key.TRAFFIC_SNIFFING, Key.RESOLVE_DESTINATION,
         Key.CONCURRENT_DIAL, Key.DIRECT_FALLBACK, Key.DIRECT_FALLBACK_URL, Key.DIRECT_FALLBACK_INTERVAL,
@@ -47,7 +47,7 @@ object NetworkSettingsHistory {
         val snapshot = gson.fromJson(content, Snapshot::class.java)
         require(snapshot.version == 1 && snapshot.settings.all { it.key in keys }) { "Invalid network settings snapshot" }
         val profileIds = SagerDatabase.proxyDao.getAll().map { it.id }.toSet()
-        require(snapshot.rules.all { it.outbound <= 0 || it.outbound in profileIds }) { "A profile used by the previous routes was deleted" }
+        require(snapshot.rules.all { (it.outbound <= 0 || it.outbound in profileIds) && (it.fallbackMode != 3 || it.fallbackProfile in profileIds) }) { "A profile used by the previous routes was deleted" }
         BackupRestore.commit(snapshot.settings, keys) {
             SagerDatabase.rulesDao.reset()
             SagerDatabase.rulesDao.insert(snapshot.rules)
