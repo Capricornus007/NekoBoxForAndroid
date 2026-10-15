@@ -47,7 +47,7 @@ func (o *fallbackTestOutbound) ListenPacket(context.Context, M.Socksaddr) (net.P
 	o.packets.Add(1)
 	return net.ListenPacket("udp", "127.0.0.1:0")
 }
-func newFallbackTest(t *testing.T, url string, interval time.Duration) (*group.URLTest, *fallbackTestOutbound, *fallbackTestOutbound, *urltest.HistoryStorage) {
+func newFallbackTest(t *testing.T, url string, interval time.Duration, modify ...func(*option.URLTestOutboundOptions)) (*group.URLTest, *fallbackTestOutbound, *fallbackTestOutbound, *urltest.HistoryStorage) {
 	t.Helper()
 	ctx := service.ContextWithDefaultRegistry(context.Background())
 	ctx = pause.WithDefaultManager(ctx)
@@ -57,7 +57,11 @@ func newFallbackTest(t *testing.T, url string, interval time.Duration) (*group.U
 	direct := &fallbackTestOutbound{Adapter: outbound.NewAdapter("test", "direct", []string{N.NetworkTCP, N.NetworkUDP}, nil), control: control}
 	proxy := &fallbackTestOutbound{Adapter: outbound.NewAdapter("test", "proxy", []string{N.NetworkTCP, N.NetworkUDP}, nil), control: control}
 	service.MustRegister[adapter.OutboundManager](ctx, &trafficOutboundManager{items: map[string]adapter.Outbound{"direct": direct, "proxy": proxy}})
-	o, err := group.NewURLTest(ctx, nil, log.NewNOPFactory().NewLogger("test"), "direct-fallback", option.URLTestOutboundOptions{Outbounds: []string{"direct", "proxy"}, URL: url, Strategy: "direct-fallback", WaitForInitial: true, Interval: badoption.Duration(interval), IdleTimeout: badoption.Duration(interval), Timeout: badoption.Duration(500 * time.Millisecond), InterruptExistConnections: true})
+	options := option.URLTestOutboundOptions{Outbounds: []string{"direct", "proxy"}, URL: url, Strategy: "direct-fallback", WaitForInitial: true, Interval: badoption.Duration(interval), IdleTimeout: badoption.Duration(interval), Timeout: badoption.Duration(500 * time.Millisecond), InterruptExistConnections: true}
+	for _, change := range modify {
+		change(&options)
+	}
+	o, err := group.NewURLTest(ctx, nil, log.NewNOPFactory().NewLogger("test"), "direct-fallback", options)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -261,5 +265,51 @@ func TestDirectFallbackSessionTrafficFollowsChosenPath(t *testing.T) {
 		if up != 4 {
 			t.Fatalf("%s traffic=%d", tag, up)
 		}
+	}
+}
+
+func TestDirectFallbackQuorumAndConsecutiveRounds(t *testing.T) {
+	var failing atomic.Bool
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/two" && failing.Load() {
+			w.WriteHeader(503)
+		} else {
+			w.WriteHeader(204)
+		}
+	}))
+	defer server.Close()
+	g, _, _, _ := newFallbackTest(t, server.URL, time.Hour, func(options *option.URLTestOutboundOptions) {
+		options.ControlURLs = []string{server.URL + "/one", server.URL + "/two"}
+		options.RequiredSuccesses = 2
+		options.FailureThreshold = 2
+		options.RecoveryThreshold = 2
+	})
+	if err := g.PostStart(); err != nil {
+		t.Fatal(err)
+	}
+	if g.Now() != "proxy" {
+		t.Fatal("used unconfirmed direct path")
+	}
+	g.CheckOutbounds()
+	if g.Now() != "direct" {
+		t.Fatal("did not recover after two healthy rounds")
+	}
+	failing.Store(true)
+	g.CheckOutbounds()
+	if g.Now() != "direct" {
+		t.Fatal("single failure caused flapping")
+	}
+	g.CheckOutbounds()
+	if g.Now() != "proxy" {
+		t.Fatal("quorum loss did not switch to proxy")
+	}
+	failing.Store(false)
+	g.CheckOutbounds()
+	if g.Now() != "proxy" {
+		t.Fatal("single recovery caused flapping")
+	}
+	g.CheckOutbounds()
+	if g.Now() != "direct" {
+		t.Fatal("did not recover")
 	}
 }

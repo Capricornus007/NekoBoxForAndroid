@@ -8,7 +8,7 @@
     <string name="restore_network_settings_failed">Could not restore network settings. The required profiles may have been deleted.</string>
     <string name="diagnostics_handshake">Latest handshake</string>
     <string name="diagnostics_handshake_never">none yet</string>
-    <string name="diagnostics_wg_counters_hint">Peer wire counters. A successful HTTP test does not verify UDP or the path MTU.</string>
+    <string name="diagnostics_wg_counters_hint">Peer wire counters. An HTTP test does not verify UDP or path MTU. With per-app filtering, ICMP without an attributable UID stays blocked.</string>
     <string name="diagnostics_connection_history">Recent routing decisions</string>
     <string name="diagnostics_history_debug_only">Enable debug or trace logging and restart the connection to collect history. DNS queries without a connection ID are shown separately.</string>
     <string name="diagnostics_selected_node">Selected node</string>

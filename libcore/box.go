@@ -125,7 +125,7 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 		pauseManager: service.FromContext[pause.Manager](ctx),
 	}
 
-	if instance.LogFactory().Level() >= boxlog.LevelDebug {
+	if (options.Log == nil || !options.Log.Disabled) && instance.LogFactory().Level() >= boxlog.LevelDebug {
 		b.diagnostics = &connectionDiagnostics{}
 		instance.Router().AppendTracker(b.diagnostics)
 		service.MustRegister[adapter.DiagnosticObserver](ctx, b.diagnostics)

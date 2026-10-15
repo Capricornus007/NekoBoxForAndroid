@@ -13,14 +13,20 @@ type wgPacketReturn struct{ packets chan []byte }
 
 func (*wgPacketReturn) ReturnHeadroom() int { return 64 }
 func (r *wgPacketReturn) ReturnPackets(packets [][]byte) [][]byte {
+	remaining := make([][]byte, 0)
 	for _, packet := range packets {
+		data := packet[64:]
+		if (data[0]>>4 == 4 && data[9] != 1) || (data[0]>>4 == 6 && data[6] != 58) {
+			remaining = append(remaining, packet)
+			continue
+		}
 		owned := append([]byte(nil), packet[64:]...)
 		select {
 		case r.packets <- owned:
 		default:
 		}
 	}
-	return nil
+	return remaining
 }
 func ipChecksum(data []byte) uint16 {
 	var sum uint32

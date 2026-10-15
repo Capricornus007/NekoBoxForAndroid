@@ -9,7 +9,7 @@ object BackupRestore {
     // One connection commits both files with SQLite's rollback/super-journal.
     // https://www.sqlite.org/lang_attach.html (both Room databases use TRUNCATE).
     @Synchronized
-    fun commit(settings: List<KeyValuePair>?, restoreProfilesAndRules: () -> Unit) {
+    fun commit(settings: List<KeyValuePair>?, settingsKeys: Set<String>? = null, restoreProfilesAndRules: () -> Unit) {
         val room = SagerDatabase.instance
         if (settings == null) {
             room.runInTransaction { restoreProfilesAndRules() }
@@ -31,7 +31,11 @@ object BackupRestore {
             }
             room.runInTransaction {
                 restoreProfilesAndRules()
-                db.execSQL("DELETE FROM restore_settings.KeyValuePair")
+                if (settingsKeys == null) db.execSQL("DELETE FROM restore_settings.KeyValuePair")
+                else {
+                    require(settingsKeys.isNotEmpty())
+                    db.execSQL("DELETE FROM restore_settings.KeyValuePair WHERE `key` IN (${settingsKeys.joinToString { "?" }})", settingsKeys.toTypedArray())
+                }
                 db.compileStatement("INSERT INTO restore_settings.KeyValuePair (`key`, valueType, value) VALUES (?, ?, ?)").use { statement ->
                     settings.forEach { pair ->
                         statement.clearBindings()

@@ -8,6 +8,7 @@ import io.nekohasekai.sagernet.database.preference.PublicDatabase
 import moe.matsuri.nb4a.utils.JavaUtil.gson
 import java.io.File
 import io.nekohasekai.sagernet.ktx.readBytesLimited
+import io.nekohasekai.sagernet.ktx.Logs
 
 /** One private, atomic rollback point; profiles are not copied. */
 object NetworkSettingsHistory {
@@ -21,9 +22,9 @@ object NetworkSettingsHistory {
     )
     private data class Snapshot(val version: Int = 1, val settings: List<KeyValuePair>, val rules: List<RuleEntity>)
 
-    fun available() = file.baseFile.exists()
+    fun available() = runCatching { file.openRead().use { }; true }.getOrDefault(false)
 
-    @Synchronized fun capture() {
+    @Synchronized fun capture(): Boolean = try {
         val snapshot = Snapshot(settings = PublicDatabase.kvPairDao.all().filter { it.key in keys }, rules = SagerDatabase.rulesDao.allRules())
         val content = gson.toJson(snapshot).toByteArray(Charsets.UTF_8)
         require(content.size <= 8 * 1024 * 1024) { "Network settings snapshot exceeds 8 MiB" }
@@ -31,6 +32,10 @@ object NetworkSettingsHistory {
         val output = target.startWrite()
         try { output.write(content); target.finishWrite(output) }
         catch (e: Exception) { target.failWrite(output); throw e }
+        true
+    } catch (e: Exception) {
+        Logs.d("Cannot save network settings rollback", e)
+        false
     }
 
     @Synchronized fun restore() {
@@ -43,8 +48,7 @@ object NetworkSettingsHistory {
         require(snapshot.version == 1 && snapshot.settings.all { it.key in keys }) { "Invalid network settings snapshot" }
         val profileIds = SagerDatabase.proxyDao.getAll().map { it.id }.toSet()
         require(snapshot.rules.all { it.outbound <= 0 || it.outbound in profileIds }) { "A profile used by the previous routes was deleted" }
-        val settings = PublicDatabase.kvPairDao.all().filter { it.key !in keys } + snapshot.settings
-        BackupRestore.commit(settings) {
+        BackupRestore.commit(snapshot.settings, keys) {
             SagerDatabase.rulesDao.reset()
             SagerDatabase.rulesDao.insert(snapshot.rules)
         }

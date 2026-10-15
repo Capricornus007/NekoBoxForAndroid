@@ -97,6 +97,10 @@ func TestWireGuardAndAmneziaPeersExchangePackets(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
+			path := &wgPacketReturn{make(chan []byte, 4)}
+			if err := peers[0].AttachReturn(path); err != nil {
+				t.Fatal(err)
+			}
 			for sender := range peers {
 				receiver := 1 - sender
 				listener, err := peers[receiver].ListenPacket(ctx, M.Socksaddr{Addr: addresses[receiver].Addr()})
@@ -134,6 +138,7 @@ func TestWireGuardAndAmneziaPeersExchangePackets(t *testing.T) {
 				_ = conn.Close()
 				_ = listener.Close()
 			}
+			_ = peers[0].DetachReturn(path)
 			testWireGuardIPPackets(t, peers, addresses, addresses6)
 		})
 	}

@@ -80,7 +80,7 @@ jobs:
         env:
           NEKO_ROUTE_ASSET_TEST_DIR: ../app/src/main/assets/sing-box
         shell: bash
-        run: go test -race -tags=with_conntrack,with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api . github.com/sagernet/sing-box/protocol/group github.com/sagernet/sing-box/protocol/http github.com/sagernet/sing-box/common/kmutex github.com/sagernet/sing-box/common/expiringmap github.com/sagernet/sing-box/common/dialer github.com/sagernet/sing-quic/congestion_meta2 github.com/sagernet/sing-box/protocol/vless/encryption 2>&1 | tee ../go-test.log
+        run: go test -race -tags=with_conntrack,with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api . github.com/sagernet/sing-box/protocol/group github.com/sagernet/sing-box/transport/wireguard github.com/sagernet/sing-box/protocol/http github.com/sagernet/sing-box/common/kmutex github.com/sagernet/sing-box/common/expiringmap github.com/sagernet/sing-box/common/dialer github.com/sagernet/sing-quic/congestion_meta2 github.com/sagernet/sing-box/protocol/vless/encryption 2>&1 | tee ../go-test.log
       - name: Build libcore AAR once
         run: ./buildScript/lib/core/build.sh
       - name: Test and build release APKs
@@ -126,13 +126,15 @@ jobs:
           cat > release-notes.txt <<'NOTES'
           Package: com.isaiandco.neko. Non-debuggable release APKs for four ABIs. Private signing is selected when KEYSTORE_BASE64 and its password/alias secrets are configured; otherwise the existing stable debug key is retained. Incomplete or invalid private signing configuration fails. Android requires a data transfer/reinstall when changing signing keys.
 
-          Restores Android TUN connection-owner lookup after the core migration, even when the local-interface cache is empty. Platform owner results are no longer cached by a reusable socket tuple. Generated per-app bypass rules now reject unknown owners and other Android profiles using full UIDs; explicitly bypassed resolver UIDs cannot regain access through DNS exceptions.
+          Adds debug/trace-only bounded routing and DNS history, selected group nodes and live WG/AWG handshake/RX/TX diagnostics. Disabled logging and lower levels do not collect connection history. Sensitive peer keys and endpoints are excluded from runtime metrics.
 
-          With per-app filtering enabled, virtual DNS follows the explicit guarded routing rules instead of the TUN classifier's automatic interception. Allow-list mode, resolver port restrictions and virtual DoT rejection are covered by shared Kotlin/native fixtures. Reconnect after installing a new app in bypass mode to refresh its allowed UID snapshot. Unrestricted VPN mode and full custom configuration/JSON override policy remain unchanged. Android interface visibility is not hidden.
+          Direct fallback supports up to eight control sites, a success quorum and consecutive failure/recovery thresholds. Existing one-site/one-check defaults are retained. Waterfall preserves configured priority and can start after the first verified member while remaining latency checks continue in the background.
 
-          Retains dev.10's profile-screen crash fix, dev.9's Android WG/AWG/WARP startup fix and official AmneziaWG v3.1.20260828. No configuration reimport is required.
+          Subscription errors distinguish empty responses, HTML, server JSON errors and unsupported formats. App installation/removal refreshes full UID lists and schedules a full VPN restart when needed. One private rollback point restores DNS, routing and connection settings without replacing unrelated settings or profiles.
 
-          JVM tests, native race tests, SQLite rollback and APK signature/ABI/16 KiB checks run before publication. Repeat the forced VPN Network/tun0 scan from the excluded work-profile app on a physical device; this environment has no Android device.
+          Adds native IPv4/IPv6 ICMP packet transport for WG/AWG while retaining the existing TCP/UDP path and startup fixes. Per-app filtering still blocks ICMP without a verified owner; Android socket-owner APIs support TCP/UDP. Retains the work-profile/TUN isolation fix and official AmneziaWG v3.1.20260828. No configuration reimport is required.
+
+          JVM tests, native race tests, SQLite rollback and APK signature/ABI/16 KiB checks run before publication. Peer loopback tests cover WG/AWG 1/2/3/3.1, IPv4/IPv6 ICMP, S4, handshake counters and UDP with the return path attached. Physical Android, work-profile and real-network validation remain device checks.
           NOTES
           OPTIONS=()
           if [ "$NEKO_DEV_BUILD" = 1 ]; then OPTIONS+=(--prerelease --latest=false); fi

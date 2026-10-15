@@ -6862,7 +6862,7 @@ index 000000000..4bf0087ce
 +	return bufio.NewNetPacketConn(tracker.TrackOutboundPacketConnection(tag, bufio.NewPacketConn(conn), false))
 +}
 diff --git a/protocol/group/selector.go b/protocol/group/selector.go
-index c3aaec5a9..3405d8879 100644
+index c3aaec5a9..3d603ab9b 100644
 --- a/protocol/group/selector.go
 +++ b/protocol/group/selector.go
 @@ -7,9 +7,9 @@ import (
@@ -6919,7 +6919,7 @@ index c3aaec5a9..3405d8879 100644
  func (s *Selector) SelectOutbound(tag string) bool {
  	detour, loaded := s.outbounds[tag]
  	if !loaded {
-@@ -146,60 +140,63 @@ func (s *Selector) SelectOutbound(tag string) bool {
+@@ -146,60 +140,69 @@ func (s *Selector) SelectOutbound(tag string) bool {
  		}
  	}
  	s.interruptGroup.Interrupt(s.interruptExternalConnections)
@@ -6956,6 +6956,9 @@ index c3aaec5a9..3405d8879 100644
  func (s *Selector) NewConnection(ctx context.Context, conn net.Conn, metadata adapter.InboundContext, onClose N.CloseHandlerFunc) {
  	ctx = interrupt.ContextWithIsExternalConnection(ctx)
  	selected := s.selected.Load()
++	if observer := service.FromContext[adapter.DiagnosticObserver](s.ctx); observer != nil {
++		observer.GroupDial(adapter.WithContext(ctx, &metadata), selected.Tag())
++	}
 +	if tracker := service.FromContext[adapter.OutboundStatsTracker](s.ctx); tracker != nil {
 +		conn = tracker.TrackOutboundConnection(selected.Tag(), conn, true)
 +	}
@@ -6970,6 +6973,9 @@ index c3aaec5a9..3405d8879 100644
  func (s *Selector) NewPacketConnection(ctx context.Context, conn N.PacketConn, metadata adapter.InboundContext, onClose N.CloseHandlerFunc) {
  	ctx = interrupt.ContextWithIsExternalConnection(ctx)
  	selected := s.selected.Load()
++	if observer := service.FromContext[adapter.DiagnosticObserver](s.ctx); observer != nil {
++		observer.GroupDial(adapter.WithContext(ctx, &metadata), selected.Tag())
++	}
 +	if tracker := service.FromContext[adapter.OutboundStatsTracker](s.ctx); tracker != nil {
 +		conn = tracker.TrackOutboundPacketConnection(selected.Tag(), conn, true)
 +	}
@@ -7003,7 +7009,7 @@ index c3aaec5a9..3405d8879 100644
 +
 +func RealTag(_ adapter.OutboundManager, detour adapter.Outbound) string { return legacyRealTag(detour) }
 diff --git a/protocol/group/urltest.go b/protocol/group/urltest.go
-index bc50ab70d..ebde59422 100644
+index bc50ab70d..d33fa390a 100644
 --- a/protocol/group/urltest.go
 +++ b/protocol/group/urltest.go
 @@ -2,7 +2,6 @@ package group
@@ -7225,7 +7231,7 @@ index bc50ab70d..ebde59422 100644
  	if outbound == nil {
  		outbound, _ = s.group.Select(N.NetworkUDP)
  	}
-@@ -189,25 +183,34 @@ func (s *URLTest) ListenPacket(ctx context.Context, destination M.Socksaddr) (ne
+@@ -189,25 +183,35 @@ func (s *URLTest) ListenPacket(ctx context.Context, destination M.Socksaddr) (ne
  	}
  	conn, err := outbound.ListenPacket(ctx, destination)
  	if err == nil {
@@ -7252,6 +7258,7 @@ index bc50ab70d..ebde59422 100644
  }
  
  type URLTestGroup struct {
++	validationEpoch              common.TypedValue[time.Time]
 +	initialProbeStarted          atomic.Bool
 +	initialProbe                 sync.Once
 +	initialReadyOnce             sync.Once
@@ -7263,7 +7270,7 @@ index bc50ab70d..ebde59422 100644
  	outbound                     adapter.OutboundManager
  	pause                        pause.Manager
  	pauseCallback                *list.Element[pause.Callback]
-@@ -217,21 +220,26 @@ type URLTestGroup struct {
+@@ -217,21 +221,26 @@ type URLTestGroup struct {
  	interval                     time.Duration
  	tolerance                    uint16
  	idleTimeout                  time.Duration
@@ -7295,7 +7302,7 @@ index bc50ab70d..ebde59422 100644
  	if interval == 0 {
  		interval = C.DefaultURLTestInterval
  	}
-@@ -241,15 +249,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -241,15 +250,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	if idleTimeout == 0 {
  		idleTimeout = C.DefaultURLTestIdleTimeout
  	}
@@ -7333,7 +7340,7 @@ index bc50ab70d..ebde59422 100644
  		outbound:                     outboundManager,
  		logger:                       logger,
  		outbounds:                    outbounds,
-@@ -257,6 +283,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -257,6 +284,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  		interval:                     interval,
  		tolerance:                    tolerance,
  		idleTimeout:                  idleTimeout,
@@ -7343,7 +7350,7 @@ index bc50ab70d..ebde59422 100644
  		history:                      history,
  		close:                        make(chan struct{}),
  		pause:                        service.FromContext[pause.Manager](ctx),
-@@ -265,59 +294,127 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -265,59 +295,127 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	}, nil
  }
  
@@ -7428,14 +7435,14 @@ index bc50ab70d..ebde59422 100644
 +func managedURLTestHistory(g *URLTestGroup, detour adapter.Outbound, network string) (*adapter.URLTestHistory, bool) {
 +	nested, isNested := detour.(*URLTest)
 +	if !isNested || !nested.managedByParent {
-+		history := g.history.LoadURLTestHistory(legacyRealTag(detour))
++		history := g.loadValidatedHistory(legacyRealTag(detour))
 +		return history, history != nil
 +	}
 +	outbound, exists := nested.group.Select(network)
 +	if outbound == nil || !exists {
 +		return nil, false
 +	}
-+	history := nested.group.history.LoadURLTestHistory(legacyRealTag(outbound))
++	history := nested.group.loadValidatedHistory(legacyRealTag(outbound))
 +	return history, history != nil
 +}
 +
@@ -7475,7 +7482,7 @@ index bc50ab70d..ebde59422 100644
 -			if history := g.history.LoadURLTestHistory(RealTag(g.outbound, g.selectedOutboundTCP)); history != nil {
 -				minOutbound = g.selectedOutboundTCP
 +		if selected := g.selectedOutboundTCP.Load(); selected != nil {
-+			if history := g.history.LoadURLTestHistory(legacyRealTag(selected)); history != nil {
++			if history := g.loadValidatedHistory(legacyRealTag(selected)); history != nil {
 +				minOutbound = selected
  				minDelay = history.Delay
  			}
@@ -7485,21 +7492,21 @@ index bc50ab70d..ebde59422 100644
 -			if history := g.history.LoadURLTestHistory(RealTag(g.outbound, g.selectedOutboundUDP)); history != nil {
 -				minOutbound = g.selectedOutboundUDP
 +		if selected := g.selectedOutboundUDP.Load(); selected != nil {
-+			if history := g.history.LoadURLTestHistory(legacyRealTag(selected)); history != nil {
++			if history := g.loadValidatedHistory(legacyRealTag(selected)); history != nil {
 +				minOutbound = selected
  				minDelay = history.Delay
  			}
  		}
-@@ -326,7 +423,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -326,7 +424,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  		if !common.Contains(detour.Network(), network) {
  			continue
  		}
 -		history := g.history.LoadURLTestHistory(RealTag(g.outbound, detour))
-+		history := g.history.LoadURLTestHistory(legacyRealTag(detour))
++		history := g.loadValidatedHistory(legacyRealTag(detour))
  		if history == nil {
  			continue
  		}
-@@ -347,180 +444,290 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -347,180 +445,299 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  	return minOutbound, true
  }
  
@@ -7547,8 +7554,9 @@ index bc50ab70d..ebde59422 100644
  
  func (g *URLTestGroup) URLTest(ctx context.Context) (map[string]uint16, error) {
 -	return g.urlTest(ctx, true)
--}
--
++	return g.urlTest(ctx, false)
+ }
+ 
 -func (g *URLTestGroup) urlTest(ctx context.Context, force bool) (map[string]uint16, error) {
 -	if g.checking.Swap(true) {
 -		return make(map[string]uint16), nil
@@ -7557,14 +7565,15 @@ index bc50ab70d..ebde59422 100644
 -	result := URLTestOutbounds(ctx, g.outbound, g.history, g.logger, g.outbounds, g.link, g.interval, force)
 -	g.performUpdateCheck()
 -	return result, nil
-+	return g.urlTest(ctx, false)
++func shouldForceInitialCheck(strategy string) bool {
++	return strategy != "priority"
  }
  
 -type urlTestResult struct {
 -	delay uint16
 -	err   error
-+func shouldForceInitialCheck(strategy string) bool {
-+	return strategy != "priority"
++func shouldCheckPrioritySequential(strategy string, force bool) bool {
++	return strategy == "priority" && !force
  }
  
 -type urlTestBatch struct {
@@ -7577,10 +7586,8 @@ index bc50ab70d..ebde59422 100644
 -	groups   []adapter.OutboundGroup
 -	access   sync.Mutex
 -	result   map[string]uint16
-+func shouldCheckPrioritySequential(strategy string, force bool) bool {
-+	return strategy == "priority" && !force
- }
- 
+-}
+-
 -func URLTestOutbounds(ctx context.Context, outboundManager adapter.OutboundManager, history *urltest.HistoryStorage, logger log.Logger, outbounds []adapter.Outbound, link string, interval time.Duration, force bool) map[string]uint16 {
 -	b, _ := batch.New(ctx, batch.WithConcurrencyNum[any](10))
 -	testBatch := &urlTestBatch{
@@ -7727,11 +7734,11 @@ index bc50ab70d..ebde59422 100644
  				return nil, nil
  			})
 +			continue
-+		}
+ 		}
 +		realTag := legacyRealTag(detour)
 +		if checked[realTag] {
 +			continue
- 		}
++		}
 +		history := g.history.LoadURLTestHistory(realTag)
 +		if !force && history != nil && time.Since(history.Time) < g.interval {
 +			if g.strategy == "fastest" {
@@ -7796,8 +7803,10 @@ index bc50ab70d..ebde59422 100644
 -		if g.selectedOutboundUDP != nil {
 +	} else if g.selectedOutboundTCP.Load() == nil || (existsTCP && outboundTCP != g.selectedOutboundTCP.Load()) {
 +		if g.selectedOutboundTCP.Load() != nil {
-+			updated = true
-+		}
+ 			updated = true
+ 		}
+-		g.selectedOutboundUDP = outbound
+-		selected = true
 +		g.recordSelection(N.NetworkTCP, outboundTCP)
 +		g.selectedOutboundTCP.Store(outboundTCP)
 +	}
@@ -7810,10 +7819,8 @@ index bc50ab70d..ebde59422 100644
 +		}
 +	} else if g.selectedOutboundUDP.Load() == nil || (existsUDP && outboundUDP != g.selectedOutboundUDP.Load()) {
 +		if g.selectedOutboundUDP.Load() != nil {
- 			updated = true
- 		}
--		g.selectedOutboundUDP = outbound
--		selected = true
++			updated = true
++		}
 +		g.recordSelection(N.NetworkUDP, outboundUDP)
 +		g.selectedOutboundUDP.Store(outboundUDP)
  	}
@@ -7912,6 +7919,7 @@ index bc50ab70d..ebde59422 100644
 +// context; a parent priority group still advances in its configured order.
 +func (g *URLTestGroup) awaitInitialCandidate(ctx context.Context) {
 +	g.initialProbe.Do(func() {
++		g.validationEpoch.Store(time.Now())
 +		g.initialProbeStarted.Store(true)
 +		go func() { g.CheckOutbounds(true); close(g.initialDone) }()
 +	})
@@ -7919,7 +7927,15 @@ index bc50ab70d..ebde59422 100644
 +	case <-g.initialReady:
 +	case <-g.initialDone:
 +	case <-ctx.Done():
++	}
++}
++
++func (g *URLTestGroup) loadValidatedHistory(tag string) *adapter.URLTestHistory {
++	history := g.history.LoadURLTestHistory(tag)
++	if history != nil && history.Time.Before(g.validationEpoch.Load()) {
++		return nil
  	}
++	return history
  }
 diff --git a/protocol/group/urltest_strategy_test.go b/protocol/group/urltest_strategy_test.go
 new file mode 100644
@@ -11094,18 +11110,19 @@ index 53a1be8d8..76f719d8d 100644
  	if iif == nil {
  		return nil
 diff --git a/route/process_cache.go b/route/process_cache.go
-index f99cebadb..d40d8a5e9 100644
+index f99cebadb..bfcad9692 100644
 --- a/route/process_cache.go
 +++ b/route/process_cache.go
-@@ -8,6 +8,7 @@ import (
+@@ -8,6 +8,8 @@ import (
  
  	"github.com/sagernet/sing-box/adapter"
  	"github.com/sagernet/sing-box/common/process"
 +	C "github.com/sagernet/sing-box/constant"
++	N "github.com/sagernet/sing/common/network"
  )
  
  type processCacheKey struct {
-@@ -36,7 +37,10 @@ func (r *Router) findProcessInfoCached(ctx context.Context, network string, sour
+@@ -36,7 +38,10 @@ func (r *Router) findProcessInfoCached(ctx context.Context, network string, sour
  }
  
  func (r *Router) searchProcessInfo(ctx context.Context, metadata *adapter.InboundContext) {
@@ -11117,7 +11134,7 @@ index f99cebadb..d40d8a5e9 100644
  		return
  	}
  	var originDestination netip.AddrPort
-@@ -45,7 +49,14 @@ func (r *Router) searchProcessInfo(ctx context.Context, metadata *adapter.Inboun
+@@ -45,9 +50,20 @@ func (r *Router) searchProcessInfo(ctx context.Context, metadata *adapter.Inboun
  	} else if metadata.Destination.IsIP() {
  		originDestination = metadata.Destination.AddrPort()
  	}
@@ -11131,8 +11148,15 @@ index f99cebadb..d40d8a5e9 100644
 +		processInfo, err = r.findProcessInfoCached(ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
 +	}
  	if err != nil {
- 		r.logger.InfoContext(ctx, "failed to search process: ", err)
+-		r.logger.InfoContext(ctx, "failed to search process: ", err)
++		if metadata.Network == N.NetworkICMP {
++			r.logger.DebugContext(ctx, "failed to search process: ", err)
++		} else {
++			r.logger.InfoContext(ctx, "failed to search process: ", err)
++		}
  		return
+ 	}
+ 	metadata.ProcessInfo = processInfo
 diff --git a/route/rule/rule_action.go b/route/rule/rule_action.go
 index cb6561181..1afb86dc1 100644
 --- a/route/rule/rule_action.go
@@ -17148,7 +17172,7 @@ index 000000000..c3af1b2d3
 +	}
 +}
 diff --git a/transport/wireguard/endpoint.go b/transport/wireguard/endpoint.go
-index f942851fb..823d1da61 100644
+index f942851fb..8dc05b13a 100644
 --- a/transport/wireguard/endpoint.go
 +++ b/transport/wireguard/endpoint.go
 @@ -10,9 +10,7 @@ import (
@@ -17340,6 +17364,12 @@ index f942851fb..823d1da61 100644
 -		standardBind := conn.NewStdNetBind(listenerControl).(*conn.StdNetBind)
 -		if e.options.ListenPort == 0 && len(e.peers) == 1 && e.peers[0].endpoint.IsValid() {
 -			standardBind.SetSinglePeerMode()
+-		}
+-		if egressEnabled {
+-			egressPoolOptions := e.options.EgressPoolOptions
+-			egressPoolOptions.Control = listenerControl
+-			e.egressPool = tun.NewUDPEgressPool(egressPoolOptions)
+-			standardBind.SetEgressProvider(e.egressPool)
 +func (e *Endpoint) Start(resolve bool) error {
 +	if common.Any(e.peers, func(peer peerConfig) bool {
 +		return !peer.endpoint.IsValid() && peer.destination.IsFqdn()
@@ -17347,12 +17377,6 @@ index f942851fb..823d1da61 100644
 +		if !resolve {
 +			return nil
  		}
--		if egressEnabled {
--			egressPoolOptions := e.options.EgressPoolOptions
--			egressPoolOptions.Control = listenerControl
--			e.egressPool = tun.NewUDPEgressPool(egressPoolOptions)
--			standardBind.SetEgressProvider(e.egressPool)
--		}
 -		powerManager := service.FromContext[*powerreport.Manager](e.options.Context)
 -		if powerManager != nil {
 -			recorder := powerManager.Recorder()
@@ -17392,8 +17416,7 @@ index f942851fb..823d1da61 100644
 -		bind = NewClientBind(e.options.Context, e.options.Logger, e.options.Dialer, isConnect, connectAddr, reserved)
 +	} else if resolve {
 +		return nil
- 	}
--	if isUDPListener || len(e.peers) > 1 {
++	}
 +	var (
 +		isConnect   bool
 +		connectAddr netip.AddrPort
@@ -17403,7 +17426,8 @@ index f942851fb..823d1da61 100644
 +		isConnect = true
 +		connectAddr = e.peers[0].endpoint
 +		reserved = e.peers[0].reserved
-+	}
+ 	}
+-	if isUDPListener || len(e.peers) > 1 {
 +	bind := NewClientBind(e.options.Context, e.options.Logger, e.options.Dialer, isConnect, connectAddr, reserved)
 +	bind.amnezia = amneziaPacketLayout(e.options)
 +	if len(e.peers) > 1 {
@@ -17492,7 +17516,7 @@ index f942851fb..823d1da61 100644
  	return nil
  }
  
-@@ -277,42 +288,20 @@ func (e *Endpoint) ListenPacket(ctx context.Context, destination M.Socksaddr) (n
+@@ -277,42 +288,23 @@ func (e *Endpoint) ListenPacket(ctx context.Context, destination M.Socksaddr) (n
  }
  
  func (e *Endpoint) Close() error {
@@ -17516,6 +17540,8 @@ index f942851fb..823d1da61 100644
 -func (e *Endpoint) Lookup(address netip.Addr) *device.Peer {
 -	if e.allowedIPs == nil {
 -		return nil
++	} else if e.tunDevice != nil {
++		_ = e.tunDevice.Close()
  	}
 -	return e.allowedIPs.LookupFromPacket(netip.Addr{}, address, nil)
 -}
@@ -17525,6 +17551,7 @@ index f942851fb..823d1da61 100644
 -		return nil
 +	if e.pauseCallback != nil {
 +		e.pause.UnregisterCallback(e.pauseCallback)
++		e.pauseCallback = nil
  	}
 -	return e.device.BindUpdate()
 +	return nil
@@ -17540,7 +17567,7 @@ index f942851fb..823d1da61 100644
  		e.device.Up()
  	}
  }
-@@ -323,24 +312,23 @@ type peerConfig struct {
+@@ -323,24 +315,23 @@ type peerConfig struct {
  	publicKeyHex    string
  	preSharedKeyHex string
  	allowedIPs      []netip.Prefix

@@ -33,12 +33,12 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     private lateinit var isProxyApps: SwitchPreferenceCompat
     private lateinit var globalCustomConfig: EditConfigPreference
     private var checkpointTaken = false
+    private var shownGlobalConfig: String? = null
 
     private fun checkpoint() {
         if (!checkpointTaken) {
-            NetworkSettingsHistory.capture()
-            checkpointTaken = true
-            findPreference<Preference>("restoreNetworkSettings")?.isEnabled = true
+            checkpointTaken = NetworkSettingsHistory.capture()
+            findPreference<Preference>("restoreNetworkSettings")?.isEnabled = NetworkSettingsHistory.available()
         }
     }
 
@@ -124,7 +124,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val mtu = findPreference<MTUPreference>(Key.MTU)!!
         globalCustomConfig = findPreference(Key.GLOBAL_CUSTOM_CONFIG)!!
         globalCustomConfig.useConfigStore(Key.GLOBAL_CUSTOM_CONFIG)
-        globalCustomConfig.setOnPreferenceClickListener { checkpoint(); false }
 
         logLevel.dialogLayoutResource = R.layout.layout_loglevel_help
         logLevel.setOnPreferenceChangeListener { _, _ ->
@@ -288,6 +287,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setMessage(R.string.reset_settings_message)
                 setNegativeButton(R.string.no, null)
                 setPositiveButton(R.string.yes) { _, _ ->
+                    checkpoint()
                     DataStore.configurationStore.reset()
                     triggerFullRestart(requireContext())
                 }
@@ -333,6 +333,9 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             isProxyApps.isChecked = DataStore.proxyApps
         }
         if (::globalCustomConfig.isInitialized) {
+            val current = DataStore.configurationStore.getString(Key.GLOBAL_CUSTOM_CONFIG).orEmpty()
+            if (shownGlobalConfig != null && shownGlobalConfig != current) needReload()
+            shownGlobalConfig = current
             globalCustomConfig.notifyChanged()
         }
     }

@@ -11,6 +11,7 @@ import (
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/adapter/outbound"
+	"github.com/sagernet/sing-box/common/urltest"
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing-box/protocol/group"
@@ -37,13 +38,14 @@ func TestWaterfallStartsOnFirstHealthyPriorityMember(t *testing.T) {
 	var once sync.Once
 	unblock := func() { once.Do(func() { close(release) }) }
 	defer unblock()
-	fast := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(204) }))
+	fast := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { time.Sleep(20 * time.Millisecond); w.WriteHeader(204) }))
 	defer fast.Close()
 	slow := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		select {
 		case <-release:
 		case <-r.Context().Done():
 		}
+		time.Sleep(20 * time.Millisecond)
 		w.WriteHeader(204)
 	}))
 	defer slow.Close()
@@ -53,6 +55,9 @@ func TestWaterfallStartsOnFirstHealthyPriorityMember(t *testing.T) {
 	ctx = pause.WithDefaultManager(ctx)
 	manager := &trafficOutboundManager{items: map[string]adapter.Outbound{}}
 	service.MustRegister[adapter.OutboundManager](ctx, manager)
+	history := urltest.NewHistoryStorage()
+	history.StoreURLTestHistory("slow", &adapter.URLTestHistory{Time: time.Now().Add(-time.Minute), Delay: 1})
+	service.MustRegister(ctx, history)
 	for tag, address := range map[string]string{"fast": fast.Listener.Addr().String(), "slow": slow.Listener.Addr().String()} {
 		manager.items[tag] = &waterfallProbeOutbound{outbound.NewAdapter("test", tag, []string{N.NetworkTCP, N.NetworkUDP}, nil), address}
 	}

@@ -9,11 +9,11 @@ internal fun directFallbackConfig(proxyTag: String, url: String, intervalSeconds
     val urls = url.lineSequence().map(String::trim).filter(String::isNotBlank).distinct().toList()
     require(urls.size in 1..8 && required in 1..urls.size && failures in 1..10 && recoveries in 1..10) { "Invalid fallback thresholds" }
     for (link in urls) {
-    val uri = URI.create(link)
-    require(uri.scheme in setOf("https", "http") && !uri.host.isNullOrBlank() &&
-        uri.userInfo == null && uri.fragment == null && (uri.port == -1 || uri.port in 1..65535)) {
-        "Invalid control site URL"
-    }
+        val uri = URI.create(link)
+        require(uri.scheme in setOf("https", "http") && !uri.host.isNullOrBlank() &&
+            uri.userInfo == null && uri.fragment == null && (uri.port == -1 || uri.port in 1..65535)) {
+            "Invalid control site URL"
+        }
     }
     require(intervalSeconds in 5..3600) { "Check interval must be 5–3600 seconds" }
     require(proxyTag != "direct" && proxyTag != TAG_DIRECT_FALLBACK) { "Invalid fallback proxy" }
