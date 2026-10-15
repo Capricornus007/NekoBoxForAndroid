@@ -100,6 +100,10 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 		cancel()
 		return nil, fmt.Errorf("decode config: %v", err)
 	}
+	if err = materializeGeoRuleSets(&options); err != nil {
+		cancel()
+		return nil, fmt.Errorf("prepare geographic rules: %w", err)
+	}
 
 	// create box
 	instance, err := box.New(box.Options{

@@ -2,6 +2,7 @@ package libcore
 
 import (
 	"fmt"
+	"io"
 	"path/filepath"
 
 	geosites "github.com/sagernet/sing-box/common/geosite"
@@ -43,12 +44,15 @@ func (g *geosite) Rules(code string) ([]option.HeadlessRule, error) {
 	}, nil
 }
 
-func init() {
-	nekoutils.GetGeoSiteHeadlessRules = func(name string) ([]option.HeadlessRule, error) {
-		g := new(geosite)
-		if err := g.Open(filepath.Join(externalAssetsPath, "geosite.db")); err != nil {
-			return nil, err
-		}
-		return g.Rules(name)
+func loadGeoSiteRules(name string) ([]option.HeadlessRule, error) {
+	g := new(geosite)
+	if err := g.Open(filepath.Join(externalAssetsPath, "geosite.db")); err != nil {
+		return nil, err
 	}
+	defer g.geositeReader.Upstream().(io.Closer).Close()
+	return g.Rules(name)
+}
+
+func init() {
+	nekoutils.GetGeoSiteHeadlessRules = loadGeoSiteRules
 }
