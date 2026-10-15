@@ -126,15 +126,13 @@ jobs:
           cat > release-notes.txt <<'NOTES'
           Package: com.isaiandco.neko. Non-debuggable release APKs for four ABIs. Private signing is selected when KEYSTORE_BASE64 and its password/alias secrets are configured; otherwise the existing stable debug key is retained. Incomplete or invalid private signing configuration fails. Android requires a data transfer/reinstall when changing signing keys.
 
-          Migrates the core to SagerNet/sing-box 1.14.3 (7054cac5124465ffdb145870d7c01885566711b1), retaining application routing groups, direct-route fallback, traffic accounting and protocol adapters, including XHTTP, VLESS encryption, KCP, SSR and WG/AWG/AWG2.
+          Updates AmneziaWG to the official v3.1.20260828 module (b5928efb6ca19f0153958460c3d141f04abc5c2e), with native support, profile editor and INI/packed Amnezia import for all AWG 3.1 options: header protection, content padding, handshake/keepalive ranges, random trailers and cookie control. PersistentKeepalive accepts a single value or range. Existing WG/AWG/AWG2 profiles remain readable.
 
-          Converts legacy inbound and DNS options only in the runtime JSON. Preserves sniff-before-resolve behavior, UID/DNS guard ordering, DNS bootstrap and address-family preferences, escaped DoH paths/queries, FakeIP ranges and local rcode responses. Geographic aliases are materialized as public inline rule-sets; GeoSite readers are closed correctly.
+          Fixes first-packet delivery with S4 padding by applying initial IPC before the TUN reader consumes data. Invalid CPS startup returns an error without blocking shutdown. Header protection keys are hidden in editor summaries and diagnostic output; invalid key/range settings are rejected.
 
-          Retains HTTP/2 CONNECT and custom XHTTP BBR initial windows. Concurrent TCP connect attempts close losing sockets; Fast Open sends application data once. Source preparation is repeatable and refuses to discard unrelated dependency edits.
+          Retains sing-box 1.14.3, DNS/UID routing protection, optional direct-route fallback, verified bundled GeoIP/GeoSite, traffic counters, backups, groups and existing protocol adapters from dev.7.
 
-          Preserves bundled verified GeoIP/GeoSite, live traffic counters, encrypted backups, subscription DNS/headers, profile references, diagnostics and conditional signing from dev.6.
-
-          Native race tests include live WG/AWG/AWG2, XHTTP modes, HTTP/2 CONNECT, Juicity TCP/UDP and VLESS encryption with X25519/ML-KEM and three XOR modes. JVM tests, SQLite rollback and actual APK signature/ABI/16 KiB checks run before publication. OEM/work-profile/Private DNS and battery behavior still require device testing. The retained WireGuard adapter supports its existing TCP/UDP path, not upstream's new direct L3/ICMP port.
+          Native race tests include first-packet and bidirectional exchange across WG/AWG/AWG2/AWG3/AWG3.1, invalid IPC shutdown, XHTTP, HTTP/2 CONNECT, Juicity and VLESS encryption. JVM tests cover imports, all new options and legacy profile serialization. SQLite rollback and APK signature/ABI/16 KiB checks run before publication. OEM/work-profile/Private DNS and battery behavior still require device testing. WireGuard retains the existing TCP/UDP adapter; upstream's direct L3/ICMP port is a separate remaining task.
           NOTES
           OPTIONS=()
           if [ "$NEKO_DEV_BUILD" = 1 ]; then OPTIONS+=(--prerelease --latest=false); fi

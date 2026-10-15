@@ -16825,7 +16825,7 @@ index ae92235b4..232282b76 100644
  	return list.Len(), nil
  }
 diff --git a/transport/wireguard/endpoint.go b/transport/wireguard/endpoint.go
-index f942851fb..1967b476c 100644
+index f942851fb..45d4af691 100644
 --- a/transport/wireguard/endpoint.go
 +++ b/transport/wireguard/endpoint.go
 @@ -10,9 +10,7 @@ import (
@@ -17086,7 +17086,7 @@ index f942851fb..1967b476c 100644
  				bind.SetReservedForEndpoint(peer.endpoint, peer.reserved)
  			}
  		}
-@@ -196,69 +242,32 @@ func (e *Endpoint) Start(postStart bool) error {
+@@ -196,69 +242,31 @@ func (e *Endpoint) Start(postStart bool) error {
  		return err
  	}
  	logger := &device.Logger{
@@ -17150,13 +17150,12 @@ index f942851fb..1967b476c 100644
  	}
 -	err = wgDevice.IpcSet(ipcConf.String())
 +	err = wgDevice.IpcSet(ipcConf)
++	close(configured.ready)
  	if err != nil {
  		wgDevice.Close()
 -		return E.Cause(err, "setup wireguard: \n", ipcConf.String())
-+		close(configured.ready)
 +		return E.Cause(err, "setup wireguard")
  	}
-+	close(configured.ready)
  	e.device = wgDevice
  	e.pause = service.FromContext[pause.Manager](e.options.Context)
  	if e.pause != nil {
@@ -17166,7 +17165,7 @@ index f942851fb..1967b476c 100644
  	return nil
  }
  
-@@ -277,42 +286,20 @@ func (e *Endpoint) ListenPacket(ctx context.Context, destination M.Socksaddr) (n
+@@ -277,42 +285,20 @@ func (e *Endpoint) ListenPacket(ctx context.Context, destination M.Socksaddr) (n
  }
  
  func (e *Endpoint) Close() error {
@@ -17214,7 +17213,7 @@ index f942851fb..1967b476c 100644
  		e.device.Up()
  	}
  }
-@@ -323,24 +310,23 @@ type peerConfig struct {
+@@ -323,24 +309,23 @@ type peerConfig struct {
  	publicKeyHex    string
  	preSharedKeyHex string
  	allowedIPs      []netip.Prefix

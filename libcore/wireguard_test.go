@@ -145,6 +145,42 @@ func TestInvalidAmneziaParametersFailBeforeHandshake(t *testing.T) {
 	}
 }
 
+func TestInvalidAmneziaIPCDoesNotBlockStartup(t *testing.T) {
+	ctx := service.ContextWithDefaultRegistry(context.Background())
+	ctx = pause.WithDefaultManager(ctx)
+	socket, err := net.ListenPacket("udp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = socket.Close() })
+	key, err := ecdh.X25519().GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	endpoint, err := wg.NewEndpoint(wg.EndpointOptions{
+		Context: ctx, Logger: log.NewNOPFactory().NewLogger("test"),
+		Dialer: wgTestDialer{socket}, MTU: 1280,
+		Address:    []netip.Prefix{netip.MustParsePrefix("10.0.0.1/32")},
+		PrivateKey: base64.StdEncoding.EncodeToString(key.Bytes()),
+		// The CPS grammar is validated by the upstream device's IPC parser.
+		I1: "<unknown>",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	result := make(chan error, 1)
+	go func() { result <- endpoint.Start(false) }()
+	select {
+	case err = <-result:
+		if err == nil {
+			_ = endpoint.Close()
+			t.Fatal("invalid CPS was accepted")
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("IPC failure blocked device shutdown")
+	}
+}
+
 func TestAmnezia31OptionsDecodeForOutboundAndEndpoint(t *testing.T) {
 	for _, modern := range []bool{false, true} {
 		for _, keepalive := range []any{25, "22-30"} {
