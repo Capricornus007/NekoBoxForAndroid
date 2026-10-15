@@ -284,6 +284,9 @@ fun buildConfig(
                     }
                 }
                 if (DataStore.proxyApps) {
+                    // Automatic TUN DNS interception bypasses route UID guards in 1.14.
+                    // Keep virtual DNS on the explicit, guarded port-53 route below.
+                    _hack_config_map["dns_mode"] = "disabled"
                     val selectedPackages = DataStore.individual
                         .lineSequence()
                         .map { it.trim() }
@@ -632,26 +635,11 @@ fun buildConfig(
             val selectedUids = DataStore.individual.lineSequence().map { it.trim() }
                 .filter { it.isNotEmpty() }
                 .mapNotNull { PackageCache[it]?.takeIf { uid -> uid >= 1000 } }.toSet()
-            if (DataStore.bypass) return if (selectedUids.isEmpty()) emptyList() else listOf(
-                Rule_DefaultOptions().apply {
-                    inbound = listOf("tun-in"); user_id = selectedUids.toList(); action = "reject"
-                }
-            )
-            val allowedUids = (selectedUids + android.os.Process.myUid()).toList()
             val resolverUids = (VpnService.ANDROID_DNS_PACKAGES.mapNotNull { PackageCache[it] } + listOf(1000, 1051)).distinct()
-            return listOf(Rule_LogicalOptions().apply {
-                type = "logical"; mode = "and"; action = "reject"
-                rules = listOf(
-                    Rule_DefaultOptions().apply { inbound = listOf("tun-in") },
-                    Rule_LogicalOptions().apply {
-                        type = "logical"; mode = "or"; invert = true
-                        rules = listOf(
-                            Rule_DefaultOptions().apply { user_id = allowedUids },
-                            Rule_DefaultOptions().apply { user_id = resolverUids; port = listOf(53, 853) }
-                        )
-                    }
-                )
-            })
+            return listOf(perAppTunGuard(
+                selectedUids, PackageCache.packageMap.values.toSet(), android.os.Process.myUid(),
+                DataStore.bypass, resolverUids
+            ))
         }
 
         if (!forTest && DataStore.globalMode) {

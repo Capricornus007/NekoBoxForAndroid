@@ -17508,3 +17508,43 @@ index f410bad52..000000000
 -	}
 -	return d.Device.Write(remaining, offset)
 -}
+diff --git a/route/process_cache.go b/route/process_cache.go
+index f99cebadb..d40d8a5e9 100644
+--- a/route/process_cache.go
++++ b/route/process_cache.go
+@@ -8,6 +8,7 @@ import (
+ 
+ 	"github.com/sagernet/sing-box/adapter"
+ 	"github.com/sagernet/sing-box/common/process"
++	C "github.com/sagernet/sing-box/constant"
+ )
+ 
+ type processCacheKey struct {
+@@ -36,7 +37,10 @@ func (r *Router) findProcessInfoCached(ctx context.Context, network string, sour
+ }
+ 
+ func (r *Router) searchProcessInfo(ctx context.Context, metadata *adapter.InboundContext) {
+-	if r.processSearcher == nil || metadata.ProcessInfo != nil || !r.isLocalSource(metadata.Source.Addr) {
++	platformTun := metadata.InboundType == C.TypeTun && r.platformInterface != nil && r.platformInterface.UsePlatformConnectionOwnerFinder()
++	// Android owns the TUN device and socket attribution. Its interface cache can
++	// be empty or predate the TUN; it must not disable per-app access checks.
++	if r.processSearcher == nil || metadata.ProcessInfo != nil || (!platformTun && !r.isLocalSource(metadata.Source.Addr)) {
+ 		return
+ 	}
+ 	var originDestination netip.AddrPort
+@@ -45,7 +49,14 @@ func (r *Router) searchProcessInfo(ctx context.Context, metadata *adapter.Inboun
+ 	} else if metadata.Destination.IsIP() {
+ 		originDestination = metadata.Destination.AddrPort()
+ 	}
+-	processInfo, err := r.findProcessInfoCached(ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
++	var processInfo *adapter.ConnectionOwner
++	var err error
++	if platformTun {
++		// Socket tuples can be reused by another UID. Do not cache authorization.
++		processInfo, err = process.FindProcessInfo(r.processSearcher, ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
++	} else {
++		processInfo, err = r.findProcessInfoCached(ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
++	}
+ 	if err != nil {
+ 		r.logger.InfoContext(ctx, "failed to search process: ", err)
+ 		return
