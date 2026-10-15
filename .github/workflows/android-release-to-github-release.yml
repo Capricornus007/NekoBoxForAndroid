@@ -126,11 +126,13 @@ jobs:
           cat > release-notes.txt <<'NOTES'
           Package: com.isaiandco.neko. Non-debuggable release APKs for four ABIs. Private signing is selected when KEYSTORE_BASE64 and its password/alias secrets are configured; otherwise the existing stable debug key is retained. Incomplete or invalid private signing configuration fails. Android requires a data transfer/reinstall when changing signing keys.
 
-          Fixes the intermittent profile-list crash: "Fragment GroupFragment not attached to a context". Card appearance jobs now belong to the fragment view lifecycle, and are cancelled when a card is rebound or recycled. Styling uses the card's own themed context. Late selection callbacks skip detached or rebound cards while the requested selection/service update continues.
+          Restores Android TUN connection-owner lookup after the core migration, even when the local-interface cache is empty. Platform owner results are no longer cached by a reusable socket tuple. Generated per-app bypass rules now reject unknown owners and other Android profiles using full UIDs; explicitly bypassed resolver UIDs cannot regain access through DNS exceptions.
 
-          Retains dev.9's Android WG/AWG/WARP startup fix, official AmneziaWG v3.1.20260828 and existing routing/DNS/UID policies. No configuration reimport is required.
+          With per-app filtering enabled, virtual DNS follows the explicit guarded routing rules instead of the TUN classifier's automatic interception. Allow-list mode, resolver port restrictions and virtual DoT rejection are covered by shared Kotlin/native fixtures. Reconnect after installing a new app in bypass mode to refresh its allowed UID snapshot. Unrestricted VPN mode and full custom configuration/JSON override policy remain unchanged. Android interface visibility is not hidden.
 
-          JVM tests, native race tests, SQLite rollback and APK signature/ABI/16 KiB checks run before publication. Physical-device verification of rapid screen/tab changes remains necessary.
+          Retains dev.10's profile-screen crash fix, dev.9's Android WG/AWG/WARP startup fix and official AmneziaWG v3.1.20260828. No configuration reimport is required.
+
+          JVM tests, native race tests, SQLite rollback and APK signature/ABI/16 KiB checks run before publication. Repeat the forced VPN Network/tun0 scan from the excluded work-profile app on a physical device; this environment has no Android device.
           NOTES
           OPTIONS=()
           if [ "$NEKO_DEV_BUILD" = 1 ]; then OPTIONS+=(--prerelease --latest=false); fi
