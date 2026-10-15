@@ -22,6 +22,13 @@ class DirectFallbackConfigTest {
         assertThrows(IllegalArgumentException::class.java) { directFallbackConfig("proxy", "https://one.example", 30, 2) }
     }
 
+    @Test fun separateRoutesUseDistinctGroupsAndPreventSelfDependency() {
+        val custom = directFallbackConfig("backup", "https://example.org", 30, tag = "route-7")
+        assertEquals("route-7", custom["tag"])
+        assertEquals(listOf("direct", "backup"), custom["outbounds"])
+        assertThrows(IllegalArgumentException::class.java) { directFallbackConfig("route-7", "https://example.org", 30, tag = "route-7") }
+    }
+
     @Test fun rejectsInvalidProbesAndIntervals() {
         for (url in listOf("", "ftp://example.org", "https://", "https://user:pass@example.org", "https://example.org/#fragment", "https://example.org:0")) {
             assertThrows(IllegalArgumentException::class.java) { directFallbackConfig("proxy", url, 30) }

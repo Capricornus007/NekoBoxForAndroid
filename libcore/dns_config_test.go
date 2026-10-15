@@ -261,8 +261,16 @@ func TestFallbackDNSWithAndroidPlatformBootstrap(t *testing.T) {
 	testFallbackDNSBootstrap(t, true)
 }
 
-func testFallbackDNSBootstrap(t *testing.T, usePlatform bool) {
+func TestPerRouteFallbackDNSUsesBackupWithoutGlobalFallback(t *testing.T) {
+	testFallbackDNSBootstrap(t, false, true)
+}
 
+func testFallbackDNSBootstrap(t *testing.T, usePlatform bool, routeScoped ...bool) {
+
+	fallbackTag, fallbackDNSTag := "direct-fallback", "dns-direct-fallback"
+	if len(routeScoped) > 0 && routeScoped[0] {
+		fallbackTag, fallbackDNSTag = "direct-fallback-rule-7", "dns-direct-fallback-rule-7"
+	}
 	var controlStatus, proxyCalls, dnsCalls atomic.Int32
 	controlStatus.Store(204)
 	controlSite := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(int(controlStatus.Load())) }))
@@ -344,12 +352,12 @@ func testFallbackDNSBootstrap(t *testing.T, usePlatform bool) {
 	configuration := map[string]any{
 		"dns": map[string]any{"servers": []any{
 			map[string]any{"type": "local", "tag": "dns-local"}, directServer,
-			map[string]any{"type": "https", "tag": "dns-direct-fallback", "server": "resolver.example.test", "server_port": doh.Listener.Addr().(*net.TCPAddr).Port, "detour": "direct-fallback", "domain_resolver": bootstrapTag, "tls": map[string]any{"enabled": true, "insecure": true}},
-		}, "rules": []any{map[string]any{"outbound": []string{"any"}, "server": "dns-direct"}, map[string]any{"server": "dns-direct-fallback", "strategy": strategy, "disable_cache": true}}},
+			map[string]any{"type": "https", "tag": fallbackDNSTag, "server": "resolver.example.test", "server_port": doh.Listener.Addr().(*net.TCPAddr).Port, "detour": fallbackTag, "domain_resolver": bootstrapTag, "tls": map[string]any{"enabled": true, "insecure": true}},
+		}, "rules": []any{map[string]any{"outbound": []string{"any"}, "server": "dns-direct"}, map[string]any{"server": fallbackDNSTag, "strategy": strategy, "disable_cache": true}}},
 		"outbounds": []any{
 			map[string]any{"type": "direct", "tag": "direct"},
 			map[string]any{"type": "http", "tag": "proxy", "server": proxyHost, "domain_strategy": "ipv4_only", "server_port": proxy.Listener.Addr().(*net.TCPAddr).Port},
-			map[string]any{"type": "urltest", "tag": "direct-fallback", "outbounds": []string{"direct", "proxy"}, "strategy": "direct-fallback", "url": controlURL, "interval": "1h", "idle_timeout": "1h", "timeout": "1s", "wait_for_initial": true, "interrupt_exist_connections": true},
+			map[string]any{"type": "urltest", "tag": fallbackTag, "outbounds": []string{"direct", "proxy"}, "strategy": "direct-fallback", "url": controlURL, "interval": "1h", "idle_timeout": "1h", "timeout": "1s", "wait_for_initial": true, "interrupt_exist_connections": true},
 		}, "route": map[string]any{"final": "proxy"},
 	}
 	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(platformDNS), nekoboxAndroidServiceRegistry(), nekoboxAndroidCertificateRegistry())
@@ -367,7 +375,7 @@ func testFallbackDNSBootstrap(t *testing.T, usePlatform bool) {
 	if err = instance.Start(); err != nil {
 		t.Fatal(err)
 	}
-	outbound, _ := instance.Outbound().Outbound("direct-fallback")
+	outbound, _ := instance.Outbound().Outbound(fallbackTag)
 	for i, status := range []int32{204, 451, 204} {
 		controlStatus.Store(status)
 		outbound.(interface{ CheckOutbounds() }).CheckOutbounds()

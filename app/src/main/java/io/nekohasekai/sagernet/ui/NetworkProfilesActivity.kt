@@ -2,6 +2,11 @@ package io.nekohasekai.sagernet.ui
 
 import android.Manifest
 import android.app.Activity
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.core.content.ContextCompat
 import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
@@ -30,7 +35,33 @@ class NetworkProfilesActivity : ThemedActivity() {
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
     private val permission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         render()
-        if (DataStore.serviceState.started) SagerNet.reloadService(true)
+        if (DataStore.networkProfilesEnabled && DataStore.serviceState.started) SagerNet.reloadService(true)
+    }
+    private val backgroundPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        render()
+        if (DataStore.networkProfilesEnabled && DataStore.serviceState.started) SagerNet.reloadService(true)
+    }
+    private val permissionSettings = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        render()
+        if (DataStore.networkProfilesEnabled && DataStore.serviceState.started) SagerNet.reloadService(true)
+    }
+    private fun requestSsidAccess() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+            return
+        }
+        if (Build.VERSION.SDK_INT < 29 || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, R.string.network_profiles_ssid_ready, Toast.LENGTH_LONG).show()
+            return
+        }
+        val label = if (Build.VERSION.SDK_INT >= 30) packageManager.backgroundPermissionOptionLabel.toString() else getString(R.string.network_profiles_always)
+        MaterialAlertDialogBuilder(this).setTitle(R.string.network_profiles_ssid_permission)
+            .setMessage(getString(R.string.network_profiles_background_reason, label))
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                if (Build.VERSION.SDK_INT == 29) backgroundPermission.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                else permissionSettings.launch(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")))
+            }.show()
     }
     private val selectProfile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val policy = pending
@@ -54,18 +85,22 @@ class NetworkProfilesActivity : ThemedActivity() {
         root.addView(ScrollView(this).apply { addView(content) }, LinearLayout.LayoutParams(-1, 0, 1f))
         setContentView(root)
         ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime())
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime())
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom); insets
         }
         render()
+        savedInstanceState?.getString("editor")?.let { json ->
+            content.post { edit(gson.fromJson(json, NetworkProfilePolicy::class.java)) }
+        }
     }
     override fun onSaveInstanceState(outState: Bundle) {
         pending?.let { outState.putString("pending", gson.toJson(it)) }
+        if (editor?.isShowing == true) editorState?.invoke()?.let { outState.putString("editor", gson.toJson(it)) }
         super.onSaveInstanceState(outState)
     }
-    private fun changed() {
+    private fun changed(reload: Boolean = DataStore.networkProfilesEnabled) {
         render()
-        if (DataStore.serviceState.started) SagerNet.reloadService(true)
+        if (reload && DataStore.serviceState.started) SagerNet.reloadService(true)
     }
     private fun render() {
         content.removeAllViews()
@@ -75,14 +110,15 @@ class NetworkProfilesActivity : ThemedActivity() {
             setOnCheckedChangeListener { _, checked ->
                 NetworkSettingsHistory.capture()
                 DataStore.networkProfilesEnabled = checked
-                changed()
+                changed(true)
             }
         }, ViewGroup.LayoutParams(-1, -2))
         content.addView(TextView(this).apply { setText(R.string.network_profiles_summary); setPadding(0, dp(12), 0, dp(12)) })
         content.addView(MaterialButton(this).apply {
             setText(R.string.network_profiles_ssid_permission)
-            setOnClickListener { permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) }
+            setOnClickListener { requestSsidAccess() }
         })
+        content.addView(TextView(this).apply { setText(R.string.network_profiles_ssid_hint); setPadding(0, dp(8), 0, dp(8)) })
         for (policy in NetworkProfiles.policies()) {
             val card = MaterialCardView(this).apply { radius = dp(24).toFloat(); cardElevation = 0f }
             val body = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(16), dp(12), dp(16), dp(12)) }
@@ -129,10 +165,10 @@ class NetworkProfilesActivity : ThemedActivity() {
         val ssid = if (policy.transport == "wifi") input(R.string.network_profiles_ssid, policy.ssid, false) else null
         val remote = input(R.string.network_profiles_remote_dns, policy.remoteDns)
         val direct = input(R.string.network_profiles_direct_dns, policy.directDns)
-        body.addView(MaterialButton(this, null, com.google.android.material.R.attr.materialButtonTextButtonStyle).apply {
+        body.addView(MaterialButton(this, null, androidx.appcompat.R.attr.borderlessButtonStyle).apply {
             text = SagerDatabase.proxyDao.getById(policy.profileId)?.displayName() ?: getString(R.string.route_fallback_profile)
             setOnClickListener {
-                pending = policy.copy(ssid = ssid?.text.toString().takeIf { ssid != null }.orEmpty(), remoteDns = remote.text.toString(), directDns = direct.text.toString())
+                pending = policy.copy(ssid = ssid?.text?.toString().orEmpty(), remoteDns = remote.text.toString(), directDns = direct.text.toString())
                 editor?.dismiss()
                 selectProfile.launch(Intent(this@NetworkProfilesActivity, ProfileSelectActivity::class.java))
             }
@@ -145,6 +181,8 @@ class NetworkProfilesActivity : ThemedActivity() {
                 NetworkProfiles.save(NetworkProfiles.policies().filterNot { it.id == policy.id }); changed()
             }.create()
         editor = dialog
+        editorState = { policy.copy(ssid = ssid?.text?.toString().orEmpty(), remoteDns = remote.text.toString(), directDns = direct.text.toString()) }
+        dialog.setOnDismissListener { editorState = null }
         dialog.setOnShowListener {
             dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 try {
@@ -161,4 +199,5 @@ class NetworkProfilesActivity : ThemedActivity() {
         dialog.show()
     }
     private var editor: androidx.appcompat.app.AlertDialog? = null
+    private var editorState: (() -> NetworkProfilePolicy)? = null
 }

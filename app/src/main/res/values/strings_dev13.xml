@@ -52,4 +52,20 @@
     <item>2</item>
     <item>3</item>
   </string-array>
+  <string name="diagnostics_probe_domain">Domain for DNS and TLS checks</string>
+  <string name="diagnostics_probe_dns">UDP DNS target (IP:port)</string>
+  <string name="diagnostics_run_checks">Check direct and proxy paths</string>
+  <string name="diagnostics_not_active">Start this profile to inspect its active connections.</string>
+  <string name="diagnostics_mtu_verified">verified inner packet: %1$d B · configured: %2$d B</string>
+  <string name="diagnostics_mtu_unsupported">ICMP size check is unavailable for this outbound</string>
+  <string name="diagnostics_mtu_busy">another check is running</string>
+  <string name="diagnostics_mtu_unknown">could not determine (no echo reply)</string>
+  <string name="diagnostics_mtu_no_reply">no reply</string>
+  <string name="diagnostics_probe_result_hint">DNS here tests UDP to the specified resolver, not your configured DoH/DoT. TCP dial may open an early proxy connection; verified TLS confirms the destination. MTU shows the largest tested inner packet, not the outer UDP path MTU. Apply any MTU changes manually in the profile; no values are changed automatically.</string>
+  <string name="network_profiles_edit_profile">Profile settings</string>
+  <string name="subscription_preview_title">Subscription update preview</string>
+  <string name="network_profiles_background_reason">For automatic SSID matching while the VPN runs in the background, open Permissions → Location and select “%1$s”. The app reads only the connected Wi-Fi name, not GPS coordinates. This is optional: generic Wi-Fi/mobile profiles work without location access.</string>
+  <string name="network_profiles_ssid_hint">On Android 10+, SSID matching requires precise location access allowed all the time; system Location must also be enabled. Otherwise generic Wi-Fi is used, including while the app is visible.</string>
+  <string name="network_profiles_ssid_ready">SSID permission is available. Keep system Location enabled for SSID matching.</string>
+  <string name="network_profiles_always">Allow all the time</string>
 </resources>

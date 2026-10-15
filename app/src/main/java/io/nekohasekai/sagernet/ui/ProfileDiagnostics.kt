@@ -2,7 +2,6 @@ package io.nekohasekai.sagernet.ui
 
 import android.app.Dialog
 import android.graphics.Typeface
-import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.ViewGroup
@@ -10,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -54,7 +54,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     val scroll = ScrollView(context).apply { addView(content) }
     root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
     ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
-        val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime())
+        val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime())
         view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
         insets
     }
@@ -77,12 +77,77 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     }
     val overview = card(R.string.diagnostics_overview, true)
     val validationView = overview.label().apply { setText(R.string.diagnostics_loading) }
-    val configButton = MaterialButton(context).apply { setText(R.string.menu_configuration); isEnabled = false }
+    val configButton = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply { setText(R.string.menu_configuration); isEnabled = false }
     overview.addView(configButton)
     val groupsView = card(R.string.diagnostics_live_state).label()
     val probesCard = card(R.string.diagnostics_active_tests)
     val probesView = probesCard.label().apply { setText(R.string.diagnostics_probe_hint) }
-    // Active probes are wired below; this container also keeps their results stable across live refreshes.
+    fun probeInput(title: Int, value: String): TextInputEditText {
+        val layout = TextInputLayout(context, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply { hint = getString(title) }
+        val edit = TextInputEditText(layout.context).apply { setSingleLine(true); setText(value) }
+        layout.addView(edit, ViewGroup.LayoutParams(-1, -2))
+        probesCard.addView(layout, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
+        return edit
+    }
+    val probeDomain = probeInput(R.string.diagnostics_probe_domain, "example.com")
+    val probeDns = probeInput(R.string.diagnostics_probe_dns, "1.1.1.1:53")
+    val runProbes = MaterialButton(context).apply { setText(R.string.diagnostics_run_checks) }
+    probesCard.addView(runProbes, ViewGroup.LayoutParams(-1, -2))
+    probesCard.addView(MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+        setText(R.string.network_profiles_edit_profile)
+        setOnClickListener {
+            val subscription = io.nekohasekai.sagernet.database.SagerDatabase.groupDao.getById(profile.groupId)?.subscription != null
+            dialog.dismiss()
+            startActivity(profile.settingIntent(context, subscription))
+        }
+    }, ViewGroup.LayoutParams(-1, -2))
+    var probeJob: Job? = null
+    runProbes.setOnClickListener {
+        if (profile.id != DataStore.currentProfile || !DataStore.serviceState.connected) {
+            probesView.setText(R.string.diagnostics_not_active)
+            return@setOnClickListener
+        }
+        runProbes.isEnabled = false
+        probesView.setText(R.string.diagnostics_loading)
+        val domain = probeDomain.text.toString().trim()
+        val dns = probeDns.text.toString().trim()
+        probeJob = lifecycleScope.launch {
+            val results = mutableListOf<String>()
+            try {
+                for (direct in listOf(true, false)) {
+                    val result = withContext(Dispatchers.IO) {
+                        connection.service?.networkProbe(profile.id, direct, domain, dns)?.let(::JSONObject)
+                            ?: error(getString(R.string.diagnostics_not_active))
+                    }
+                    val title = getString(if (direct) R.string.route_bypass else R.string.route_proxy)
+                    results += buildString {
+                        append(title)
+                        append("\nUDP: ").append(getString(if (result.optString("udp") == "response") R.string.diagnostics_reachable else R.string.diagnostics_unreachable))
+                        append("\nDNS (UDP): ").append(if (result.optString("outbound_dns_udp") == "response")
+                            "rcode ${result.optInt("rcode")} · ${result.optInt("answers")} · ${result.optInt("dns_ms")} ms" else getString(R.string.diagnostics_query_failed))
+                        if (result.optBoolean("truncated")) append(" · truncated")
+                        append("\nTCP dial: ").append(if (result.optString("tcp") == "dialed") "${result.optInt("tcp_ms")} ms" else getString(R.string.diagnostics_query_failed))
+                        append("\nTLS: ").append(if (result.optString("tls") == "verified") "${result.optInt("tls_ms")} ms" else getString(R.string.diagnostics_query_failed))
+                        result.optJSONObject("mtu")?.let { mtu ->
+                            append("\nMTU: ").append(when (mtu.optString("state")) {
+                                "verified-inner-packet" -> getString(R.string.diagnostics_mtu_verified, mtu.optInt("largest_verified"), mtu.optInt("configured_mtu"))
+                                "unsupported" -> getString(R.string.diagnostics_mtu_unsupported)
+                                "busy" -> getString(R.string.diagnostics_mtu_busy)
+                                else -> getString(R.string.diagnostics_mtu_unknown)
+                            })
+                            mtu.optJSONArray("samples")?.let { samples -> for (n in 0 until samples.length()) {
+                                val sample = samples.getJSONObject(n)
+                                append("\n  ").append(sample.optInt("size")).append(" B · ").append(if (sample.optBoolean("received")) "${sample.optInt("rtt_ms")} ms" else getString(R.string.diagnostics_mtu_no_reply))
+                            } }
+                        }
+                    }
+                    probesView.text = results.joinToString("\n\n") + "\n\n" + getString(R.string.diagnostics_probe_result_hint)
+                }
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (e: Exception) { probesView.text = results.joinToString("\n\n") + "\n" + redactDiagnostic(e.readableMessage) }
+            finally { runProbes.isEnabled = true }
+        }
+    }
     val historyCard = card(R.string.diagnostics_connection_history)
     fun filter(title: Int): TextInputEditText {
         val layout = TextInputLayout(context, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply { hint = getString(title) }
@@ -138,7 +203,8 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
         runtimeState = state
         val report = StringBuilder()
         val groups = state?.optJSONArray("groups")
-        if (groups == null || groups.length() == 0) report.append(getString(R.string.diagnostics_no_groups))
+        if (state == null) report.append(getString(R.string.diagnostics_not_active))
+        else if (groups == null || groups.length() == 0) report.append(getString(R.string.diagnostics_no_groups))
         else for (index in 0 until groups.length()) {
             val group = groups.getJSONObject(index)
             if (report.isNotEmpty()) report.append("\n\n")
@@ -193,7 +259,11 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     }
     dialog.setContentView(root)
     dialog.show()
-    dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+    dialog.window?.let { window ->
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        ViewCompat.requestApplyInsets(root)
+    }
     val job = lifecycleScope.launch {
         try {
             val (summary, preview) = withContext(Dispatchers.IO) {
@@ -251,5 +321,5 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (e: Exception) { validationView.text = redactDiagnostic(e.readableMessage) }
     }
-    dialog.setOnDismissListener { job.cancel() }
+    dialog.setOnDismissListener { job.cancel(); probeJob?.cancel() }
 }

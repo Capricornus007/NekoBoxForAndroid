@@ -13,18 +13,24 @@ import kotlin.coroutines.suspendCoroutine
 
 class GroupInterfaceAdapter(val context: ThemedActivity) : GroupManager.Interface {
 
-    override suspend fun confirm(message: String): Boolean {
-        return suspendCoroutine {
-            runOnMainDispatcher {
-                MaterialAlertDialogBuilder(context).setTitle(R.string.confirm)
-                    .setMessage(message)
-                    .setPositiveButton(R.string.yes) { _, _ -> it.resume(true) }
-                    .setNegativeButton(R.string.no) { _, _ -> it.resume(false) }
-                    .setOnCancelListener { _ -> it.resume(false) }
-                    .show()
+    override suspend fun confirm(message: String): Boolean = ask(R.string.confirm, R.string.yes, message)
+
+    override suspend fun previewSubscription(message: String): Boolean =
+        ask(R.string.subscription_preview_title, R.string.apply, message)
+
+    private suspend fun ask(title: Int, positive: Int, message: String): Boolean =
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main.immediate) {
+            kotlinx.coroutines.suspendCancellableCoroutine { continuation ->
+                if (context.isFinishing || context.isDestroyed) { continuation.resume(false); return@suspendCancellableCoroutine }
+                val dialog = MaterialAlertDialogBuilder(context).setTitle(title).setMessage(message)
+                    .setPositiveButton(positive) { _, _ -> if (continuation.isActive) continuation.resume(true) }
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> if (continuation.isActive) continuation.resume(false) }
+                    .setOnCancelListener { if (continuation.isActive) continuation.resume(false) }
+                    .create()
+                continuation.invokeOnCancellation { context.runOnUiThread { dialog.dismiss() } }
+                dialog.show()
             }
         }
-    }
 
     override suspend fun onUpdateSuccess(
         group: ProxyGroup,

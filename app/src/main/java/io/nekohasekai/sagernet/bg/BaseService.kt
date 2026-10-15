@@ -164,6 +164,16 @@ class BaseService {
             return proxy.box.runtimeDiagnostics()
         }
 
+        override fun networkProbe(expectedProfileId: Long, direct: Boolean, domain: String, dnsTarget: String): String {
+            check(android.os.Binder.getCallingUid() == android.os.Process.myUid()) { "Caller is not the application" }
+            val current = data ?: error("Service is unavailable")
+            val proxy = current.proxy ?: error("Core is not running")
+            check(current.state == State.Connected && proxy.isInitialized() && DataStore.currentProfile == expectedProfileId) { "Profile is no longer active" }
+            val tag = if (direct) "direct" else if (proxy.config.selectorGroupId > 0) "proxy"
+                else proxy.config.profileTagMap[proxy.profile.id] ?: error("Proxy outbound is unavailable")
+            return proxy.box.networkProbe(tag, domain, dnsTarget)
+        }
+
         fun stateChanged(s: State, msg: String?) = launch {
             val profileName = profileName
             broadcast { it.stateChanged(s.ordinal, profileName, msg) }

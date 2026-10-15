@@ -14,6 +14,7 @@ import (
 	"github.com/sagernet/sing-box/adapter"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
+	"github.com/sagernet/sing/common/ntp"
 	"github.com/sagernet/sing/service"
 )
 
@@ -137,7 +138,7 @@ func runNetworkProbe(ctx context.Context, dialer N.Dialer, domain string, destin
 		_ = conn.SetDeadline(time.Now().Add(4 * time.Second))
 		report["tcp"] = "dialed"
 		report["tcp_ms"] = time.Since(started).Milliseconds()
-		secure := tls.Client(conn, &tls.Config{ServerName: domain, MinVersion: tls.VersionTLS12})
+		secure := tls.Client(conn, &tls.Config{ServerName: domain, MinVersion: tls.VersionTLS12, RootCAs: adapter.RootPoolFromContext(ctx), Time: ntp.TimeFuncFromContext(ctx)})
 		if secure.HandshakeContext(probeCtx) != nil {
 			report["tls"] = "failed"
 			return

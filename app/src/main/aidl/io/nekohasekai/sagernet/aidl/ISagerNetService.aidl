@@ -11,4 +11,5 @@ interface ISagerNetService {
 
   int urlTest();
   String getRuntimeDiagnostics();
+  String networkProbe(long expectedProfileId, boolean direct, String domain, String dnsTarget);
 }

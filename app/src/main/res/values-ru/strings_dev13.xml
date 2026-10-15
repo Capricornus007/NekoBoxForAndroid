@@ -46,4 +46,20 @@
     <item>Напрямую → текущий прокси</item>
     <item>Напрямую → резервный профиль</item>
   </string-array>
+  <string name="diagnostics_probe_domain">Домен для проверки DNS и TLS</string>
+  <string name="diagnostics_probe_dns">Адрес UDP DNS (IP:порт)</string>
+  <string name="diagnostics_run_checks">Проверить прямой путь и прокси</string>
+  <string name="diagnostics_not_active">Запустите этот профиль для проверки активного соединения.</string>
+  <string name="diagnostics_mtu_verified">проверенный внутренний пакет: %1$d Б · настроено: %2$d Б</string>
+  <string name="diagnostics_mtu_unsupported">проверка размера ICMP недоступна для этого исходящего соединения</string>
+  <string name="diagnostics_mtu_busy">уже выполняется другая проверка</string>
+  <string name="diagnostics_mtu_unknown">не удалось определить (нет echo-ответа)</string>
+  <string name="diagnostics_mtu_no_reply">нет ответа</string>
+  <string name="diagnostics_probe_result_hint">DNS здесь проверяет UDP к указанному резолверу, а не настроенный DoH/DoT. TCP dial может открыть предварительное соединение прокси; успешный TLS подтверждает соединение с сайтом. MTU — наибольший проверенный внутренний пакет, а не MTU внешнего UDP-пути. Изменения MTU вносите вручную в профиль; автоматически ничего не меняется.</string>
+  <string name="network_profiles_edit_profile">Настройки профиля</string>
+  <string name="subscription_preview_title">Предпросмотр обновления подписки</string>
+  <string name="network_profiles_background_reason">Для автоматического выбора по SSID при работе VPN в фоне откройте «Разрешения → Местоположение» и выберите «%1$s». Приложение читает только название подключённого Wi-Fi, без GPS-координат. Это необязательно: общие профили Wi-Fi и мобильной сети работают без доступа к местоположению.</string>
+  <string name="network_profiles_ssid_hint">На Android 10+ для сопоставления SSID нужен точный доступ к местоположению «Всегда» и включённая системная геолокация. Иначе используется общий Wi-Fi, в том числе при открытом приложении.</string>
+  <string name="network_profiles_ssid_ready">Разрешение для SSID предоставлено. Для сопоставления SSID системная геолокация должна быть включена.</string>
+  <string name="network_profiles_always">Разрешить всегда</string>
 </resources>

@@ -299,7 +299,7 @@ class RouteSettingsActivity(
 
         if (DataStore.routeOutbound == 1 && DataStore.routeFallbackMode == 3 &&
             ProfileManager.getProfile(DataStore.routeFallbackProfile) == null) {
-            onMainDispatcher { snackbar(getString(R.string.route_fallback_missing)).show() }
+            onMainDispatcher { Toast.makeText(this@RouteSettingsActivity, R.string.route_fallback_missing, Toast.LENGTH_LONG).show() }
             return
         }
         io.nekohasekai.sagernet.database.NetworkSettingsHistory.capture()

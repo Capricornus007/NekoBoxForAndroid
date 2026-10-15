@@ -12,14 +12,14 @@ import java.security.MessageDigest
 object SubscriptionHistory {
     private const val LIMIT = 64 * 1024 * 1024
     private fun file(id: Long) = AtomicFile(File(SagerNet.application.noBackupFilesDir, "subscription-$id.previous"))
-    @Synchronized fun available(id: Long) = file(id).baseFile.exists()
+    @Synchronized fun available(id: Long) = runCatching { file(id).openRead().use { }; true }.getOrDefault(false)
     @Synchronized fun delete(id: Long) = file(id).delete()
 
     @Synchronized fun capture(group: ProxyGroup, profiles: List<ProxyEntity>) {
         val bytes = ByteArrayOutputStream().also { buffer ->
             DataOutputStream(buffer).use { output ->
                 output.writeInt(1)
-                fun write(value: ByteArray) { output.writeInt(value.size); output.write(value) }
+                fun write(value: ByteArray) { require(buffer.size().toLong() + value.size + 4 <= LIMIT); output.writeInt(value.size); output.write(value) }
                 write(KryoConverters.serialize(group))
                 output.writeInt(profiles.size)
                 profiles.forEach { write(KryoConverters.serialize(it)) }

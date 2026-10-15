@@ -265,7 +265,7 @@ object RawUpdater : GroupUpdater() {
                 }
             }
             toDelete.forEach { if (lines.size < 100) lines += "− ${it.displayName().take(160)}" }
-            if (additions + modifications + toDelete.size > 0 && !userInterface.confirm(
+            if (additions + modifications + toDelete.size > 0 && !userInterface.previewSubscription(
                 app.getString(R.string.subscription_preview, additions, modifications, toDelete.size) +
                     "\n\n" + lines.joinToString("\n") + "\n\n" + app.getString(R.string.subscription_preview_hint)
             )) {
