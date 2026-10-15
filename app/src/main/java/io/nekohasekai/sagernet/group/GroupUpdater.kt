@@ -132,7 +132,7 @@ abstract class GroupUpdater {
 
         suspend fun executeUpdate(proxyGroup: ProxyGroup, byUser: Boolean): Boolean {
             return coroutineScope {
-                if (!updating.add(proxyGroup.id)) cancel()
+                if (!updating.add(proxyGroup.id)) return@coroutineScope false
                 GroupManager.postReload(proxyGroup.id)
 
                 val subscription = proxyGroup.subscription!!

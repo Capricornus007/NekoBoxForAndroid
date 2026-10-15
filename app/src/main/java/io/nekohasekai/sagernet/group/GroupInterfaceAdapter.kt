@@ -27,6 +27,17 @@ class GroupInterfaceAdapter(val context: ThemedActivity) : GroupManager.Interfac
                     .setNegativeButton(android.R.string.cancel) { _, _ -> if (continuation.isActive) continuation.resume(false) }
                     .setOnCancelListener { if (continuation.isActive) continuation.resume(false) }
                     .create()
+                val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+                    if (event == androidx.lifecycle.Lifecycle.Event.ON_DESTROY) {
+                        if (continuation.isActive) continuation.resume(false)
+                        dialog.dismiss()
+                    }
+                }
+                dialog.setOnDismissListener {
+                    context.lifecycle.removeObserver(observer)
+                    if (continuation.isActive) continuation.resume(false)
+                }
+                context.lifecycle.addObserver(observer)
                 continuation.invokeOnCancellation { context.runOnUiThread { dialog.dismiss() } }
                 dialog.show()
             }

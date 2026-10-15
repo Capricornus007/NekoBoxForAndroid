@@ -3,7 +3,7 @@
   <string name="subscription_preview_hint">Apply these changes? The previous profiles will remain available for undo. Values of credentials are hidden. Up to 100 changes are listed.</string>
   <string name="subscription_undo">Previous subscription version</string>
   <string name="subscription_undo_confirm">Restore profiles from before the last subscription update? Current profile edits in this group will be replaced. Traffic counters are preserved.</string>
-  <string name="subscription_undo_referenced">A profile added by the update is in use. Select another profile and remove its references from routes or groups before undoing.</string>
+  <string name="subscription_undo_referenced">A newly added profile is in use. Before undoing, switch the VPN to another profile and remove references to this node from settings.</string>
   <string name="subscription_field_name">name</string>
   <string name="subscription_field_address">server address/port</string>
   <string name="subscription_field_dns">DNS</string>

@@ -3,7 +3,7 @@
   <string name="subscription_preview_hint">Применить изменения? Предыдущую версию профилей можно будет восстановить. Значения ключей и паролей скрыты. Показано до 100 изменений.</string>
   <string name="subscription_undo">Предыдущая версия подписки</string>
   <string name="subscription_undo_confirm">Восстановить профили до последнего обновления подписки? Текущие правки профилей этой группы будут заменены. Счётчики трафика сохранятся.</string>
-  <string name="subscription_undo_referenced">Добавленный обновлением профиль используется. Перед откатом выберите другой профиль и уберите ссылки на него из маршрутов и групп.</string>
+  <string name="subscription_undo_referenced">Добавленный обновлением профиль используется. Перед откатом переключите VPN на другой профиль и уберите ссылки на этот узел из настроек.</string>
   <string name="subscription_field_name">название</string>
   <string name="subscription_field_address">адрес/порт сервера</string>
   <string name="subscription_field_dns">DNS</string>
