@@ -1,5 +1,5 @@
 diff --git a/libcore/box.go b/libcore/box.go
-index 4ebecfc..daac367 100644
+index 4ebecfc..4397903 100644
 --- a/libcore/box.go
 +++ b/libcore/box.go
 @@ -16,11 +16,9 @@ import (
@@ -32,7 +32,7 @@ index 4ebecfc..daac367 100644
  		log.Println("Reset system connections done")
  	} else {
  		log.Println("TODO: Reset user connections")
-@@ -88,10 +86,10 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
+@@ -88,14 +86,14 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
  	ctx, cancel := context.WithCancel(context.Background())
  	ctx = box.Context(ctx,
  		nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(),
@@ -45,8 +45,13 @@ index 4ebecfc..daac367 100644
  
  	// parse options
  	var options option.Options
+-	err = options.UnmarshalJSONContext(ctx, []byte(config))
++	err = decodeConfigOptions(ctx, []byte(config), &options)
+ 	if err != nil {
+ 		cancel()
+ 		return nil, fmt.Errorf("decode config: %v", err)
 diff --git a/libcore/box_include.go b/libcore/box_include.go
-index b5d2a5f..0ef03a0 100644
+index b5d2a5f..07f2eea 100644
 --- a/libcore/box_include.go
 +++ b/libcore/box_include.go
 @@ -4,6 +4,7 @@ import (
@@ -57,29 +62,354 @@ index b5d2a5f..0ef03a0 100644
  	"github.com/sagernet/sing-box/adapter/endpoint"
  	"github.com/sagernet/sing-box/adapter/inbound"
  	"github.com/sagernet/sing-box/adapter/outbound"
-@@ -19,7 +20,6 @@ import (
+@@ -19,7 +20,7 @@ import (
  	"github.com/sagernet/sing-box/protocol/anytls"
  	"github.com/sagernet/sing-box/protocol/block"
  	"github.com/sagernet/sing-box/protocol/direct"
 -	protocolDns "github.com/sagernet/sing-box/protocol/dns"
++ protocolDns "github.com/sagernet/sing-box/protocol/dns"
  	"github.com/sagernet/sing-box/protocol/group"
  	"github.com/sagernet/sing-box/protocol/http"
  	"github.com/sagernet/sing-box/protocol/hysteria"
-@@ -66,7 +66,7 @@ func nekoboxAndroidOutboundRegistry() *outbound.Registry {
- 	direct.RegisterOutbound(registry)
+@@ -103,6 +104,7 @@ func nekoboxAndroidEndpointRegistry() *endpoint.Registry {
  
- 	block.RegisterOutbound(registry)
--	protocolDns.RegisterOutbound(registry)
-+	// DNS special outbounds require JSON migration in 1.14.
+ func nekoboxAndroidDNSTransportRegistry(localTransport LocalDNSTransport) *dns.TransportRegistry {
+ 	registry := dns.NewTransportRegistry()
++ dns.RegisterTransport[legacyRcodeOptions](registry,"neko-rcode",newLegacyRcodeTransport)
  
- 	group.RegisterSelector(registry)
- 	group.RegisterURLTest(registry)
-@@ -131,3 +131,5 @@ func nekoboxAndroidServiceRegistry() *service.Registry {
+ 	transport.RegisterTCP(registry)
+ 	transport.RegisterUDP(registry)
+@@ -131,3 +133,5 @@ func nekoboxAndroidServiceRegistry() *service.Registry {
  
  	return registry
  }
 +
 +func nekoboxAndroidCertificateRegistry() *certificate.Registry { return certificate.NewRegistry() }
+diff --git a/libcore/config_compat.go b/libcore/config_compat.go
+new file mode 100644
+index 0000000..2c8f085
+--- /dev/null
++++ b/libcore/config_compat.go
+@@ -0,0 +1,223 @@
++package libcore
++
++import (
++	"bytes"
++	"context"
++	"fmt"
++	"io"
++
++	"github.com/sagernet/sing-box/option"
++	"github.com/sagernet/sing/common/json"
++	"github.com/sagernet/sing/common/json/badoption"
++)
++
++// Migrations affect only the runtime copy; imported and stored JSON stays intact.
++func decodeConfigOptions(ctx context.Context, content []byte, options *option.Options) error {
++	normalized, err := normalizeConfigJSON(ctx, content)
++	if err != nil {
++		return err
++	}
++	return options.UnmarshalJSONContext(ctx, normalized)
++}
++
++func normalizeConfigJSON(ctx context.Context, content []byte) ([]byte, error) {
++	decoder := json.NewDecoderContext(ctx, bytes.NewReader(content))
++	decoder.UseNumber()
++	var root map[string]any
++	if err := decoder.Decode(&root); err != nil {
++		return nil, err
++	}
++	if root == nil {
++		return nil, fmt.Errorf("configuration must be an object")
++	}
++	var extra any
++	if err := decoder.Decode(&extra); err != io.EOF {
++		return nil, fmt.Errorf("configuration must contain one JSON object")
++	}
++	inbounds, _ := root["inbounds"].([]any)
++	used := make(map[string]bool)
++	for _, item := range inbounds {
++		if inbound, ok := item.(map[string]any); ok {
++			if tag, ok := inbound["tag"].(string); ok {
++				used[tag] = true
++			}
++		}
++	}
++	var actions []any
++	for i, item := range inbounds {
++		inbound, ok := item.(map[string]any)
++		if !ok {
++			continue
++		}
++		sniff, _ := inbound["sniff"].(bool)
++		override, _ := inbound["sniff_override_destination"].(bool)
++		strategy, _ := inbound["domain_strategy"].(string)
++		unmapping, _ := inbound["udp_disable_domain_unmapping"].(bool)
++		if sniff || strategy != "" || unmapping {
++			tag, _ := inbound["tag"].(string)
++			if tag == "" {
++				for n := i; ; n++ {
++					tag = fmt.Sprintf("neko-legacy-inbound-%d", n)
++					if !used[tag] {
++						break
++					}
++				}
++				inbound["tag"], used[tag] = tag, true
++			}
++			if strategy != "" {
++				actions = append(actions, map[string]any{"inbound": []string{tag}, "action": "resolve", "strategy": strategy})
++			}
++			if sniff {
++				action := map[string]any{"inbound": []string{tag}, "action": "sniff", "override_destination": override}
++				if timeout, exists := inbound["sniff_timeout"]; exists {
++					action["timeout"] = timeout
++				}
++				actions = append(actions, action)
++			}
++			if unmapping {
++				actions = append(actions, map[string]any{"inbound": []string{tag}, "action": "route-options", "udp_disable_domain_unmapping": true})
++			}
++		}
++		for _, field := range []string{"sniff", "sniff_timeout", "sniff_override_destination", "domain_strategy", "udp_disable_domain_unmapping"} {
++			// Invalid values must reach strict core validation, rather than disappear.
++			value, exists := inbound[field]
++			if !exists {
++				continue
++			}
++			valid := false
++			switch field {
++			case "domain_strategy":
++				_, valid = value.(string)
++			case "sniff_timeout":
++				encoded, err := json.Marshal(value)
++				var timeout badoption.Duration
++				valid = err == nil && json.Unmarshal(encoded, &timeout) == nil
++			default:
++				_, valid = value.(bool)
++			}
++			if !valid {
++				return nil, fmt.Errorf("inbound[%d]: invalid %s", i, field)
++			}
++			delete(inbound, field)
++		}
++		if inbound["type"] == "tun" {
++			if value, exists := inbound["endpoint_independent_nat"]; exists {
++				enabled, ok := value.(bool)
++				if !ok {
++					return nil, fmt.Errorf("invalid endpoint_independent_nat")
++				}
++				behavior := "address_and_port_dependent"
++				if enabled {
++					behavior = "endpoint_independent"
++				}
++				for _, field := range []string{"udp_mapping", "udp_filtering"} {
++					if _, exists := inbound[field]; !exists {
++						inbound[field] = behavior
++					}
++				}
++				delete(inbound, "endpoint_independent_nat")
++			}
++		}
++	}
++	if len(actions) > 0 {
++		route, ok := root["route"].(map[string]any)
++		if !ok {
++			if value := root["route"]; value != nil {
++				return nil, fmt.Errorf("route must be an object")
++			}
++			route = make(map[string]any)
++			root["route"] = route
++		}
++		rules, ok := route["rules"].([]any)
++		if !ok && route["rules"] != nil {
++			return nil, fmt.Errorf("route.rules must be an array")
++		}
++		position := 0
++		for position < len(rules) && isEarlyNetworkGuard(rules[position]) {
++			position++
++		}
++		merged := make([]any, 0, len(rules)+len(actions))
++		merged = append(merged, rules[:position]...)
++		merged = append(merged, actions...)
++		merged = append(merged, rules[position:]...)
++		route["rules"] = merged
++	}
++	if dns, ok := root["dns"].(map[string]any); ok {
++		if err := migrateLegacyDNSServers(dns); err != nil {
++			return nil, err
++		}
++		rules, _ := dns["rules"].([]any)
++		if needsLegacyDNSRules(rules) {
++			preserveLegacyQueryTypes(rules)
++		}
++	}
++	return json.Marshal(root)
++}
++
++func isEarlyNetworkGuard(item any) bool {
++	rule, ok := item.(map[string]any)
++	if !ok || rule["action"] != "reject" {
++		return false
++	}
++	var hasUID func(map[string]any) bool
++	hasUID = func(rule map[string]any) bool {
++		if rule["user_id"] != nil || rule["package_name"] != nil {
++			return true
++		}
++		children, _ := rule["rules"].([]any)
++		for _, child := range children {
++			if nested, ok := child.(map[string]any); ok && hasUID(nested) {
++				return true
++			}
++		}
++		return false
++	}
++	if hasUID(rule) {
++		return true
++	}
++	// The app's virtual-DNS TLS guard is before sniffing and destination resolution.
++	ports, _ := rule["port"].([]any)
++	for _, port := range ports {
++		if fmt.Sprint(port) == "853" && rule["ip_cidr"] != nil {
++			return true
++		}
++	}
++	return false
++}
++
++func needsLegacyDNSRules(rules []any) bool {
++	for _, item := range rules {
++		rule, ok := item.(map[string]any)
++		if !ok {
++			continue
++		}
++		if strategy, _ := rule["strategy"].(string); strategy != "" {
++			return true
++		}
++		if rule["match_response"] == nil && (rule["ip_cidr"] != nil || rule["ip_is_private"] == true || rule["ip_accept_any"] == true || rule["rule_set_ip_cidr_accept_empty"] == true) {
++			return true
++		}
++		if children, ok := rule["rules"].([]any); ok && needsLegacyDNSRules(children) {
++			return true
++		}
++	}
++	return false
++}
++
++func preserveLegacyQueryTypes(rules []any) {
++	for _, item := range rules {
++		rule, ok := item.(map[string]any)
++		if !ok {
++			continue
++		}
++		if value, exists := rule["query_type"]; exists {
++			if rule["neko_legacy_query_type"] == nil {
++				rule["neko_legacy_query_type"] = value
++				delete(rule, "query_type")
++			}
++		}
++		if children, ok := rule["rules"].([]any); ok {
++			preserveLegacyQueryTypes(children)
++		}
++	}
++}
+diff --git a/libcore/config_compat_test.go b/libcore/config_compat_test.go
+new file mode 100644
+index 0000000..c5cb71c
+--- /dev/null
++++ b/libcore/config_compat_test.go
+@@ -0,0 +1,90 @@
++package libcore
++
++import (
++	"context"
++	"encoding/json"
++	"reflect"
++	"strings"
++	"testing"
++)
++
++func normalizedConfig(t *testing.T, raw string) map[string]any {
++	t.Helper()
++	value, err := normalizeConfigJSON(context.Background(), []byte(raw))
++	if err != nil {
++		t.Fatal(err)
++	}
++	var root map[string]any
++	if err := json.Unmarshal(value, &root); err != nil {
++		t.Fatal(err)
++	}
++	return root
++}
++
++func TestLegacyInboundMigrationKeepsGuardsBeforeDNSAndSniffing(t *testing.T) {
++	const raw = `{"inbounds":[{"type":"tun","tag":"tun-in","address":["172.19.0.1/28"],"sniff":true,"sniff_override_destination":true,"sniff_timeout":"500ms","domain_strategy":"prefer_ipv4","endpoint_independent_nat":true}],"outbounds":[{"type":"direct","tag":"direct"}],"route":{"rules":[{"inbound":["tun-in"],"user_id":[23456],"action":"reject"},{"inbound":["tun-in"],"port":[853],"ip_cidr":["172.19.0.2/32"],"action":"reject"},{"port":[53],"action":"hijack-dns"}],"final":"direct"}}`
++	root := normalizedConfig(t, raw)
++	inbound := root["inbounds"].([]any)[0].(map[string]any)
++	if inbound["sniff"] != nil || inbound["domain_strategy"] != nil || inbound["endpoint_independent_nat"] != nil {
++		t.Fatal("legacy fields survived")
++	}
++	if inbound["udp_mapping"] != "endpoint_independent" {
++		t.Fatal("changed UDP mapping")
++	}
++	rules := root["route"].(map[string]any)["rules"].([]any)
++	for i, action := range []string{"reject", "reject", "resolve", "sniff", "hijack-dns"} {
++		if rules[i].(map[string]any)["action"] != action {
++			t.Fatalf("changed guard order at %d", i)
++		}
++	}
++	if rules[3].(map[string]any)["override_destination"] != true {
++		t.Fatal("lost destination override")
++	}
++	if err := CheckConfig(raw, nil); err != nil {
++		t.Fatal(err)
++	}
++	encoded, _ := json.Marshal(root)
++	if again := normalizedConfig(t, string(encoded)); !reflect.DeepEqual(root, again) {
++		t.Fatal("migration must be idempotent")
++	}
++}
++
++func TestLegacyMigrationPreservesUserFieldsAndRejectsMalformedInput(t *testing.T) {
++	const raw = `{"opaque":{"number":9007199254740993,"password":"test-fixture"},"inbounds":[{"type":"socks","tag":"neko-legacy-inbound-1"},{"type":"socks","sniff":true}],"route":{"rules":[{"action":"reject","domain":["blocked.example"]}]}}`
++	result, err := normalizeConfigJSON(context.Background(), []byte(raw))
++	if err != nil {
++		t.Fatal(err)
++	}
++	if !strings.Contains(string(result), "9007199254740993") {
++		t.Fatal("changed an exact numeric value")
++	}
++	root := normalizedConfig(t, string(result))
++	items := root["inbounds"].([]any)
++	if items[0].(map[string]any)["tag"] == items[1].(map[string]any)["tag"] {
++		t.Fatal("generated a duplicate tag")
++	}
++	if root["opaque"].(map[string]any)["password"] != "test-fixture" {
++		t.Fatal("modified unrelated user options")
++	}
++	for _, raw := range []string{`{} {}`, `null`, `{"inbounds":[{"sniff":"yes"}]}`, `{"inbounds":[{"sniff_timeout":false}]}`, `{"inbounds":[{"sniff":true}],"route":{"rules":{}}}`} {
++		if _, err := normalizeConfigJSON(context.Background(), []byte(raw)); err == nil {
++			t.Fatalf("accepted malformed config: %s", raw)
++		}
++	}
++	if err := CheckConfig(`{"unknown_option":true}`, nil); err == nil {
++		t.Fatal("migration must retain strict core validation")
++	}
++}
++
++func TestLegacyDNSCompatibilityDoesNotRewriteModernRules(t *testing.T) {
++	legacy := normalizedConfig(t, `{"dns":{"rules":[{"query_type":["A","AAAA"],"strategy":"ipv4_only","server":"fake"}]}}`)
++	rule := legacy["dns"].(map[string]any)["rules"].([]any)[0].(map[string]any)
++	if rule["query_type"] != nil || rule["neko_legacy_query_type"] == nil || rule["strategy"] != "ipv4_only" {
++		t.Fatal("lost legacy DNS family/query behavior")
++	}
++	modern := normalizedConfig(t, `{"dns":{"rules":[{"query_type":["A"],"ip_version":4,"server":"modern"}]}}`)
++	rule = modern["dns"].(map[string]any)["rules"].([]any)[0].(map[string]any)
++	if rule["query_type"] == nil || rule["neko_legacy_query_type"] != nil {
++		t.Fatal("changed native 1.14 DNS semantics")
++	}
++}
 diff --git a/libcore/direct_fallback_test.go b/libcore/direct_fallback_test.go
 index e973694..b320280 100644
 --- a/libcore/direct_fallback_test.go
@@ -116,7 +446,7 @@ index c05eb9a..568b4ed 100644
 + go func() { response, err := p.Exchange(ctx, message); callback(response, err) }()
 +}
 diff --git a/libcore/dns_config_test.go b/libcore/dns_config_test.go
-index e1501b7..f64a6a4 100644
+index e1501b7..25d6aa1 100644
 --- a/libcore/dns_config_test.go
 +++ b/libcore/dns_config_test.go
 @@ -18,7 +18,6 @@ import (
@@ -127,8 +457,97 @@ index e1501b7..f64a6a4 100644
  	"github.com/sagernet/sing-box/option"
  	"github.com/sagernet/sing-tun"
  	"github.com/sagernet/sing/common/control"
-@@ -137,9 +136,9 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
- 		"route":     map[string]any{"final": "proxy"},
+@@ -79,43 +78,48 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
+ 	}
+ 	defer proxy.Close()
+ 	go func() {
+-		conn, err := proxy.Accept()
+-		if err != nil {
+-			return
+-		}
+-		defer conn.Close()
+-		_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
+-		reader := bufio.NewReader(conn)
+-		if _, err = socks5.ReadAuthRequest(reader); err != nil {
+-			t.Error(err)
+-			return
+-		}
+-		if err = socks5.WriteAuthResponse(conn, socks5.AuthResponse{Method: socks5.AuthTypeNotRequired}); err != nil {
+-			t.Error(err)
+-			return
+-		}
+-		request, err := socks5.ReadRequest(reader)
+-		if err != nil {
+-			t.Error(err)
+-			return
+-		}
+-		proxyCalls.Add(1)
+-		if request.Command != socks5.CommandConnect || request.Destination != M.SocksaddrFromNet(https.Listener.Addr()) {
+-			t.Errorf("unexpected proxy destination: %s", request.Destination)
+-			return
+-		}
+-		upstream, err := net.DialTimeout("tcp", request.Destination.String(), time.Second)
+-		if err != nil {
+-			t.Error(err)
+-			return
+-		}
+-		defer upstream.Close()
+-		if err = socks5.WriteResponse(conn, socks5.Response{ReplyCode: socks5.ReplyCodeSuccess}); err != nil {
+-			t.Error(err)
+-			return
++		for {
++			conn, acceptErr := proxy.Accept()
++			if acceptErr != nil {
++				return
++			}
++			go func(conn net.Conn) {
++				var err error
++				defer conn.Close()
++				_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
++				reader := bufio.NewReader(conn)
++				if _, err = socks5.ReadAuthRequest(reader); err != nil {
++					t.Error(err)
++					return
++				}
++				if err = socks5.WriteAuthResponse(conn, socks5.AuthResponse{Method: socks5.AuthTypeNotRequired}); err != nil {
++					t.Error(err)
++					return
++				}
++				request, err := socks5.ReadRequest(reader)
++				if err != nil {
++					t.Error(err)
++					return
++				}
++				proxyCalls.Add(1)
++				if request.Command != socks5.CommandConnect || request.Destination != M.SocksaddrFromNet(https.Listener.Addr()) {
++					t.Errorf("unexpected proxy destination: %s", request.Destination)
++					return
++				}
++				upstream, err := net.DialTimeout("tcp", request.Destination.String(), time.Second)
++				if err != nil {
++					t.Error(err)
++					return
++				}
++				defer upstream.Close()
++				if err = socks5.WriteResponse(conn, socks5.Response{ReplyCode: socks5.ReplyCodeSuccess}); err != nil {
++					t.Error(err)
++					return
++				}
++				go func() { _, _ = io.Copy(conn, upstream) }()
++				_, _ = io.Copy(upstream, reader)
++			}(conn)
+ 		}
+-		go func() { _, _ = io.Copy(conn, upstream) }()
+-		_, _ = io.Copy(upstream, reader)
+ 	}()
+ 	configuration := map[string]any{
+ 		"dns": map[string]any{
+@@ -134,14 +138,14 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
+ 			}, "final": "dns-remote",
+ 		},
+ 		"outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}, map[string]any{"type": "socks", "tag": "proxy", "server": "proxy.example.test", "server_port": proxy.Addr().(*net.TCPAddr).Port, "domain_strategy": "ipv4_only"}},
+-		"route":     map[string]any{"final": "proxy"},
++		"route":     map[string]any{"final": "proxy"}, "log": map[string]any{"level": "trace"},
  	}
  	content, _ := json.Marshal(configuration)
 -	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry())
@@ -137,9 +556,30 @@ index e1501b7..f64a6a4 100644
 -	service.MustRegister[platform.Interface](ctx, dnsTestPlatform{})
 +	service.MustRegister[adapter.PlatformInterface](ctx, &dnsTestPlatform{})
  	var options option.Options
- 	if err = options.UnmarshalJSONContext(ctx, content); err != nil {
+-	if err = options.UnmarshalJSONContext(ctx, content); err != nil {
++	if err = decodeConfigOptions(ctx, content, &options); err != nil {
  		t.Fatal(err)
-@@ -184,7 +183,7 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
+ 	}
+ 	instance, err := box.New(box.Options{Context: ctx, Options: options})
+@@ -158,7 +162,7 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
+ 		defer cancel()
+ 		response, err := service.FromContext[adapter.DNSRouter](ctx).Exchange(requestCtx, new(mDNS.Msg).SetQuestion(domain, mDNS.TypeA), adapter.DNSQueryOptions{})
+ 		if err != nil {
+-			t.Fatal(err)
++			t.Fatalf("query %s: %v; UDP=%d HTTPS=%d proxy=%d", domain, err, udpCalls.Load(), httpsCalls.Load(), proxyCalls.Load())
+ 		}
+ 		return response
+ 	}
+@@ -171,7 +175,7 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
+ 	if response := query("www.example.test.", ""); len(response.Answer) != 1 || response.Answer[0].(*mDNS.A).A.String() != "203.0.113.10" {
+ 		t.Fatal("remote HTTPS DNS failed")
+ 	}
+-	if udpCalls.Load() < 2 || httpsCalls.Load() != 1 || proxyCalls.Load() != 1 {
++	if udpCalls.Load() < 2 || httpsCalls.Load() != 1 || proxyCalls.Load() < 1 {
+ 		t.Fatal("remote DNS hostname did not bootstrap through direct DNS")
+ 	}
+ 	if response := query("fake.example.test.", "tun-in"); len(response.Answer) != 1 || !netip.MustParsePrefix("198.18.0.0/15").Contains(netip.MustParseAddr(response.Answer[0].(*mDNS.A).A.String())) {
+@@ -184,7 +188,7 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
  
  // Android supplies interface updates through Java. Mirror that contract without
  // requiring Linux netlink privileges in the test environment.
@@ -148,22 +588,24 @@ index e1501b7..f64a6a4 100644
  
  func (dnsTestPlatform) Initialize(adapter.NetworkManager) error { return nil }
  func (dnsTestPlatform) CreateDefaultInterfaceMonitor(logger.Logger) tun.DefaultInterfaceMonitor {
-@@ -195,7 +194,7 @@ func (dnsTestPlatform) UsePlatformAutoDetectInterfaceControl() bool     { return
+@@ -195,7 +199,7 @@ func (dnsTestPlatform) UsePlatformAutoDetectInterfaceControl() bool     { return
  func (dnsTestPlatform) IncludeAllNetworks() bool                        { return false }
  func (dnsTestPlatform) UnderNetworkExtension() bool                     { return false }
  func (dnsTestPlatform) SystemCertificates() []string                    { return nil }
 -func (dnsTestPlatform) ReadWIFIState() adapter.WIFIState                { return adapter.WIFIState{} }
-+func (dnsTestPlatform) ReadWIFIState(context.Context) adapter.WIFIState                { return adapter.WIFIState{} }
++func (dnsTestPlatform) ReadWIFIState(context.Context) adapter.WIFIState { return adapter.WIFIState{} }
  
  type dnsTestMonitor struct{ tun.DefaultInterfaceMonitor }
  
-@@ -204,14 +203,15 @@ func (dnsTestMonitor) Close() error { return nil }
+@@ -204,18 +208,19 @@ func (dnsTestMonitor) Close() error { return nil }
  func (dnsTestMonitor) RegisterCallback(tun.DefaultInterfaceUpdateCallback) *list.Element[tun.DefaultInterfaceUpdateCallback] {
  	return nil
  }
+-func (dnsTestMonitor) DefaultInterface() *control.Interface { return nil }
+-func (dnsTestMonitor) AndroidVPNEnabled() bool              { return false }
 +func (dnsTestMonitor) UnregisterCallback(*list.Element[tun.DefaultInterfaceUpdateCallback]) {}
- func (dnsTestMonitor) DefaultInterface() *control.Interface { return nil }
- func (dnsTestMonitor) AndroidVPNEnabled() bool              { return false }
++func (dnsTestMonitor) DefaultInterface() *control.Interface                                 { return nil }
++func (dnsTestMonitor) AndroidVPNEnabled() bool                                              { return false }
  
  func TestTypedFakeIPRespectsIPv6Modes(t *testing.T) {
  	for _, strategy := range []string{"prefer_ipv6", "ipv6_only"} {
@@ -175,7 +617,12 @@ index e1501b7..f64a6a4 100644
  			data := map[string]any{"dns": map[string]any{"servers": []any{map[string]any{"type": "local", "tag": "dns-local"}, map[string]any{"type": "fakeip", "tag": "dns-fake", "inet4_range": "198.18.0.0/15", "inet6_range": "fc00::/18"}}, "rules": []any{map[string]any{"server": "dns-fake", "strategy": strategy}}}, "outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}}}
  			content, _ := json.Marshal(data)
  			var options option.Options
-@@ -347,8 +347,8 @@ func testFallbackDNSBootstrap(t *testing.T, usePlatform bool) {
+-			if err := options.UnmarshalJSONContext(ctx, content); err != nil {
++			if err := decodeConfigOptions(ctx, content, &options); err != nil {
+ 				t.Fatal(err)
+ 			}
+ 			instance, err := box.New(box.Options{Context: ctx, Options: options})
+@@ -347,11 +352,11 @@ func testFallbackDNSBootstrap(t *testing.T, usePlatform bool) {
  			map[string]any{"type": "urltest", "tag": "direct-fallback", "outbounds": []string{"direct", "proxy"}, "strategy": "direct-fallback", "url": controlURL, "interval": "1h", "idle_timeout": "1h", "timeout": "1s", "wait_for_initial": true, "interrupt_exist_connections": true},
  		}, "route": map[string]any{"final": "proxy"},
  	}
@@ -185,8 +632,12 @@ index e1501b7..f64a6a4 100644
 +	service.MustRegister[adapter.PlatformInterface](ctx, &dnsTestPlatform{})
  	content, _ := json.Marshal(configuration)
  	var options option.Options
- 	if err := options.UnmarshalJSONContext(ctx, content); err != nil {
-@@ -411,8 +411,8 @@ func TestVirtualDNSIsHijackedBeforeLANBypass(t *testing.T) {
+-	if err := options.UnmarshalJSONContext(ctx, content); err != nil {
++	if err := decodeConfigOptions(ctx, content, &options); err != nil {
+ 		t.Fatal(err)
+ 	}
+ 	instance, err := box.New(box.Options{Context: ctx, Options: options})
+@@ -411,11 +416,11 @@ func TestVirtualDNSIsHijackedBeforeLANBypass(t *testing.T) {
  		"outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}, map[string]any{"type": "direct", "tag": "bypass"}},
  		"route":     map[string]any{"rules": []any{map[string]any{"port": 53, "action": "hijack-dns"}, map[string]any{"protocol": "dns", "action": "hijack-dns"}, map[string]any{"ip_is_private": true, "outbound": "bypass"}}, "final": "direct"},
  	}
@@ -196,9 +647,19 @@ index e1501b7..f64a6a4 100644
 +	service.MustRegister[adapter.PlatformInterface](ctx, &dnsTestPlatform{})
  	data, _ := json.Marshal(configuration)
  	var options option.Options
- 	if err = options.UnmarshalJSONContext(ctx, data); err != nil {
+-	if err = options.UnmarshalJSONContext(ctx, data); err != nil {
++	if err = decodeConfigOptions(ctx, data, &options); err != nil {
+ 		t.Fatal(err)
+ 	}
+ 	instance, err := box.New(box.Options{Context: ctx, Options: options})
+@@ -448,3 +453,5 @@ func TestVirtualDNSIsHijackedBeforeLANBypass(t *testing.T) {
+ 		}
+ 	}
+ }
++
++func (dnsTestMonitor) MyInterfaces() []string { return nil }
 diff --git a/libcore/dns_outbound_test.go b/libcore/dns_outbound_test.go
-index 7d173ba..3215ccd 100644
+index 7d173ba..5a73a21 100644
 --- a/libcore/dns_outbound_test.go
 +++ b/libcore/dns_outbound_test.go
 @@ -14,8 +14,8 @@ import (
@@ -211,7 +672,7 @@ index 7d173ba..3215ccd 100644
  	M "github.com/sagernet/sing/common/metadata"
  	"github.com/sagernet/sing/service"
  )
-@@ -61,9 +61,9 @@ func TestDomainOutboundWithOverriddenDNS(t *testing.T) {
+@@ -61,12 +61,12 @@ func TestDomainOutboundWithOverriddenDNS(t *testing.T) {
  				"dns":       map[string]any{"servers": []any{map[string]any{"type": "local", "tag": test.dnsTag}}, "final": test.dnsTag},
  				"outbounds": outbounds, "route": map[string]any{"final": "fqdn"},
  			}
@@ -222,7 +683,24 @@ index 7d173ba..3215ccd 100644
 +			service.MustRegister[adapter.PlatformInterface](ctx, &dnsTestPlatform{})
  			content, _ := json.Marshal(configuration)
  			var options option.Options
- 			if err := options.UnmarshalJSONContext(ctx, content); err != nil {
+-			if err := options.UnmarshalJSONContext(ctx, content); err != nil {
++			if err := decodeConfigOptions(ctx, content, &options); err != nil {
+ 				t.Fatal(err)
+ 			}
+ 			instance, err := box.New(box.Options{Context: ctx, Options: options})
+diff --git a/libcore/geo_rules.go b/libcore/geo_rules.go
+index 32dd5f5..44b5d11 100644
+--- a/libcore/geo_rules.go
++++ b/libcore/geo_rules.go
+@@ -36,7 +36,7 @@ func materializeGeoRuleSets(options *option.Options) error {
+ 			var err error
+ 			rules, err = load(name)
+ 			if err != nil {
+-				return fmt.Errorf("rule-set %s (%s): %w", set.Tag, path, err)
++				return fmt.Errorf("rule-set %s (%s): %w", strings.Join(set.Tag, ","), path, err)
+ 			}
+ 			loaded[path] = rules
+ 		}
 diff --git a/libcore/geo_rules_test.go b/libcore/geo_rules_test.go
 index ab229c8..61f126d 100644
 --- a/libcore/geo_rules_test.go
@@ -237,10 +715,10 @@ index ab229c8..61f126d 100644
  		t.Fatal("changed an ordinary local rule-set", err)
  	}
 diff --git a/libcore/go.mod b/libcore/go.mod
-index daf9f05..d3d41e7 100644
+index daf9f05..65cf589 100644
 --- a/libcore/go.mod
 +++ b/libcore/go.mod
-@@ -5,88 +5,101 @@ go 1.26.0
+@@ -5,95 +5,108 @@ go 1.26.0
  toolchain go1.26.9
  
  require (
@@ -379,8 +857,22 @@ index daf9f05..d3d41e7 100644
  	gvisor.dev/gvisor v0.0.0-20250606233247-e3c4c4cad86f // indirect
  	lukechampine.com/blake3 v1.3.0 // indirect
  )
+ 
+ replace github.com/matsuridayo/libneko => ../../libneko
+ 
+-replace github.com/sagernet/sing-box => ../../sing-box
++replace github.com/sagernet/sing-box => ../../sing-box-114
+ 
+ replace github.com/sagernet/wireguard-go => ../../wireguard-go
+ 
+@@ -107,3 +120,5 @@ replace github.com/sagernet/sing-vmess => github.com/starifly/sing-vmess v0.2.8-
+ // replace github.com/sagernet/sing-dns => ../../sing-dns
+ 
+ // replace berty.tech/go-libtor => github.com/berty/go-libtor v0.0.0-20220627102132-9189eb6e3982
++
++replace github.com/sagernet/sing-quic => ../../sing-quic-114
 diff --git a/libcore/go.sum b/libcore/go.sum
-index 0181566..8504777 100644
+index 0181566..63a1635 100644
 --- a/libcore/go.sum
 +++ b/libcore/go.sum
 @@ -1,29 +1,41 @@
@@ -511,7 +1003,7 @@ index 0181566..8504777 100644
  github.com/metacubex/chacha v0.1.5 h1:fKWMb/5c7ZrY8Uoqi79PPFxl+qwR7X/q0OrsAubyX2M=
  github.com/metacubex/chacha v0.1.5/go.mod h1:Djn9bPZxLTXbJFSeyo0/qzEzQI+gUSSzttuzZM75GH8=
  github.com/metacubex/mihomo v1.19.13 h1:tpW9UMO+HSW5G3cdOA2gjr1zl0YOaDNf8UVqEqAtkm4=
-@@ -69,49 +104,49 @@ github.com/metacubex/randv2 v0.2.0 h1:uP38uBvV2SxYfLj53kuvAjbND4RUDfFJjwr4UigMiL
+@@ -69,49 +104,47 @@ github.com/metacubex/randv2 v0.2.0 h1:uP38uBvV2SxYfLj53kuvAjbND4RUDfFJjwr4UigMiL
  github.com/metacubex/randv2 v0.2.0/go.mod h1:kFi2SzrQ5WuneuoLLCMkABtiBu6VRrMrWFqSPyj2cxY=
  github.com/metacubex/sing v0.5.5 h1:m5U8iHvRAUxlme3FZlE/LPIGHjU8oMCUzXWGbQQAC1E=
  github.com/metacubex/sing v0.5.5/go.mod h1:ypf0mjwlZm0sKdQSY+yQvmsbWa0hNPtkeqyRMGgoN+w=
@@ -582,8 +1074,6 @@ index 0181566..8504777 100644
 +github.com/sagernet/sing v0.9.7-0.20260929150544-0ad23b637bd4/go.mod h1:K3Owt3xPhHugvlnlPPxZJ/exXdaJfEPOTNorGk4AXjo=
 +github.com/sagernet/sing-mux v0.3.10-0.20260929204512-caf09fe32475 h1:aG0DqHEOjax7DyfE1GTAXZotOg3QGVCz3/8rCSua2kg=
 +github.com/sagernet/sing-mux v0.3.10-0.20260929204512-caf09fe32475/go.mod h1:jricpwCOndDsTEM1TM3piJvhL/2Mm7OhLkm+JadJJ1Q=
-+github.com/sagernet/sing-quic v0.7.2-0.20261002084117-75c3ac4fa12b h1:2Jx/URJAPt32MEbLmAR5nzH87tO6NQZLRfRFvFqBWuk=
-+github.com/sagernet/sing-quic v0.7.2-0.20261002084117-75c3ac4fa12b/go.mod h1:rJFeVxbEej2iuyeCJ3drKW+p5rOgtLIW3XhZ6ty7Fig=
 +github.com/sagernet/sing-shadowsocks v0.2.9-0.20260929204512-65740e0f0e3e h1:LKgE/uuqp/D2kgxYViOz8vf4slaCUfpFywXjtuwD5gU=
 +github.com/sagernet/sing-shadowsocks v0.2.9-0.20260929204512-65740e0f0e3e/go.mod h1:lo7TWEMDcN5/h5B8S0ew+r78ZODn6SwVaFhvB6H+PTI=
 +github.com/sagernet/sing-shadowsocks2 v0.2.2-0.20260929152114-a69d1086332b h1:VH65QNqSHat2b+N3Rlzo5Qe44gRmQGwzY5atuy3D0A8=
@@ -599,7 +1089,7 @@ index 0181566..8504777 100644
  github.com/sagernet/smux v1.5.50-sing-box-mod.1 h1:XkJcivBC9V4wBjiGXIXZ229aZCU1hzcbp6kSkkyQ478=
  github.com/sagernet/smux v1.5.50-sing-box-mod.1/go.mod h1:NjhsCEWedJm7eFLyhuBgIEzwfhRmytrUoiLluxs5Sk8=
  github.com/sagernet/ws v0.0.0-20231204124109-acfe8907c854 h1:6uUiZcDRnZSAegryaUGwPC/Fj13JSHwiTftrXhMmYOc=
-@@ -122,8 +157,8 @@ github.com/starifly/sing-vmess v0.2.8-mod.1 h1:FnSQ8t2psjiCuAQ7I2VDHGdiQBguOKEi/
+@@ -122,8 +155,8 @@ github.com/starifly/sing-vmess v0.2.8-mod.1 h1:FnSQ8t2psjiCuAQ7I2VDHGdiQBguOKEi/
  github.com/starifly/sing-vmess v0.2.8-mod.1/go.mod h1:P11scgTxMxVVQ8dlM27yNm3Cro40mD0+gHbnqrNGDuY=
  github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
  github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
@@ -610,7 +1100,7 @@ index 0181566..8504777 100644
  github.com/ulikunitz/xz v0.5.15 h1:9DNdB5s+SgV3bQ2ApL10xRc35ck0DuIX/isZvIk+ubY=
  github.com/ulikunitz/xz v0.5.15/go.mod h1:nbz6k7qbPmH4IRqmfOplQw/tblSgqTqBwxkY0oWt/14=
  github.com/vishvananda/netns v0.0.5 h1:DfiHV+j8bA32MFM7bfEunvT8IAqQ/NzSJHtcmW5zdEY=
-@@ -136,45 +171,55 @@ github.com/zeebo/pcg v1.0.1 h1:lyqfGeWiv4ahac6ttHs+I5hwtH/+1mrhlCtVNQM2kHo=
+@@ -136,45 +169,55 @@ github.com/zeebo/pcg v1.0.1 h1:lyqfGeWiv4ahac6ttHs+I5hwtH/+1mrhlCtVNQM2kHo=
  github.com/zeebo/pcg v1.0.1/go.mod h1:09F0S9iiKrwn9rlI5yjLkmrug154/YRW6KnnXVDM/l4=
  gitlab.com/go-extension/aes-ccm v0.0.0-20230221065045-e58665ef23c7 h1:UNrDfkQqiEYzdMlNsVvBYOAJWZjdktqFE9tQh5BT2+4=
  gitlab.com/go-extension/aes-ccm v0.0.0-20230221065045-e58665ef23c7/go.mod h1:E+rxHvJG9H6PUdzq9NRG6csuLN3XUx98BfGOVWNYnXs=
@@ -682,7 +1172,7 @@ index 0181566..8504777 100644
  golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
  golang.org/x/sys v0.0.0-20210423082822-04245dca01da/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
  golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-@@ -185,23 +230,28 @@ golang.org/x/sys v0.48.0/go.mod h1:hNLxWAXmnKAxqDtdwIYC4bM9oQPEecfsnNMuSxOs3og=
+@@ -185,23 +228,28 @@ golang.org/x/sys v0.48.0/go.mod h1:hNLxWAXmnKAxqDtdwIYC4bM9oQPEecfsnNMuSxOs3og=
  golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
  golang.org/x/term v0.46.0 h1:3+OXuTbaKDgwk8jTi3aSLHRlmWqHEUDUtxnbFigO4YE=
  golang.org/x/term v0.46.0/go.mod h1:+K02xbkittuwc0Am4abfA3Fc+XRGXkvBXNO88NCXPoc=
@@ -720,10 +1210,18 @@ index 0181566..8504777 100644
  gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
  gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 diff --git a/libcore/http_test.go b/libcore/http_test.go
-index c4b4422..15cb439 100644
+index c4b4422..e2cc151 100644
 --- a/libcore/http_test.go
 +++ b/libcore/http_test.go
-@@ -19,7 +19,6 @@ import (
+@@ -5,7 +5,6 @@ import (
+ 	"bufio"
+ 	"bytes"
+ 	"context"
+-	"encoding/json"
+ 	"fmt"
+ 	"io"
+ 	"net"
+@@ -19,7 +18,6 @@ import (
  
  	utls "github.com/metacubex/utls"
  	"github.com/sagernet/sing-box/adapter"
@@ -731,7 +1229,16 @@ index c4b4422..15cb439 100644
  	"github.com/sagernet/sing-box/log"
  	"github.com/sagernet/sing-box/option"
  	"github.com/sagernet/sing-box/route/rule"
-@@ -344,7 +343,7 @@ func TestLogicalTunGuardInActualCore(t *testing.T) {
+@@ -323,7 +321,7 @@ func TestZipRefusesTraversalAndSymlinks(t *testing.T) {
+ func TestLogicalTunGuardInActualCore(t *testing.T) {
+ 	var options option.Rule
+ 	const config = `{"type":"logical","mode":"and","action":"reject","rules":[{"inbound":["tun-in"]},{"type":"logical","mode":"or","invert":true,"rules":[{"user_id":[12345,20001]},{"user_id":[1000,1051],"port":[53,853]}]}]}`
+-	if err := json.Unmarshal([]byte(config), &options); err != nil {
++	if err := options.UnmarshalJSONContext(context.Background(), []byte(config)); err != nil {
+ 		t.Fatal(err)
+ 	}
+ 	guard, err := rule.NewRule(context.Background(), log.NewNOPFactory().NewLogger("test"), options, false)
+@@ -344,7 +342,7 @@ func TestLogicalTunGuardInActualCore(t *testing.T) {
  		{"dns", "tun-in", 1000, 53, false}, {"dot", "tun-in", 1051, 853, false}, {"system other", "tun-in", 1000, 443, true}, {"unknown", "tun-in", -1, 443, true},
  	} {
  		t.Run(test.name, func(t *testing.T) {
@@ -740,6 +1247,15 @@ index c4b4422..15cb439 100644
  			if got := guard.Match(metadata); got != test.reject {
  				t.Fatalf("reject=%v, want %v", got, test.reject)
  			}
+@@ -398,7 +396,7 @@ func TestProxyOnlyNeverFallsBackOnConnectionOrHandshakeFailure(t *testing.T) {
+ func TestVirtualDNSDoesNotDialDoTThroughLAN(t *testing.T) {
+ 	var options option.Rule
+ 	const config = `{"inbound":["tun-in"],"ip_cidr":["172.19.0.2/32","fdfe:dcba:9876::2/128"],"port":[853],"action":"reject"}`
+-	if err := json.Unmarshal([]byte(config), &options); err != nil {
++	if err := options.UnmarshalJSONContext(context.Background(), []byte(config)); err != nil {
+ 		t.Fatal(err)
+ 	}
+ 	guard, err := rule.NewRule(context.Background(), log.NewNOPFactory().NewLogger("test"), options, false)
 diff --git a/libcore/interface_monitor.go b/libcore/interface_monitor.go
 index 0167666..0ac7236 100644
 --- a/libcore/interface_monitor.go
@@ -753,8 +1269,439 @@ index 0167666..0ac7236 100644
 +func (s *interfaceMonitorStub) MyInterfaces() []string {
 +	return nil
  }
+diff --git a/libcore/legacy_dns.go b/libcore/legacy_dns.go
+new file mode 100644
+index 0000000..9e3065e
+--- /dev/null
++++ b/libcore/legacy_dns.go
+@@ -0,0 +1,299 @@
++package libcore
++
++import (
++	"bytes"
++	"context"
++	stdjson "encoding/json"
++	"fmt"
++	"net"
++	"net/netip"
++	"net/url"
++	"strconv"
++	"strings"
++
++	mDNS "github.com/miekg/dns"
++	"github.com/sagernet/sing-box/adapter"
++	"github.com/sagernet/sing-box/dns"
++	"github.com/sagernet/sing-box/log"
++	"github.com/sagernet/sing-box/option"
++	singjson "github.com/sagernet/sing/common/json"
++	"github.com/sagernet/sing/common/json/badoption"
++	M "github.com/sagernet/sing/common/metadata"
++)
++
++// rcode:// is a DNS transport in old imports. Retaining a local transport also
++// preserves explicit resolver references and never substitutes network DNS.
++type legacyRcodeOptions struct {
++	Rcode option.DNSRCode `json:"rcode"`
++}
++type legacyRcodeTransport struct {
++	dns.TransportAdapter
++	rcode int
++}
++
++func newLegacyRcodeTransport(_ context.Context, _ log.ContextLogger, tag string, options legacyRcodeOptions) (adapter.DNSTransport, error) {
++	return &legacyRcodeTransport{dns.NewTransportAdapter("neko-rcode", tag, nil), int(options.Rcode)}, nil
++}
++func (t *legacyRcodeTransport) Start(adapter.StartStage, *adapter.Scope) error { return nil }
++func (t *legacyRcodeTransport) Reset()                                         {}
++func (t *legacyRcodeTransport) Exchange(_ context.Context, request *mDNS.Msg) (*mDNS.Msg, error) {
++	return new(mDNS.Msg).SetRcode(request, t.rcode), nil
++}
++func (t *legacyRcodeTransport) ExchangeAsync(ctx context.Context, request *mDNS.Msg, callback func(*mDNS.Msg, error)) {
++	response, err := t.Exchange(ctx, request)
++	callback(response, err)
++}
++
++// Decode every legacy field before conversion so bad types and unknown options
++// cannot disappear just because their transport does not use them.
++type legacyDNSServerInput struct {
++	Type                 string                `json:"type"`
++	Tag                  string                `json:"tag"`
++	Address              string                `json:"address"`
++	AddressResolver      string                `json:"address_resolver"`
++	AddressStrategy      option.DomainStrategy `json:"address_strategy"`
++	AddressFallbackDelay badoption.Duration    `json:"address_fallback_delay"`
++	Strategy             option.DomainStrategy `json:"strategy"`
++	Detour               string                `json:"detour"`
++	ClientSubnet         *badoption.Prefixable `json:"client_subnet"`
++}
++type legacyFakeIPInput struct {
++	Enabled    bool              `json:"enabled"`
++	Inet4Range *badoption.Prefix `json:"inet4_range"`
++	Inet6Range *badoption.Prefix `json:"inet6_range"`
++}
++
++func validateLegacyDNS(value any, output any) error {
++	data, err := singjson.Marshal(value)
++	if err != nil {
++		return err
++	}
++	decoder := stdjson.NewDecoder(bytes.NewReader(data))
++	decoder.DisallowUnknownFields()
++	return decoder.Decode(output)
++}
++
++func migrateLegacyDNSServers(dnsConfig map[string]any) error {
++	servers, _ := dnsConfig["servers"].([]any)
++	var fakeOptions legacyFakeIPInput
++	fake, hasFake := dnsConfig["fakeip"]
++	if hasFake && fake != nil {
++		if err := validateLegacyDNS(fake, &fakeOptions); err != nil {
++			return fmt.Errorf("invalid legacy DNS fakeip options")
++		}
++		if fakeOptions.Inet4Range != nil && !netip.Prefix(*fakeOptions.Inet4Range).Addr().Is4() {
++			return fmt.Errorf("invalid fakeip IPv4 range")
++		}
++		if fakeOptions.Inet6Range != nil && !netip.Prefix(*fakeOptions.Inet6Range).Addr().Is6() {
++			return fmt.Errorf("invalid fakeip IPv6 range")
++		}
++	}
++	// The old global ranges also applied to typed fakeip transports.
++	for _, item := range servers {
++		server, ok := item.(map[string]any)
++		if !ok || server["type"] != "fakeip" || !fakeOptions.Enabled {
++			continue
++		}
++		if ranges, ok := fake.(map[string]any); ok {
++			for _, key := range []string{"inet4_range", "inet6_range"} {
++				if _, exists := server[key]; !exists && ranges[key] != nil {
++					server[key] = ranges[key]
++				}
++			}
++		}
++	}
++	if hasFake {
++		delete(dnsConfig, "fakeip")
++	}
++	defaults := make(map[string]map[string]any)
++	bootstrapTag := "neko-legacy-bootstrap"
++	used := make(map[string]bool)
++	for i, item := range servers {
++		if server, ok := item.(map[string]any); ok {
++			tag, _ := server["tag"].(string)
++			if tag == "" {
++				tag = strconv.Itoa(i)
++			}
++			used[tag] = true
++		}
++	}
++	for used[bootstrapTag] {
++		bootstrapTag += "-local"
++	}
++	needsBootstrap := false
++	for i, item := range servers {
++		server, ok := item.(map[string]any)
++		if !ok {
++			continue
++		}
++		typeName, validType := server["type"].(string)
++		if value, exists := server["type"]; exists && value != nil && !validType {
++			return fmt.Errorf("DNS server[%d]: invalid type", i)
++		}
++		if typeName != "" && typeName != "legacy" {
++			continue
++		}
++		address, ok := server["address"].(string)
++		if !ok {
++			continue
++		}
++		var input legacyDNSServerInput
++		if err := validateLegacyDNS(server, &input); err != nil {
++			return fmt.Errorf("legacy DNS server[%d]: invalid options", i)
++		}
++
++		tag, _ := server["tag"].(string)
++		if tag == "" {
++			tag = strconv.Itoa(i)
++		}
++		converted := map[string]any{"tag": tag}
++		legacyDefaults := make(map[string]any)
++		for _, key := range []string{"strategy", "client_subnet"} {
++			if value, exists := server[key]; exists {
++				legacyDefaults[key] = value
++			}
++		}
++		defaults[tag] = legacyDefaults
++		for _, key := range []string{"detour", "address_fallback_delay"} {
++			if value, exists := server[key]; exists {
++				field := key
++				if field == "address_fallback_delay" {
++					field = "fallback_delay"
++				}
++				converted[field] = value
++			}
++		}
++		scheme, target := "udp", address
++		var parsed *url.URL
++		if strings.Contains(address, "://") {
++			var err error
++			parsed, err = url.Parse(address)
++			if err != nil || parsed.User != nil || parsed.Fragment != "" {
++				return fmt.Errorf("legacy DNS server[%d]: invalid address", i)
++			}
++			scheme, target = parsed.Scheme, parsed.Host
++		} else if address == "local" || address == "localhost" || address == "fakeip" {
++			scheme = address
++			if scheme == "localhost" {
++				scheme = "local"
++			}
++		}
++		converted["type"] = scheme
++		switch scheme {
++		case "local":
++		case "fakeip":
++			if ranges, ok := fake.(map[string]any); ok && fakeOptions.Enabled {
++				for _, key := range []string{"inet4_range", "inet6_range"} {
++					if ranges[key] != nil {
++						converted[key] = ranges[key]
++					}
++				}
++			}
++		case "rcode":
++			codes := map[string]string{"success": "NOERROR", "format_error": "FORMERR", "server_failure": "SERVFAIL", "name_error": "NXDOMAIN", "not_implemented": "NOTIMP", "refused": "REFUSED"}
++			code, exists := codes[target]
++			if !exists {
++				return fmt.Errorf("legacy DNS server[%d]: unknown rcode", i)
++			}
++			converted = map[string]any{"type": "neko-rcode", "tag": tag, "rcode": code}
++		case "dhcp":
++			if target != "auto" && target != "" {
++				converted["interface"] = target
++			}
++		case "udp", "tcp", "tls", "quic", "https", "h3":
++			// ParseSocksaddr accepts a uint16 port; reject overflow before narrowing.
++			if _, port, err := net.SplitHostPort(target); err == nil {
++				value, err := strconv.ParseUint(port, 10, 16)
++				if err != nil || value == 0 {
++					return fmt.Errorf("legacy DNS server[%d]: invalid port", i)
++				}
++			} else if strings.Contains(target, ":") {
++				if _, err := netip.ParseAddr(strings.Trim(target, "[]")); err != nil {
++					return fmt.Errorf("legacy DNS server[%d]: invalid endpoint", i)
++				}
++			}
++			endpoint := M.ParseSocksaddr(target)
++			if !endpoint.IsValid() {
++				return fmt.Errorf("legacy DNS server[%d]: invalid endpoint", i)
++			}
++			converted["server"] = endpoint.AddrString()
++			if endpoint.Port != 0 {
++				converted["server_port"] = endpoint.Port
++			}
++			if scheme == "https" || scheme == "h3" {
++				if parsed == nil {
++					return fmt.Errorf("invalid legacy HTTPS DNS address")
++				}
++				path := parsed.EscapedPath()
++				if path == "" {
++					path = "/dns-query"
++				}
++				if parsed.RawQuery != "" {
++					path += "?" + parsed.RawQuery
++				}
++				converted["path"] = path
++			}
++			resolver, _ := server["address_resolver"].(string)
++			if resolver == "" && endpoint.IsDomain() {
++				needsBootstrap, resolver = true, bootstrapTag
++			}
++			if resolver != "" {
++				options := map[string]any{"server": resolver}
++				if strategy, exists := server["address_strategy"]; exists {
++					options["strategy"] = strategy
++				}
++				converted["domain_resolver"] = options
++			}
++		default:
++			return fmt.Errorf("legacy DNS server[%d]: unsupported scheme", i)
++		}
++		servers[i] = converted
++	}
++	if len(defaults) == 0 {
++		return nil
++	}
++	if needsBootstrap {
++		servers = append(servers, map[string]any{"type": "local", "tag": bootstrapTag})
++	}
++	dnsConfig["servers"] = servers
++	if _, exists := dnsConfig["fakeip"]; exists {
++		delete(dnsConfig, "fakeip")
++	}
++	var apply func([]any)
++	apply = func(rules []any) {
++		for _, item := range rules {
++			rule, ok := item.(map[string]any)
++			if !ok {
++				continue
++			}
++			tag, _ := rule["server"].(string)
++			for key, value := range defaults[tag] {
++				if _, exists := rule[key]; !exists {
++					rule[key] = value
++				}
++			}
++			if children, ok := rule["rules"].([]any); ok {
++				apply(children)
++			}
++		}
++	}
++	rules, _ := dnsConfig["rules"].([]any)
++	apply(rules)
++	final, _ := dnsConfig["final"].(string)
++	if final == "" && len(servers) > 0 {
++		if first, ok := servers[0].(map[string]any); ok {
++			final, _ = first["tag"].(string)
++		}
++	}
++	if len(defaults[final]) > 0 {
++		fallback := map[string]any{"server": final}
++		for key, value := range defaults[final] {
++			fallback[key] = value
++		}
++		rules = append(rules, fallback)
++	}
++	if rules != nil {
++		dnsConfig["rules"] = rules
++	}
++	return nil
++}
+diff --git a/libcore/legacy_dns_test.go b/libcore/legacy_dns_test.go
+new file mode 100644
+index 0000000..06cdbf7
+--- /dev/null
++++ b/libcore/legacy_dns_test.go
+@@ -0,0 +1,120 @@
++package libcore
++
++import (
++	"context"
++	"encoding/json"
++	box "github.com/sagernet/sing-box"
++	"github.com/sagernet/sing-box/option"
++	"strings"
++	"sync/atomic"
++	"testing"
++	"time"
++
++	mDNS "github.com/miekg/dns"
++	"github.com/sagernet/sing-box/adapter"
++	"github.com/sagernet/sing/service"
++)
++
++func TestLegacyDNSURLsRetainPathBootstrapAndPreferences(t *testing.T) {
++	const raw = `{"dns":{"servers":[{"tag":"bootstrap","address":"local"},{"tag":"remote","address":"https://dns.example.test:8443/a%2Fb?profile=fixture","address_resolver":"bootstrap","address_strategy":"ipv4_only","strategy":"prefer_ipv6","detour":"proxy","client_subnet":"192.0.2.0/24"}],"rules":[{"domain":["example.test"],"server":"remote"}],"final":"remote"}}`
++	root := normalizedConfig(t, raw)
++	dns := root["dns"].(map[string]any)
++	server := dns["servers"].([]any)[1].(map[string]any)
++	if server["type"] != "https" || server["server"] != "dns.example.test" || server["server_port"] != float64(8443) || server["path"] != "/a%2Fb?profile=fixture" || server["detour"] != "proxy" {
++		t.Fatal("lost DNS URL or detour")
++	}
++	resolver := server["domain_resolver"].(map[string]any)
++	if resolver["server"] != "bootstrap" || resolver["strategy"] != "ipv4_only" {
++		t.Fatal("lost bootstrap resolver preference")
++	}
++	for _, item := range dns["rules"].([]any) {
++		rule := item.(map[string]any)
++		if rule["server"] == "remote" && (rule["strategy"] != "prefer_ipv6" || rule["client_subnet"] != "192.0.2.0/24") {
++			t.Fatal("lost per-server DNS options")
++		}
++	}
++	encoded, _ := json.Marshal(root)
++	if strings.Contains(string(encoded), `"address"`) {
++		t.Fatal("left a legacy DNS address")
++	}
++	aliases := normalizedConfig(t, `{"dns":{"servers":[{"address":"localhost"},{"address":"udp://127.0.0.1:5353"},{"address":"https://resolver.example.test/query?key=fixture"}]}}`)
++	items := aliases["dns"].(map[string]any)["servers"].([]any)
++	if items[0].(map[string]any)["type"] != "local" || items[1].(map[string]any)["type"] != "udp" || items[1].(map[string]any)["server_port"] != float64(5353) {
++		t.Fatal("changed explicit loopback or bare system DNS alias")
++	}
++	if len(items) != 4 || items[2].(map[string]any)["domain_resolver"] == nil {
++		t.Fatal("legacy hostname DNS needs independent bootstrap")
++	}
++}
++
++func TestLegacyRcodeResolverNeverUsesNetworkFallback(t *testing.T) {
++	for _, code := range []struct {
++		name  string
++		value int
++	}{{"refused", mDNS.RcodeRefused}, {"success", mDNS.RcodeSuccess}, {"name_error", mDNS.RcodeNameError}} {
++		t.Run(code.name, func(t *testing.T) {
++			var networkCalls atomic.Int32
++			local := &testLocalDNS{lookup: func(*ExchangeContext, string) { networkCalls.Add(1) }}
++			ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(local), nekoboxAndroidServiceRegistry(), nekoboxAndroidCertificateRegistry())
++			ctx = service.ContextWithDefaultRegistry(ctx)
++			service.MustRegister[adapter.PlatformInterface](ctx, &dnsTestPlatform{})
++			var options option.Options
++			if err := decodeConfigOptions(ctx, []byte(`{"dns":{"servers":[{"address":"rcode://`+code.name+`","tag":"local-only"}],"final":"local-only"},"outbounds":[{"type":"direct","tag":"direct"}]}`), &options); err != nil {
++				t.Fatal(err)
++			}
++			instance, err := box.New(box.Options{Context: ctx, Options: options})
++			if err != nil {
++				t.Fatal(err)
++			}
++			defer instance.Close()
++			if err := instance.Start(); err != nil {
++				t.Fatal(err)
++			}
++			router := service.FromContext[adapter.DNSRouter](ctx)
++			qctx, cancel := context.WithTimeout(ctx, time.Second)
++			defer cancel()
++			response, err := router.Exchange(qctx, new(mDNS.Msg).SetQuestion("test.example.", mDNS.TypeA), adapter.DNSQueryOptions{})
++			if err != nil || response.Rcode != code.value {
++				t.Fatalf("rcode changed: %v %v", response, err)
++			}
++			if networkCalls.Load() != 0 {
++				t.Fatal("rcode resolver leaked to system DNS")
++			}
++		})
++	}
++}
++
++func TestLegacyDNSMigrationRejectsInvalidOptions(t *testing.T) {
++	for _, raw := range []string{
++		`{"dns":{"servers":[{"address":"local","tag":7}]}}`,
++		`{"dns":{"servers":[{"address":"local","detour":true}]}}`,
++		`{"dns":{"servers":[{"address":"local","address_resolver":3}]}}`,
++		`{"dns":{"servers":[{"address":"local","strategy":"invalid"}]}}`,
++		`{"dns":{"servers":[{"address":"local","address_strategy":"invalid"}]}}`,
++		`{"dns":{"servers":[{"address":"local","address_fallback_delay":"oops"}]}}`,
++		`{"dns":{"servers":[{"address":"local","client_subnet":"invalid"}]}}`,
++		`{"dns":{"servers":[{"address":"https://dns.test:99999/query"}]}}`,
++		`{"dns":{"servers":[{"address":"local","unknown":true}]}}`,
++		`{"dns":{"fakeip":{"enabled":true,"unknown":true}}}`,
++		`{"dns":{"fakeip":{"enabled":"true"}}}`,
++		`{"dns":{"fakeip":{"enabled":true,"inet4_range":"fd00::/8"}}}`,
++	} {
++		if _, err := normalizeConfigJSON(context.Background(), []byte(raw)); err == nil {
++			t.Errorf("accepted invalid options: %s", raw)
++		}
++	}
++}
++
++func TestLegacyFakeIPRangesPreserveTypedOverrides(t *testing.T) {
++	root := normalizedConfig(t, `{"dns":{"fakeip":{"enabled":true,"inet4_range":"198.18.0.0/15","inet6_range":"fc00::/18"},"servers":[{"type":"fakeip","tag":"typed","inet4_range":"198.19.0.0/16"},{"address":"fakeip","tag":"old"}]}}`)
++	dns := root["dns"].(map[string]any)
++	if _, exists := dns["fakeip"]; exists {
++		t.Fatal("left legacy global options")
++	}
++	servers := dns["servers"].([]any)
++	typed := servers[0].(map[string]any)
++	old := servers[1].(map[string]any)
++	if typed["inet4_range"] != "198.19.0.0/16" || typed["inet6_range"] != "fc00::/18" || old["inet4_range"] != "198.18.0.0/15" {
++		t.Fatal("lost FakeIP ranges or explicit override")
++	}
++}
 diff --git a/libcore/platform_box.go b/libcore/platform_box.go
-index 966c9ef..368558f 100644
+index 966c9ef..08b0a4c 100644
 --- a/libcore/platform_box.go
 +++ b/libcore/platform_box.go
 @@ -13,8 +13,6 @@ import (
@@ -766,7 +1713,7 @@ index 966c9ef..368558f 100644
  	sblog "github.com/sagernet/sing-box/log"
  	"github.com/sagernet/sing-box/option"
  	tun "github.com/sagernet/sing-tun"
-@@ -23,11 +21,11 @@ import (
+@@ -23,12 +21,12 @@ import (
  	N "github.com/sagernet/sing/common/network"
  )
  
@@ -777,10 +1724,12 @@ index 966c9ef..368558f 100644
 +type boxPlatformInterfaceWrapper struct{ platformUnsupportedInterface }
  
 -func (w *boxPlatformInterfaceWrapper) ReadWIFIState() adapter.WIFIState {
+-	state := strings.Split(intfBox.WIFIState(), ",")
 +func (w *boxPlatformInterfaceWrapper) ReadWIFIState(ctx context.Context) adapter.WIFIState {
- 	state := strings.Split(intfBox.WIFIState(), ",")
++	state := strings.SplitN(intfBox.WIFIState()+",", ",", 2)
  	return adapter.WIFIState{
  		SSID:  state[0],
+ 		BSSID: state[1],
 @@ -53,7 +51,7 @@ func (w *boxPlatformInterfaceWrapper) AutoDetectInterfaceControl(fd int) error {
  	return intfBox.AutoDetectInterfaceControl(int32(fd))
  }
@@ -817,20 +1766,42 @@ index 966c9ef..368558f 100644
  }
  
  // io.Writer
-@@ -173,3 +171,14 @@ func (w *boxPlatformLogWriterWrapper) WriteMessage(level uint8, message string)
+@@ -173,3 +171,36 @@ func (w *boxPlatformLogWriterWrapper) WriteMessage(level uint8, message string)
  	}
  	neko_log.LogWriter.Write([]byte(redactDiagnostic(message)))
  }
 +
-+func (w *boxPlatformInterfaceWrapper) UsePlatformInterface() bool { return true }
++func (w *boxPlatformInterfaceWrapper) UsePlatformInterface() bool             { return true }
 +func (w *boxPlatformInterfaceWrapper) UsePlatformConnectionOwnerFinder() bool { return true }
 +func (w *boxPlatformInterfaceWrapper) FindConnectionOwner(request *adapter.FindConnectionOwnerRequest) (*adapter.ConnectionOwner, error) {
-+ network := "tcp"; if request.IpProtocol == syscall.IPPROTO_UDP { network = "udp" }
-+ source, err := netip.ParseAddr(request.SourceAddress); if err != nil { return nil, err }
-+ destination, err := netip.ParseAddr(request.DestinationAddress); if err != nil { return nil, err }
-+ info, err := w.findProcessInfo(context.Background(), network, netip.AddrPortFrom(source, uint16(request.SourcePort)), netip.AddrPortFrom(destination, uint16(request.DestinationPort)))
-+ if err != nil { return nil, err }
-+ return info, nil
++	if request == nil {
++		return nil, E.New("missing connection owner request")
++	}
++	var network string
++	switch request.IpProtocol {
++	case syscall.IPPROTO_TCP:
++		network = N.NetworkTCP
++	case syscall.IPPROTO_UDP:
++		network = N.NetworkUDP
++	default:
++		return nil, E.New("unsupported owner protocol")
++	}
++	if request.SourcePort < 0 || request.SourcePort > 65535 || request.DestinationPort < 0 || request.DestinationPort > 65535 {
++		return nil, E.New("invalid owner port")
++	}
++	source, err := netip.ParseAddr(request.SourceAddress)
++	if err != nil {
++		return nil, err
++	}
++	destination, err := netip.ParseAddr(request.DestinationAddress)
++	if err != nil {
++		return nil, err
++	}
++	info, err := w.findProcessInfo(context.Background(), network, netip.AddrPortFrom(source, uint16(request.SourcePort)), netip.AddrPortFrom(destination, uint16(request.DestinationPort)))
++	if err != nil {
++		return nil, err
++	}
++	return info, nil
 +}
 diff --git a/libcore/platform_unsupported.go b/libcore/platform_unsupported.go
 new file mode 100644

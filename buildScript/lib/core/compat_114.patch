@@ -1,3 +1,15 @@
+diff --git a/adapter/network.go b/adapter/network.go
+index c3ae515..b95daf8 100644
+--- a/adapter/network.go
++++ b/adapter/network.go
+@@ -38,6 +38,7 @@ type NetworkManager interface {
+ }
+ 
+ type NetworkOptions struct {
++ ConcurrentDial bool
+ 	BindInterface        string
+ 	RoutingMark          uint32
+ 	DomainResolver       string
 diff --git a/adapter/outbound_stats.go b/adapter/outbound_stats.go
 new file mode 100644
 index 0000000..7529f20
@@ -412,10 +424,10 @@ index 0000000..df2abde
 +}
 diff --git a/common/congestion/congestion.go b/common/congestion/congestion.go
 new file mode 100644
-index 0000000..1d95827
+index 0000000..ef10f95
 --- /dev/null
 +++ b/common/congestion/congestion.go
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,47 @@
 +package congestion
 +
 +import (
@@ -435,10 +447,13 @@ index 0000000..1d95827
 +	if cwnd == 0 {
 +		cwnd = 32
 +	}
++	if cwnd < 4 || cwnd > int(qcongestion.MaxCongestionWindowPackets) {
++		return nil, E.New("invalid congestion window")
++	}
 +	switch name {
 +	case "", "bbr":
 +		return func(conn *quic.Conn) qcongestion.CongestionControl {
-+			return congestion_meta2.NewBbrSenderWithProfile(conn.InitialPacketSize(), congestion_meta2.ProfileStandard)
++			return congestion_meta2.NewBbrSenderWithInitialWindow(conn.InitialPacketSize(), uint32(cwnd))
 +		}, nil
 +	case "cubic":
 +		return func(conn *quic.Conn) qcongestion.CongestionControl {
@@ -460,6 +475,220 @@ index 0000000..1d95827
 +		return nil, E.New("unknown congestion control: ", name)
 +	}
 +}
+diff --git a/common/dialer/default.go b/common/dialer/default.go
+index f202283..0f7c991 100644
+--- a/common/dialer/default.go
++++ b/common/dialer/default.go
+@@ -31,6 +31,7 @@ var (
+ )
+ 
+ type DefaultDialer struct {
++ concurrentDial bool
+ 	dialer4                tfo.Dialer
+ 	dialer6                tfo.Dialer
+ 	udpDialer4             net.Dialer
+@@ -229,6 +230,7 @@ func NewDefault(ctx context.Context, options option.DialerOptions) (*DefaultDial
+ 	tcpDialer4 := tfo.Dialer{Dialer: dialer4, DisableTFO: !options.TCPFastOpen}
+ 	tcpDialer6 := tfo.Dialer{Dialer: dialer6, DisableTFO: !options.TCPFastOpen}
+ 	return &DefaultDialer{
++ concurrentDial: options.ConcurrentDial || (networkManager != nil && networkManager.DefaultOptions().ConcurrentDial),
+ 		dialer4:                tcpDialer4,
+ 		dialer6:                tcpDialer6,
+ 		udpDialer4:             udpDialer4,
+@@ -268,6 +270,7 @@ func setMarkWrapper(networkManager adapter.NetworkManager, mark uint32, isDefaul
+ }
+ 
+ func (d *DefaultDialer) DialContext(ctx context.Context, network string, address M.Socksaddr) (net.Conn, error) {
++ ctx = context.WithValue(ctx, concurrentDialContextKey{}, d.concurrentDial)
+ 	if !address.IsValid() {
+ 		return nil, E.New("invalid address")
+ 	} else if address.IsDomain() {
+@@ -296,6 +299,7 @@ func (d *DefaultDialer) DialContext(ctx context.Context, network string, address
+ }
+ 
+ func (d *DefaultDialer) DialParallelInterface(ctx context.Context, network string, address M.Socksaddr, strategy *C.NetworkStrategy, interfaceType []C.InterfaceType, fallbackInterfaceType []C.InterfaceType, fallbackDelay time.Duration) (net.Conn, error) {
++ ctx = context.WithValue(ctx, concurrentDialContextKey{}, d.concurrentDial)
+ 	if strategy == nil {
+ 		strategy = d.networkStrategy
+ 	}
+diff --git a/common/dialer/neko_concurrent.go b/common/dialer/neko_concurrent.go
+new file mode 100644
+index 0000000..e2f6f31
+--- /dev/null
++++ b/common/dialer/neko_concurrent.go
+@@ -0,0 +1,53 @@
++package dialer
++
++import (
++	"context"
++	N "github.com/sagernet/sing/common/network"
++	"net"
++)
++
++type concurrentDialContextKey struct{}
++
++// Race connect attempts only. Fast Open writes still take the single-dial path,
++// so application data is never replayed on losing connections.
++func dialTCPConcurrently(ctx context.Context, network string, dial func(context.Context) (net.Conn, error)) (net.Conn, error) {
++	if err := ctx.Err(); err != nil {
++		return nil, err
++	}
++	enabled, _ := ctx.Value(concurrentDialContextKey{}).(bool)
++	if !enabled || ctx.Value("nb4a_no_concurrent_dial") == true || N.NetworkName(network) != N.NetworkTCP {
++		return dial(ctx)
++	}
++	raceCtx, cancel := context.WithCancel(ctx)
++	defer cancel()
++	type result struct {
++		conn net.Conn
++		err  error
++	}
++	results := make(chan result)
++	for range 3 {
++		go func() {
++			conn, err := dial(raceCtx)
++			select {
++			case results <- result{conn, err}:
++			case <-raceCtx.Done():
++				if conn != nil {
++					conn.Close()
++				}
++			}
++		}()
++	}
++	var lastError error
++	for range 3 {
++		select {
++		case item := <-results:
++			if item.err == nil {
++				return item.conn, nil
++			}
++			lastError = item.err
++		case <-ctx.Done():
++			return nil, ctx.Err()
++		}
++	}
++	return nil, lastError
++}
+diff --git a/common/dialer/neko_concurrent_test.go b/common/dialer/neko_concurrent_test.go
+new file mode 100644
+index 0000000..5ec39c8
+--- /dev/null
++++ b/common/dialer/neko_concurrent_test.go
+@@ -0,0 +1,100 @@
++package dialer
++
++import (
++	"context"
++	"errors"
++	"net"
++	"sync"
++	"sync/atomic"
++	"testing"
++	"time"
++)
++
++type countedConn struct {
++	net.Conn
++	closed  atomic.Bool
++	onClose func()
++}
++
++func (c *countedConn) Close() error {
++	if c.closed.CompareAndSwap(false, true) {
++		c.onClose()
++		return c.Conn.Close()
++	}
++	return nil
++}
++
++func TestConcurrentConnectClosesLosers(t *testing.T) {
++	ctx, cancel := context.WithTimeout(context.WithValue(context.Background(), concurrentDialContextKey{}, true), time.Second)
++	defer cancel()
++	var started atomic.Int32
++	var closed atomic.Int32
++	barrier := make(chan struct{})
++	var peers sync.WaitGroup
++	peers.Add(3)
++	winner, err := dialTCPConcurrently(ctx, "tcp", func(context.Context) (net.Conn, error) {
++		left, right := net.Pipe()
++		go func() { defer peers.Done(); defer right.Close(); var b [1]byte; right.Read(b[:]) }()
++		if started.Add(1) == 3 {
++			close(barrier)
++		}
++		<-barrier
++		return &countedConn{Conn: left, onClose: func() { closed.Add(1) }}, nil
++	})
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer winner.Close()
++	done := make(chan struct{})
++	go func() {
++		for closed.Load() != 2 {
++			select {
++			case <-ctx.Done():
++				close(done)
++				return
++			default:
++				time.Sleep(time.Millisecond)
++			}
++		}
++		close(done)
++	}()
++	<-done
++	if started.Load() != 3 || closed.Load() != 2 {
++		t.Fatalf("started %d closed %d", started.Load(), closed.Load())
++	}
++	if winner.(*countedConn).closed.Load() {
++		t.Fatal("winner was closed")
++	}
++	winner.Close()
++	peers.Wait()
++}
++
++func TestConcurrentConnectPolicyAndErrors(t *testing.T) {
++	sentinel := errors.New("dial failure")
++	for _, test := range []struct {
++		name, network  string
++		enabled, probe bool
++		calls          int
++	}{
++		{"enabled", "tcp", true, false, 3}, {"disabled", "tcp", false, false, 1},
++		{"UDP", "udp", true, false, 1}, {"probe", "tcp", true, true, 1},
++	} {
++		t.Run(test.name, func(t *testing.T) {
++			ctx := context.WithValue(context.Background(), concurrentDialContextKey{}, test.enabled)
++			if test.probe {
++				ctx = context.WithValue(ctx, "nb4a_no_concurrent_dial", true)
++			}
++			var count atomic.Int32
++			_, err := dialTCPConcurrently(ctx, test.network, func(context.Context) (net.Conn, error) { count.Add(1); return nil, sentinel })
++			if !errors.Is(err, sentinel) || count.Load() != int32(test.calls) {
++				t.Fatalf("calls %d, err %v", count.Load(), err)
++			}
++		})
++	}
++	ctx, cancel := context.WithCancel(context.WithValue(context.Background(), concurrentDialContextKey{}, true))
++	cancel()
++	_, err := dialTCPConcurrently(ctx, "tcp", func(context.Context) (net.Conn, error) { t.Error("dial after cancellation"); return nil, sentinel })
++	if !errors.Is(err, context.Canceled) {
++		t.Fatal(err)
++	}
++}
+diff --git a/common/dialer/tfo.go b/common/dialer/tfo.go
+index fec2aaf..09c75c0 100644
+--- a/common/dialer/tfo.go
++++ b/common/dialer/tfo.go
+@@ -35,7 +35,7 @@ func DialSlowContext(dialer *tfo.Dialer, ctx context.Context, network string, de
+ 	if dialer.DisableTFO || N.NetworkName(network) != N.NetworkTCP {
+ 		switch N.NetworkName(network) {
+ 		case N.NetworkTCP, N.NetworkUDP:
+-			return dialer.Dialer.DialContext(ctx, network, destination.String())
++			return dialTCPConcurrently(ctx, network, func(dialCtx context.Context) (net.Conn, error) { return dialer.Dialer.DialContext(dialCtx, network, destination.String()) })
+ 		default:
+ 			return dialer.Dialer.DialContext(ctx, network, destination.AddrString())
+ 		}
 diff --git a/common/expiringmap/map.go b/common/expiringmap/map.go
 new file mode 100644
 index 0000000..725f017
@@ -1024,7 +1253,7 @@ index 0000000..6648442
 +	wg.Wait()
 +}
 diff --git a/common/urltest/urltest.go b/common/urltest/urltest.go
-index 26efe39..1a81d3f 100644
+index 26efe39..ce94db2 100644
 --- a/common/urltest/urltest.go
 +++ b/common/urltest/urltest.go
 @@ -3,6 +3,7 @@ package urltest
@@ -1035,7 +1264,15 @@ index 26efe39..1a81d3f 100644
  	"net"
  	"net/http"
  	"net/url"
-@@ -151,3 +152,68 @@ func urlTest(ctx context.Context, link string, detour N.Dialer) (t uint16, err e
+@@ -81,6 +82,7 @@ func (s *HistoryStorage) Close() error {
+ }
+ 
+ func URLTest(ctx context.Context, link string, detour N.Dialer) (uint16, error) {
++ ctx = context.WithValue(ctx, "nb4a_no_concurrent_dial", true)
+ 	multiplexOutbound, isMultiplexOutbound := common.Cast[adapter.OutboundWithMultiplex](detour)
+ 	if isMultiplexOutbound && multiplexOutbound.MultiplexEnabled() {
+ 		warmContext := adapter.ContextWithKeepSession(ctx)
+@@ -151,3 +153,68 @@ func urlTest(ctx context.Context, link string, detour N.Dialer) (t uint16, err e
  	t = uint16(time.Since(start) / time.Millisecond)
  	return
  }
@@ -4910,6 +5147,42 @@ index c3089a6..167a0fd 100644
 +
 +const V2RayTransportTypeXHTTP = "xhttp"
 +const V2RayTransportTypeKCP = "kcp"
+diff --git a/dns/transport/https.go b/dns/transport/https.go
+index 4d5d3fb..a005d3d 100644
+--- a/dns/transport/https.go
++++ b/dns/transport/https.go
+@@ -96,7 +96,12 @@ func NewHTTPS(ctx context.Context, logger log.ContextLogger, tag string, options
+ 	if path == "" {
+ 		path = "/dns-query"
+ 	}
+-	err = sHTTP.URLSetPath(&destinationURL, path)
++	requestPath, parseErr := url.Parse(path)
++	if parseErr != nil || requestPath.Scheme != "" || requestPath.Host != "" || requestPath.Fragment != "" {
++		return nil, E.New("invalid DNS request path")
++	}
++	destinationURL.RawQuery = requestPath.RawQuery
++	err = sHTTP.URLSetPath(&destinationURL, requestPath.EscapedPath())
+ 	if err != nil {
+ 		return nil, err
+ 	}
+diff --git a/dns/transport/quic/http3.go b/dns/transport/quic/http3.go
+index e50d47c..cd61f35 100644
+--- a/dns/transport/quic/http3.go
++++ b/dns/transport/quic/http3.go
+@@ -89,7 +89,12 @@ func NewHTTP3(ctx context.Context, logger log.ContextLogger, tag string, options
+ 	if path == "" {
+ 		path = "/dns-query"
+ 	}
+-	err = sHTTP.URLSetPath(&destinationURL, path)
++	requestPath, parseErr := url.Parse(path)
++	if parseErr != nil || requestPath.Scheme != "" || requestPath.Host != "" || requestPath.Fragment != "" {
++		return nil, E.New("invalid DNS request path")
++	}
++	destinationURL.RawQuery = requestPath.RawQuery
++	err = sHTTP.URLSetPath(&destinationURL, requestPath.EscapedPath())
+ 	if err != nil {
+ 		return nil, err
+ 	}
 diff --git a/nekoutils/callback.go b/nekoutils/callback.go
 new file mode 100644
 index 0000000..97f5612
@@ -5009,6 +5282,65 @@ index bc0c07e..2d43bc0 100644
 +	WaitForInitial            bool               `json:"wait_for_initial,omitempty"`
  	InterruptExistConnections bool               `json:"interrupt_exist_connections,omitempty"`
  }
+diff --git a/option/outbound.go b/option/outbound.go
+index 4590b48..7d50df3 100644
+--- a/option/outbound.go
++++ b/option/outbound.go
+@@ -40,10 +40,6 @@ func (h *Outbound) UnmarshalJSONContext(ctx context.Context, content []byte) err
+ 	if registry == nil {
+ 		return E.New("missing outbound options registry in context")
+ 	}
+-	switch h.Type {
+-	case C.TypeDNS:
+-		return E.New("dns outbound is deprecated in sing-box 1.11.0 and removed in sing-box 1.13.0, use rule actions instead")
+-	}
+ 	options, loaded := registry.CreateOptions(h.Type)
+ 	if !loaded {
+ 		return E.New("unknown outbound type: ", h.Type)
+@@ -83,6 +79,7 @@ type DialerOptions struct {
+ }
+ 
+ type AbstractDialerOptions struct {
++ ConcurrentDial bool `json:"concurrent_dial,omitempty"`
+ 	BindInterface              string                            `json:"bind_interface,omitempty"`
+ 	Inet4BindAddress           *badoption.Addr                   `json:"inet4_bind_address,omitempty"`
+ 	Inet6BindAddress           *badoption.Addr                   `json:"inet6_bind_address,omitempty"`
+diff --git a/option/route.go b/option/route.go
+index 39f3cfb..a33fd51 100644
+--- a/option/route.go
++++ b/option/route.go
+@@ -3,6 +3,7 @@ package option
+ import "github.com/sagernet/sing/common/json/badoption"
+ 
+ type RouteOptions struct {
++ ConcurrentDial bool `json:"concurrent_dial,omitempty"`
+ 	GeoIP                      *GeoIPOptions                     `json:"geoip,omitempty" schema:"omit"`
+ 	Geosite                    *GeositeOptions                   `json:"geosite,omitempty" schema:"omit"`
+ 	Rules                      []Rule                            `json:"rules,omitempty"`
+diff --git a/option/rule_action.go b/option/rule_action.go
+index ae05200..575d381 100644
+--- a/option/rule_action.go
++++ b/option/rule_action.go
+@@ -323,6 +323,7 @@ func (r *RejectActionOptions) UnmarshalJSON(bytes []byte) error {
+ }
+ 
+ type RouteActionSniff struct {
++ OverrideDestination bool `json:"override_destination,omitempty"`
+ 	Sniffer badoption.Listable[string] `json:"sniffer,omitempty" enum:"tls,http,quic,dns,stun,bittorrent,dtls,ssh,rdp,ntp"`
+ 	Timeout badoption.Duration         `json:"timeout,omitempty"`
+ }
+diff --git a/option/rule_dns.go b/option/rule_dns.go
+index 9124a58..4fa1d47 100644
+--- a/option/rule_dns.go
++++ b/option/rule_dns.go
+@@ -135,6 +135,7 @@ func (m DNSRuleMatchResponse) DescribeSchema(builder schema.Builder) (*schema.No
+ }
+ 
+ type RawDefaultDNSRule struct {
++ LegacyQueryType badoption.Listable[DNSQueryType] `json:"neko_legacy_query_type,omitempty" schema:"omit"`
+ 	Inbound                  badoption.Listable[string]                                                  `json:"inbound,omitempty" reference:"inbound"`
+ 	IPVersion                int                                                                         `json:"ip_version,omitempty" enum:"4,6"`
+ 	QueryType                badoption.Listable[DNSQueryType]                                            `json:"query_type,omitempty"`
 diff --git a/option/v2ray_transport.go b/option/v2ray_transport.go
 index 8788151..2316b05 100644
 --- a/option/v2ray_transport.go
@@ -5711,7 +6043,7 @@ index d25d0d2..59a4910 100644
 +	Reserved     []uint8                          `json:"reserved,omitempty"`
 +}
 diff --git a/protocol/direct/outbound.go b/protocol/direct/outbound.go
-index af8826b..84e4d93 100644
+index af8826b..c53defc 100644
 --- a/protocol/direct/outbound.go
 +++ b/protocol/direct/outbound.go
 @@ -2,9 +2,14 @@ package direct
@@ -5729,35 +6061,25 @@ index af8826b..84e4d93 100644
  	"time"
  
  	"github.com/sagernet/sing-box/adapter"
-@@ -13,15 +18,11 @@ import (
- 	C "github.com/sagernet/sing-box/constant"
- 	"github.com/sagernet/sing-box/log"
- 	"github.com/sagernet/sing-box/option"
--	"github.com/sagernet/sing-tun"
--	"github.com/sagernet/sing-tun/ping"
--	"github.com/sagernet/sing/common"
--	"github.com/sagernet/sing/common/control"
+@@ -16,6 +21,7 @@ import (
+ 	"github.com/sagernet/sing-tun"
+ 	"github.com/sagernet/sing-tun/ping"
+ 	"github.com/sagernet/sing/common"
 +	"github.com/sagernet/sing/common/bufio"
+ 	"github.com/sagernet/sing/common/control"
  	E "github.com/sagernet/sing/common/exceptions"
  	"github.com/sagernet/sing/common/logger"
- 	M "github.com/sagernet/sing/common/metadata"
- 	N "github.com/sagernet/sing/common/network"
--	"github.com/sagernet/sing/service"
- )
- 
- func RegisterOutbound(registry *outbound.Registry) {
-@@ -29,24 +30,29 @@ func RegisterOutbound(registry *outbound.Registry) {
+@@ -29,24 +35,35 @@ func RegisterOutbound(registry *outbound.Registry) {
  }
  
  var (
--	_ N.ParallelDialer                = (*Outbound)(nil)
--	_ dialer.ParallelNetworkDialer    = (*Outbound)(nil)
--	_ dialer.DirectDialer             = (*Outbound)(nil)
++	_ adapter.FlowOutbound            = (*Outbound)(nil)
++	_ adapter.InterfaceUpdateListener = (*Outbound)(nil)
+ 	_ N.ParallelDialer                = (*Outbound)(nil)
+ 	_ dialer.ParallelNetworkDialer    = (*Outbound)(nil)
+ 	_ dialer.DirectDialer             = (*Outbound)(nil)
 -	_ adapter.FlowOutbound            = (*Outbound)(nil)
 -	_ adapter.InterfaceUpdateListener = (*Outbound)(nil)
-+	_ N.ParallelDialer             = (*Outbound)(nil)
-+	_ dialer.ParallelNetworkDialer = (*Outbound)(nil)
-+	_ dialer.DirectDialer          = (*Outbound)(nil)
  )
  
  type Outbound struct {
@@ -5779,7 +6101,11 @@ index af8826b..84e4d93 100644
 +	overrideDestination M.Socksaddr
 +	isEmpty             bool
 +	// loopBack *loopBackDetector
-+	fragment *Fragment
++	fragment    *Fragment
++	ctx         context.Context
++	network     adapter.NetworkManager
++	myAddresses common.TypedValue[[]netip.Prefix]
++	icmpPort    *ping.Port
 +}
 +
 +type Fragment struct {
@@ -5790,15 +6116,14 @@ index af8826b..84e4d93 100644
  }
  
  func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.DirectOutboundOptions) (adapter.Outbound, error) {
-@@ -64,99 +70,101 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
- 		return nil, err
+@@ -65,22 +82,86 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
  	}
  	outbound := &Outbound{
--		Adapter: outbound.NewAdapterWithDialerOptions(C.TypeDirect, tag, []string{N.NetworkTCP, N.NetworkUDP, N.NetworkICMP}, options.DialerOptions),
+ 		Adapter: outbound.NewAdapterWithDialerOptions(C.TypeDirect, tag, []string{N.NetworkTCP, N.NetworkUDP, N.NetworkICMP}, options.DialerOptions),
 -		ctx:     ctx,
-+		Adapter: outbound.NewAdapterWithDialerOptions(C.TypeDirect, tag, []string{N.NetworkTCP, N.NetworkUDP}, options.DialerOptions),
  		logger:  logger,
--		network: service.FromContext[adapter.NetworkManager](ctx),
++		ctx:     ctx,
+ 		network: service.FromContext[adapter.NetworkManager](ctx),
  		//nolint:staticcheck
  		domainStrategy: C.DomainStrategy(options.DomainStrategy),
  		fallbackDelay:  time.Duration(options.FallbackDelay),
@@ -5815,9 +6140,6 @@ index af8826b..84e4d93 100644
  		return nil, E.New("Proxy Protocol is deprecated and removed in sing-box 1.6.0")
  	}
 -	if defaultDialer, isDefaultDialer := common.Cast[*dialer.DefaultDialer](outbound.dialer); isDefaultDialer {
--		outbound.icmpPort = ping.NewPort(ctx, logger, func(destination netip.Addr) control.Func {
--			return defaultDialer.DialerForICMPDestination(destination).Control
--		}, 0)
 +	//nolint:staticcheck
 +	if options.OverrideAddress != "" && options.OverridePort != 0 {
 +		outbound.overrideOption = 1
@@ -5828,22 +6150,11 @@ index af8826b..84e4d93 100644
 +	} else if options.OverridePort != 0 {
 +		outbound.overrideOption = 3
 +		outbound.overrideDestination = M.Socksaddr{Port: options.OverridePort}
- 	}
--	return outbound, nil
--}
--
--func (h *Outbound) Start(stage adapter.StartStage, scope *adapter.Scope) error {
--	switch stage {
--	case adapter.StartStateInitialize:
--		if h.icmpPort != nil {
--			scope.Add(h.icmpPort.Close)
++	}
 +	if options.Fragment != nil {
 +		if len(options.Fragment.Interval) == 0 || len(options.Fragment.Length) == 0 {
 +			return nil, E.New("Invalid interval or length")
- 		}
--	case adapter.StartStatePostStart, adapter.StartStateStarted:
--		if len(h.myAddresses.Load()) == 0 {
--			h.fetchMyAddresses()
++		}
 +		intervalMinMax := strings.Split(options.Fragment.Interval, "-")
 +		var minInterval, maxInterval int64
 +		var err, err2 error
@@ -5859,26 +6170,8 @@ index af8826b..84e4d93 100644
 +		}
 +		if err2 != nil {
 +			return nil, E.Cause(err2, "Invalid maximum interval: ")
- 		}
--	}
--	return nil
--}
- 
--func (h *Outbound) fetchMyAddresses() {
--	interfaceMonitor := h.network.InterfaceMonitor()
--	if interfaceMonitor == nil {
--		return
--	}
--	myInterfaceNames := interfaceMonitor.MyInterfaces()
--	if len(myInterfaceNames) == 0 {
--		return
--	}
--	var (
--		myAddresses []netip.Prefix
--		found       bool
--	)
--	for _, myInterfaceName := range myInterfaceNames {
--		myInterface, err := h.network.InterfaceFinder().ByName(myInterfaceName)
++		}
++
 +		lengthMinMax := strings.Split(options.Fragment.Length, "-")
 +		var minLength, maxLength int64
 +		if len(lengthMinMax) == 2 {
@@ -5889,60 +6182,33 @@ index af8826b..84e4d93 100644
 +			minLength, err = strconv.ParseInt(lengthMinMax[0], 10, 64)
 +			maxLength = minLength
 +		}
- 		if err != nil {
--			continue
++		if err != nil {
 +			return nil, E.Cause(err, "Invalid minimum length: ")
 +		}
 +		if err2 != nil {
 +			return nil, E.Cause(err2, "Invalid maximum length: ")
- 		}
--		found = true
--		myAddresses = append(myAddresses, myInterface.Addresses...)
--	}
--	if !found {
--		return
--	}
--	h.myAddresses.Store(myAddresses)
--}
- 
--func (h *Outbound) InterfaceUpdated(ctx context.Context) {
--	h.fetchMyAddresses()
--	if h.icmpPort != nil {
--		h.icmpPort.Close()
--	}
--}
++		}
++
 +		if minInterval > maxInterval {
 +			minInterval, maxInterval = maxInterval, minInterval
 +		}
 +		if minLength > maxLength {
 +			minLength, maxLength = maxLength, minLength
 +		}
- 
--func (h *Outbound) isMyLoopbackAddress(addresses ...netip.Addr) bool {
--	for _, prefix := range h.myAddresses.Load() {
--		for _, address := range addresses {
--			if !C.IsDarwin && prefix.Addr() == address {
--				continue
--			}
--			if prefix.Contains(address) {
--				return true
--			}
++
 +		outbound.fragment = &Fragment{
 +			MinInterval: int32(minInterval),
 +			MaxInterval: int32(maxInterval),
 +			MinLength:   int32(minLength),
 +			MaxLength:   int32(maxLength),
- 		}
++		}
 +		outbound.isEmpty = false
- 	}
--	return false
-+	return outbound, nil
- }
- 
- func (h *Outbound) DialContext(ctx context.Context, network string, destination M.Socksaddr) (net.Conn, error) {
--	if h.isMyLoopbackAddress(destination.Addr) {
--		return nil, E.New("loopback connection to TUN range")
--	}
++	}
++	if defaultDialer, ok := common.Cast[*dialer.DefaultDialer](outbound.dialer); ok {
+ 		outbound.icmpPort = ping.NewPort(ctx, logger, func(destination netip.Addr) control.Func {
+ 			return defaultDialer.DialerForICMPDestination(destination).Control
+ 		}, 0)
+@@ -157,6 +238,16 @@ func (h *Outbound) DialContext(ctx context.Context, network string, destination
  	ctx, metadata := adapter.ExtendContext(ctx)
  	metadata.Outbound = h.Tag()
  	metadata.Destination = destination
@@ -5959,7 +6225,7 @@ index af8826b..84e4d93 100644
  	network = N.NetworkName(network)
  	switch network {
  	case N.NetworkTCP:
-@@ -164,58 +172,70 @@ func (h *Outbound) DialContext(ctx context.Context, network string, destination
+@@ -164,7 +255,26 @@ func (h *Outbound) DialContext(ctx context.Context, network string, destination
  	case N.NetworkUDP:
  		h.logger.InfoContext(ctx, "outbound packet connection to ", destination)
  	}
@@ -5987,9 +6253,7 @@ index af8826b..84e4d93 100644
  }
  
  func (h *Outbound) ListenPacket(ctx context.Context, destination M.Socksaddr) (net.PacketConn, error) {
--	if h.isMyLoopbackAddress(destination.Addr) {
--		return nil, E.New("loopback connection to TUN range")
--	}
+@@ -174,11 +284,30 @@ func (h *Outbound) ListenPacket(ctx context.Context, destination M.Socksaddr) (n
  	ctx, metadata := adapter.ExtendContext(ctx)
  	metadata.Outbound = h.Tag()
  	metadata.Destination = destination
@@ -6014,44 +6278,21 @@ index af8826b..84e4d93 100644
  	if err != nil {
  		return nil, err
  	}
--	return conn, nil
--}
--
--func (h *Outbound) PreMatchFlow(network string, destination netip.Addr) adapter.PreMatchAction {
--	if network == N.NetworkICMP && h.icmpPort != nil {
--		return adapter.PreMatchFlow
 +	// conn = h.loopBack.NewPacketConn(bufio.NewPacketConn(conn), destination)
 +	if originDestination != destination {
 +		conn = bufio.NewNATPacketConn(bufio.NewPacketConn(conn), destination, originDestination)
- 	}
--	return adapter.PreMatchContinue
--}
--
--func (h *Outbound) PortAddresses() (netip.Addr, netip.Addr) {
--	return h.icmpPort.PortAddresses()
--}
--
--func (h *Outbound) PortMTU() uint32 {
--	return h.icmpPort.PortMTU()
--}
--
--func (h *Outbound) AttachReturn(returnPath tun.Return) error {
--	return h.icmpPort.AttachReturn(returnPath)
--}
--
--func (h *Outbound) DetachReturn(returnPath tun.Return) error {
--	return h.icmpPort.DetachReturn(returnPath)
--}
--
--func (h *Outbound) WritePackets(packets [][]byte) error {
--	return h.icmpPort.WritePackets(packets)
-+	return conn, nil
++	}
+ 	return conn, nil
+ }
+ 
+@@ -210,12 +339,19 @@ func (h *Outbound) WritePackets(packets [][]byte) error {
  }
  
  func (h *Outbound) DialParallel(ctx context.Context, network string, destination M.Socksaddr, destinationAddresses []netip.Addr) (net.Conn, error) {
 -	if h.isMyLoopbackAddress(destinationAddresses...) {
--		return nil, E.New("loopback connection to TUN range")
--	}
++	if h.isMyLoopbackAddress(append(destinationAddresses, destination.Addr)...) {
+ 		return nil, E.New("loopback connection to TUN range")
+ 	}
  	ctx, metadata := adapter.ExtendContext(ctx)
  	metadata.Outbound = h.Tag()
  	metadata.Destination = destination
@@ -6065,7 +6306,7 @@ index af8826b..84e4d93 100644
  	network = N.NetworkName(network)
  	switch network {
  	case N.NetworkTCP:
-@@ -223,16 +243,34 @@ func (h *Outbound) DialParallel(ctx context.Context, network string, destination
+@@ -223,16 +359,37 @@ func (h *Outbound) DialParallel(ctx context.Context, network string, destination
  	case N.NetworkUDP:
  		h.logger.InfoContext(ctx, "outbound packet connection to ", destination)
  	}
@@ -6089,8 +6330,9 @@ index af8826b..84e4d93 100644
  
  func (h *Outbound) DialParallelNetwork(ctx context.Context, network string, destination M.Socksaddr, destinationAddresses []netip.Addr, networkStrategy *C.NetworkStrategy, networkType []C.InterfaceType, fallbackNetworkType []C.InterfaceType, fallbackDelay time.Duration) (net.Conn, error) {
 -	if h.isMyLoopbackAddress(destinationAddresses...) {
--		return nil, E.New("loopback connection to TUN range")
--	}
++	if h.isMyLoopbackAddress(append(destinationAddresses, destination.Addr)...) {
+ 		return nil, E.New("loopback connection to TUN range")
+ 	}
  	ctx, metadata := adapter.ExtendContext(ctx)
  	metadata.Outbound = h.Tag()
  	metadata.Destination = destination
@@ -6104,7 +6346,7 @@ index af8826b..84e4d93 100644
  	network = N.NetworkName(network)
  	switch network {
  	case N.NetworkTCP:
-@@ -240,17 +278,42 @@ func (h *Outbound) DialParallelNetwork(ctx context.Context, network string, dest
+@@ -240,17 +397,45 @@ func (h *Outbound) DialParallelNetwork(ctx context.Context, network string, dest
  	case N.NetworkUDP:
  		h.logger.InfoContext(ctx, "outbound packet connection to ", destination)
  	}
@@ -6128,8 +6370,9 @@ index af8826b..84e4d93 100644
  
  func (h *Outbound) ListenSerialNetworkPacket(ctx context.Context, destination M.Socksaddr, destinationAddresses []netip.Addr, networkStrategy *C.NetworkStrategy, networkType []C.InterfaceType, fallbackNetworkType []C.InterfaceType, fallbackDelay time.Duration) (net.PacketConn, netip.Addr, error) {
 -	if h.isMyLoopbackAddress(destinationAddresses...) {
--		return nil, netip.Addr{}, E.New("loopback connection to TUN range")
--	}
++	if h.isMyLoopbackAddress(append(destinationAddresses, destination.Addr)...) {
+ 		return nil, netip.Addr{}, E.New("loopback connection to TUN range")
+ 	}
  	ctx, metadata := adapter.ExtendContext(ctx)
  	metadata.Outbound = h.Tag()
  	metadata.Destination = destination
@@ -6152,7 +6395,7 @@ index af8826b..84e4d93 100644
  	conn, newDestination, err := dialer.ListenSerialNetworkPacket(ctx, h.dialer, destination, destinationAddresses, networkStrategy, networkType, fallbackNetworkType, fallbackDelay)
  	if err != nil {
  		return nil, netip.Addr{}, err
-@@ -261,3 +324,112 @@ func (h *Outbound) ListenSerialNetworkPacket(ctx context.Context, destination M.
+@@ -261,3 +446,112 @@ func (h *Outbound) ListenSerialNetworkPacket(ctx context.Context, destination M.
  func (h *Outbound) IsEmpty() bool {
  	return h.isEmpty
  }
@@ -7381,6 +7624,539 @@ index 0000000..d12357e
 +	managed := &URLTest{managedByParent: true}
 +	managed.checkAfterFailure()
 +}
+diff --git a/protocol/http/h2connect.go b/protocol/http/h2connect.go
+new file mode 100644
+index 0000000..740b826
+--- /dev/null
++++ b/protocol/http/h2connect.go
+@@ -0,0 +1,166 @@
++package http
++
++import (
++	"context"
++	stdtls "crypto/tls"
++	"encoding/base64"
++	"io"
++	"net"
++	"net/http"
++	"net/url"
++	"os"
++	"strings"
++	"sync"
++	"sync/atomic"
++	"time"
++
++	"github.com/sagernet/sing/common/baderror"
++	E "github.com/sagernet/sing/common/exceptions"
++	M "github.com/sagernet/sing/common/metadata"
++	N "github.com/sagernet/sing/common/network"
++
++	"golang.org/x/net/http2"
++)
++
++type connectionStateConn interface {
++	ConnectionState() stdtls.ConnectionState
++}
++
++type h2TunnelConn struct {
++	rawConn    net.Conn
++	pipeWriter *io.PipeWriter
++	reader     io.ReadCloser
++	closeOnce  sync.Once
++}
++
++var _ net.Conn = (*h2TunnelConn)(nil)
++
++func dialH2Connect(
++	ctx context.Context,
++	tlsConn net.Conn,
++	destination M.Socksaddr,
++	host string,
++	username string,
++	password string,
++	headers http.Header,
++) (net.Conn, error) {
++	transport := &http2.Transport{
++		DisableCompression: true,
++	}
++	var connUsed atomic.Bool
++	transport.DialTLSContext = func(ctx context.Context, network, addr string, cfg *stdtls.Config) (net.Conn, error) {
++		if !connUsed.CompareAndSwap(false, true) {
++			return nil, E.New("http: h2 tunnel connection already in use")
++		}
++		return tlsConn, nil
++	}
++	pipeReader, pipeWriter := io.Pipe()
++	request := (&http.Request{
++		Method: http.MethodConnect,
++		URL: &url.URL{
++			Scheme: "https",
++			Host:   destination.String(),
++		},
++		Header: http.Header{},
++		Body:   pipeReader,
++	}).WithContext(ctx)
++	if host != "" && host != destination.Fqdn {
++		request.Host = host
++	}
++	if username != "" {
++		auth := username + ":" + password
++		request.Header.Set("Proxy-Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(auth)))
++	}
++	for key, valueList := range headers {
++		switch strings.ToLower(key) {
++		case "connection", "proxy-connection", "keep-alive", "upgrade", "transfer-encoding":
++			continue
++		}
++		for _, value := range valueList {
++			request.Header.Add(key, value)
++		}
++	}
++	response, err := transport.RoundTrip(request)
++	if err != nil {
++		_ = pipeReader.Close()
++		_ = pipeWriter.Close()
++		_ = tlsConn.Close()
++		return nil, err
++	}
++	if response.StatusCode != http.StatusOK {
++		_ = response.Body.Close()
++		_ = pipeWriter.Close()
++		_ = tlsConn.Close()
++		switch response.StatusCode {
++		case http.StatusProxyAuthRequired:
++			return nil, E.New("authentication required")
++		case http.StatusMethodNotAllowed:
++			return nil, E.New("method not allowed")
++		default:
++			return nil, E.New("http: unexpected status: ", response.Status)
++		}
++	}
++	return &h2TunnelConn{
++		rawConn:    tlsConn,
++		pipeWriter: pipeWriter,
++		reader:     response.Body,
++	}, nil
++}
++
++func (c *h2TunnelConn) Read(p []byte) (n int, err error) {
++	n, err = c.reader.Read(p)
++	return n, baderror.WrapH2(err)
++}
++
++func (c *h2TunnelConn) Write(p []byte) (n int, err error) {
++	n, err = c.pipeWriter.Write(p)
++	return n, baderror.WrapH2(err)
++}
++
++func (c *h2TunnelConn) Close() error {
++	c.closeOnce.Do(func() {
++		_ = c.pipeWriter.Close()
++		_ = c.reader.Close()
++		_ = c.rawConn.Close()
++	})
++	return nil
++}
++
++func (c *h2TunnelConn) LocalAddr() net.Addr {
++	return c.rawConn.LocalAddr()
++}
++
++func (c *h2TunnelConn) RemoteAddr() net.Addr {
++	return c.rawConn.RemoteAddr()
++}
++
++func (c *h2TunnelConn) SetDeadline(t time.Time) error {
++	return os.ErrInvalid
++}
++
++func (c *h2TunnelConn) SetReadDeadline(t time.Time) error {
++	return os.ErrInvalid
++}
++
++func (c *h2TunnelConn) SetWriteDeadline(t time.Time) error {
++	return os.ErrInvalid
++}
++
++type singleConnDialer struct {
++	conn net.Conn
++}
++
++var _ N.Dialer = (*singleConnDialer)(nil)
++
++func (d *singleConnDialer) DialContext(ctx context.Context, network string, destination M.Socksaddr) (net.Conn, error) {
++	conn := d.conn
++	if conn == nil {
++		return nil, E.New("http: connection already used")
++	}
++	d.conn = nil
++	return conn, nil
++}
++
++func (d *singleConnDialer) ListenPacket(ctx context.Context, destination M.Socksaddr) (net.PacketConn, error) {
++	return nil, os.ErrInvalid
++}
+diff --git a/protocol/http/h2connect_test.go b/protocol/http/h2connect_test.go
+new file mode 100644
+index 0000000..b373580
+--- /dev/null
++++ b/protocol/http/h2connect_test.go
+@@ -0,0 +1,253 @@
++package http
++
++import (
++	"bytes"
++	"context"
++	stdtls "crypto/tls"
++	"crypto/x509"
++	"io"
++	"net"
++	"net/http"
++	"testing"
++	"time"
++
++	boxtls "github.com/sagernet/sing-box/common/tls"
++	"github.com/sagernet/sing-box/log"
++	"github.com/sagernet/sing-box/option"
++	"github.com/sagernet/sing/common/json/badoption"
++	M "github.com/sagernet/sing/common/metadata"
++
++	"github.com/stretchr/testify/require"
++
++	"golang.org/x/net/http2"
++)
++
++type h2TestCheck func(r *http.Request) int
++
++func startH2ConnectTestServer(t *testing.T, check h2TestCheck) (addr M.Socksaddr, certPool *x509.CertPool) {
++	t.Helper()
++
++	listener, err := net.Listen("tcp", "127.0.0.1:0")
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { listener.Close() })
++
++	cert, err := boxtls.GenerateKeyPair(nil, nil, time.Now, "example.org")
++	if err != nil {
++		t.Fatal(err)
++	}
++	server := &http.Server{
++		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++			if r.Method != http.MethodConnect {
++				w.WriteHeader(http.StatusMethodNotAllowed)
++				return
++			}
++			if check != nil {
++				if status := check(r); status != 0 {
++					w.WriteHeader(status)
++					return
++				}
++			}
++			w.WriteHeader(http.StatusOK)
++			flusher, canFlush := w.(http.Flusher)
++			if canFlush {
++				flusher.Flush()
++			}
++			// echo tunnel data back
++			buffer := make([]byte, 8192)
++			for {
++				n, err := r.Body.Read(buffer)
++				if n > 0 {
++					if _, wErr := w.Write(buffer[:n]); wErr != nil {
++						return
++					}
++					if canFlush {
++						flusher.Flush()
++					}
++				}
++				if err != nil {
++					return
++				}
++			}
++		}),
++		TLSConfig: &stdtls.Config{
++			Certificates: []stdtls.Certificate{*cert},
++			NextProtos:   []string{"h2", "http/1.1"},
++		},
++	}
++	if err = http2.ConfigureServer(server, &http2.Server{}); err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { server.Close() })
++	go server.ServeTLS(listener, "", "")
++
++	socksaddr := M.ParseSocksaddr(listener.Addr().String())
++	pool := x509.NewCertPool()
++	pool.AddCert(cert.Leaf)
++	return socksaddr, pool
++}
++
++func dialTestTLS(t *testing.T, server M.Socksaddr, pool *x509.CertPool) *stdtls.Conn {
++	t.Helper()
++	rawConn, err := net.Dial("tcp", server.String())
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { rawConn.Close() })
++	tlsConn := stdtls.Client(rawConn, &stdtls.Config{
++		ServerName: "example.org",
++		RootCAs:    pool,
++		NextProtos: []string{"h2", "http/1.1"},
++	})
++	if err = tlsConn.HandshakeContext(context.Background()); err != nil {
++		t.Fatal(err)
++	}
++	return tlsConn
++}
++
++func TestDialH2Connect(t *testing.T) {
++	server, certPool := startH2ConnectTestServer(t, nil)
++
++	tlsConn := dialTestTLS(t, server, certPool)
++	if tlsConn.ConnectionState().NegotiatedProtocol != "h2" {
++		t.Fatal("expected h2 negotiation, got ", tlsConn.ConnectionState().NegotiatedProtocol)
++	}
++
++	destination := M.ParseSocksaddr("example.com:443")
++	conn, err := dialH2Connect(context.Background(), tlsConn, destination, "", "user", "pass", nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer conn.Close()
++
++	if _, err = conn.Write([]byte("ping")); err != nil {
++		t.Fatal(err)
++	}
++	readErr := make(chan error, 1)
++	go func() {
++		buffer := make([]byte, 8192)
++		n, err := conn.Read(buffer)
++		if err != nil {
++			readErr <- err
++			return
++		}
++		if !bytes.Equal(buffer[:n], []byte("ping")) {
++			readErr <- io.ErrUnexpectedEOF
++			return
++		}
++		readErr <- nil
++	}()
++	select {
++	case err = <-readErr:
++		if err != nil {
++			t.Fatal(err)
++		}
++	case <-time.After(10 * time.Second):
++		t.Fatal("timeout waiting for echo")
++	}
++}
++
++func TestDialH2ConnectRejected(t *testing.T) {
++	server, certPool := startH2ConnectTestServer(t, func(r *http.Request) int {
++		if r.Header.Get("Proxy-Authorization") != "Basic dXNlcjpwYXNz" {
++			return http.StatusProxyAuthRequired
++		}
++		return 0
++	})
++
++	tlsConn := dialTestTLS(t, server, certPool)
++
++	destination := M.ParseSocksaddr("example.com:443")
++	_, err := dialH2Connect(context.Background(), tlsConn, destination, "", "user", "wrong", nil)
++	if err == nil {
++		t.Fatal("expected authentication error")
++	}
++	if err.Error() != "authentication required" {
++		t.Fatal("unexpected error: ", err)
++	}
++
++	tlsConn2 := dialTestTLS(t, server, certPool)
++	conn, err := dialH2Connect(context.Background(), tlsConn2, destination, "", "user", "pass", nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	conn.Close()
++}
++
++func TestDialH2ConnectHostOverride(t *testing.T) {
++	server, certPool := startH2ConnectTestServer(t, func(r *http.Request) int {
++		if r.Host != "override.example.org" {
++			return http.StatusForbidden
++		}
++		return 0
++	})
++
++	tlsConn := dialTestTLS(t, server, certPool)
++
++	destination := M.ParseSocksaddr("example.com:443")
++	conn, err := dialH2Connect(context.Background(), tlsConn, destination, "", "", "", nil)
++	if err == nil {
++		conn.Close()
++		t.Fatal("expected rejection without host override")
++	}
++
++	tlsConn2 := dialTestTLS(t, server, certPool)
++	conn, err = dialH2Connect(context.Background(), tlsConn2, destination, "override.example.org", "", "", nil)
++	if err != nil {
++		t.Fatal(err)
++	}
++	conn.Close()
++}
++
++func TestDialH2ConnectHopByHopHeaders(t *testing.T) {
++	server, certPool := startH2ConnectTestServer(t, func(r *http.Request) int {
++		if r.Header.Get("X-Custom") != "value" {
++			return http.StatusForbidden
++		}
++		return 0
++	})
++
++	tlsConn := dialTestTLS(t, server, certPool)
++
++	destination := M.ParseSocksaddr("example.com:443")
++	headers := http.Header{
++		"Connection": []string{"keep-alive"},
++		"Keep-Alive": []string{"timeout=60"},
++		"X-Custom":   []string{"value"},
++	}
++	conn, err := dialH2Connect(context.Background(), tlsConn, destination, "", "", "", headers)
++	if err != nil {
++		t.Fatal(err)
++	}
++	conn.Close()
++}
++
++func newTestHTTPOutboundOptions(tlsOptions *option.OutboundTLSOptions) option.HTTPOutboundOptions {
++	return option.HTTPOutboundOptions{
++		ServerOptions: option.ServerOptions{
++			Server:     "127.0.0.1",
++			ServerPort: 1080,
++		},
++		OutboundTLSOptionsContainer: option.OutboundTLSOptionsContainer{
++			TLS: tlsOptions,
++		},
++	}
++}
++
++func TestOutboundDefaultALPN(t *testing.T) {
++	tlsOptions := &option.OutboundTLSOptions{Enabled: true}
++	_, err := NewOutbound(context.Background(), nil, log.NewNOPFactory().Logger(), "http-out", newTestHTTPOutboundOptions(tlsOptions))
++	require.NoError(t, err)
++	require.Equal(t, badoption.Listable[string]{"h2", "http/1.1"}, tlsOptions.ALPN)
++
++	tlsOptions = &option.OutboundTLSOptions{Enabled: true, ALPN: badoption.Listable[string]{"h3"}}
++	_, err = NewOutbound(context.Background(), nil, log.NewNOPFactory().Logger(), "http-out", newTestHTTPOutboundOptions(tlsOptions))
++	require.NoError(t, err)
++	require.Equal(t, badoption.Listable[string]{"h3"}, tlsOptions.ALPN)
++
++	options := newTestHTTPOutboundOptions(nil)
++	_, err = NewOutbound(context.Background(), nil, log.NewNOPFactory().Logger(), "http-out", options)
++	require.NoError(t, err)
++	require.Nil(t, options.TLS)
++}
+diff --git a/protocol/http/outbound.go b/protocol/http/outbound.go
+index 48c4be6..c7a4f31 100644
+--- a/protocol/http/outbound.go
++++ b/protocol/http/outbound.go
+@@ -3,6 +3,7 @@ package http
+ import (
+ 	"context"
+ 	"net"
++	"net/http"
+ 	"os"
+ 
+ 	"github.com/sagernet/sing-box/adapter"
+@@ -25,8 +26,15 @@ func RegisterOutbound(registry *outbound.Registry) {
+ 
+ type Outbound struct {
+ 	outbound.Adapter
+-	logger logger.ContextLogger
+-	client *sHTTP.Client
++	logger    logger.ContextLogger
++	client    *sHTTP.Client
++	tlsDialer tls.Dialer
++	server    M.Socksaddr
++	username  string
++	password  string
++	host      string
++	path      string
++	headers   http.Header
+ }
+ 
+ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.HTTPOutboundOptions) (adapter.Outbound, error) {
+@@ -34,10 +42,24 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
+ 	if err != nil {
+ 		return nil, err
+ 	}
++	if options.TLS != nil && options.TLS.Enabled && len(options.TLS.ALPN) == 0 {
++		options.TLS.ALPN = []string{"h2", "http/1.1"}
++	}
+ 	detour, err := tls.NewDialerFromOptions(ctx, logger, outboundDialer, options.Server, common.PtrValueOrDefault(options.TLS))
+ 	if err != nil {
+ 		return nil, err
+ 	}
++	headers := options.Headers.Build()
++	var host string
++	if headers != nil {
++		host = headers.Get("Host")
++	}
++	var tlsDetour tls.Dialer
++	if options.TLS != nil && options.TLS.Enabled {
++		if tlsDialer, isTLSDialer := detour.(tls.Dialer); isTLSDialer {
++			tlsDetour = tlsDialer
++		}
++	}
+ 	return &Outbound{
+ 		Adapter: outbound.NewAdapterWithDialerOptions(C.TypeHTTP, tag, []string{N.NetworkTCP}, options.DialerOptions),
+ 		logger:  logger,
+@@ -47,8 +69,15 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
+ 			Username: options.Username,
+ 			Password: options.Password,
+ 			Path:     options.Path,
+-			Headers:  options.Headers.Build(),
++			Headers:  headers,
+ 		}),
++		tlsDialer: tlsDetour,
++		server:    options.ServerOptions.Build(),
++		username:  options.Username,
++		password:  options.Password,
++		host:      host,
++		path:      options.Path,
++		headers:   headers,
+ 	}, nil
+ }
+ 
+@@ -57,6 +86,29 @@ func (h *Outbound) DialContext(ctx context.Context, network string, destination
+ 	metadata.Outbound = h.Tag()
+ 	metadata.Destination = destination
+ 	h.logger.InfoContext(ctx, "outbound connection to ", destination)
++	if h.tlsDialer != nil {
++		tlsConn, err := h.tlsDialer.DialTLSContext(ctx, h.server)
++		if err != nil {
++			return nil, err
++		}
++		if stateConn, ok := tlsConn.(connectionStateConn); ok {
++			if stateConn.ConnectionState().NegotiatedProtocol == "h2" {
++				return dialH2Connect(ctx, tlsConn, destination, h.host, h.username, h.password, h.headers)
++			}
++		}
++		fallbackHeaders := h.headers.Clone()
++		if h.host != "" {
++			fallbackHeaders.Set("Host", h.host)
++		}
++		return sHTTP.NewClient(sHTTP.Options{
++			Dialer:   &singleConnDialer{conn: tlsConn},
++			Server:   h.server,
++			Username: h.username,
++			Password: h.password,
++			Path:     h.path,
++			Headers:  fallbackHeaders,
++		}).DialContext(ctx, network, destination)
++	}
+ 	return h.client.DialContext(ctx, network, destination)
+ }
+ 
 diff --git a/protocol/shadowsocksr/outbound.go b/protocol/shadowsocksr/outbound.go
 new file mode 100644
 index 0000000..ed529eb
@@ -9768,6 +10544,43 @@ index 0000000..750dd81
 +	}
 +	return o.endpoint.ListenPacket(ctx, destination)
 +}
+diff --git a/route/network.go b/route/network.go
+index 53a1be8..cd911cc 100644
+--- a/route/network.go
++++ b/route/network.go
+@@ -85,6 +85,7 @@ func NewNetworkManager(ctx context.Context, logger logger.ContextLogger, options
+ 		interfaceFinder:     control.NewDefaultInterfaceFinder(),
+ 		autoDetectInterface: options.AutoDetectInterface,
+ 		defaultOptions: adapter.NetworkOptions{
++ ConcurrentDial: options.ConcurrentDial,
+ 			BindInterface:  options.DefaultInterface,
+ 			RoutingMark:    uint32(options.DefaultMark),
+ 			DomainResolver: defaultDomainResolver.Server,
+diff --git a/route/rule/rule_action.go b/route/rule/rule_action.go
+index cb65611..ef7c76f 100644
+--- a/route/rule/rule_action.go
++++ b/route/rule/rule_action.go
+@@ -105,6 +105,7 @@ func NewRuleAction(ctx context.Context, logger logger.ContextLogger, action opti
+ 		return &RuleActionHijackDNS{}, nil
+ 	case C.RuleActionTypeSniff:
+ 		sniffAction := &RuleActionSniff{
++ OverrideDestination: action.SniffOptions.OverrideDestination,
+ 			SnifferNames: action.SniffOptions.Sniffer,
+ 			Timeout:      time.Duration(action.SniffOptions.Timeout),
+ 		}
+diff --git a/route/rule/rule_dns.go b/route/rule/rule_dns.go
+index a7f3bcf..35ec0b8 100644
+--- a/route/rule/rule_dns.go
++++ b/route/rule/rule_dns.go
+@@ -134,6 +134,8 @@ func NewDefaultDNSRule(ctx context.Context, logger log.ContextLogger, options op
+ 			return nil, E.New("invalid ip version: ", options.IPVersion)
+ 		}
+ 	}
++ if len(options.QueryType) > 0 && len(options.LegacyQueryType) > 0 { return nil, E.New("query_type cannot be combined with neko_legacy_query_type") }
++ if len(options.QueryType) == 0 { options.QueryType = options.LegacyQueryType }
+ 	if len(options.QueryType) > 0 {
+ 		item := NewQueryTypeItem(options.QueryType)
+ 		rule.items = append(rule.items, item)
 diff --git a/transport/v2ray/transport.go b/transport/v2ray/transport.go
 index ab52f55..6afa640 100644
 --- a/transport/v2ray/transport.go
