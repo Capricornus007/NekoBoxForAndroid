@@ -26,10 +26,10 @@ var boxPlatformInterfaceInstance adapter.PlatformInterface = &boxPlatformInterfa
 type boxPlatformInterfaceWrapper struct{ platformUnsupportedInterface }
 
 func (w *boxPlatformInterfaceWrapper) ReadWIFIState(ctx context.Context) adapter.WIFIState {
-	state := strings.SplitN(intfBox.WIFIState()+",", ",", 2)
+	ssid, bssid, _ := strings.Cut(intfBox.WIFIState(), ",")
 	return adapter.WIFIState{
-		SSID:  state[0],
-		BSSID: state[1],
+		SSID:  ssid,
+		BSSID: bssid,
 	}
 }
 
