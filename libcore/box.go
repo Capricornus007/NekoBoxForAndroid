@@ -16,6 +16,7 @@ import (
 	"github.com/matsuridayo/libneko/speedtest"
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/boxapi"
+	boxlog "github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/protocol/group"
 
 	box "github.com/sagernet/sing-box"
@@ -78,6 +79,7 @@ type BoxInstance struct {
 	v2api        *boxapi.SbV2rayServer
 	selector     *group.Selector
 	pauseManager pause.Manager
+	diagnostics  *connectionDiagnostics
 }
 
 func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *BoxInstance, err error) {
@@ -121,6 +123,12 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 		ctx:          ctx,
 		cancel:       cancel,
 		pauseManager: service.FromContext[pause.Manager](ctx),
+	}
+
+	if instance.LogFactory().Level() >= boxlog.LevelDebug {
+		b.diagnostics = &connectionDiagnostics{}
+		instance.Router().AppendTracker(b.diagnostics)
+		service.MustRegister[adapter.DiagnosticObserver](ctx, b.diagnostics)
 	}
 
 	// selector

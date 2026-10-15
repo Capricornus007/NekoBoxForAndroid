@@ -113,6 +113,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var bypassLanInCore by configurationStore.boolean(Key.BYPASS_LAN_IN_CORE)
     var directFallback by configurationStore.boolean(Key.DIRECT_FALLBACK)
     var directFallbackUrl by configurationStore.string(Key.DIRECT_FALLBACK_URL) { "https://www.kernel.org" }
+    var directFallbackRequired by configurationStore.stringToInt(Key.DIRECT_FALLBACK_REQUIRED) { 1 }
+    var directFallbackFailures by configurationStore.stringToInt(Key.DIRECT_FALLBACK_FAILURES) { 1 }
+    var directFallbackRecoveries by configurationStore.stringToInt(Key.DIRECT_FALLBACK_RECOVERIES) { 1 }
     var directFallbackInterval by configurationStore.stringToInt(Key.DIRECT_FALLBACK_INTERVAL) { 30 }
     var concurrentDial by configurationStore.boolean(Key.CONCURRENT_DIAL)
 

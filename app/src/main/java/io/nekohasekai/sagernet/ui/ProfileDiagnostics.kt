@@ -62,7 +62,8 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
                 val runtime = if (profile.id == DataStore.currentProfile && DataStore.serviceState.started) {
                     runCatching { connection.service?.runtimeDiagnostics }.getOrNull()
                 } else null
-                val groups = runtime?.let { JSONObject(it).optJSONArray("groups") }
+                val runtimeState = runtime?.let(::JSONObject)
+                val groups = runtimeState?.optJSONArray("groups")
                 if (groups == null || groups.length() == 0) report.append("\n\n").append(getString(R.string.diagnostics_no_groups))
                 else for (index in 0 until groups.length()) {
                     val group = groups.getJSONObject(index)
@@ -94,6 +95,42 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
                         runCatching {
                             val changed = Instant.parse(state.getString("changed_at"))
                             if (changed.epochSecond > 0) report.append(" · ").append(DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault()).format(changed))
+                        }
+                    }
+                }
+                val wireguard = runtimeState?.optJSONArray("wireguard")
+                if (wireguard != null) for (index in 0 until wireguard.length()) {
+                    val state = wireguard.getJSONObject(index)
+                    report.append("\n\nWG/AWG · ").append(state.optString("tag")).append(" · MTU ").append(state.optInt("mtu"))
+                    val peers = state.optJSONArray("peers")
+                    if (peers != null) for (peerIndex in 0 until peers.length()) {
+                        val peer = peers.getJSONObject(peerIndex)
+                        val handshake = peer.optLong("last_handshake_time_sec")
+                        val handshakeText = if (handshake > 0) DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault()).format(Instant.ofEpochSecond(handshake)) else getString(R.string.diagnostics_handshake_never)
+                        report.append("\n#").append(peer.optInt("index")).append(" · ").append(getString(R.string.diagnostics_handshake)).append(": ").append(handshakeText)
+                        report.append("\nRX ").append(peer.optLong("rx_bytes")).append(" B · TX ").append(peer.optLong("tx_bytes")).append(" B")
+                    }
+                    report.append("\n").append(getString(R.string.diagnostics_wg_counters_hint))
+                }
+                if (runtimeState != null) {
+                    report.append("\n\n").append(getString(R.string.diagnostics_connection_history))
+                    if (!runtimeState.optBoolean("debug_history")) report.append("\n").append(getString(R.string.diagnostics_history_debug_only))
+                    val events = runtimeState.optJSONArray("events")
+                    if (events != null) for (index in 0 until events.length()) {
+                        val event = events.getJSONObject(index)
+                        val time = runCatching { DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault()).format(Instant.parse(event.getString("time"))) }.getOrDefault("")
+                        report.append("\n\n").append(time)
+                        event.optString("id").substringBefore('/').takeIf { it.isNotBlank() }?.let { report.append(" #").append(it) }
+                        if (event.has("uid")) report.append(" UID ").append(event.optInt("uid"))
+                        event.optJSONArray("packages")?.let { packages -> report.append(" ").append((0 until packages.length()).joinToString { packages.optString(it) }) }
+                        when (event.optString("kind")) {
+                            "route" -> report.append("\n").append(event.optString("network")).append(" ").append(event.optString("domain")).append(" ").append(event.optString("destination"))
+                                .append("\n").append(event.optString("rule")).append(" → ").append(event.optString("outbound")).append(" [").append(event.optString("outbound_type")).append("]")
+                            "selected" -> report.append("\n").append(getString(R.string.diagnostics_selected_node)).append(": ").append(event.optString("outbound"))
+                            "dns" -> report.append("\nDNS ").append(event.optString("domain")).append(" → ").append(event.optString("server"))
+                                .append(" · type ").append(event.optInt("query_type")).append(" · ")
+                                .append(if (event.optBoolean("failed")) getString(R.string.diagnostics_query_failed) else "rcode ${event.optInt("rcode")}")
+                                .append(if (event.optBoolean("cached")) " · cache" else "")
                         }
                     }
                 }

@@ -61,23 +61,38 @@ func CheckConfig(config string, localTransport LocalDNSTransport) (err error) {
 			Rules []json.RawMessage
 		}
 	}
-	if err := json.Unmarshal([]byte(config), &routing); err != nil { return err }
+	if err := json.Unmarshal([]byte(config), &routing); err != nil {
+		return err
+	}
 	if routing.Route.Final != "" {
-		if err := visit(routing.Route.Final); err != nil { return err }
+		if err := visit(routing.Route.Final); err != nil {
+			return err
+		}
 	}
 	var checkRules func([]json.RawMessage) error
 	checkRules = func(rules []json.RawMessage) error {
 		for _, raw := range rules {
-			var rule struct { Action, Outbound string; Rules []json.RawMessage }
-			if err := json.Unmarshal(raw, &rule); err != nil { return err }
-			if (rule.Action == "" || rule.Action == "route") && rule.Outbound != "" {
-				if err := visit(rule.Outbound); err != nil { return err }
+			var rule struct {
+				Action, Outbound string
+				Rules            []json.RawMessage
 			}
-			if err := checkRules(rule.Rules); err != nil { return err }
+			if err := json.Unmarshal(raw, &rule); err != nil {
+				return err
+			}
+			if (rule.Action == "" || rule.Action == "route") && rule.Outbound != "" {
+				if err := visit(rule.Outbound); err != nil {
+					return err
+				}
+			}
+			if err := checkRules(rule.Rules); err != nil {
+				return err
+			}
 		}
 		return nil
 	}
-	if err := checkRules(routing.Route.Rules); err != nil { return err }
+	if err := checkRules(routing.Route.Rules); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -95,7 +110,30 @@ func (b *BoxInstance) RuntimeDiagnostics() (string, error) {
 			}
 		}
 	}
-	content, err := json.Marshal(map[string]any{"groups": groups})
+	report := map[string]any{"groups": groups, "debug_history": b.diagnostics != nil}
+	if b.diagnostics != nil {
+		report["events"] = b.diagnostics.snapshot()
+	}
+	wireguard := make([]map[string]any, 0)
+	if b.state == 1 && b.Box != nil {
+		collect := func(outbound adapter.Outbound) {
+			if source, ok := outbound.(interface{ WireGuardDiagnostics() map[string]any }); ok && len(wireguard) < 64 {
+				state := source.WireGuardDiagnostics()
+				state["tag"] = outbound.Tag()
+				wireguard = append(wireguard, state)
+			}
+		}
+		for _, outbound := range b.Outbound().Outbounds() {
+			collect(outbound)
+		}
+		if manager := service.FromContext[adapter.EndpointManager](b.ctx); manager != nil {
+			for _, endpoint := range manager.Endpoints() {
+				collect(endpoint)
+			}
+		}
+	}
+	report["wireguard"] = wireguard
+	content, err := json.Marshal(report)
 	if len(content) > 512*1024 {
 		return "", fmt.Errorf("runtime diagnostics exceed 512 KiB")
 	}

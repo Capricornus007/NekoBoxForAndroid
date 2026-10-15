@@ -124,6 +124,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val mtu = findPreference<MTUPreference>(Key.MTU)!!
         globalCustomConfig = findPreference(Key.GLOBAL_CUSTOM_CONFIG)!!
         globalCustomConfig.useConfigStore(Key.GLOBAL_CUSTOM_CONFIG)
+        globalCustomConfig.setOnPreferenceClickListener { checkpoint(); false }
 
         logLevel.dialogLayoutResource = R.layout.layout_loglevel_help
         logLevel.setOnPreferenceChangeListener { _, _ ->
@@ -227,7 +228,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         findPreference<SwitchPreferenceCompat>(Key.DIRECT_FALLBACK)!!.onPreferenceChangeListener = reloadListener
         findPreference<EditTextPreference>(Key.DIRECT_FALLBACK_URL)!!.setOnPreferenceChangeListener { preference, value ->
             try {
-                directFallbackConfig("proxy", value.toString(), DataStore.directFallbackInterval)
+                directFallbackConfig("proxy", value.toString(), DataStore.directFallbackInterval, DataStore.directFallbackRequired, DataStore.directFallbackFailures, DataStore.directFallbackRecoveries)
                 reloadListener.onPreferenceChange(preference, value)
             } catch (_: IllegalArgumentException) {
                 Toast.makeText(requireContext(), R.string.direct_fallback_invalid_url, Toast.LENGTH_LONG).show()
@@ -243,6 +244,17 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 } else {
                     Toast.makeText(requireContext(), R.string.direct_fallback_invalid_interval, Toast.LENGTH_LONG).show()
                     false
+                }
+            }
+        }
+        for (key in listOf(Key.DIRECT_FALLBACK_REQUIRED, Key.DIRECT_FALLBACK_FAILURES, Key.DIRECT_FALLBACK_RECOVERIES)) {
+            findPreference<EditTextPreference>(key)!!.apply {
+                setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+                setOnPreferenceChangeListener { preference, value ->
+                    val count = value.toString().toIntOrNull()
+                    val maximum = if (key == Key.DIRECT_FALLBACK_REQUIRED) DataStore.directFallbackUrl.lineSequence().map(String::trim).filter(String::isNotBlank).distinct().count().coerceAtMost(8) else 10
+                    if (count != null && count in 1..maximum) reloadListener.onPreferenceChange(preference, value)
+                    else { Toast.makeText(requireContext(), getString(R.string.direct_fallback_invalid_count, maximum), Toast.LENGTH_LONG).show(); false }
                 }
             }
         }

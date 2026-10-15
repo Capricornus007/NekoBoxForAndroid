@@ -38,6 +38,7 @@ func TestWireGuardAndAmneziaPeersExchangePackets(t *testing.T) {
 			var sockets [2]net.PacketConn
 			var peers [2]*wg.Endpoint
 			addresses := []netip.Prefix{netip.MustParsePrefix("10.0.0.1/32"), netip.MustParsePrefix("10.0.0.2/32")}
+			addresses6 := []netip.Prefix{netip.MustParsePrefix("fd00::1/128"), netip.MustParsePrefix("fd00::2/128")}
 			for i := range keys {
 				var err error
 				keys[i], err = ecdh.X25519().GenerateKey(rand.Reader)
@@ -51,7 +52,7 @@ func TestWireGuardAndAmneziaPeersExchangePackets(t *testing.T) {
 				t.Cleanup(func() { _ = sockets[i].Close() })
 			}
 			for i := range peers {
-				options := wg.EndpointOptions{Context: ctx, Logger: log.NewNOPFactory().NewLogger("test"), Dialer: wgTestDialer{sockets[i]}, MTU: 1408, Address: []netip.Prefix{addresses[i]}, PrivateKey: base64.StdEncoding.EncodeToString(keys[i].Bytes()), Peers: []wg.PeerOptions{{Endpoint: M.SocksaddrFromNet(sockets[1-i].LocalAddr()), PublicKey: base64.StdEncoding.EncodeToString(keys[1-i].PublicKey().Bytes()), AllowedIPs: []netip.Prefix{addresses[1-i]}}}}
+				options := wg.EndpointOptions{Context: ctx, Logger: log.NewNOPFactory().NewLogger("test"), Dialer: wgTestDialer{sockets[i]}, MTU: 1408, Address: []netip.Prefix{addresses[i], addresses6[i]}, PrivateKey: base64.StdEncoding.EncodeToString(keys[i].Bytes()), Peers: []wg.PeerOptions{{Endpoint: M.SocksaddrFromNet(sockets[1-i].LocalAddr()), PublicKey: base64.StdEncoding.EncodeToString(keys[1-i].PublicKey().Bytes()), AllowedIPs: []netip.Prefix{addresses[1-i], addresses6[1-i]}}}}
 				// Keepalive is enabled on the client; the responder stays passive.
 				// Two simultaneous initiators may need WireGuard's 5s+jitter retry.
 				if i == 0 {
@@ -133,6 +134,7 @@ func TestWireGuardAndAmneziaPeersExchangePackets(t *testing.T) {
 				_ = conn.Close()
 				_ = listener.Close()
 			}
+			testWireGuardIPPackets(t, peers, addresses, addresses6)
 		})
 	}
 }

@@ -1,3 +1,18 @@
+diff --git a/adapter/diagnostics.go b/adapter/diagnostics.go
+new file mode 100644
+index 000000000..0b7d08b21
+--- /dev/null
++++ b/adapter/diagnostics.go
+@@ -0,0 +1,9 @@
++package adapter
++
++import "context"
++
++// Optional debug-only observer. Register before Start; it never changes routing.
++type DiagnosticObserver interface {
++	GroupDial(ctx context.Context, selected string)
++	DNSQuery(ctx context.Context, domain, server string, queryType uint16, rcode int, cached bool, err error)
++}
 diff --git a/adapter/network.go b/adapter/network.go
 index c3ae515a5..5b765bba8 100644
 --- a/adapter/network.go
@@ -5158,6 +5173,89 @@ index 5a816a733..80fe387e7 100644
  
 -var Version = "unknown"
 +var Version = "1.14.3-neko-1"
+diff --git a/dns/client.go b/dns/client.go
+index 77fe1cbc5..20952bb2f 100644
+--- a/dns/client.go
++++ b/dns/client.go
+@@ -397,7 +397,17 @@ func (c *Client) finishExchange(transport adapter.DNSTransport, operation *excha
+ 	return response, nil
+ }
+ 
+-func (c *Client) Exchange(ctx context.Context, transport adapter.DNSTransport, message *dns.Msg, options adapter.DNSQueryOptions, responseChecker func(response *dns.Msg) bool) (*dns.Msg, error) {
++func (c *Client) Exchange(ctx context.Context, transport adapter.DNSTransport, message *dns.Msg, options adapter.DNSQueryOptions, responseChecker func(response *dns.Msg) bool) (response *dns.Msg, err error) {
++	cached := false
++	if observer := service.FromContext[adapter.DiagnosticObserver](ctx); observer != nil && len(message.Question) > 0 {
++		defer func() {
++			rcode := -1
++			if response != nil {
++				rcode = response.Rcode
++			}
++			observer.DNSQuery(ctx, FqdnToDomain(message.Question[0].Name), transport.Tag(), message.Question[0].Qtype, rcode, cached, err)
++		}()
++	}
+ 	if options.Timeout == 0 {
+ 		options.Timeout = c.timeout
+ 	}
+@@ -405,10 +415,11 @@ func (c *Client) Exchange(ctx context.Context, transport adapter.DNSTransport, m
+ 	defer cancel()
+ 	operation, earlyResponse, status, err := c.beginExchange(ctx, transport, message, options, responseChecker, true)
+ 	if status != exchangeReady {
++		cached = status == exchangeDone && err == nil
+ 		return earlyResponse, err
+ 	}
+ 	defer operation.release()
+-	response, err := c.exchangeToTransport(operation.ctx, transport, operation.message)
++	response, err = c.exchangeToTransport(operation.ctx, transport, operation.message)
+ 	if err != nil {
+ 		return nil, err
+ 	}
+@@ -416,6 +427,19 @@ func (c *Client) Exchange(ctx context.Context, transport adapter.DNSTransport, m
+ }
+ 
+ func (c *Client) ExchangeAsync(ctx context.Context, transport adapter.DNSTransport, message *dns.Msg, options adapter.DNSQueryOptions, responseChecker func(response *dns.Msg) bool, callback func(response *dns.Msg, err error)) {
++	originalCallback := callback
++	cached := false
++	if observer := service.FromContext[adapter.DiagnosticObserver](ctx); observer != nil && len(message.Question) > 0 {
++		original := callback
++		callback = func(response *dns.Msg, err error) {
++			rcode := -1
++			if response != nil {
++				rcode = response.Rcode
++			}
++			observer.DNSQuery(ctx, FqdnToDomain(message.Question[0].Name), transport.Tag(), message.Question[0].Qtype, rcode, cached, err)
++			original(response, err)
++		}
++	}
+ 	if options.Timeout == 0 {
+ 		options.Timeout = c.timeout
+ 	}
+@@ -423,6 +447,7 @@ func (c *Client) ExchangeAsync(ctx context.Context, transport adapter.DNSTranspo
+ 	operation, earlyResponse, status, err := c.beginExchange(ctx, transport, message, options, responseChecker, false)
+ 	switch status {
+ 	case exchangeDone:
++		cached = err == nil
+ 		cancel()
+ 		callback(earlyResponse, err)
+ 		return
+@@ -430,7 +455,7 @@ func (c *Client) ExchangeAsync(ctx context.Context, transport adapter.DNSTranspo
+ 		go func() {
+ 			response, exchangeErr := c.Exchange(ctx, transport, message, options, responseChecker)
+ 			cancel()
+-			callback(response, exchangeErr)
++			originalCallback(response, exchangeErr)
+ 		}()
+ 		return
+ 	}
+@@ -551,6 +576,9 @@ func (c *Client) lookupToExchange(ctx context.Context, transport adapter.DNSTran
+ 	if !disableCache {
+ 		cachedAddresses, err := c.questionCache(ctx, transport, &message, options, responseChecker)
+ 		if err != ErrNotCached {
++			if observer := service.FromContext[adapter.DiagnosticObserver](ctx); observer != nil {
++				observer.DNSQuery(ctx, FqdnToDomain(name), transport.Tag(), qType, 0, true, err)
++			}
+ 			return cachedAddresses, err
+ 		}
+ 	}
 diff --git a/dns/transport/https.go b/dns/transport/https.go
 index 4d5d3fb21..a005d3d66 100644
 --- a/dns/transport/https.go
@@ -5278,10 +5376,10 @@ index a11c45e98..2485fe76a 100644
  	return nil
  }
 diff --git a/option/group.go b/option/group.go
-index bc0c07e47..2d43bc090 100644
+index bc0c07e47..9e5b4354c 100644
 --- a/option/group.go
 +++ b/option/group.go
-@@ -3,16 +3,20 @@ package option
+@@ -3,16 +3,24 @@ package option
  import "github.com/sagernet/sing/common/json/badoption"
  
  type SelectorOutboundOptions struct {
@@ -5294,6 +5392,10 @@ index bc0c07e47..2d43bc090 100644
  
  type URLTestOutboundOptions struct {
 -	Outbounds                 []string           `json:"outbounds" reference:"outbound"`
++	ControlURLs               []string           `json:"control_urls,omitempty"`
++	RequiredSuccesses         int                `json:"required_successes,omitempty"`
++	FailureThreshold          int                `json:"failure_threshold,omitempty"`
++	RecoveryThreshold         int                `json:"recovery_threshold,omitempty"`
 +	Outbounds                 []string           `json:"outbounds"`
  	URL                       string             `json:"url,omitempty"`
  	Interval                  badoption.Duration `json:"interval,omitempty"`
@@ -6583,12 +6685,151 @@ index af8826b89..c53defcf1 100644
 +
 +	return err
 +}
+diff --git a/protocol/group/direct_fallback.go b/protocol/group/direct_fallback.go
+new file mode 100644
+index 000000000..1187ad964
+--- /dev/null
++++ b/protocol/group/direct_fallback.go
+@@ -0,0 +1,112 @@
++package group
++
++import (
++	"context"
++	"net/url"
++	"time"
++
++	"github.com/sagernet/sing-box/adapter"
++	"github.com/sagernet/sing-box/common/urltest"
++	"github.com/sagernet/sing-box/option"
++	E "github.com/sagernet/sing/common/exceptions"
++)
++
++type directFallbackPolicy struct {
++	urls                           []string
++	required, failures, recoveries int
++	failedRounds, healthyRounds    int
++}
++
++func (g *URLTestGroup) configureFallback(options option.URLTestOutboundOptions) error {
++	if g.strategy != "direct-fallback" {
++		return nil
++	}
++	policy := directFallbackPolicy{urls: options.ControlURLs, required: options.RequiredSuccesses, failures: options.FailureThreshold, recoveries: options.RecoveryThreshold}
++	if len(policy.urls) == 0 {
++		policy.urls = []string{g.link}
++	}
++	if policy.required == 0 {
++		policy.required = 1
++	}
++	if policy.failures == 0 {
++		policy.failures = 1
++	}
++	if policy.recoveries == 0 {
++		policy.recoveries = 1
++	}
++	if len(policy.urls) > 8 || policy.required < 1 || policy.required > len(policy.urls) || policy.failures < 1 || policy.failures > 10 || policy.recoveries < 1 || policy.recoveries > 10 {
++		return E.New("invalid direct-fallback thresholds")
++	}
++	for _, link := range policy.urls {
++		parsed, err := url.Parse(link)
++		if err != nil || parsed.Hostname() == "" || (parsed.Scheme != "http" && parsed.Scheme != "https") || parsed.User != nil || parsed.Fragment != "" {
++			return E.New("invalid direct-fallback control URL")
++		}
++	}
++	g.fallback = policy
++	return nil
++}
++func (p *directFallbackPolicy) apply(healthy, direct bool) bool {
++	if healthy {
++		p.failedRounds = 0
++		p.healthyRounds = min(p.healthyRounds+1, max(1, p.recoveries))
++		return direct || p.healthyRounds >= max(1, p.recoveries)
++	}
++	p.healthyRounds = 0
++	p.failedRounds = min(p.failedRounds+1, max(1, p.failures))
++	return direct && p.failedRounds < max(1, p.failures)
++}
++func (g *URLTestGroup) checkDirectFallback(ctx context.Context) (map[string]uint16, error) {
++	// Direct is tested independently; proxy latency never competes with it.
++	links := g.fallback.urls
++	if len(links) == 0 {
++		links = []string{g.link}
++	}
++	required := max(1, g.fallback.required)
++	type probe struct {
++		delay uint16
++		err   error
++	}
++	results := make(chan probe, len(links))
++	testCtx, cancel := context.WithTimeout(ctx, g.timeout)
++	defer cancel()
++	for _, link := range links {
++		go func() {
++			delay, err := urltest.URLTestReachable(testCtx, link, g.outbounds[0])
++			results <- probe{delay, err}
++		}()
++	}
++	successes := 0
++	var delay uint16
++	for completed := 0; completed < len(links); completed++ {
++		select {
++		case result := <-results:
++			if result.err == nil {
++				successes++
++				delay = max(delay, result.delay)
++			}
++		case <-testCtx.Done():
++			completed = len(links)
++		}
++		if successes >= required || successes+len(links)-completed-1 < required {
++			break
++		}
++	}
++	if ctx.Err() != nil {
++		return nil, ctx.Err()
++	}
++	direct := g.outbounds[0]
++	available := g.history.LoadURLTestHistory(direct.Tag()) != nil
++	enabled := g.fallback.apply(successes >= required, available)
++	result := make(map[string]uint16)
++	if enabled {
++		if successes >= required {
++			g.history.StoreURLTestHistory(direct.Tag(), &adapter.URLTestHistory{Time: time.Now(), Delay: delay})
++		}
++		result[direct.Tag()] = delay
++	} else {
++		g.history.DeleteURLTestHistory(direct.Tag())
++	}
++	g.performUpdateCheck()
++	return result, nil
++}
+diff --git a/protocol/group/direct_fallback_policy_test.go b/protocol/group/direct_fallback_policy_test.go
+new file mode 100644
+index 000000000..e19df6101
+--- /dev/null
++++ b/protocol/group/direct_fallback_policy_test.go
+@@ -0,0 +1,15 @@
++package group
++
++import "testing"
++
++func TestDirectFallbackHysteresis(t *testing.T) {
++	p := directFallbackPolicy{failures: 2, recoveries: 2}
++	direct := false
++	for i, healthy := range []bool{true, false, true, true, false, true, false, false, true, true} {
++		direct = p.apply(healthy, direct)
++		want := []bool{false, false, false, true, true, true, true, false, false, true}[i]
++		if direct != want {
++			t.Fatalf("round %d: direct=%v want %v", i, direct, want)
++		}
++	}
++}
 diff --git a/protocol/group/outbound_stats.go b/protocol/group/outbound_stats.go
 new file mode 100644
-index 000000000..2562a0427
+index 000000000..4bf0087ce
 --- /dev/null
 +++ b/protocol/group/outbound_stats.go
-@@ -0,0 +1,25 @@
+@@ -0,0 +1,31 @@
 +package group
 +
 +import (
@@ -6600,6 +6841,9 @@ index 000000000..2562a0427
 +)
 +
 +func trackGroupDial(ctx context.Context, tag string, conn net.Conn) net.Conn {
++	if observer := service.FromContext[adapter.DiagnosticObserver](ctx); observer != nil {
++		observer.GroupDial(ctx, tag)
++	}
 +	tracker := service.FromContext[adapter.OutboundStatsTracker](ctx)
 +	if tracker == nil || adapter.ContextFrom(ctx) == nil {
 +		return conn
@@ -6608,6 +6852,9 @@ index 000000000..2562a0427
 +}
 +
 +func trackGroupPacketDial(ctx context.Context, tag string, conn net.PacketConn) net.PacketConn {
++	if observer := service.FromContext[adapter.DiagnosticObserver](ctx); observer != nil {
++		observer.GroupDial(ctx, tag)
++	}
 +	tracker := service.FromContext[adapter.OutboundStatsTracker](ctx)
 +	if tracker == nil || adapter.ContextFrom(ctx) == nil {
 +		return conn
@@ -6756,7 +7003,7 @@ index c3aaec5a9..3405d8879 100644
 +
 +func RealTag(_ adapter.OutboundManager, detour adapter.Outbound) string { return legacyRealTag(detour) }
 diff --git a/protocol/group/urltest.go b/protocol/group/urltest.go
-index bc50ab70d..af72590f8 100644
+index bc50ab70d..ebde59422 100644
 --- a/protocol/group/urltest.go
 +++ b/protocol/group/urltest.go
 @@ -2,7 +2,6 @@ package group
@@ -6785,7 +7032,7 @@ index bc50ab70d..af72590f8 100644
  	outbound                     adapter.OutboundManager
  	connection                   adapter.ConnectionManager
  	logger                       log.ContextLogger
-@@ -46,8 +42,11 @@ type URLTest struct {
+@@ -46,8 +42,12 @@ type URLTest struct {
  	interval                     time.Duration
  	tolerance                    uint16
  	idleTimeout                  time.Duration
@@ -6793,12 +7040,13 @@ index bc50ab70d..af72590f8 100644
 +	strategy                     string
 +	managedByParent              bool
 +	waitForInitial               bool
++	fallbackOptions              option.URLTestOutboundOptions
  	group                        *URLTestGroup
 -	checkAccess                  sync.Mutex
  	interruptExternalConnections bool
  }
  
-@@ -55,6 +54,7 @@ func NewURLTest(ctx context.Context, router adapter.Router, logger log.ContextLo
+@@ -55,6 +55,7 @@ func NewURLTest(ctx context.Context, router adapter.Router, logger log.ContextLo
  	outbound := &URLTest{
  		Adapter:                      outbound.NewAdapter(C.TypeURLTest, tag, []string{N.NetworkTCP, N.NetworkUDP}, options.Outbounds),
  		ctx:                          ctx,
@@ -6806,7 +7054,7 @@ index bc50ab70d..af72590f8 100644
  		outbound:                     service.FromContext[adapter.OutboundManager](ctx),
  		connection:                   service.FromContext[adapter.ConnectionManager](ctx),
  		logger:                       logger,
-@@ -63,6 +63,10 @@ func NewURLTest(ctx context.Context, router adapter.Router, logger log.ContextLo
+@@ -63,6 +64,11 @@ func NewURLTest(ctx context.Context, router adapter.Router, logger log.ContextLo
  		interval:                     time.Duration(options.Interval),
  		tolerance:                    options.Tolerance,
  		idleTimeout:                  time.Duration(options.IdleTimeout),
@@ -6814,10 +7062,11 @@ index bc50ab70d..af72590f8 100644
 +		strategy:                     options.Strategy,
 +		managedByParent:              options.ManagedByParent,
 +		waitForInitial:               options.WaitForInitial,
++		fallbackOptions:              options,
  		interruptExternalConnections: options.InterruptExistConnections,
  	}
  	if len(outbound.tags) == 0 {
-@@ -72,33 +76,47 @@ func NewURLTest(ctx context.Context, router adapter.Router, logger log.ContextLo
+@@ -72,33 +78,50 @@ func NewURLTest(ctx context.Context, router adapter.Router, logger log.ContextLo
  }
  
  func (s *URLTest) Start(stage adapter.StartStage, scope *adapter.Scope) error {
@@ -6857,6 +7106,9 @@ index bc50ab70d..af72590f8 100644
 +	if err != nil {
 +		return err
  	}
++	if err := group.configureFallback(s.fallbackOptions); err != nil {
++		return err
++	}
 +	s.group = group
  	return nil
  }
@@ -6886,7 +7138,7 @@ index bc50ab70d..af72590f8 100644
  	}
  	return ""
  }
-@@ -107,49 +125,18 @@ func (s *URLTest) All() []string {
+@@ -107,49 +130,18 @@ func (s *URLTest) All() []string {
  	return s.tags
  }
  
@@ -6911,13 +7163,13 @@ index bc50ab70d..af72590f8 100644
  
  func (s *URLTest) CheckOutbounds() {
 -	s.group.CheckOutbounds(s.ctx, true)
+-}
+-
+-func (s *URLTest) PerformUpdateCheck() {
+-	s.group.performUpdateCheck()
 +	s.group.CheckOutbounds(true)
  }
  
--func (s *URLTest) PerformUpdateCheck() {
--	s.group.performUpdateCheck()
--}
--
 -func (s *URLTest) InterfaceUpdated(ctx context.Context) {
 -	group := s.group
 -	if group == nil {
@@ -6940,7 +7192,7 @@ index bc50ab70d..af72590f8 100644
  }
  
  func (s *URLTest) DialContext(ctx context.Context, network string, destination M.Socksaddr) (net.Conn, error) {
-@@ -157,9 +144,9 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
+@@ -157,9 +149,9 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
  	var outbound adapter.Outbound
  	switch N.NetworkName(network) {
  	case N.NetworkTCP:
@@ -6952,7 +7204,7 @@ index bc50ab70d..af72590f8 100644
  	default:
  		return nil, E.Extend(N.ErrUnknownNetwork, network)
  	}
-@@ -171,16 +158,18 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
+@@ -171,16 +163,18 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
  	}
  	conn, err := outbound.DialContext(ctx, network, destination)
  	if err == nil {
@@ -6973,7 +7225,7 @@ index bc50ab70d..af72590f8 100644
  	if outbound == nil {
  		outbound, _ = s.group.Select(N.NetworkUDP)
  	}
-@@ -189,25 +178,28 @@ func (s *URLTest) ListenPacket(ctx context.Context, destination M.Socksaddr) (ne
+@@ -189,25 +183,34 @@ func (s *URLTest) ListenPacket(ctx context.Context, destination M.Socksaddr) (ne
  	}
  	conn, err := outbound.ListenPacket(ctx, destination)
  	if err == nil {
@@ -7000,12 +7252,18 @@ index bc50ab70d..af72590f8 100644
  }
  
  type URLTestGroup struct {
++	initialProbeStarted          atomic.Bool
++	initialProbe                 sync.Once
++	initialReadyOnce             sync.Once
++	initialReady                 chan struct{}
++	initialDone                  chan struct{}
++	fallback                     directFallbackPolicy
  	ctx                          context.Context
 +	router                       adapter.Router
  	outbound                     adapter.OutboundManager
  	pause                        pause.Manager
  	pauseCallback                *list.Element[pause.Callback]
-@@ -217,21 +209,26 @@ type URLTestGroup struct {
+@@ -217,21 +220,26 @@ type URLTestGroup struct {
  	interval                     time.Duration
  	tolerance                    uint16
  	idleTimeout                  time.Duration
@@ -7037,7 +7295,7 @@ index bc50ab70d..af72590f8 100644
  	if interval == 0 {
  		interval = C.DefaultURLTestInterval
  	}
-@@ -241,12 +238,30 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -241,15 +249,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	if idleTimeout == 0 {
  		idleTimeout = C.DefaultURLTestIdleTimeout
  	}
@@ -7070,8 +7328,12 @@ index bc50ab70d..af72590f8 100644
 +		history = urltest.NewHistoryStorage()
  	}
  	return &URLTestGroup{
- 		ctx:                          ctx,
-@@ -257,6 +272,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+-		ctx:                          ctx,
++		initialReady: make(chan struct{}), initialDone: make(chan struct{}), ctx: ctx,
+ 		outbound:                     outboundManager,
+ 		logger:                       logger,
+ 		outbounds:                    outbounds,
+@@ -257,6 +283,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  		interval:                     interval,
  		tolerance:                    tolerance,
  		idleTimeout:                  idleTimeout,
@@ -7081,7 +7343,7 @@ index bc50ab70d..af72590f8 100644
  		history:                      history,
  		close:                        make(chan struct{}),
  		pause:                        service.FromContext[pause.Manager](ctx),
-@@ -265,59 +283,123 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -265,59 +294,127 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	}, nil
  }
  
@@ -7093,7 +7355,11 @@ index bc50ab70d..af72590f8 100644
  	g.lastActive.Store(time.Now())
 -	go g.CheckOutbounds(g.ctx, false)
 +	if waitForInitial {
-+		g.CheckOutbounds(shouldForceInitialCheck(g.strategy))
++		if g.strategy == "fastest" {
++			g.awaitInitialCandidate(g.ctx)
++		} else {
++			g.CheckOutbounds(shouldForceInitialCheck(g.strategy))
++		}
 +	} else {
 +		go g.CheckOutbounds(false)
 +	}
@@ -7224,7 +7490,7 @@ index bc50ab70d..af72590f8 100644
  				minDelay = history.Delay
  			}
  		}
-@@ -326,7 +408,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -326,7 +423,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  		if !common.Contains(detour.Network(), network) {
  			continue
  		}
@@ -7233,7 +7499,7 @@ index bc50ab70d..af72590f8 100644
  		if history == nil {
  			continue
  		}
-@@ -347,180 +429,278 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -347,180 +444,290 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  	return minOutbound, true
  }
  
@@ -7281,9 +7547,8 @@ index bc50ab70d..af72590f8 100644
  
  func (g *URLTestGroup) URLTest(ctx context.Context) (map[string]uint16, error) {
 -	return g.urlTest(ctx, true)
-+	return g.urlTest(ctx, false)
- }
- 
+-}
+-
 -func (g *URLTestGroup) urlTest(ctx context.Context, force bool) (map[string]uint16, error) {
 -	if g.checking.Swap(true) {
 -		return make(map[string]uint16), nil
@@ -7292,15 +7557,14 @@ index bc50ab70d..af72590f8 100644
 -	result := URLTestOutbounds(ctx, g.outbound, g.history, g.logger, g.outbounds, g.link, g.interval, force)
 -	g.performUpdateCheck()
 -	return result, nil
-+func shouldForceInitialCheck(strategy string) bool {
-+	return strategy != "priority"
++	return g.urlTest(ctx, false)
  }
  
 -type urlTestResult struct {
 -	delay uint16
 -	err   error
-+func shouldCheckPrioritySequential(strategy string, force bool) bool {
-+	return strategy == "priority" && !force
++func shouldForceInitialCheck(strategy string) bool {
++	return strategy != "priority"
  }
  
 -type urlTestBatch struct {
@@ -7313,8 +7577,10 @@ index bc50ab70d..af72590f8 100644
 -	groups   []adapter.OutboundGroup
 -	access   sync.Mutex
 -	result   map[string]uint16
--}
--
++func shouldCheckPrioritySequential(strategy string, force bool) bool {
++	return strategy == "priority" && !force
+ }
+ 
 -func URLTestOutbounds(ctx context.Context, outboundManager adapter.OutboundManager, history *urltest.HistoryStorage, logger log.Logger, outbounds []adapter.Outbound, link string, interval time.Duration, force bool) map[string]uint16 {
 -	b, _ := batch.New(ctx, batch.WithConcurrencyNum[any](10))
 -	testBatch := &urlTestBatch{
@@ -7339,33 +7605,17 @@ index bc50ab70d..af72590f8 100644
 +	}
 +	defer g.checking.Store(false)
 +	if g.strategy == "direct-fallback" {
-+		// The proxy is a fallback, not another probe candidate: no latency ranking.
-+		direct := g.outbounds[0]
-+		testCtx, cancel := context.WithTimeout(ctx, g.timeout)
-+		delay, err := urltest.URLTestReachable(testCtx, g.link, direct)
-+		cancel()
-+		if err != nil {
-+			g.history.DeleteURLTestHistory(direct.Tag())
-+		} else {
-+			g.history.StoreURLTestHistory(direct.Tag(), &adapter.URLTestHistory{Time: time.Now(), Delay: delay})
-+			result[direct.Tag()] = delay
- 		}
-+		g.performUpdateCheck()
-+		return result, nil
- 	}
--	return testBatch.result
--}
--
--func (b *urlTestBatch) test(outbounds []adapter.Outbound, link string, interval time.Duration, force bool) {
--	for _, detour := range outbounds {
--		tag := detour.Tag()
--		if b.checked[tag] {
--			continue
++		return g.checkDirectFallback(ctx)
++	}
 +	if shouldCheckPrioritySequential(g.strategy, force) {
 +		for _, detour := range g.outbounds {
 +			tag := detour.Tag()
 +			if nested, isNested := detour.(*URLTest); isNested && nested.managedByParent {
-+				_, _ = nested.group.urlTest(ctx, force)
++				if nested.group.strategy == "fastest" && !nested.group.initialProbeStarted.Load() {
++					nested.group.awaitInitialCandidate(ctx)
++				} else {
++					_, _ = nested.group.urlTest(ctx, force)
++				}
 +				if history, exists := managedURLTestHistory(g, detour, N.NetworkTCP); exists {
 +					result[tag] = history.Delay
 +					break
@@ -7395,6 +7645,22 @@ index bc50ab70d..af72590f8 100644
 +			result[tag] = t
 +			break
  		}
++		g.performUpdateCheck()
++		return result, nil
+ 	}
+-	return testBatch.result
+-}
+-
+-func (b *urlTestBatch) test(outbounds []adapter.Outbound, link string, interval time.Duration, force bool) {
+-	for _, detour := range outbounds {
++	b, _ := batch.New(ctx, batch.WithConcurrencyNum[any](10))
++	checked := make(map[string]bool)
++	var resultAccess sync.Mutex
++	for _, detour := range g.outbounds {
+ 		tag := detour.Tag()
+-		if b.checked[tag] {
+-			continue
+-		}
 -		switch nested := detour.(type) {
 -		case *URLTest:
 -			b.checked[tag] = true
@@ -7416,14 +7682,6 @@ index bc50ab70d..af72590f8 100644
 -		default:
 -			history := b.history.LoadURLTestHistory(tag)
 -			if !force && history != nil && time.Since(history.Time) < interval {
-+		g.performUpdateCheck()
-+		return result, nil
-+	}
-+	b, _ := batch.New(ctx, batch.WithConcurrencyNum[any](10))
-+	checked := make(map[string]bool)
-+	var resultAccess sync.Mutex
-+	for _, detour := range g.outbounds {
-+		tag := detour.Tag()
 +		if nested, isNested := detour.(*URLTest); isNested && nested.managedByParent {
 +			if checked[tag] {
  				continue
@@ -7476,6 +7734,9 @@ index bc50ab70d..af72590f8 100644
  		}
 +		history := g.history.LoadURLTestHistory(realTag)
 +		if !force && history != nil && time.Since(history.Time) < g.interval {
++			if g.strategy == "fastest" {
++				g.initialReadyOnce.Do(func() { g.performUpdateCheck(); close(g.initialReady) })
++			}
 +			continue
 +		}
 +		checked[realTag] = true
@@ -7484,7 +7745,7 @@ index bc50ab70d..af72590f8 100644
 +			continue
 +		}
 +		b.Go(realTag, func() (any, error) {
-+			testCtx, cancel := context.WithTimeout(g.ctx, g.timeout)
++			testCtx, cancel := context.WithTimeout(ctx, g.timeout)
 +			defer cancel()
 +			t, err := urltest.URLTest(testCtx, g.link, p)
 +			if err != nil {
@@ -7496,6 +7757,9 @@ index bc50ab70d..af72590f8 100644
 +					Time:  time.Now(),
 +					Delay: t,
 +				})
++				if g.strategy == "fastest" {
++					g.initialReadyOnce.Do(func() { g.performUpdateCheck(); close(g.initialReady) })
++				}
 +				resultAccess.Lock()
 +				result[tag] = t
 +				resultAccess.Unlock()
@@ -7532,10 +7796,8 @@ index bc50ab70d..af72590f8 100644
 -		if g.selectedOutboundUDP != nil {
 +	} else if g.selectedOutboundTCP.Load() == nil || (existsTCP && outboundTCP != g.selectedOutboundTCP.Load()) {
 +		if g.selectedOutboundTCP.Load() != nil {
- 			updated = true
- 		}
--		g.selectedOutboundUDP = outbound
--		selected = true
++			updated = true
++		}
 +		g.recordSelection(N.NetworkTCP, outboundTCP)
 +		g.selectedOutboundTCP.Store(outboundTCP)
 +	}
@@ -7548,14 +7810,16 @@ index bc50ab70d..af72590f8 100644
 +		}
 +	} else if g.selectedOutboundUDP.Load() == nil || (existsUDP && outboundUDP != g.selectedOutboundUDP.Load()) {
 +		if g.selectedOutboundUDP.Load() != nil {
-+			updated = true
-+		}
+ 			updated = true
+ 		}
+-		g.selectedOutboundUDP = outbound
+-		selected = true
 +		g.recordSelection(N.NetworkUDP, outboundUDP)
 +		g.selectedOutboundUDP.Store(outboundUDP)
  	}
  	if updated {
 +		if g.strategy == "direct-fallback" && outboundTCP != nil {
-+			g.logger.Info("direct fallback selected: ", outboundTCP.Tag())
++			g.logger.Debug("direct fallback selected: ", outboundTCP.Tag())
 +		}
  		g.interruptGroup.Interrupt(g.interruptExternalConnections)
  	}
@@ -7637,11 +7901,25 @@ index bc50ab70d..af72590f8 100644
 +	if err != nil {
 +		logger.Error(err)
 +		return nil
- 	}
++	}
 +	g.history = history
 +	defer g.Close()
 +	result, _ := g.urlTest(ctx, force)
 +	return result
++}
++
++// Only the first usable member blocks startup. Ranking continues in this service's
++// context; a parent priority group still advances in its configured order.
++func (g *URLTestGroup) awaitInitialCandidate(ctx context.Context) {
++	g.initialProbe.Do(func() {
++		g.initialProbeStarted.Store(true)
++		go func() { g.CheckOutbounds(true); close(g.initialDone) }()
++	})
++	select {
++	case <-g.initialReady:
++	case <-g.initialDone:
++	case <-ctx.Done():
+ 	}
  }
 diff --git a/protocol/group/urltest_strategy_test.go b/protocol/group/urltest_strategy_test.go
 new file mode 100644
@@ -10226,7 +10504,7 @@ index c0ece0a2d..cf74fd24a 100644
 +	return nil
 +}
 diff --git a/protocol/wireguard/endpoint.go b/protocol/wireguard/endpoint.go
-index c80cf86fa..18a8793f4 100644
+index c80cf86fa..05c0c28f7 100644
 --- a/protocol/wireguard/endpoint.go
 +++ b/protocol/wireguard/endpoint.go
 @@ -4,14 +4,11 @@ import (
@@ -10257,7 +10535,7 @@ index c80cf86fa..18a8793f4 100644
  func RegisterEndpoint(registry *endpoint.Registry) {
  	endpoint.Register[option.WireGuardEndpointOptions](registry, C.TypeWireGuard, NewEndpoint)
  }
-@@ -44,13 +35,11 @@ type Endpoint struct {
+@@ -44,8 +35,6 @@ type Endpoint struct {
  	logger         logger.ContextLogger
  	localAddresses []netip.Prefix
  	endpoint       *wireguard.Endpoint
@@ -10266,12 +10544,6 @@ index c80cf86fa..18a8793f4 100644
  }
  
  func NewEndpoint(ctx context.Context, router adapter.Router, logger log.ContextLogger, tag string, options option.WireGuardEndpointOptions) (adapter.Endpoint, error) {
- 	ep := &Endpoint{
--		Adapter:        endpoint.NewAdapterWithDialerOptions(C.TypeWireGuard, tag, []string{N.NetworkTCP, N.NetworkUDP, N.NetworkICMP}, options.DialerOptions),
-+		Adapter:        endpoint.NewAdapterWithDialerOptions(C.TypeWireGuard, tag, []string{N.NetworkTCP, N.NetworkUDP}, options.DialerOptions),
- 		ctx:            ctx,
- 		router:         router,
- 		dnsRouter:      service.FromContext[adapter.DNSRouter](ctx),
 @@ -77,43 +66,29 @@ func NewEndpoint(ctx context.Context, router adapter.Router, logger log.ContextL
  	} else {
  		udpTimeout = C.UDPTimeout
@@ -10430,10 +10702,8 @@ index c80cf86fa..18a8793f4 100644
 -
 -func (w *Endpoint) AttachReturn(returnPath tun.Return) error {
 -	return w.endpoint.AttachReturn(returnPath)
-+func (w *Endpoint) Close() error {
-+	return w.endpoint.Close()
- }
- 
+-}
+-
 -func (w *Endpoint) DetachReturn(returnPath tun.Return) error {
 -	return w.endpoint.DetachReturn(returnPath)
 -}
@@ -10443,17 +10713,7 @@ index c80cf86fa..18a8793f4 100644
 -		if localPrefix.Contains(destination.Addr()) {
 -			return tun.FlowVerdict{Action: tun.ActionAccept}
 -		}
-+func (w *Endpoint) PrepareConnection(network string, source M.Socksaddr, destination M.Socksaddr) error {
-+	result := w.router.PreMatch(adapter.InboundContext{
-+		Inbound:     w.Tag(),
-+		InboundType: w.Type(),
-+		Network:     network,
-+		Source:      source,
-+		Destination: destination,
-+	}, nil)
-+	if result.Action == adapter.PreMatchReject || result.Action == adapter.PreMatchDrop {
-+		return E.New("connection rejected")
- 	}
+-	}
 -	return adapter.JudgeFlow(w.router, w.Tag(), w.Type(), network, source, destination, firstPacket)
 -}
 -
@@ -10468,12 +10728,24 @@ index c80cf86fa..18a8793f4 100644
 -	metadata.Protocol = C.ProtocolDNS
 -	w.logger.InfoContext(ctx, "inbound DNS packet from ", source)
 -	w.router.HijackDNSPacket(ctx, payload, writer, metadata)
--}
--
++func (w *Endpoint) Close() error {
++	return w.endpoint.Close()
+ }
+ 
 -func (w *Endpoint) WritePackets(packets [][]byte) error {
 -	if !w.started.Load() {
 -		return E.New("WireGuard is not ready yet")
--	}
++func (w *Endpoint) PrepareConnection(network string, source M.Socksaddr, destination M.Socksaddr) error {
++	result := w.router.PreMatch(adapter.InboundContext{
++		Inbound:     w.Tag(),
++		InboundType: w.Type(),
++		Network:     network,
++		Source:      source,
++		Destination: destination,
++	}, nil)
++	if result.Action == adapter.PreMatchReject || result.Action == adapter.PreMatchDrop {
++		return E.New("connection rejected")
+ 	}
 -	return w.endpoint.WritePackets(packets)
 +	return nil
  }
@@ -10491,7 +10763,7 @@ index c80cf86fa..18a8793f4 100644
  		destinationAddresses, err := w.dnsRouter.Lookup(ctx, destination.Fqdn, adapter.DNSQueryOptions{})
  		if err != nil {
  			return nil, err
-@@ -290,50 +228,25 @@ func (w *Endpoint) DialContext(ctx context.Context, network string, destination
+@@ -290,50 +228,27 @@ func (w *Endpoint) DialContext(ctx context.Context, network string, destination
  	return w.endpoint.DialContext(ctx, network, destination)
  }
  
@@ -10515,15 +10787,15 @@ index c80cf86fa..18a8793f4 100644
 +			return nil, err
  		}
 -		return iponly.NewPacketConn(w.logger, packetConn), destinationAddress, nil
-+		return packetConn, err
- 	}
+-	}
 -	packetConn, err := w.endpoint.ListenPacket(ctx, destination)
 -	if err != nil {
 -		return nil, netip.Addr{}, err
 -	}
 -	if destination.IsIP() {
 -		return iponly.NewPacketConn(w.logger, packetConn), destination.Addr, nil
--	}
++		return packetConn, err
+ 	}
 -	return iponly.NewPacketConn(w.logger, packetConn), netip.Addr{}, nil
 +	return w.endpoint.ListenPacket(ctx, destination)
  }
@@ -10537,22 +10809,23 @@ index c80cf86fa..18a8793f4 100644
 -		return bufio.NewNATPacketConn(bufio.NewPacketConn(packetConn), M.SocksaddrFrom(destinationAddress, destination.Port), destination), nil
 -	}
 -	return packetConn, nil
--}
--
--func (w *Endpoint) PreferredDomain(metadata *adapter.InboundContext, domain string) bool {
--	return false
 +func (w *Endpoint) JudgeFlow(network uint8, source, destination netip.AddrPort, firstPacket []byte) tun.FlowVerdict {
 +	return adapter.JudgeFlow(w.router, w.Tag(), w.Type(), network, source, destination, firstPacket)
  }
 -
+-func (w *Endpoint) PreferredDomain(metadata *adapter.InboundContext, domain string) bool {
+-	return false
++func (w *Endpoint) NewDNSPacket(payload []byte, source, destination M.Socksaddr, writer N.PacketWriter) {
++	w.router.HijackDNSPacket(w.ctx, payload, writer, adapter.InboundContext{Inbound: w.Tag(), InboundType: w.Type(), Network: N.NetworkUDP, Source: source, Destination: destination})
+ }
+ 
 -func (w *Endpoint) PreferredAddress(metadata *adapter.InboundContext, address netip.Addr) bool {
 -	if !w.started.Load() {
 -		return false
 -	}
 -	return w.endpoint.Lookup(address) != nil
-+func (w *Endpoint) NewDNSPacket(payload []byte, source, destination M.Socksaddr, writer N.PacketWriter) {
-+	w.router.HijackDNSPacket(w.ctx, payload, writer, adapter.InboundContext{Inbound: w.Tag(), InboundType: w.Type(), Network: N.NetworkUDP, Source: source, Destination: destination})
- }
+-}
++func (w *Endpoint) WireGuardDiagnostics() map[string]any { return w.endpoint.Diagnostics() }
 diff --git a/protocol/wireguard/init.go b/protocol/wireguard/init.go
 new file mode 100644
 index 000000000..0b280a906
@@ -10562,10 +10835,10 @@ index 000000000..0b280a906
 +package wireguard
 diff --git a/protocol/wireguard/outbound.go b/protocol/wireguard/outbound.go
 new file mode 100644
-index 000000000..dd9ad9af0
+index 000000000..188a60c64
 --- /dev/null
 +++ b/protocol/wireguard/outbound.go
-@@ -0,0 +1,185 @@
+@@ -0,0 +1,187 @@
 +package wireguard
 +
 +import (
@@ -10605,7 +10878,7 @@ index 000000000..dd9ad9af0
 +	if options.GSO {
 +	}
 +	outbound := &Outbound{
-+		Adapter:        outbound.NewAdapterWithDialerOptions(C.TypeWireGuard, tag, []string{N.NetworkTCP, N.NetworkUDP}, options.DialerOptions),
++		Adapter:        outbound.NewAdapterWithDialerOptions(C.TypeWireGuard, tag, []string{N.NetworkTCP, N.NetworkUDP, N.NetworkICMP}, options.DialerOptions),
 +		ctx:            ctx,
 +		dnsRouter:      service.FromContext[adapter.DNSRouter](ctx),
 +		logger:         logger,
@@ -10751,6 +11024,53 @@ index 000000000..dd9ad9af0
 +	}
 +	return o.endpoint.ListenPacket(ctx, destination)
 +}
++
++func (o *Outbound) WireGuardDiagnostics() map[string]any { return o.endpoint.Diagnostics() }
+diff --git a/protocol/wireguard/port.go b/protocol/wireguard/port.go
+new file mode 100644
+index 000000000..088a523bd
+--- /dev/null
++++ b/protocol/wireguard/port.go
+@@ -0,0 +1,39 @@
++package wireguard
++
++import (
++	"github.com/sagernet/sing-box/adapter"
++	"github.com/sagernet/sing-tun"
++	N "github.com/sagernet/sing/common/network"
++	"net/netip"
++)
++
++// Existing TCP/UDP socket routing stays in place. ICMP uses the native IP flow
++// engine, after the same UID and route-rule checks as other TUN traffic.
++func packetFlow(endpoint interface {
++	SupportsPacketFlow() bool
++	Allows(netip.Addr) bool
++}, network string, destination netip.Addr) adapter.PreMatchAction {
++	if network != N.NetworkICMP || !endpoint.SupportsPacketFlow() {
++		return adapter.PreMatchContinue
++	}
++	if !endpoint.Allows(destination) {
++		return adapter.PreMatchReject
++	}
++	return adapter.PreMatchFlow
++}
++func (o *Outbound) PreMatchFlow(network string, destination netip.Addr) adapter.PreMatchAction {
++	return packetFlow(o.endpoint, network, destination)
++}
++func (o *Outbound) PortAddresses() (netip.Addr, netip.Addr) { return o.endpoint.PortAddresses() }
++func (o *Outbound) PortMTU() uint32                         { return o.endpoint.PortMTU() }
++func (o *Outbound) WritePackets(packets [][]byte) error     { return o.endpoint.WritePackets(packets) }
++func (o *Outbound) AttachReturn(path tun.Return) error      { return o.endpoint.AttachReturn(path) }
++func (o *Outbound) DetachReturn(path tun.Return) error      { return o.endpoint.DetachReturn(path) }
++func (w *Endpoint) PreMatchFlow(network string, destination netip.Addr) adapter.PreMatchAction {
++	return packetFlow(w.endpoint, network, destination)
++}
++func (w *Endpoint) PortAddresses() (netip.Addr, netip.Addr) { return w.endpoint.PortAddresses() }
++func (w *Endpoint) PortMTU() uint32                         { return w.endpoint.PortMTU() }
++func (w *Endpoint) WritePackets(packets [][]byte) error     { return w.endpoint.WritePackets(packets) }
++func (w *Endpoint) AttachReturn(path tun.Return) error      { return w.endpoint.AttachReturn(path) }
++func (w *Endpoint) DetachReturn(path tun.Return) error      { return w.endpoint.DetachReturn(path) }
 diff --git a/route/network.go b/route/network.go
 index 53a1be8d8..76f719d8d 100644
 --- a/route/network.go
@@ -10773,6 +11093,46 @@ index 53a1be8d8..76f719d8d 100644
  	iif := r.interfaceMonitor.DefaultInterface()
  	if iif == nil {
  		return nil
+diff --git a/route/process_cache.go b/route/process_cache.go
+index f99cebadb..d40d8a5e9 100644
+--- a/route/process_cache.go
++++ b/route/process_cache.go
+@@ -8,6 +8,7 @@ import (
+ 
+ 	"github.com/sagernet/sing-box/adapter"
+ 	"github.com/sagernet/sing-box/common/process"
++	C "github.com/sagernet/sing-box/constant"
+ )
+ 
+ type processCacheKey struct {
+@@ -36,7 +37,10 @@ func (r *Router) findProcessInfoCached(ctx context.Context, network string, sour
+ }
+ 
+ func (r *Router) searchProcessInfo(ctx context.Context, metadata *adapter.InboundContext) {
+-	if r.processSearcher == nil || metadata.ProcessInfo != nil || !r.isLocalSource(metadata.Source.Addr) {
++	platformTun := metadata.InboundType == C.TypeTun && r.platformInterface != nil && r.platformInterface.UsePlatformConnectionOwnerFinder()
++	// Android owns the TUN device and socket attribution. Its interface cache can
++	// be empty or predate the TUN; it must not disable per-app access checks.
++	if r.processSearcher == nil || metadata.ProcessInfo != nil || (!platformTun && !r.isLocalSource(metadata.Source.Addr)) {
+ 		return
+ 	}
+ 	var originDestination netip.AddrPort
+@@ -45,7 +49,14 @@ func (r *Router) searchProcessInfo(ctx context.Context, metadata *adapter.Inboun
+ 	} else if metadata.Destination.IsIP() {
+ 		originDestination = metadata.Destination.AddrPort()
+ 	}
+-	processInfo, err := r.findProcessInfoCached(ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
++	var processInfo *adapter.ConnectionOwner
++	var err error
++	if platformTun {
++		// Socket tuples can be reused by another UID. Do not cache authorization.
++		processInfo, err = process.FindProcessInfo(r.processSearcher, ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
++	} else {
++		processInfo, err = r.findProcessInfoCached(ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
++	}
+ 	if err != nil {
+ 		r.logger.InfoContext(ctx, "failed to search process: ", err)
+ 		return
 diff --git a/route/rule/rule_action.go b/route/rule/rule_action.go
 index cb6561181..1afb86dc1 100644
 --- a/route/rule/rule_action.go
@@ -16213,7 +16573,7 @@ index 000000000..af86550b8
 +	return d.Device.Read(buffers, sizes, offset)
 +}
 diff --git a/transport/wireguard/device.go b/transport/wireguard/device.go
-index 37575e4d7..0977b293b 100644
+index 37575e4d7..363e94bab 100644
 --- a/transport/wireguard/device.go
 +++ b/transport/wireguard/device.go
 @@ -2,15 +2,15 @@ package wireguard
@@ -16235,12 +16595,7 @@ index 37575e4d7..0977b293b 100644
  )
  
  type Device interface {
-@@ -18,33 +18,28 @@ type Device interface {
- 	N.Dialer
- 	Start() error
- 	SetDevice(device *device.Device)
--	Inet4Address() netip.Addr
--	Inet6Address() netip.Addr
+@@ -23,28 +23,25 @@ type Device interface {
  }
  
  type DeviceOptions struct {
@@ -16284,27 +16639,25 @@ index 37575e4d7..0977b293b 100644
  	} else {
  		return newSystemStackDevice(options)
 diff --git a/transport/wireguard/device_stack.go b/transport/wireguard/device_stack.go
-index 3321ef8f0..035a89dd4 100644
+index 3321ef8f0..3b26449b1 100644
 --- a/transport/wireguard/device_stack.go
 +++ b/transport/wireguard/device_stack.go
-@@ -5,10 +5,10 @@ package wireguard
+@@ -4,11 +4,14 @@ package wireguard
+ 
  import (
  	"context"
++	"io"
  	"net"
--	"net/netip"
+ 	"net/netip"
  	"os"
--	"sync"
+ 	"sync"
  
 +	"github.com/amnezia-vpn/amneziawg-go/v3/device"
 +	wgTun "github.com/amnezia-vpn/amneziawg-go/v3/tun"
  	"github.com/sagernet/gvisor/pkg/buffer"
  	"github.com/sagernet/gvisor/pkg/tcpip"
  	"github.com/sagernet/gvisor/pkg/tcpip/adapters/gonet"
-@@ -16,44 +16,35 @@ import (
- 	"github.com/sagernet/gvisor/pkg/tcpip/network/ipv4"
- 	"github.com/sagernet/gvisor/pkg/tcpip/network/ipv6"
- 	"github.com/sagernet/gvisor/pkg/tcpip/stack"
--	"github.com/sagernet/gvisor/pkg/tcpip/transport/icmp"
+@@ -20,12 +23,9 @@ import (
  	"github.com/sagernet/gvisor/pkg/tcpip/transport/tcp"
  	"github.com/sagernet/gvisor/pkg/tcpip/transport/udp"
  	"github.com/sagernet/sing-tun"
@@ -16317,213 +16670,83 @@ index 3321ef8f0..035a89dd4 100644
  )
  
  var _ Device = (*stackDevice)(nil)
- 
- type stackDevice struct {
--	stack          *stack.Stack
--	mtu            uint32
--	events         chan wgTun.Event
--	outbound       chan *stack.PacketBuffer
+@@ -35,7 +35,7 @@ type stackDevice struct {
+ 	mtu            uint32
+ 	events         chan wgTun.Event
+ 	outbound       chan *stack.PacketBuffer
 -	packetOutbound chan *buf.Buffer
--	done           chan struct{}
--	closeOnce      sync.Once
--	dispatcher     stack.NetworkDispatcher
--	inet4Address   netip.Addr
--	inet6Address   netip.Addr
--	icmpForwarder  *tun.ICMPForwarder
--	udpForwarder   *tun.UDPForwarder
-+	stack      *stack.Stack
-+	mtu        uint32
-+	events     chan wgTun.Event
-+	outbound   chan *stack.PacketBuffer
-+	done       chan struct{}
-+	dispatcher stack.NetworkDispatcher
-+	addr4      tcpip.Address
-+	addr6      tcpip.Address
- }
- 
- func newStackDevice(options DeviceOptions) (*stackDevice, error) {
- 	tunDevice := &stackDevice{
--		mtu:            options.MTU,
--		events:         make(chan wgTun.Event, 1),
--		outbound:       make(chan *stack.PacketBuffer, 256),
++	packetOutbound chan []byte
+ 	done           chan struct{}
+ 	closeOnce      sync.Once
+ 	dispatcher     stack.NetworkDispatcher
+@@ -50,7 +50,7 @@ func newStackDevice(options DeviceOptions) (*stackDevice, error) {
+ 		mtu:            options.MTU,
+ 		events:         make(chan wgTun.Event, 1),
+ 		outbound:       make(chan *stack.PacketBuffer, 256),
 -		packetOutbound: make(chan *buf.Buffer, 256),
--		done:           make(chan struct{}),
-+		mtu:      options.MTU,
-+		events:   make(chan wgTun.Event, 1),
-+		outbound: make(chan *stack.PacketBuffer, 256),
-+		done:     make(chan struct{}),
++		packetOutbound: make(chan []byte, 256),
+ 		done:           make(chan struct{}),
  	}
--	ipStack, err := tun.NewGVisorStackWithOptions((*wireEndpoint)(tunDevice), stack.NICOptions{}, true)
-+	ipStack, err := tun.NewGVisorStack((*wireEndpoint)(tunDevice))
- 	if err != nil {
- 		return nil, err
- 	}
-@@ -66,10 +57,10 @@ func newStackDevice(options DeviceOptions) (*stackDevice, error) {
- 			},
- 		}
- 		if prefix.Addr().Is4() {
--			tunDevice.inet4Address = prefix.Addr()
-+			tunDevice.addr4 = addr
- 			protoAddr.Protocol = ipv4.ProtocolNumber
- 		} else {
--			tunDevice.inet6Address = prefix.Addr()
-+			tunDevice.addr6 = addr
- 			protoAddr.Protocol = ipv6.ProtocolNumber
- 		}
- 		gErr := ipStack.AddProtocolAddress(tun.DefaultNIC, protoAddr, stack.AddressProperties{})
-@@ -80,20 +71,7 @@ func newStackDevice(options DeviceOptions) (*stackDevice, error) {
- 	tunDevice.stack = ipStack
- 	if options.Handler != nil {
+ 	ipStack, err := tun.NewGVisorStackWithOptions((*wireEndpoint)(tunDevice), stack.NICOptions{}, true)
+@@ -82,11 +82,11 @@ func newStackDevice(options DeviceOptions) (*stackDevice, error) {
  		ipStack.SetTransportProtocolHandler(tcp.ProtocolNumber, tun.NewTCPForwarder(options.Context, ipStack, options.Handler).HandlePacket)
--		udpForwarder := tun.NewUDPForwarder(options.Context, ipStack, options.Handler, tun.UDPNatOptions{
--			Timeout:         options.UDPTimeout,
+ 		udpForwarder := tun.NewUDPForwarder(options.Context, ipStack, options.Handler, tun.UDPNatOptions{
+ 			Timeout:         options.UDPTimeout,
 -			Shared:          true,
 -			Mapping:         options.UDPMapping,
 -			Filtering:       options.UDPFiltering,
 -			MaxSize:         options.UDPNATMax,
 -			InterfaceFinder: options.InterfaceFinder,
--		})
--		ipStack.SetTransportProtocolHandler(udp.ProtocolNumber, udpForwarder.HandlePacket)
--		tunDevice.udpForwarder = udpForwarder
--		icmpForwarder := tun.NewICMPForwarder(ipStack, options.Handler, options.Logger)
--		ipStack.SetTransportProtocolHandler(icmp.ProtocolNumber4, icmpForwarder.HandlePacket)
--		ipStack.SetTransportProtocolHandler(icmp.ProtocolNumber6, icmpForwarder.HandlePacket)
--		tunDevice.icmpForwarder = icmpForwarder
-+		ipStack.SetTransportProtocolHandler(udp.ProtocolNumber, tun.NewUDPForwarder(options.Context, ipStack, options.Handler, tun.UDPNatOptions{Timeout: options.UDPTimeout}).HandlePacket)
- 	}
- 	return tunDevice, nil
- }
-@@ -109,17 +87,11 @@ func (w *stackDevice) DialContext(ctx context.Context, network string, destinati
- 	}
- 	var networkProtocol tcpip.NetworkProtocolNumber
- 	if destination.IsIPv4() {
--		if !w.inet4Address.IsValid() {
--			return nil, E.New("missing IPv4 local address")
--		}
- 		networkProtocol = header.IPv4ProtocolNumber
--		bind.Addr = tun.AddressFromAddr(w.inet4Address)
-+		bind.Addr = w.addr4
- 	} else {
--		if !w.inet6Address.IsValid() {
--			return nil, E.New("missing IPv6 local address")
--		}
- 		networkProtocol = header.IPv6ProtocolNumber
--		bind.Addr = tun.AddressFromAddr(w.inet6Address)
-+		bind.Addr = w.addr6
- 	}
- 	switch N.NetworkName(network) {
- 	case N.NetworkTCP:
-@@ -145,17 +117,11 @@ func (w *stackDevice) ListenPacket(ctx context.Context, destination M.Socksaddr)
- 	}
- 	var networkProtocol tcpip.NetworkProtocolNumber
- 	if destination.IsIPv4() {
--		if !w.inet4Address.IsValid() {
--			return nil, E.New("missing IPv4 local address")
--		}
- 		networkProtocol = header.IPv4ProtocolNumber
--		bind.Addr = tun.AddressFromAddr(w.inet4Address)
-+		bind.Addr = w.addr4
- 	} else {
--		if !w.inet6Address.IsValid() {
--			return nil, E.New("missing IPv6 local address")
--		}
- 		networkProtocol = header.IPv6ProtocolNumber
--		bind.Addr = tun.AddressFromAddr(w.inet6Address)
-+		bind.Addr = w.addr6
- 	}
- 	udpConn, err := gonet.DialUDP(w.stack, &bind, nil, networkProtocol)
- 	if err != nil {
-@@ -164,24 +130,10 @@ func (w *stackDevice) ListenPacket(ctx context.Context, destination M.Socksaddr)
- 	return udpConn, nil
- }
- 
--func (w *stackDevice) Inet4Address() netip.Addr {
--	return w.inet4Address
--}
--
--func (w *stackDevice) Inet6Address() netip.Addr {
--	return w.inet6Address
--}
--
- func (w *stackDevice) SetDevice(device *device.Device) {
- }
- 
- func (w *stackDevice) Start() error {
--	if w.udpForwarder != nil {
--		err := w.udpForwarder.Start()
--		if err != nil {
--			return err
--		}
--	}
- 	w.events <- wgTun.EventUp
- 	return nil
- }
-@@ -192,24 +144,20 @@ func (w *stackDevice) File() *os.File {
- 
- func (w *stackDevice) Read(bufs [][]byte, sizes []int, offset int) (count int, err error) {
- 	select {
--	case packet, ok := <-w.outbound:
-+	case packetBuffer, ok := <-w.outbound:
- 		if !ok {
- 			return 0, os.ErrClosed
- 		}
--		defer packet.DecRef()
--		var copyN int
--		/*rangeIterate(packet.Data().AsRange(), func(view *buffer.View) {
--			copyN += copy(bufs[0][offset+copyN:], view.AsSlice())
--		})*/
--		for _, view := range packet.AsSlices() {
--			copyN += copy(bufs[0][offset+copyN:], view)
-+		defer packetBuffer.DecRef()
-+		p := bufs[0]
-+		p = p[offset:]
-+		n := 0
-+		for _, slice := range packetBuffer.AsSlices() {
-+			n += copy(p[n:], slice)
- 		}
--		sizes[0] = copyN
--		return 1, nil
--	case packet := <-w.packetOutbound:
++			Shared:          false,
++			Mapping:         tun.NATMapping(0),
++			Filtering:       tun.NATFiltering(0),
++			MaxSize:         0,
++			InterfaceFinder: nil,
+ 		})
+ 		ipStack.SetTransportProtocolHandler(udp.ProtocolNumber, udpForwarder.HandlePacket)
+ 		tunDevice.udpForwarder = udpForwarder
+@@ -207,8 +207,10 @@ func (w *stackDevice) Read(bufs [][]byte, sizes []int, offset int) (count int, e
+ 		sizes[0] = copyN
+ 		return 1, nil
+ 	case packet := <-w.packetOutbound:
 -		defer packet.Release()
 -		sizes[0] = copy(bufs[0][offset:], packet.Bytes())
--		return 1, nil
-+		sizes[0] = n
-+		count = 1
-+		return
++		if len(packet) > len(bufs[0])-offset {
++			return 0, io.ErrShortBuffer
++		}
++		sizes[0] = copy(bufs[0][offset:], packet)
+ 		return 1, nil
  	case <-w.done:
  		return 0, os.ErrClosed
- 	}
-@@ -255,21 +203,13 @@ func (w *stackDevice) Events() <-chan wgTun.Event {
- }
+@@ -330,6 +332,7 @@ func (ep *wireEndpoint) WritePackets(list stack.PacketBufferList) (int, tcpip.Er
+ 		packetBuffer.IncRef()
+ 		select {
+ 		case <-ep.done:
++			packetBuffer.DecRef()
+ 			return 0, &tcpip.ErrClosedForSend{}
+ 		case ep.outbound <- packetBuffer:
+ 		}
+@@ -342,3 +345,18 @@ func (ep *wireEndpoint) Close() {
  
- func (w *stackDevice) Close() error {
--	w.closeOnce.Do(func() {
--		close(w.done)
--		close(w.events)
--		if w.icmpForwarder != nil {
--			w.icmpForwarder.Close()
--		}
--		if w.udpForwarder != nil {
--			_ = w.udpForwarder.Close()
--		}
--		w.stack.Close()
--		for _, endpoint := range w.stack.CleanupEndpoints() {
--			endpoint.Abort()
--		}
--		w.stack.Wait()
--	})
-+	close(w.done)
-+	close(w.events)
-+	w.stack.Close()
-+	for _, endpoint := range w.stack.CleanupEndpoints() {
-+		endpoint.Abort()
+ func (ep *wireEndpoint) SetOnCloseAction(f func()) {
+ }
++
++func (w *stackDevice) enqueuePacket(packet []byte) error {
++	owned := append([]byte(nil), packet...)
++	select {
++	case <-w.done:
++		return os.ErrClosed
++	default:
 +	}
-+	w.stack.Wait()
- 	return nil
- }
- 
++	select {
++	case <-w.done:
++		return os.ErrClosed
++	case w.packetOutbound <- owned:
++		return nil
++	}
++}
 diff --git a/transport/wireguard/device_system.go b/transport/wireguard/device_system.go
-index f6eea5fb6..93179c0b5 100644
+index f6eea5fb6..b4a47d8a2 100644
 --- a/transport/wireguard/device_system.go
 +++ b/transport/wireguard/device_system.go
 @@ -9,55 +9,35 @@ import (
@@ -16640,23 +16863,27 @@ index f6eea5fb6..93179c0b5 100644
  				tun.PacketFillHeader(packet[offset-tun.PacketOffset:], tun.PacketIPVersion(packet[offset:]))
  			}
  			_, err = w.device.Write(packet[offset-tun.PacketOffset:])
-@@ -179,14 +149,8 @@ func (w *systemDevice) Events() <-chan wgTun.Event {
+@@ -195,3 +165,20 @@ func (w *systemDevice) BatchSize() int {
+ 	}
+ 	return 1
  }
- 
- func (w *systemDevice) Close() error {
--	var err error
--	w.closeOnce.Do(func() {
--		close(w.events)
--		if w.device != nil {
--			err = w.device.Close()
--		}
--	})
--	return err
-+	close(w.events)
-+	return w.device.Close()
- }
- 
- func (w *systemDevice) BatchSize() int {
++
++func (w *systemDevice) Inet4Address() netip.Addr {
++	for _, prefix := range w.options.Address {
++		if prefix.Addr().Is4() {
++			return prefix.Addr()
++		}
++	}
++	return netip.Addr{}
++}
++func (w *systemDevice) Inet6Address() netip.Addr {
++	for _, prefix := range w.options.Address {
++		if prefix.Addr().Is6() {
++			return prefix.Addr()
++		}
++	}
++	return netip.Addr{}
++}
 diff --git a/transport/wireguard/device_system_stack.go b/transport/wireguard/device_system_stack.go
 index ae92235b4..232282b76 100644
 --- a/transport/wireguard/device_system_stack.go
@@ -16834,8 +17061,94 @@ index ae92235b4..232282b76 100644
  	}
  	return list.Len(), nil
  }
+diff --git a/transport/wireguard/diagnostics.go b/transport/wireguard/diagnostics.go
+new file mode 100644
+index 000000000..dacdc84d5
+--- /dev/null
++++ b/transport/wireguard/diagnostics.go
+@@ -0,0 +1,51 @@
++package wireguard
++
++import (
++	"strconv"
++	"strings"
++)
++
++// Only counters leave this function. Never return the raw UAPI dump: it contains
++// private/preshared keys, public keys and remote endpoints.
++func parsePeerDiagnostics(content string) []map[string]any {
++	peers := make([]map[string]any, 0)
++	var peer map[string]any
++	for line := range strings.SplitSeq(content, "\n") {
++		key, value, ok := strings.Cut(line, "=")
++		if !ok {
++			continue
++		}
++		if key == "public_key" {
++			if len(peers) >= 64 {
++				break
++			}
++			peer = map[string]any{"index": len(peers) + 1}
++			peers = append(peers, peer)
++			continue
++		}
++		if peer == nil {
++			continue
++		}
++		switch key {
++		case "last_handshake_time_sec", "last_handshake_time_nsec", "rx_bytes", "tx_bytes":
++			if number, err := strconv.ParseUint(value, 10, 64); err == nil {
++				peer[key] = number
++			}
++		}
++	}
++	return peers
++}
++
++func (e *Endpoint) Diagnostics() map[string]any {
++	result := map[string]any{"ready": e.device != nil, "mtu": e.options.MTU}
++	if e.device == nil {
++		return result
++	}
++	content, err := e.device.IpcGet()
++	if err != nil {
++		result["read_failed"] = true
++		return result
++	}
++	result["peers"] = parsePeerDiagnostics(content)
++	return result
++}
+diff --git a/transport/wireguard/diagnostics_test.go b/transport/wireguard/diagnostics_test.go
+new file mode 100644
+index 000000000..c3af1b2d3
+--- /dev/null
++++ b/transport/wireguard/diagnostics_test.go
+@@ -0,0 +1,23 @@
++package wireguard
++
++import (
++	"encoding/json"
++	"strings"
++	"testing"
++)
++
++func TestPeerDiagnosticsExcludeSecrets(t *testing.T) {
++	peers := parsePeerDiagnostics("private_key=PRIVATE\npublic_key=PUBLIC\npreshared_key=PSK\nendpoint=SECRET\nlast_handshake_time_sec=123\nrx_bytes=42\ntx_bytes=17\npublic_key=OTHER\nrx_bytes=-1\ntx_bytes=bad\n")
++	content, _ := json.Marshal(peers)
++	for _, secret := range []string{"PRIVATE", "PUBLIC", "PSK", "SECRET", "OTHER", "private_key", "endpoint"} {
++		if strings.Contains(string(content), secret) {
++			t.Fatalf("unexpected field %s", secret)
++		}
++	}
++	if len(peers) != 2 || peers[0]["rx_bytes"] != uint64(42) || peers[0]["last_handshake_time_sec"] != uint64(123) {
++		t.Fatal(peers)
++	}
++	if _, ok := peers[1]["rx_bytes"]; ok {
++		t.Fatal("accepted invalid counter")
++	}
++}
 diff --git a/transport/wireguard/endpoint.go b/transport/wireguard/endpoint.go
-index f942851fb..45d4af691 100644
+index f942851fb..823d1da61 100644
 --- a/transport/wireguard/endpoint.go
 +++ b/transport/wireguard/endpoint.go
 @@ -10,9 +10,7 @@ import (
@@ -16858,11 +17171,9 @@ index f942851fb..45d4af691 100644
  
  	"go4.org/netipx"
  )
-@@ -32,15 +28,15 @@ type Endpoint struct {
- 	ipcConf        string
- 	allowedAddress []netip.Prefix
+@@ -34,13 +30,14 @@ type Endpoint struct {
  	tunDevice      Device
--	returnDevice   *returnDeviceWrapper
+ 	returnDevice   *returnDeviceWrapper
  	device         *device.Device
 -	allowedIPs     *device.AllowedIPs
 -	egressPool     *tun.UDPEgressPool
@@ -16877,7 +17188,7 @@ index f942851fb..45d4af691 100644
  	if options.PrivateKey == "" {
  		return nil, E.New("missing private key")
  	}
-@@ -53,6 +49,82 @@ func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
+@@ -53,6 +50,82 @@ func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
  	if options.ListenPort != 0 {
  		ipcConf += "\nlisten_port=" + F.ToString(options.ListenPort)
  	}
@@ -16960,7 +17271,7 @@ index f942851fb..45d4af691 100644
  	var peers []peerConfig
  	for peerIndex, rawPeer := range options.Peers {
  		peer := peerConfig{
-@@ -61,7 +133,7 @@ func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
+@@ -61,7 +134,7 @@ func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
  		}
  		if rawPeer.Endpoint.Addr.IsValid() {
  			peer.endpoint = rawPeer.Endpoint.AddrPort()
@@ -16969,7 +17280,7 @@ index f942851fb..45d4af691 100644
  			peer.destination = rawPeer.Endpoint
  		}
  		publicKeyBytes, err := base64.StdEncoding.DecodeString(rawPeer.PublicKey)
-@@ -102,21 +174,16 @@ func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
+@@ -102,91 +175,67 @@ func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
  		options.MTU = 1408
  	}
  	deviceOptions := DeviceOptions{
@@ -17001,7 +17312,13 @@ index f942851fb..45d4af691 100644
  	}
  	tunDevice, err := NewDevice(deviceOptions)
  	if err != nil {
-@@ -128,65 +195,44 @@ func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
+ 		return nil, E.Cause(err, "create WireGuard device")
+ 	}
++	returnDevice := &returnDeviceWrapper{Device: tunDevice}
+ 	return &Endpoint{
++		returnDevice:   returnDevice,
+ 		options:        options,
+ 		peers:          peers,
  		ipcConf:        ipcConf,
  		allowedAddress: allowedAddresses,
  		tunDevice:      tunDevice,
@@ -17096,7 +17413,7 @@ index f942851fb..45d4af691 100644
  				bind.SetReservedForEndpoint(peer.endpoint, peer.reserved)
  			}
  		}
-@@ -196,69 +242,31 @@ func (e *Endpoint) Start(postStart bool) error {
+@@ -196,69 +245,31 @@ func (e *Endpoint) Start(postStart bool) error {
  		return err
  	}
  	logger := &device.Logger{
@@ -17110,7 +17427,7 @@ index f942851fb..45d4af691 100644
  		},
  	}
 -	wgDevice := device.NewDevice(e.options.Context, e.returnDevice, bind, logger, e.options.Workers)
-+	configured := &configuredDevice{Device: e.tunDevice, ready: make(chan struct{})}
++	configured := &configuredDevice{Device: e.returnDevice, ready: make(chan struct{})}
 +	wgDevice := device.NewDevice(configured, bind, logger)
  	e.tunDevice.SetDevice(wgDevice)
 -	domainPeers := make(map[device.NoisePublicKey]*peerConfig)
@@ -17175,7 +17492,7 @@ index f942851fb..45d4af691 100644
  	return nil
  }
  
-@@ -277,42 +285,20 @@ func (e *Endpoint) ListenPacket(ctx context.Context, destination M.Socksaddr) (n
+@@ -277,42 +288,20 @@ func (e *Endpoint) ListenPacket(ctx context.Context, destination M.Socksaddr) (n
  }
  
  func (e *Endpoint) Close() error {
@@ -17223,7 +17540,7 @@ index f942851fb..45d4af691 100644
  		e.device.Up()
  	}
  }
-@@ -323,24 +309,23 @@ type peerConfig struct {
+@@ -323,24 +312,23 @@ type peerConfig struct {
  	publicKeyHex    string
  	preSharedKeyHex string
  	allowedIPs      []netip.Prefix
@@ -17346,58 +17663,76 @@ index 006010aeb..c2ad1b778 100644
  	Reserved                    []uint8
  }
 diff --git a/transport/wireguard/port.go b/transport/wireguard/port.go
-deleted file mode 100644
-index f410bad52..000000000
+index f410bad52..5aa189085 100644
 --- a/transport/wireguard/port.go
-+++ /dev/null
-@@ -1,157 +0,0 @@
--package wireguard
--
--import (
--	"net/netip"
--	"sync/atomic"
--
--	"github.com/sagernet/sing-tun"
--	"github.com/sagernet/sing-tun/gtcpip/header"
--	E "github.com/sagernet/sing/common/exceptions"
++++ b/transport/wireguard/port.go
+@@ -7,109 +7,85 @@ import (
+ 	"github.com/sagernet/sing-tun"
+ 	"github.com/sagernet/sing-tun/gtcpip/header"
+ 	E "github.com/sagernet/sing/common/exceptions"
 -	"github.com/sagernet/wireguard-go/device"
--)
--
--func (e *Endpoint) PortAddresses() (netip.Addr, netip.Addr) {
--	return e.tunDevice.Inet4Address(), e.tunDevice.Inet6Address()
--}
+ )
+ 
+ func (e *Endpoint) PortAddresses() (netip.Addr, netip.Addr) {
+ 	return e.tunDevice.Inet4Address(), e.tunDevice.Inet6Address()
+ }
 -
 -func (e *Endpoint) PortMTU() uint32 {
 -	return e.options.MTU
--}
++func (e *Endpoint) PortMTU() uint32 { return e.options.MTU }
++func (e *Endpoint) SupportsPacketFlow() bool {
++	_, ok := e.tunDevice.(interface{ enqueuePacket([]byte) error })
++	return ok
++}
++func (e *Endpoint) Allows(destination netip.Addr) bool {
++	for _, prefix := range e.allowedAddress {
++		if prefix.Contains(destination) {
++			return true
++		}
++	}
++	return false
+ }
 -
--func (e *Endpoint) WritePackets(packets [][]byte) error {
+ func (e *Endpoint) WritePackets(packets [][]byte) error {
 -	wgDevice := e.device
 -	if wgDevice == nil {
 -		return E.New("WireGuard device is not ready")
--	}
++	writer, ok := e.tunDevice.(interface{ enqueuePacket([]byte) error })
++	if !ok || e.device == nil {
++		return E.New("WireGuard packet device is not ready")
+ 	}
 -	packetRefs := make([]*device.InputPacketRef, 0, len(packets))
 -	refs := make([]device.InputPacketRef, len(packets))
 -	packetSlices := make([][]byte, len(packets))
 -	for i, packet := range packets {
--		if len(packet) == 0 {
--			continue
--		}
++	for _, packet := range packets {
+ 		if len(packet) == 0 {
+ 			continue
+ 		}
 -		var destination []byte
--		switch header.IPVersion(packet) {
--		case header.IPv4Version:
--			if len(packet) < header.IPv4MinimumSize {
++		if len(packet) > int(e.options.MTU) {
++			return E.New("WireGuard packet exceeds MTU")
++		}
++		var destination netip.Addr
+ 		switch header.IPVersion(packet) {
+ 		case header.IPv4Version:
+ 			if len(packet) < header.IPv4MinimumSize {
 -				continue
--			}
++				return E.New("short IPv4 packet")
+ 			}
 -			destination = header.IPv4(packet).DestinationAddressSlice()
--		case header.IPv6Version:
--			if len(packet) < header.IPv6MinimumSize {
++			destination = netip.AddrFrom4([4]byte(packet[16:20]))
+ 		case header.IPv6Version:
+ 			if len(packet) < header.IPv6MinimumSize {
 -				continue
--			}
++				return E.New("short IPv6 packet")
+ 			}
 -			destination = header.IPv6(packet).DestinationAddressSlice()
--		default:
++			destination = netip.AddrFrom16([16]byte(packet[24:40]))
+ 		default:
 -			continue
--		}
++			return E.New("unsupported IP packet")
+ 		}
 -		packetSlices[i] = packet
 -		refs[i] = device.InputPacketRef{
 -			Destination:  destination,
@@ -17424,17 +17759,21 @@ index f410bad52..000000000
 -			source = e.tunDevice.Inet4Address()
 -		} else {
 -			source = e.tunDevice.Inet6Address()
--		}
++		if !e.Allows(destination) {
++			return E.New("WireGuard destination outside allowed IPs")
+ 		}
 -		reply, replyOk := tun.BuildUnreachable(packet, source, state.headroom)
 -		if replyOk {
 -			replies = append(replies, reply)
--		}
--	}
++		if err := writer.enqueuePacket(packet); err != nil {
++			return err
+ 		}
+ 	}
 -	if len(replies) > 0 {
 -		state.returnPath.ReturnPackets(replies)
 -	}
--	return nil
--}
+ 	return nil
+ }
 -
 -func (e *Endpoint) AttachReturn(returnPath tun.Return) error {
 -	headroom := returnPath.ReturnHeadroom()
@@ -17445,106 +17784,93 @@ index f410bad52..000000000
 -		returnPath: returnPath,
 -		headroom:   headroom,
 -	}
--	for {
++func (e *Endpoint) AttachReturn(path tun.Return) error {
++	// AWG S4 changes the actual offset. The return wrapper copies if the supplied
++	// buffer lacks headroom rather than assuming WireGuard's fixed 16-byte header.
++	headroom := path.ReturnHeadroom()
++	if headroom < 0 || headroom > 65536 {
++		return E.New("invalid return headroom")
++	}
++	state := &returnPathState{path, headroom}
+ 	for {
 -		currentState := e.returnDevice.state.Load()
 -		if currentState != nil {
 -			if currentState.returnPath == returnPath {
--				return nil
--			}
--			return E.New("return path already attached")
--		}
++		current := e.returnDevice.state.Load()
++		if current != nil {
++			if current.returnPath == path {
+ 				return nil
+ 			}
+ 			return E.New("return path already attached")
+ 		}
 -		if e.returnDevice.state.CompareAndSwap(nil, newState) {
--			return nil
--		}
--	}
--}
++		if e.returnDevice.state.CompareAndSwap(nil, state) {
+ 			return nil
+ 		}
+ 	}
+ }
 -
 -func (e *Endpoint) DetachReturn(returnPath tun.Return) error {
 -	currentState := e.returnDevice.state.Load()
 -	if currentState != nil && currentState.returnPath == returnPath {
 -		e.returnDevice.state.CompareAndSwap(currentState, nil)
--	}
--	return nil
--}
++func (e *Endpoint) DetachReturn(path tun.Return) error {
++	current := e.returnDevice.state.Load()
++	if current != nil && current.returnPath == path {
++		e.returnDevice.state.CompareAndSwap(current, nil)
+ 	}
+ 	return nil
+ }
+@@ -118,7 +94,6 @@ type returnPathState struct {
+ 	returnPath tun.Return
+ 	headroom   int
+ }
 -
--type returnPathState struct {
--	returnPath tun.Return
--	headroom   int
--}
--
--type returnDeviceWrapper struct {
--	Device
--	state atomic.Pointer[returnPathState]
--}
--
--func (d *returnDeviceWrapper) Write(bufs [][]byte, offset int) (int, error) {
--	state := d.state.Load()
--	if state == nil || len(bufs) == 0 {
--		return d.Device.Write(bufs, offset)
--	}
--	packets := make([][]byte, len(bufs))
--	for i, packet := range bufs {
+ type returnDeviceWrapper struct {
+ 	Device
+ 	state atomic.Pointer[returnPathState]
+@@ -131,27 +106,29 @@ func (d *returnDeviceWrapper) Write(bufs [][]byte, offset int) (int, error) {
+ 	}
+ 	packets := make([][]byte, len(bufs))
+ 	for i, packet := range bufs {
 -		// wireguard-go leaves device.MessageTransportOffsetContent writable bytes in front of the decrypted packet.
 -		packets[i] = packet[offset-state.headroom:]
--	}
--	unconsumed := state.returnPath.ReturnPackets(packets)
--	if len(unconsumed) == 0 {
++		if offset < 0 || offset > len(packet) {
++			return 0, E.New("invalid decrypted packet offset")
++		}
++		if state.headroom <= offset {
++			packets[i] = packet[offset-state.headroom:]
++		} else {
++			packets[i] = make([]byte, state.headroom+len(packet)-offset)
++			copy(packets[i][state.headroom:], packet[offset:])
++		}
+ 	}
+ 	unconsumed := state.returnPath.ReturnPackets(packets)
+ 	if len(unconsumed) == 0 {
 -		return 0, nil
 -	}
 -	if len(unconsumed) == len(bufs) {
 -		return d.Device.Write(bufs, offset)
--	}
--	remaining := make([][]byte, 0, len(unconsumed))
++		return len(bufs), nil
+ 	}
+ 	remaining := make([][]byte, 0, len(unconsumed))
 -	searchIndex := 0
--	for _, packet := range unconsumed {
+ 	for _, packet := range unconsumed {
 -		for searchIndex < len(bufs) && &packet[0] != &bufs[searchIndex][offset-state.headroom] {
 -			searchIndex++
 -		}
 -		if searchIndex == len(bufs) {
 -			break
--		}
++		if len(packet) < state.headroom {
++			return 0, E.New("invalid returned packet")
+ 		}
 -		remaining = append(remaining, bufs[searchIndex])
 -		searchIndex++
--	}
++		// ReturnPackets returns a subset of the input. Pass its potentially rewritten
++		// bytes to the IP stack; no pointer identity assumption across an AWG buffer.
++		remaining = append(remaining, packet[state.headroom:])
+ 	}
 -	return d.Device.Write(remaining, offset)
--}
-diff --git a/route/process_cache.go b/route/process_cache.go
-index f99cebadb..d40d8a5e9 100644
---- a/route/process_cache.go
-+++ b/route/process_cache.go
-@@ -8,6 +8,7 @@ import (
- 
- 	"github.com/sagernet/sing-box/adapter"
- 	"github.com/sagernet/sing-box/common/process"
-+	C "github.com/sagernet/sing-box/constant"
- )
- 
- type processCacheKey struct {
-@@ -36,7 +37,10 @@ func (r *Router) findProcessInfoCached(ctx context.Context, network string, sour
++	_, err := d.Device.Write(remaining, 0)
++	return len(bufs), err
  }
- 
- func (r *Router) searchProcessInfo(ctx context.Context, metadata *adapter.InboundContext) {
--	if r.processSearcher == nil || metadata.ProcessInfo != nil || !r.isLocalSource(metadata.Source.Addr) {
-+	platformTun := metadata.InboundType == C.TypeTun && r.platformInterface != nil && r.platformInterface.UsePlatformConnectionOwnerFinder()
-+	// Android owns the TUN device and socket attribution. Its interface cache can
-+	// be empty or predate the TUN; it must not disable per-app access checks.
-+	if r.processSearcher == nil || metadata.ProcessInfo != nil || (!platformTun && !r.isLocalSource(metadata.Source.Addr)) {
- 		return
- 	}
- 	var originDestination netip.AddrPort
-@@ -45,7 +49,14 @@ func (r *Router) searchProcessInfo(ctx context.Context, metadata *adapter.Inboun
- 	} else if metadata.Destination.IsIP() {
- 		originDestination = metadata.Destination.AddrPort()
- 	}
--	processInfo, err := r.findProcessInfoCached(ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
-+	var processInfo *adapter.ConnectionOwner
-+	var err error
-+	if platformTun {
-+		// Socket tuples can be reused by another UID. Do not cache authorization.
-+		processInfo, err = process.FindProcessInfo(r.processSearcher, ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
-+	} else {
-+		processInfo, err = r.findProcessInfoCached(ctx, metadata.Network, metadata.Source.AddrPort(), originDestination)
-+	}
- 	if err != nil {
- 		r.logger.InfoContext(ctx, "failed to search process: ", err)
- 		return

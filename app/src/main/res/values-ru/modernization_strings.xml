@@ -6,4 +6,15 @@
     <string name="restore_network_settings">Вернуть предыдущие настройки сети</string>
     <string name="restore_network_settings_confirm">Восстановить предыдущие DNS, маршруты и параметры подключения?</string>
     <string name="restore_network_settings_failed">Не удалось восстановить настройки сети. Возможно, используемые профили были удалены.</string>
+    <string name="diagnostics_handshake">Последний handshake</string>
+    <string name="diagnostics_handshake_never">ещё не было</string>
+    <string name="diagnostics_wg_counters_hint">Счётчики транспорта пира. Успешный HTTP-тест не проверяет UDP и MTU пути.</string>
+    <string name="diagnostics_connection_history">Последние решения маршрутизации</string>
+    <string name="diagnostics_history_debug_only">Для сбора истории включите debug или trace и перезапустите соединение. DNS-запросы без идентификатора соединения показаны отдельно.</string>
+    <string name="diagnostics_selected_node">Выбранный узел</string>
+    <string name="diagnostics_query_failed">ошибка</string>
+    <string name="direct_fallback_required">Доступных сайтов для успешной проверки</string>
+    <string name="direct_fallback_failures">Неудачных проверок для перехода на прокси</string>
+    <string name="direct_fallback_recoveries">Успешных проверок для возврата напрямую</string>
+    <string name="direct_fallback_invalid_count">Введите число от 1 до %1$d.</string>
 </resources>

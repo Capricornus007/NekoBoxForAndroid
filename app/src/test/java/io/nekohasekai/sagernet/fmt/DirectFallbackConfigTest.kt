@@ -13,6 +13,15 @@ class DirectFallbackConfigTest {
         assertEquals(true, config["interrupt_exist_connections"])
     }
 
+    @Test fun supportsSeveralControlSitesAndHysteresis() {
+        val config = directFallbackConfig("proxy", " https://one.example\nhttps://two.example\nhttps://one.example ", 30, 2, 3, 2)
+        assertEquals(listOf("https://one.example", "https://two.example"), config["control_urls"])
+        assertEquals(2, config["required_successes"])
+        assertEquals(3, config["failure_threshold"])
+        assertEquals(2, config["recovery_threshold"])
+        assertThrows(IllegalArgumentException::class.java) { directFallbackConfig("proxy", "https://one.example", 30, 2) }
+    }
+
     @Test fun rejectsInvalidProbesAndIntervals() {
         for (url in listOf("", "ftp://example.org", "https://", "https://user:pass@example.org", "https://example.org/#fragment", "https://example.org:0")) {
             assertThrows(IllegalArgumentException::class.java) { directFallbackConfig("proxy", url, 30) }

@@ -2,8 +2,8 @@
 <resources>
     <string name="direct_fallback">Proxy fallback for direct routes</string>
     <string name="direct_fallback_summary">If the control site is unreachable directly, use the selected proxy for direct routes. Restore direct access when it recovers. LAN stays direct. Existing connections are reconnected.</string>
-    <string name="direct_fallback_url">Control site URL</string>
-    <string name="direct_fallback_url_summary">Use an HTTPS site outside the whitelist. A HEAD response of 2xx/3xx is considered reachable; timeout is 3 seconds. Applies to generated configurations.</string>
+    <string name="direct_fallback_url">Control sites</string>
+    <string name="direct_fallback_url_summary">One HTTP(S) URL per line, up to 8. Only direct access is tested; the configured quorum and consecutive checks control switching.</string>
     <string name="direct_fallback_interval">Check interval (seconds)</string>
     <string name="direct_fallback_invalid_url">Enter a valid HTTP or HTTPS URL without credentials or a fragment.</string>
     <string name="direct_fallback_invalid_interval">The check interval must be from 5 to 3600 seconds.</string>

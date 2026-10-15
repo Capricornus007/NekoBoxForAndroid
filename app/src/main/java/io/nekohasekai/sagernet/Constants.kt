@@ -41,6 +41,9 @@ object Key {
     const val DIRECT_FALLBACK = "directFallback"
     const val DIRECT_FALLBACK_URL = "directFallbackUrl"
     const val DIRECT_FALLBACK_INTERVAL = "directFallbackInterval"
+    const val DIRECT_FALLBACK_REQUIRED = "directFallbackRequired"
+    const val DIRECT_FALLBACK_FAILURES = "directFallbackFailures"
+    const val DIRECT_FALLBACK_RECOVERIES = "directFallbackRecoveries"
     const val CONCURRENT_DIAL = "concurrentDial"
 
     const val MIXED_PORT = "mixedPort" // migration source

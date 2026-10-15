@@ -9,7 +9,7 @@ import moe.matsuri.nb4a.utils.JavaUtil.gson
 import java.io.File
 import io.nekohasekai.sagernet.ktx.readBytesLimited
 
-/** One private, atomic rollback point; profiles and their secrets are not copied. */
+/** One private, atomic rollback point; profiles are not copied. */
 object NetworkSettingsHistory {
     private val file get() = AtomicFile(File(SagerNet.application.noBackupFilesDir, "network-settings-previous.json"))
     private val keys = setOf(

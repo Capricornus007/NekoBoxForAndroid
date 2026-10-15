@@ -902,7 +902,8 @@ fun buildConfig(
         if (useDirectFallback) {
             outbounds.add(Outbound().apply {
                 _hack_config_map.putAll(directFallbackConfig(
-                    mainProxyTag, DataStore.directFallbackUrl, DataStore.directFallbackInterval
+                    mainProxyTag, DataStore.directFallbackUrl, DataStore.directFallbackInterval,
+                    DataStore.directFallbackRequired, DataStore.directFallbackFailures, DataStore.directFallbackRecoveries
                 ))
             })
         }
