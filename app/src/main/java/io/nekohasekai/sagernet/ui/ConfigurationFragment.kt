@@ -36,6 +36,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.size
 import kotlinx.coroutines.delay
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceDataStore
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -1487,6 +1488,11 @@ class ConfigurationFragment @JvmOverloads constructor(
                 }
             }
 
+            override fun onViewRecycled(holder: ConfigurationHolder) {
+                holder.cancelBind()
+                super.onViewRecycled(holder)
+            }
+
             override fun getItemCount(): Int {
                 return configurationIdList.size
             }
@@ -1686,6 +1692,13 @@ class ConfigurationFragment @JvmOverloads constructor(
             PopupMenu.OnMenuItemClickListener {
 
             lateinit var entity: ProxyEntity
+
+            private var bindJob: Job? = null
+
+            fun cancelBind() {
+                bindJob?.cancel()
+                bindJob = null
+            }
             
             private fun showShareMenu(anchor: View, proxyEntity: ProxyEntity) {
                 val popup = PopupMenu(requireContext(), anchor)
@@ -1727,22 +1740,23 @@ class ConfigurationFragment @JvmOverloads constructor(
             val removeButton: ImageView = view.findViewById(R.id.remove)
 
             private fun updateSelectedAppearance(selected: Boolean) {
-                val primaryText = requireContext().getColorAttr(
+                val context = view.context
+                val primaryText = context.getColorAttr(
                     if (selected) com.google.android.material.R.attr.colorOnPrimaryContainer
                     else com.google.android.material.R.attr.colorOnSurface
                 )
-                val secondaryText = requireContext().getColorAttr(
+                val secondaryText = context.getColorAttr(
                     if (selected) com.google.android.material.R.attr.colorOnPrimaryContainer
                     else com.google.android.material.R.attr.colorOnSurfaceVariant
                 )
                 (view as? MaterialCardView)?.setCardBackgroundColor(
-                    requireContext().getColorAttr(
+                    context.getColorAttr(
                         if (selected) com.google.android.material.R.attr.colorPrimaryContainer
                         else com.google.android.material.R.attr.colorSurfaceContainerLowest
                     )
                 )
                 profileIconContainer.setCardBackgroundColor(
-                    requireContext().getColorAttr(
+                    context.getColorAttr(
                         if (selected) com.google.android.material.R.attr.colorSecondaryContainer
                         else com.google.android.material.R.attr.colorSurfaceContainerLow
                     )
@@ -1776,6 +1790,9 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             fun bind(proxyEntity: ProxyEntity, trafficData: TrafficData? = null) {
                 val pf = parentFragment as? ConfigurationFragment ?: return
+                val lifecycleOwner = viewLifecycleOwnerLiveData.value ?: return
+
+                cancelBind()
 
                 entity = proxyEntity
 
@@ -1793,7 +1810,9 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 lastSelected = DataStore.selectedProxy
                                 DataStore.selectedProxy = proxyEntity.id
                                 onMainDispatcher {
-                                    updateSelectedAppearance(true)
+                                    if (view.isAttachedToWindow && entity.id == proxyEntity.id) {
+                                        updateSelectedAppearance(true)
+                                    }
                                 }
                             }
 
@@ -1975,7 +1994,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                     }
                 }
 
-                runOnDefaultDispatcher {
+                bindJob = lifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
                     val selected = (selectedItem?.id ?: DataStore.selectedProxy) == proxyEntity.id
                     val started =
                         selected && DataStore.serviceState.started && DataStore.currentProfile == proxyEntity.id
@@ -1989,7 +2008,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                         onMainDispatcher {
                             shareButton.setImageResource(R.drawable.ic_social_share)
                             shareButton.imageTintList = ColorStateList.valueOf(
-                                requireContext().getColorAttr(
+                                view.context.getColorAttr(
                                     if (selected) com.google.android.material.R.attr.colorOnPrimaryContainer
                                     else com.google.android.material.R.attr.colorOnSurface
                                 )
