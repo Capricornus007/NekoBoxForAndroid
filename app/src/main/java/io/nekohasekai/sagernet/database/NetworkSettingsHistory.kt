@@ -22,7 +22,7 @@ object NetworkSettingsHistory {
     )
     private data class Snapshot(val version: Int = 1, val settings: List<KeyValuePair>, val rules: List<RuleEntity>)
 
-    fun available() = runCatching { file.openRead().use { }; true }.getOrDefault(false)
+    @Synchronized fun available() = runCatching { file.openRead().use { }; true }.getOrDefault(false)
 
     @Synchronized fun capture(): Boolean = try {
         val snapshot = Snapshot(settings = PublicDatabase.kvPairDao.all().filter { it.key in keys }, rules = SagerDatabase.rulesDao.allRules())
