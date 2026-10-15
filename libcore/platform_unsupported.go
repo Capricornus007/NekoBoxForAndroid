@@ -41,7 +41,7 @@ func (s *platformUnsupportedInterface) UsePlatformDefaultInterfaceMonitor() bool
 }
 
 func (s *platformUnsupportedInterface) CreateDefaultInterfaceMonitor(logger logger.Logger) tun.DefaultInterfaceMonitor {
-	return &interfaceMonitorStub{}
+	return nil
 }
 
 func (s *platformUnsupportedInterface) UsePlatformNetworkInterfaces() bool {

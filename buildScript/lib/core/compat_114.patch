@@ -10752,7 +10752,7 @@ index 000000000..dd9ad9af0
 +	return o.endpoint.ListenPacket(ctx, destination)
 +}
 diff --git a/route/network.go b/route/network.go
-index 53a1be8d8..5b49d841c 100644
+index 53a1be8d8..76f719d8d 100644
 --- a/route/network.go
 +++ b/route/network.go
 @@ -85,6 +85,7 @@ func NewNetworkManager(ctx context.Context, logger logger.ContextLogger, options
@@ -10763,6 +10763,16 @@ index 53a1be8d8..5b49d841c 100644
  			BindInterface:  options.DefaultInterface,
  			RoutingMark:    uint32(options.DefaultMark),
  			DomainResolver: defaultDomainResolver.Server,
+@@ -317,6 +318,9 @@ func (r *NetworkManager) UpdateInterfaces() error {
+ }
+ 
+ func (r *NetworkManager) DefaultNetworkInterface() *adapter.NetworkInterface {
++	if r.interfaceMonitor == nil {
++		return nil
++	}
+ 	iif := r.interfaceMonitor.DefaultInterface()
+ 	if iif == nil {
+ 		return nil
 diff --git a/route/rule/rule_action.go b/route/rule/rule_action.go
 index cb6561181..1afb86dc1 100644
 --- a/route/rule/rule_action.go

@@ -43,3 +43,17 @@ Android profile serialization v5 preserves v4 numeric keepalive values and
 adds the AWG 3.1 fields. INI and packed Amnezia imports, cloning and editor
 bindings retain those fields. HeaderProtectionKey is redacted in Kotlin and Go
 diagnostics. Range/key validation errors do not include secret values.
+
+The Android adapter provides no native default-interface monitor. Its former
+no-op stub returned a nil default interface, which 1.14's post-start dispatch
+interpreted as a lost network and permanently paused WireGuard. Android's
+existing DefaultNetworkListener continues to own connectivity/restart handling;
+VpnService fd protection is unchanged. NetworkManager.DefaultNetworkInterface
+returns nil safely when the optional native monitor is absent.
+
+The full-service regression test uses the actual Android platform adapter,
+replacing only the Android fd-protection call with a counted test callback.
+Both plain WG and a WARP-style AWG2 profile (1250-byte synthetic CPS preface)
+exchange requests/replies after full box startup and after device pause/wake.
+The test reproduced the false network pause before the fix. No uploaded
+configuration, endpoint or key is included in test fixtures.

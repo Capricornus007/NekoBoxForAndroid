@@ -79,11 +79,13 @@ func (w *boxPlatformInterfaceWrapper) CloseTun() error {
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformDefaultInterfaceMonitor() bool {
+	// DefaultNetworkListener owns Android connectivity; do not use native netlink.
 	return true
 }
 
 func (w *boxPlatformInterfaceWrapper) CreateDefaultInterfaceMonitor(l logger.Logger) tun.DefaultInterfaceMonitor {
-	return &interfaceMonitorStub{}
+	// No native monitor is different from a monitor reporting a lost network.
+	return nil
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformInterfaceGetter() bool {
