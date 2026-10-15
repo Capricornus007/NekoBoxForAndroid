@@ -14,7 +14,7 @@ import (
 	"time"
 
 	box "github.com/sagernet/sing-box"
-	"github.com/sagernet/sing-box/experimental/libbox/platform"
+	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/option"
 	M "github.com/sagernet/sing/common/metadata"
 	"github.com/sagernet/sing/service"
@@ -61,12 +61,12 @@ func TestDomainOutboundWithOverriddenDNS(t *testing.T) {
 				"dns":       map[string]any{"servers": []any{map[string]any{"type": "local", "tag": test.dnsTag}}, "final": test.dnsTag},
 				"outbounds": outbounds, "route": map[string]any{"final": "fqdn"},
 			}
-			ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(&testLocalDNS{lookup: func(exchange *ExchangeContext, network string) { exchange.Success("127.0.0.1") }}), nekoboxAndroidServiceRegistry())
+			ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(&testLocalDNS{lookup: func(exchange *ExchangeContext, network string) { exchange.Success("127.0.0.1") }}), nekoboxAndroidServiceRegistry(), nekoboxAndroidCertificateRegistry())
 			ctx = service.ContextWithDefaultRegistry(ctx)
-			service.MustRegister[platform.Interface](ctx, dnsTestPlatform{})
+			service.MustRegister[adapter.PlatformInterface](ctx, &dnsTestPlatform{})
 			content, _ := json.Marshal(configuration)
 			var options option.Options
-			if err := options.UnmarshalJSONContext(ctx, content); err != nil {
+			if err := decodeConfigOptions(ctx, content, &options); err != nil {
 				t.Fatal(err)
 			}
 			instance, err := box.New(box.Options{Context: ctx, Options: options})

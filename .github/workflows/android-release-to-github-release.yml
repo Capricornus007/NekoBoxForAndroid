@@ -80,7 +80,7 @@ jobs:
         env:
           NEKO_ROUTE_ASSET_TEST_DIR: ../app/src/main/assets/sing-box
         shell: bash
-        run: go test -race -tags=with_conntrack,with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api . github.com/sagernet/sing-box/protocol/group github.com/sagernet/sing-box/protocol/http github.com/sagernet/sing-box/common/kmutex github.com/sagernet/sing-box/common/expiringmap 2>&1 | tee ../go-test.log
+        run: go test -race -tags=with_conntrack,with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api . github.com/sagernet/sing-box/protocol/group github.com/sagernet/sing-box/protocol/http github.com/sagernet/sing-box/common/kmutex github.com/sagernet/sing-box/common/expiringmap github.com/sagernet/sing-box/common/dialer github.com/sagernet/sing-quic/congestion_meta2 github.com/sagernet/sing-box/protocol/vless/encryption 2>&1 | tee ../go-test.log
       - name: Build libcore AAR once
         run: ./buildScript/lib/core/build.sh
       - name: Test and build release APKs
@@ -126,17 +126,15 @@ jobs:
           cat > release-notes.txt <<'NOTES'
           Package: com.isaiandco.neko. Non-debuggable release APKs for four ABIs. Private signing is selected when KEYSTORE_BASE64 and its password/alias secrets are configured; otherwise the existing stable debug key is retained. Incomplete or invalid private signing configuration fails. Android requires a data transfer/reinstall when changing signing keys.
 
-          Adds per-subscription server DNS and HTTP headers, with independent Android DNS bootstrap and cross-origin credential stripping. Unambiguous node renames preserve IDs, traffic and references; removal of referenced profiles requires manual review. Existing subscription/HWID data remains readable.
+          Migrates the core to SagerNet/sing-box 1.14.3 (7054cac5124465ffdb145870d7c01885566711b1), retaining application routing groups, direct-route fallback, traffic accounting and protocol adapters, including XHTTP, VLESS encryption, KCP, SSR and WG/AWG/AWG2.
 
-          WG/AWG import retains DNS, AllowedIPs and PersistentKeepalive. Keepalive is passed to the core. An opt-in setting applies imported DNS/routes to a standalone selected profile; existing profiles retain previous behavior. Imported private subnets are captured without weakening TUN UID/DNS guards.
+          Converts legacy inbound and DNS options only in the runtime JSON. Preserves sniff-before-resolve behavior, UID/DNS guard ordering, DNS bootstrap and address-family preferences, escaped DoH paths/queries, FakeIP ranges and local rcode responses. Geographic aliases are materialized as public inline rule-sets; GeoSite readers are closed correctly.
 
-          Adds Configuration > Check configuration and routes in the profile menu: static core validation, missing/cyclic outbound references, redacted JSON preview and live group decisions with TCP/UDP selection, RTT and switch reasons. Known secrets are masked in native logs and log export.
+          Retains HTTP/2 CONNECT and custom XHTTP BBR initial windows. Concurrent TCP connect attempts close losing sockets; Fast Open sends application data once. Source preparation is repeatable and refuses to discard unrelated dependency edits.
 
-          Updates the compatible starifly core pin to 0b7a2fc2f2c33f754e5fe5a1bb3e0a4f610b6aa9 and sing-vmess to v0.2.8-mod.1. Includes XHTTP/VLESS/HTTP2 CONNECT fixes and an additional XHTTP upload-buffer ownership/short-write fix found by a live race test. TUN generation uses the modern address field. This is not a full migration to upstream sing-box 1.14.
+          Preserves bundled verified GeoIP/GeoSite, live traffic counters, encrypted backups, subscription DNS/headers, profile references, diagnostics and conditional signing from dev.6.
 
-          Retains bundled verified GeoIP/GeoSite, live traffic counters, encrypted backups, optional direct-route fallback and bare local/localhost Android system DNS behavior from dev.5.2.
-
-          JVM and native race tests, live XHTTP packet-up/stream-up/stream-one exchange, WG/AWG/AWG2 exchange, DNS routing, SQLite rollback and actual APK signature/ABI/16 KiB checks run before publication. Static validation does not test server availability or prove absence of every leak. OEM/work-profile/Private DNS and battery behavior still require device testing.
+          Native race tests include live WG/AWG/AWG2, XHTTP modes, HTTP/2 CONNECT, Juicity TCP/UDP and VLESS encryption with X25519/ML-KEM and three XOR modes. JVM tests, SQLite rollback and actual APK signature/ABI/16 KiB checks run before publication. OEM/work-profile/Private DNS and battery behavior still require device testing. The retained WireGuard adapter supports its existing TCP/UDP path, not upstream's new direct L3/ICMP port.
           NOTES
           OPTIONS=()
           if [ "$NEKO_DEV_BUILD" = 1 ]; then OPTIONS+=(--prerelease --latest=false); fi

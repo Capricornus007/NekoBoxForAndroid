@@ -62,7 +62,7 @@ func newFallbackTest(t *testing.T, url string, interval time.Duration) (*group.U
 		t.Fatal(err)
 	}
 	g := o.(*group.URLTest)
-	if err = g.Start(); err != nil {
+	if err = g.Start(adapter.StartStateStart, adapter.NewScope(ctx, log.NewNOPFactory().Logger())); err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = g.Close() })

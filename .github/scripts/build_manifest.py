@@ -14,7 +14,7 @@ def run(*args, cwd=root):
 
 properties = dict(line.split('=', 1) for line in (root / 'nb4a.properties').read_text().splitlines() if '=' in line)
 pins = dict(re.findall(r'export (COMMIT_\w+)="([0-9a-f]{40})"', (root / 'buildScript/lib/core/get_source_env.sh').read_text()))
-patches = {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest() for path in (root / 'buildScript/lib/core').glob('patch_*.py')}
+patches = {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted((root / 'buildScript/lib/core').glob('*.patch'))}
 verification = json.loads(Path(sys.argv[2]).read_text())
 public_cert = subprocess.check_output(['keytool', '-exportcert', '-keystore', str(root / 'app/debug.keystore'), '-storepass', 'android', '-alias', 'androiddebugkey'], stderr=subprocess.DEVNULL)
 certificate = verification['apks'][0]['certificate_sha256']

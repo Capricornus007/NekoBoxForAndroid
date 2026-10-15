@@ -36,7 +36,7 @@ func materializeGeoRuleSets(options *option.Options) error {
 			var err error
 			rules, err = load(name)
 			if err != nil {
-				return fmt.Errorf("rule-set %s (%s): %w", set.Tag, path, err)
+				return fmt.Errorf("rule-set %s (%s): %w", strings.Join(set.Tag, ","), path, err)
 			}
 			loaded[path] = rules
 		}

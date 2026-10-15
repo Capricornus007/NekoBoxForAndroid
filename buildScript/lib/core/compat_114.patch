@@ -1,12 +1,12 @@
 diff --git a/adapter/network.go b/adapter/network.go
-index c3ae515..b95daf8 100644
+index c3ae515..5b765bb 100644
 --- a/adapter/network.go
 +++ b/adapter/network.go
 @@ -38,6 +38,7 @@ type NetworkManager interface {
  }
  
  type NetworkOptions struct {
-+ ConcurrentDial bool
++	ConcurrentDial       bool
  	BindInterface        string
  	RoutingMark          uint32
  	DomainResolver       string
@@ -476,14 +476,14 @@ index 0000000..ef10f95
 +	}
 +}
 diff --git a/common/dialer/default.go b/common/dialer/default.go
-index f202283..0f7c991 100644
+index f202283..3095ebe 100644
 --- a/common/dialer/default.go
 +++ b/common/dialer/default.go
 @@ -31,6 +31,7 @@ var (
  )
  
  type DefaultDialer struct {
-+ concurrentDial bool
++	concurrentDial         bool
  	dialer4                tfo.Dialer
  	dialer6                tfo.Dialer
  	udpDialer4             net.Dialer
@@ -491,7 +491,7 @@ index f202283..0f7c991 100644
  	tcpDialer4 := tfo.Dialer{Dialer: dialer4, DisableTFO: !options.TCPFastOpen}
  	tcpDialer6 := tfo.Dialer{Dialer: dialer6, DisableTFO: !options.TCPFastOpen}
  	return &DefaultDialer{
-+ concurrentDial: options.ConcurrentDial || (networkManager != nil && networkManager.DefaultOptions().ConcurrentDial),
++		concurrentDial:         options.ConcurrentDial || (networkManager != nil && networkManager.DefaultOptions().ConcurrentDial),
  		dialer4:                tcpDialer4,
  		dialer6:                tcpDialer6,
  		udpDialer4:             udpDialer4,
@@ -499,7 +499,7 @@ index f202283..0f7c991 100644
  }
  
  func (d *DefaultDialer) DialContext(ctx context.Context, network string, address M.Socksaddr) (net.Conn, error) {
-+ ctx = context.WithValue(ctx, concurrentDialContextKey{}, d.concurrentDial)
++	ctx = context.WithValue(ctx, concurrentDialContextKey{}, d.concurrentDial)
  	if !address.IsValid() {
  		return nil, E.New("invalid address")
  	} else if address.IsDomain() {
@@ -507,7 +507,7 @@ index f202283..0f7c991 100644
  }
  
  func (d *DefaultDialer) DialParallelInterface(ctx context.Context, network string, address M.Socksaddr, strategy *C.NetworkStrategy, interfaceType []C.InterfaceType, fallbackInterfaceType []C.InterfaceType, fallbackDelay time.Duration) (net.Conn, error) {
-+ ctx = context.WithValue(ctx, concurrentDialContextKey{}, d.concurrentDial)
++	ctx = context.WithValue(ctx, concurrentDialContextKey{}, d.concurrentDial)
  	if strategy == nil {
  		strategy = d.networkStrategy
  	}
@@ -677,15 +677,17 @@ index 0000000..5ec39c8
 +	}
 +}
 diff --git a/common/dialer/tfo.go b/common/dialer/tfo.go
-index fec2aaf..09c75c0 100644
+index fec2aaf..6aaff17 100644
 --- a/common/dialer/tfo.go
 +++ b/common/dialer/tfo.go
-@@ -35,7 +35,7 @@ func DialSlowContext(dialer *tfo.Dialer, ctx context.Context, network string, de
+@@ -35,7 +35,9 @@ func DialSlowContext(dialer *tfo.Dialer, ctx context.Context, network string, de
  	if dialer.DisableTFO || N.NetworkName(network) != N.NetworkTCP {
  		switch N.NetworkName(network) {
  		case N.NetworkTCP, N.NetworkUDP:
 -			return dialer.Dialer.DialContext(ctx, network, destination.String())
-+			return dialTCPConcurrently(ctx, network, func(dialCtx context.Context) (net.Conn, error) { return dialer.Dialer.DialContext(dialCtx, network, destination.String()) })
++			return dialTCPConcurrently(ctx, network, func(dialCtx context.Context) (net.Conn, error) {
++				return dialer.Dialer.DialContext(dialCtx, network, destination.String())
++			})
  		default:
  			return dialer.Dialer.DialContext(ctx, network, destination.AddrString())
  		}
@@ -1253,7 +1255,7 @@ index 0000000..6648442
 +	wg.Wait()
 +}
 diff --git a/common/urltest/urltest.go b/common/urltest/urltest.go
-index 26efe39..ce94db2 100644
+index 26efe39..1fe59a6 100644
 --- a/common/urltest/urltest.go
 +++ b/common/urltest/urltest.go
 @@ -3,6 +3,7 @@ package urltest
@@ -1268,7 +1270,7 @@ index 26efe39..ce94db2 100644
  }
  
  func URLTest(ctx context.Context, link string, detour N.Dialer) (uint16, error) {
-+ ctx = context.WithValue(ctx, "nb4a_no_concurrent_dial", true)
++	ctx = context.WithValue(ctx, "nb4a_no_concurrent_dial", true)
  	multiplexOutbound, isMultiplexOutbound := common.Cast[adapter.OutboundWithMultiplex](detour)
  	if isMultiplexOutbound && multiplexOutbound.MultiplexEnabled() {
  		warmContext := adapter.ContextWithKeepSession(ctx)
@@ -5147,6 +5149,15 @@ index c3089a6..167a0fd 100644
 +
 +const V2RayTransportTypeXHTTP = "xhttp"
 +const V2RayTransportTypeKCP = "kcp"
+diff --git a/constant/version.go b/constant/version.go
+index 5a816a7..80fe387 100644
+--- a/constant/version.go
++++ b/constant/version.go
+@@ -1,3 +1,3 @@
+ package constant
+ 
+-var Version = "unknown"
++var Version = "1.14.3-neko-1"
 diff --git a/dns/transport/https.go b/dns/transport/https.go
 index 4d5d3fb..a005d3d 100644
 --- a/dns/transport/https.go
@@ -5206,7 +5217,7 @@ index 0000000..a86df58
 +
 +var GetGeoSiteHeadlessRules func(name string) ([]option.HeadlessRule, error)
 diff --git a/option/direct.go b/option/direct.go
-index a11c45e..9babb1e 100644
+index a11c45e..2485fe7 100644
 --- a/option/direct.go
 +++ b/option/direct.go
 @@ -3,7 +3,6 @@ package option
@@ -5221,7 +5232,7 @@ index a11c45e..9babb1e 100644
  	Network         NetworkList `json:"network,omitempty"`
  	OverrideAddress string      `json:"override_address,omitempty"`
  	OverridePort    uint16      `json:"override_port,omitempty"`
-+  Fragment        *Fragment `json:"fragment,omitempty"`
++	Fragment        *Fragment   `json:"fragment,omitempty"`
 +}
 +
 +type Fragment struct {
@@ -5239,8 +5250,8 @@ index a11c45e..9babb1e 100644
 +	OverridePort uint16 `json:"override_port,omitempty"`
  	// Deprecated: removed
 -	ProxyProtocol uint8 `json:"proxy_protocol,omitempty" schema:"omit"`
-+	ProxyProtocol uint8 `json:"proxy_protocol,omitempty"`
-+	Fragment *Fragment `json:"fragment,omitempty"`
++	ProxyProtocol uint8     `json:"proxy_protocol,omitempty"`
++	Fragment      *Fragment `json:"fragment,omitempty"`
  }
  
  type DirectOutboundOptions _DirectOutboundOptions
@@ -5283,7 +5294,7 @@ index bc0c07e..2d43bc0 100644
  	InterruptExistConnections bool               `json:"interrupt_exist_connections,omitempty"`
  }
 diff --git a/option/outbound.go b/option/outbound.go
-index 4590b48..7d50df3 100644
+index 4590b48..afdaecc 100644
 --- a/option/outbound.go
 +++ b/option/outbound.go
 @@ -40,10 +40,6 @@ func (h *Outbound) UnmarshalJSONContext(ctx context.Context, content []byte) err
@@ -5301,43 +5312,47 @@ index 4590b48..7d50df3 100644
  }
  
  type AbstractDialerOptions struct {
-+ ConcurrentDial bool `json:"concurrent_dial,omitempty"`
++	ConcurrentDial             bool                              `json:"concurrent_dial,omitempty"`
  	BindInterface              string                            `json:"bind_interface,omitempty"`
  	Inet4BindAddress           *badoption.Addr                   `json:"inet4_bind_address,omitempty"`
  	Inet6BindAddress           *badoption.Addr                   `json:"inet6_bind_address,omitempty"`
 diff --git a/option/route.go b/option/route.go
-index 39f3cfb..a33fd51 100644
+index 39f3cfb..3804d69 100644
 --- a/option/route.go
 +++ b/option/route.go
 @@ -3,6 +3,7 @@ package option
  import "github.com/sagernet/sing/common/json/badoption"
  
  type RouteOptions struct {
-+ ConcurrentDial bool `json:"concurrent_dial,omitempty"`
++	ConcurrentDial             bool                              `json:"concurrent_dial,omitempty"`
  	GeoIP                      *GeoIPOptions                     `json:"geoip,omitempty" schema:"omit"`
  	Geosite                    *GeositeOptions                   `json:"geosite,omitempty" schema:"omit"`
  	Rules                      []Rule                            `json:"rules,omitempty"`
 diff --git a/option/rule_action.go b/option/rule_action.go
-index ae05200..575d381 100644
+index ae05200..aa8042c 100644
 --- a/option/rule_action.go
 +++ b/option/rule_action.go
-@@ -323,6 +323,7 @@ func (r *RejectActionOptions) UnmarshalJSON(bytes []byte) error {
+@@ -323,8 +323,9 @@ func (r *RejectActionOptions) UnmarshalJSON(bytes []byte) error {
  }
  
  type RouteActionSniff struct {
-+ OverrideDestination bool `json:"override_destination,omitempty"`
- 	Sniffer badoption.Listable[string] `json:"sniffer,omitempty" enum:"tls,http,quic,dns,stun,bittorrent,dtls,ssh,rdp,ntp"`
- 	Timeout badoption.Duration         `json:"timeout,omitempty"`
+-	Sniffer badoption.Listable[string] `json:"sniffer,omitempty" enum:"tls,http,quic,dns,stun,bittorrent,dtls,ssh,rdp,ntp"`
+-	Timeout badoption.Duration         `json:"timeout,omitempty"`
++	OverrideDestination bool                       `json:"override_destination,omitempty"`
++	Sniffer             badoption.Listable[string] `json:"sniffer,omitempty" enum:"tls,http,quic,dns,stun,bittorrent,dtls,ssh,rdp,ntp"`
++	Timeout             badoption.Duration         `json:"timeout,omitempty"`
  }
+ 
+ type RouteActionResolve struct {
 diff --git a/option/rule_dns.go b/option/rule_dns.go
-index 9124a58..4fa1d47 100644
+index 9124a58..4b1cb44 100644
 --- a/option/rule_dns.go
 +++ b/option/rule_dns.go
 @@ -135,6 +135,7 @@ func (m DNSRuleMatchResponse) DescribeSchema(builder schema.Builder) (*schema.No
  }
  
  type RawDefaultDNSRule struct {
-+ LegacyQueryType badoption.Listable[DNSQueryType] `json:"neko_legacy_query_type,omitempty" schema:"omit"`
++	LegacyQueryType          badoption.Listable[DNSQueryType]                                            `json:"neko_legacy_query_type,omitempty" schema:"omit"`
  	Inbound                  badoption.Listable[string]                                                  `json:"inbound,omitempty" reference:"inbound"`
  	IPVersion                int                                                                         `json:"ip_version,omitempty" enum:"4,6"`
  	QueryType                badoption.Listable[DNSQueryType]                                            `json:"query_type,omitempty"`
@@ -5949,7 +5964,7 @@ index 5acf2ae..702810c 100644
  	Multiplex      *OutboundMultiplexOptions `json:"multiplex,omitempty"`
  	Transport      *V2RayTransportOptions    `json:"transport,omitempty"`
 diff --git a/option/wireguard.go b/option/wireguard.go
-index d25d0d2..59a4910 100644
+index d25d0d2..f848d44 100644
 --- a/option/wireguard.go
 +++ b/option/wireguard.go
 @@ -7,18 +7,31 @@ import (
@@ -5977,22 +5992,22 @@ index d25d0d2..59a4910 100644
 +	Peers      []WireGuardPeer                  `json:"peers,omitempty"`
 +	UDPTimeout badoption.Duration               `json:"udp_timeout,omitempty"`
 +	Workers    int                              `json:"workers,omitempty"`
-+	Jc int `json:"jc,omitempty"`
-+	Jmin int `json:"jmin,omitempty"`
-+	Jmax int `json:"jmax,omitempty"`
-+	S1 int `json:"s1,omitempty"`
-+	S2 int `json:"s2,omitempty"`
-+	S3 int `json:"s3,omitempty"`
-+	S4 int `json:"s4,omitempty"`
-+	H1 string `json:"h1,omitempty"`
-+	H2 string `json:"h2,omitempty"`
-+	H3 string `json:"h3,omitempty"`
-+	H4 string `json:"h4,omitempty"`
-+	I1 string `json:"i1,omitempty"`
-+	I2 string `json:"i2,omitempty"`
-+	I3 string `json:"i3,omitempty"`
-+	I4 string `json:"i4,omitempty"`
-+	I5 string `json:"i5,omitempty"`
++	Jc         int                              `json:"jc,omitempty"`
++	Jmin       int                              `json:"jmin,omitempty"`
++	Jmax       int                              `json:"jmax,omitempty"`
++	S1         int                              `json:"s1,omitempty"`
++	S2         int                              `json:"s2,omitempty"`
++	S3         int                              `json:"s3,omitempty"`
++	S4         int                              `json:"s4,omitempty"`
++	H1         string                           `json:"h1,omitempty"`
++	H2         string                           `json:"h2,omitempty"`
++	H3         string                           `json:"h3,omitempty"`
++	H4         string                           `json:"h4,omitempty"`
++	I1         string                           `json:"i1,omitempty"`
++	I2         string                           `json:"i2,omitempty"`
++	I3         string                           `json:"i3,omitempty"`
++	I4         string                           `json:"i4,omitempty"`
++	I5         string                           `json:"i5,omitempty"`
  	DialerOptions
  }
  
@@ -6036,11 +6051,11 @@ index d25d0d2..59a4910 100644
 +
 +type LegacyWireGuardPeer struct {
 +	ServerOptions
-+	PersistentKeepaliveInterval uint16 `json:"persistent_keepalive_interval,omitempty"`
-+	PublicKey    string                           `json:"public_key,omitempty"`
-+	PreSharedKey string                           `json:"pre_shared_key,omitempty"`
-+	AllowedIPs   badoption.Listable[netip.Prefix] `json:"allowed_ips,omitempty"`
-+	Reserved     []uint8                          `json:"reserved,omitempty"`
++	PersistentKeepaliveInterval uint16                           `json:"persistent_keepalive_interval,omitempty"`
++	PublicKey                   string                           `json:"public_key,omitempty"`
++	PreSharedKey                string                           `json:"pre_shared_key,omitempty"`
++	AllowedIPs                  badoption.Listable[netip.Prefix] `json:"allowed_ips,omitempty"`
++	Reserved                    []uint8                          `json:"reserved,omitempty"`
 +}
 diff --git a/protocol/direct/outbound.go b/protocol/direct/outbound.go
 index af8826b..c53defc 100644
@@ -8875,6 +8890,113 @@ index 0000000..84e3818
 +	}
 +	return
 +}
+diff --git a/protocol/vless/encryption/roundtrip_test.go b/protocol/vless/encryption/roundtrip_test.go
+new file mode 100644
+index 0000000..b263cf4
+--- /dev/null
++++ b/protocol/vless/encryption/roundtrip_test.go
+@@ -0,0 +1,101 @@
++package encryption
++
++import (
++	"crypto/ecdh"
++	"crypto/mlkem"
++	"crypto/rand"
++	"io"
++	"net"
++	"strings"
++	"testing"
++	"time"
++)
++
++func TestEncryptedRoundTripAfterMigration(t *testing.T) {
++	for _, keyType := range []string{"x25519", "mlkem768"} {
++		for _, mode := range []uint32{0, 1, 2} {
++			t.Run(keyType+string(rune('0'+mode)), func(t *testing.T) {
++				var private, public []byte
++				if keyType == "x25519" {
++					key, err := ecdh.X25519().GenerateKey(rand.Reader)
++					if err != nil {
++						t.Fatal(err)
++					}
++					private = key.Bytes()
++					public = key.PublicKey().Bytes()
++				} else {
++					key, err := mlkem.GenerateKey768()
++					if err != nil {
++						t.Fatal(err)
++					}
++					private = key.Bytes()
++					public = key.EncapsulationKey().Bytes()
++				}
++				var server ServerInstance
++				if err := server.Init([][]byte{private}, mode, 0, 0, ""); err != nil {
++					t.Fatal(err)
++				}
++				defer server.Close()
++				var client ClientInstance
++				if err := client.Init([][]byte{public}, mode, 0, ""); err != nil {
++					t.Fatal(err)
++				}
++				listener, err := net.Listen("tcp", "127.0.0.1:0")
++				if err != nil {
++					t.Fatal(err)
++				}
++				defer listener.Close()
++				accepted := make(chan net.Conn, 1)
++				go func() {
++					conn, err := listener.Accept()
++					if err == nil {
++						accepted <- conn
++					}
++				}()
++				left, err := net.DialTimeout("tcp", listener.Addr().String(), time.Second)
++				if err != nil {
++					t.Fatal(err)
++				}
++				right := <-accepted
++				defer left.Close()
++				defer right.Close()
++				left.SetDeadline(time.Now().Add(3 * time.Second))
++				right.SetDeadline(time.Now().Add(3 * time.Second))
++				serverDone := make(chan error, 1)
++				payload := strings.Repeat("encrypted migration fixture ", 800)
++				go func() {
++					var fallback []byte
++					conn, err := server.Handshake(right, &fallback)
++					if err != nil {
++						serverDone <- err
++						return
++					}
++					data := make([]byte, len(payload))
++					_, err = io.ReadFull(conn, data)
++					if err == nil {
++						_, err = conn.Write(data)
++					}
++					serverDone <- err
++				}()
++				conn, err := client.Handshake(left)
++				if err != nil {
++					t.Fatal(err)
++				}
++				// Check multi-record encryption framing on real TCP sockets.
++				if _, err = io.WriteString(conn, payload); err != nil {
++					t.Fatal(err)
++				}
++				response := make([]byte, len(payload))
++				if _, err = io.ReadFull(conn, response); err != nil {
++					t.Fatal(err)
++				}
++				if string(response) != payload {
++					t.Fatal("encrypted payload changed")
++				}
++				if err = <-serverDone; err != nil {
++					t.Fatal(err)
++				}
++			})
++		}
++	}
++}
 diff --git a/protocol/vless/encryption/server.go b/protocol/vless/encryption/server.go
 new file mode 100644
 index 0000000..6e25f16
@@ -10545,39 +10667,47 @@ index 0000000..750dd81
 +	return o.endpoint.ListenPacket(ctx, destination)
 +}
 diff --git a/route/network.go b/route/network.go
-index 53a1be8..cd911cc 100644
+index 53a1be8..5b49d84 100644
 --- a/route/network.go
 +++ b/route/network.go
 @@ -85,6 +85,7 @@ func NewNetworkManager(ctx context.Context, logger logger.ContextLogger, options
  		interfaceFinder:     control.NewDefaultInterfaceFinder(),
  		autoDetectInterface: options.AutoDetectInterface,
  		defaultOptions: adapter.NetworkOptions{
-+ ConcurrentDial: options.ConcurrentDial,
++			ConcurrentDial: options.ConcurrentDial,
  			BindInterface:  options.DefaultInterface,
  			RoutingMark:    uint32(options.DefaultMark),
  			DomainResolver: defaultDomainResolver.Server,
 diff --git a/route/rule/rule_action.go b/route/rule/rule_action.go
-index cb65611..ef7c76f 100644
+index cb65611..1afb86d 100644
 --- a/route/rule/rule_action.go
 +++ b/route/rule/rule_action.go
-@@ -105,6 +105,7 @@ func NewRuleAction(ctx context.Context, logger logger.ContextLogger, action opti
+@@ -105,8 +105,9 @@ func NewRuleAction(ctx context.Context, logger logger.ContextLogger, action opti
  		return &RuleActionHijackDNS{}, nil
  	case C.RuleActionTypeSniff:
  		sniffAction := &RuleActionSniff{
-+ OverrideDestination: action.SniffOptions.OverrideDestination,
- 			SnifferNames: action.SniffOptions.Sniffer,
- 			Timeout:      time.Duration(action.SniffOptions.Timeout),
+-			SnifferNames: action.SniffOptions.Sniffer,
+-			Timeout:      time.Duration(action.SniffOptions.Timeout),
++			OverrideDestination: action.SniffOptions.OverrideDestination,
++			SnifferNames:        action.SniffOptions.Sniffer,
++			Timeout:             time.Duration(action.SniffOptions.Timeout),
  		}
+ 		return sniffAction, sniffAction.build()
+ 	case C.RuleActionTypeResolve:
 diff --git a/route/rule/rule_dns.go b/route/rule/rule_dns.go
-index a7f3bcf..35ec0b8 100644
+index a7f3bcf..0082bac 100644
 --- a/route/rule/rule_dns.go
 +++ b/route/rule/rule_dns.go
-@@ -134,6 +134,8 @@ func NewDefaultDNSRule(ctx context.Context, logger log.ContextLogger, options op
+@@ -134,6 +134,12 @@ func NewDefaultDNSRule(ctx context.Context, logger log.ContextLogger, options op
  			return nil, E.New("invalid ip version: ", options.IPVersion)
  		}
  	}
-+ if len(options.QueryType) > 0 && len(options.LegacyQueryType) > 0 { return nil, E.New("query_type cannot be combined with neko_legacy_query_type") }
-+ if len(options.QueryType) == 0 { options.QueryType = options.LegacyQueryType }
++	if len(options.QueryType) > 0 && len(options.LegacyQueryType) > 0 {
++		return nil, E.New("query_type cannot be combined with neko_legacy_query_type")
++	}
++	if len(options.QueryType) == 0 {
++		options.QueryType = options.LegacyQueryType
++	}
  	if len(options.QueryType) > 0 {
  		item := NewQueryTypeItem(options.QueryType)
  		rule.items = append(rule.items, item)
@@ -10771,7 +10901,7 @@ index 0000000..9874051
 +}
 diff --git a/transport/v2raykcp/connection.go b/transport/v2raykcp/connection.go
 new file mode 100644
-index 0000000..9bb112c
+index 0000000..8057e72
 --- /dev/null
 +++ b/transport/v2raykcp/connection.go
 @@ -0,0 +1,566 @@
@@ -10953,7 +11083,7 @@ index 0000000..9bb112c
 +	isTerminated := func() bool {
 +		return conn.State() == StateTerminated
 +	}
-+	
++
 +	conn.dataUpdater = NewUpdater(
 +		config.GetTTIValue(),
 +		func() bool {
@@ -11136,7 +11266,7 @@ index 0000000..9bb112c
 +		if c.State().Is(StateReadyToClose, StateTerminating, StateTerminated) {
 +			return 0, io.EOF
 +		}
-+		
++
 +		nBytes := c.receivingWorker.Read(b)
 +		if nBytes > 0 {
 +			c.dataUpdater.WakeUp()
@@ -11343,7 +11473,7 @@ index 0000000..9bb112c
 +}
 diff --git a/transport/v2raykcp/crypt.go b/transport/v2raykcp/crypt.go
 new file mode 100644
-index 0000000..015d112
+index 0000000..e9773f1
 --- /dev/null
 +++ b/transport/v2raykcp/crypt.go
 @@ -0,0 +1,109 @@
@@ -11442,23 +11572,23 @@ index 0000000..015d112
 +func NewAEADAESGCMBasedOnSeed(seed string) cipher.AEAD {
 +	// Use SHA256 to hash the seed
 +	hashedSeed := sha256.Sum256([]byte(seed))
-+	
++
 +	// Use first 16 bytes as AES-128 key
 +	block, err := aes.NewCipher(hashedSeed[:16])
 +	if err != nil {
 +		panic(err)
 +	}
-+	
++
 +	gcm, err := cipher.NewGCM(block)
 +	if err != nil {
 +		panic(err)
 +	}
-+	
++
 +	return gcm
 +}
 diff --git a/transport/v2raykcp/dialer.go b/transport/v2raykcp/dialer.go
 new file mode 100644
-index 0000000..34c5494
+index 0000000..4a5fb7c
 --- /dev/null
 +++ b/transport/v2raykcp/dialer.go
 @@ -0,0 +1,231 @@
@@ -11485,11 +11615,11 @@ index 0000000..34c5494
 +var _ adapter.V2RayClientTransport = (*Client)(nil)
 +
 +type Client struct {
-+	ctx       context.Context
-+	dialer    N.Dialer
++	ctx        context.Context
++	dialer     N.Dialer
 +	serverAddr M.Socksaddr
-+	config    *Config
-+	tlsConfig tls.Config
++	config     *Config
++	tlsConfig  tls.Config
 +}
 +
 +func NewClient(
@@ -11602,7 +11732,7 @@ index 0000000..34c5494
 +
 +		segments := reader.Read(buffer.Bytes())
 +		buffer.Release()
-+		
++
 +		if len(segments) > 0 {
 +			kcpConn.Input(segments)
 +		}
@@ -11730,10 +11860,10 @@ index 0000000..4f46a4f
 +}
 diff --git a/transport/v2raykcp/header.go b/transport/v2raykcp/header.go
 new file mode 100644
-index 0000000..4ac8b15
+index 0000000..b281dec
 --- /dev/null
 +++ b/transport/v2raykcp/header.go
-@@ -0,0 +1,203 @@
+@@ -0,0 +1,202 @@
 +package v2raykcp
 +
 +import (
@@ -11936,10 +12066,9 @@ index 0000000..4ac8b15
 +	}
 +	return binary.BigEndian.Uint32(b[:])
 +}
-+
 diff --git a/transport/v2raykcp/listener.go b/transport/v2raykcp/listener.go
 new file mode 100644
-index 0000000..3bfb32c
+index 0000000..5678b25
 --- /dev/null
 +++ b/transport/v2raykcp/listener.go
 @@ -0,0 +1,227 @@
@@ -11958,22 +12087,22 @@ index 0000000..3bfb32c
 +	"github.com/sagernet/sing/common"
 +	"github.com/sagernet/sing/common/buf"
 +	E "github.com/sagernet/sing/common/exceptions"
++	"github.com/sagernet/sing/common/logger"
 +	M "github.com/sagernet/sing/common/metadata"
 +	N "github.com/sagernet/sing/common/network"
-+	"github.com/sagernet/sing/common/logger"
 +)
 +
 +var _ adapter.V2RayServerTransport = (*Server)(nil)
 +
 +type Server struct {
-+	ctx       context.Context
-+	logger    logger.ContextLogger
-+	config    *Config
-+	tlsConfig tls.ServerConfig
-+	handler   adapter.V2RayServerTransportHandler
-+	listener  *net.UDPConn
-+	sessions  sync.Map // map[ConnectionID]*Connection
-+	security  cipher.AEAD
++	ctx        context.Context
++	logger     logger.ContextLogger
++	config     *Config
++	tlsConfig  tls.ServerConfig
++	handler    adapter.V2RayServerTransportHandler
++	listener   *net.UDPConn
++	sessions   sync.Map // map[ConnectionID]*Connection
++	security   cipher.AEAD
 +	headerSize int
 +}
 +
@@ -12172,10 +12301,10 @@ index 0000000..3bfb32c
 +}
 diff --git a/transport/v2raykcp/multi_buffer.go b/transport/v2raykcp/multi_buffer.go
 new file mode 100644
-index 0000000..3af4c58
+index 0000000..9482e69
 --- /dev/null
 +++ b/transport/v2raykcp/multi_buffer.go
-@@ -0,0 +1,53 @@
+@@ -0,0 +1,52 @@
 +package v2raykcp
 +
 +import "github.com/sagernet/sing/common/buf"
@@ -12228,7 +12357,6 @@ index 0000000..3af4c58
 +	}
 +	return true
 +}
-+
 diff --git a/transport/v2raykcp/output.go b/transport/v2raykcp/output.go
 new file mode 100644
 index 0000000..b4469bc
@@ -13232,7 +13360,7 @@ index 0000000..5d55680
 +}
 diff --git a/transport/v2raykcp/updater.go b/transport/v2raykcp/updater.go
 new file mode 100644
-index 0000000..af9455f
+index 0000000..a5e2848
 --- /dev/null
 +++ b/transport/v2raykcp/updater.go
 @@ -0,0 +1,58 @@
@@ -13280,7 +13408,7 @@ index 0000000..af9455f
 +	}
 +	ticker := time.NewTicker(u.Interval())
 +	defer ticker.Stop()
-+	
++
 +	for u.shouldContinue() {
 +		u.updateFunc()
 +		<-ticker.C
@@ -16944,3 +17072,166 @@ index 006010a..cffd8fd 100644
  }
  
  type PeerOptions struct {
+diff --git a/transport/wireguard/port.go b/transport/wireguard/port.go
+deleted file mode 100644
+index f410bad..0000000
+--- a/transport/wireguard/port.go
++++ /dev/null
+@@ -1,157 +0,0 @@
+-package wireguard
+-
+-import (
+-	"net/netip"
+-	"sync/atomic"
+-
+-	"github.com/sagernet/sing-tun"
+-	"github.com/sagernet/sing-tun/gtcpip/header"
+-	E "github.com/sagernet/sing/common/exceptions"
+-	"github.com/sagernet/wireguard-go/device"
+-)
+-
+-func (e *Endpoint) PortAddresses() (netip.Addr, netip.Addr) {
+-	return e.tunDevice.Inet4Address(), e.tunDevice.Inet6Address()
+-}
+-
+-func (e *Endpoint) PortMTU() uint32 {
+-	return e.options.MTU
+-}
+-
+-func (e *Endpoint) WritePackets(packets [][]byte) error {
+-	wgDevice := e.device
+-	if wgDevice == nil {
+-		return E.New("WireGuard device is not ready")
+-	}
+-	packetRefs := make([]*device.InputPacketRef, 0, len(packets))
+-	refs := make([]device.InputPacketRef, len(packets))
+-	packetSlices := make([][]byte, len(packets))
+-	for i, packet := range packets {
+-		if len(packet) == 0 {
+-			continue
+-		}
+-		var destination []byte
+-		switch header.IPVersion(packet) {
+-		case header.IPv4Version:
+-			if len(packet) < header.IPv4MinimumSize {
+-				continue
+-			}
+-			destination = header.IPv4(packet).DestinationAddressSlice()
+-		case header.IPv6Version:
+-			if len(packet) < header.IPv6MinimumSize {
+-				continue
+-			}
+-			destination = header.IPv6(packet).DestinationAddressSlice()
+-		default:
+-			continue
+-		}
+-		packetSlices[i] = packet
+-		refs[i] = device.InputPacketRef{
+-			Destination:  destination,
+-			PacketSlices: packetSlices[i : i+1],
+-		}
+-		packetRefs = append(packetRefs, &refs[i])
+-	}
+-	if len(packetRefs) == 0 {
+-		return nil
+-	}
+-	unmatchedRefs := wgDevice.InputPackets(packetRefs)
+-	if len(unmatchedRefs) == 0 {
+-		return nil
+-	}
+-	state := e.returnDevice.state.Load()
+-	if state == nil {
+-		return nil
+-	}
+-	var replies [][]byte
+-	for _, packetRef := range unmatchedRefs {
+-		packet := packetRef.PacketSlices[0]
+-		var source netip.Addr
+-		if header.IPVersion(packet) == header.IPv4Version {
+-			source = e.tunDevice.Inet4Address()
+-		} else {
+-			source = e.tunDevice.Inet6Address()
+-		}
+-		reply, replyOk := tun.BuildUnreachable(packet, source, state.headroom)
+-		if replyOk {
+-			replies = append(replies, reply)
+-		}
+-	}
+-	if len(replies) > 0 {
+-		state.returnPath.ReturnPackets(replies)
+-	}
+-	return nil
+-}
+-
+-func (e *Endpoint) AttachReturn(returnPath tun.Return) error {
+-	headroom := returnPath.ReturnHeadroom()
+-	if headroom > device.MessageTransportOffsetContent {
+-		return E.New("return path headroom ", headroom, " exceeds available ", device.MessageTransportOffsetContent)
+-	}
+-	newState := &returnPathState{
+-		returnPath: returnPath,
+-		headroom:   headroom,
+-	}
+-	for {
+-		currentState := e.returnDevice.state.Load()
+-		if currentState != nil {
+-			if currentState.returnPath == returnPath {
+-				return nil
+-			}
+-			return E.New("return path already attached")
+-		}
+-		if e.returnDevice.state.CompareAndSwap(nil, newState) {
+-			return nil
+-		}
+-	}
+-}
+-
+-func (e *Endpoint) DetachReturn(returnPath tun.Return) error {
+-	currentState := e.returnDevice.state.Load()
+-	if currentState != nil && currentState.returnPath == returnPath {
+-		e.returnDevice.state.CompareAndSwap(currentState, nil)
+-	}
+-	return nil
+-}
+-
+-type returnPathState struct {
+-	returnPath tun.Return
+-	headroom   int
+-}
+-
+-type returnDeviceWrapper struct {
+-	Device
+-	state atomic.Pointer[returnPathState]
+-}
+-
+-func (d *returnDeviceWrapper) Write(bufs [][]byte, offset int) (int, error) {
+-	state := d.state.Load()
+-	if state == nil || len(bufs) == 0 {
+-		return d.Device.Write(bufs, offset)
+-	}
+-	packets := make([][]byte, len(bufs))
+-	for i, packet := range bufs {
+-		// wireguard-go leaves device.MessageTransportOffsetContent writable bytes in front of the decrypted packet.
+-		packets[i] = packet[offset-state.headroom:]
+-	}
+-	unconsumed := state.returnPath.ReturnPackets(packets)
+-	if len(unconsumed) == 0 {
+-		return 0, nil
+-	}
+-	if len(unconsumed) == len(bufs) {
+-		return d.Device.Write(bufs, offset)
+-	}
+-	remaining := make([][]byte, 0, len(unconsumed))
+-	searchIndex := 0
+-	for _, packet := range unconsumed {
+-		for searchIndex < len(bufs) && &packet[0] != &bufs[searchIndex][offset-state.headroom] {
+-			searchIndex++
+-		}
+-		if searchIndex == len(bufs) {
+-			break
+-		}
+-		remaining = append(remaining, bufs[searchIndex])
+-		searchIndex++
+-	}
+-	return d.Device.Write(remaining, offset)
+-}

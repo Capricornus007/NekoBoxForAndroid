@@ -56,7 +56,7 @@ func TestGeoAliasesBecomePublicRuleSetsAndStillMatch(t *testing.T) {
 			t.Fatalf("%s: missing or changed geographic match", test.tag)
 		}
 	}
-	options := option.Options{Route: &option.RouteOptions{RuleSet: []option.RuleSet{{Type: "local", Tag: "ordinary", Format: "binary", LocalOptions: option.LocalRuleSet{Path: "/tmp/custom.srs"}}}}}
+	options := option.Options{Route: &option.RouteOptions{RuleSet: []option.RuleSet{{Type: "local", Tag: []string{"ordinary"}, Format: "binary", LocalOptions: option.LocalRuleSet{Path: "/tmp/custom.srs"}}}}}
 	if err := materializeGeoRuleSets(&options); err != nil || options.Route.RuleSet[0].LocalOptions.Path != "/tmp/custom.srs" {
 		t.Fatal("changed an ordinary local rule-set", err)
 	}

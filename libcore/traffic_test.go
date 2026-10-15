@@ -6,6 +6,7 @@ import (
 	"github.com/sagernet/sing-box/adapter/outbound"
 	"github.com/sagernet/sing-box/boxapi"
 	"github.com/sagernet/sing-box/common/interrupt"
+	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing-box/protocol/group"
 	M "github.com/sagernet/sing/common/metadata"
@@ -63,7 +64,7 @@ func TestSelectorTracksActualChildAndExistingConnections(t *testing.T) {
 		t.Fatal(err)
 	}
 	selector := o.(*group.Selector)
-	if err = selector.Start(); err != nil {
+	if err = selector.Start(adapter.StartStateStart, adapter.NewScope(ctx, log.NewNOPFactory().Logger())); err != nil {
 		t.Fatal(err)
 	}
 	metadata := adapter.InboundContext{Inbound: "tun-in"}
@@ -143,7 +144,7 @@ func TestUDPGroupTracksSelectedCandidateAndDirection(t *testing.T) {
 		t.Fatal(err)
 	}
 	u := o.(*group.URLTest)
-	if err = u.Start(); err != nil {
+	if err = u.Start(adapter.StartStateStart, adapter.NewScope(ctx, log.NewNOPFactory().Logger())); err != nil {
 		t.Fatal(err)
 	}
 	meta := adapter.InboundContext{Inbound: "tun-in"}

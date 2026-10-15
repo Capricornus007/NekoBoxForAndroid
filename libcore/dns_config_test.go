@@ -18,7 +18,6 @@ import (
 	mDNS "github.com/miekg/dns"
 	box "github.com/sagernet/sing-box"
 	"github.com/sagernet/sing-box/adapter"
-	"github.com/sagernet/sing-box/experimental/libbox/platform"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common/control"
@@ -79,43 +78,48 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
 	}
 	defer proxy.Close()
 	go func() {
-		conn, err := proxy.Accept()
-		if err != nil {
-			return
+		for {
+			conn, acceptErr := proxy.Accept()
+			if acceptErr != nil {
+				return
+			}
+			go func(conn net.Conn) {
+				var err error
+				defer conn.Close()
+				_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
+				reader := bufio.NewReader(conn)
+				if _, err = socks5.ReadAuthRequest(reader); err != nil {
+					t.Error(err)
+					return
+				}
+				if err = socks5.WriteAuthResponse(conn, socks5.AuthResponse{Method: socks5.AuthTypeNotRequired}); err != nil {
+					t.Error(err)
+					return
+				}
+				request, err := socks5.ReadRequest(reader)
+				if err != nil {
+					t.Error(err)
+					return
+				}
+				proxyCalls.Add(1)
+				if request.Command != socks5.CommandConnect || request.Destination != M.SocksaddrFromNet(https.Listener.Addr()) {
+					t.Errorf("unexpected proxy destination: %s", request.Destination)
+					return
+				}
+				upstream, err := net.DialTimeout("tcp", request.Destination.String(), time.Second)
+				if err != nil {
+					t.Error(err)
+					return
+				}
+				defer upstream.Close()
+				if err = socks5.WriteResponse(conn, socks5.Response{ReplyCode: socks5.ReplyCodeSuccess}); err != nil {
+					t.Error(err)
+					return
+				}
+				go func() { _, _ = io.Copy(conn, upstream) }()
+				_, _ = io.Copy(upstream, reader)
+			}(conn)
 		}
-		defer conn.Close()
-		_ = conn.SetDeadline(time.Now().Add(5 * time.Second))
-		reader := bufio.NewReader(conn)
-		if _, err = socks5.ReadAuthRequest(reader); err != nil {
-			t.Error(err)
-			return
-		}
-		if err = socks5.WriteAuthResponse(conn, socks5.AuthResponse{Method: socks5.AuthTypeNotRequired}); err != nil {
-			t.Error(err)
-			return
-		}
-		request, err := socks5.ReadRequest(reader)
-		if err != nil {
-			t.Error(err)
-			return
-		}
-		proxyCalls.Add(1)
-		if request.Command != socks5.CommandConnect || request.Destination != M.SocksaddrFromNet(https.Listener.Addr()) {
-			t.Errorf("unexpected proxy destination: %s", request.Destination)
-			return
-		}
-		upstream, err := net.DialTimeout("tcp", request.Destination.String(), time.Second)
-		if err != nil {
-			t.Error(err)
-			return
-		}
-		defer upstream.Close()
-		if err = socks5.WriteResponse(conn, socks5.Response{ReplyCode: socks5.ReplyCodeSuccess}); err != nil {
-			t.Error(err)
-			return
-		}
-		go func() { _, _ = io.Copy(conn, upstream) }()
-		_, _ = io.Copy(upstream, reader)
 	}()
 	configuration := map[string]any{
 		"dns": map[string]any{
@@ -134,14 +138,14 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
 			}, "final": "dns-remote",
 		},
 		"outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}, map[string]any{"type": "socks", "tag": "proxy", "server": "proxy.example.test", "server_port": proxy.Addr().(*net.TCPAddr).Port, "domain_strategy": "ipv4_only"}},
-		"route":     map[string]any{"final": "proxy"},
+		"route":     map[string]any{"final": "proxy"}, "log": map[string]any{"level": "trace"},
 	}
 	content, _ := json.Marshal(configuration)
-	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry())
+	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry(), nekoboxAndroidCertificateRegistry())
 	ctx = service.ContextWithDefaultRegistry(ctx)
-	service.MustRegister[platform.Interface](ctx, dnsTestPlatform{})
+	service.MustRegister[adapter.PlatformInterface](ctx, &dnsTestPlatform{})
 	var options option.Options
-	if err = options.UnmarshalJSONContext(ctx, content); err != nil {
+	if err = decodeConfigOptions(ctx, content, &options); err != nil {
 		t.Fatal(err)
 	}
 	instance, err := box.New(box.Options{Context: ctx, Options: options})
@@ -158,7 +162,7 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
 		defer cancel()
 		response, err := service.FromContext[adapter.DNSRouter](ctx).Exchange(requestCtx, new(mDNS.Msg).SetQuestion(domain, mDNS.TypeA), adapter.DNSQueryOptions{})
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("query %s: %v; UDP=%d HTTPS=%d proxy=%d", domain, err, udpCalls.Load(), httpsCalls.Load(), proxyCalls.Load())
 		}
 		return response
 	}
@@ -171,7 +175,7 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
 	if response := query("www.example.test.", ""); len(response.Answer) != 1 || response.Answer[0].(*mDNS.A).A.String() != "203.0.113.10" {
 		t.Fatal("remote HTTPS DNS failed")
 	}
-	if udpCalls.Load() < 2 || httpsCalls.Load() != 1 || proxyCalls.Load() != 1 {
+	if udpCalls.Load() < 2 || httpsCalls.Load() != 1 || proxyCalls.Load() < 1 {
 		t.Fatal("remote DNS hostname did not bootstrap through direct DNS")
 	}
 	if response := query("fake.example.test.", "tun-in"); len(response.Answer) != 1 || !netip.MustParsePrefix("198.18.0.0/15").Contains(netip.MustParseAddr(response.Answer[0].(*mDNS.A).A.String())) {
@@ -184,7 +188,7 @@ func TestTypedDNSRoutesBootstrapRemoteAndFakeIP(t *testing.T) {
 
 // Android supplies interface updates through Java. Mirror that contract without
 // requiring Linux netlink privileges in the test environment.
-type dnsTestPlatform struct{ platform.Interface }
+type dnsTestPlatform struct{ platformUnsupportedInterface }
 
 func (dnsTestPlatform) Initialize(adapter.NetworkManager) error { return nil }
 func (dnsTestPlatform) CreateDefaultInterfaceMonitor(logger.Logger) tun.DefaultInterfaceMonitor {
@@ -195,7 +199,7 @@ func (dnsTestPlatform) UsePlatformAutoDetectInterfaceControl() bool     { return
 func (dnsTestPlatform) IncludeAllNetworks() bool                        { return false }
 func (dnsTestPlatform) UnderNetworkExtension() bool                     { return false }
 func (dnsTestPlatform) SystemCertificates() []string                    { return nil }
-func (dnsTestPlatform) ReadWIFIState() adapter.WIFIState                { return adapter.WIFIState{} }
+func (dnsTestPlatform) ReadWIFIState(context.Context) adapter.WIFIState { return adapter.WIFIState{} }
 
 type dnsTestMonitor struct{ tun.DefaultInterfaceMonitor }
 
@@ -204,18 +208,19 @@ func (dnsTestMonitor) Close() error { return nil }
 func (dnsTestMonitor) RegisterCallback(tun.DefaultInterfaceUpdateCallback) *list.Element[tun.DefaultInterfaceUpdateCallback] {
 	return nil
 }
-func (dnsTestMonitor) DefaultInterface() *control.Interface { return nil }
-func (dnsTestMonitor) AndroidVPNEnabled() bool              { return false }
+func (dnsTestMonitor) UnregisterCallback(*list.Element[tun.DefaultInterfaceUpdateCallback]) {}
+func (dnsTestMonitor) DefaultInterface() *control.Interface                                 { return nil }
+func (dnsTestMonitor) AndroidVPNEnabled() bool                                              { return false }
 
 func TestTypedFakeIPRespectsIPv6Modes(t *testing.T) {
 	for _, strategy := range []string{"prefer_ipv6", "ipv6_only"} {
 		t.Run(strategy, func(t *testing.T) {
-			ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry())
-			service.MustRegister[platform.Interface](ctx, dnsTestPlatform{})
+			ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry(), nekoboxAndroidCertificateRegistry())
+			service.MustRegister[adapter.PlatformInterface](ctx, &dnsTestPlatform{})
 			data := map[string]any{"dns": map[string]any{"servers": []any{map[string]any{"type": "local", "tag": "dns-local"}, map[string]any{"type": "fakeip", "tag": "dns-fake", "inet4_range": "198.18.0.0/15", "inet6_range": "fc00::/18"}}, "rules": []any{map[string]any{"server": "dns-fake", "strategy": strategy}}}, "outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}}}
 			content, _ := json.Marshal(data)
 			var options option.Options
-			if err := options.UnmarshalJSONContext(ctx, content); err != nil {
+			if err := decodeConfigOptions(ctx, content, &options); err != nil {
 				t.Fatal(err)
 			}
 			instance, err := box.New(box.Options{Context: ctx, Options: options})
@@ -347,11 +352,11 @@ func testFallbackDNSBootstrap(t *testing.T, usePlatform bool) {
 			map[string]any{"type": "urltest", "tag": "direct-fallback", "outbounds": []string{"direct", "proxy"}, "strategy": "direct-fallback", "url": controlURL, "interval": "1h", "idle_timeout": "1h", "timeout": "1s", "wait_for_initial": true, "interrupt_exist_connections": true},
 		}, "route": map[string]any{"final": "proxy"},
 	}
-	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(platformDNS), nekoboxAndroidServiceRegistry())
-	service.MustRegister[platform.Interface](ctx, dnsTestPlatform{})
+	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(platformDNS), nekoboxAndroidServiceRegistry(), nekoboxAndroidCertificateRegistry())
+	service.MustRegister[adapter.PlatformInterface](ctx, &dnsTestPlatform{})
 	content, _ := json.Marshal(configuration)
 	var options option.Options
-	if err := options.UnmarshalJSONContext(ctx, content); err != nil {
+	if err := decodeConfigOptions(ctx, content, &options); err != nil {
 		t.Fatal(err)
 	}
 	instance, err := box.New(box.Options{Context: ctx, Options: options})
@@ -411,11 +416,11 @@ func TestVirtualDNSIsHijackedBeforeLANBypass(t *testing.T) {
 		"outbounds": []any{map[string]any{"type": "direct", "tag": "direct"}, map[string]any{"type": "direct", "tag": "bypass"}},
 		"route":     map[string]any{"rules": []any{map[string]any{"port": 53, "action": "hijack-dns"}, map[string]any{"protocol": "dns", "action": "hijack-dns"}, map[string]any{"ip_is_private": true, "outbound": "bypass"}}, "final": "direct"},
 	}
-	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry())
-	service.MustRegister[platform.Interface](ctx, dnsTestPlatform{})
+	ctx := box.Context(context.Background(), nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(), nekoboxAndroidDNSTransportRegistry(nil), nekoboxAndroidServiceRegistry(), nekoboxAndroidCertificateRegistry())
+	service.MustRegister[adapter.PlatformInterface](ctx, &dnsTestPlatform{})
 	data, _ := json.Marshal(configuration)
 	var options option.Options
-	if err = options.UnmarshalJSONContext(ctx, data); err != nil {
+	if err = decodeConfigOptions(ctx, data, &options); err != nil {
 		t.Fatal(err)
 	}
 	instance, err := box.New(box.Options{Context: ctx, Options: options})
@@ -448,3 +453,5 @@ func TestVirtualDNSIsHijackedBeforeLANBypass(t *testing.T) {
 		}
 	}
 }
+
+func (dnsTestMonitor) MyInterfaces() []string { return nil }

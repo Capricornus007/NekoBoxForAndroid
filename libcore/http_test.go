@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -19,7 +18,6 @@ import (
 
 	utls "github.com/metacubex/utls"
 	"github.com/sagernet/sing-box/adapter"
-	"github.com/sagernet/sing-box/common/process"
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing-box/route/rule"
@@ -323,7 +321,7 @@ func TestZipRefusesTraversalAndSymlinks(t *testing.T) {
 func TestLogicalTunGuardInActualCore(t *testing.T) {
 	var options option.Rule
 	const config = `{"type":"logical","mode":"and","action":"reject","rules":[{"inbound":["tun-in"]},{"type":"logical","mode":"or","invert":true,"rules":[{"user_id":[12345,20001]},{"user_id":[1000,1051],"port":[53,853]}]}]}`
-	if err := json.Unmarshal([]byte(config), &options); err != nil {
+	if err := options.UnmarshalJSONContext(context.Background(), []byte(config)); err != nil {
 		t.Fatal(err)
 	}
 	guard, err := rule.NewRule(context.Background(), log.NewNOPFactory().NewLogger("test"), options, false)
@@ -344,7 +342,7 @@ func TestLogicalTunGuardInActualCore(t *testing.T) {
 		{"dns", "tun-in", 1000, 53, false}, {"dot", "tun-in", 1051, 853, false}, {"system other", "tun-in", 1000, 443, true}, {"unknown", "tun-in", -1, 443, true},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			metadata := &adapter.InboundContext{Inbound: test.inbound, Destination: M.Socksaddr{Port: test.port}, ProcessInfo: &process.Info{UserId: test.uid}}
+			metadata := &adapter.InboundContext{Inbound: test.inbound, Destination: M.Socksaddr{Port: test.port}, ProcessInfo: &adapter.ConnectionOwner{UserId: test.uid}}
 			if got := guard.Match(metadata); got != test.reject {
 				t.Fatalf("reject=%v, want %v", got, test.reject)
 			}
@@ -398,7 +396,7 @@ func TestProxyOnlyNeverFallsBackOnConnectionOrHandshakeFailure(t *testing.T) {
 func TestVirtualDNSDoesNotDialDoTThroughLAN(t *testing.T) {
 	var options option.Rule
 	const config = `{"inbound":["tun-in"],"ip_cidr":["172.19.0.2/32","fdfe:dcba:9876::2/128"],"port":[853],"action":"reject"}`
-	if err := json.Unmarshal([]byte(config), &options); err != nil {
+	if err := options.UnmarshalJSONContext(context.Background(), []byte(config)); err != nil {
 		t.Fatal(err)
 	}
 	guard, err := rule.NewRule(context.Background(), log.NewNOPFactory().NewLogger("test"), options, false)
