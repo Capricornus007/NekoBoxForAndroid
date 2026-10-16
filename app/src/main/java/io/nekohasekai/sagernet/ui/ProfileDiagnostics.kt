@@ -151,7 +151,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     val historyCard = card(R.string.diagnostics_connection_history)
     fun filter(title: Int): TextInputEditText {
         val layout = TextInputLayout(context, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply { hint = getString(title) }
-        val edit = TextInputEditText(layout.context).apply { setSingleLine(true); maxLines = 1 }
+        val edit = TextInputEditText(layout.context).apply { setSingleLine(true); maxLines = 1; filters = arrayOf(android.text.InputFilter.LengthFilter(256)) }
         layout.addView(edit, LinearLayout.LayoutParams(-1, -2))
         historyCard.addView(layout, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
         return edit
@@ -159,22 +159,36 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     val appFilter = filter(R.string.diagnostics_filter_app)
     val domainFilter = filter(R.string.diagnostics_filter_domain)
     val nodeFilter = filter(R.string.diagnostics_filter_node)
+    val historySummary = historyCard.label()
     val historyView = historyCard.label()
+    val olderHistory = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply { setText(R.string.diagnostics_history_older); isEnabled = false }
+    val latestHistory = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply { setText(R.string.diagnostics_history_latest); isEnabled = false }
+    historyCard.addView(olderHistory)
+    historyCard.addView(latestHistory)
+    var historyBefore = 0L
+    var nextHistoryBefore = 0L
+    var historyVersion = 0
+    olderHistory.setOnClickListener { historyBefore = nextHistoryBefore; historyVersion++; olderHistory.isEnabled = false }
+    latestHistory.setOnClickListener { historyBefore = 0; historyVersion++; latestHistory.isEnabled = false }
     var runtimeState: JSONObject? = null
     fun time(value: String): String = runCatching { DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault()).format(Instant.parse(value)) }.getOrDefault("")
     fun renderHistory() {
         val state = runtimeState
         if (state == null || !state.optBoolean("debug_history")) {
+            historySummary.text = ""
+            olderHistory.isEnabled = false
+            latestHistory.isEnabled = false
             historyView.setText(R.string.diagnostics_history_debug_only)
             return
         }
         val array = state.optJSONArray("events")
         val events = if (array == null) emptyList() else (0 until array.length()).mapNotNull { array.optJSONObject(it) }
-        val matched = diagnosticMatches(events.map { event -> DiagnosticEvent(event.optString("id"),
-            listOf(event.optString("uid"), event.optJSONArray("packages")?.toString().orEmpty()).joinToString(" "),
-            event.optString("domain") + " " + event.optString("destination"), event.optString("outbound")) },
-            appFilter.text.toString(), domainFilter.text.toString(), nodeFilter.text.toString())
-        val report = events.indices.reversed().filter { it in matched }.joinToString("\n\n") { index ->
+        nextHistoryBefore = state.optLong("history_before")
+        olderHistory.isEnabled = state.optBoolean("history_has_more") && nextHistoryBefore > 0 && nextHistoryBefore != historyBefore
+        latestHistory.isEnabled = historyBefore > 0
+        historySummary.text = getString(R.string.diagnostics_history_window, state.optInt("history_total"), events.size) +
+            if (state.optBoolean("history_truncated")) "\n" + getString(R.string.diagnostics_history_truncated) else ""
+        val report = events.indices.reversed().joinToString("\n\n") { index ->
             val event = events[index]
             buildString {
                 append(time(event.optString("time")))
@@ -196,7 +210,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     }
     listOf(appFilter, domainFilter, nodeFilter).forEach { edit -> edit.addTextChangedListener(object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = renderHistory()
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { historyBefore = 0; historyVersion++ }
         override fun afterTextChanged(s: Editable?) = Unit
     }) }
     fun renderRuntime(state: JSONObject?) {
@@ -309,12 +323,15 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
             }
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 while (isActive) {
+                    val version = historyVersion
+                    val query = JSONObject().put("app", appFilter.text.toString()).put("domain", domainFilter.text.toString())
+                        .put("outbound", nodeFilter.text.toString()).put("before", historyBefore).put("limit", 100).toString()
                     val state = withContext(Dispatchers.IO) {
                         if (profile.id == DataStore.currentProfile && DataStore.serviceState.connected)
-                            runCatching { connection.service?.runtimeDiagnostics?.let(::JSONObject) }.getOrNull()
+                            runCatching { connection.service?.getRuntimeDiagnostics(query)?.let(::JSONObject) }.getOrNull()
                         else null
                     }
-                    renderRuntime(state)
+                    if (version == historyVersion) renderRuntime(state)
                     delay(2000)
                 }
             }

@@ -6875,6 +6875,45 @@ index 000000000..4bf0087ce
 +	}
 +	return bufio.NewNetPacketConn(tracker.TrackOutboundPacketConnection(tag, bufio.NewPacketConn(conn), false))
 +}
+diff --git a/protocol/group/probe_pause.go b/protocol/group/probe_pause.go
+new file mode 100644
+index 000000000..bcedbe531
+--- /dev/null
++++ b/protocol/group/probe_pause.go
+@@ -0,0 +1,33 @@
++package group
++
++// Screen/keyguard pauses apply only to health checks, never to VPN devices or
++// user traffic. The system Doze/network pause remains an independent condition.
++func (g *URLTestGroup) checksPaused() bool {
++	return g.probesPaused.Load() || g.pause.IsDevicePaused() || g.pause.IsNetworkPaused()
++}
++
++func (s *URLTest) SetProbesPaused(paused bool) {
++	g := s.group
++	if g == nil {
++		return
++	}
++	g.access.Lock()
++	defer g.access.Unlock()
++	g.probeAccess.Lock()
++	defer g.probeAccess.Unlock()
++	if g.closed || g.probesPaused.Swap(paused) == paused {
++		return
++	}
++	if paused && g.probeCancel != nil {
++		g.probeCancel()
++	}
++	if g.ticker == nil {
++		return
++	}
++	if g.checksPaused() {
++		g.ticker.Stop()
++	} else {
++		g.ticker.Reset(g.interval)
++		go g.CheckOutbounds(true)
++	}
++}
 diff --git a/protocol/group/selector.go b/protocol/group/selector.go
 index c3aaec5a9..3d603ab9b 100644
 --- a/protocol/group/selector.go
@@ -7023,7 +7062,7 @@ index c3aaec5a9..3d603ab9b 100644
 +
 +func RealTag(_ adapter.OutboundManager, detour adapter.Outbound) string { return legacyRealTag(detour) }
 diff --git a/protocol/group/urltest.go b/protocol/group/urltest.go
-index bc50ab70d..9575daf92 100644
+index bc50ab70d..ba72c2d2b 100644
 --- a/protocol/group/urltest.go
 +++ b/protocol/group/urltest.go
 @@ -2,7 +2,6 @@ package group
@@ -7125,21 +7164,21 @@ index bc50ab70d..9575daf92 100644
 +	group, err := NewURLTestGroup(s.ctx, s.outbound, s.logger, outbounds, s.link, s.interval, s.tolerance, s.idleTimeout, s.timeout, s.strategy, s.managedByParent, s.interruptExternalConnections)
 +	if err != nil {
 +		return err
- 	}
++	}
 +	if err := group.configureFallback(s.fallbackOptions); err != nil {
 +		return err
 +	}
 +	s.group = group
- 	return nil
- }
- 
-+func (s *URLTest) PostStart() error {
-+	if !s.managedByParent {
-+		s.group.PostStart(s.waitForInitial)
-+	}
 +	return nil
 +}
 +
++func (s *URLTest) PostStart() error {
++	if !s.managedByParent {
++		s.group.PostStart(s.waitForInitial)
+ 	}
+ 	return nil
+ }
+ 
 +func (s *URLTest) Close() error {
 +	return common.Close(
 +		common.PtrOrNil(s.group),
@@ -7183,24 +7222,24 @@ index bc50ab70d..9575daf92 100644
  
  func (s *URLTest) CheckOutbounds() {
 -	s.group.CheckOutbounds(s.ctx, true)
--}
--
--func (s *URLTest) PerformUpdateCheck() {
--	s.group.performUpdateCheck()
 +	s.group.CheckOutbounds(true)
  }
  
+-func (s *URLTest) PerformUpdateCheck() {
+-	s.group.performUpdateCheck()
+-}
+-
 -func (s *URLTest) InterfaceUpdated(ctx context.Context) {
 -	group := s.group
 -	if group == nil {
--		return
--	}
--	if group.pause.IsDevicePaused() || group.pause.IsNetworkPaused() {
 -		return
 +func (s *URLTest) checkAfterFailure() {
 +	if !s.managedByParent {
 +		go s.group.CheckOutbounds(true)
  	}
+-	if group.pause.IsDevicePaused() || group.pause.IsNetworkPaused() {
+-		return
+-	}
 -	go func() {
 -		s.checkAccess.Lock()
 -		defer s.checkAccess.Unlock()
@@ -7285,7 +7324,7 @@ index bc50ab70d..9575daf92 100644
  	outbound                     adapter.OutboundManager
  	pause                        pause.Manager
  	pauseCallback                *list.Element[pause.Callback]
-@@ -217,21 +222,26 @@ type URLTestGroup struct {
+@@ -217,21 +222,29 @@ type URLTestGroup struct {
  	interval                     time.Duration
  	tolerance                    uint16
  	idleTimeout                  time.Duration
@@ -7297,6 +7336,9 @@ index bc50ab70d..9575daf92 100644
  	checking                     atomic.Bool
 -	selectedOutboundTCP          adapter.Outbound
 -	selectedOutboundUDP          adapter.Outbound
++	probesPaused                 atomic.Bool
++	probeAccess                  sync.Mutex
++	probeCancel                  context.CancelFunc
 +	tcpSelection                 common.TypedValue[groupSelection]
 +	udpSelection                 common.TypedValue[groupSelection]
 +	selectedOutboundTCP          common.TypedValue[adapter.Outbound]
@@ -7317,7 +7359,7 @@ index bc50ab70d..9575daf92 100644
  	if interval == 0 {
  		interval = C.DefaultURLTestInterval
  	}
-@@ -241,15 +251,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -241,15 +254,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	if idleTimeout == 0 {
  		idleTimeout = C.DefaultURLTestIdleTimeout
  	}
@@ -7355,7 +7397,7 @@ index bc50ab70d..9575daf92 100644
  		outbound:                     outboundManager,
  		logger:                       logger,
  		outbounds:                    outbounds,
-@@ -257,6 +285,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -257,6 +288,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  		interval:                     interval,
  		tolerance:                    tolerance,
  		idleTimeout:                  idleTimeout,
@@ -7365,7 +7407,7 @@ index bc50ab70d..9575daf92 100644
  		history:                      history,
  		close:                        make(chan struct{}),
  		pause:                        service.FromContext[pause.Manager](ctx),
-@@ -265,59 +296,127 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -265,59 +299,141 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	}, nil
  }
  
@@ -7411,11 +7453,25 @@ index bc50ab70d..9575daf92 100644
 -	go g.loopCheck(ticker, g.close)
 +	g.ticker = time.NewTicker(g.interval)
 +	go g.loopCheck()
-+	var resume func()
-+	if g.strategy == "direct-fallback" {
-+		resume = func() { go g.CheckOutbounds(true) }
++	ticker := g.ticker
++	g.pauseCallback = g.pause.RegisterCallback(func(event int) {
++		g.probeAccess.Lock()
++		defer g.probeAccess.Unlock()
++		if g.checksPaused() {
++			ticker.Stop()
++			if g.probeCancel != nil {
++				g.probeCancel()
++			}
++		} else {
++			ticker.Reset(g.interval)
++			go g.CheckOutbounds(true)
++		}
++	})
++	g.probeAccess.Lock()
++	if g.checksPaused() {
++		ticker.Stop()
 +	}
-+	g.pauseCallback = pause.RegisterTicker(g.pause, g.ticker, g.interval, resume)
++	g.probeAccess.Unlock()
  }
  
  func (g *URLTestGroup) Close() error {
@@ -7431,8 +7487,8 @@ index bc50ab70d..9575daf92 100644
 -	g.pauseCallback = nil
 +	g.closed = true
 +	if g.ticker != nil {
-+		g.ticker.Stop()
 +		g.pause.UnregisterCallback(g.pauseCallback)
++		g.ticker.Stop()
 +	}
  	close(g.close)
  	return nil
@@ -7512,7 +7568,7 @@ index bc50ab70d..9575daf92 100644
  				minDelay = history.Delay
  			}
  		}
-@@ -326,7 +425,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -326,7 +442,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  		if !common.Contains(detour.Network(), network) {
  			continue
  		}
@@ -7521,7 +7577,7 @@ index bc50ab70d..9575daf92 100644
  		if history == nil {
  			continue
  		}
-@@ -347,180 +446,299 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -347,180 +463,318 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  	return minOutbound, true
  }
  
@@ -7549,9 +7605,9 @@ index bc50ab70d..9575daf92 100644
 -				g.pause.UnregisterCallback(g.pauseCallback)
 -				g.pauseCallback = nil
 -			}
++			g.pause.UnregisterCallback(g.pauseCallback)
 +			g.ticker.Stop()
 +			g.ticker = nil
-+			g.pause.UnregisterCallback(g.pauseCallback)
 +			g.pauseCallback = nil
  			g.access.Unlock()
  			return
@@ -7602,7 +7658,22 @@ index bc50ab70d..9575daf92 100644
 -	access   sync.Mutex
 -	result   map[string]uint16
 -}
--
++func (g *URLTestGroup) urlTest(ctx context.Context, force bool) (map[string]uint16, error) {
++	result := make(map[string]uint16)
++	if g.checking.Swap(true) {
++		return result, nil
++	}
++	defer g.checking.Store(false)
++	g.probeAccess.Lock()
++	if g.checksPaused() {
++		g.probeAccess.Unlock()
++		return result, nil
++	}
++	ctx, cancel := context.WithCancel(ctx)
++	g.probeCancel = cancel
++	g.probeAccess.Unlock()
++	defer func() { cancel(); g.probeAccess.Lock(); g.probeCancel = nil; g.probeAccess.Unlock() }()
+ 
 -func URLTestOutbounds(ctx context.Context, outboundManager adapter.OutboundManager, history *urltest.HistoryStorage, logger log.Logger, outbounds []adapter.Outbound, link string, interval time.Duration, force bool) map[string]uint16 {
 -	b, _ := batch.New(ctx, batch.WithConcurrencyNum[any](10))
 -	testBatch := &urlTestBatch{
@@ -7620,12 +7691,6 @@ index bc50ab70d..9575daf92 100644
 -		groupHistory := history.LoadURLTestHistory(RealTag(outboundManager, outboundGroup))
 -		if groupHistory != nil {
 -			testBatch.result[outboundGroup.Tag()] = groupHistory.Delay
-+func (g *URLTestGroup) urlTest(ctx context.Context, force bool) (map[string]uint16, error) {
-+	result := make(map[string]uint16)
-+	if g.checking.Swap(true) {
-+		return result, nil
-+	}
-+	defer g.checking.Store(false)
 +	if g.strategy == "direct-fallback" {
 +		return g.checkDirectFallback(ctx)
 +	}
@@ -7657,6 +7722,9 @@ index bc50ab70d..9575daf92 100644
 +			testCtx, cancel := context.WithTimeout(ctx, g.timeout)
 +			t, err := urltest.URLTest(testCtx, g.link, p)
 +			cancel()
++			if ctx.Err() != nil {
++				return result, ctx.Err()
++			}
 +			if err != nil {
 +				g.logger.Debug("outbound ", tag, " unavailable: ", err)
 +				g.history.DeleteURLTestHistory(realTag)
@@ -7770,6 +7838,9 @@ index bc50ab70d..9575daf92 100644
 +			testCtx, cancel := context.WithTimeout(ctx, g.timeout)
 +			defer cancel()
 +			t, err := urltest.URLTest(testCtx, g.link, p)
++			if ctx.Err() != nil {
++				return nil, ctx.Err()
++			}
 +			if err != nil {
 +				g.logger.Debug("outbound ", tag, " unavailable: ", err)
 +				g.history.DeleteURLTestHistory(realTag)
@@ -7788,8 +7859,11 @@ index bc50ab70d..9575daf92 100644
 +			}
 +			return nil, nil
 +		})
- 	}
++	}
 +	b.Wait()
++	if ctx.Err() != nil {
++		return result, ctx.Err()
+ 	}
 +	g.performUpdateCheck()
 +	return result, nil
  }
@@ -7818,10 +7892,8 @@ index bc50ab70d..9575daf92 100644
 -		if g.selectedOutboundUDP != nil {
 +	} else if g.selectedOutboundTCP.Load() == nil || (existsTCP && outboundTCP != g.selectedOutboundTCP.Load()) {
 +		if g.selectedOutboundTCP.Load() != nil {
- 			updated = true
- 		}
--		g.selectedOutboundUDP = outbound
--		selected = true
++			updated = true
++		}
 +		g.recordSelection(N.NetworkTCP, outboundTCP)
 +		g.selectedOutboundTCP.Store(outboundTCP)
 +	}
@@ -7834,8 +7906,10 @@ index bc50ab70d..9575daf92 100644
 +		}
 +	} else if g.selectedOutboundUDP.Load() == nil || (existsUDP && outboundUDP != g.selectedOutboundUDP.Load()) {
 +		if g.selectedOutboundUDP.Load() != nil {
-+			updated = true
-+		}
+ 			updated = true
+ 		}
+-		g.selectedOutboundUDP = outbound
+-		selected = true
 +		g.recordSelection(N.NetworkUDP, outboundUDP)
 +		g.selectedOutboundUDP.Store(outboundUDP)
  	}

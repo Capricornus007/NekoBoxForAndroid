@@ -34,7 +34,8 @@ class TrafficUpdater(
     }
 
     companion object {
-        fun pollingInterval(speedInterval: Long) = speedInterval.takeIf { it > 0 } ?: 1000L
+        fun pollingInterval(speedInterval: Long, interactive: Boolean = true): Long =
+            if (interactive) speedInterval.takeIf { it > 0 } ?: 1000L else maxOf(30_000L, speedInterval)
 
         // Session totals are supplied separately by the native ingress tracker.
         // Group and leaf counters intentionally overlap and must never be summed

@@ -5,6 +5,18 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class TrafficUpdaterTest {
+    @Test fun screenOffPollingRetainsTotalsAcrossLongInterval() {
+        assertEquals(30_000L, TrafficUpdater.pollingInterval(500, false))
+        assertEquals(60_000L, TrafficUpdater.pollingInterval(60_000, false))
+        assertEquals(500L, TrafficUpdater.pollingInterval(500, true))
+        var now = 0L
+        val item = TrafficUpdater.TrafficLooperData("proxy")
+        val updater = TrafficUpdater(listOf(item), { _, _ -> 3000L }, { now })
+        now = 30_000
+        updater.updateAll()
+        assertEquals(3000L, item.tx)
+        assertEquals(100L, item.txRate)
+    }
     @Test fun disabledSpeedStillPollsTotals() {
         assertEquals(1000L, TrafficUpdater.pollingInterval(0))
         assertEquals(500L, TrafficUpdater.pollingInterval(500))

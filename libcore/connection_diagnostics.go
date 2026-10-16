@@ -4,23 +4,12 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"sync"
-	"time"
 
 	"github.com/sagernet/sing-box/adapter"
 	boxlog "github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-tun"
 	N "github.com/sagernet/sing/common/network"
 )
-
-// A bounded in-memory ring, created only when the core log level is debug/trace.
-// DNS and group selection use the same connection ID when available. Resolver
-// requests without that ID remain separate: a domain alone is not attribution.
-type connectionDiagnostics struct {
-	access  sync.Mutex
-	entries []map[string]any
-	next    int
-}
 
 func diagnosticText(s string) string {
 	if len(s) > 1024 {
@@ -35,7 +24,6 @@ func diagnosticID(ctx context.Context) string {
 	return ""
 }
 func (d *connectionDiagnostics) add(ctx context.Context, entry map[string]any) {
-	entry["time"] = time.Now().UTC().Format(time.RFC3339Nano)
 	entry["id"] = diagnosticID(ctx)
 	if metadata := adapter.ContextFrom(ctx); metadata != nil && metadata.ProcessInfo != nil {
 		entry["uid"] = metadata.ProcessInfo.UserId
@@ -45,22 +33,12 @@ func (d *connectionDiagnostics) add(ctx context.Context, entry map[string]any) {
 		}
 		entry["packages"] = append([]string(nil), packages...)
 	}
-	d.access.Lock()
-	defer d.access.Unlock()
-	if len(d.entries) < 128 {
-		d.entries = append(d.entries, entry)
-	} else {
-		d.entries[d.next] = entry
-		d.next = (d.next + 1) % 128
+	for key, value := range entry {
+		if text, ok := value.(string); ok {
+			entry[key] = diagnosticText(text)
+		}
 	}
-}
-func (d *connectionDiagnostics) snapshot() []map[string]any {
-	d.access.Lock()
-	defer d.access.Unlock()
-	result := make([]map[string]any, 0, len(d.entries))
-	result = append(result, d.entries[d.next:]...)
-	result = append(result, d.entries[:d.next]...)
-	return result
+	d.record(entry)
 }
 func (d *connectionDiagnostics) route(ctx context.Context, metadata adapter.InboundContext, rule adapter.Rule, outbound adapter.Outbound) {
 	entry := map[string]any{"kind": "route", "network": metadata.Network, "domain": diagnosticText(metadata.Domain), "destination": metadata.Destination.String(), "inbound": metadata.Inbound, "rule": "final"}
@@ -73,7 +51,7 @@ func (d *connectionDiagnostics) route(ctx context.Context, metadata adapter.Inbo
 	}
 	if metadata.ProcessInfo != nil {
 		entry["uid"] = metadata.ProcessInfo.UserId
-		entry["packages"] = append([]string(nil), metadata.ProcessInfo.AndroidPackageNames...)
+		entry["packages"] = append([]string(nil), metadata.ProcessInfo.AndroidPackageNames[:min(8, len(metadata.ProcessInfo.AndroidPackageNames))]...)
 	}
 	d.add(ctx, entry)
 }

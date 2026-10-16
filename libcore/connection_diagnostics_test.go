@@ -40,8 +40,8 @@ func TestConnectionHistoryRequiresDebugAndIsBounded(t *testing.T) {
 		collector.GroupDial(context.Background(), fmt.Sprint(i))
 	}
 	snapshot := collector.snapshot()
-	if len(snapshot) != 128 || snapshot[0]["outbound"] != "72" || snapshot[127]["outbound"] != "199" {
-		t.Fatal("ring lost ordering or exceeded bound")
+	if len(snapshot) != 200 || snapshot[0]["outbound"] != "0" || snapshot[199]["outbound"] != "199" {
+		t.Fatal("ten-minute history lost ordering")
 	}
 }
 

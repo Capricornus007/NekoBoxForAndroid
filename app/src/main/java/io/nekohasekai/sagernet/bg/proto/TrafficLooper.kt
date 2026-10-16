@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.bg.proto
 
 import io.nekohasekai.sagernet.aidl.SpeedDisplayData
+import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.SagerConnection
@@ -8,11 +9,14 @@ import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.database.ProxyEntity
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 
 class TrafficLooper(val data: BaseService.Data) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var job: Job? = null
     private var updater: TrafficUpdater? = null
+    private val powerChanged = Channel<Unit>(Channel.CONFLATED)
+    fun onPowerChanged() { powerChanged.trySend(Unit) }
     private val profiles = mutableMapOf<Long, ProxyEntity>()
     private val profileTags = mutableMapOf<Long, MutableList<TrafficUpdater.TrafficLooperData>>()
     private val bases = mutableMapOf<Long, Pair<Long, Long>>()
@@ -63,9 +67,8 @@ class TrafficLooper(val data: BaseService.Data) {
 
     private suspend fun loop() {
         val speedInterval = DataStore.speedInterval.toLong()
-        val delayMs = TrafficUpdater.pollingInterval(speedInterval)
         while (currentCoroutineContext().isActive) {
-            delay(delayMs)
+            withTimeoutOrNull(TrafficUpdater.pollingInterval(speedInterval, SagerNet.power.isInteractive)) { powerChanged.receive() }
             updater?.updateAll()
             val showSpeed = speedInterval > 0
             val speed = SpeedDisplayData(

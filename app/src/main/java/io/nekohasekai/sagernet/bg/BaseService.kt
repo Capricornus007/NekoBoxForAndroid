@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
 import android.app.ActivityManager
+import android.app.KeyguardManager
 import android.widget.Toast
 import io.nekohasekai.sagernet.Action
 import io.nekohasekai.sagernet.BootReceiver
@@ -66,7 +67,10 @@ class BaseService {
                             Libcore.resetAllConnections(true)
                         }
                     }
+                    updateProbePowerState()
                 }
+
+                Intent.ACTION_SCREEN_ON, Intent.ACTION_SCREEN_OFF, Intent.ACTION_USER_PRESENT -> updateProbePowerState()
 
                 Action.RESET_UPSTREAM_CONNECTIONS -> runOnDefaultDispatcher {
                     Libcore.resetAllConnections(true)
@@ -86,6 +90,14 @@ class BaseService {
 
         val binder = Binder(this)
         var connectingJob: Job? = null
+
+        fun updateProbePowerState() {
+            if (state != State.Connected) return
+            val context = service as Context
+            val keyguard = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            proxy?.box?.setProbesPaused(pauseHealthChecks(SagerNet.power.isInteractive, keyguard.isKeyguardLocked, SagerNet.power.isDeviceIdleMode))
+            proxy?.looper?.onPowerChanged()
+        }
 
         fun changeState(s: State, msg: String? = null) {
             if (state == s && msg == null) return
@@ -158,10 +170,11 @@ class BaseService {
             }
         }
 
-        override fun getRuntimeDiagnostics(): String {
+        override fun getRuntimeDiagnostics(historyQuery: String): String {
+            check(android.os.Binder.getCallingUid() == android.os.Process.myUid()) { "Caller is not the application" }
             val proxy = data?.proxy ?: return "{\"groups\":[]}"
             if (!proxy.isInitialized()) return "{\"groups\":[]}"
-            return proxy.box.runtimeDiagnostics()
+            return proxy.box.runtimeDiagnostics(historyQuery)
         }
 
         override fun networkProbe(expectedProfileId: Long, direct: Boolean, domain: String, dnsTarget: String): String {
@@ -436,6 +449,9 @@ class BaseService {
                     addAction(Action.CLOSE)
                     // addAction(Action.SWITCH_WAKE_LOCK)
                     addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
+                    addAction(Intent.ACTION_SCREEN_ON)
+                    addAction(Intent.ACTION_SCREEN_OFF)
+                    addAction(Intent.ACTION_USER_PRESENT)
                     addAction(Action.RESET_UPSTREAM_CONNECTIONS)
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -477,6 +493,7 @@ class BaseService {
 
                     withContext(Dispatchers.IO) { startProcesses() }
                     data.changeState(State.Connected)
+                    data.updateProbePowerState()
 
                     lateInit()
                 } catch (_: CancellationException) { // if the job was cancelled, it is canceller's responsibility to call stopRunner

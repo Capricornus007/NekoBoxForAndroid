@@ -70,4 +70,8 @@
   <string name="network_profiles_ssid_hint">On Android 10+, SSID matching requires precise location access allowed all the time; system Location must also be enabled. Otherwise generic Wi-Fi is used, including while the app is visible.</string>
   <string name="network_profiles_ssid_ready">SSID permission is available. Keep system Location enabled for SSID matching.</string>
   <string name="network_profiles_always">Allow all the time</string>
+  <string name="diagnostics_history_window">Last 10 minutes · matches: %1$d · on page: %2$d</string>
+  <string name="diagnostics_history_older">Older events</string>
+  <string name="diagnostics_history_latest">Latest events</string>
+  <string name="diagnostics_history_truncated">The journal safety limit was reached: some of the oldest events were removed.</string>
 </resources>

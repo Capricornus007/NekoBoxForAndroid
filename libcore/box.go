@@ -205,6 +205,19 @@ func (b *BoxInstance) Wake() {
 	}
 }
 
+func (b *BoxInstance) SetProbesPaused(paused bool) {
+	b.access.Lock()
+	defer b.access.Unlock()
+	if b.state != 1 || b.Box == nil {
+		return
+	}
+	for _, outbound := range b.Outbound().Outbounds() {
+		if checks, ok := outbound.(*group.URLTest); ok {
+			checks.SetProbesPaused(paused)
+		}
+	}
+}
+
 func (b *BoxInstance) SetAsMain() {
 	mainInstance = b
 	goServeProtect(true)

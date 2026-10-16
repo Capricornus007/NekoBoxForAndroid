@@ -96,7 +96,16 @@ func CheckConfig(config string, localTransport LocalDNSTransport) (err error) {
 	return nil
 }
 
-func (b *BoxInstance) RuntimeDiagnostics() (string, error) {
+func (b *BoxInstance) RuntimeDiagnostics(queryJSON string) (string, error) {
+	query := historyQuery{Limit: 100}
+	if len(queryJSON) > 4096 {
+		return "", fmt.Errorf("diagnostic query is too large")
+	}
+	if queryJSON != "" {
+		if err := json.Unmarshal([]byte(queryJSON), &query); err != nil {
+			return "", err
+		}
+	}
 	b.access.Lock()
 	defer b.access.Unlock()
 	groups := make([]map[string]any, 0)
@@ -112,7 +121,9 @@ func (b *BoxInstance) RuntimeDiagnostics() (string, error) {
 	}
 	report := map[string]any{"groups": groups, "debug_history": b.diagnostics != nil}
 	if b.diagnostics != nil {
-		report["events"] = b.diagnostics.snapshot()
+		for key, value := range b.diagnostics.page(query) {
+			report[key] = value
+		}
 	}
 	wireguard := make([]map[string]any, 0)
 	if b.state == 1 && b.Box != nil {
@@ -134,8 +145,8 @@ func (b *BoxInstance) RuntimeDiagnostics() (string, error) {
 	}
 	report["wireguard"] = wireguard
 	content, err := json.Marshal(report)
-	if len(content) > 512*1024 {
-		return "", fmt.Errorf("runtime diagnostics exceed 512 KiB")
+	if len(content) > 256*1024 {
+		return "", fmt.Errorf("runtime diagnostics exceed 256 KiB")
 	}
 	return string(content), err
 }
