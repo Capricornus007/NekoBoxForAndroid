@@ -31,6 +31,21 @@ Expressive design is applied through action emphasis, semantic color roles,
 grouping, appropriate shape/typography and accessible controls. No decorative
 motion, new UI framework or additional runtime dependency was introduced.
 
+## dev.14.1 scrollbar correction
+
+A user recording exposed jitter in routes and profiles that the static audit did
+not detect. The existing FastScroll 2.0.1 widget estimated the entire list from
+the first visible card height, omitted card margins, and used a different padded
+track for drawing and dragging. Shared list layouts now use row-based progress
+from both visible edges, decorated bounds including margins, and the same track
+for thumb input/output. Existing thumb styling, animations and app-name popup are
+reused; no dependency was added. Grid rows and a partial final row are supported.
+Seeking corrects the target against its actual laid-out height before drawing,
+including a final card taller than the viewport. Thumb capture prevents a
+ViewPager2 group swipe. JVM regression checks cover continuity, track round trips,
+row/grid seeking, viewport boundaries and a tall final card. Device replay is
+still required; no Android target is attached here.
+
 ## Power and diagnostic behavior
 
 - Health checks stop when the display is off, the keyguard is locked or Android

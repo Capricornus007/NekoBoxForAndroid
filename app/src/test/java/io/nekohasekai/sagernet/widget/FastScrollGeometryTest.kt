@@ -55,4 +55,9 @@ class FastScrollGeometryTest {
         assertEquals(1f, FastScrollGeometry.dragProgress(2f, 800, 52, 8, 148), 0f)
         assertEquals(0, FastScrollGeometry.target(0f, 0, 400, 80).first)
     }
+
+    @Test fun bottomSeekUsesActualHeightEvenWhenFinalCardIsTallerThanScreen() {
+        assertEquals(12 to -500, FastScrollGeometry.target(1f, 13, 400, 900))
+        assertEquals(12 to 324, FastScrollGeometry.target(1f, 13, 400, 76))
+    }
 }

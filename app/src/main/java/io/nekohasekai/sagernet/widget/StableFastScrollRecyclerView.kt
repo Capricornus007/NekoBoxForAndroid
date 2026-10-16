@@ -24,6 +24,7 @@ class StableFastScrollRecyclerView @JvmOverloads constructor(
     private var thumbX = -1
     private var thumbY = -1
     private var thumbGesture = false
+    private var pendingSeek: Pair<Int, Float>? = null
 
     init {
         // 2.0.1 keeps its renderer private; replace its scroll listener before adding our renderer.
@@ -104,6 +105,18 @@ class StableFastScrollRecyclerView @JvmOverloads constructor(
 
     override fun showScrollbar() = scrollbar.show()
 
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        val (row, progress) = pendingSeek ?: return
+        pendingSeek = null
+        val rowBounds = rowBounds(row) ?: return
+        val rows = rowOf((adapter?.itemCount ?: 1) - 1) + 1
+        val (_, offset) = FastScrollGeometry.target(progress, rows,
+            height - paddingTop - paddingBottom, rowBounds.second - rowBounds.first)
+        // Align using the actual laid-out height, including margins, before the frame is drawn.
+        scrollBy(0, rowBounds.first - paddingTop - offset)
+    }
+
     override fun onInterceptTouchEvent(rv: RecyclerView, event: MotionEvent): Boolean = handleThumbTouch(event)
 
     override fun onTouchEvent(rv: RecyclerView, event: MotionEvent) {
@@ -142,13 +155,12 @@ class StableFastScrollRecyclerView @JvmOverloads constructor(
         val progress = FastScrollGeometry.dragProgress(touchFraction, height, scrollbar.thumbHeight, paddingTop, paddingBottom)
         val rows = rowOf(count - 1) + 1
         val targetRow = (progress * rows).toInt().coerceIn(0, rows - 1)
-        val visibleRow = rowBounds(targetRow) ?: rowBounds(rowOf(manager.findFirstVisibleItemPosition().coerceAtLeast(0)))
-        val rowHeight = visibleRow?.let { it.second - it.first } ?: 1
         val viewport = height - paddingTop - paddingBottom
-        val (row, offset) = FastScrollGeometry.target(progress, rows, viewport, rowHeight)
-        val position = rowPosition(row)
+        val position = rowPosition(targetRow)
         stopScroll()
-        manager.scrollToPositionWithOffset(position, offset)
+        pendingSeek = targetRow to progress
+        // Keep the requested row visible so onLayout can use its real height, even for a tall rule.
+        manager.scrollToPositionWithOffset(position, (progress * (viewport - 1)).toInt())
         return (adapter as? SectionedAdapter)?.getSectionName(position).orEmpty()
     }
 }
