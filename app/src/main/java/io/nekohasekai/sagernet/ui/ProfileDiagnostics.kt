@@ -164,7 +164,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     val comparisonUrl = TextInputEditText(comparisonUrlLayout.context).apply {
         setSingleLine(true)
         filters = arrayOf(android.text.InputFilter.LengthFilter(2048))
-        setText("https://www.gstatic.com/generate_204")
+        setText(profile.chainBean?.healthUrl?.takeIf { it.isNotBlank() } ?: "https://www.gstatic.com/generate_204")
     }
     comparisonUrlLayout.addView(comparisonUrl)
     comparisonCard.addView(comparisonUrlLayout)
@@ -175,6 +175,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     val comparisonDns = mutableListOf<Pair<String, String>>()
     val chosenTargets = linkedSetOf<String>()
     var chosenDns = ""
+    var comparisonInitialized = false
     var comparisonJob: Job? = null
     fun comparisonButtons() {
         targetsButton.text = if (chosenTargets.isEmpty()) getString(R.string.diagnostics_compare_choose_nodes) else chosenTargets.joinToString("\n")
@@ -189,7 +190,14 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
         comparisonTargets.clear(); comparisonTargets.addAll(entries("probe_targets"))
         comparisonDns.clear(); comparisonDns.addAll(entries("dns_servers"))
         chosenTargets.retainAll(comparisonTargets.map { it.first }.toSet())
-        if (chosenTargets.isEmpty()) comparisonTargets.firstOrNull { it.first != "direct" }?.let { chosenTargets.add(it.first) }
+        if (!comparisonInitialized && comparisonTargets.isNotEmpty()) {
+            val groups = state?.optJSONArray("groups")
+            val active = if (groups == null) null else (0 until groups.length()).mapNotNull { groups.optJSONObject(it) }
+                .firstOrNull { it.optString("strategy") == "fastest" }?.optJSONObject("tcp")?.optString("current")
+            comparisonTargets.firstOrNull { it.first == active }?.let { chosenTargets.add(it.first) }
+                ?: comparisonTargets.firstOrNull { it.first != "direct" }?.let { chosenTargets.add(it.first) }
+            comparisonInitialized = true
+        }
         if (comparisonDns.none { it.first == chosenDns }) chosenDns = comparisonDns.firstOrNull { it.first == "dns-remote" }?.first ?: comparisonDns.firstOrNull()?.first.orEmpty()
         targetsButton.isEnabled = comparisonTargets.isNotEmpty()
         dnsButton.isEnabled = comparisonDns.isNotEmpty()
@@ -367,6 +375,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
             }
             group.optJSONObject("fallback")?.let { fallback ->
                 report.append("\n").append(getString(R.string.diagnostics_fallback_rounds, fallback.optInt("failed_rounds"), fallback.optInt("failure_threshold"), fallback.optInt("healthy_rounds"), fallback.optInt("recovery_threshold")))
+                report.append("\n").append(getString(R.string.diagnostics_control_quorum, fallback.optInt("successes"), fallback.optInt("required"), fallback.optLong("timeout_ms")))
                 fallback.optString("checked_at").takeIf(String::isNotBlank)?.let { timestamp ->
                     val age = runCatching { java.time.Duration.between(Instant.parse(timestamp), Instant.now()).seconds.coerceAtLeast(0) }.getOrDefault(0)
                     report.append("\n").append(getString(R.string.diagnostics_last_check, time(timestamp), age))

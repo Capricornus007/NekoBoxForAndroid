@@ -46,6 +46,24 @@ func newCandidateChecker(options option.Options) *candidateChecker {
 	return checker
 }
 
+func (c *candidateChecker) validate(dnsTag, link string) error {
+	if _, err := validProbeURL(link); err != nil {
+		return err
+	}
+	for _, source := range c.servers {
+		if source.Tag != dnsTag {
+			continue
+		}
+		switch source.Type {
+		case C.DNSTypeUDP, C.DNSTypeTCP, C.DNSTypeTLS, C.DNSTypeHTTPS, C.DNSTypeQUIC, C.DNSTypeHTTP3:
+			return nil
+		default:
+			return fmt.Errorf("DNS health check requires a remote network DNS transport")
+		}
+	}
+	return fmt.Errorf("configured DNS health server is missing")
+}
+
 func probeErrorCode(err error) string {
 	if err == nil {
 		return ""
@@ -85,7 +103,7 @@ func validProbeURL(link string) (*url.URL, error) {
 }
 
 // Use an isolated copy of the actual typed DNS transport. Neither live DNS
-// configuration/caches nor the selected proxy are modified by a probe.
+// configuration nor the selected proxy are modified by a probe.
 func (c *candidateChecker) CheckCandidate(ctx context.Context, tag, dnsTag, link string) (uint16, map[string]any, error) {
 	report := map[string]any{"dns_server": dnsTag, "dns": map[string]any{"state": "not-tested"}, "https": map[string]any{"state": "not-tested"}}
 	u, err := validProbeURL(link)
@@ -234,7 +252,7 @@ func (c *candidateChecker) CheckCandidate(ctx context.Context, tag, dnsTag, link
 		return 0, report, ctx.Err()
 	}
 	if len(addresses) == 0 {
-		dnsReport["state"] = "failed"
+		dnsReport["state"], dnsReport["error"] = "failed", "no-addresses"
 		if queryErr != nil {
 			return 0, report, fmt.Errorf("DNS exchange: %w", safeProbeError(queryErr))
 		}
@@ -258,6 +276,7 @@ func (c *candidateChecker) CheckCandidate(ctx context.Context, tag, dnsTag, link
 	httpsReport := map[string]any{"state": "failed", "tcp": "not-tested", "tls": "not-tested"}
 	report["https"] = httpsReport
 	started := time.Now()
+	defer func() { httpsReport["ms"] = time.Since(started).Milliseconds() }()
 	port := uint16(443)
 	if u.Port() != "" {
 		n, _ := strconv.Atoi(u.Port())
@@ -308,7 +327,7 @@ func (c *candidateChecker) CheckCandidate(ctx context.Context, tag, dnsTag, link
 		return 0, report, fmt.Errorf("HTTPS status %d", response.StatusCode)
 	}
 	httpsReport["state"] = "reachable"
-	return uint16(min(65535, time.Since(started).Milliseconds())), report, nil
+	return uint16(min(65535, max(1, time.Since(started).Milliseconds()))), report, nil
 }
 
 // Error text deliberately excludes URL paths, headers and answers. Wrapping

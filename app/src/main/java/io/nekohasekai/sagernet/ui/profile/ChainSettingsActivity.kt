@@ -101,9 +101,6 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
                     }
                     return
                 }
-            } catch (e: IllegalArgumentException) {
-                onMainDispatcher { Toast.makeText(this@ChainSettingsActivity, R.string.fastest_health_invalid_url, Toast.LENGTH_LONG).show() }
-                return
             } catch (e: FastestCandidateResolutionException) {
                 onMainDispatcher {
                     Toast.makeText(
@@ -112,6 +109,9 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
                         Toast.LENGTH_LONG,
                     ).show()
                 }
+                return
+            } catch (e: IllegalArgumentException) {
+                onMainDispatcher { Toast.makeText(this@ChainSettingsActivity, R.string.fastest_health_invalid_url, Toast.LENGTH_LONG).show() }
                 return
             }
         } else if (proxyList.isEmpty()) {

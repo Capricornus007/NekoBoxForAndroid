@@ -29,7 +29,7 @@ internal object RouteOverlap {
 
     private fun domains(value: String) = tokens(value).map { token ->
         val lower = token.lowercase(java.util.Locale.ROOT)
-        if (':' !in lower) "domain:$lower" else lower
+        if (listOf("domain:","full:","regexp:","keyword:","geosite:").any(token::startsWith)) lower else "domain:$lower"
     }.toSet()
 
     private fun covers(a: RuleEntity, b: RuleEntity): Boolean {
@@ -55,7 +55,7 @@ internal object RouteOverlap {
         if (!upper.startsWith("domain:")) return false
         val suffix = upper.removePrefix("domain:")
         // Leading dots and regexp/keyword/geosite are intentionally compared only exactly.
-        if (suffix.isEmpty() || suffix.startsWith('.')) return false
+        if (suffix.isEmpty() || suffix.startsWith('.') || suffix.any { !it.isLetterOrDigit() && it !in "-_." }) return false
         val host = when {
             lower.startsWith("full:") -> lower.removePrefix("full:")
             lower.startsWith("domain:") -> lower.removePrefix("domain:")

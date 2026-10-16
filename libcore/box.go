@@ -114,6 +114,21 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 
 	// create box
 	checker := newCandidateChecker(options)
+	for _, outbound := range options.Outbounds {
+		if test, ok := outbound.Options.(*option.URLTestOutboundOptions); ok && test.HealthCheck {
+			dnsTag, link := test.HealthDNSServer, test.HealthURL
+			if dnsTag == "" {
+				dnsTag = "dns-remote"
+			}
+			if link == "" {
+				link = "https://www.gstatic.com/generate_204"
+			}
+			if err := checker.validate(dnsTag, link); err != nil {
+				cancel()
+				return nil, err
+			}
+		}
+	}
 	service.MustRegister[group.CandidateHealthChecker](ctx, checker)
 	instance, err := box.New(box.Options{
 		Options:           options,

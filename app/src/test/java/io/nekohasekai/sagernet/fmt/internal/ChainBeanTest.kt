@@ -43,6 +43,9 @@ class ChainBeanTest {
             ignoreCase = false
             protocolFilterMode = 1
             protocols = listOf("vless", "hysteria2")
+            healthCheck = true
+            failureCooldown = true
+            healthUrl = "https://example.com/check"
             proxies = listOf(11L, 22L)
         }
 
@@ -54,7 +57,36 @@ class ChainBeanTest {
         assertEquals(false, restored.ignoreCase)
         assertEquals(source.protocolFilterMode, restored.protocolFilterMode)
         assertEquals(source.protocols, restored.protocols)
+        assertEquals(source.healthCheck, restored.healthCheck)
+        assertEquals(source.failureCooldown, restored.failureCooldown)
+        assertEquals(source.healthUrl, restored.healthUrl)
         assertEquals(listOf(11L, 22L), restored.proxies)
+    }
+
+    @Test
+    fun versionFourKeepsMetadataAndDisablesHealthOptions() {
+        val output = ByteBufferOutput(256)
+        output.writeInt(4)
+        output.writeInt(ChainBean.STRATEGY_FASTEST)
+        output.writeInt(ChainBean.CANDIDATE_MODE_MANUAL)
+        output.writeLong(0)
+        output.writeString("")
+        output.writeBoolean(true)
+        output.writeInt(1)
+        output.writeLong(7)
+        output.writeInt(0)
+        output.writeInt(1)
+        output.writeString("hysteria2")
+        output.writeInt(1)
+        output.writeString("legacy-v4")
+        output.writeString("")
+        output.writeString("")
+        val restored = KryoConverters.chainDeserialize(output.toBytes())
+        assertEquals("legacy-v4", restored.name)
+        assertEquals(listOf("hysteria2"), restored.protocols)
+        assertEquals(false, restored.healthCheck)
+        assertEquals(false, restored.failureCooldown)
+        assertEquals("https://www.gstatic.com/generate_204", restored.healthUrl)
     }
 
     @Test

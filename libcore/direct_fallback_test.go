@@ -313,3 +313,18 @@ func TestDirectFallbackQuorumAndConsecutiveRounds(t *testing.T) {
 		t.Fatal("did not recover")
 	}
 }
+
+func TestFallbackDiagnosticsReportsTimeoutAsUnreachable(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { <-r.Context().Done() }))
+	defer server.Close()
+	g, _, _, _ := newFallbackTest(t, server.URL, time.Hour, func(o *option.URLTestOutboundOptions) { o.Timeout = badoption.Duration(30 * time.Millisecond) })
+	g.CheckOutbounds()
+	report := g.SelectionDiagnostics()["fallback"].(map[string]any)
+	sites := report["sites"].([]map[string]any)
+	if report["round_state"] != "completed" || sites[0]["state"] != "unreachable" || sites[0]["reason"] != "timeout" {
+		t.Fatalf("ambiguous timeout verdict: %v", report)
+	}
+	if g.Now() != "proxy" {
+		t.Fatal("timeout enabled direct routing")
+	}
+}

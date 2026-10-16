@@ -6730,10 +6730,10 @@ index af8826b89..c53defcf1 100644
 +}
 diff --git a/protocol/group/candidate_health.go b/protocol/group/candidate_health.go
 new file mode 100644
-index 000000000..6ebda73ad
+index 000000000..82d2a636f
 --- /dev/null
 +++ b/protocol/group/candidate_health.go
-@@ -0,0 +1,168 @@
+@@ -0,0 +1,176 @@
 +package group
 +
 +import (
@@ -6756,11 +6756,10 @@ index 000000000..6ebda73ad
 +}
 +
 +type candidateHealthState struct {
-+	CheckedAt time.Time      `json:"checked_at"`
-+	Failures  int            `json:"failures"`
-+	RetryAt   time.Time      `json:"retry_at,omitempty"`
-+	Error     string         `json:"error,omitempty"`
-+	Report    map[string]any `json:"report,omitempty"`
++	CheckedAt time.Time `json:"checked_at"`
++	Failures  int       `json:"failures"`
++	RetryAt   time.Time `json:"retry_at,omitempty"`
++	Error     string    `json:"error,omitempty"`
 +}
 +
 +func (g *URLTestGroup) configureHealth(o option.URLTestOutboundOptions) error {
@@ -6807,7 +6806,16 @@ index 000000000..6ebda73ad
 +}
 +
 +func (g *URLTestGroup) allowFailureCheck() bool {
-+	if !g.healthCheck && !g.failureCooldown {
++	enhanced := g.healthCheck || g.failureCooldown
++	if !enhanced {
++		for _, outbound := range g.outbounds {
++			if nested, ok := outbound.(*URLTest); ok && nested.group != nil && (nested.group.healthCheck || nested.group.failureCooldown) {
++				enhanced = true
++				break
++			}
++		}
++	}
++	if !enhanced {
 +		return true
 +	}
 +	g.healthAccess.Lock()
@@ -6828,7 +6836,7 @@ index 000000000..6ebda73ad
 +	return delay, nil, err
 +}
 +
-+func (g *URLTestGroup) recordProbe(tag, realTag string, epoch uint64, delay uint16, report map[string]any, err error) bool {
++func (g *URLTestGroup) recordProbe(tag, realTag string, epoch uint64, delay uint16, _ map[string]any, err error) bool {
 +	g.healthAccess.Lock()
 +	defer g.healthAccess.Unlock()
 +	if epoch != g.healthEpoch || errors.Is(err, context.Canceled) {
@@ -6836,7 +6844,7 @@ index 000000000..6ebda73ad
 +	}
 +	if g.healthCheck || g.failureCooldown {
 +		state := g.healthStates[tag]
-+		state.CheckedAt, state.Report = time.Now(), report
++		state.CheckedAt = time.Now()
 +		state.Error = ""
 +		if err != nil {
 +			state.Failures = min(10, state.Failures+1)
@@ -6902,12 +6910,114 @@ index 000000000..6ebda73ad
 +}
 +
 +func (s *URLTest) InterfaceUpdated(context.Context) { s.ResetProbeHealth() }
+diff --git a/protocol/group/candidate_health_test.go b/protocol/group/candidate_health_test.go
+new file mode 100644
+index 000000000..acf97d557
+--- /dev/null
++++ b/protocol/group/candidate_health_test.go
+@@ -0,0 +1,96 @@
++package group
++
++import (
++	"context"
++	"errors"
++	"net"
++	"testing"
++	"time"
++
++	"github.com/sagernet/sing-box/adapter"
++	"github.com/sagernet/sing-box/adapter/outbound"
++	"github.com/sagernet/sing-box/common/urltest"
++	"github.com/sagernet/sing-box/log"
++	"github.com/sagernet/sing-box/option"
++	M "github.com/sagernet/sing/common/metadata"
++	"github.com/sagernet/sing/service"
++	"github.com/sagernet/sing/service/pause"
++)
++
++type healthTestOutbound struct{ outbound.Adapter }
++
++func (*healthTestOutbound) DialContext(context.Context, string, M.Socksaddr) (net.Conn, error) {
++	return nil, errors.New("unused")
++}
++func (*healthTestOutbound) ListenPacket(context.Context, M.Socksaddr) (net.PacketConn, error) {
++	return nil, errors.New("unused")
++}
++func newHealthGroup(t *testing.T) *URLTestGroup {
++	t.Helper()
++	ctx := pause.WithDefaultManager(service.ContextWithDefaultRegistry(context.Background()))
++	members := []adapter.Outbound{&healthTestOutbound{outbound.NewAdapter("test", "a", []string{"tcp", "udp"}, nil)}, &healthTestOutbound{outbound.NewAdapter("test", "b", []string{"tcp", "udp"}, nil)}}
++	g, err := NewURLTestGroup(ctx, nil, log.NewNOPFactory().Logger(), members, "https://example.com", time.Hour, 50, time.Hour, time.Second, "fastest", false, false)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err = g.configureHealth(option.URLTestOutboundOptions{FailureCooldown: true}); err != nil {
++		t.Fatal(err)
++	}
++	return g
++}
++func TestCandidateCooldownThresholdCancellationRecoveryAndIsolation(t *testing.T) {
++	g := newHealthGroup(t)
++	unrelated := urltest.NewHistoryStorage()
++	unrelated.StoreURLTestHistory("a", &adapter.URLTestHistory{Time: time.Now(), Delay: 1})
++	for index := range 2 {
++		if !g.recordProbe("a", "a", 0, 0, nil, context.DeadlineExceeded) || g.candidateBlocked("a") {
++			t.Fatalf("premature cooldown %d", index)
++		}
++	}
++	if g.recordProbe("a", "a", 0, 0, nil, context.Canceled) {
++		t.Fatal("counted cancellation")
++	}
++	if g.healthStates["a"].Failures != 2 {
++		t.Fatal("cancellation counted as failure")
++	}
++	g.recordProbe("a", "a", 0, 0, nil, context.DeadlineExceeded)
++	if !g.candidateBlocked("a") || g.candidateBlocked("b") {
++		t.Fatal("cooldown did not isolate failed node")
++	}
++	selected, _ := g.Select("tcp")
++	if selected == nil || selected.Tag() != "b" {
++		t.Fatal("selected quarantined node")
++	}
++	g.recordProbe("b", "b", 0, 0, nil, errors.New("failed"))
++	g.recordProbe("b", "b", 0, 0, nil, errors.New("failed"))
++	g.recordProbe("b", "b", 0, 0, nil, errors.New("failed"))
++	if selected, _ = g.Select("tcp"); selected != nil {
++		t.Fatal("fell back to a quarantined node when all nodes failed")
++	}
++	g.recordProbe("a", "a", 0, 4, nil, nil)
++	if g.candidateBlocked("a") || g.healthStates["a"].Failures != 0 {
++		t.Fatal("successful retry did not clear cooldown")
++	}
++	if unrelated.LoadURLTestHistory("a") == nil {
++		t.Fatal("group changed shared probe history")
++	}
++	if !g.allowFailureCheck() || g.allowFailureCheck() {
++		t.Fatal("failure checks not throttled")
++	}
++}
++func TestCandidateNetworkChangeInvalidatesOldResults(t *testing.T) {
++	g := newHealthGroup(t)
++	g.recordProbe("a", "a", 0, 5, nil, nil)
++	g.recordProbe("b", "b", 0, 0, nil, context.DeadlineExceeded)
++	g.checking.Store(true) // Simulate an in-flight check; reset queues its replacement.
++	(&URLTest{group: g}).ResetProbeHealth()
++	if len(g.healthStates) != 0 || g.history.LoadURLTestHistory("a") != nil {
++		t.Fatal("retained old network health")
++	}
++	if g.recordProbe("a", "a", 0, 5, nil, nil) {
++		t.Fatal("accepted old-network completion")
++	}
++	if !g.recordProbe("b", "b", g.probeEpoch(), 8, nil, nil) {
++		t.Fatal("rejected current network result")
++	}
++}
 diff --git a/protocol/group/direct_fallback.go b/protocol/group/direct_fallback.go
 new file mode 100644
-index 000000000..0aafe4bc5
+index 000000000..aabadfd69
 --- /dev/null
 +++ b/protocol/group/direct_fallback.go
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,157 @@
 +package group
 +
 +import (
@@ -6980,6 +7090,7 @@ index 000000000..0aafe4bc5
 +		elapsed time.Duration
 +	}
 +	results := make(chan probe, len(links))
++	roundStarted := time.Now()
 +	testCtx, cancel := context.WithTimeout(ctx, g.timeout)
 +	defer cancel()
 +	for index, link := range links {
@@ -7005,6 +7116,9 @@ index 000000000..0aafe4bc5
 +			site := sites[result.index]
 +			code, status := urltest.ReachabilityErrorCode(result.err)
 +			site["state"], site["reason"], site["elapsed_ms"] = "unreachable", code, result.elapsed.Milliseconds()
++			if code == "cancelled" {
++				site["state"] = "cancelled"
++			}
 +			if status != 0 {
 +				site["http_status"] = status
 +			}
@@ -7021,7 +7135,7 @@ index 000000000..0aafe4bc5
 +			}
 +			for _, site := range sites {
 +				if site["state"] == "checking" {
-+					site["state"], site["reason"] = "unreachable", code
++					site["state"], site["reason"], site["elapsed_ms"] = "unreachable", code, time.Since(roundStarted).Milliseconds()
 +					if code == "cancelled" {
 +						site["state"] = "cancelled"
 +					}
@@ -7031,10 +7145,11 @@ index 000000000..0aafe4bc5
 +		}
 +	}
 +	if ctx.Err() != nil {
++		roundState = "cancelled"
 +		g.fallbackDiagnostics.Store(map[string]any{
 +			"sites": sites, "checked_at": time.Now(), "round_state": roundState, "successes": successes, "required": required,
 +			"failed_rounds": g.fallback.failedRounds, "healthy_rounds": g.fallback.healthyRounds,
-+			"failure_threshold": g.fallback.failures, "recovery_threshold": g.fallback.recoveries,
++			"failure_threshold": g.fallback.failures, "recovery_threshold": g.fallback.recoveries, "timeout_ms": g.timeout.Milliseconds(),
 +		})
 +		return nil, ctx.Err()
 +	}
@@ -7045,7 +7160,7 @@ index 000000000..0aafe4bc5
 +	g.fallbackDiagnostics.Store(map[string]any{
 +		"sites": sites, "checked_at": time.Now(), "round_state": roundState, "successes": successes, "required": required,
 +		"failed_rounds": g.fallback.failedRounds, "healthy_rounds": g.fallback.healthyRounds,
-+		"failure_threshold": g.fallback.failures, "recovery_threshold": g.fallback.recoveries,
++		"failure_threshold": g.fallback.failures, "recovery_threshold": g.fallback.recoveries, "timeout_ms": g.timeout.Milliseconds(),
 +	})
 +	result := make(map[string]uint16)
 +	if enabled {
@@ -7305,7 +7420,7 @@ index c3aaec5a9..3d603ab9b 100644
 +
 +func RealTag(_ adapter.OutboundManager, detour adapter.Outbound) string { return legacyRealTag(detour) }
 diff --git a/protocol/group/urltest.go b/protocol/group/urltest.go
-index bc50ab70d..b8ea1148b 100644
+index bc50ab70d..9f53f010d 100644
 --- a/protocol/group/urltest.go
 +++ b/protocol/group/urltest.go
 @@ -2,7 +2,6 @@ package group
@@ -7854,7 +7969,7 @@ index bc50ab70d..b8ea1148b 100644
  			if !common.Contains(detour.Network(), network) {
  				continue
  			}
-@@ -347,180 +482,340 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -347,180 +482,347 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  	return minOutbound, true
  }
  
@@ -8311,10 +8426,17 @@ index bc50ab70d..b8ea1148b 100644
 +		g.initialProbeStarted.Store(true)
 +		go func() { g.CheckOutbounds(true); close(g.initialDone) }()
 +	})
++	var budget <-chan time.Time
++	if g.healthCheck {
++		timer := time.NewTimer(18 * time.Second)
++		defer timer.Stop()
++		budget = timer.C
++	}
 +	select {
 +	case <-g.initialReady:
 +	case <-g.initialDone:
 +	case <-ctx.Done():
++	case <-budget: // Ranking continues in the service context; startup stays bounded.
 +	}
 +}
 +

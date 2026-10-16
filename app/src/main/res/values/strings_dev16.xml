@@ -44,4 +44,5 @@
     <string name="diagnostics_probe_verified">Verified</string>
     <string name="diagnostics_probe_started">Started</string>
     <string name="diagnostics_health_failures">Failed checks: %1$d</string>
+    <string name="diagnostics_control_quorum">Available: %1$d · required: %2$d · timeout: %3$d ms</string>
 </resources>
