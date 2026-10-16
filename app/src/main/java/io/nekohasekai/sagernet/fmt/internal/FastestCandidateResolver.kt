@@ -11,6 +11,7 @@ enum class FastestCandidateResolutionError(val configMessage: String) {
     SOURCE_GROUP_MISSING("Fastest regex profile source subscription is missing"),
     SOURCE_GROUP_NOT_SUBSCRIPTION("Fastest regex profile source group is not a subscription"),
     DUPLICATE_MANUAL_CANDIDATES("Dynamic proxy profile contains duplicate candidates"),
+    INVALID_PROTOCOL_FILTER("Fastest profile has an invalid protocol filter"),
 }
 
 class FastestCandidateResolutionException(
@@ -21,7 +22,7 @@ class FastestCandidateResolutionException(
 object FastestCandidateResolver {
 
     fun resolve(bean: ChainBean): List<ProxyEntity> {
-        return if (bean.candidateMode == ChainBean.CANDIDATE_MODE_REGEX) {
+        val candidates = if (bean.candidateMode == ChainBean.CANDIDATE_MODE_REGEX) {
             val sourceGroup = SagerDatabase.groupDao.getById(bean.sourceGroupId)
                 ?: throw FastestCandidateResolutionException(
                     FastestCandidateResolutionError.SOURCE_GROUP_MISSING
@@ -44,6 +45,12 @@ object FastestCandidateResolver {
             }
             val profilesById = SagerDatabase.proxyDao.getEntities(bean.proxies).associateBy { it.id }
             bean.proxies.mapNotNull(profilesById::get)
+        }
+        val cache = candidates.associateBy { it.id }.toMutableMap()
+        fun lookup(id: Long): ProxyEntity? = cache[id] ?: SagerDatabase.proxyDao.getById(id)?.also { cache[id] = it }
+        return FastestProtocolFilter.filter(candidates, bean.protocolFilterMode, bean.protocols.toSet(), ::lookup) { candidate ->
+            val group = SagerDatabase.groupDao.getById(candidate.groupId)
+            listOfNotNull(group?.frontProxy?.let(::lookup), group?.landingProxy?.let(::lookup))
         }
     }
 

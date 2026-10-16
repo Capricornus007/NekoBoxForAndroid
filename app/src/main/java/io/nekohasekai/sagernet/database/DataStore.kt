@@ -226,6 +226,10 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var fastestSourceGroup by profileCacheStore.stringToLong(Key.FASTEST_SOURCE_GROUP)
     var fastestNameRegex by profileCacheStore.string(Key.FASTEST_NAME_REGEX)
     var fastestIgnoreCase by profileCacheStore.boolean(Key.FASTEST_IGNORE_CASE) { true }
+    var fastestProtocolFilterMode by profileCacheStore.stringToInt(Key.FASTEST_PROTOCOL_FILTER_MODE) { 0 }
+    var fastestProtocols: Set<String>
+        get() = profileCacheStore.getStringSet(Key.FASTEST_PROTOCOLS).orEmpty()
+        set(value) = profileCacheStore.putStringSet(Key.FASTEST_PROTOCOLS, value.toMutableSet())
     var serverAddress by profileCacheStore.string(Key.SERVER_ADDRESS)
     var serverPort by profileCacheStore.stringToInt(Key.SERVER_PORT)
     var serverPorts by profileCacheStore.string("serverPorts")

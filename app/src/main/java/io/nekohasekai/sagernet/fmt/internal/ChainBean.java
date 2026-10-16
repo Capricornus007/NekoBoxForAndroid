@@ -28,6 +28,8 @@ public class ChainBean extends InternalBean {
     public long sourceGroupId;
     public String nameRegex;
     public boolean ignoreCase = true;
+    public int protocolFilterMode;
+    public List<String> protocols;
 
     @Override
     public String displayName() {
@@ -59,6 +61,7 @@ public class ChainBean extends InternalBean {
             proxies = new ArrayList<>();
         }
         if (nameRegex == null) nameRegex = "";
+        if (protocols == null) protocols = new ArrayList<>();
         if (candidateMode != CANDIDATE_MODE_REGEX) {
             candidateMode = CANDIDATE_MODE_MANUAL;
         }
@@ -66,7 +69,7 @@ public class ChainBean extends InternalBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(3);
+        output.writeInt(4);
         output.writeInt(strategy);
         output.writeInt(candidateMode);
         output.writeLong(sourceGroupId);
@@ -76,6 +79,9 @@ public class ChainBean extends InternalBean {
         for (Long proxy : proxies) {
             output.writeLong(proxy);
         }
+        output.writeInt(protocolFilterMode);
+        output.writeInt(protocols.size());
+        for (String protocol : protocols) output.writeString(protocol);
     }
 
     @Override
@@ -105,6 +111,12 @@ public class ChainBean extends InternalBean {
         proxies = new ArrayList<>();
         for (int i = 0; i < length; i++) {
             proxies.add(input.readLong());
+        }
+        protocolFilterMode = version >= 4 ? input.readInt() : 0;
+        protocols = new ArrayList<>();
+        if (version >= 4) {
+            int count = input.readInt();
+            for (int i = 0; i < count; i++) protocols.add(input.readString());
         }
     }
 

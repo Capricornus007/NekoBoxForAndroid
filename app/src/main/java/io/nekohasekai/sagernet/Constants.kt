@@ -100,6 +100,8 @@ object Key {
     const val FASTEST_SOURCE_GROUP = "fastestSourceGroup"
     const val FASTEST_NAME_REGEX = "fastestNameRegex"
     const val FASTEST_IGNORE_CASE = "fastestIgnoreCase"
+    const val FASTEST_PROTOCOL_FILTER_MODE = "fastestProtocolFilterMode"
+    const val FASTEST_PROTOCOLS = "fastestProtocols"
     const val FASTEST_REGEX_OPTIONS = "fastestRegexOptions"
     const val FASTEST_REGEX_PREVIEW = "fastestRegexPreview"
 

@@ -41,6 +41,8 @@ class ChainBeanTest {
             sourceGroupId = 42L
             nameRegex = "(?:Германия|США)"
             ignoreCase = false
+            protocolFilterMode = 1
+            protocols = listOf("vless", "hysteria2")
             proxies = listOf(11L, 22L)
         }
 
@@ -50,6 +52,8 @@ class ChainBeanTest {
         assertEquals(42L, restored.sourceGroupId)
         assertEquals("(?:Германия|США)", restored.nameRegex)
         assertEquals(false, restored.ignoreCase)
+        assertEquals(source.protocolFilterMode, restored.protocolFilterMode)
+        assertEquals(source.protocols, restored.protocols)
         assertEquals(listOf(11L, 22L), restored.proxies)
     }
 
