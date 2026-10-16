@@ -124,6 +124,8 @@ jobs:
             exit 1
           fi
           cat > release-notes.txt <<'NOTES'
+          dev.13.1 fixes the TextInputLayout ClassCastException when opening diagnostics and the network-policy editor, including diagnostic filters. Diagnostics now has a dedicated navigation-drawer entry for the active/selected profile and a direct item in each profile's overflow menu; it is removed from Share → Configuration. The adb diagnostics smoke scenario now asserts the form opens, rather than only checking that the process survives.
+
           Package: com.isaiandco.neko. Non-debuggable release APKs for four ABIs. Private signing is selected when KEYSTORE_BASE64 and its password/alias secrets are configured; otherwise the existing stable debug key is retained. Incomplete or invalid private signing configuration fails. Android requires a data transfer/reinstall when changing signing keys.
 
           Adds a full-screen, visible-only live diagnostics view with application/full UID, domain and node filters. Routing/DNS connection history is bounded and remains debug/trace only. Group selection, WG/AWG handshake/RX/TX and fallback per-site results and failure/recovery counters are shown separately. Secondary actions and grouped surfaces follow Material 3 Expressive guidance.
