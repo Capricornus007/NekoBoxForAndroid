@@ -102,7 +102,7 @@
 
     </LinearLayout>
 
-    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+    <io.nekohasekai.sagernet.widget.StableFastScrollRecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
