@@ -12,7 +12,7 @@ class FastestProtocolFilterTest {
     private val hy1 = hysteria(1, 1)
     private val hy2 = hysteria(2, 2)
     private val vless = ProxyEntity(id = 3, type = ProxyEntity.TYPE_VMESS,
-        vmessBean = VMessBean().apply { initializeDefaultValues(); isVLESS = true; name = "Hysteria 2 misleading name" })
+        vmessBean = VMessBean().apply { alterId = -1; initializeDefaultValues(); name = "Hysteria 2 misleading name" })
     private val candidates = listOf(hy2, vless, hy1)
 
     private fun hysteria(id: Long, version: Int) = ProxyEntity(id = id, type = ProxyEntity.TYPE_HYSTERIA,
@@ -84,5 +84,17 @@ class FastestProtocolFilterTest {
         assertEquals(0, restored.protocolFilterMode)
         assertTrue(restored.protocols.isEmpty())
         assertSame(candidates, FastestProtocolFilter.filter(candidates, restored.protocolFilterMode, restored.protocols.toSet(), { null }))
+    }
+
+    @Test fun cloningKeepsExclusionsAndIsIndependent() {
+        val source = ChainBean().apply {
+            initializeDefaultValues(); strategy = ChainBean.STRATEGY_FASTEST
+            protocols = arrayListOf("hysteria", "hysteria2")
+        }
+        val clone = source.clone()
+        assertEquals(0, clone.protocolFilterMode)
+        assertEquals(source.protocols, clone.protocols)
+        clone.protocols.clear()
+        assertEquals(listOf("hysteria", "hysteria2"), source.protocols)
     }
 }
