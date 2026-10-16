@@ -14,7 +14,7 @@ def main():
     parser.add_argument("--serial", required=True)
     parser.add_argument("--package", default="com.isaiandco.neko")
     parser.add_argument("--output", type=pathlib.Path, required=True)
-    parser.add_argument("--diagnostics", action="store_true", help="Open diagnostics for first visible profile via its share menu")
+    parser.add_argument("--diagnostics", action="store_true", help="Open diagnostics from the first visible profile's menu and verify its form")
     parser.add_argument("--network-cycle", action="store_true", help="Cycle Wi-Fi/mobile data; restore original switches afterwards")
     parser.add_argument("--sleep-wake", action="store_true")
     parser.add_argument("--uid-fixture-apk", type=pathlib.Path, help="Install then remove a disposable fixture to trigger UID refresh")
@@ -77,11 +77,14 @@ def main():
     assert_alive("launch")
     snapshot("launch")
     if args.diagnostics:
-        tap(lambda n: n.get("resource-id", "").endswith(":id/shareIcon"))
-        tap(lambda n: n.get("text", "").casefold() in {"configuration", "конфигурация"})
-        tap(lambda n: "diagnostic" in n.get("text", "").casefold() or "диагност" in n.get("text", "").casefold())
+        tap(lambda n: n.get("resource-id", "").endswith(":id/double_column_menu"))
+        tap(lambda n: n.get("text", "").casefold() in {"diagnostics", "диагностика"})
         time.sleep(2)
-        snapshot("diagnostics")
+        diagnostics = snapshot("diagnostics")
+        if not any(n.get("class", "").endswith("EditText") and n.get("text") == "example.com"
+                   for n in diagnostics.iter("node")):
+            raise RuntimeError("Diagnostics form did not open (process survival alone is insufficient)")
+        report["checks"].append({"step": "diagnostics form", "visible": True})
         assert_alive("diagnostics")
     wifi = mobile = None
     installed_fixture = False

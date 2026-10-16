@@ -159,7 +159,7 @@ class NetworkProfilesActivity : ThemedActivity() {
         fun input(label: Int, value: String, multiline: Boolean = true): TextInputEditText {
             val layout = TextInputLayout(this, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply { hint = getString(label) }
             val edit = TextInputEditText(layout.context).apply { setText(value); setSingleLine(!multiline); minLines = if (multiline) 2 else 1; maxLines = 6 }
-            layout.addView(edit, ViewGroup.LayoutParams(-1, -2)); body.addView(layout)
+            layout.addView(edit, LinearLayout.LayoutParams(-1, -2)); body.addView(layout)
             return edit
         }
         val ssid = if (policy.transport == "wifi") input(R.string.network_profiles_ssid, policy.ssid, false) else null

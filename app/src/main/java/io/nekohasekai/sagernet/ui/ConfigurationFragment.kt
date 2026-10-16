@@ -1945,6 +1945,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                                 showShareMenu(it, proxyEntity)
                                 true
                             }
+                            R.id.action_profile_diagnostics -> onMenuItemClick(menuItem)
                             R.id.action_delete -> {
                                 adapter?.let { adapter ->
                                     val index = adapter.configurationIdList.indexOf(proxyEntity.id)

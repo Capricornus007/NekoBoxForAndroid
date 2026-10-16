@@ -43,7 +43,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     val dialog = Dialog(context, R.style.Theme_SagerNet)
     val root = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
     val toolbar = MaterialToolbar(context).apply {
-        setTitle(R.string.profile_diagnostics)
+        setTitle(R.string.menu_diagnostics)
         subtitle = profile.displayName()
         setNavigationIcon(R.drawable.ic_navigation_close)
         setNavigationContentDescription(android.R.string.cancel)
@@ -85,7 +85,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     fun probeInput(title: Int, value: String): TextInputEditText {
         val layout = TextInputLayout(context, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply { hint = getString(title) }
         val edit = TextInputEditText(layout.context).apply { setSingleLine(true); setText(value) }
-        layout.addView(edit, ViewGroup.LayoutParams(-1, -2))
+        layout.addView(edit, LinearLayout.LayoutParams(-1, -2))
         probesCard.addView(layout, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
         return edit
     }
@@ -152,7 +152,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     fun filter(title: Int): TextInputEditText {
         val layout = TextInputLayout(context, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply { hint = getString(title) }
         val edit = TextInputEditText(layout.context).apply { setSingleLine(true); maxLines = 1 }
-        layout.addView(edit, ViewGroup.LayoutParams(-1, -2))
+        layout.addView(edit, LinearLayout.LayoutParams(-1, -2))
         historyCard.addView(layout, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
         return edit
     }

@@ -20,7 +20,9 @@ python3 buildScript/tests/test_restore_transaction.py
 
 ## ADB smoke runner
 
-`buildScript/tests/android_regression.py` uses only Python's standard library and adb. Tap positions come from current UI bounds. It launches an already installed app, can open the first visible profile's diagnostics, takes screenshots, and checks process survival and the app's crash-buffer marker. It **does not prove VPN traffic recovery or isolation**.
+`buildScript/tests/android_regression.py` uses only Python's standard library and adb. Tap positions come from current UI bounds. It launches an already installed app, can open the first visible profile's diagnostics through its overflow menu, verifies the network-check input is present, takes screenshots, and checks process survival and the app's crash-buffer marker. A caught UI-construction exception must fail the form assertion even if the process stays alive. It **does not prove VPN traffic recovery or isolation**.
+
+In dev.13.1, diagnostics is also available directly in the navigation drawer for the running profile (or the selected profile when stopped). It no longer lives inside Share → Configuration. Check both entry points, all diagnostic input/filter fields, and the network-policy editor: programmatically added `TextInputEditText` children must use `LinearLayout.LayoutParams`, as required by `TextInputLayout`.
 
 Use a dedicated test device and preconfigure test profiles. The `--network-cycle` option changes Wi-Fi/mobile switches and restores both afterwards. The `--uid-fixture-apk` option requires a separate disposable APK; its package identity is checked with SDK aapt2, an already installed package is rejected, and the new package is removed afterwards. Screenshots may contain profile names and remain local; no artifacts are uploaded automatically.
 
