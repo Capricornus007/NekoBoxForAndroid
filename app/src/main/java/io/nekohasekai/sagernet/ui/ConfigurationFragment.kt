@@ -1931,6 +1931,7 @@ class ConfigurationFragment @JvmOverloads constructor(
                 doubleColumnMenuButton.setOnClickListener {
                     val popup = PopupMenu(requireContext(), it)
                     popup.menuInflater.inflate(R.menu.double_column_item_menu, popup.menu)
+                    popup.menu.findItem(R.id.action_profile_diagnostics).isVisible = activity is MainActivity
                     popup.setOnMenuItemClickListener { menuItem ->
                         when (menuItem.itemId) {
                             R.id.action_edit -> {
