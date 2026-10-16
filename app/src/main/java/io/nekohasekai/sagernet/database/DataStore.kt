@@ -227,6 +227,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var fastestNameRegex by profileCacheStore.string(Key.FASTEST_NAME_REGEX)
     var fastestIgnoreCase by profileCacheStore.boolean(Key.FASTEST_IGNORE_CASE) { true }
     var fastestProtocolFilterMode by profileCacheStore.stringToInt(Key.FASTEST_PROTOCOL_FILTER_MODE) { 0 }
+    var fastestHealthCheck by profileCacheStore.boolean(Key.FASTEST_HEALTH_CHECK)
+    var fastestFailureCooldown by profileCacheStore.boolean(Key.FASTEST_FAILURE_COOLDOWN)
+    var fastestHealthUrl by profileCacheStore.string(Key.FASTEST_HEALTH_URL) { "https://www.gstatic.com/generate_204" }
     var fastestProtocols: Set<String>
         get() = profileCacheStore.getStringSet(Key.FASTEST_PROTOCOLS).orEmpty()
         set(value) = profileCacheStore.putStringSet(Key.FASTEST_PROTOCOLS, value.toMutableSet())

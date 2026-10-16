@@ -148,6 +148,132 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
             finally { runProbes.isEnabled = true }
         }
     }
+    val comparisonCard = card(R.string.diagnostics_compare_nodes)
+    comparisonCard.label().setText(R.string.diagnostics_compare_hint)
+    val targetsButton = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+        setText(R.string.diagnostics_compare_choose_nodes)
+    }
+    val dnsButton = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+        setText(R.string.diagnostics_compare_choose_dns)
+    }
+    comparisonCard.addView(targetsButton)
+    comparisonCard.addView(dnsButton)
+    val comparisonUrlLayout = TextInputLayout(context, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply {
+        hint = getString(R.string.diagnostics_compare_url)
+    }
+    val comparisonUrl = TextInputEditText(comparisonUrlLayout.context).apply {
+        setSingleLine(true)
+        filters = arrayOf(android.text.InputFilter.LengthFilter(2048))
+        setText("https://www.gstatic.com/generate_204")
+    }
+    comparisonUrlLayout.addView(comparisonUrl)
+    comparisonCard.addView(comparisonUrlLayout)
+    val comparisonRun = MaterialButton(context).apply { setText(R.string.diagnostics_compare_run); isEnabled = false }
+    comparisonCard.addView(comparisonRun)
+    val comparisonResult = comparisonCard.label()
+    val comparisonTargets = mutableListOf<Pair<String, String>>()
+    val comparisonDns = mutableListOf<Pair<String, String>>()
+    val chosenTargets = linkedSetOf<String>()
+    var chosenDns = ""
+    var comparisonJob: Job? = null
+    fun comparisonButtons() {
+        targetsButton.text = if (chosenTargets.isEmpty()) getString(R.string.diagnostics_compare_choose_nodes) else chosenTargets.joinToString("\n")
+        dnsButton.text = if (chosenDns.isBlank()) getString(R.string.diagnostics_compare_choose_dns) else comparisonDns.firstOrNull { it.first == chosenDns }?.let { "${it.first} · ${it.second}" } ?: chosenDns
+    }
+    fun updateComparisonTargets(state: JSONObject?) {
+        if (comparisonJob?.isActive == true) return
+        fun entries(key: String): List<Pair<String,String>> {
+            val array = state?.optJSONArray(key) ?: return emptyList()
+            return (0 until array.length()).mapNotNull { array.optJSONObject(it) }.map { it.optString("tag") to it.optString("type") }
+        }
+        comparisonTargets.clear(); comparisonTargets.addAll(entries("probe_targets"))
+        comparisonDns.clear(); comparisonDns.addAll(entries("dns_servers"))
+        chosenTargets.retainAll(comparisonTargets.map { it.first }.toSet())
+        if (chosenTargets.isEmpty()) comparisonTargets.firstOrNull { it.first != "direct" }?.let { chosenTargets.add(it.first) }
+        if (comparisonDns.none { it.first == chosenDns }) chosenDns = comparisonDns.firstOrNull { it.first == "dns-remote" }?.first ?: comparisonDns.firstOrNull()?.first.orEmpty()
+        targetsButton.isEnabled = comparisonTargets.isNotEmpty()
+        dnsButton.isEnabled = comparisonDns.isNotEmpty()
+        comparisonRun.isEnabled = state != null && !state.optBoolean("probes_paused") && chosenTargets.isNotEmpty() && chosenDns.isNotBlank()
+        comparisonButtons()
+    }
+    targetsButton.setOnClickListener {
+        val choices = comparisonTargets.toList()
+        val checked = chosenTargets.toMutableSet()
+        val picker = MaterialAlertDialogBuilder(context).setTitle(R.string.diagnostics_compare_choose_nodes)
+            .setMultiChoiceItems(choices.map { "${it.first} · ${it.second}" }.toTypedArray(), BooleanArray(choices.size) { choices[it].first in checked }) { dialog, which, enabled ->
+                val tag = choices[which].first
+                if (enabled && checked.size >= 8) {
+                    (dialog as androidx.appcompat.app.AlertDialog).listView.setItemChecked(which, false)
+                    android.widget.Toast.makeText(context, R.string.diagnostics_compare_limit, android.widget.Toast.LENGTH_SHORT).show()
+                } else if (enabled) checked.add(tag) else checked.remove(tag)
+            }.setPositiveButton(android.R.string.ok) { _, _ ->
+                chosenTargets.clear(); chosenTargets.addAll(checked); comparisonButtons()
+            }.setNegativeButton(android.R.string.cancel, null)
+        picker.show()
+    }
+    dnsButton.setOnClickListener {
+        val choices = comparisonDns.toList()
+        MaterialAlertDialogBuilder(context).setTitle(R.string.diagnostics_compare_choose_dns)
+            .setSingleChoiceItems(choices.map { "${it.first} · ${it.second}" }.toTypedArray(), choices.indexOfFirst { it.first == chosenDns }) { dialog, which ->
+                chosenDns = choices[which].first; comparisonButtons(); dialog.dismiss()
+            }.setNegativeButton(android.R.string.cancel, null).show()
+    }
+    fun renderConfiguredProbe(result: JSONObject): String = buildString {
+        val dns = result.optJSONObject("dns")
+        append("DNS · ").append(dns?.optString("type").orEmpty()).append(" · ").append(probeLabel(dns?.optString("state").orEmpty()))
+        dns?.optJSONObject("bootstrap")?.let {
+            append("\n").append(getString(R.string.diagnostics_bootstrap)).append(": ").append(probeLabel(it.optString("state")))
+            if (it.has("ms")) append(" · ").append(it.optLong("ms")).append(" ms")
+            if (it.has("error")) append(" · ").append(probeLabel(it.optString("error")))
+        }
+        for (type in listOf("a", "aaaa")) dns?.optJSONObject(type)?.let {
+            append("\n").append(type.uppercase()).append(": ").append(probeLabel(it.optString("state")))
+            if (it.has("rcode")) append(" · rcode ").append(it.optInt("rcode"))
+            if (it.has("addresses")) append(" · ").append(it.optInt("addresses"))
+            append(" · ").append(it.optLong("ms")).append(" ms")
+            if (it.has("error")) append(" · ").append(probeLabel(it.optString("error")))
+        }
+        result.optJSONObject("https")?.let {
+            append("\nTCP: ").append(probeLabel(it.optString("tcp", "not-tested")))
+            append("\nTLS: ").append(probeLabel(it.optString("tls", "not-tested")))
+            append("\nHTTPS: ").append(probeLabel(it.optString("state")))
+            if (it.has("status")) append(" · HTTP ").append(it.optInt("status"))
+            if (it.has("ms")) append(" · ").append(it.optLong("ms")).append(" ms")
+            if (it.has("error")) append(" · ").append(probeLabel(it.optString("error")))
+        }
+        if (result.has("error")) append("\n").append(redactDiagnostic(result.optString("error")))
+    }
+    comparisonRun.setOnClickListener {
+        val targets = chosenTargets.toList()
+        val dns = chosenDns
+        val link = comparisonUrl.text.toString().trim()
+        if (targets.isEmpty() || dns.isBlank() || targets.size > 8) {
+            comparisonResult.setText(R.string.diagnostics_compare_select)
+            return@setOnClickListener
+        }
+        if (runCatching { io.nekohasekai.sagernet.fmt.internal.validateHealthUrl(link) }.isFailure) {
+            comparisonUrlLayout.error = getString(R.string.fastest_health_invalid_url)
+            return@setOnClickListener
+        }
+        comparisonUrlLayout.error = null
+        comparisonRun.isEnabled = false; targetsButton.isEnabled = false; dnsButton.isEnabled = false
+        comparisonJob = lifecycleScope.launch {
+            val reports = mutableListOf<String>()
+            try {
+                for (tag in targets) {
+                    comparisonResult.text = reports.joinToString("\n\n") + "\n\n" + tag + " · " + getString(R.string.diagnostics_loading)
+                    val result = withContext(Dispatchers.IO) {
+                        connection.service?.configuredProbe(profile.id, tag, dns, link)?.let(::JSONObject)
+                            ?: error(getString(R.string.diagnostics_not_active))
+                    }
+                    reports += "$tag · $dns\n" + renderConfiguredProbe(result)
+                }
+                comparisonResult.text = reports.joinToString("\n\n") + "\n\n" + getString(R.string.diagnostics_compare_result_hint)
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (e: Exception) { comparisonResult.text = reports.joinToString("\n\n") + "\n" + redactDiagnostic(e.readableMessage) }
+            finally { comparisonRun.isEnabled = true; targetsButton.isEnabled = true; dnsButton.isEnabled = true }
+        }
+    }
     val historyCard = card(R.string.diagnostics_connection_history)
     fun filter(title: Int): TextInputEditText {
         val layout = TextInputLayout(context, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply { hint = getString(title) }
@@ -215,6 +341,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     }) }
     fun renderRuntime(state: JSONObject?) {
         runtimeState = state
+        updateComparisonTargets(state)
         val report = StringBuilder()
         val groups = state?.optJSONArray("groups")
         if (state == null) report.append(getString(R.string.diagnostics_not_active))
@@ -240,20 +367,36 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
             }
             group.optJSONObject("fallback")?.let { fallback ->
                 report.append("\n").append(getString(R.string.diagnostics_fallback_rounds, fallback.optInt("failed_rounds"), fallback.optInt("failure_threshold"), fallback.optInt("healthy_rounds"), fallback.optInt("recovery_threshold")))
+                fallback.optString("checked_at").takeIf(String::isNotBlank)?.let { timestamp ->
+                    val age = runCatching { java.time.Duration.between(Instant.parse(timestamp), Instant.now()).seconds.coerceAtLeast(0) }.getOrDefault(0)
+                    report.append("\n").append(getString(R.string.diagnostics_last_check, time(timestamp), age))
+                }
+                if (fallback.optString("round_state") == "cancelled") report.append("\n").append(probeLabel("cancelled"))
                 fallback.optJSONArray("sites")?.let { sites -> for (n in 0 until sites.length()) {
                     val site = sites.getJSONObject(n)
                     report.append("\n").append(site.optString("host")).append(": ").append(getString(when (site.optString("state")) {
                         "reachable" -> R.string.diagnostics_reachable
                         "unreachable" -> R.string.diagnostics_unreachable
+                        "cancelled" -> R.string.diagnostics_probe_cancelled
                         else -> R.string.diagnostics_not_checked
                     }))
-                    if (site.has("rtt_ms")) report.append(" · ").append(site.optInt("rtt_ms")).append(" ms")
+                    if (site.has("elapsed_ms")) report.append(" · ").append(site.optLong("elapsed_ms")).append(" ms")
+                    else if (site.has("rtt_ms")) report.append(" · ").append(site.optInt("rtt_ms")).append(" ms")
+                    if (site.has("reason")) report.append(" · ").append(probeLabel(site.optString("reason")))
+                    if (site.has("http_status")) report.append(" · HTTP ").append(site.optInt("http_status"))
                 } }
             }
             group.optJSONArray("candidates")?.let { candidates -> for (n in 0 until candidates.length()) {
                 val candidate = candidates.getJSONObject(n)
                 report.append("\n  ").append(candidate.optString("tag")).append(" · ")
                     .append(if (candidate.optBoolean("reachable")) "${candidate.optInt("rtt_ms")} ms" else getString(R.string.diagnostics_no_probe))
+                candidate.optJSONObject("health")?.let { health ->
+                    report.append(" · ").append(getString(R.string.diagnostics_health_failures, health.optInt("failures")))
+                    if (health.optString("error").isNotBlank()) report.append(" · ").append(probeLabel(health.optString("error")))
+                    val retry = health.optString("retry_at")
+                    if (runCatching { Instant.parse(retry).isAfter(Instant.now()) }.getOrDefault(false))
+                        report.append("\n    ").append(getString(R.string.diagnostics_cooldown_until, time(retry), health.optInt("failures")))
+                }
             } }
         }
         state?.optJSONArray("wireguard")?.let { wireguard -> for (index in 0 until wireguard.length()) {
@@ -338,5 +481,27 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (e: Exception) { validationView.text = redactDiagnostic(e.readableMessage) }
     }
-    dialog.setOnDismissListener { job.cancel(); probeJob?.cancel() }
+    dialog.setOnDismissListener { job.cancel(); probeJob?.cancel(); comparisonJob?.cancel() }
 }
+
+private fun MainActivity.probeLabel(code: String): String = getString(when (code) {
+    "reachable" -> R.string.diagnostics_probe_reachable
+    "unreachable" -> R.string.diagnostics_probe_unreachable
+    "timeout" -> R.string.diagnostics_probe_timeout
+    "cancelled" -> R.string.diagnostics_probe_cancelled
+    "certificate" -> R.string.diagnostics_probe_certificate
+    "connection" -> R.string.diagnostics_probe_connection
+    "tls" -> R.string.diagnostics_probe_tls
+    "http-status" -> R.string.diagnostics_probe_http_status
+    "answered" -> R.string.diagnostics_probe_answered
+    "resolved" -> R.string.diagnostics_probe_resolved
+    "numeric-address" -> R.string.diagnostics_probe_numeric_address
+    "unsupported" -> R.string.diagnostics_probe_unsupported
+    "dns-response" -> R.string.diagnostics_probe_dns_response
+    "invalid-response" -> R.string.diagnostics_probe_invalid_response
+    "connected" -> R.string.diagnostics_probe_connected
+    "verified" -> R.string.diagnostics_probe_verified
+    "started" -> R.string.diagnostics_probe_started
+    "failed" -> R.string.diagnostics_probe_failed
+    else -> R.string.diagnostics_probe_not_tested
+})

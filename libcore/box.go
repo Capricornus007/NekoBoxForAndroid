@@ -69,6 +69,7 @@ func ResetAllConnections(system bool) {
 }
 
 type BoxInstance struct {
+	candidateChecker *candidateChecker
 	access           sync.Mutex
 	probeWG          sync.WaitGroup
 	probesPaused     bool
@@ -112,6 +113,8 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 	}
 
 	// create box
+	checker := newCandidateChecker(options)
+	service.MustRegister[group.CandidateHealthChecker](ctx, checker)
 	instance, err := box.New(box.Options{
 		Options:           options,
 		Context:           ctx,
@@ -123,10 +126,11 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 	}
 
 	b = &BoxInstance{
-		Box:          instance,
-		ctx:          ctx,
-		cancel:       cancel,
-		pauseManager: service.FromContext[pause.Manager](ctx),
+		Box:              instance,
+		candidateChecker: checker,
+		ctx:              ctx,
+		cancel:           cancel,
+		pauseManager:     service.FromContext[pause.Manager](ctx),
 	}
 
 	if (options.Log == nil || !options.Log.Disabled) && instance.LogFactory().Level() >= boxlog.LevelDebug {

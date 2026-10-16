@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.*
+import io.nekohasekai.sagernet.database.RouteOverlap
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -118,6 +121,31 @@ class RouteFragment : ToolbarFragment(R.layout.layout_route), Toolbar.OnMenuItem
                     }
                     .setNegativeButton(R.string.no, null)
                     .show()
+            }
+            R.id.action_check_routes -> {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val findings = withContext(Dispatchers.Default) {
+                        RouteOverlap.find(SagerDatabase.rulesDao.allRules())
+                    }
+                    if (findings.isEmpty()) {
+                        MaterialAlertDialogBuilder(activity).setTitle(R.string.route_check_overlaps)
+                            .setMessage(R.string.route_check_no_overlaps).setPositiveButton(android.R.string.ok, null).show()
+                    } else {
+                        val labels = findings.map { finding -> getString(
+                            if (finding.duplicate) R.string.route_overlap_duplicate else R.string.route_overlap_shadowed,
+                            finding.later.displayName(), finding.earlier.displayName()) }.toTypedArray()
+                        MaterialAlertDialogBuilder(activity).setTitle(R.string.route_check_overlaps)
+                            .setItems(labels) { _, which ->
+                                val finding = findings[which]
+                                val rules = arrayOf(finding.earlier, finding.later)
+                                MaterialAlertDialogBuilder(activity).setTitle(R.string.route_overlap_open)
+                                    .setItems(rules.map { it.displayName() }.toTypedArray()) { _, index ->
+                                        startActivity(Intent(activity, RouteSettingsActivity::class.java)
+                                            .putExtra(RouteSettingsActivity.EXTRA_ROUTE_ID, rules[index].id))
+                                    }.setNegativeButton(android.R.string.cancel, null).show()
+                            }.setPositiveButton(android.R.string.ok, null).show()
+                    }
+                }
             }
             R.id.action_manage_assets -> {
                 startActivity(Intent(requireContext(), AssetsActivity::class.java))

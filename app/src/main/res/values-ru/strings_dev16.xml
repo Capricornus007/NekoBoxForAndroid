@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="route_check_overlaps">Проверить перекрытия правил</string>
+    <string name="route_check_no_overlaps">Очевидных перекрытий не найдено. Пользовательский JSON и сложные условия адресов и rule-set требуют проверки при работе.</string>
+    <string name="route_overlap_duplicate">%1$s: дублирует «%2$s»</string>
+    <string name="route_overlap_shadowed">%1$s: перекрыто правилом «%2$s»</string>
+    <string name="route_overlap_open">Открыть правило</string>
+    <string name="fastest_health_check">Проверять DNS и HTTPS</string>
+    <string name="fastest_health_check_hint">Требовать пригодный ответ настроенного удалённого DNS и подтверждённый ответ HTTPS. До 18 секунд на узел, до трёх проверок одновременно.</string>
+    <string name="fastest_health_url">Контрольный HTTPS-адрес</string>
+    <string name="fastest_health_invalid_url">Укажи HTTPS-адрес без логина, пароля и фрагмента после #.</string>
+    <string name="fastest_failure_cooldown">Временно исключать сбойные узлы</string>
+    <string name="fastest_failure_cooldown_hint">После трёх неудачных проверок — пауза от 30 секунд до 10 минут. Повтор при очередной плановой проверке. При смене сети результаты сбрасываются.</string>
+    <string name="diagnostics_compare_nodes">Сравнить узлы с настроенным DNS</string>
+    <string name="diagnostics_compare_hint">Используется отдельная копия выбранного DNS-транспорта с его TLS и заголовками. Активный профиль и настройки DNS сохраняются.</string>
+    <string name="diagnostics_compare_choose_nodes">Узлы (до 8)</string>
+    <string name="diagnostics_compare_choose_dns">Настроенный DNS-сервер</string>
+    <string name="diagnostics_compare_url">Контрольный HTTPS-адрес</string>
+    <string name="diagnostics_compare_run">Сравнить выбранные узлы</string>
+    <string name="diagnostics_compare_select">Выбери хотя бы один узел и настроенный DNS-сервер.</string>
+    <string name="diagnostics_compare_limit">Можно выбрать не более 8 узлов.</string>
+    <string name="diagnostics_compare_result_hint">Показано количество DNS-адресов, сами адреса и пути DNS-URL скрыты. Отсутствие AAAA в успешном ответе допустимо для сайта только с IPv4.</string>
+    <string name="diagnostics_bootstrap">Разрешение адреса DNS-сервера</string>
+    <string name="diagnostics_last_check">Последняя проверка: %1$s · %2$d с назад</string>
+    <string name="diagnostics_control_reason">Результат: %1$s</string>
+    <string name="diagnostics_cooldown_until">Исключён до %1$s · неудачных проверок: %2$d</string>
+    <string name="diagnostics_probe_reachable">Доступен</string>
+    <string name="diagnostics_probe_unreachable">Недоступен</string>
+    <string name="diagnostics_probe_timeout">Тайм-аут</string>
+    <string name="diagnostics_probe_cancelled">Отменена</string>
+    <string name="diagnostics_probe_certificate">Ошибка проверки сертификата</string>
+    <string name="diagnostics_probe_connection">Ошибка соединения</string>
+    <string name="diagnostics_probe_tls">Ошибка TLS</string>
+    <string name="diagnostics_probe_http_status">Неподходящий HTTP-статус</string>
+    <string name="diagnostics_probe_not_tested">Не проверялось</string>
+    <string name="diagnostics_probe_answered">Ответ DNS получен</string>
+    <string name="diagnostics_probe_resolved">Адрес разрешён</string>
+    <string name="diagnostics_probe_numeric_address">Адрес сервера задан IP</string>
+    <string name="diagnostics_probe_unsupported">DNS-транспорт не поддерживает эту проверку</string>
+    <string name="diagnostics_probe_failed">Ошибка</string>
+    <string name="diagnostics_probe_dns_response">Непригодный ответ DNS</string>
+    <string name="diagnostics_probe_invalid_response">Некорректный ответ DNS</string>
+    <string name="diagnostics_probe_connected">Соединение установлено</string>
+    <string name="diagnostics_probe_verified">Проверено</string>
+    <string name="diagnostics_probe_started">Начато</string>
+    <string name="diagnostics_health_failures">Неудачных проверок: %1$d</string>
+</resources>

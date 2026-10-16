@@ -612,6 +612,15 @@ fun buildConfig(
                 } else {
                     "fastest"
                 }
+                if (entity.type == ProxyEntity.TYPE_FASTEST) {
+                    if (bean.healthCheck) {
+                        io.nekohasekai.sagernet.fmt.internal.validateHealthUrl(bean.healthUrl)
+                        health_check = true
+                        health_dns_server = "dns-remote"
+                        health_url = bean.healthUrl
+                    }
+                    failure_cooldown = bean.failureCooldown
+                }
                 managed_by_parent = managedByParent
                 wait_for_initial = true
             })

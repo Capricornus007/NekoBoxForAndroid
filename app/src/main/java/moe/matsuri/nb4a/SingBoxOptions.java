@@ -4455,6 +4455,10 @@ public class SingBoxOptions {
     }
 
     public static class Outbound_URLTestOptions extends Outbound {
+        public Boolean health_check;
+        public String health_dns_server;
+        public String health_url;
+        public Boolean failure_cooldown;
 
         public List<String> outbounds;
 

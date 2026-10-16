@@ -30,6 +30,9 @@ public class ChainBean extends InternalBean {
     public boolean ignoreCase = true;
     public int protocolFilterMode;
     public List<String> protocols;
+    public boolean healthCheck;
+    public boolean failureCooldown;
+    public String healthUrl;
 
     @Override
     public String displayName() {
@@ -62,6 +65,7 @@ public class ChainBean extends InternalBean {
         }
         if (nameRegex == null) nameRegex = "";
         if (protocols == null) protocols = new ArrayList<>();
+        if (healthUrl == null || healthUrl.isEmpty()) healthUrl = "https://www.gstatic.com/generate_204";
         if (candidateMode != CANDIDATE_MODE_REGEX) {
             candidateMode = CANDIDATE_MODE_MANUAL;
         }
@@ -69,7 +73,7 @@ public class ChainBean extends InternalBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(4);
+        output.writeInt(5);
         output.writeInt(strategy);
         output.writeInt(candidateMode);
         output.writeLong(sourceGroupId);
@@ -82,6 +86,9 @@ public class ChainBean extends InternalBean {
         output.writeInt(protocolFilterMode);
         output.writeInt(protocols.size());
         for (String protocol : protocols) output.writeString(protocol);
+        output.writeBoolean(healthCheck);
+        output.writeBoolean(failureCooldown);
+        output.writeString(healthUrl);
     }
 
     @Override
@@ -118,6 +125,9 @@ public class ChainBean extends InternalBean {
             int count = input.readInt();
             for (int i = 0; i < count; i++) protocols.add(input.readString());
         }
+        healthCheck = version >= 5 && input.readBoolean();
+        failureCooldown = version >= 5 && input.readBoolean();
+        healthUrl = version >= 5 ? input.readString() : "https://www.gstatic.com/generate_204";
     }
 
     @NotNull

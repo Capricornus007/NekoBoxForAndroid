@@ -97,7 +97,8 @@ func TestLockCancelsProbeWithoutChangingFallbackHealth(t *testing.T) {
 	defer server.Close()
 	g, _, _, _ := newFallbackTest(t, server.URL, time.Hour)
 	g.CheckOutbounds()
-	before := g.SelectionDiagnostics()["fallback"]
+	before := g.SelectionDiagnostics()["fallback"].(map[string]any)
+	selectedBefore := g.Now()
 	block.Store(true)
 	done := make(chan struct{})
 	go func() { g.CheckOutbounds(); close(done) }()
@@ -112,7 +113,16 @@ func TestLockCancelsProbeWithoutChangingFallbackHealth(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("in-flight probe was not cancelled")
 	}
-	if !reflect.DeepEqual(g.SelectionDiagnostics()["fallback"], before) {
-		t.Fatal("cancelled round changed fallback health")
+	after := g.SelectionDiagnostics()["fallback"].(map[string]any)
+	for _, key := range []string{"failed_rounds", "healthy_rounds", "failure_threshold", "recovery_threshold"} {
+		if !reflect.DeepEqual(before[key], after[key]) {
+			t.Fatalf("cancelled round changed %s", key)
+		}
+	}
+	if g.Now() != selectedBefore {
+		t.Fatal("cancelled round changed the selected outbound")
+	}
+	if after["round_state"] != "cancelled" {
+		t.Fatal("cancelled round was not reported")
 	}
 }

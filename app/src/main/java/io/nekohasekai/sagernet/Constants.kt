@@ -102,6 +102,9 @@ object Key {
     const val FASTEST_IGNORE_CASE = "fastestIgnoreCase"
     const val FASTEST_PROTOCOL_FILTER_MODE = "fastestProtocolFilterMode"
     const val FASTEST_PROTOCOLS = "fastestProtocols"
+    const val FASTEST_HEALTH_CHECK = "fastestHealthCheck"
+    const val FASTEST_FAILURE_COOLDOWN = "fastestFailureCooldown"
+    const val FASTEST_HEALTH_URL = "fastestHealthUrl"
     const val FASTEST_REGEX_OPTIONS = "fastestRegexOptions"
     const val FASTEST_REGEX_PREVIEW = "fastestRegexPreview"
 

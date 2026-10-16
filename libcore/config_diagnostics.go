@@ -119,7 +119,29 @@ func (b *BoxInstance) RuntimeDiagnostics(queryJSON string) (string, error) {
 			}
 		}
 	}
-	report := map[string]any{"groups": groups, "debug_history": b.diagnostics != nil, "probes_paused": b.probesPaused}
+	targets := make([]map[string]string, 0)
+	servers := make([]map[string]string, 0)
+	if b.state == 1 && b.Box != nil {
+		for _, outbound := range b.Outbound().Outbounds() {
+			if _, isGroup := outbound.(adapter.OutboundGroup); isGroup || outbound.Type() == "block" {
+				continue
+			}
+			if len(targets) >= 128 {
+				break
+			}
+			targets = append(targets, map[string]string{"tag": outbound.Tag(), "type": outbound.Type()})
+		}
+		for _, server := range b.candidateChecker.servers {
+			switch server.Type {
+			case "udp", "tcp", "tls", "https", "quic", "h3":
+				servers = append(servers, map[string]string{"tag": server.Tag, "type": server.Type})
+			}
+			if len(servers) >= 32 {
+				break
+			}
+		}
+	}
+	report := map[string]any{"probe_targets": targets, "dns_servers": servers, "groups": groups, "debug_history": b.diagnostics != nil, "probes_paused": b.probesPaused}
 	if b.diagnostics != nil {
 		for key, value := range b.diagnostics.page(query) {
 			report[key] = value

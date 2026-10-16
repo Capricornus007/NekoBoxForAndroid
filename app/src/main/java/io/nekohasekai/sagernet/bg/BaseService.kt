@@ -189,6 +189,14 @@ class BaseService {
             return proxy.box.networkProbe(tag, domain, dnsTarget)
         }
 
+        override fun configuredProbe(expectedProfileId: Long, tag: String, dnsTag: String, httpsUrl: String): String {
+            check(android.os.Binder.getCallingUid() == android.os.Process.myUid()) { "Caller is not the application" }
+            val current = data ?: error("Service is unavailable")
+            val proxy = current.proxy ?: error("Core is not running")
+            check(current.state == State.Connected && proxy.isInitialized() && DataStore.currentProfile == expectedProfileId) { "Profile is no longer active" }
+            return proxy.box.configuredProbe(tag, dnsTag, httpsUrl)
+        }
+
         fun stateChanged(s: State, msg: String?) = launch {
             val profileName = profileName
             broadcast { it.stateChanged(s.ordinal, profileName, msg) }
@@ -375,12 +383,17 @@ class BaseService {
                 val oldName = data.networkSignature
                 data.networkSignature = newName
                 upstreamInterfaceName = link.interfaceName
-                when (networkChangeAction(
+                val networkAction = networkChangeAction(
                     oldName,
                     newName,
                     DataStore.restartProfileOnNetworkChange,
                     DataStore.networkChangeResetConnections,
-                )) {
+                )
+                if (oldName != null && oldName != newName && networkAction == NetworkChangeAction.NONE) {
+                    val active = data.proxy
+                    if (active != null && active.isInitialized()) runOnDefaultDispatcher { active.box.resetProbeHealth() }
+                }
+                when (networkAction) {
                     NetworkChangeAction.RESTART_PROFILE -> {
                         Logs.d("Network changed: $oldName -> $newName")
                         scheduleNetworkProfileRestart(requireNotNull(oldName), newName)

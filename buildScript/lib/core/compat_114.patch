@@ -1270,18 +1270,20 @@ index 000000000..6648442bb
 +	wg.Wait()
 +}
 diff --git a/common/urltest/urltest.go b/common/urltest/urltest.go
-index 26efe39cb..1fe59a614 100644
+index 26efe39cb..e5bd1c77a 100644
 --- a/common/urltest/urltest.go
 +++ b/common/urltest/urltest.go
-@@ -3,6 +3,7 @@ package urltest
+@@ -3,6 +3,9 @@ package urltest
  import (
  	"context"
  	"crypto/tls"
++	"crypto/x509"
++	"errors"
 +	"fmt"
  	"net"
  	"net/http"
  	"net/url"
-@@ -81,6 +82,7 @@ func (s *HistoryStorage) Close() error {
+@@ -81,6 +84,7 @@ func (s *HistoryStorage) Close() error {
  }
  
  func URLTest(ctx context.Context, link string, detour N.Dialer) (uint16, error) {
@@ -1289,7 +1291,7 @@ index 26efe39cb..1fe59a614 100644
  	multiplexOutbound, isMultiplexOutbound := common.Cast[adapter.OutboundWithMultiplex](detour)
  	if isMultiplexOutbound && multiplexOutbound.MultiplexEnabled() {
  		warmContext := adapter.ContextWithKeepSession(ctx)
-@@ -151,3 +153,68 @@ func urlTest(ctx context.Context, link string, detour N.Dialer) (t uint16, err e
+@@ -151,3 +155,105 @@ func urlTest(ctx context.Context, link string, detour N.Dialer) (t uint16, err e
  	t = uint16(time.Since(start) / time.Millisecond)
  	return
  }
@@ -1353,10 +1355,47 @@ index 26efe39cb..1fe59a614 100644
 +	}
 +	resp.Body.Close()
 +	if reachable && (resp.StatusCode < 200 || resp.StatusCode >= 400) {
-+		return 0, fmt.Errorf("control site returned HTTP %d", resp.StatusCode)
++		return 0, &HTTPStatusError{Status: resp.StatusCode}
 +	}
 +	t = uint16(time.Since(start) / time.Millisecond)
 +	return
++}
++
++// HTTP status is a verdict, not evidence that the control site is reachable.
++type HTTPStatusError struct{ Status int }
++
++func (e *HTTPStatusError) Error() string {
++	return fmt.Sprintf("control site returned HTTP %d", e.Status)
++}
++func ReachabilityErrorCode(err error) (string, int) {
++	if err == nil {
++		return "reachable", 0
++	}
++	if errors.Is(err, context.Canceled) {
++		return "cancelled", 0
++	}
++	if errors.Is(err, context.DeadlineExceeded) {
++		return "timeout", 0
++	}
++	var status *HTTPStatusError
++	if errors.As(err, &status) {
++		return "http-status", status.Status
++	}
++	var cert *tls.CertificateVerificationError
++	var authority x509.UnknownAuthorityError
++	var host x509.HostnameError
++	if errors.As(err, &cert) || errors.As(err, &authority) || errors.As(err, &host) {
++		return "certificate", 0
++	}
++	var timeout net.Error
++	if errors.As(err, &timeout) && timeout.Timeout() {
++		return "timeout", 0
++	}
++	var record tls.RecordHeaderError
++	if errors.As(err, &record) {
++		return "tls", 0
++	}
++	return "connection", 0
 +}
 diff --git a/common/vision/hook.go b/common/vision/hook.go
 new file mode 100644
@@ -5376,10 +5415,10 @@ index a11c45e98..2485fe76a 100644
  	return nil
  }
 diff --git a/option/group.go b/option/group.go
-index bc0c07e47..9e5b4354c 100644
+index bc0c07e47..fc4cac723 100644
 --- a/option/group.go
 +++ b/option/group.go
-@@ -3,16 +3,24 @@ package option
+@@ -3,16 +3,28 @@ package option
  import "github.com/sagernet/sing/common/json/badoption"
  
  type SelectorOutboundOptions struct {
@@ -5392,6 +5431,10 @@ index bc0c07e47..9e5b4354c 100644
  
  type URLTestOutboundOptions struct {
 -	Outbounds                 []string           `json:"outbounds" reference:"outbound"`
++	HealthCheck               bool               `json:"health_check,omitempty"`
++	HealthDNSServer           string             `json:"health_dns_server,omitempty"`
++	HealthURL                 string             `json:"health_url,omitempty"`
++	FailureCooldown           bool               `json:"failure_cooldown,omitempty"`
 +	ControlURLs               []string           `json:"control_urls,omitempty"`
 +	RequiredSuccesses         int                `json:"required_successes,omitempty"`
 +	FailureThreshold          int                `json:"failure_threshold,omitempty"`
@@ -6685,12 +6728,186 @@ index af8826b89..c53defcf1 100644
 +
 +	return err
 +}
+diff --git a/protocol/group/candidate_health.go b/protocol/group/candidate_health.go
+new file mode 100644
+index 000000000..6ebda73ad
+--- /dev/null
++++ b/protocol/group/candidate_health.go
+@@ -0,0 +1,168 @@
++package group
++
++import (
++	"context"
++	"errors"
++	"fmt"
++	"net/url"
++	"time"
++
++	"github.com/sagernet/sing-box/adapter"
++	"github.com/sagernet/sing-box/common/urltest"
++	"github.com/sagernet/sing-box/option"
++	"github.com/sagernet/sing/service"
++)
++
++// The Android host supplies the configured DNS transport, including its TLS,
++// bootstrap and headers. Groups never substitute a public resolver.
++type CandidateHealthChecker interface {
++	CheckCandidate(context.Context, string, string, string) (uint16, map[string]any, error)
++}
++
++type candidateHealthState struct {
++	CheckedAt time.Time      `json:"checked_at"`
++	Failures  int            `json:"failures"`
++	RetryAt   time.Time      `json:"retry_at,omitempty"`
++	Error     string         `json:"error,omitempty"`
++	Report    map[string]any `json:"report,omitempty"`
++}
++
++func (g *URLTestGroup) configureHealth(o option.URLTestOutboundOptions) error {
++	if !o.HealthCheck && !o.FailureCooldown {
++		return nil
++	}
++	if g.strategy != "fastest" {
++		return fmt.Errorf("candidate health options require fastest strategy")
++	}
++	g.healthCheck, g.failureCooldown = o.HealthCheck, o.FailureCooldown
++	g.healthDNS, g.healthURL = o.HealthDNSServer, o.HealthURL
++	if g.healthDNS == "" {
++		g.healthDNS = "dns-remote"
++	}
++	if g.healthURL == "" {
++		g.healthURL = "https://www.gstatic.com/generate_204"
++	}
++	u, err := url.Parse(g.healthURL)
++	if err != nil || u.Scheme != "https" || u.Hostname() == "" || u.User != nil || u.Fragment != "" || len(g.healthURL) > 2048 {
++		return fmt.Errorf("candidate health check requires a valid HTTPS URL")
++	}
++	if g.healthCheck && service.FromContext[CandidateHealthChecker](g.ctx) == nil {
++		return fmt.Errorf("configured DNS health checker is unavailable")
++	}
++	// A basic URLTest by another group must not validate DNS/HTTPS for this group.
++	g.history = urltest.NewHistoryStorage()
++	g.healthStates = make(map[string]candidateHealthState)
++	return nil
++}
++
++func (g *URLTestGroup) probeEpoch() uint64 {
++	g.healthAccess.Lock()
++	defer g.healthAccess.Unlock()
++	return g.healthEpoch
++}
++
++func (g *URLTestGroup) candidateBlocked(tag string) bool {
++	if !g.failureCooldown {
++		return false
++	}
++	g.healthAccess.Lock()
++	defer g.healthAccess.Unlock()
++	return time.Now().Before(g.healthStates[tag].RetryAt)
++}
++
++func (g *URLTestGroup) allowFailureCheck() bool {
++	if !g.healthCheck && !g.failureCooldown {
++		return true
++	}
++	g.healthAccess.Lock()
++	defer g.healthAccess.Unlock()
++	now := time.Now()
++	if now.Before(g.nextFailureCheck) {
++		return false
++	}
++	g.nextFailureCheck = now.Add(15 * time.Second)
++	return true
++}
++
++func (g *URLTestGroup) probeCandidate(ctx context.Context, outbound adapter.Outbound) (uint16, map[string]any, error) {
++	if g.healthCheck {
++		return service.FromContext[CandidateHealthChecker](g.ctx).CheckCandidate(ctx, outbound.Tag(), g.healthDNS, g.healthURL)
++	}
++	delay, err := urltest.URLTest(ctx, g.link, outbound)
++	return delay, nil, err
++}
++
++func (g *URLTestGroup) recordProbe(tag, realTag string, epoch uint64, delay uint16, report map[string]any, err error) bool {
++	g.healthAccess.Lock()
++	defer g.healthAccess.Unlock()
++	if epoch != g.healthEpoch || errors.Is(err, context.Canceled) {
++		return false
++	}
++	if g.healthCheck || g.failureCooldown {
++		state := g.healthStates[tag]
++		state.CheckedAt, state.Report = time.Now(), report
++		state.Error = ""
++		if err != nil {
++			state.Failures = min(10, state.Failures+1)
++			state.Error = "unreachable"
++			if errors.Is(err, context.DeadlineExceeded) {
++				state.Error = "timeout"
++			}
++			if g.failureCooldown && state.Failures >= 3 {
++				backoff := min(10*time.Minute, 30*time.Second*time.Duration(1<<min(5, state.Failures-3)))
++				state.RetryAt = time.Now().Add(backoff)
++			}
++		} else {
++			state.Failures = 0
++			state.RetryAt = time.Time{}
++		}
++		g.healthStates[tag] = state
++	}
++	if err != nil {
++		g.history.DeleteURLTestHistory(realTag)
++	} else {
++		g.history.StoreURLTestHistory(realTag, &adapter.URLTestHistory{Time: time.Now(), Delay: delay})
++	}
++	return true
++}
++
++func (g *URLTestGroup) candidateDiagnostics(tag string) any {
++	g.healthAccess.Lock()
++	defer g.healthAccess.Unlock()
++	state, exists := g.healthStates[tag]
++	if !exists {
++		return nil
++	}
++	return state
++}
++
++// Network identities are kept in Android, never in logs or persistent storage.
++// A network change invalidates both failures and earlier successful probes.
++func (s *URLTest) ResetProbeHealth() {
++	g := s.group
++	if g == nil || (!g.healthCheck && !g.failureCooldown) {
++		return
++	}
++	g.probeAccess.Lock()
++	if g.probeCancel != nil {
++		g.probeCancel()
++	}
++	g.probeAccess.Unlock()
++	g.healthAccess.Lock()
++	g.healthEpoch++
++	g.healthStates = make(map[string]candidateHealthState)
++	g.nextFailureCheck = time.Time{}
++	g.validationEpoch.Store(time.Now())
++	for _, outbound := range g.outbounds {
++		g.history.DeleteURLTestHistory(legacyRealTag(outbound))
++	}
++	g.healthAccess.Unlock()
++	g.resetPending.Store(true)
++	go func() {
++		if !g.checking.Load() && g.resetPending.Swap(false) {
++			g.CheckOutbounds(true)
++		}
++	}()
++}
++
++func (s *URLTest) InterfaceUpdated(context.Context) { s.ResetProbeHealth() }
 diff --git a/protocol/group/direct_fallback.go b/protocol/group/direct_fallback.go
 new file mode 100644
-index 000000000..1224c75a5
+index 000000000..0aafe4bc5
 --- /dev/null
 +++ b/protocol/group/direct_fallback.go
-@@ -0,0 +1,126 @@
+@@ -0,0 +1,152 @@
 +package group
 +
 +import (
@@ -6757,51 +6974,76 @@ index 000000000..1224c75a5
 +	}
 +	required := max(1, g.fallback.required)
 +	type probe struct {
-+		index int
-+		delay uint16
-+		err   error
++		index   int
++		delay   uint16
++		err     error
++		elapsed time.Duration
 +	}
 +	results := make(chan probe, len(links))
 +	testCtx, cancel := context.WithTimeout(ctx, g.timeout)
 +	defer cancel()
 +	for index, link := range links {
 +		go func() {
++			started := time.Now()
 +			delay, err := urltest.URLTestReachable(testCtx, link, g.outbounds[0])
-+			results <- probe{index, delay, err}
++			results <- probe{index, delay, err, time.Since(started)}
 +		}()
 +	}
 +	sites := make([]map[string]any, len(links))
 +	for index, link := range links {
 +		parsed, _ := url.Parse(link)
-+		sites[index] = map[string]any{"host": parsed.Host, "state": "not-checked"}
++		sites[index] = map[string]any{"host": parsed.Host, "state": "checking"}
 +	}
 +	successes := 0
 +	var delay uint16
-+	for completed := 0; completed < len(links); completed++ {
++	roundState := "completed"
++	completed := 0
++	for completed < len(links) {
 +		select {
 +		case result := <-results:
-+			sites[result.index]["state"] = "unreachable"
++			completed++
++			site := sites[result.index]
++			code, status := urltest.ReachabilityErrorCode(result.err)
++			site["state"], site["reason"], site["elapsed_ms"] = "unreachable", code, result.elapsed.Milliseconds()
++			if status != 0 {
++				site["http_status"] = status
++			}
 +			if result.err == nil {
 +				successes++
-+				sites[result.index]["state"] = "reachable"
-+				sites[result.index]["rtt_ms"] = result.delay
++				site["state"], site["rtt_ms"] = "reachable", result.delay
 +				delay = max(delay, result.delay)
 +			}
 +		case <-testCtx.Done():
++			code := "timeout"
++			if ctx.Err() != nil {
++				code = "cancelled"
++				roundState = "cancelled"
++			}
++			for _, site := range sites {
++				if site["state"] == "checking" {
++					site["state"], site["reason"] = "unreachable", code
++					if code == "cancelled" {
++						site["state"] = "cancelled"
++					}
++				}
++			}
 +			completed = len(links)
-+		}
-+		if successes >= required || successes+len(links)-completed-1 < required {
-+			break
 +		}
 +	}
 +	if ctx.Err() != nil {
++		g.fallbackDiagnostics.Store(map[string]any{
++			"sites": sites, "checked_at": time.Now(), "round_state": roundState, "successes": successes, "required": required,
++			"failed_rounds": g.fallback.failedRounds, "healthy_rounds": g.fallback.healthyRounds,
++			"failure_threshold": g.fallback.failures, "recovery_threshold": g.fallback.recoveries,
++		})
 +		return nil, ctx.Err()
 +	}
++
 +	direct := g.outbounds[0]
 +	available := g.history.LoadURLTestHistory(direct.Tag()) != nil
 +	enabled := g.fallback.apply(successes >= required, available)
 +	g.fallbackDiagnostics.Store(map[string]any{
-+		"sites": sites, "checked_at": time.Now(), "successes": successes, "required": required,
++		"sites": sites, "checked_at": time.Now(), "round_state": roundState, "successes": successes, "required": required,
 +		"failed_rounds": g.fallback.failedRounds, "healthy_rounds": g.fallback.healthyRounds,
 +		"failure_threshold": g.fallback.failures, "recovery_threshold": g.fallback.recoveries,
 +	})
@@ -6814,6 +7056,7 @@ index 000000000..1224c75a5
 +	} else {
 +		g.history.DeleteURLTestHistory(direct.Tag())
 +	}
++	g.logger.Debug("direct control check: ", successes, "/", required, " available; direct=", enabled)
 +	g.performUpdateCheck()
 +	return result, nil
 +}
@@ -7062,7 +7305,7 @@ index c3aaec5a9..3d603ab9b 100644
 +
 +func RealTag(_ adapter.OutboundManager, detour adapter.Outbound) string { return legacyRealTag(detour) }
 diff --git a/protocol/group/urltest.go b/protocol/group/urltest.go
-index bc50ab70d..dd38ed37e 100644
+index bc50ab70d..b8ea1148b 100644
 --- a/protocol/group/urltest.go
 +++ b/protocol/group/urltest.go
 @@ -2,7 +2,6 @@ package group
@@ -7125,7 +7368,7 @@ index bc50ab70d..dd38ed37e 100644
  		interruptExternalConnections: options.InterruptExistConnections,
  	}
  	if len(outbound.tags) == 0 {
-@@ -72,33 +78,50 @@ func NewURLTest(ctx context.Context, router adapter.Router, logger log.ContextLo
+@@ -72,33 +78,53 @@ func NewURLTest(ctx context.Context, router adapter.Router, logger log.ContextLo
  }
  
  func (s *URLTest) Start(stage adapter.StartStage, scope *adapter.Scope) error {
@@ -7165,20 +7408,23 @@ index bc50ab70d..dd38ed37e 100644
 +	if err != nil {
 +		return err
 +	}
++	if err := group.configureHealth(s.fallbackOptions); err != nil {
++		return err
+ 	}
 +	if err := group.configureFallback(s.fallbackOptions); err != nil {
 +		return err
 +	}
 +	s.group = group
-+	return nil
-+}
-+
-+func (s *URLTest) PostStart() error {
-+	if !s.managedByParent {
-+		s.group.PostStart(s.waitForInitial)
- 	}
  	return nil
  }
  
++func (s *URLTest) PostStart() error {
++	if !s.managedByParent {
++		s.group.PostStart(s.waitForInitial)
++	}
++	return nil
++}
++
 +func (s *URLTest) Close() error {
 +	return common.Close(
 +		common.PtrOrNil(s.group),
@@ -7197,7 +7443,7 @@ index bc50ab70d..dd38ed37e 100644
  	}
  	return ""
  }
-@@ -107,49 +130,18 @@ func (s *URLTest) All() []string {
+@@ -107,49 +133,18 @@ func (s *URLTest) All() []string {
  	return s.tags
  }
  
@@ -7222,19 +7468,19 @@ index bc50ab70d..dd38ed37e 100644
  
  func (s *URLTest) CheckOutbounds() {
 -	s.group.CheckOutbounds(s.ctx, true)
+-}
+-
+-func (s *URLTest) PerformUpdateCheck() {
+-	s.group.performUpdateCheck()
 +	s.group.CheckOutbounds(true)
  }
  
--func (s *URLTest) PerformUpdateCheck() {
--	s.group.performUpdateCheck()
--}
--
 -func (s *URLTest) InterfaceUpdated(ctx context.Context) {
 -	group := s.group
 -	if group == nil {
 -		return
 +func (s *URLTest) checkAfterFailure() {
-+	if !s.managedByParent {
++	if !s.managedByParent && s.group.allowFailureCheck() {
 +		go s.group.CheckOutbounds(true)
  	}
 -	if group.pause.IsDevicePaused() || group.pause.IsNetworkPaused() {
@@ -7251,7 +7497,7 @@ index bc50ab70d..dd38ed37e 100644
  }
  
  func (s *URLTest) DialContext(ctx context.Context, network string, destination M.Socksaddr) (net.Conn, error) {
-@@ -157,9 +149,9 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
+@@ -157,13 +152,13 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
  	var outbound adapter.Outbound
  	switch N.NetworkName(network) {
  	case N.NetworkTCP:
@@ -7263,7 +7509,12 @@ index bc50ab70d..dd38ed37e 100644
  	default:
  		return nil, E.Extend(N.ErrUnknownNetwork, network)
  	}
-@@ -171,16 +163,18 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
+-	if outbound == nil {
++	if outbound == nil || s.group.candidateBlocked(outbound.Tag()) {
+ 		outbound, _ = s.group.Select(network)
+ 	}
+ 	if outbound == nil {
+@@ -171,17 +166,19 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
  	}
  	conn, err := outbound.DialContext(ctx, network, destination)
  	if err == nil {
@@ -7280,11 +7531,13 @@ index bc50ab70d..dd38ed37e 100644
  func (s *URLTest) ListenPacket(ctx context.Context, destination M.Socksaddr) (net.PacketConn, error) {
  	s.group.Touch()
 -	outbound := s.group.selectedOutboundUDP
+-	if outbound == nil {
 +	outbound := s.group.selectedOutboundUDP.Load()
- 	if outbound == nil {
++	if outbound == nil || s.group.candidateBlocked(outbound.Tag()) {
  		outbound, _ = s.group.Select(N.NetworkUDP)
  	}
-@@ -189,25 +183,36 @@ func (s *URLTest) ListenPacket(ctx context.Context, destination M.Socksaddr) (ne
+ 	if outbound == nil {
+@@ -189,25 +186,46 @@ func (s *URLTest) ListenPacket(ctx context.Context, destination M.Socksaddr) (ne
  	}
  	conn, err := outbound.ListenPacket(ctx, destination)
  	if err == nil {
@@ -7311,6 +7564,16 @@ index bc50ab70d..dd38ed37e 100644
  }
  
  type URLTestGroup struct {
++	selectionAccess              sync.Mutex
++	healthCheck                  bool
++	healthDNS                    string
++	healthURL                    string
++	failureCooldown              bool
++	healthAccess                 sync.Mutex
++	healthStates                 map[string]candidateHealthState
++	healthEpoch                  uint64
++	nextFailureCheck             time.Time
++	resetPending                 atomic.Bool
 +	validationEpoch              common.TypedValue[time.Time]
 +	initialProbeStarted          atomic.Bool
 +	initialProbe                 sync.Once
@@ -7324,7 +7587,7 @@ index bc50ab70d..dd38ed37e 100644
  	outbound                     adapter.OutboundManager
  	pause                        pause.Manager
  	pauseCallback                *list.Element[pause.Callback]
-@@ -217,21 +222,29 @@ type URLTestGroup struct {
+@@ -217,21 +235,29 @@ type URLTestGroup struct {
  	interval                     time.Duration
  	tolerance                    uint16
  	idleTimeout                  time.Duration
@@ -7359,7 +7622,7 @@ index bc50ab70d..dd38ed37e 100644
  	if interval == 0 {
  		interval = C.DefaultURLTestInterval
  	}
-@@ -241,15 +254,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -241,15 +267,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	if idleTimeout == 0 {
  		idleTimeout = C.DefaultURLTestIdleTimeout
  	}
@@ -7397,7 +7660,7 @@ index bc50ab70d..dd38ed37e 100644
  		outbound:                     outboundManager,
  		logger:                       logger,
  		outbounds:                    outbounds,
-@@ -257,6 +288,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -257,6 +301,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  		interval:                     interval,
  		tolerance:                    tolerance,
  		idleTimeout:                  idleTimeout,
@@ -7407,7 +7670,7 @@ index bc50ab70d..dd38ed37e 100644
  		history:                      history,
  		close:                        make(chan struct{}),
  		pause:                        service.FromContext[pause.Manager](ctx),
-@@ -265,59 +299,141 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -265,59 +312,141 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	}, nil
  }
  
@@ -7568,7 +7831,7 @@ index bc50ab70d..dd38ed37e 100644
  				minDelay = history.Delay
  			}
  		}
-@@ -326,7 +442,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -326,7 +455,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  		if !common.Contains(detour.Network(), network) {
  			continue
  		}
@@ -7577,7 +7840,21 @@ index bc50ab70d..dd38ed37e 100644
  		if history == nil {
  			continue
  		}
-@@ -347,180 +463,319 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -336,7 +465,13 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+ 		}
+ 	}
+ 	if minOutbound == nil {
++		if g.healthCheck {
++			return nil, false
++		}
+ 		for _, detour := range g.outbounds {
++			if g.candidateBlocked(detour.Tag()) {
++				continue
++			}
+ 			if !common.Contains(detour.Network(), network) {
+ 				continue
+ 			}
+@@ -347,180 +482,340 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  	return minOutbound, true
  }
  
@@ -7625,9 +7902,8 @@ index bc50ab70d..dd38ed37e 100644
  
  func (g *URLTestGroup) URLTest(ctx context.Context) (map[string]uint16, error) {
 -	return g.urlTest(ctx, true)
-+	return g.urlTest(ctx, false)
- }
- 
+-}
+-
 -func (g *URLTestGroup) urlTest(ctx context.Context, force bool) (map[string]uint16, error) {
 -	if g.checking.Swap(true) {
 -		return make(map[string]uint16), nil
@@ -7636,15 +7912,14 @@ index bc50ab70d..dd38ed37e 100644
 -	result := URLTestOutbounds(ctx, g.outbound, g.history, g.logger, g.outbounds, g.link, g.interval, force)
 -	g.performUpdateCheck()
 -	return result, nil
-+func shouldForceInitialCheck(strategy string) bool {
-+	return strategy != "priority"
++	return g.urlTest(ctx, false)
  }
  
 -type urlTestResult struct {
 -	delay uint16
 -	err   error
-+func shouldCheckPrioritySequential(strategy string, force bool) bool {
-+	return strategy == "priority" && !force
++func shouldForceInitialCheck(strategy string) bool {
++	return strategy != "priority"
  }
  
 -type urlTestBatch struct {
@@ -7657,23 +7932,9 @@ index bc50ab70d..dd38ed37e 100644
 -	groups   []adapter.OutboundGroup
 -	access   sync.Mutex
 -	result   map[string]uint16
--}
-+func (g *URLTestGroup) urlTest(ctx context.Context, force bool) (map[string]uint16, error) {
-+	result := make(map[string]uint16)
-+	if g.checking.Swap(true) {
-+		return result, nil
-+	}
-+	defer g.checking.Store(false)
-+	g.probeAccess.Lock()
-+	// Forced bootstrap checks may run before Android publishes a default network.
-+	if g.probesPaused.Load() || g.pause.IsDevicePaused() {
-+		g.probeAccess.Unlock()
-+		return result, nil
-+	}
-+	ctx, cancel := context.WithCancel(ctx)
-+	g.probeCancel = cancel
-+	g.probeAccess.Unlock()
-+	defer func() { cancel(); g.probeAccess.Lock(); g.probeCancel = nil; g.probeAccess.Unlock() }()
++func shouldCheckPrioritySequential(strategy string, force bool) bool {
++	return strategy == "priority" && !force
+ }
  
 -func URLTestOutbounds(ctx context.Context, outboundManager adapter.OutboundManager, history *urltest.HistoryStorage, logger log.Logger, outbounds []adapter.Outbound, link string, interval time.Duration, force bool) map[string]uint16 {
 -	b, _ := batch.New(ctx, batch.WithConcurrencyNum[any](10))
@@ -7692,6 +7953,35 @@ index bc50ab70d..dd38ed37e 100644
 -		groupHistory := history.LoadURLTestHistory(RealTag(outboundManager, outboundGroup))
 -		if groupHistory != nil {
 -			testBatch.result[outboundGroup.Tag()] = groupHistory.Delay
++func (g *URLTestGroup) urlTest(ctx context.Context, force bool) (map[string]uint16, error) {
++	result := make(map[string]uint16)
++	if g.checking.Swap(true) {
++		return result, nil
++	}
++	defer func() {
++		g.checking.Store(false)
++		if g.resetPending.Swap(false) {
++			go g.CheckOutbounds(true)
+ 		}
++	}()
++	g.probeAccess.Lock()
++	// Forced bootstrap checks may run before Android publishes a default network.
++	if g.probesPaused.Load() || g.pause.IsDevicePaused() {
++		g.probeAccess.Unlock()
++		return result, nil
+ 	}
+-	return testBatch.result
+-}
++	ctx, cancel := context.WithCancel(ctx)
++	g.probeCancel = cancel
++	g.probeAccess.Unlock()
++	defer func() { cancel(); g.probeAccess.Lock(); g.probeCancel = nil; g.probeAccess.Unlock() }()
+ 
+-func (b *urlTestBatch) test(outbounds []adapter.Outbound, link string, interval time.Duration, force bool) {
+-	for _, detour := range outbounds {
+-		tag := detour.Tag()
+-		if b.checked[tag] {
+-			continue
 +	if g.strategy == "direct-fallback" {
 +		return g.checkDirectFallback(ctx)
 +	}
@@ -7736,22 +8026,6 @@ index bc50ab70d..dd38ed37e 100644
 +			result[tag] = t
 +			break
  		}
-+		g.performUpdateCheck()
-+		return result, nil
- 	}
--	return testBatch.result
--}
--
--func (b *urlTestBatch) test(outbounds []adapter.Outbound, link string, interval time.Duration, force bool) {
--	for _, detour := range outbounds {
-+	b, _ := batch.New(ctx, batch.WithConcurrencyNum[any](10))
-+	checked := make(map[string]bool)
-+	var resultAccess sync.Mutex
-+	for _, detour := range g.outbounds {
- 		tag := detour.Tag()
--		if b.checked[tag] {
--			continue
--		}
 -		switch nested := detour.(type) {
 -		case *URLTest:
 -			b.checked[tag] = true
@@ -7773,6 +8047,19 @@ index bc50ab70d..dd38ed37e 100644
 -		default:
 -			history := b.history.LoadURLTestHistory(tag)
 -			if !force && history != nil && time.Since(history.Time) < interval {
++		g.performUpdateCheck()
++		return result, nil
++	}
++	epoch := g.probeEpoch()
++	concurrency := 10
++	if g.healthCheck {
++		concurrency = 3
++	}
++	b, _ := batch.New(ctx, batch.WithConcurrencyNum[any](concurrency))
++	checked := make(map[string]bool)
++	var resultAccess sync.Mutex
++	for _, detour := range g.outbounds {
++		tag := detour.Tag()
 +		if nested, isNested := detour.(*URLTest); isNested && nested.managedByParent {
 +			if checked[tag] {
  				continue
@@ -7818,11 +8105,11 @@ index bc50ab70d..dd38ed37e 100644
  				return nil, nil
  			})
 +			continue
- 		}
++		}
 +		realTag := legacyRealTag(detour)
 +		if checked[realTag] {
 +			continue
-+		}
+ 		}
 +		history := g.history.LoadURLTestHistory(realTag)
 +		if !force && history != nil && time.Since(history.Time) < g.interval {
 +			if g.strategy == "fastest" {
@@ -7831,26 +8118,31 @@ index bc50ab70d..dd38ed37e 100644
 +			continue
 +		}
 +		checked[realTag] = true
++		if g.candidateBlocked(tag) {
++			continue
++		}
 +		p, loaded := g.outbound.Outbound(realTag)
 +		if !loaded {
 +			continue
 +		}
 +		b.Go(realTag, func() (any, error) {
-+			testCtx, cancel := context.WithTimeout(ctx, g.timeout)
++			probeTimeout := g.timeout
++			if g.healthCheck {
++				probeTimeout = min(18*time.Second, max(12*time.Second, probeTimeout))
++			}
++			testCtx, cancel := context.WithTimeout(ctx, probeTimeout)
 +			defer cancel()
-+			t, err := urltest.URLTest(testCtx, g.link, p)
++			t, report, err := g.probeCandidate(testCtx, p)
 +			if ctx.Err() != nil {
 +				return nil, ctx.Err()
 +			}
++			if !g.recordProbe(tag, realTag, epoch, t, report, err) {
++				return nil, nil
++			}
 +			if err != nil {
 +				g.logger.Debug("outbound ", tag, " unavailable: ", err)
-+				g.history.DeleteURLTestHistory(realTag)
 +			} else {
 +				g.logger.Debug("outbound ", tag, " available: ", t, "ms")
-+				g.history.StoreURLTestHistory(realTag, &adapter.URLTestHistory{
-+					Time:  time.Now(),
-+					Delay: t,
-+				})
 +				if g.strategy == "fastest" {
 +					g.initialReadyOnce.Do(func() { g.performUpdateCheck(); close(g.initialReady) })
 +				}
@@ -7860,11 +8152,11 @@ index bc50ab70d..dd38ed37e 100644
 +			}
 +			return nil, nil
 +		})
-+	}
+ 	}
 +	b.Wait()
 +	if ctx.Err() != nil {
 +		return result, ctx.Err()
- 	}
++	}
 +	g.performUpdateCheck()
 +	return result, nil
  }
@@ -7878,10 +8170,12 @@ index bc50ab70d..dd38ed37e 100644
 -	)
 -	if outbound, exists := g.Select(N.NetworkTCP); outbound != nil && (g.selectedOutboundTCP == nil || (exists && outbound != g.selectedOutboundTCP)) {
 -		if g.selectedOutboundTCP != nil {
++	g.selectionAccess.Lock()
++	defer g.selectionAccess.Unlock()
 +	var updated bool
 +	outboundTCP, existsTCP := g.Select(N.NetworkTCP)
 +	if outboundTCP == nil {
-+		if g.strategy == "priority" && g.selectedOutboundTCP.Load() != nil {
++		if (g.strategy == "priority" || g.healthCheck || g.failureCooldown) && g.selectedOutboundTCP.Load() != nil {
 +			g.recordSelection(N.NetworkTCP, nil)
 +			g.selectedOutboundTCP.Store(nil)
  			updated = true
@@ -7900,17 +8194,17 @@ index bc50ab70d..dd38ed37e 100644
 +	}
 +	outboundUDP, existsUDP := g.Select(N.NetworkUDP)
 +	if outboundUDP == nil {
-+		if g.strategy == "priority" && g.selectedOutboundUDP.Load() != nil {
++		if (g.strategy == "priority" || g.healthCheck || g.failureCooldown) && g.selectedOutboundUDP.Load() != nil {
 +			g.recordSelection(N.NetworkUDP, nil)
 +			g.selectedOutboundUDP.Store(nil)
-+			updated = true
-+		}
-+	} else if g.selectedOutboundUDP.Load() == nil || (existsUDP && outboundUDP != g.selectedOutboundUDP.Load()) {
-+		if g.selectedOutboundUDP.Load() != nil {
  			updated = true
  		}
 -		g.selectedOutboundUDP = outbound
 -		selected = true
++	} else if g.selectedOutboundUDP.Load() == nil || (existsUDP && outboundUDP != g.selectedOutboundUDP.Load()) {
++		if g.selectedOutboundUDP.Load() != nil {
++			updated = true
++		}
 +		g.recordSelection(N.NetworkUDP, outboundUDP)
 +		g.selectedOutboundUDP.Store(outboundUDP)
  	}
@@ -7963,6 +8257,7 @@ index bc50ab70d..dd38ed37e 100644
 +	} else if _, available := managedURLTestHistory(g, selected, network); !available {
 +		state.Reason = "no-successful-probe"
 +	}
++	g.logger.Debug("group ", network, " selected: ", state.Current, "; ", state.Reason)
 +	if network == N.NetworkTCP {
 +		g.tcpSelection.Store(state)
 +	} else {
@@ -7981,6 +8276,9 @@ index bc50ab70d..dd38ed37e 100644
 +			break
 +		}
 +		candidate := map[string]any{"tag": outbound.Tag(), "reachable": false}
++		if health := g.candidateDiagnostics(outbound.Tag()); health != nil {
++			candidate["health"] = health
++		}
 +		if history, available := managedURLTestHistory(g, outbound, N.NetworkTCP); available {
 +			candidate["reachable"] = true
 +			candidate["rtt_ms"] = history.Delay
@@ -7990,7 +8288,7 @@ index bc50ab70d..dd38ed37e 100644
 +	}
 +	return map[string]any{"tag": s.Tag(), "strategy": g.strategy, "url": g.link,
 +		"tcp": g.tcpSelection.Load(), "udp": g.udpSelection.Load(),
-+		"candidates": candidates, "candidate_count": len(g.outbounds), "fallback": g.fallbackDiagnostics.Load()}
++		"candidates": candidates, "candidate_count": len(g.outbounds), "fallback": g.fallbackDiagnostics.Load(), "health_check": g.healthCheck, "failure_cooldown": g.failureCooldown, "probes_paused": g.checksPaused()}
 +}
 +
 +func URLTestOutbounds(ctx context.Context, outboundManager adapter.OutboundManager, history *urltest.HistoryStorage, logger log.Logger, outbounds []adapter.Outbound, link string, interval time.Duration, force bool) map[string]uint16 {

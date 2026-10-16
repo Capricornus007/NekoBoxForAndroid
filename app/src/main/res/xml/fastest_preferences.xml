@@ -52,6 +52,12 @@
         app:key="fastestProtocols"
         app:title="@string/fastest_protocols" />
 
+    <SwitchPreferenceCompat app:key="fastestHealthCheck" app:defaultValue="false"
+        app:title="@string/fastest_health_check" app:summary="@string/fastest_health_check_hint" />
+    <EditTextPreference app:key="fastestHealthUrl" app:dependency="fastestHealthCheck"
+        app:title="@string/fastest_health_url" app:useSimpleSummaryProvider="true" />
+    <SwitchPreferenceCompat app:key="fastestFailureCooldown" app:defaultValue="false"
+        app:title="@string/fastest_failure_cooldown" app:summary="@string/fastest_failure_cooldown_hint" />
     <Preference
         app:icon="@drawable/ic_baseline_manage_search_24"
         app:key="fastestRegexPreview"

@@ -64,6 +64,9 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         DataStore.fastestIgnoreCase = ignoreCase
         DataStore.fastestProtocolFilterMode = protocolFilterMode
         DataStore.fastestProtocols = protocols.toSet()
+        DataStore.fastestHealthCheck = healthCheck
+        DataStore.fastestFailureCooldown = failureCooldown
+        DataStore.fastestHealthUrl = healthUrl
     }
 
     override fun ChainBean.serialize() {
@@ -75,6 +78,9 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         ignoreCase = DataStore.fastestIgnoreCase
         protocolFilterMode = DataStore.fastestProtocolFilterMode
         protocols = DataStore.fastestProtocols.sorted()
+        healthCheck = DataStore.fastestHealthCheck
+        failureCooldown = DataStore.fastestFailureCooldown
+        healthUrl = DataStore.fastestHealthUrl.orEmpty()
         proxies = if (isRegexFastest()) {
             DataStore.serverProtocol.split(",").mapNotNull {
                 it.takeIf(String::isNotBlank)?.toLongOrNull()
@@ -88,12 +94,16 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
     override suspend fun saveAndExit() {
         if (currentStrategy == ChainBean.STRATEGY_FASTEST) {
             try {
+                if (DataStore.fastestHealthCheck) io.nekohasekai.sagernet.fmt.internal.validateHealthUrl(DataStore.fastestHealthUrl.orEmpty())
                 if (FastestCandidateResolver.resolve(candidateBean()).isEmpty()) {
                     onMainDispatcher {
                         Toast.makeText(this@ChainSettingsActivity, R.string.fastest_protocol_no_candidates, Toast.LENGTH_LONG).show()
                     }
                     return
                 }
+            } catch (e: IllegalArgumentException) {
+                onMainDispatcher { Toast.makeText(this@ChainSettingsActivity, R.string.fastest_health_invalid_url, Toast.LENGTH_LONG).show() }
+                return
             } catch (e: FastestCandidateResolutionException) {
                 onMainDispatcher {
                     Toast.makeText(
@@ -300,6 +310,9 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         ignoreCase = DataStore.fastestIgnoreCase
         protocolFilterMode = DataStore.fastestProtocolFilterMode
         protocols = DataStore.fastestProtocols.sorted()
+        healthCheck = DataStore.fastestHealthCheck
+        failureCooldown = DataStore.fastestFailureCooldown
+        healthUrl = DataStore.fastestHealthUrl.orEmpty()
         proxies = proxyList.map { it.id }
     }
 
