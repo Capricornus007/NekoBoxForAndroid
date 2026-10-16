@@ -19,6 +19,7 @@ import (
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/adapter/outbound"
 	"github.com/sagernet/sing-box/common/urltest"
+	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing-box/protocol/group"
@@ -44,6 +45,12 @@ func (o *candidateFixture) DialContext(ctx context.Context, network string, dest
 	} else {
 		o.httpsCalls.Add(1)
 	}
+	if destination.Addr.Is6() {
+		// A proxy can return a stream before its remote dial/handshake fails.
+		client, server := net.Pipe()
+		server.Close()
+		return client, nil
+	}
 	address := destination.String()
 	if destination.IsDomain() {
 		address = fmt.Sprintf("127.0.0.1:%d", destination.Port)
@@ -61,6 +68,7 @@ type candidateFixtureOptions struct {
 func TestConfiguredProbeUsesCandidateDoHAndRejectsFalseHealthyNode(t *testing.T) {
 	var rcode atomic.Int32
 	var blockDNS atomic.Bool
+	var ipv6Answers atomic.Bool
 	startedDNS := make(chan struct{}, 1)
 	var httpStatus atomic.Int32
 	httpStatus.Store(204)
@@ -88,6 +96,11 @@ func TestConfiguredProbeUsesCandidateDoHAndRejectsFalseHealthyNode(t *testing.T)
 		reply.Rcode = int(rcode.Load())
 		if reply.Rcode == mDNS.RcodeSuccess && request.Question[0].Qtype == mDNS.TypeA {
 			reply.Answer = []mDNS.RR{&mDNS.A{Hdr: mDNS.RR_Header{Name: request.Question[0].Name, Rrtype: mDNS.TypeA, Class: mDNS.ClassINET, Ttl: 60}, A: net.ParseIP("127.0.0.1")}}
+		}
+		if reply.Rcode == mDNS.RcodeSuccess && request.Question[0].Qtype == mDNS.TypeAAAA && ipv6Answers.Load() {
+			for _, address := range []string{"2001:db8::1", "2001:db8::2"} {
+				reply.Answer = append(reply.Answer, &mDNS.AAAA{Hdr: mDNS.RR_Header{Name: request.Question[0].Name, Rrtype: mDNS.TypeAAAA, Class: mDNS.ClassINET, Ttl: 60}, AAAA: net.ParseIP(address)})
+			}
 		}
 		content, _ := reply.Pack()
 		w.Header().Set("Content-Type", "application/dns-message")
@@ -165,6 +178,13 @@ func TestConfiguredProbeUsesCandidateDoHAndRejectsFalseHealthyNode(t *testing.T)
 	}
 	if g.Now() != "good" || options.DNS.Servers[0].Options.(*option.RemoteHTTPSDNSServerOptions).Detour != "auto" {
 		t.Fatal("manual probe changed the running configuration")
+	}
+	ipv6Answers.Store(true)
+	preferIPv6 := newCandidateChecker(options)
+	preferIPv6.strategy = C.DomainStrategyPreferIPv6
+	_, dualReport, dualErr := preferIPv6.CheckCandidate(ctx, "good", "dns-remote", httpsURL)
+	if dualErr != nil || dualReport["dns"].(map[string]any)["aaaa"].(map[string]any)["addresses"] != 2 {
+		t.Fatalf("did not fall back from IPv6 TLS failure to working IPv4: %v %v", dualErr, dualReport)
 	}
 	httpStatus.Store(451)
 	_, report, err = checker.CheckCandidate(ctx, "good", "dns-remote", httpsURL)

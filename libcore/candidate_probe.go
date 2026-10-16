@@ -273,61 +273,88 @@ func (c *candidateChecker) CheckCandidate(ctx context.Context, tag, dnsTag, link
 		}
 		addresses = ordered
 	}
-	httpsReport := map[string]any{"state": "failed", "tcp": "not-tested", "tls": "not-tested"}
-	report["https"] = httpsReport
-	started := time.Now()
-	defer func() { httpsReport["ms"] = time.Since(started).Milliseconds() }()
-	port := uint16(443)
-	if u.Port() != "" {
-		n, _ := strconv.Atoi(u.Port())
-		port = uint16(n)
+	tryHTTPS := func(ctx context.Context, ip netip.Addr) (uint16, map[string]any, error) {
+		httpsReport := map[string]any{"state": "failed", "tcp": "not-tested", "tls": "not-tested"}
+		report["https"] = httpsReport
+		started := time.Now()
+		defer func() { httpsReport["ms"] = time.Since(started).Milliseconds() }()
+		port := uint16(443)
+		if u.Port() != "" {
+			n, _ := strconv.Atoi(u.Port())
+			port = uint16(n)
+		}
+		conn, err := outbound.DialContext(ctx, "tcp", M.SocksaddrFromNetIP(netip.AddrPortFrom(ip, port)))
+		if err != nil {
+			httpsReport["tcp"], httpsReport["error"] = "failed", probeErrorCode(err)
+			return 0, report, fmt.Errorf("HTTPS connection: %w", safeProbeError(err))
+		}
+		defer conn.Close()
+		stopClose := context.AfterFunc(ctx, func() { conn.Close() })
+		defer stopClose()
+		if deadline, ok := ctx.Deadline(); ok {
+			_ = conn.SetDeadline(deadline)
+		}
+		httpsReport["tcp"] = "connected"
+		secure := tls.Client(conn, &tls.Config{ServerName: u.Hostname(), MinVersion: tls.VersionTLS12,
+			RootCAs: adapter.RootPoolFromContext(ctx), Time: ntp.TimeFuncFromContext(ctx), NextProtos: []string{"http/1.1"}})
+		if err = secure.HandshakeContext(ctx); err != nil {
+			httpsReport["tls"], httpsReport["error"] = "failed", probeErrorCode(err)
+			return 0, report, fmt.Errorf("HTTPS TLS: %w", safeProbeError(err))
+		}
+		httpsReport["tls"] = "verified"
+		request, _ := http.NewRequestWithContext(ctx, http.MethodHead, link, nil)
+		request.Close = true
+		if err = request.Write(secure); err != nil {
+			httpsReport["error"] = probeErrorCode(err)
+			return 0, report, fmt.Errorf("HTTPS request: %w", safeProbeError(err))
+		}
+		// Headers are enough; do not download a page or follow redirects.
+		response, err := http.ReadResponse(bufio.NewReader(io.LimitReader(secure, 64*1024)), request)
+		httpsReport["ms"] = time.Since(started).Milliseconds()
+		if err != nil {
+			httpsReport["error"] = probeErrorCode(err)
+			return 0, report, fmt.Errorf("HTTPS response: %w", safeProbeError(err))
+		}
+		response.Body.Close()
+		httpsReport["status"] = response.StatusCode
+		if response.StatusCode < 200 || response.StatusCode >= 400 {
+			httpsReport["error"] = "http-status"
+			return 0, report, fmt.Errorf("HTTPS status %d", response.StatusCode)
+		}
+		httpsReport["state"] = "reachable"
+		return uint16(min(65535, max(1, time.Since(started).Milliseconds()))), report, nil
 	}
-	var conn net.Conn
-	for _, ip := range addresses[:min(2, len(addresses))] {
-		conn, err = outbound.DialContext(ctx, "tcp", M.SocksaddrFromNetIP(netip.AddrPortFrom(ip, port)))
-		if err == nil {
+	// Try both address families before a second address in the same family.
+	// Each attempt includes TLS: proxy DialContext may return before connecting.
+	targets := addresses[:min(2, len(addresses))]
+	for _, address := range addresses[1:] {
+		if address.Is4() != addresses[0].Is4() {
+			targets = []netip.Addr{addresses[0], address}
 			break
 		}
 	}
-	if err != nil {
-		httpsReport["tcp"], httpsReport["error"] = "failed", probeErrorCode(err)
-		return 0, report, fmt.Errorf("HTTPS connection: %w", safeProbeError(err))
+	var lastErr error
+	for index, ip := range targets {
+		attemptCtx, cancel := context.WithCancel(ctx)
+		if index == 0 && len(targets) > 1 {
+			cancel()
+			attemptCtx, cancel = context.WithTimeout(ctx, 4*time.Second)
+		}
+		delay, _, err := tryHTTPS(attemptCtx, ip)
+		cancel()
+		if ctx.Err() != nil {
+			return 0, report, ctx.Err()
+		}
+		if err == nil {
+			return delay, report, nil
+		}
+		lastErr = err
+		if report["https"].(map[string]any)["error"] == "http-status" {
+			break
+		}
 	}
-	defer conn.Close()
-	stopClose := context.AfterFunc(ctx, func() { conn.Close() })
-	defer stopClose()
-	if deadline, ok := ctx.Deadline(); ok {
-		_ = conn.SetDeadline(deadline)
-	}
-	httpsReport["tcp"] = "connected"
-	secure := tls.Client(conn, &tls.Config{ServerName: u.Hostname(), MinVersion: tls.VersionTLS12,
-		RootCAs: adapter.RootPoolFromContext(ctx), Time: ntp.TimeFuncFromContext(ctx), NextProtos: []string{"http/1.1"}})
-	if err = secure.HandshakeContext(ctx); err != nil {
-		httpsReport["tls"], httpsReport["error"] = "failed", probeErrorCode(err)
-		return 0, report, fmt.Errorf("HTTPS TLS: %w", safeProbeError(err))
-	}
-	httpsReport["tls"] = "verified"
-	request, _ := http.NewRequestWithContext(ctx, http.MethodHead, link, nil)
-	request.Close = true
-	if err = request.Write(secure); err != nil {
-		httpsReport["error"] = probeErrorCode(err)
-		return 0, report, fmt.Errorf("HTTPS request: %w", safeProbeError(err))
-	}
-	// Headers are enough; do not download a page or follow redirects.
-	response, err := http.ReadResponse(bufio.NewReader(io.LimitReader(secure, 64*1024)), request)
-	httpsReport["ms"] = time.Since(started).Milliseconds()
-	if err != nil {
-		httpsReport["error"] = probeErrorCode(err)
-		return 0, report, fmt.Errorf("HTTPS response: %w", safeProbeError(err))
-	}
-	response.Body.Close()
-	httpsReport["status"] = response.StatusCode
-	if response.StatusCode < 200 || response.StatusCode >= 400 {
-		httpsReport["error"] = "http-status"
-		return 0, report, fmt.Errorf("HTTPS status %d", response.StatusCode)
-	}
-	httpsReport["state"] = "reachable"
-	return uint16(min(65535, max(1, time.Since(started).Milliseconds()))), report, nil
+	return 0, report, lastErr
+
 }
 
 // Error text deliberately excludes URL paths, headers and answers. Wrapping
