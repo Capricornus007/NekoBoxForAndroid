@@ -48,6 +48,7 @@ class BaseService {
 
     class Data internal constructor(private val service: Interface) {
         @Volatile var state = State.Stopped
+        @Volatile var powerRestricted = false
         var networkSignature: String? = null
         var networkPolicySignature: String? = null
         var proxy: ProxyInstance? = null
@@ -95,7 +96,8 @@ class BaseService {
             if (state != State.Connected) return
             val context = service as Context
             val keyguard = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            proxy?.box?.setProbesPaused(pauseHealthChecks(SagerNet.power.isInteractive, keyguard.isKeyguardLocked, SagerNet.power.isDeviceIdleMode))
+            powerRestricted = pauseHealthChecks(SagerNet.power.isInteractive, keyguard.isKeyguardLocked, SagerNet.power.isDeviceIdleMode)
+            proxy?.box?.setProbesPaused(powerRestricted)
             proxy?.looper?.onPowerChanged()
         }
 

@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.bg.proto
 
 import io.nekohasekai.sagernet.aidl.SpeedDisplayData
-import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.aidl.TrafficData
 import io.nekohasekai.sagernet.bg.BaseService
 import io.nekohasekai.sagernet.bg.SagerConnection
@@ -68,7 +67,7 @@ class TrafficLooper(val data: BaseService.Data) {
     private suspend fun loop() {
         val speedInterval = DataStore.speedInterval.toLong()
         while (currentCoroutineContext().isActive) {
-            withTimeoutOrNull(TrafficUpdater.pollingInterval(speedInterval, SagerNet.power.isInteractive)) { powerChanged.receive() }
+            withTimeoutOrNull(TrafficUpdater.pollingInterval(speedInterval, !data.powerRestricted)) { powerChanged.receive() }
             updater?.updateAll()
             val showSpeed = speedInterval > 0
             val speed = SpeedDisplayData(

@@ -7062,7 +7062,7 @@ index c3aaec5a9..3d603ab9b 100644
 +
 +func RealTag(_ adapter.OutboundManager, detour adapter.Outbound) string { return legacyRealTag(detour) }
 diff --git a/protocol/group/urltest.go b/protocol/group/urltest.go
-index bc50ab70d..ba72c2d2b 100644
+index bc50ab70d..dd38ed37e 100644
 --- a/protocol/group/urltest.go
 +++ b/protocol/group/urltest.go
 @@ -2,7 +2,6 @@ package group
@@ -7577,7 +7577,7 @@ index bc50ab70d..ba72c2d2b 100644
  		if history == nil {
  			continue
  		}
-@@ -347,180 +463,318 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -347,180 +463,319 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  	return minOutbound, true
  }
  
@@ -7665,7 +7665,8 @@ index bc50ab70d..ba72c2d2b 100644
 +	}
 +	defer g.checking.Store(false)
 +	g.probeAccess.Lock()
-+	if g.checksPaused() {
++	// Forced bootstrap checks may run before Android publishes a default network.
++	if g.probesPaused.Load() || g.pause.IsDevicePaused() {
 +		g.probeAccess.Unlock()
 +		return result, nil
 +	}

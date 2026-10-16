@@ -39,7 +39,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/show_system_apps"
-                            style="@style/Widget.MaterialComponents.Chip.Filter"
+                            style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="4dp"

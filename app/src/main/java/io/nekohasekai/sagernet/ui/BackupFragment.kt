@@ -477,7 +477,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
                             val binding = LayoutProgressBinding.inflate(layoutInflater)
                             binding.content.text = getString(R.string.backup_importing)
-                            val dialog = AlertDialog.Builder(requireContext())
+                            val dialog = MaterialAlertDialogBuilder(requireContext())
                                 .setView(binding.root)
                                 .setCancelable(false)
                                 .show()
@@ -701,7 +701,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
                         val binding = LayoutProgressBinding.inflate(layoutInflater)
                         binding.content.text = getString(R.string.backup_importing)
-                        val dialog = AlertDialog.Builder(requireContext())
+                        val dialog = MaterialAlertDialogBuilder(requireContext())
                             .setView(binding.root)
                             .setCancelable(false)
                             .show()

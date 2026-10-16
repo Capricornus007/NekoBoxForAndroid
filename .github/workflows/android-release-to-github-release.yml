@@ -75,6 +75,8 @@ jobs:
         run: ./buildScript/lib/assets.sh
       - name: Test two-database backup restore
         run: python3 buildScript/tests/test_restore_transaction.py
+      - name: Check UI resources and fixed palette contrast
+        run: python3 buildScript/tests/test_ui_resources.py
       - name: Test Go core with race detection
         working-directory: libcore
         env:

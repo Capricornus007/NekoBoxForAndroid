@@ -268,7 +268,7 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
             } }
             report.append("\n").append(getString(R.string.diagnostics_wg_counters_hint))
         } }
-        groupsView.text = redactDiagnostic(report.toString())
+        groupsView.text = (if (state?.optBoolean("probes_paused") == true) getString(R.string.diagnostics_probes_paused) + "\n\n" else "") + redactDiagnostic(report.toString())
         renderHistory()
     }
     dialog.setContentView(root)

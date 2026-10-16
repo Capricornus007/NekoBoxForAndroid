@@ -2,6 +2,7 @@ package libcore
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -11,6 +12,50 @@ import (
 
 	"github.com/sagernet/sing-box/option"
 )
+
+func TestScreenLockCancelsManualProbeWithoutDevicePause(t *testing.T) {
+	b, err := NewSingBoxInstance(`{"log":{"disabled":true},"outbounds":[{"type":"direct","tag":"direct"}]}`, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer b.Close()
+	if err = b.Start(); err != nil {
+		t.Fatal(err)
+	}
+	server, err := net.ListenPacket("udp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer server.Close()
+	started := make(chan struct{})
+	go func() { buffer := make([]byte, 2048); _, _, _ = server.ReadFrom(buffer); close(started) }()
+	done := make(chan error, 1)
+	go func() { _, err := b.NetworkProbe("direct", "example.com", server.LocalAddr().String()); done <- err }()
+	select {
+	case <-started:
+	case <-time.After(time.Second):
+		t.Fatal("manual UDP probe did not start")
+	}
+	b.SetProbesPaused(true)
+	select {
+	case err := <-done:
+		if err == nil {
+			t.Fatal("cancelled probe reported success")
+		}
+	case <-time.After(time.Second):
+		t.Fatal("manual probe survived screen lock")
+	}
+	if b.pauseManager.IsDevicePaused() {
+		t.Fatal("screen lock paused the VPN device")
+	}
+	if _, err = b.NetworkProbe("direct", "example.com", server.LocalAddr().String()); err == nil {
+		t.Fatal("manual probe started while locked")
+	}
+	b.SetProbesPaused(false)
+	if b.probesPaused || b.probePowerCtx.Err() != nil {
+		t.Fatal("probe context did not recover after unlock")
+	}
+}
 
 func TestHealthChecksPauseWithoutStoppingTraffic(t *testing.T) {
 	for _, strategy := range []string{"fastest", "priority", "direct-fallback"} {

@@ -119,7 +119,7 @@ func (b *BoxInstance) RuntimeDiagnostics(queryJSON string) (string, error) {
 			}
 		}
 	}
-	report := map[string]any{"groups": groups, "debug_history": b.diagnostics != nil}
+	report := map[string]any{"groups": groups, "debug_history": b.diagnostics != nil, "probes_paused": b.probesPaused}
 	if b.diagnostics != nil {
 		for key, value := range b.diagnostics.page(query) {
 			report[key] = value

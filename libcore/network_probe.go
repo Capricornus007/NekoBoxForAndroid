@@ -33,9 +33,9 @@ func (b *BoxInstance) NetworkProbe(tag, domain, dnsAddress string) (string, erro
 		return "", fmt.Errorf("DNS target must be IP:port")
 	}
 	b.access.Lock()
-	if b.state != 1 {
+	if b.state != 1 || b.probesPaused {
 		b.access.Unlock()
-		return "", fmt.Errorf("core is not running")
+		return "", fmt.Errorf("network checks are paused or the core is not running")
 	}
 	outbound, exists := b.Outbound().Outbound(tag)
 	if !exists {
@@ -54,11 +54,18 @@ func (b *BoxInstance) NetworkProbe(tag, domain, dnsAddress string) (string, erro
 	}
 	// Close cancels the core context and waits for these operations before closing devices.
 	b.probeWG.Add(1)
-	ctx, cancel := context.WithTimeout(b.ctx, 18*time.Second)
+	if b.probePowerCtx == nil {
+		b.probePowerCtx, b.probePowerCancel = context.WithCancel(b.ctx)
+	}
+	parent := b.probePowerCtx
+	ctx, cancel := context.WithTimeout(parent, 18*time.Second)
 	b.access.Unlock()
 	defer b.probeWG.Done()
 	defer cancel()
 	report := runNetworkProbe(ctx, outbound, domain, destination)
+	if ctx.Err() != nil {
+		return "", ctx.Err()
+	}
 	// Resolve selectors at probe time; do not guess MTU from successful HTTP.
 	resolved := outbound
 	for depth := 0; depth < 16; depth++ {
@@ -78,6 +85,9 @@ func (b *BoxInstance) NetworkProbe(tag, domain, dnsAddress string) (string, erro
 		report["mtu"] = prober.ProbeMTU(ctx, destination.Addr())
 	} else {
 		report["mtu"] = map[string]any{"state": "unsupported"}
+	}
+	if ctx.Err() != nil {
+		return "", ctx.Err()
 	}
 	content, err := json.Marshal(report)
 	return string(content), err

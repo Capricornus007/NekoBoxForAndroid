@@ -69,8 +69,11 @@ func ResetAllConnections(system bool) {
 }
 
 type BoxInstance struct {
-	access  sync.Mutex
-	probeWG sync.WaitGroup
+	access           sync.Mutex
+	probeWG          sync.WaitGroup
+	probesPaused     bool
+	probePowerCtx    context.Context
+	probePowerCancel context.CancelFunc
 
 	*box.Box
 	ctx    context.Context
@@ -210,6 +213,15 @@ func (b *BoxInstance) SetProbesPaused(paused bool) {
 	defer b.access.Unlock()
 	if b.state != 1 || b.Box == nil {
 		return
+	}
+	if b.probesPaused != paused {
+		b.probesPaused = paused
+		if b.probePowerCancel != nil {
+			b.probePowerCancel()
+		}
+		if !paused {
+			b.probePowerCtx, b.probePowerCancel = context.WithCancel(b.ctx)
+		}
 	}
 	for _, outbound := range b.Outbound().Outbounds() {
 		if checks, ok := outbound.(*group.URLTest); ok {
