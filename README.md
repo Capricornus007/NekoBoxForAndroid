@@ -2,7 +2,7 @@
 
 **VPN-клиент для Android с гибкой маршрутизацией, автоматическим выбором серверов и поддержкой AmneziaWG.**
 
-[**Скачать APK**](https://github.com/ISAIandCO/NekoBox_SF/releases) · [Что нового в 2.00](https://github.com/ISAIandCO/NekoBox_SF/releases/tag/v2.00) · [Сообщить о проблеме](https://github.com/ISAIandCO/NekoBox_SF/issues)
+[**Скачать APK**](https://github.com/ISAIandCO/NekoBox_SF/releases) · [Сообщить о проблеме](https://github.com/ISAIandCO/NekoBox_SF/issues)
 
 ## Что это
 
