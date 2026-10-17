@@ -6,8 +6,6 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.getByName
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Base64
 import java.util.Properties
 import kotlin.system.exitProcess
@@ -222,14 +220,13 @@ fun Project.setupApp() {
             }
         }
 
-        val buildDateStamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"))
         val abiPattern = Regex("(armeabi-v7a|arm64-v8a|x86_64|x86)")
 
         applicationVariants.all {
             outputs.all {
                 this as BaseVariantOutputImpl
                 val abi = abiPattern.find(outputFileName)?.value ?: "universal"
-                outputFileName = "NB_SF-$buildDateStamp-$abi.apk"
+                outputFileName = "NB_SF-$verName-$abi.apk"
             }
         }
 
