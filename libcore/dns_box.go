@@ -46,7 +46,7 @@ func newPlatformTransport(iif LocalDNSTransport, tag string, options option.Loca
 	}
 }
 
-func (p *platformLocalDNSTransport) Start(stage adapter.StartStage) error {
+func (p *platformLocalDNSTransport) Start(stage adapter.StartStage, scope *adapter.Scope) error {
 	return nil
 }
 
@@ -55,6 +55,9 @@ func (p *platformLocalDNSTransport) Close() error {
 }
 
 func (p *platformLocalDNSTransport) Exchange(ctx context.Context, message *mDNS.Msg) (*mDNS.Msg, error) {
+	if len(message.Question) != 1 {
+		return nil, E.New("expected one DNS question")
+	}
 	if p.raw && rawQueryFunc != nil {
 		// Raw - Android 10 及以上才有
 
@@ -145,6 +148,7 @@ func (c *ExchangeContext) Success(result string) {
 	}), func(it string) netip.Addr {
 		return M.ParseSocksaddrHostPort(it, 0).Unwrap().Addr
 	})
+	c.done()
 }
 
 func (c *ExchangeContext) RawSuccess(result []byte) {
@@ -163,4 +167,9 @@ func (c *ExchangeContext) ErrorCode(code int32) {
 func (c *ExchangeContext) ErrnoCode(code int32) {
 	c.error = syscall.Errno(code)
 	c.done()
+}
+
+func (p *platformLocalDNSTransport) Reset() {}
+func (p *platformLocalDNSTransport) ExchangeAsync(ctx context.Context, message *mDNS.Msg, callback func(*mDNS.Msg, error)) {
+	go func() { response, err := p.Exchange(ctx, message); callback(response, err) }()
 }

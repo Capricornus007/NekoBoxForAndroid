@@ -1,0 +1,35 @@
+diff --git a/congestion_meta2/neko_initial_window.go b/congestion_meta2/neko_initial_window.go
+new file mode 100644
+index 0000000..376d6e7
+--- /dev/null
++++ b/congestion_meta2/neko_initial_window.go
+@@ -0,0 +1,8 @@
++package congestion
++
++import qcongestion "github.com/sagernet/quic-go/congestion"
++
++// NewBbrSenderWithInitialWindow preserves the application's configured packet window.
++func NewBbrSenderWithInitialWindow(mss qcongestion.ByteCount, packets uint32) qcongestion.CongestionControl {
++	return newBbrSender(mss, qcongestion.ByteCount(packets)*mss, qcongestion.MaxCongestionWindowPackets*mss, ProfileStandard)
++}
+diff --git a/congestion_meta2/neko_initial_window_test.go b/congestion_meta2/neko_initial_window_test.go
+new file mode 100644
+index 0000000..f4ff0e8
+--- /dev/null
++++ b/congestion_meta2/neko_initial_window_test.go
+@@ -0,0 +1,15 @@
++package congestion
++
++import (
++	qcongestion "github.com/sagernet/quic-go/congestion"
++	"testing"
++)
++
++func TestConfiguredInitialWindow(t *testing.T) {
++	for _, packets := range []uint32{4, 32, 64, 256} {
++		sender := NewBbrSenderWithInitialWindow(1200, packets)
++		if got := sender.GetCongestionWindow(); got != 1200*qcongestion.ByteCount(packets) {
++			t.Fatalf("window %d: %d", packets, got)
++		}
++	}
++}

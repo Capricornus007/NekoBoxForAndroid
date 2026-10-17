@@ -499,7 +499,7 @@
     <string name="wireguard_local_address">Local Address</string>
     <string name="wireguard_public_key">Peer Public Key</string>
     <string name="wireguard_psk">Peer Pre-Shared Key</string>
-    <string name="amneziawg_category">AmneziaWG 2.0</string>
+    <string name="amneziawg_category">AmneziaWG</string>
     <string name="amneziawg_jc">Jc (junk packets)</string>
     <string name="amneziawg_jmin">Jmin (junk min size)</string>
     <string name="amneziawg_jmax">Jmax (junk max size)</string>
@@ -720,4 +720,15 @@
     <string name="amoled_theme">AMOLED Dark Theme</string>
     <string name="amoled_theme_summary">Pure black background in dark mode</string>
     <string name="app_theme">Accent Color</string>
+    <string name="authenticated_http_proxy_unavailable">Android VPN HTTP proxy does not support the required username and password.</string>
+    <string name="clash_api_token">Clash API token</string>
+    <string name="clash_api_token_summary">Show or copy the dashboard access token</string>
+    <string name="confirm_stop_service">Stop the running proxy?</string>
+    <string name="confirm_clear_cache">Stop the proxy, clear the core cache and restart the app?</string>
+    <string name="downloads_proxy_only">Updates only through proxy</string>
+    <string name="downloads_proxy_only_summary">Subscription and GeoIP/GeoSite updates require the running local SOCKS proxy. Direct fallback is disabled.</string>
+    <string name="backup_encryption_password">Backup password (optional)</string>
+    <string name="backup_encryption_summary">At least 8 characters protects exported, shared and WebDAV backups. Leave empty for an unencrypted backup. The password is not saved.</string>
+    <string name="backup_password_short">Use at least 8 characters for the backup password.</string>
+    <string name="backup_decrypt_failed">Incorrect password or damaged backup. Nothing was restored.</string>
 </resources>

@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
 import android.text.format.Formatter
 import androidx.core.app.NotificationCompat
@@ -192,7 +193,7 @@ class ServiceNotification(
             (service as Service).startForeground(
                 notificationId,
                 notification,
-                FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
+                if (service is ProxyService) FOREGROUND_SERVICE_TYPE_SPECIAL_USE else FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
             )
         } else {
             (service as Service).startForeground(notificationId, notification)

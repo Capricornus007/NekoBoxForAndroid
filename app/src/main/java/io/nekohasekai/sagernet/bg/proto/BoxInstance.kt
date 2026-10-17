@@ -36,6 +36,10 @@ abstract class BoxInstance(
     val externalInstances = hashMapOf<Int, AbstractInstance>()
     open lateinit var processes: GuardedProcessPool
     private var cacheFiles = ArrayList<File>()
+    fun cancelStart() {
+        if (::box.isInitialized) box.cancelStart()
+    }
+
     fun isInitialized(): Boolean {
         return ::config.isInitialized && ::box.isInitialized
     }

@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
-    android:paddingStart="12dp"
+    android:minHeight="64dp"
+    android:paddingVertical="8dp"
+    android:paddingStart="16dp"
     android:paddingEnd="12dp"
     android:focusable="true">
     <ImageView android:id="@android:id/icon"
@@ -18,13 +20,13 @@
                   android:layout_weight="1"
                   android:layout_gravity="center_vertical">
         <TextView android:id="@android:id/text1"
-                  android:textAppearance="?android:attr/textAppearance"
+                  android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:maxLines="2"
                   android:ellipsize="end"/>
         <TextView android:id="@android:id/text2"
-                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:maxLines="2"

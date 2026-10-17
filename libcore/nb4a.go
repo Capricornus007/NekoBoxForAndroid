@@ -63,12 +63,16 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 	neko_log.LogWriterDisable = !logEnable
 	neko_log.TruncateOnStart = isBgProcess
 	neko_log.SetupLog(int(maxLogSizeKb)*1024, filepath.Join(cachePath, "neko.log"))
+	log.SetOutput(redactingLogWriter{neko_log.LogWriter})
 
 	// nekoutils
 	nekoutils.Selector_OnProxySelected = intfNB4A.Selector_OnProxySelected
 
 	// Set up some component
+	ready := make(chan struct{})
+	assetsReady = ready
 	go func() {
+		defer close(ready)
 		defer device.DeferPanicToError("InitCore-go", func(err error) { log.Println(err) })
 		device.GoDebug(process)
 
@@ -78,10 +82,8 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 			updateRootCACerts(pem)
 		}
 
-		// bg
-		if isBgProcess {
-			extractAssets()
-		}
+		// Both processes need assets; file locks serialize first installation.
+		extractAssets()
 	}()
 }
 

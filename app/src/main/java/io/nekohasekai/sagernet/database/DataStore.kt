@@ -82,12 +82,16 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     }
 
     var appTLSVersion by configurationStore.string(Key.APP_TLS_VERSION)
+    var clashApiSecret by configurationStore.string(Key.CLASH_API_SECRET) { Util.generateCryptoSecurePassword(32) }
     var enableClashAPI by configurationStore.boolean(Key.ENABLE_CLASH_API)
     var showBottomBar by configurationStore.boolean(Key.SHOW_BOTTOM_BAR)
     var confirmProfileDelete by configurationStore.boolean(Key.CONFIRM_PROFILE_DELETE) { true }
     var groupLayoutMode by configurationStore.stringToInt(Key.GROUP_LAYOUT_MODE) { 0 }
 
     var allowInsecureOnRequest by configurationStore.boolean(Key.ALLOW_INSECURE_ON_REQUEST)
+    var downloadsProxyOnly by configurationStore.boolean(Key.DOWNLOADS_PROXY_ONLY)
+    var networkProfilesEnabled by configurationStore.boolean("networkProfilesEnabled")
+    var networkProfiles by configurationStore.string("networkProfiles") { "[]" }
     var networkChangeResetConnections by configurationStore.boolean(Key.NETWORK_CHANGE_RESET_CONNECTIONS) { true }
     var restartProfileOnNetworkChange by configurationStore.boolean(
         Key.RESTART_PROFILE_ON_NETWORK_CHANGE
@@ -109,6 +113,12 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     var bypassLan by configurationStore.boolean(Key.BYPASS_LAN)
     var bypassLanInCore by configurationStore.boolean(Key.BYPASS_LAN_IN_CORE)
+    var directFallback by configurationStore.boolean(Key.DIRECT_FALLBACK)
+    var directFallbackUrl by configurationStore.string(Key.DIRECT_FALLBACK_URL) { "https://www.kernel.org" }
+    var directFallbackRequired by configurationStore.stringToInt(Key.DIRECT_FALLBACK_REQUIRED) { 1 }
+    var directFallbackFailures by configurationStore.stringToInt(Key.DIRECT_FALLBACK_FAILURES) { 1 }
+    var directFallbackRecoveries by configurationStore.stringToInt(Key.DIRECT_FALLBACK_RECOVERIES) { 1 }
+    var directFallbackInterval by configurationStore.stringToInt(Key.DIRECT_FALLBACK_INTERVAL) { 30 }
     var concurrentDial by configurationStore.boolean(Key.CONCURRENT_DIAL)
 
     var allowAccess by configurationStore.boolean(Key.ALLOW_ACCESS)
@@ -152,6 +162,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     }
 
     fun initGlobal() {
+        if (configurationStore.getString(Key.CLASH_API_SECRET).isNullOrBlank()) {
+            clashApiSecret = Util.generateCryptoSecurePassword(32)
+        }
         if (configurationStore.getString(Key.MIXED_PORT) == null) {
             mixedPort = mixedPort
         }
@@ -213,6 +226,13 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var fastestSourceGroup by profileCacheStore.stringToLong(Key.FASTEST_SOURCE_GROUP)
     var fastestNameRegex by profileCacheStore.string(Key.FASTEST_NAME_REGEX)
     var fastestIgnoreCase by profileCacheStore.boolean(Key.FASTEST_IGNORE_CASE) { true }
+    var fastestProtocolFilterMode by profileCacheStore.stringToInt(Key.FASTEST_PROTOCOL_FILTER_MODE) { 0 }
+    var fastestHealthCheck by profileCacheStore.boolean(Key.FASTEST_HEALTH_CHECK)
+    var fastestFailureCooldown by profileCacheStore.boolean(Key.FASTEST_FAILURE_COOLDOWN)
+    var fastestHealthUrl by profileCacheStore.string(Key.FASTEST_HEALTH_URL) { "https://www.gstatic.com/generate_204" }
+    var fastestProtocols: Set<String>
+        get() = profileCacheStore.getStringSet(Key.FASTEST_PROTOCOLS).orEmpty()
+        set(value) = profileCacheStore.putStringSet(Key.FASTEST_PROTOCOLS, value.toMutableSet())
     var serverAddress by profileCacheStore.string(Key.SERVER_ADDRESS)
     var serverPort by profileCacheStore.stringToInt(Key.SERVER_PORT)
     var serverPorts by profileCacheStore.string("serverPorts")
@@ -271,6 +291,8 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var routeProtocol by profileCacheStore.string(Key.ROUTE_PROTOCOL)
     var routeRuleset by profileCacheStore.string(Key.ROUTE_RULESET)
     var routeOutbound by profileCacheStore.stringToInt(Key.ROUTE_OUTBOUND)
+    var routeFallbackMode by profileCacheStore.stringToInt("routeFallbackMode")
+    var routeFallbackProfile by profileCacheStore.long("routeFallbackProfile")
     var routeOutboundRule by profileCacheStore.long(Key.ROUTE_OUTBOUND + "Long")
     var routePackages by profileCacheStore.string(Key.ROUTE_PACKAGES)
 
@@ -295,6 +317,8 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var subscriptionUserAgent by profileCacheStore.string(Key.SUBSCRIPTION_USER_AGENT)
     var subscriptionSendHwid by profileCacheStore.boolean(Key.SUBSCRIPTION_SEND_HWID)
     var subscriptionCustomHwidParams by profileCacheStore.string(Key.SUBSCRIPTION_CUSTOM_HWID_PARAMS)
+    var subscriptionServerDns by profileCacheStore.string(Key.SUBSCRIPTION_SERVER_DNS)
+    var subscriptionHeaders by profileCacheStore.string(Key.SUBSCRIPTION_HEADERS)
     var subscriptionAutoUpdate by profileCacheStore.boolean(Key.SUBSCRIPTION_AUTO_UPDATE)
     var subscriptionAutoUpdateDelay by profileCacheStore.stringToInt(Key.SUBSCRIPTION_AUTO_UPDATE_DELAY) { 360 }
     var subscriptionFilterMode by profileCacheStore.stringToInt(Key.SUBSCRIPTION_FILTER_MODE) { 0 }

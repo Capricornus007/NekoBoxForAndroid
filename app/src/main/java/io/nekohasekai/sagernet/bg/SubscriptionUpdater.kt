@@ -3,6 +3,9 @@ package io.nekohasekai.sagernet.bg
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.NetworkType
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy.UPDATE
 import androidx.work.PeriodicWorkRequest
@@ -21,26 +24,27 @@ object SubscriptionUpdater {
     private const val WORK_NAME = "SubscriptionUpdater"
 
     suspend fun reconfigureUpdater() {
-        RemoteWorkManager.getInstance(app).cancelUniqueWork(WORK_NAME)
 
         val subscriptions = SagerDatabase.groupDao.subscriptions()
             .filter { it.subscription!!.autoUpdate }
-        if (subscriptions.isEmpty()) return
+        if (subscriptions.isEmpty()) {
+            RemoteWorkManager.getInstance(app).cancelUniqueWork(WORK_NAME)
+            return
+        }
 
-        // PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS
-        var minDelay =
-            subscriptions.minByOrNull { it.subscription!!.autoUpdateDelay }!!.subscription!!.autoUpdateDelay.toLong()
+        val minDelay = subscriptions.minOf { maxOf(15L, it.subscription!!.autoUpdateDelay.toLong()) }
         val now = System.currentTimeMillis() / 1000L
-        var minInitDelay =
-            subscriptions.minOf { now - it.subscription!!.lastUpdated - (minDelay * 60) }
-        if (minDelay < 15) minDelay = 15
-        if (minInitDelay > 60) minInitDelay = 60
+        val minInitDelay = subscriptions.minOf {
+            subscriptionDelaySeconds(now, it.subscription!!.lastUpdated.toLong(), it.subscription!!.autoUpdateDelay)
+        }
 
         // main process
         RemoteWorkManager.getInstance(app).enqueueUniquePeriodicWork(
             WORK_NAME,
             UPDATE,
             PeriodicWorkRequest.Builder(UpdateTask::class.java, minDelay, TimeUnit.MINUTES)
+                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
                 .apply {
                     if (minInitDelay > 0) setInitialDelay(minInitDelay, TimeUnit.SECONDS)
                 }
@@ -69,10 +73,12 @@ object SubscriptionUpdater {
                 subscriptions = subscriptions.filter { !it.subscription!!.updateWhenConnectedOnly }
             }
 
-            if (subscriptions.isNotEmpty()) for (profile in subscriptions) {
+            var failed = false
+            try {
+            for (profile in subscriptions) {
                 val subscription = profile.subscription!!
 
-                if (((System.currentTimeMillis() / 1000).toInt() - subscription.lastUpdated) < subscription.autoUpdateDelay * 60) {
+                if (subscriptionDelaySeconds(System.currentTimeMillis() / 1000, subscription.lastUpdated.toLong(), subscription.autoUpdateDelay) > 0) {
                     Logs.d("work: not updating " + profile.displayName())
                     continue
                 }
@@ -85,12 +91,18 @@ object SubscriptionUpdater {
                 )
                 nm.notify(2, notification.build())
 
-                GroupUpdater.executeUpdate(profile, false)
+                try {
+                    if (!GroupUpdater.executeUpdate(profile, false)) failed = true
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    throw cancelled
+                } catch (failure: Exception) {
+                    Logs.w(failure)
+                    failed = true
+                }
             }
 
-            nm.cancel(2)
-
-            return Result.success()
+            } finally { nm.cancel(2) }
+            return if (failed && runAttemptCount < 3) Result.retry() else if (failed) Result.failure() else Result.success()
         }
     }
 

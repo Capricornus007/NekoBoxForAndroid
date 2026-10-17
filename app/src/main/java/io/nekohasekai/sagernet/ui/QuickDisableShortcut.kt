@@ -35,7 +35,10 @@ class QuickDisableShortcut : Activity(), SagerConnection.Callback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        connection.connect(this, this)
+        android.app.AlertDialog.Builder(this).setMessage(io.nekohasekai.sagernet.R.string.confirm_stop_service)
+            .setPositiveButton(android.R.string.ok) { _, _ -> connection.connect(this, this) }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> finish() }
+            .setOnCancelListener { finish() }.show()
         if (Build.VERSION.SDK_INT >= 25) {
             getSystemService<ShortcutManager>()!!.reportShortcutUsed("disable")
         }

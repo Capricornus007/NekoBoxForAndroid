@@ -16,12 +16,13 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 7,
+    version = 8,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
         AutoMigration(from = 5, to = 6),
-        AutoMigration(from = 6, to = 7)
+        AutoMigration(from = 6, to = 7),
+        AutoMigration(from = 7, to = 8)
     ]
 )
 @TypeConverters(value = [KryoConverters::class, GsonConverters::class])
@@ -34,11 +35,11 @@ abstract class SagerDatabase : RoomDatabase() {
         val instance by lazy {
             SagerNet.application.getDatabasePath(Key.DB_PROFILE).parentFile?.mkdirs()
             Room.databaseBuilder(SagerNet.application, SagerDatabase::class.java, Key.DB_PROFILE)
+                .addCallback(InitialConfiguration.routesCallback)
 //                .addMigrations(*SagerDatabase_Migrations.build())
                 .setJournalMode(JournalMode.TRUNCATE)
                 .allowMainThreadQueries()
                 .enableMultiInstanceInvalidation()
-                .fallbackToDestructiveMigration()
                 .setQueryExecutor { GlobalScope.launch { it.run() } }
                 .build()
         }

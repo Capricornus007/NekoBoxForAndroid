@@ -4455,6 +4455,10 @@ public class SingBoxOptions {
     }
 
     public static class Outbound_URLTestOptions extends Outbound {
+        public Boolean health_check;
+        public String health_dns_server;
+        public String health_url;
+        public Boolean failure_cooldown;
 
         public List<String> outbounds;
 
@@ -4474,6 +4478,13 @@ public class SingBoxOptions {
 
         public Boolean wait_for_initial;
 
+    }
+
+    public static class Rule_LogicalOptions extends Rule {
+        public String mode;
+        public List<Rule> rules;
+        public Boolean invert;
+        public String action;
     }
 
     public static class Rule_DefaultOptions extends Rule {

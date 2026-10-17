@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.ui
 
+import androidx.room.withTransaction
 import android.content.Intent
 import android.os.Bundle
 import android.text.format.Formatter
@@ -361,6 +362,29 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
                     startFilesForResult(exportProfiles, "profiles_${proxyGroup.displayName()}.txt")
                 }
 
+                R.id.action_undo_subscription -> {
+                    runOnDefaultDispatcher {
+                        // Share the updater reservation until the snapshot is consumed after commit.
+                        if (!GroupUpdater.updating.add(proxyGroup.id)) return@runOnDefaultDispatcher
+                        try {
+                            GroupManager.postReload(proxyGroup.id)
+                            val revision = SubscriptionHistory.revision(SagerDatabase.proxyDao.getByGroup(proxyGroup.id))
+                            if (GroupManager.userInterface?.confirm(getString(R.string.subscription_undo_confirm)) != true) return@runOnDefaultDispatcher
+                            SagerDatabase.instance.withTransaction { SubscriptionHistory.restore(proxyGroup.id, revision) }
+                            SubscriptionHistory.delete(proxyGroup.id)
+                            GroupManager.postUpdate(proxyGroup.id)
+                            if (DataStore.serviceState.started) SagerNet.reloadService(true)
+                        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                            throw cancelled
+                        } catch (e: Exception) {
+                            onMainDispatcher { activity.snackbar(redactDiagnostic(e.readableMessage)).show() }
+                        } finally {
+                            GroupUpdater.updating.remove(proxyGroup.id)
+                            GroupManager.postReload(proxyGroup.id)
+                        }
+                    }
+                }
+
                 R.id.action_clear -> {
                     MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.confirm)
                         .setMessage(R.string.clear_profiles_message)
@@ -405,6 +429,10 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
 
                 if (proxyGroup.type != GroupType.SUBSCRIPTION) {
                     popup.menu.removeItem(R.id.action_share_subscription)
+                }
+                popup.menu.findItem(R.id.action_undo_subscription).apply {
+                    isVisible = proxyGroup.type == GroupType.SUBSCRIPTION
+                    isEnabled = SubscriptionHistory.available(proxyGroup.id) && proxyGroup.id !in GroupUpdater.updating
                 }
                 popup.setOnMenuItemClickListener(this)
                 popup.show()

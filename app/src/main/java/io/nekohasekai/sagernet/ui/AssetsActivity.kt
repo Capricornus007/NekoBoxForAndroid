@@ -21,7 +21,6 @@ import libcore.Libcore
 import moe.matsuri.nb4a.utils.Util
 import org.json.JSONObject
 import java.io.File
-import java.io.FileWriter
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -47,6 +46,10 @@ class AssetsActivity : ThemedActivity() {
 
         binding.recyclerView.layoutManager = FixedLinearLayoutManager(binding.recyclerView)
         adapter = AssetAdapter()
+        runOnDefaultDispatcher {
+            Libcore.waitForAssets()
+            onMainDispatcher { adapter.reloadAssets() }
+        }
         binding.recyclerView.adapter = adapter
 
         binding.refreshLayout.setOnRefreshListener {
@@ -111,21 +114,25 @@ class AssetsActivity : ThemedActivity() {
             val filesDir = getExternalFilesDir(null) ?: filesDir
 
             runOnDefaultDispatcher {
-                val outFile = File(filesDir, fileName).apply {
-                    parentFile?.mkdirs()
+                try {
+                    Libcore.waitForAssets()
+                    require(File(fileName).name == fileName) { "Invalid asset name" }
+                    val outFile = File(filesDir, fileName)
+                    val staged = File.createTempFile(".import-", ".db", filesDir)
+                    try {
+                        contentResolver.openInputStream(file)?.use { input ->
+                            staged.outputStream().use { output -> input.copyToLimited(output, 512L * 1024 * 1024) }
+                        } ?: error("Cannot read asset")
+                        if (fileName in assetNames) {
+                            Libcore.installRouteAssetVersion(staged.absolutePath, outFile.absolutePath, "Custom")
+                        } else {
+                            check(staged.renameTo(outFile)) { "Cannot install asset" }
+                        }
+                    } finally { staged.delete() }
+                    onMainDispatcher { adapter.reloadAssets() }
+                } catch (error: Exception) {
+                    onMainDispatcher { alert(error.readableMessage).tryToShow() }
                 }
-
-                contentResolver.openInputStream(file)?.use(outFile.outputStream())
-
-                File(outFile.parentFile, outFile.nameWithoutExtension + ".version.txt").apply {
-                    if (isFile) delete()
-                    createNewFile()
-                    val fw = FileWriter(this)
-                    fw.write("Custom")
-                    fw.close()
-                }
-
-                adapter.reloadAssets()
             }
 
         }
@@ -276,13 +283,18 @@ class AssetsActivity : ThemedActivity() {
         if (DataStore.rulesProvider == 4){
             return updateCustomAsset(file, versionFile)
         }
+        Libcore.waitForAssets()
         val fileName = file.name
         val repo = rulesProviders[DataStore.rulesProvider].repoByFileName[fileName]
 
         val client = Libcore.newHttpClient().apply {
             modernTLS()
             keepAlive()
-            trySocks5(DataStore.mixedPort)
+            if (DataStore.downloadsProxyOnly) {
+                requireSocks5(DataStore.socksPort, DataStore.mixedUsername, DataStore.mixedPassword)
+            } else {
+                trySocks5(DataStore.socksPort, DataStore.mixedUsername, DataStore.mixedPassword)
+            }
         }
 
         try {
@@ -309,19 +321,11 @@ class AssetsActivity : ThemedActivity() {
                 setURL(browserDownloadUrl)
             }.execute()
 
-            val cacheFile = File(file.parentFile, fileName + ".tmp")
-            cacheFile.parentFile?.mkdirs()
-
-            response.writeTo(cacheFile.canonicalPath)
-
-            if (fileName.endsWith(".xz")) {
-                Libcore.unxz(cacheFile.absolutePath, file.absolutePath)
-                cacheFile.delete()
-            } else {
-                cacheFile.renameTo(file)
-            }
-
-            versionFile.writeText(tagName)
+            val cacheFile = File.createTempFile(".download-", ".db", file.parentFile)
+            try {
+                response.writeTo(cacheFile.canonicalPath)
+                Libcore.installRouteAssetVersion(cacheFile.absolutePath, file.absolutePath, tagName)
+            } finally { cacheFile.delete() }
 
             adapter.reloadAssets()
 
@@ -334,6 +338,7 @@ class AssetsActivity : ThemedActivity() {
     }
 
     suspend fun updateCustomAsset(file: File, versionFile: File) {
+        Libcore.waitForAssets()
         val fileName = file.name
         val url: String = if (fileName == "geoip.db") {
             DataStore.rulesGeoipUrl
@@ -345,19 +350,21 @@ class AssetsActivity : ThemedActivity() {
         val client = Libcore.newHttpClient().apply {
             modernTLS()
             keepAlive()
-            trySocks5(DataStore.mixedPort)
+            if (DataStore.downloadsProxyOnly) {
+                requireSocks5(DataStore.socksPort, DataStore.mixedUsername, DataStore.mixedPassword)
+            } else {
+                trySocks5(DataStore.socksPort, DataStore.mixedUsername, DataStore.mixedPassword)
+            }
         }
         try {
             val response = client.newRequest().apply {
                 setURL(url)
             }.execute()
-            val cacheFile = File(file.parentFile, fileName + ".tmp")
-            cacheFile.parentFile?.mkdirs()
-            response.writeTo(cacheFile.canonicalPath)
-            cacheFile.renameTo(file)
-
-            val currentDate = java.text.SimpleDateFormat("yyyyMMdd").format(java.util.Date())
-            versionFile.writeText(currentDate)
+            val cacheFile = File.createTempFile(".download-", ".db", file.parentFile)
+            try {
+                response.writeTo(cacheFile.canonicalPath)
+                Libcore.installRouteAssetVersion(cacheFile.absolutePath, file.absolutePath, "Custom")
+            } finally { cacheFile.delete() }
 
             adapter.reloadAssets()
             onMainDispatcher {
@@ -365,9 +372,6 @@ class AssetsActivity : ThemedActivity() {
             }
         } finally {
             client.close()
-            // if (versionFile.isFile) {
-            //     versionFile.delete()
-            // }
         }
     }
 

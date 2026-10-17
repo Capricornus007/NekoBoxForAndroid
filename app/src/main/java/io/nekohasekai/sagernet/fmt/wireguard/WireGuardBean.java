@@ -18,6 +18,19 @@ public class WireGuardBean extends AbstractBean {
     public String peerPreSharedKey;
     public Integer mtu;
     public String reserved;
+    public String dnsServers;
+    public String allowedIPs;
+    public String persistentKeepalive;
+    public Boolean useConfigRoutes;
+    public String headerProtectionKey;
+    public String contentPaddingAddition;
+    public String rekeyAfterTime;
+    public String rekeyTimeout;
+    public String rejectAfterTime;
+    public String keepaliveTimeout;
+    public String maxHandshakeAttempts;
+    public Boolean randomTrailers;
+    public Boolean disableCookies;
     public Integer jc;
     public Integer jmin;
     public Integer jmax;
@@ -44,6 +57,19 @@ public class WireGuardBean extends AbstractBean {
         if (peerPreSharedKey == null) peerPreSharedKey = "";
         if (mtu == null) mtu = 1420;
         if (reserved == null) reserved = "";
+        if (dnsServers == null) dnsServers = "";
+        if (allowedIPs == null) allowedIPs = "";
+        if (persistentKeepalive == null) persistentKeepalive = "0";
+        if (useConfigRoutes == null) useConfigRoutes = false;
+        if (headerProtectionKey == null) headerProtectionKey = "";
+        if (contentPaddingAddition == null) contentPaddingAddition = "";
+        if (rekeyAfterTime == null) rekeyAfterTime = "";
+        if (rekeyTimeout == null) rekeyTimeout = "";
+        if (rejectAfterTime == null) rejectAfterTime = "";
+        if (keepaliveTimeout == null) keepaliveTimeout = "";
+        if (maxHandshakeAttempts == null) maxHandshakeAttempts = "";
+        if (randomTrailers == null) randomTrailers = false;
+        if (disableCookies == null) disableCookies = false;
         if (jc == null) jc = 0;
         if (jmin == null) jmin = 0;
         if (jmax == null) jmax = 0;
@@ -64,7 +90,7 @@ public class WireGuardBean extends AbstractBean {
 
     @Override
     public void serialize(ByteBufferOutput output) {
-        output.writeInt(3);
+        output.writeInt(5);
         super.serialize(output);
         output.writeString(localAddress);
         output.writeString(privateKey);
@@ -88,6 +114,20 @@ public class WireGuardBean extends AbstractBean {
         output.writeString(i3);
         output.writeString(i4);
         output.writeString(i5);
+        output.writeString(dnsServers);
+        output.writeString(allowedIPs);
+        output.writeString(persistentKeepalive);
+        output.writeBoolean(useConfigRoutes);
+        output.writeString(headerProtectionKey);
+        output.writeString(contentPaddingAddition);
+        output.writeString(rekeyAfterTime);
+        output.writeString(rekeyTimeout);
+        output.writeString(rejectAfterTime);
+        output.writeString(keepaliveTimeout);
+        output.writeString(maxHandshakeAttempts);
+        output.writeBoolean(randomTrailers);
+        output.writeBoolean(disableCookies);
+
     }
 
     @Override
@@ -120,16 +160,46 @@ public class WireGuardBean extends AbstractBean {
             i4 = input.readString();
             i5 = input.readString();
         }
+        if (version >= 4) {
+            dnsServers = input.readString();
+            allowedIPs = input.readString();
+            persistentKeepalive = version >= 5 ? input.readString() : Integer.toString(input.readInt());
+            useConfigRoutes = input.readBoolean();
+        }
+        if (version >= 5) {
+            headerProtectionKey = input.readString();
+            contentPaddingAddition = input.readString();
+            rekeyAfterTime = input.readString();
+            rekeyTimeout = input.readString();
+            rejectAfterTime = input.readString();
+            keepaliveTimeout = input.readString();
+            maxHandshakeAttempts = input.readString();
+            randomTrailers = input.readBoolean();
+            disableCookies = input.readBoolean();
+        }
         initializeDefaultValues();
     }
 
     public boolean isAmneziaWG() {
-        return intOrZero(jc) != 0 || intOrZero(jmin) != 0 || intOrZero(jmax) != 0 ||
+        return hasAmneziaV3Options() || intOrZero(jc) != 0 || intOrZero(jmin) != 0 || intOrZero(jmax) != 0 ||
                 intOrZero(s1) != 0 || intOrZero(s2) != 0 || intOrZero(s3) != 0 || intOrZero(s4) != 0 ||
                 strOrEmpty(h1).length() > 0 || strOrEmpty(h2).length() > 0 ||
                 strOrEmpty(h3).length() > 0 || strOrEmpty(h4).length() > 0 ||
                 strOrEmpty(i1).length() > 0 || strOrEmpty(i2).length() > 0 ||
                 strOrEmpty(i3).length() > 0 || strOrEmpty(i4).length() > 0 || strOrEmpty(i5).length() > 0;
+    }
+
+    public boolean hasAmneziaV3Options() {
+        return !strOrEmpty(headerProtectionKey).isEmpty() ||
+                !strOrEmpty(contentPaddingAddition).isEmpty() ||
+                !strOrEmpty(rekeyAfterTime).isEmpty() ||
+                !strOrEmpty(rekeyTimeout).isEmpty() ||
+                !strOrEmpty(rejectAfterTime).isEmpty() ||
+                !strOrEmpty(keepaliveTimeout).isEmpty() ||
+                !strOrEmpty(maxHandshakeAttempts).isEmpty() ||
+                Boolean.TRUE.equals(randomTrailers) ||
+                Boolean.TRUE.equals(disableCookies) ||
+                strOrEmpty(persistentKeepalive).contains("-");
     }
 
     private static int intOrZero(Integer v) {

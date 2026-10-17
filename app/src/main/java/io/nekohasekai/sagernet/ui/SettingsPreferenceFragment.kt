@@ -10,22 +10,39 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.preference.*
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.InitialConfiguration
+import io.nekohasekai.sagernet.database.NetworkSettingsHistory
+import io.nekohasekai.sagernet.database.preference.PublicDatabase
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.requestPinClearCacheShortcut
 import io.nekohasekai.sagernet.utils.Theme
 import moe.matsuri.nb4a.ui.*
+import io.nekohasekai.sagernet.fmt.directFallbackConfig
 import java.io.File
 
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private lateinit var isProxyApps: SwitchPreferenceCompat
     private lateinit var globalCustomConfig: EditConfigPreference
+    private var checkpointTaken = false
+    private var shownGlobalConfig: String? = null
+
+    private fun checkpoint() {
+        if (!checkpointTaken) {
+            checkpointTaken = NetworkSettingsHistory.capture()
+            findPreference<Preference>("restoreNetworkSettings")?.isEnabled = NetworkSettingsHistory.available()
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -33,6 +50,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private val reloadListener = Preference.OnPreferenceChangeListener { _, _ ->
+        checkpoint()
         needReload()
         true
     }
@@ -41,6 +59,31 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = DataStore.configurationStore
         DataStore.initGlobal()
         addPreferencesFromResource(R.xml.global_preferences)
+        findPreference<Preference>("networkProfilesScreen")!!.setOnPreferenceClickListener {
+            startActivity(android.content.Intent(requireContext(), NetworkProfilesActivity::class.java)); true
+        }
+        findPreference<Preference>("restoreNetworkSettings")!!.apply {
+            isEnabled = NetworkSettingsHistory.available()
+            setOnPreferenceClickListener {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.restore_network_settings)
+                    .setMessage(R.string.restore_network_settings_confirm)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            try {
+                                withContext(Dispatchers.IO) { NetworkSettingsHistory.restore() }
+                                if (DataStore.serviceState.started) SagerNet.reloadService(force = true)
+                                activity?.recreate()
+                            } catch (e: Exception) {
+                                Logs.d("Network settings restore failed", e)
+                                context?.let { Toast.makeText(it, R.string.restore_network_settings_failed, Toast.LENGTH_LONG).show() }
+                            }
+                        }
+                    }.show()
+                true
+            }
+        }
 
         val dynamicColors = findPreference<SwitchPreferenceCompat>(Key.DYNAMIC_COLORS)!!
         dynamicColors.isEnabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
@@ -133,12 +176,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             newValue
         }
 
-        val profileTrafficStatistics =
-            findPreference<SwitchPreferenceCompat>(Key.PROFILE_TRAFFIC_STATISTICS)!!
         val speedInterval = findPreference<SimpleMenuPreference>(Key.SPEED_INTERVAL)!!
-        profileTrafficStatistics.isEnabled = speedInterval.value.toString() != "0"
-        speedInterval.setOnPreferenceChangeListener { _, newValue ->
-            profileTrafficStatistics.isEnabled = newValue.toString() != "0"
+        speedInterval.setOnPreferenceChangeListener { _, _ ->
             needReload()
             true
         }
@@ -152,6 +191,14 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val resolveDestination = findPreference<SwitchPreferenceCompat>(Key.RESOLVE_DESTINATION)!!
         val acquireWakeLock = findPreference<SwitchPreferenceCompat>(Key.ACQUIRE_WAKE_LOCK)!!
         val hideFromRecentApps = findPreference<SwitchPreferenceCompat>(Key.HIDE_FROM_RECENT_APPS)!!
+        findPreference<Preference>(Key.CLASH_API_SECRET)!!.setOnPreferenceClickListener {
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.clash_api_token).setMessage(DataStore.clashApiSecret)
+                .setPositiveButton(android.R.string.copy) { _, _ ->
+                    SagerNet.trySetPrimaryClip(DataStore.clashApiSecret, sensitive = true)
+                }.setNegativeButton(android.R.string.cancel, null).show()
+            true
+        }
         val enableClashAPI = findPreference<SwitchPreferenceCompat>(Key.ENABLE_CLASH_API)!!
         enableClashAPI.setOnPreferenceChangeListener { _, newValue ->
             (activity as MainActivity?)?.refreshNavMenu(newValue as Boolean)
@@ -175,12 +222,46 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         httpPort.onPreferenceChangeListener = reloadListener
         mixedUsername.onPreferenceChangeListener = reloadListener
         mixedPassword.onPreferenceChangeListener = reloadListener
-        appendHttpProxy.onPreferenceChangeListener = reloadListener
+        appendHttpProxy.isEnabled = false
+        appendHttpProxy.summary = getString(R.string.authenticated_http_proxy_unavailable)
         strictRoute.onPreferenceChangeListener = reloadListener
         showDirectSpeed.onPreferenceChangeListener = reloadListener
         trafficSniffing.onPreferenceChangeListener = reloadListener
         bypassLan.onPreferenceChangeListener = reloadListener
         bypassLanInCore.onPreferenceChangeListener = reloadListener
+        findPreference<SwitchPreferenceCompat>(Key.DIRECT_FALLBACK)!!.onPreferenceChangeListener = reloadListener
+        findPreference<EditTextPreference>(Key.DIRECT_FALLBACK_URL)!!.setOnPreferenceChangeListener { preference, value ->
+            try {
+                directFallbackConfig("proxy", value.toString(), DataStore.directFallbackInterval, DataStore.directFallbackRequired, DataStore.directFallbackFailures, DataStore.directFallbackRecoveries)
+                reloadListener.onPreferenceChange(preference, value)
+            } catch (_: IllegalArgumentException) {
+                Toast.makeText(requireContext(), R.string.direct_fallback_invalid_url, Toast.LENGTH_LONG).show()
+                false
+            }
+        }
+        findPreference<EditTextPreference>(Key.DIRECT_FALLBACK_INTERVAL)!!.apply {
+            setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+            setOnPreferenceChangeListener { preference, value ->
+                val seconds = value.toString().toIntOrNull()
+                if (seconds != null && seconds in 5..3600) {
+                    reloadListener.onPreferenceChange(preference, value)
+                } else {
+                    Toast.makeText(requireContext(), R.string.direct_fallback_invalid_interval, Toast.LENGTH_LONG).show()
+                    false
+                }
+            }
+        }
+        for (key in listOf(Key.DIRECT_FALLBACK_REQUIRED, Key.DIRECT_FALLBACK_FAILURES, Key.DIRECT_FALLBACK_RECOVERIES)) {
+            findPreference<EditTextPreference>(key)!!.apply {
+                setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
+                setOnPreferenceChangeListener { preference, value ->
+                    val count = value.toString().toIntOrNull()
+                    val maximum = if (key == Key.DIRECT_FALLBACK_REQUIRED) DataStore.directFallbackUrl.lineSequence().map(String::trim).filter(String::isNotBlank).distinct().count().coerceAtMost(8) else 10
+                    if (count != null && count in 1..maximum) reloadListener.onPreferenceChange(preference, value)
+                    else { Toast.makeText(requireContext(), getString(R.string.direct_fallback_invalid_count, maximum), Toast.LENGTH_LONG).show(); false }
+                }
+            }
+        }
         mtu.onPreferenceChangeListener = reloadListener
 
         val concurrentDial = findPreference<SwitchPreferenceCompat>(Key.CONCURRENT_DIAL)!!
@@ -211,7 +292,11 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setMessage(R.string.reset_settings_message)
                 setNegativeButton(R.string.no, null)
                 setPositiveButton(R.string.yes) { _, _ ->
-                    DataStore.configurationStore.reset()
+                    checkpoint()
+                    PublicDatabase.instance.runInTransaction {
+                        DataStore.configurationStore.reset()
+                        PublicDatabase.kvPairDao.insert(InitialConfiguration.settings())
+                    }
                     triggerFullRestart(requireContext())
                 }
             }.show()
@@ -256,6 +341,9 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             isProxyApps.isChecked = DataStore.proxyApps
         }
         if (::globalCustomConfig.isInitialized) {
+            val current = DataStore.configurationStore.getString(Key.GLOBAL_CUSTOM_CONFIG).orEmpty()
+            if (shownGlobalConfig != null && shownGlobalConfig != current) needReload()
+            shownGlobalConfig = current
             globalCustomConfig.notifyChanged()
         }
     }

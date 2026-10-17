@@ -10,4 +10,7 @@ interface ISagerNetService {
   oneway void unregisterCallback(in ISagerNetServiceCallback cb);
 
   int urlTest();
+  String getRuntimeDiagnostics(String historyQuery);
+  String configuredProbe(long expectedProfileId, String tag, String dnsTag, String httpsUrl);
+  String networkProbe(long expectedProfileId, boolean direct, String domain, String dnsTarget);
 }

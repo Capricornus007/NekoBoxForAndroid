@@ -2,7 +2,6 @@ package libcore
 
 import (
 	"fmt"
-	"net"
 	"path/filepath"
 	"strings"
 
@@ -24,31 +23,27 @@ func (g *geoip) Open(path string) error {
 
 func (g *geoip) Rules(countryCode string) ([]option.HeadlessRule, error) {
 	networks := g.geoipReader.Networks(maxminddb.SkipAliasedNetworks)
-	countryMap := make(map[string][]*net.IPNet)
-	var (
-		ipNet           *net.IPNet
-		nextCountryCode string
-		err             error
-	)
+	var cidrs []string
+	countryCode = strings.ToLower(countryCode)
 	for networks.Next() {
-		ipNet, err = networks.Network(&nextCountryCode)
+		var nextCountryCode string
+		ipNet, err := networks.Network(&nextCountryCode)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get network: %w", err)
 		}
-		countryMap[nextCountryCode] = append(countryMap[nextCountryCode], ipNet)
+		if nextCountryCode == countryCode {
+			cidrs = append(cidrs, ipNet.String())
+		}
 	}
-
-	ipNets := countryMap[strings.ToLower(countryCode)]
-
-	if len(ipNets) == 0 {
+	if err := networks.Err(); err != nil {
+		return nil, err
+	}
+	if len(cidrs) == 0 {
 		return nil, fmt.Errorf("no networks found for country code: %s", countryCode)
 	}
 
 	var headlessRule option.DefaultHeadlessRule
-	headlessRule.IPCIDR = make([]string, 0, len(ipNets))
-	for _, cidr := range ipNets {
-		headlessRule.IPCIDR = append(headlessRule.IPCIDR, cidr.String())
-	}
+	headlessRule.IPCIDR = cidrs
 
 	return []option.HeadlessRule{
 		{
@@ -58,13 +53,15 @@ func (g *geoip) Rules(countryCode string) ([]option.HeadlessRule, error) {
 	}, nil
 }
 
-func init() {
-	nekoutils.GetGeoIPHeadlessRules = func(name string) ([]option.HeadlessRule, error) {
-		g := new(geoip)
-		if err := g.Open(filepath.Join(externalAssetsPath, "geoip.db")); err != nil {
-			return nil, err
-		}
-		defer g.geoipReader.Close()
-		return g.Rules(name)
+func loadGeoIPRules(name string) ([]option.HeadlessRule, error) {
+	g := new(geoip)
+	if err := g.Open(filepath.Join(externalAssetsPath, "geoip.db")); err != nil {
+		return nil, err
 	}
+	defer g.geoipReader.Close()
+	return g.Rules(name)
+}
+
+func init() {
+	nekoutils.GetGeoIPHeadlessRules = loadGeoIPRules
 }

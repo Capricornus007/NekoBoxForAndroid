@@ -1,0 +1,77 @@
+<resources>
+  <string name="menu_diagnostics">Diagnostics</string>
+  <string name="diagnostics_select_profile">Select a profile on the Configuration screen first.</string>
+  <string name="subscription_preview">Preview: +%1$d · changed %2$d · removed %3$d</string>
+  <string name="subscription_preview_hint">Apply these changes? The previous profiles will remain available for undo. Values of credentials are hidden. Up to 100 changes are listed.</string>
+  <string name="subscription_undo">Previous subscription version</string>
+  <string name="subscription_undo_confirm">Restore profiles from before the last subscription update? Current profile edits in this group will be replaced. Traffic counters are preserved.</string>
+  <string name="subscription_undo_referenced">A newly added profile is in use. Before undoing, switch the VPN to another profile and remove references to this node from settings.</string>
+  <string name="subscription_field_name">name</string>
+  <string name="subscription_field_address">server address/port</string>
+  <string name="subscription_field_dns">DNS</string>
+  <string name="subscription_field_allowed_ips">AllowedIPs</string>
+  <string name="subscription_field_tls">TLS</string>
+  <string name="subscription_field_credentials">credentials (hidden)</string>
+  <string name="subscription_field_protocol">protocol</string>
+  <string name="subscription_field_parameters">protocol parameters</string>
+  <string name="diagnostics_overview">Configuration</string>
+  <string name="diagnostics_loading">Checking…</string>
+  <string name="diagnostics_live_state">Live connection state</string>
+  <string name="diagnostics_active_tests">Network checks</string>
+  <string name="diagnostics_probe_hint">Checks run only on request. They create connections to the specified destination through direct and proxy paths.</string>
+  <string name="diagnostics_filter_app">Application package or UID</string>
+  <string name="diagnostics_filter_domain">Domain or destination</string>
+  <string name="diagnostics_filter_node">Outbound or node</string>
+  <string name="diagnostics_no_matching_events">No matching events in the latest 128 entries.</string>
+  <string name="diagnostics_fallback_rounds">Failed rounds: %1$d/%2$d · recovery: %3$d/%4$d</string>
+  <string name="diagnostics_reachable">reachable</string>
+  <string name="diagnostics_unreachable">unreachable</string>
+  <string name="diagnostics_not_checked">not checked in this round</string>
+  <string name="route_fallback_mode">Direct-route fallback</string>
+  <string name="route_fallback_hint">Uses the control sites and thresholds from global fallback settings. Local addresses stay direct. A custom JSON route can override this policy.</string>
+  <string name="route_fallback_profile">Backup profile</string>
+  <string name="route_fallback_missing">Select an existing profile</string>
+  <string name="network_profiles">Network profiles</string>
+  <string name="network_profiles_enable">Select profile and DNS by network</string>
+  <string name="network_profiles_summary">Applies on VPN start and network changes. Specific Wi-Fi SSIDs take precedence over generic Wi-Fi. Blank DNS fields inherit global settings. Without SSID access, generic Wi-Fi is used. Full custom configurations retain their own DNS.</string>
+  <string name="network_profiles_ssid_permission">Allow SSID access (optional)</string>
+  <string name="network_profiles_mobile">Mobile network</string>
+  <string name="network_profiles_add">Add network profile</string>
+  <string name="network_profiles_edit">Configure network profile</string>
+  <string name="network_profiles_ssid">SSID (blank = any Wi-Fi)</string>
+  <string name="network_profiles_remote_dns">Proxy DNS (blank = inherit)</string>
+  <string name="network_profiles_direct_dns">Direct DNS (blank = inherit)</string>
+  <string name="network_profiles_invalid">Invalid DNS, profile or duplicate network condition.</string>
+  <string-array name="route_fallback_entries">
+    <item>Inherit global setting</item>
+    <item>Always direct</item>
+    <item>Direct → current proxy</item>
+    <item>Direct → backup profile</item>
+  </string-array>
+  <string-array name="route_fallback_values">
+    <item>0</item>
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+  </string-array>
+  <string name="diagnostics_probe_domain">Domain for DNS and TLS checks</string>
+  <string name="diagnostics_probe_dns">UDP DNS target (IP:port)</string>
+  <string name="diagnostics_run_checks">Check direct and proxy paths</string>
+  <string name="diagnostics_not_active">Start this profile to inspect its active connections.</string>
+  <string name="diagnostics_mtu_verified">verified inner packet: %1$d B · configured: %2$d B</string>
+  <string name="diagnostics_mtu_unsupported">ICMP size check is unavailable for this outbound</string>
+  <string name="diagnostics_mtu_busy">another check is running</string>
+  <string name="diagnostics_mtu_unknown">could not determine (no echo reply)</string>
+  <string name="diagnostics_mtu_no_reply">no reply</string>
+  <string name="diagnostics_probe_result_hint">DNS here tests UDP to the specified resolver, not your configured DoH/DoT. TCP dial may open an early proxy connection; verified TLS confirms the destination. MTU shows the largest tested inner packet, not the outer UDP path MTU. Apply any MTU changes manually in the profile; no values are changed automatically.</string>
+  <string name="network_profiles_edit_profile">Profile settings</string>
+  <string name="subscription_preview_title">Subscription update preview</string>
+  <string name="network_profiles_background_reason">For automatic SSID matching while the VPN runs in the background, open Permissions → Location and select “%1$s”. The app reads only the connected Wi-Fi name, not GPS coordinates. This is optional: generic Wi-Fi/mobile profiles work without location access.</string>
+  <string name="network_profiles_ssid_hint">On Android 10+, SSID matching requires precise location access allowed all the time; system Location must also be enabled. Otherwise generic Wi-Fi is used, including while the app is visible.</string>
+  <string name="network_profiles_ssid_ready">SSID permission is available. Keep system Location enabled for SSID matching.</string>
+  <string name="network_profiles_always">Allow all the time</string>
+  <string name="diagnostics_history_window">Last 10 minutes · matches: %1$d · on page: %2$d</string>
+  <string name="diagnostics_history_older">Older events</string>
+  <string name="diagnostics_history_latest">Latest events</string>
+  <string name="diagnostics_history_truncated">The journal safety limit was reached: some of the oldest events were removed.</string>
+</resources>

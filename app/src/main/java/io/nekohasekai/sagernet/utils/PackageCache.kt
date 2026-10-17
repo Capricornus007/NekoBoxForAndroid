@@ -5,6 +5,9 @@ import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import io.nekohasekai.sagernet.Key
+import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.listenForPackageChanges
 import kotlinx.coroutines.runBlocking
@@ -19,7 +22,8 @@ object PackageCache {
     lateinit var installedPluginPackages: Map<String, PackageInfo>
     lateinit var installedApps: Map<String, ApplicationInfo>
     lateinit var packageMap: Map<String, Int>
-    val uidMap = HashMap<Int, HashSet<String>>()
+    @Volatile var uidMap: Map<Int, Set<String>> = emptyMap()
+        private set
     val loaded = Mutex(true)
     var registerd = AtomicBoolean(false)
 
@@ -28,8 +32,16 @@ object PackageCache {
         if (registerd.getAndSet(true)) return
         reload()
         app.listenForPackageChanges(false) {
+            val previous = packageMap
             reload()
             labelMap.clear()
+            if (previous != packageMap && DataStore.proxyApps && DataStore.serviceMode == Key.MODE_VPN) {
+                runOnMainDispatcher {
+                    DataStore.baseService?.apply {
+                        scheduleNetworkProfileRestart("installed-apps", "UIDs-updated")
+                    }
+                }
+            }
         }
         loaded.unlock()
     }
@@ -57,11 +69,7 @@ object PackageCache {
         val installed = app.packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
         installedApps = installed.associateBy { it.packageName }
         packageMap = installed.associate { it.packageName to it.uid }
-        uidMap.clear()
-        for (info in installed) {
-            val uid = info.uid
-            uidMap.getOrPut(uid) { HashSet() }.add(info.packageName)
-        }
+        uidMap = installed.groupBy { it.uid }.mapValues { (_, apps) -> apps.map { it.packageName }.toSet() }
     }
 
     operator fun get(uid: Int) = uidMap[uid]

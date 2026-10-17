@@ -20,6 +20,8 @@
         <item name="colorOnSurface">@color/ui_on_surface</item>
         <item name="colorSurfaceVariant">@color/ui_surface_variant</item>
         <item name="colorOnSurfaceVariant">@color/ui_on_surface_variant</item>
+        <item name="colorSurfaceContainerLowest">@color/ui_surface_container_lowest</item>
+        <item name="colorSurfaceContainerHighest">@color/ui_surface_container_highest</item>
         <item name="colorSurfaceContainerLow">@color/ui_surface_container_low</item>
         <item name="colorSurfaceContainer">@color/ui_surface_container</item>
         <item name="colorSurfaceContainerHigh">@color/ui_surface_container_high</item>
@@ -120,36 +122,36 @@
     </style>
 
     <style name="ThemeOverlay.SagerNet.Accent.Blue" parent="">
-        <item name="colorPrimary">#0061A4</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorPrimaryContainer">#D1E4FF</item>
-        <item name="colorOnPrimaryContainer">#001D36</item>
-        <item name="colorSecondary">#535F70</item>
-        <item name="colorOnSecondary">#FFFFFF</item>
-        <item name="colorSecondaryContainer">#D7E3F7</item>
-        <item name="colorOnSecondaryContainer">#101C2B</item>
+        <item name="colorPrimary">@color/ui_blue_primary</item>
+        <item name="colorOnPrimary">@color/ui_blue_on_primary</item>
+        <item name="colorPrimaryContainer">@color/ui_blue_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/ui_blue_on_primary_container</item>
+        <item name="colorSecondary">@color/ui_blue_secondary</item>
+        <item name="colorOnSecondary">@color/ui_blue_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/ui_blue_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/ui_blue_on_secondary_container</item>
     </style>
 
     <style name="ThemeOverlay.SagerNet.Accent.Green" parent="">
-        <item name="colorPrimary">#2E6B27</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorPrimaryContainer">#AFFF9D</item>
-        <item name="colorOnPrimaryContainer">#002202</item>
-        <item name="colorSecondary">#54634D</item>
-        <item name="colorOnSecondary">#FFFFFF</item>
-        <item name="colorSecondaryContainer">#D7E8CC</item>
-        <item name="colorOnSecondaryContainer">#121F0E</item>
+        <item name="colorPrimary">@color/ui_green_primary</item>
+        <item name="colorOnPrimary">@color/ui_green_on_primary</item>
+        <item name="colorPrimaryContainer">@color/ui_green_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/ui_green_on_primary_container</item>
+        <item name="colorSecondary">@color/ui_green_secondary</item>
+        <item name="colorOnSecondary">@color/ui_green_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/ui_green_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/ui_green_on_secondary_container</item>
     </style>
 
     <style name="ThemeOverlay.SagerNet.Accent.Pink" parent="">
-        <item name="colorPrimary">#984061</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorPrimaryContainer">#FFD9E2</item>
-        <item name="colorOnPrimaryContainer">#3E001D</item>
-        <item name="colorSecondary">#74565F</item>
-        <item name="colorOnSecondary">#FFFFFF</item>
-        <item name="colorSecondaryContainer">#FFD9E2</item>
-        <item name="colorOnSecondaryContainer">#2B151C</item>
+        <item name="colorPrimary">@color/ui_pink_primary</item>
+        <item name="colorOnPrimary">@color/ui_pink_on_primary</item>
+        <item name="colorPrimaryContainer">@color/ui_pink_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/ui_pink_on_primary_container</item>
+        <item name="colorSecondary">@color/ui_pink_secondary</item>
+        <item name="colorOnSecondary">@color/ui_pink_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/ui_pink_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/ui_pink_on_secondary_container</item>
     </style>
 
     <style name="ThemeOverlay.SagerNet.AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">

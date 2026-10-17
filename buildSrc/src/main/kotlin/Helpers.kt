@@ -6,8 +6,6 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.getByName
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Base64
 import java.util.Properties
 import kotlin.system.exitProcess
@@ -96,7 +94,7 @@ fun Project.setupCommon() {
                     }
                 }
                 getByName("debug") {
-                    applicationIdSuffix = "debug"
+                    applicationIdSuffix = null
                     debuggable(true)
                     jniDebuggable(true)
                 }
@@ -147,7 +145,20 @@ fun Project.setupAppCommon() {
                 }
 
                 ciDebugKey != null -> {
+                    getByName("release").signingConfig = ciDebugKey
                     getByName("debug").signingConfig = ciDebugKey
+                }
+            }
+        }
+    }
+}
+
+fun Project.requireReleaseSignature() {
+    tasks.configureEach {
+        if (name.startsWith("package") && name.endsWith("Release")) {
+            doFirst {
+                check(android.buildTypes.getByName("release").signingConfig != null) {
+                    "Signing is required. Configure a private key or restore app/debug.keystore."
                 }
             }
         }
@@ -157,16 +168,21 @@ fun Project.setupAppCommon() {
 fun Project.setupApp() {
     val pkgName = requireMetadata().getProperty("PACKAGE_NAME")
     val verName = requireMetadata().getProperty("VERSION_NAME")
+    val sourceCommit = System.getenv("GITHUB_SHA") ?: runCatching {
+        providers.exec { commandLine("git", "rev-parse", "HEAD") }.standardOutput.asText.get().trim()
+    }.getOrDefault("unknown")
     val verCode = (requireMetadata().getProperty("VERSION_CODE").toInt()) * 5
     android.apply {
         defaultConfig {
             applicationId = pkgName
+            buildConfigField("String", "SOURCE_COMMIT", "\"$sourceCommit\"")
             versionCode = verCode
             versionName = verName
             buildConfigField("String", "PRE_VERSION_NAME", "\"\"")
         }
     }
     setupAppCommon()
+    requireReleaseSignature()
 
     android.apply {
         this as AbstractAppExtension
@@ -204,14 +220,13 @@ fun Project.setupApp() {
             }
         }
 
-        val buildDateStamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd"))
         val abiPattern = Regex("(armeabi-v7a|arm64-v8a|x86_64|x86)")
 
         applicationVariants.all {
             outputs.all {
                 this as BaseVariantOutputImpl
                 val abi = abiPattern.find(outputFileName)?.value ?: "universal"
-                outputFileName = "NB_SF-$buildDateStamp-$abi.apk"
+                outputFileName = "NB_SF-$verName-$abi.apk"
             }
         }
 

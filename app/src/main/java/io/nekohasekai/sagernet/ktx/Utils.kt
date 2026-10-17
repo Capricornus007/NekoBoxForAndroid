@@ -244,7 +244,7 @@ fun Fragment.startFilesForResult(
 fun Fragment.needReload() {
     if (DataStore.serviceState.started) {
         snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {
-            SagerNet.reloadService()
+            SagerNet.reloadService(force = true)
         }.show()
     }
 }

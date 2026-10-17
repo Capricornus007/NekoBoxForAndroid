@@ -159,8 +159,14 @@ class SagerNet : Application(),
                 ?.getItemAt(0)?.text?.toString() ?: ""
         }
 
-        fun trySetPrimaryClip(clip: String) = try {
-            clipboard.setPrimaryClip(ClipData.newPlainText(null, clip))
+        fun trySetPrimaryClip(clip: String, sensitive: Boolean = false) = try {
+            val data = ClipData.newPlainText(null, clip)
+            if (sensitive && Build.VERSION.SDK_INT >= 33) {
+                data.description.extras = android.os.PersistableBundle().apply {
+                    putBoolean(android.content.ClipDescription.EXTRA_IS_SENSITIVE, true)
+                }
+            }
+            clipboard.setPrimaryClip(data)
             true
         } catch (e: RuntimeException) {
             Logs.w(e)
@@ -199,8 +205,8 @@ class SagerNet : Application(),
             application, Intent(application, SagerConnection.serviceClass)
         )
 
-        fun reloadService() =
-            application.sendBroadcast(Intent(Action.RELOAD).setPackage(application.packageName))
+        fun reloadService(force: Boolean = false) =
+            application.sendBroadcast(Intent(Action.RELOAD).setPackage(application.packageName).putExtra("force", force))
 
         fun stopService() =
             application.sendBroadcast(Intent(Action.CLOSE).setPackage(application.packageName))

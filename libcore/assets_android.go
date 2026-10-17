@@ -8,173 +8,111 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
+	"strings"
 
 	"golang.org/x/mobile/asset"
 )
 
 func extractAssets() {
-	useOfficialAssets := intfNB4A.UseOfficialAssets()
-
-	extract := func(name string) {
-		err := extractAssetName(name, useOfficialAssets)
-		if err != nil {
-			log.Println("Extract", geoipDat, "failed:", err)
+	for _, name := range []string{geoipDat, geositeDat, yacdDstFolder} {
+		if err := extractAssetName(name, intfNB4A.UseOfficialAssets()); err != nil {
+			log.Println("Extract", name, "failed:", err)
 		}
 	}
-
-	extract(geoipDat)
-	extract(geositeDat)
-	extract(yacdDstFolder)
 }
 
-// 这里解压的是 apk 里面的
-func extractAssetName(name string, useOfficialAssets bool) error {
-	// 支持非官方源的，就是 replaceable，放 Android 目录
-	// 不支持非官方源的，就放 file 目录
-	replaceable := true
-
-	var version string
-	var apkPrefix string
+func extractAssetName(name string, official bool) error {
+	versionName, prefix, dir := yacdVersion, "", internalAssetsPath
 	switch name {
 	case geoipDat:
-		version = geoipVersion
-		apkPrefix = apkAssetPrefixSingBox
+		versionName, prefix, dir = geoipVersion, apkAssetPrefixSingBox, externalAssetsPath
 	case geositeDat:
-		version = geositeVersion
-		apkPrefix = apkAssetPrefixSingBox
+		versionName, prefix, dir = geositeVersion, apkAssetPrefixSingBox, externalAssetsPath
 	case yacdDstFolder:
-		version = yacdVersion
-		replaceable = false
+	default:
+		return fmt.Errorf("unsupported bundled asset: %s", name)
 	}
-
-	var dir string
-	if !replaceable {
-		dir = internalAssetsPath
-	} else {
-		dir = externalAssetsPath
-	}
-	dstName := dir + name
-
-	var localVersion string
-	var assetVersion string
-
-	// loadAssetVersion from APK
-	loadAssetVersion := func() error {
-		av, err := asset.Open(apkPrefix + version)
-		if err != nil {
-			return fmt.Errorf("open version in assets: %v", err)
-		}
-		b, err := io.ReadAll(av)
-		av.Close()
-		if err != nil {
-			return fmt.Errorf("read internal version: %v", err)
-		}
-		assetVersion = string(b)
-		return nil
-	}
-	if err := loadAssetVersion(); err != nil {
+	if err := os.MkdirAll(dir, 0700); err != nil {
 		return err
 	}
-
-	var doExtract bool
-
-	if _, err := os.Stat(dstName); err != nil {
-		// assetFileMissing
-		doExtract = true
-	} else if useOfficialAssets || !replaceable {
-		// 官方源升级
-		b, err := os.ReadFile(dir + version)
-		if err != nil {
-			// versionFileMissing
-			doExtract = true
-			_ = os.RemoveAll(version)
-		} else {
-			localVersion = string(b)
-			if localVersion == "Custom" {
-				doExtract = false
-			} else {
-				av, err := strconv.ParseUint(assetVersion, 10, 64)
-				if err != nil {
-					doExtract = assetVersion != localVersion
-				} else {
-					lv, err := strconv.ParseUint(localVersion, 10, 64)
-					doExtract = err != nil || av > lv
-				}
-			}
-		}
-	} else {
-		//非官方源不升级
-	}
-
-	if !doExtract {
-		return nil
-	}
-
-	extractXz := func(f asset.File) error {
-		tmpXzName := dstName + ".xz"
-		err := extractAsset(f, tmpXzName)
-		if err == nil {
-			err = Unxz(tmpXzName, dstName)
-			os.Remove(tmpXzName)
-		}
-		if err != nil {
-			return fmt.Errorf("extract xz: %v", err)
-		}
-		return nil
-	}
-
-	extracZip := func(f asset.File, outDir string) error {
-		tmpZipName := dstName + ".zip"
-		err := extractAsset(f, tmpZipName)
-		if err == nil {
-			err = Unzip(tmpZipName, outDir)
-			os.Remove(tmpZipName)
-		}
-		if err != nil {
-			return fmt.Errorf("extract zip: %v", err)
-		}
-		return nil
-	}
-
-	if f, err := asset.Open(apkPrefix + name + ".xz"); err == nil {
-		extractXz(f)
-	} else if f, err := asset.Open("yacd.zip"); err == nil {
-		os.RemoveAll(dstName)
-		extracZip(f, internalAssetsPath)
-		m, err := filepath.Glob(internalAssetsPath + "/Yacd-*")
-		if err != nil {
-			return fmt.Errorf("glob Yacd: %v", err)
-		}
-		if len(m) != 1 {
-			return fmt.Errorf("glob Yacd found %d result, expect 1", len(m))
-		}
-		err = os.Rename(m[0], dstName)
-		if err != nil {
-			return fmt.Errorf("rename Yacd: %v", err)
-		}
-
-	} // TODO normal file
-
-	o, err := os.Create(dir + version)
+	versionFile, err := asset.Open(prefix + versionName)
 	if err != nil {
-		return fmt.Errorf("create version: %v", err)
+		return fmt.Errorf("open bundled version: %w", err)
 	}
-	_, err = io.WriteString(o, assetVersion)
-	o.Close()
-	return err
+	contents, err := io.ReadAll(io.LimitReader(versionFile, 128))
+	versionFile.Close()
+	if err != nil {
+		return err
+	}
+	version := strings.TrimSpace(string(contents))
+	if version == "" {
+		return fmt.Errorf("empty bundled version")
+	}
+	destination, versionPath := filepath.Join(dir, name), filepath.Join(dir, versionName)
+	if name != yacdDstFolder {
+		return installBundledRouteAsset(destination, versionPath, version, official, func() (io.ReadCloser, error) {
+			return asset.Open(prefix + name + ".xz")
+		})
+	}
+	return withAssetLock(destination, func() error {
+		local, _ := os.ReadFile(versionPath)
+		if _, err := os.Stat(destination); err == nil && !bundledAssetIsNewer(version, strings.TrimSpace(string(local))) {
+			return nil
+		}
+		stage, err := os.MkdirTemp(dir, ".yacd-*")
+		if err != nil {
+			return err
+		}
+		defer os.RemoveAll(stage)
+		input, err := asset.Open("yacd.zip")
+		if err != nil {
+			return err
+		}
+		archive := filepath.Join(stage, "yacd.zip")
+		if err = extractAsset(input, archive); err != nil {
+			return err
+		}
+		if err = Unzip(archive, stage); err != nil {
+			return err
+		}
+		matches, err := filepath.Glob(filepath.Join(stage, "Yacd-*"))
+		if err != nil {
+			return err
+		}
+		if len(matches) != 1 {
+			return fmt.Errorf("expected one Yacd directory, got %d", len(matches))
+		}
+		backup := filepath.Join(stage, "previous")
+		hadOld := false
+		if _, err = os.Stat(destination); err == nil {
+			if err = os.Rename(destination, backup); err != nil {
+				return err
+			}
+			hadOld = true
+		}
+		if err = os.Rename(matches[0], destination); err != nil {
+			if hadOld {
+				_ = os.Rename(backup, destination)
+			}
+			return err
+		}
+		return writeAssetVersion(versionPath, version)
+	})
 }
 
-func extractAsset(i asset.File, path string) error {
-	defer i.Close()
-	o, err := os.Create(path)
+func extractAsset(input asset.File, path string) error {
+	defer input.Close()
+	output, err := os.Create(path)
 	if err != nil {
 		return err
 	}
-	defer o.Close()
-	_, err = io.Copy(o, i)
-	if err == nil {
-		log.Println("Extract >>", path)
+	defer output.Close()
+	n, err := io.Copy(output, io.LimitReader(input, maxAssetBytes+1))
+	if err != nil {
+		return err
 	}
-	return err
+	if n > maxAssetBytes {
+		return fmt.Errorf("compressed asset exceeds 512 MiB")
+	}
+	return output.Close()
 }

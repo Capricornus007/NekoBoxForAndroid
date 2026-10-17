@@ -38,6 +38,12 @@ object Key {
 
     const val BYPASS_LAN = "bypassLan"
     const val BYPASS_LAN_IN_CORE = "bypassLanInCore"
+    const val DIRECT_FALLBACK = "directFallback"
+    const val DIRECT_FALLBACK_URL = "directFallbackUrl"
+    const val DIRECT_FALLBACK_INTERVAL = "directFallbackInterval"
+    const val DIRECT_FALLBACK_REQUIRED = "directFallbackRequired"
+    const val DIRECT_FALLBACK_FAILURES = "directFallbackFailures"
+    const val DIRECT_FALLBACK_RECOVERIES = "directFallbackRecoveries"
     const val CONCURRENT_DIAL = "concurrentDial"
 
     const val MIXED_PORT = "mixedPort" // migration source
@@ -83,6 +89,7 @@ object Key {
 
     const val TUN_IMPLEMENTATION = "tunImplementation"
     const val PROFILE_TRAFFIC_STATISTICS = "profileTrafficStatistics"
+    const val DOWNLOADS_PROXY_ONLY = "downloadsProxyOnly"
 
     const val PROFILE_DIRTY = "profileDirty"
     const val PROFILE_ID = "profileId"
@@ -93,6 +100,11 @@ object Key {
     const val FASTEST_SOURCE_GROUP = "fastestSourceGroup"
     const val FASTEST_NAME_REGEX = "fastestNameRegex"
     const val FASTEST_IGNORE_CASE = "fastestIgnoreCase"
+    const val FASTEST_PROTOCOL_FILTER_MODE = "fastestProtocolFilterMode"
+    const val FASTEST_PROTOCOLS = "fastestProtocols"
+    const val FASTEST_HEALTH_CHECK = "fastestHealthCheck"
+    const val FASTEST_FAILURE_COOLDOWN = "fastestFailureCooldown"
+    const val FASTEST_HEALTH_URL = "fastestHealthUrl"
     const val FASTEST_REGEX_OPTIONS = "fastestRegexOptions"
     const val FASTEST_REGEX_PREVIEW = "fastestRegexPreview"
 
@@ -179,6 +191,8 @@ object Key {
     const val SUBSCRIPTION_USER_AGENT = "subscriptionUserAgent"
     const val SUBSCRIPTION_SEND_HWID = "subscriptionSendHwid"
     const val SUBSCRIPTION_CUSTOM_HWID_PARAMS = "subscriptionCustomHwidParams"
+    const val SUBSCRIPTION_SERVER_DNS = "subscriptionServerDns"
+    const val SUBSCRIPTION_HEADERS = "subscriptionHeaders"
     const val SUBSCRIPTION_AUTO_UPDATE = "subscriptionAutoUpdate"
     const val SUBSCRIPTION_AUTO_UPDATE_DELAY = "subscriptionAutoUpdateDelay"
     const val SUBSCRIPTION_FILTER_MODE = "subscriptionFilterMode"
@@ -186,6 +200,7 @@ object Key {
 
     //
     const val APP_TLS_VERSION = "appTLSVersion"
+    const val CLASH_API_SECRET = "clashApiSecret"
     const val ENABLE_CLASH_API = "enableClashAPI"
 
     const val ENABLE_TLS_FRAGMENT = "enableTLSFragment"

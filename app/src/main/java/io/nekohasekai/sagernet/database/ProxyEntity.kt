@@ -208,7 +208,11 @@ data class ProxyEntity(
         TYPE_NAIVE -> "Naïve"
         TYPE_HYSTERIA -> "Hysteria" + hysteriaBean!!.protocolVersion
         TYPE_SSH -> "SSH"
-        TYPE_WG -> if (wgBean?.isAmneziaWG == true) "AmneziaWG 2.0" else "WireGuard"
+        TYPE_WG -> when {
+            wgBean?.hasAmneziaV3Options() == true -> "AmneziaWG 3.1"
+            wgBean?.isAmneziaWG == true -> "AmneziaWG 2.0"
+            else -> "WireGuard"
+        }
         TYPE_TUIC -> "TUIC"
         TYPE_JUICITY -> "Juicity"
         TYPE_SHADOWTLS -> "ShadowTLS"

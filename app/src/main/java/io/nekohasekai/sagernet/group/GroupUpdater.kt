@@ -132,7 +132,7 @@ abstract class GroupUpdater {
 
         suspend fun executeUpdate(proxyGroup: ProxyGroup, byUser: Boolean): Boolean {
             return coroutineScope {
-                if (!updating.add(proxyGroup.id)) cancel()
+                if (!updating.add(proxyGroup.id)) return@coroutineScope false
                 GroupManager.postReload(proxyGroup.id)
 
                 val subscription = proxyGroup.subscription!!
@@ -150,8 +150,14 @@ abstract class GroupUpdater {
                 try {
                     RawUpdater.doUpdate(proxyGroup, subscription, userInterface, byUser)
                     true
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    finishUpdate(proxyGroup)
+                    throw cancelled
                 } catch (e: Throwable) {
-                    Logs.w(e)
+                    if (e is SubscriptionResponseException) {
+                        Logs.d("Subscription import failed: ${e.problem}", e)
+                        Logs.w(app.getString(R.string.no_proxies_found))
+                    } else Logs.w(e)
                     userInterface?.onUpdateFailure(proxyGroup, e.readableMessage)
                     finishUpdate(proxyGroup)
                     false
@@ -163,7 +169,7 @@ abstract class GroupUpdater {
         suspend fun finishUpdate(proxyGroup: ProxyGroup) {
             updating.remove(proxyGroup.id)
             progress.remove(proxyGroup.id)
-            GroupManager.postUpdate(proxyGroup)
+            GroupManager.postUpdate(proxyGroup.id)
         }
 
     }

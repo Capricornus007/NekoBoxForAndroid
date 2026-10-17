@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
 import android.app.ActivityManager
+import android.app.KeyguardManager
 import android.widget.Toast
 import io.nekohasekai.sagernet.Action
 import io.nekohasekai.sagernet.BootReceiver
@@ -14,6 +15,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.aidl.ISagerNetService
 import io.nekohasekai.sagernet.aidl.ISagerNetServiceCallback
 import io.nekohasekai.sagernet.bg.proto.ProxyInstance
+import io.nekohasekai.sagernet.database.NetworkProfiles
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.ktx.*
@@ -45,14 +47,17 @@ class BaseService {
     interface ExpectedException
 
     class Data internal constructor(private val service: Interface) {
-        var state = State.Stopped
+        @Volatile var state = State.Stopped
+        @Volatile var powerRestricted = false
+        var networkSignature: String? = null
+        var networkPolicySignature: String? = null
         var proxy: ProxyInstance? = null
         var notification: ServiceNotification? = null
 
         val receiver = broadcastReceiver { ctx, intent ->
             when (intent.action) {
                 Intent.ACTION_SHUTDOWN -> service.persistStats()
-                Action.RELOAD -> service.reload()
+                Action.RELOAD -> if (intent.getBooleanExtra("force", false)) service.stopRunner(restart = true) else service.reload()
                 // Action.SWITCH_WAKE_LOCK -> runOnDefaultDispatcher { service.switchWakeLock() }
                 PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
                     if (SagerNet.power.isDeviceIdleMode) {
@@ -63,7 +68,10 @@ class BaseService {
                             Libcore.resetAllConnections(true)
                         }
                     }
+                    updateProbePowerState()
                 }
+
+                Intent.ACTION_SCREEN_ON, Intent.ACTION_SCREEN_OFF, Intent.ACTION_USER_PRESENT -> updateProbePowerState()
 
                 Action.RESET_UPSTREAM_CONNECTIONS -> runOnDefaultDispatcher {
                     Libcore.resetAllConnections(true)
@@ -83,6 +91,15 @@ class BaseService {
 
         val binder = Binder(this)
         var connectingJob: Job? = null
+
+        fun updateProbePowerState() {
+            if (state != State.Connected) return
+            val context = service as Context
+            val keyguard = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            powerRestricted = pauseHealthChecks(SagerNet.power.isInteractive, keyguard.isKeyguardLocked, SagerNet.power.isDeviceIdleMode)
+            proxy?.box?.setProbesPaused(powerRestricted)
+            proxy?.looper?.onPowerChanged()
+        }
 
         fun changeState(s: State, msg: String? = null) {
             if (state == s && msg == null) return
@@ -153,6 +170,31 @@ class BaseService {
             } catch (e: Exception) {
                 error(Protocols.genFriendlyMsg(e.readableMessage))
             }
+        }
+
+        override fun getRuntimeDiagnostics(historyQuery: String): String {
+            check(android.os.Binder.getCallingUid() == android.os.Process.myUid()) { "Caller is not the application" }
+            val proxy = data?.proxy ?: return "{\"groups\":[]}"
+            if (!proxy.isInitialized()) return "{\"groups\":[]}"
+            return proxy.box.runtimeDiagnostics(historyQuery)
+        }
+
+        override fun networkProbe(expectedProfileId: Long, direct: Boolean, domain: String, dnsTarget: String): String {
+            check(android.os.Binder.getCallingUid() == android.os.Process.myUid()) { "Caller is not the application" }
+            val current = data ?: error("Service is unavailable")
+            val proxy = current.proxy ?: error("Core is not running")
+            check(current.state == State.Connected && proxy.isInitialized() && DataStore.currentProfile == expectedProfileId) { "Profile is no longer active" }
+            val tag = if (direct) "direct" else if (proxy.config.selectorGroupId > 0) "proxy"
+                else proxy.config.profileTagMap[proxy.profile.id] ?: error("Proxy outbound is unavailable")
+            return proxy.box.networkProbe(tag, domain, dnsTarget)
+        }
+
+        override fun configuredProbe(expectedProfileId: Long, tag: String, dnsTag: String, httpsUrl: String): String {
+            check(android.os.Binder.getCallingUid() == android.os.Process.myUid()) { "Caller is not the application" }
+            val current = data ?: error("Service is unavailable")
+            val proxy = current.proxy ?: error("Core is not running")
+            check(current.state == State.Connected && proxy.isInitialized() && DataStore.currentProfile == expectedProfileId) { "Profile is no longer active" }
+            return proxy.box.configuredProbe(tag, dnsTag, httpsUrl)
         }
 
         fun stateChanged(s: State, msg: String?) = launch {
@@ -265,10 +307,13 @@ class BaseService {
             data.changeState(State.Stopping)
 
             runOnMainDispatcher {
-                data.connectingJob?.cancelAndJoin() // ensure stop connecting first
+                val connectingJob = data.connectingJob
+                connectingJob?.cancel()
+                data.proxy?.cancelStart()
+                connectingJob?.join()
                 // we use a coroutineScope here to allow clean-up in parallel
                 coroutineScope {
-                    killProcesses()
+                    withContext(Dispatchers.IO) { killProcesses() }
                     val data = data
                     if (data.closeReceiverRegistered) {
                         unregisterReceiver(data.receiver)
@@ -314,17 +359,41 @@ class BaseService {
                 if (DataStore.baseService !== this@Interface) return@start
                 SagerNet.underlyingNetwork = network
                 DataStore.vpnService?.updateUnderlyingNetwork()
+                val policySelection = NetworkProfiles.select(network)
+                val previousPolicy = data.networkPolicySignature
+                if (network != null && policySelection.identity != "unavailable") {
+                    data.networkPolicySignature = policySelection.identity
+                    if (previousPolicy != null && previousPolicy != policySelection.identity) {
+                        policySelection.policy?.let { DataStore.selectedProxy = it.profileId }
+                        scheduleNetworkProfileRestart("network-policy", "network-policy")
+                    }
+                }
                 val link = network?.let { SagerNet.connectivity.getLinkProperties(it) }
-                    ?: return@start
-                val oldName = upstreamInterfaceName
-                val newName = link.interfaceName ?: return@start
-                upstreamInterfaceName = newName
-                when (networkChangeAction(
+                if (link == null) { upstreamInterfaceName = null; return@start }
+                val newName = buildString {
+                    append(network).append('|').append(link.interfaceName)
+                    append('|').append(link.linkAddresses.map { it.toString() }.sorted())
+                    append('|').append(link.dnsServers.map { it.hostAddress }.sortedBy { it })
+                    append('|').append(link.routes.map { it.toString() }.sorted())
+                    append('|').append(link.domains).append('|').append(link.mtu)
+                    if (Build.VERSION.SDK_INT >= 28) {
+                        append('|').append(link.isPrivateDnsActive).append('|').append(link.privateDnsServerName)
+                    }
+                }
+                val oldName = data.networkSignature
+                data.networkSignature = newName
+                upstreamInterfaceName = link.interfaceName
+                val networkAction = networkChangeAction(
                     oldName,
                     newName,
                     DataStore.restartProfileOnNetworkChange,
                     DataStore.networkChangeResetConnections,
-                )) {
+                )
+                if (oldName != null && oldName != newName && networkAction == NetworkChangeAction.NONE) {
+                    val active = data.proxy
+                    if (active != null && active.isInitialized()) runOnDefaultDispatcher { active.box.resetProbeHealth() }
+                }
+                when (networkAction) {
                     NetworkChangeAction.RESTART_PROFILE -> {
                         Logs.d("Network changed: $oldName -> $newName")
                         scheduleNetworkProfileRestart(requireNotNull(oldName), newName)
@@ -374,6 +443,9 @@ class BaseService {
 
             // A database read must not consume the foreground-service promotion deadline.
             val notification = ensureForegroundNotification(getString(R.string.app_name))
+            val policySelection = NetworkProfiles.select()
+            data.networkPolicySignature = policySelection.identity
+            policySelection.policy?.let { DataStore.selectedProxy = it.profileId }
             val profile = SagerDatabase.proxyDao.getById(DataStore.selectedProxy)
             if (profile == null) { // gracefully shutdown: https://stackoverflow.com/q/47337857/2245107
                 stopRunner(false, getString(R.string.profile_empty))
@@ -392,6 +464,9 @@ class BaseService {
                     addAction(Action.CLOSE)
                     // addAction(Action.SWITCH_WAKE_LOCK)
                     addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
+                    addAction(Intent.ACTION_SCREEN_ON)
+                    addAction(Intent.ACTION_SCREEN_OFF)
+                    addAction(Intent.ACTION_USER_PRESENT)
                     addAction(Action.RESET_UPSTREAM_CONNECTIONS)
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -421,9 +496,9 @@ class BaseService {
                 try {
                     notification.postNotificationTitle(notificationTitle)
 
-                    Executable.killAll()    // clean up old processes
+                    withContext(Dispatchers.IO) { Executable.killAll() }
                     preInit()
-                    proxy.init()
+                    withContext(Dispatchers.IO) { proxy.init() }
                     DataStore.currentProfile = profile.id
 
                     proxy.processes = GuardedProcessPool {
@@ -431,8 +506,9 @@ class BaseService {
                         stopRunner(false, it.readableMessage)
                     }
 
-                    startProcesses()
+                    withContext(Dispatchers.IO) { startProcesses() }
                     data.changeState(State.Connected)
+                    data.updateProbePowerState()
 
                     lateInit()
                 } catch (_: CancellationException) { // if the job was cancelled, it is canceller's responsibility to call stopRunner

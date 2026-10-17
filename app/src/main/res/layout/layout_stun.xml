@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/stun_attest_loading"
-                android:textAppearance="@style/AppearanceFoundation.Title" />
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
         </LinearLayout>
 
 
@@ -48,8 +48,9 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginRight="16dp"
-                    android:clickable="true"
-                    android:focusable="true"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardCornerRadius="28dp"
+                    app:strokeWidth="0dp"
                     app:cardElevation="?attr/uiCardElevation">
 
                     <LinearLayout
@@ -58,19 +59,19 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/nat_stun_server_hint"
-                            android:textAppearance="?attr/textAppearanceSubtitle2" />
-
-                        <EditText
-                            android:id="@+id/nat_stun_server"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:ems="10"
-                            android:inputType="text"
-                            android:text="stun.voipgate.com:3478" />
+                            android:hint="@string/nat_stun_server_hint">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/nat_stun_server"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textUri"
+                                android:singleLine="true"
+                                android:text="stun.voipgate.com:3478" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -81,8 +82,9 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginRight="16dp"
-                    android:clickable="true"
-                    android:focusable="true"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardCornerRadius="28dp"
+                    app:strokeWidth="0dp"
                     app:cardElevation="?attr/uiCardElevation">
 
                     <LinearLayout
@@ -95,10 +97,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/nat_result_hint"
-                            android:textAppearance="?attr/textAppearanceSubtitle2" />
+                            android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
 
                         <TextView
                             android:id="@+id/nat_result"
+                            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textIsSelectable="true"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -117,9 +122,10 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/stunTest"
-                        style="@style/Widget.Material3.Button.TonalButton"
+                        style="@style/Widget.Material3.Button"
                         android:layout_width="wrap_content"
-                        android:layout_height="48dp"
+                        android:layout_height="wrap_content"
+        android:minHeight="48dp"
                         android:layout_marginEnd="8dp"
                         android:text="@string/start" />
                 </LinearLayout>

@@ -83,21 +83,21 @@ object Util {
 
     fun zlibDecompress(input: ByteArray): ByteArray {
         val inflater = Inflater()
-        val outputStream = ByteArrayOutputStream()
-
-        return outputStream.use {
-            val buffer = ByteArray(1024)
-
+        try {
             inflater.setInput(input)
-
-            var count = -1
-            while (count != 0) {
-                count = inflater.inflate(buffer)
-                outputStream.write(buffer, 0, count)
+            val output = ByteArrayOutputStream()
+            val buffer = ByteArray(8192)
+            while (!inflater.finished()) {
+                val count = inflater.inflate(buffer)
+                require(count > 0 || inflater.finished()) { "Truncated or invalid compressed input" }
+                require(count <= io.nekohasekai.sagernet.ktx.MAX_SUBSCRIPTION_BYTES - output.size()) {
+                    "Decompressed input is too large"
+                }
+                output.write(buffer, 0, count)
             }
-
+            return output.toByteArray()
+        } finally {
             inflater.end()
-            outputStream.toByteArray()
         }
     }
 

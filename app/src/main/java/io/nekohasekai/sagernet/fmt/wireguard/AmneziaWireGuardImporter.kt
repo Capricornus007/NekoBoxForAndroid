@@ -63,12 +63,23 @@ object AmneziaWireGuardImporter {
         val awgFields = listOf(
             "Jc", "Jmin", "Jmax", "S1", "S2", "S3", "S4",
             "H1", "H2", "H3", "H4", "I1", "I2", "I3", "I4", "I5",
+            "HeaderProtectionKey",
+            "ContentPaddingAddition",
+            "RekeyAfterTime",
+            "RekeyTimeout",
+            "RejectAfterTime",
+            "KeepaliveTimeout",
+            "MaxHandshakeAttempts",
+            "RandomTrailers",
+            "DisableCookies",
+
         )
         val isAmnezia = awgFields.any(iface::contains)
         val explicitMtu = iface.get("MTU")?.toIntOrNull()?.takeIf { it > 0 }
 
         val template = WireGuardBean().applyDefaultValues().apply {
             localAddress = addresses.joinToString("\n")
+            dnsServers = iface.getAll("DNS").joinToString("\n")
             this.privateKey = privateKey
             mtu = explicitMtu ?: if (isAmnezia) AMNEZIA_MOBILE_MTU else mtu
             jc = iface.intValue("Jc")
@@ -87,6 +98,16 @@ object AmneziaWireGuardImporter {
             i3 = iface.get("I3").orEmpty()
             i4 = iface.get("I4").orEmpty()
             i5 = iface.get("I5").orEmpty()
+            headerProtectionKey = iface.get("HeaderProtectionKey").orEmpty()
+            contentPaddingAddition = iface.get("ContentPaddingAddition").orEmpty()
+            rekeyAfterTime = iface.get("RekeyAfterTime").orEmpty()
+            rekeyTimeout = iface.get("RekeyTimeout").orEmpty()
+            rejectAfterTime = iface.get("RejectAfterTime").orEmpty()
+            keepaliveTimeout = iface.get("KeepaliveTimeout").orEmpty()
+            maxHandshakeAttempts = iface.get("MaxHandshakeAttempts").orEmpty()
+            randomTrailers = iface.boolValue("RandomTrailers")
+            disableCookies = iface.boolValue("DisableCookies")
+            validateAmneziaParameters()
         }
 
         return peers.mapNotNull { peer ->
@@ -98,6 +119,11 @@ object AmneziaWireGuardImporter {
                 serverPort = endpoint.port
                 peerPublicKey = publicKey
                 peerPreSharedKey = peer.get("PresharedKey").orEmpty()
+                allowedIPs = peer.getAll("AllowedIPs").joinToString("\n")
+                persistentKeepalive = peer.get("PersistentKeepalive").orEmpty().ifBlank { "0" }
+                validateAmneziaParameters()
+                if (persistentKeepalive.contains('-') && explicitMtu == null) mtu = AMNEZIA_MOBILE_MTU
+                if (allowedIPs.isNotBlank()) normalizeWireGuardLocalAddresses(allowedIPs)
                 initializeDefaultValues()
             }
         }.ifEmpty {
@@ -291,7 +317,15 @@ object AmneziaWireGuardImporter {
     private fun hasIniOption(conf: String, key: String): Boolean =
         Regex("(?im)^\\s*${Regex.escape(key)}\\s*=").containsMatchIn(conf)
 
-    private fun IniSection.intValue(key: String): Int = get(key)?.toIntOrNull() ?: 0
+    private fun IniSection.boolValue(key: String): Boolean = when (get(key)?.lowercase(Locale.ROOT).orEmpty()) {
+        "", "0", "false" -> false
+        "1", "true" -> true
+        else -> throw IllegalArgumentException("Invalid $key")
+    }
+
+    private fun IniSection.intValue(key: String): Int = get(key)?.let {
+        requireNotNull(it.toIntOrNull()) { "Invalid integer for $key" }
+    } ?: 0
 
     private fun JsonObject.stringValue(key: String): String? =
         get(key)?.takeIf { it.isJsonPrimitive }?.asString?.takeIf(String::isNotBlank)

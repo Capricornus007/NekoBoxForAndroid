@@ -2,77 +2,95 @@ package libcore
 
 import (
 	"archive/zip"
+	"errors"
+	"github.com/ulikunitz/xz"
 	"io"
 	"os"
-        "path/filepath"
-
-	"github.com/ulikunitz/xz"
-	"github.com/sagernet/sing/common"
-        E "github.com/sagernet/sing/common/exceptions"
+	"path/filepath"
 )
 
-func Unxz(archive string, path string) error {
-	i, err := os.Open(archive)
+const maxAssetBytes int64 = 512 * 1024 * 1024
+
+func Unxz(archive, path string) error {
+	input, err := os.Open(archive)
 	if err != nil {
 		return err
 	}
-	r, err := xz.NewReader(i)
+	defer input.Close()
+	reader, err := xz.NewReader(input)
 	if err != nil {
-		i.Close()
 		return err
 	}
-	o, err := os.Create(path)
+	output, err := os.CreateTemp(filepath.Dir(path), ".asset-*")
 	if err != nil {
-		i.Close()
 		return err
 	}
-	_, err = io.Copy(o, r)
-	i.Close()
-	return err
+	defer os.Remove(output.Name())
+	defer output.Close()
+	n, err := io.Copy(output, io.LimitReader(reader, maxAssetBytes+1))
+	if err != nil {
+		return err
+	}
+	if n > maxAssetBytes {
+		return errors.New("decompressed asset exceeds 512 MiB")
+	}
+	if err = output.Sync(); err != nil {
+		return err
+	}
+	if err = output.Close(); err != nil {
+		return err
+	}
+	return os.Rename(output.Name(), path)
 }
 
-func Unzip(archive string, path string) error {
-	r, err := zip.OpenReader(archive)
+func Unzip(archive, path string) error {
+	reader, err := zip.OpenReader(archive)
 	if err != nil {
 		return err
 	}
-	defer r.Close()
-
-	err = os.MkdirAll(path, os.ModePerm)
-	if err != nil {
+	defer reader.Close()
+	if err = os.MkdirAll(path, 0700); err != nil {
 		return err
 	}
-
-	for _, file := range r.File {
-		filePath := filepath.Join(path, file.Name)
-
+	var total int64
+	for _, file := range reader.File {
+		if !filepath.IsLocal(file.Name) || file.Mode()&os.ModeSymlink != 0 {
+			return errors.New("unsafe ZIP entry")
+		}
+		destination := filepath.Join(path, file.Name)
 		if file.FileInfo().IsDir() {
-			err = os.MkdirAll(filePath, os.ModePerm)
-			if err != nil {
+			if err = os.MkdirAll(destination, 0700); err != nil {
 				return err
 			}
 			continue
 		}
-
-		newFile, err := os.Create(filePath)
-		if err != nil {
+		if err = os.MkdirAll(filepath.Dir(destination), 0700); err != nil {
 			return err
 		}
-
-		zipFile, err := file.Open()
+		err = func() error {
+			input, err := file.Open()
+			if err != nil {
+				return err
+			}
+			defer input.Close()
+			output, err := os.Create(destination)
+			if err != nil {
+				return err
+			}
+			defer output.Close()
+			n, err := io.Copy(output, io.LimitReader(input, maxAssetBytes-total+1))
+			total += n
+			if err != nil {
+				return err
+			}
+			if total > maxAssetBytes {
+				return errors.New("ZIP exceeds 512 MiB")
+			}
+			return output.Close()
+		}()
 		if err != nil {
-			newFile.Close()
 			return err
-		}
-
-		var errs error
-		_, err = io.Copy(newFile, zipFile)
-		errs = E.Errors(errs, err)
-		errs = E.Errors(errs, common.Close(zipFile, newFile))
-		if errs != nil {
-			return errs
 		}
 	}
-
 	return nil
 }
