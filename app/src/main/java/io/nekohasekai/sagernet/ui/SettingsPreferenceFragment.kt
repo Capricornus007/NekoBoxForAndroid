@@ -19,7 +19,9 @@ import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.InitialConfiguration
 import io.nekohasekai.sagernet.database.NetworkSettingsHistory
+import io.nekohasekai.sagernet.database.preference.PublicDatabase
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ui.requestPinClearCacheShortcut
@@ -291,7 +293,10 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setNegativeButton(R.string.no, null)
                 setPositiveButton(R.string.yes) { _, _ ->
                     checkpoint()
-                    DataStore.configurationStore.reset()
+                    PublicDatabase.instance.runInTransaction {
+                        DataStore.configurationStore.reset()
+                        PublicDatabase.kvPairDao.insert(InitialConfiguration.settings())
+                    }
                     triggerFullRestart(requireContext())
                 }
             }.show()
