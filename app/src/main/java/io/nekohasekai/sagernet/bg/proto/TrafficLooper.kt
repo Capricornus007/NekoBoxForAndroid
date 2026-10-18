@@ -67,8 +67,9 @@ class TrafficLooper(val data: BaseService.Data) {
     private suspend fun loop() {
         val speedInterval = DataStore.speedInterval.toLong()
         while (currentCoroutineContext().isActive) {
-            withTimeoutOrNull(TrafficUpdater.pollingInterval(speedInterval, !data.powerRestricted)) { powerChanged.receive() }
-            updater?.updateAll()
+            val resumed = TrafficUpdater.awaitUpdate(speedInterval, { data.powerRestricted }, powerChanged)
+            if (data.state != BaseService.State.Connected || data.powerRestricted) continue
+            updater?.updateAll(calculateRates = !resumed)
             val showSpeed = speedInterval > 0
             val speed = SpeedDisplayData(
                 if (showSpeed) session.txRate else 0,

@@ -1,5 +1,8 @@
 package io.nekohasekai.sagernet.bg.proto
 
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.withTimeoutOrNull
+
 // Native queries return and reset deltas. Read each tag once, even when a
 // profile appears in several chains or several profiles share one tag.
 class TrafficUpdater(
@@ -17,7 +20,7 @@ class TrafficUpdater(
 
     private var lastUpdate = clock()
 
-    fun updateAll() {
+    fun updateAll(calculateRates: Boolean = true) {
         val now = clock()
         val interval = now - lastUpdate
         lastUpdate = now
@@ -28,14 +31,29 @@ class TrafficUpdater(
             }
             item.tx += tx
             item.rx += rx
-            item.txRate = if (interval > 0) tx * 1000 / interval else 0
-            item.rxRate = if (interval > 0) rx * 1000 / interval else 0
+            item.txRate = if (calculateRates && interval > 0) tx * 1000 / interval else 0
+            item.rxRate = if (calculateRates && interval > 0) rx * 1000 / interval else 0
         }
     }
 
     companion object {
-        fun pollingInterval(speedInterval: Long, interactive: Boolean = true): Long =
-            if (interactive) speedInterval.takeIf { it > 0 } ?: 1000L else maxOf(30_000L, speedInterval)
+        fun pollingInterval(speedInterval: Long): Long = speedInterval.takeIf { it > 0 } ?: 1000L
+
+        // The native counters accumulate until read; screen-off needs no polling timer.
+        internal suspend fun awaitUpdate(
+            speedInterval: Long,
+            powerRestricted: () -> Boolean,
+            powerChanged: ReceiveChannel<Unit>,
+        ): Boolean {
+            var resumed = false
+            do {
+                if (powerRestricted()) {
+                    resumed = true
+                    powerChanged.receive()
+                } else withTimeoutOrNull(pollingInterval(speedInterval)) { powerChanged.receive() }
+            } while (powerRestricted())
+            return resumed
+        }
 
         // Session totals are supplied separately by the native ingress tracker.
         // Group and leaf counters intentionally overlap and must never be summed

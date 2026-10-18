@@ -25,11 +25,11 @@ object Logs {
     }
 
     fun i(message: String) {
-        print("[Info] [${mkTag()}] $message")
+        if (DataStore.logLevel in 2..4) print("[Info] [${mkTag()}] $message")
     }
 
     fun i(message: String, exception: Throwable) {
-        print("[Info] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
+        if (DataStore.logLevel in 2..4) print("[Info] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
     }
 
     fun w(message: String) {
