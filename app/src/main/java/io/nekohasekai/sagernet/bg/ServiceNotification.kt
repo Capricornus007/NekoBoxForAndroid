@@ -2,10 +2,8 @@ package io.nekohasekai.sagernet.bg
 
 import android.app.PendingIntent
 import android.app.Service
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
@@ -40,7 +38,7 @@ import kotlinx.coroutines.sync.withLock
 class ServiceNotification(
     private val service: BaseService.Interface, title: String,
     channel: String, visible: Boolean = false,
-) : BroadcastReceiver() {
+) {
     companion object {
         const val notificationId = 1
         const val flags = PendingIntent.FLAG_IMMUTABLE
@@ -52,7 +50,11 @@ class ServiceNotification(
         }
     }
 
-    var listenPostSpeed = true
+    @Volatile private var destroyed = false
+
+    val listenPostSpeed: Boolean
+        get() = !destroyed && service.data.state == BaseService.State.Connected &&
+            !service.data.powerRestricted && SagerNet.power.isInteractive
 
     suspend fun postNotificationSpeedUpdate(stats: SpeedDisplayData) {
         useBuilder {
@@ -140,11 +142,6 @@ class ServiceNotification(
         // coroutine scheduling or proxy initialization.
         show()
 
-        service.registerReceiver(this, IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_SCREEN_OFF)
-        })
-
         runOnMainDispatcher {
             updateActions()
             update()
@@ -180,13 +177,6 @@ class ServiceNotification(
         }
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
-        if (service.data.state == BaseService.State.Connected) {
-            listenPostSpeed = intent.action == Intent.ACTION_SCREEN_ON
-        }
-    }
-
-
     private fun show() {
         val notification = builder.build()
         if (Build.VERSION.SDK_INT >= 34) {
@@ -205,12 +195,11 @@ class ServiceNotification(
     }
 
     fun destroy() {
-        listenPostSpeed = false
+        destroyed = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             (service as Service).stopForeground(Service.STOP_FOREGROUND_REMOVE)
         } else {
             (service as Service).stopForeground(true)
         }
-        service.unregisterReceiver(this)
     }
 }

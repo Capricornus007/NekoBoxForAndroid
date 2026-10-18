@@ -18628,3 +18628,103 @@ index f410bad52..9c3922c40 100644
 +	_, err := d.Device.Write(remaining, 0)
 +	return originalCount, err
  }
+diff --git a/log/observable.go b/log/observable.go
+--- a/log/observable.go
++++ b/log/observable.go
+@@ -161,7 +161,7 @@
+ 		f.subscriber.Emit(Entry{level, f.formatter.FormatSimple(ctx, tag, message)})
+ 	}
+ 	platformWriters := f.loadPlatformWriters()
+-	if len(platformWriters) > 0 {
++	if level <= f.level && len(platformWriters) > 0 {
+ 		platformMessage := f.platformFormatter.Format(ctx, level, tag, message, timestamp)
+ 		for _, platformWriter := range platformWriters {
+ 			platformWriter.WriteMessage(level, platformMessage)
+@@ -178,8 +178,7 @@
+ 
+ func (l *observableLogger) Log(ctx context.Context, level Level, args []any) {
+ 	level = OverrideLevelFromContext(level, ctx)
+-	platformWriters := l.loadPlatformWriters()
+-	if level > l.level && len(platformWriters) == 0 && !l.needObservable {
++	if level > l.level && !l.needObservable {
+ 		return
+ 	}
+ 	nowTime := time.Now()
+diff --git a/log/platform_level_test.go b/log/platform_level_test.go
+new file mode 100644
+--- /dev/null
++++ b/log/platform_level_test.go
+@@ -0,0 +1,73 @@
++package log
++
++import (
++	"context"
++	"io"
++	"testing"
++)
++
++type levelTestWriter struct{ levels []Level }
++
++func (w *levelTestWriter) WriteMessage(level Level, _ string) {
++	w.levels = append(w.levels, level)
++}
++
++func TestPlatformWriterHonorsConfiguredLevel(t *testing.T) {
++	for _, observable := range []bool{false, true} {
++		for _, threshold := range []Level{LevelWarn, LevelInfo, LevelDebug, LevelTrace} {
++			writer := &levelTestWriter{}
++			factory := NewDefaultFactory(context.Background(), Formatter{}, io.Discard, "", writer, observable)
++			factory.SetLevel(threshold)
++			logger := factory.Logger()
++			// Also exercise messages buffered before the factory has started.
++			logger.Info("startup info")
++			if err := factory.Start(); err != nil {
++				t.Fatal(err)
++			}
++			logger.Error("error")
++			logger.Warn("warn")
++			logger.Info("info")
++			logger.Debug("debug")
++			logger.Trace("trace")
++			want := []Level{LevelError, LevelWarn}
++			if threshold >= LevelInfo {
++				want = append([]Level{LevelInfo}, append(want, LevelInfo)...)
++			}
++			if threshold >= LevelDebug {
++				want = append(want, LevelDebug)
++			}
++			if threshold >= LevelTrace {
++				want = append(want, LevelTrace)
++			}
++			if len(writer.levels) != len(want) {
++				t.Fatalf("level=%v observable=%v: got %v, want %v", threshold, observable, writer.levels, want)
++			}
++			for i := range want {
++				if writer.levels[i] != want[i] {
++					t.Fatalf("level=%v observable=%v: got %v, want %v", threshold, observable, writer.levels, want)
++				}
++			}
++			factory.Close()
++		}
++	}
++}
++
++type levelTestStringer struct{ calls int }
++
++func (s *levelTestStringer) String() string { s.calls++; return "suppressed" }
++
++func TestSuppressedPlatformMessagesAreNotFormatted(t *testing.T) {
++	writer := &levelTestWriter{}
++	factory := NewDefaultFactory(context.Background(), Formatter{}, io.Discard, "", writer, false)
++	factory.SetLevel(LevelWarn)
++	defer factory.Close()
++	value := &levelTestStringer{}
++	factory.Logger().Debug(value)
++	if err := factory.Start(); err != nil {
++		t.Fatal(err)
++	}
++	factory.Logger().Info(value)
++	if value.calls != 0 || len(writer.levels) != 0 {
++		t.Fatalf("suppressed logs performed work: formatting=%d writes=%d", value.calls, len(writer.levels))
++	}
++}

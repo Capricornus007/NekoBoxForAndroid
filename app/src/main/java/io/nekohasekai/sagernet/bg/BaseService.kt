@@ -96,9 +96,11 @@ class BaseService {
             if (state != State.Connected) return
             val context = service as Context
             val keyguard = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            powerRestricted = pauseHealthChecks(SagerNet.power.isInteractive, keyguard.isKeyguardLocked, SagerNet.power.isDeviceIdleMode)
+            val restricted = pauseHealthChecks(SagerNet.power.isInteractive, keyguard.isKeyguardLocked, SagerNet.power.isDeviceIdleMode)
+            val changed = powerRestricted != restricted
+            powerRestricted = restricted
             proxy?.box?.setProbesPaused(powerRestricted)
-            proxy?.looper?.onPowerChanged()
+            if (changed) proxy?.looper?.onPowerChanged()
         }
 
         fun changeState(s: State, msg: String? = null) {

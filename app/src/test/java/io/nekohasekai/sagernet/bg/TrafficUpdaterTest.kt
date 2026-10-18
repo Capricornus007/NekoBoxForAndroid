@@ -1,14 +1,13 @@
 package io.nekohasekai.sagernet.bg
 
 import io.nekohasekai.sagernet.bg.proto.TrafficUpdater
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.junit.Assert.*
 import org.junit.Test
 
 class TrafficUpdaterTest {
-    @Test fun screenOffPollingRetainsTotalsAcrossLongInterval() {
-        assertEquals(30_000L, TrafficUpdater.pollingInterval(500, false))
-        assertEquals(60_000L, TrafficUpdater.pollingInterval(60_000, false))
-        assertEquals(500L, TrafficUpdater.pollingInterval(500, true))
+    @Test fun countersRetainTotalsAcrossLongInterval() {
         var now = 0L
         val item = TrafficUpdater.TrafficLooperData("proxy")
         val updater = TrafficUpdater(listOf(item), { _, _ -> 3000L }, { now })
@@ -16,6 +15,50 @@ class TrafficUpdaterTest {
         updater.updateAll()
         assertEquals(3000L, item.tx)
         assertEquals(100L, item.txRate)
+    }
+
+    @Test fun lockedScreenWaitsForUnlockWithoutReadingCounters(): Unit = runBlocking {
+        var restricted = true
+        val changes = Channel<Unit>(Channel.CONFLATED)
+        var reads = 0
+        val item = TrafficUpdater.TrafficLooperData("proxy")
+        val updater = TrafficUpdater(listOf(item), { _, _ -> reads++; 3000L })
+        val update = async(start = CoroutineStart.UNDISPATCHED) {
+            val resumed = TrafficUpdater.awaitUpdate(1, { restricted }, changes)
+            assertTrue(resumed)
+            updater.updateAll(calculateRates = !resumed)
+        }
+        // A queued screen-off/Doze event must not cause a counter read.
+        changes.send(Unit)
+        yield()
+        assertFalse(update.isCompleted)
+        assertEquals(0, reads)
+        restricted = false
+        changes.send(Unit)
+        withTimeout(1000) { update.await() }
+        assertEquals(2, reads)
+        assertEquals(3000L, item.tx)
+        assertEquals(3000L, item.rx)
+        assertEquals(0L, item.txRate)
+        assertEquals(0L, item.rxRate)
+        changes.close()
+    }
+
+    @Test fun unlockedScreenStillUpdatesOnTimer(): Unit = runBlocking {
+        val changes = Channel<Unit>(Channel.CONFLATED)
+        assertFalse(withTimeout(1000) { TrafficUpdater.awaitUpdate(1, { false }, changes) })
+        changes.close()
+    }
+
+    @Test fun stoppingWhileLockedCancelsWaitingImmediately(): Unit = runBlocking {
+        val changes = Channel<Unit>(Channel.CONFLATED)
+        val update = launch(start = CoroutineStart.UNDISPATCHED) {
+            TrafficUpdater.awaitUpdate(1, { true }, changes)
+            fail("A locked screen must not request an update")
+        }
+        withTimeout(1000) { update.cancelAndJoin() }
+        assertTrue(update.isCancelled)
+        changes.close()
     }
     @Test fun disabledSpeedStillPollsTotals() {
         assertEquals(1000L, TrafficUpdater.pollingInterval(0))

@@ -82,7 +82,7 @@ jobs:
         env:
           NEKO_ROUTE_ASSET_TEST_DIR: ../app/src/main/assets/sing-box
         shell: bash
-        run: go test -race -tags=with_conntrack,with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api . github.com/sagernet/sing-box/protocol/group github.com/sagernet/sing-box/transport/wireguard github.com/sagernet/sing-box/protocol/http github.com/sagernet/sing-box/common/kmutex github.com/sagernet/sing-box/common/expiringmap github.com/sagernet/sing-box/common/dialer github.com/sagernet/sing-quic/congestion_meta2 github.com/sagernet/sing-box/protocol/vless/encryption 2>&1 | tee ../go-test.log
+        run: go test -race -tags=with_conntrack,with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api . github.com/sagernet/sing-box/log github.com/sagernet/sing-box/protocol/group github.com/sagernet/sing-box/transport/wireguard github.com/sagernet/sing-box/protocol/http github.com/sagernet/sing-box/common/kmutex github.com/sagernet/sing-box/common/expiringmap github.com/sagernet/sing-box/common/dialer github.com/sagernet/sing-quic/congestion_meta2 github.com/sagernet/sing-box/protocol/vless/encryption 2>&1 | tee ../go-test.log
       - name: Build libcore AAR once
         run: ./buildScript/lib/core/build.sh
       - name: Test and build release APKs
