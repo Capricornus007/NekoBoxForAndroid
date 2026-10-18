@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Release tag. Leave empty to auto-generate.
+        description: 'Release tag and app version (e.g. v2.01 or 2.01). Empty: generate a unique version.'
         required: false
         type: string
       title:
@@ -37,6 +37,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Prepare release version and notes
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_TITLE: ${{ inputs.title }}
+        run: python3 .github/scripts/prepare_release.py
+      - name: Reject an existing release before building
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release $RELEASE_TAG already exists; refusing to overwrite it."
+            exit 1
+          fi
       - name: Set up JDK 17
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
@@ -75,6 +88,8 @@ jobs:
         run: ./buildScript/lib/assets.sh
       - name: Test two-database backup restore
         run: python3 buildScript/tests/test_restore_transaction.py
+      - name: Test release metadata
+        run: python3 .github/scripts/test_prepare_release.py
       - name: Check UI resources and fixed palette contrast
         run: python3 buildScript/tests/test_ui_resources.py
       - name: Test Go core with race detection
@@ -114,32 +129,14 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          INPUT_TAG: ${{ inputs.tag }}
-          INPUT_TITLE: ${{ inputs.title }}
         run: |
-          VERSION_NAME=$(sed -n 's/^VERSION_NAME=//p' nb4a.properties)
-          NOTES_FILE="docs/releases/${VERSION_NAME}.md"
-          DEFAULT_TAG="v${VERSION_NAME}-${GITHUB_RUN_NUMBER}"
-          if [ -f "$NOTES_FILE" ]; then DEFAULT_TAG="v${VERSION_NAME}"; fi
-          TAG=${INPUT_TAG:-$DEFAULT_TAG}
-          TITLE=${INPUT_TITLE:-NekoBox_SF ${VERSION_NAME}}
-          git check-ref-format "refs/tags/$TAG"
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Release $TAG already exists; refusing to overwrite it."
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release $RELEASE_TAG already exists; refusing to overwrite it."
             exit 1
           fi
-          if [ "$VERSION_NAME" = "2.00" ]; then
+          if [ "$RELEASE_VERSION" = "2.00" ]; then
             python3 -c 'import json; m=json.load(open("release-assets/BUILD-MANIFEST.json")); assert m["signing_key"] == "private-ci", "Version 2.00 must be published with the configured private signing key"'
-          fi
-          if [ -f "$NOTES_FILE" ]; then
-            cp "$NOTES_FILE" release-notes.txt
-          else
-            cat > release-notes.txt <<'NOTES'
-          APK для Android 6 и новее. Выберите файл для архитектуры своего устройства; для большинства современных телефонов подходит arm64-v8a.
-
-          Перед переходом со старого имени пакета или другой подписи сохраните резервную копию вне папки приложения. Подробности установки и изменений — в README репозитория.
-          NOTES
           fi
           OPTIONS=()
           if [ "$NEKO_DEV_BUILD" = 1 ]; then OPTIONS+=(--prerelease --latest=false); fi
-          gh release create "$TAG" release-assets/* --target "$GITHUB_SHA" --title "$TITLE" --notes-file release-notes.txt "${OPTIONS[@]}"
+          gh release create "$RELEASE_TAG" release-assets/* --target "$GITHUB_SHA" --title "$RELEASE_TITLE" --notes-file release-notes.txt "${OPTIONS[@]}"
