@@ -107,6 +107,9 @@ func NewSingBoxInstance(config string, localTransport LocalDNSTransport) (b *Box
 		cancel()
 		return nil, fmt.Errorf("decode config: %v", err)
 	}
+	if options.Log != nil {
+		options.Log.DisableColor = true
+	}
 	if err = materializeGeoRuleSets(&options); err != nil {
 		cancel()
 		return nil, fmt.Errorf("prepare geographic rules: %w", err)

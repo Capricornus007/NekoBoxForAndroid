@@ -5,6 +5,13 @@ import org.junit.Test
 import com.google.gson.JsonParser
 
 class DiagnosticRedactionTest {
+    @Test fun removesAnsiColorsFromOldLogsAndExports() {
+        val line = "\u001b[37mDEBUG\u001b[0m[0010] [\u001b[38;5;84m42\u001b[0m 1ms] router: ready"
+        val plain = "DEBUG[0010] [42 1ms] router: ready"
+        assertEquals(plain, stripAnsiColors(line))
+        assertEquals(plain, redactDiagnostic(line))
+        assertFalse(redactDiagnostic("\u001b[31mpassword\u001b[0m=fixture-secret").contains("fixture-secret"))
+    }
     @Test fun previewKeepsValidJsonAndHidesNestedSecrets() {
         val source = """{"outbounds":[{"type":"http","password":"secret phrase","tls":{"private_key":["private-fixture"]},"transport":{"headers":{"Example-Api-Key":"header-fixture"}}}],"url":"https://example.test/account-fixture"}"""
         val preview = redactConfigJson(source)

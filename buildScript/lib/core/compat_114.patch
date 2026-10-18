@@ -6730,7 +6730,7 @@ index af8826b89..c53defcf1 100644
 +}
 diff --git a/protocol/group/candidate_health.go b/protocol/group/candidate_health.go
 new file mode 100644
-index 000000000..82d2a636f
+index 0000000..88374c2
 --- /dev/null
 +++ b/protocol/group/candidate_health.go
 @@ -0,0 +1,176 @@
@@ -6815,7 +6815,7 @@ index 000000000..82d2a636f
 +			}
 +		}
 +	}
-+	if !enhanced {
++	if !enhanced && !g.probesPaused.Load() {
 +		return true
 +	}
 +	g.healthAccess.Lock()
@@ -7235,14 +7235,17 @@ index 000000000..4bf0087ce
 +}
 diff --git a/protocol/group/probe_pause.go b/protocol/group/probe_pause.go
 new file mode 100644
-index 000000000..bcedbe531
+index 0000000..b5b1a2a
 --- /dev/null
 +++ b/protocol/group/probe_pause.go
-@@ -0,0 +1,33 @@
+@@ -0,0 +1,36 @@
 +package group
 +
++type failureRecoveryKey struct{}
++
 +// Screen/keyguard pauses apply only to health checks, never to VPN devices or
-+// user traffic. The system Doze/network pause remains an independent condition.
++// user traffic. A real dial failure may run a throttled recovery check while
++// the screen is locked. The system Doze/network pause remains independent.
 +func (g *URLTestGroup) checksPaused() bool {
 +	return g.probesPaused.Load() || g.pause.IsDevicePaused() || g.pause.IsNetworkPaused()
 +}
@@ -7420,7 +7423,7 @@ index c3aaec5a9..3d603ab9b 100644
 +
 +func RealTag(_ adapter.OutboundManager, detour adapter.Outbound) string { return legacyRealTag(detour) }
 diff --git a/protocol/group/urltest.go b/protocol/group/urltest.go
-index bc50ab70d..9f53f010d 100644
+index bc50ab7..8a90e88 100644
 --- a/protocol/group/urltest.go
 +++ b/protocol/group/urltest.go
 @@ -2,7 +2,6 @@ package group
@@ -7558,7 +7561,7 @@ index bc50ab70d..9f53f010d 100644
  	}
  	return ""
  }
-@@ -107,49 +133,18 @@ func (s *URLTest) All() []string {
+@@ -107,49 +133,19 @@ func (s *URLTest) All() []string {
  	return s.tags
  }
  
@@ -7596,7 +7599,8 @@ index bc50ab70d..9f53f010d 100644
 -		return
 +func (s *URLTest) checkAfterFailure() {
 +	if !s.managedByParent && s.group.allowFailureCheck() {
-+		go s.group.CheckOutbounds(true)
++		ctx := context.WithValue(s.group.ctx, failureRecoveryKey{}, true)
++		go func() { _, _ = s.group.urlTest(ctx, true) }()
  	}
 -	if group.pause.IsDevicePaused() || group.pause.IsNetworkPaused() {
 -		return
@@ -7612,7 +7616,7 @@ index bc50ab70d..9f53f010d 100644
  }
  
  func (s *URLTest) DialContext(ctx context.Context, network string, destination M.Socksaddr) (net.Conn, error) {
-@@ -157,13 +152,13 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
+@@ -157,57 +153,82 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
  	var outbound adapter.Outbound
  	switch N.NetworkName(network) {
  	case N.NetworkTCP:
@@ -7629,7 +7633,8 @@ index bc50ab70d..9f53f010d 100644
  		outbound, _ = s.group.Select(network)
  	}
  	if outbound == nil {
-@@ -171,17 +166,19 @@ func (s *URLTest) DialContext(ctx context.Context, network string, destination M
++		s.checkAfterFailure()
+ 		return nil, E.New("missing supported outbound")
  	}
  	conn, err := outbound.DialContext(ctx, network, destination)
  	if err == nil {
@@ -7652,7 +7657,8 @@ index bc50ab70d..9f53f010d 100644
  		outbound, _ = s.group.Select(N.NetworkUDP)
  	}
  	if outbound == nil {
-@@ -189,25 +186,46 @@ func (s *URLTest) ListenPacket(ctx context.Context, destination M.Socksaddr) (ne
++		s.checkAfterFailure()
+ 		return nil, E.New("missing supported outbound")
  	}
  	conn, err := outbound.ListenPacket(ctx, destination)
  	if err == nil {
@@ -7702,7 +7708,7 @@ index bc50ab70d..9f53f010d 100644
  	outbound                     adapter.OutboundManager
  	pause                        pause.Manager
  	pauseCallback                *list.Element[pause.Callback]
-@@ -217,21 +235,29 @@ type URLTestGroup struct {
+@@ -217,21 +238,29 @@ type URLTestGroup struct {
  	interval                     time.Duration
  	tolerance                    uint16
  	idleTimeout                  time.Duration
@@ -7737,7 +7743,7 @@ index bc50ab70d..9f53f010d 100644
  	if interval == 0 {
  		interval = C.DefaultURLTestInterval
  	}
-@@ -241,15 +267,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -241,15 +270,33 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	if idleTimeout == 0 {
  		idleTimeout = C.DefaultURLTestIdleTimeout
  	}
@@ -7775,7 +7781,7 @@ index bc50ab70d..9f53f010d 100644
  		outbound:                     outboundManager,
  		logger:                       logger,
  		outbounds:                    outbounds,
-@@ -257,6 +301,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -257,6 +304,9 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  		interval:                     interval,
  		tolerance:                    tolerance,
  		idleTimeout:                  idleTimeout,
@@ -7785,7 +7791,7 @@ index bc50ab70d..9f53f010d 100644
  		history:                      history,
  		close:                        make(chan struct{}),
  		pause:                        service.FromContext[pause.Manager](ctx),
-@@ -265,59 +312,141 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
+@@ -265,59 +315,141 @@ func NewURLTestGroup(ctx context.Context, outboundManager adapter.OutboundManage
  	}, nil
  }
  
@@ -7946,7 +7952,7 @@ index bc50ab70d..9f53f010d 100644
  				minDelay = history.Delay
  			}
  		}
-@@ -326,7 +455,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -326,7 +458,7 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  		if !common.Contains(detour.Network(), network) {
  			continue
  		}
@@ -7955,7 +7961,7 @@ index bc50ab70d..9f53f010d 100644
  		if history == nil {
  			continue
  		}
-@@ -336,7 +465,13 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -336,7 +468,13 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  		}
  	}
  	if minOutbound == nil {
@@ -7969,7 +7975,7 @@ index bc50ab70d..9f53f010d 100644
  			if !common.Contains(detour.Network(), network) {
  				continue
  			}
-@@ -347,180 +482,347 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
+@@ -347,180 +485,348 @@ func (g *URLTestGroup) Select(network string) (adapter.Outbound, bool) {
  	return minOutbound, true
  }
  
@@ -8081,22 +8087,16 @@ index bc50ab70d..9f53f010d 100644
 +	}()
 +	g.probeAccess.Lock()
 +	// Forced bootstrap checks may run before Android publishes a default network.
-+	if g.probesPaused.Load() || g.pause.IsDevicePaused() {
++	recovery := ctx.Value(failureRecoveryKey{}) == true
++	if (g.probesPaused.Load() && !recovery) || g.pause.IsDevicePaused() || (recovery && g.pause.IsNetworkPaused()) {
 +		g.probeAccess.Unlock()
 +		return result, nil
- 	}
--	return testBatch.result
--}
++	}
 +	ctx, cancel := context.WithCancel(ctx)
 +	g.probeCancel = cancel
 +	g.probeAccess.Unlock()
 +	defer func() { cancel(); g.probeAccess.Lock(); g.probeCancel = nil; g.probeAccess.Unlock() }()
- 
--func (b *urlTestBatch) test(outbounds []adapter.Outbound, link string, interval time.Duration, force bool) {
--	for _, detour := range outbounds {
--		tag := detour.Tag()
--		if b.checked[tag] {
--			continue
++
 +	if g.strategy == "direct-fallback" {
 +		return g.checkDirectFallback(ctx)
 +	}
@@ -8140,7 +8140,28 @@ index bc50ab70d..9f53f010d 100644
 +			g.history.StoreURLTestHistory(realTag, &adapter.URLTestHistory{Time: time.Now(), Delay: t})
 +			result[tag] = t
 +			break
- 		}
++		}
++		g.performUpdateCheck()
++		return result, nil
+ 	}
+-	return testBatch.result
+-}
+-
+-func (b *urlTestBatch) test(outbounds []adapter.Outbound, link string, interval time.Duration, force bool) {
+-	for _, detour := range outbounds {
++	epoch := g.probeEpoch()
++	concurrency := 10
++	if g.healthCheck {
++		concurrency = 3
++	}
++	b, _ := batch.New(ctx, batch.WithConcurrencyNum[any](concurrency))
++	checked := make(map[string]bool)
++	var resultAccess sync.Mutex
++	for _, detour := range g.outbounds {
+ 		tag := detour.Tag()
+-		if b.checked[tag] {
+-			continue
+-		}
 -		switch nested := detour.(type) {
 -		case *URLTest:
 -			b.checked[tag] = true
@@ -8162,19 +8183,6 @@ index bc50ab70d..9f53f010d 100644
 -		default:
 -			history := b.history.LoadURLTestHistory(tag)
 -			if !force && history != nil && time.Since(history.Time) < interval {
-+		g.performUpdateCheck()
-+		return result, nil
-+	}
-+	epoch := g.probeEpoch()
-+	concurrency := 10
-+	if g.healthCheck {
-+		concurrency = 3
-+	}
-+	b, _ := batch.New(ctx, batch.WithConcurrencyNum[any](concurrency))
-+	checked := make(map[string]bool)
-+	var resultAccess sync.Mutex
-+	for _, detour := range g.outbounds {
-+		tag := detour.Tag()
 +		if nested, isNested := detour.(*URLTest); isNested && nested.managedByParent {
 +			if checked[tag] {
  				continue
@@ -8220,11 +8228,11 @@ index bc50ab70d..9f53f010d 100644
  				return nil, nil
  			})
 +			continue
-+		}
+ 		}
 +		realTag := legacyRealTag(detour)
 +		if checked[realTag] {
 +			continue
- 		}
++		}
 +		history := g.history.LoadURLTestHistory(realTag)
 +		if !force && history != nil && time.Since(history.Time) < g.interval {
 +			if g.strategy == "fastest" {
@@ -8267,11 +8275,11 @@ index bc50ab70d..9f53f010d 100644
 +			}
 +			return nil, nil
 +		})
- 	}
++	}
 +	b.Wait()
 +	if ctx.Err() != nil {
 +		return result, ctx.Err()
-+	}
+ 	}
 +	g.performUpdateCheck()
 +	return result, nil
  }
@@ -8302,8 +8310,10 @@ index bc50ab70d..9f53f010d 100644
 -		if g.selectedOutboundUDP != nil {
 +	} else if g.selectedOutboundTCP.Load() == nil || (existsTCP && outboundTCP != g.selectedOutboundTCP.Load()) {
 +		if g.selectedOutboundTCP.Load() != nil {
-+			updated = true
-+		}
+ 			updated = true
+ 		}
+-		g.selectedOutboundUDP = outbound
+-		selected = true
 +		g.recordSelection(N.NetworkTCP, outboundTCP)
 +		g.selectedOutboundTCP.Store(outboundTCP)
 +	}
@@ -8312,10 +8322,8 @@ index bc50ab70d..9f53f010d 100644
 +		if (g.strategy == "priority" || g.healthCheck || g.failureCooldown) && g.selectedOutboundUDP.Load() != nil {
 +			g.recordSelection(N.NetworkUDP, nil)
 +			g.selectedOutboundUDP.Store(nil)
- 			updated = true
- 		}
--		g.selectedOutboundUDP = outbound
--		selected = true
++			updated = true
++		}
 +	} else if g.selectedOutboundUDP.Load() == nil || (existsUDP && outboundUDP != g.selectedOutboundUDP.Load()) {
 +		if g.selectedOutboundUDP.Load() != nil {
 +			updated = true
@@ -18629,9 +18637,18 @@ index f410bad52..9c3922c40 100644
 +	return originalCount, err
  }
 diff --git a/log/observable.go b/log/observable.go
+index ab50e56..b276585 100644
 --- a/log/observable.go
 +++ b/log/observable.go
-@@ -161,7 +161,7 @@
+@@ -55,6 +55,7 @@ func NewDefaultFactory(
+ 		formatter: formatter,
+ 		platformFormatter: Formatter{
+ 			BaseTime:         formatter.BaseTime,
++			DisableColors:    true,
+ 			DisableLineBreak: true,
+ 		},
+ 		writer:         writer,
+@@ -161,7 +162,7 @@ func (f *defaultFactory) output(ctx context.Context, level Level, tag string, me
  		f.subscriber.Emit(Entry{level, f.formatter.FormatSimple(ctx, tag, message)})
  	}
  	platformWriters := f.loadPlatformWriters()
@@ -18640,7 +18657,7 @@ diff --git a/log/observable.go b/log/observable.go
  		platformMessage := f.platformFormatter.Format(ctx, level, tag, message, timestamp)
  		for _, platformWriter := range platformWriters {
  			platformWriter.WriteMessage(level, platformMessage)
-@@ -178,8 +178,7 @@
+@@ -178,8 +179,7 @@ type observableLogger struct {
  
  func (l *observableLogger) Log(ctx context.Context, level Level, args []any) {
  	level = OverrideLevelFromContext(level, ctx)
@@ -18652,21 +18669,47 @@ diff --git a/log/observable.go b/log/observable.go
  	nowTime := time.Now()
 diff --git a/log/platform_level_test.go b/log/platform_level_test.go
 new file mode 100644
+index 0000000..4395950
 --- /dev/null
 +++ b/log/platform_level_test.go
-@@ -0,0 +1,73 @@
+@@ -0,0 +1,98 @@
 +package log
 +
 +import (
 +	"context"
 +	"io"
++	"strings"
 +	"testing"
++	"time"
 +)
 +
-+type levelTestWriter struct{ levels []Level }
++type levelTestWriter struct {
++	levels   []Level
++	messages []string
++}
 +
-+func (w *levelTestWriter) WriteMessage(level Level, _ string) {
++func (w *levelTestWriter) WriteMessage(level Level, message string) {
 +	w.levels = append(w.levels, level)
++	w.messages = append(w.messages, message)
++}
++
++func TestPlatformWriterUsesPlainTextIncludingConnectionIDs(t *testing.T) {
++	writer := &levelTestWriter{}
++	factory := NewDefaultFactory(context.Background(), Formatter{}, io.Discard, "", writer, false)
++	factory.SetLevel(LevelTrace)
++	if err := factory.Start(); err != nil {
++		t.Fatal(err)
++	}
++	defer factory.Close()
++	ctx := ContextWithID(context.Background(), ID{ID: 42, CreatedAt: time.Now()})
++	factory.Logger().InfoContext(ctx, "connection ready")
++	if len(writer.messages) != 1 {
++		t.Fatalf("messages=%v", writer.messages)
++	}
++	message := writer.messages[0]
++	if strings.ContainsRune(message, '\x1b') || !strings.Contains(message, "INFO[") || !strings.Contains(message, "[42 ") || !strings.Contains(message, "connection ready") {
++		t.Fatalf("unexpected platform text: %q", message)
++	}
 +}
 +
 +func TestPlatformWriterHonorsConfiguredLevel(t *testing.T) {
@@ -18726,5 +18769,173 @@ new file mode 100644
 +	factory.Logger().Info(value)
 +	if value.calls != 0 || len(writer.levels) != 0 {
 +		t.Fatalf("suppressed logs performed work: formatting=%d writes=%d", value.calls, len(writer.levels))
++	}
++}
+diff --git a/protocol/group/background_recovery_test.go b/protocol/group/background_recovery_test.go
+new file mode 100644
+index 0000000..7e102ee
+--- /dev/null
++++ b/protocol/group/background_recovery_test.go
+@@ -0,0 +1,162 @@
++package group
++
++import (
++	"context"
++	"errors"
++	"io"
++	"net"
++	"net/http"
++	"net/http/httptest"
++	"sync/atomic"
++	"testing"
++	"time"
++
++	"github.com/sagernet/sing-box/adapter"
++	"github.com/sagernet/sing-box/adapter/outbound"
++	"github.com/sagernet/sing-box/log"
++	"github.com/sagernet/sing-box/option"
++	M "github.com/sagernet/sing/common/metadata"
++	"github.com/sagernet/sing/service"
++	"github.com/sagernet/sing/service/pause"
++)
++
++type recoveryTestOutbound struct {
++	outbound.Adapter
++	control string
++	failed  atomic.Bool
++	probes  atomic.Int32
++}
++
++func (o *recoveryTestOutbound) DialContext(ctx context.Context, network string, target M.Socksaddr) (net.Conn, error) {
++	if target.String() == o.control {
++		o.probes.Add(1)
++	}
++	if o.failed.Load() {
++		return nil, errors.New("fixture node unavailable")
++	}
++	if target.String() == o.control {
++		return (&net.Dialer{}).DialContext(ctx, network, o.control)
++	}
++	local, remote := net.Pipe()
++	go func() { defer remote.Close(); _, _ = io.WriteString(remote, o.Tag()) }()
++	return local, nil
++}
++
++func (o *recoveryTestOutbound) ListenPacket(context.Context, M.Socksaddr) (net.PacketConn, error) {
++	if o.failed.Load() {
++		return nil, errors.New("fixture node unavailable")
++	}
++	return net.ListenPacket("udp", "127.0.0.1:0")
++}
++
++type recoveryTestManager struct {
++	adapter.OutboundManager
++	items map[string]adapter.Outbound
++}
++
++func (m *recoveryTestManager) Outbound(tag string) (adapter.Outbound, bool) {
++	member, ok := m.items[tag]
++	return member, ok
++}
++
++func waitForRecovery(t *testing.T, ready func() bool) {
++	t.Helper()
++	deadline := time.Now().Add(3 * time.Second)
++	for !ready() {
++		if time.Now().After(deadline) {
++			t.Fatal("background recovery did not finish")
++		}
++		time.Sleep(time.Millisecond)
++	}
++}
++
++func TestDialFailureRecoversWhileScreenRemainsLocked(t *testing.T) {
++	for _, strategy := range []string{"fastest", "priority", "direct-fallback"} {
++		for _, network := range []string{"tcp", "udp"} {
++			t.Run(strategy+"/"+network, func(t *testing.T) {
++				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(204) }))
++				defer server.Close()
++				ctx, cancel := context.WithCancel(pause.WithDefaultManager(service.ContextWithDefaultRegistry(context.Background())))
++				defer cancel()
++				target := M.ParseSocksaddr(server.URL[len("http://"):]).String()
++				first := &recoveryTestOutbound{Adapter: outbound.NewAdapter("test", "first", []string{"tcp", "udp"}, nil), control: target}
++				second := &recoveryTestOutbound{Adapter: outbound.NewAdapter("test", "second", []string{"tcp", "udp"}, nil), control: target}
++				manager := &recoveryTestManager{items: map[string]adapter.Outbound{"first": first, "second": second}}
++				g, err := NewURLTestGroup(ctx, manager, log.NewNOPFactory().Logger(), []adapter.Outbound{first, second}, server.URL, time.Hour, 50, time.Hour, time.Second, strategy, false, false)
++				if err != nil {
++					t.Fatal(err)
++				}
++				defer g.Close()
++				if err = g.configureFallback(option.URLTestOutboundOptions{}); err != nil {
++					t.Fatal(err)
++				}
++				g.PostStart(true)
++				waitForRecovery(t, func() bool { return !g.checking.Load() })
++				g.recordProbe("first", "first", 0, 1, nil, nil)
++				g.recordProbe("second", "second", 0, 100, nil, nil)
++				g.performUpdateCheck()
++				s := &URLTest{group: g, logger: log.NewNOPFactory().Logger()}
++				s.SetProbesPaused(true)
++				before := first.probes.Load() + second.probes.Load()
++				g.CheckOutbounds(true)
++				if got := first.probes.Load() + second.probes.Load(); got != before {
++					t.Fatal("screen-off ran scheduled checks")
++				}
++
++				first.failed.Store(true)
++				destination := M.ParseSocksaddr("payload.test:443")
++				if network == "tcp" {
++					if _, err = s.DialContext(context.Background(), network, destination); err == nil {
++						t.Fatal("expected failed node")
++					}
++				} else {
++					if _, err = s.ListenPacket(context.Background(), destination); err == nil {
++						t.Fatal("expected failed node")
++					}
++				}
++				waitForRecovery(t, func() bool {
++					selected := g.selectedOutboundTCP.Load()
++					return selected != nil && selected.Tag() == "second" && !g.checking.Load()
++				})
++				if !g.probesPaused.Load() {
++					t.Fatal("recovery resumed periodic checks")
++				}
++				conn, err := s.DialContext(context.Background(), "tcp", destination)
++				if err != nil {
++					t.Fatal(err)
++				}
++				_ = conn.SetReadDeadline(time.Now().Add(time.Second))
++				payload, err := io.ReadAll(conn)
++				conn.Close()
++				if err != nil || string(payload) != "second" {
++					t.Fatalf("payload=%q err=%v", payload, err)
++				}
++				packet, err := s.ListenPacket(context.Background(), destination)
++				if err != nil {
++					t.Fatal(err)
++				}
++				packet.Close()
++
++				before = first.probes.Load() + second.probes.Load()
++				g.CheckOutbounds(false)
++				if got := first.probes.Load() + second.probes.Load(); got != before {
++					t.Fatal("periodic checks resumed after recovery")
++				}
++				g.pause.DevicePause()
++				recovery := context.WithValue(ctx, failureRecoveryKey{}, true)
++				_, _ = g.urlTest(recovery, true)
++				if got := first.probes.Load() + second.probes.Load(); got != before {
++					t.Fatal("recovery ignored system Doze")
++				}
++			})
++		}
++	}
++}
++
++func TestScreenOffFailureRecoveryIsThrottled(t *testing.T) {
++	g := &URLTestGroup{}
++	g.probesPaused.Store(true)
++	if !g.allowFailureCheck() || g.allowFailureCheck() {
++		t.Fatal("repeated failures must not start a probe storm")
 +	}
 +}

@@ -440,7 +440,7 @@ class BaseService {
                     data.proxy?.displayProfileName ?: getString(R.string.app_name)
                 )
                 if (data.state == State.Stopping) data.restartAfterStop = true
-                return Service.START_NOT_STICKY
+                return Service.START_STICKY
             }
 
             // A database read must not consume the foreground-service promotion deadline.
@@ -537,7 +537,9 @@ class BaseService {
             }
             data.connectingJob = connectingJob
             connectingJob.start()
-            return Service.START_NOT_STICKY
+            // Android may recreate a killed VPN process without waiting for the UI.
+            // Explicit stopRunner(false) still calls stopSelf() and ends that request.
+            return Service.START_STICKY
         }
     }
 

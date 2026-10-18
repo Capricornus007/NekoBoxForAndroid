@@ -5,12 +5,17 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 
+private val ansiColors = Regex("""\x1B\[[0-9;:]*m""")
+
+internal fun stripAnsiColors(message: String): String =
+    if ('\u001b' in message) ansiColors.replace(message, "") else message
+
 private val secretUri = Regex("""(?i)\b(?:https?|ssr?|vmess|vless|trojan(?:-go)?|socks[45a]?|naive\+https?|hysteria2?|tuic|juicity|anytls|vpn|sn)://[^\s"'<>]+""")
 private val privatePem = Regex("""-----BEGIN ([A-Z ]*PRIVATE KEY)-----.*?-----END \1-----""", RegexOption.DOT_MATCHES_ALL)
 private val secretField = Regex("""(?i)(["']?(?:password|passwd|private[_-]?key|preshared[_-]?key|pre_shared_key|header[_-]?protection[_-]?key|uuid|token|secret|authorization|cookie|(?:x-)?hwid|customHwidParams|customHeaders)["']?\s*[:=]\s*)(?:"(?:\\.|[^"\\])*"|'[^'\r\n]*'|[^,;}\r\n]+)""")
 
 internal fun redactDiagnostic(message: String): String = secretField.replace(
-    secretUri.replace(privatePem.replace(message, "[redacted private key]"), "[redacted URI]")
+    secretUri.replace(privatePem.replace(stripAnsiColors(message), "[redacted private key]"), "[redacted URI]")
 ) { "${it.groupValues[1]}[redacted]" }
 
 internal fun redactConfigJson(config: String): String {
