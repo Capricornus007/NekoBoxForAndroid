@@ -1,8 +1,40 @@
 <resources>
     <!-- 使用標準的 M3 代替丟失的 Expressive 基礎主題 -->
-    <style name="Theme.SagerNet" parent="Theme.Material3.DayNight.NoActionBar" />
+    <!--
+      ui* 這組 attr 是 75a27b532 那波「Expressive 化」加進來的：佈局裡原本寫死的值
+      （?attr/actionBarSize、2dp 卡片高度、4dp appbar 浮起…）全換成 ?attr/ui*，
+      但**只有 Theme.SagerNet.Expressive 給它們賦了值**（themes_expressive.xml:59 起）。
+      於是一切非 Expressive 的變體（Theme.SagerNet、.Dialog、values-v31 的 Monet 系、
+      values-night 的 Dracula/Nord/…）在佈局膨脹時解析不到該 attr，直接
+      java.lang.UnsupportedOperationException: Failed to resolve attribute
+      → AppBarLayout.generateLayoutParams → TypedArray.getLayoutDimension 崩潰
+      （實測日誌：layout_group_list 行 #27，FATAL EXCEPTION: main）。
+      修法就是把「改造前的那些值」放進兩條根主題，讓所有變體都有兜底，
+      Expressive 那側照舊覆寫，視覺不變。
+    -->
+    <eat-comment />
+    <style name="Theme.SagerNet" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="uiAppBarHeight">?attr/actionBarSize</item>
+        <item name="uiAppBarElevation">4dp</item>
+        <item name="uiAppBarBackground">?attr/colorSurface</item>
+        <item name="uiCardElevation">2dp</item>
+        <item name="uiCardCornerRadius">12dp</item>
+        <item name="uiCardStrokeWidth">0dp</item>
+        <item name="uiCardStrokeColor">@android:color/transparent</item>
+        <item name="uiListItemMargin">0dp</item>
+        <item name="uiListOuterPadding">8dp</item>
+    </style>
     <style name="Theme.SagerNet.Dialog" parent="Theme.Material3.DayNight.Dialog">
         <item name="windowFixedHeightMajor" type="dimen">95%</item>
+        <item name="uiAppBarHeight">?attr/actionBarSize</item>
+        <item name="uiAppBarElevation">4dp</item>
+        <item name="uiAppBarBackground">?attr/colorSurface</item>
+        <item name="uiCardElevation">2dp</item>
+        <item name="uiCardCornerRadius">12dp</item>
+        <item name="uiCardStrokeWidth">0dp</item>
+        <item name="uiCardStrokeColor">@android:color/transparent</item>
+        <item name="uiListItemMargin">0dp</item>
+        <item name="uiListOuterPadding">8dp</item>
     </style>
 
     <style name="AppearanceFoundation.Title" parent="TextAppearance.AppCompat.Title">

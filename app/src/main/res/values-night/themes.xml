@@ -12,7 +12,19 @@
       Selecting Dracula also forces night mode on (SettingsPreferenceFragment),
       which is what brings these overrides into effect.
     -->
+    <!-- ⚠️ 這份在夜間模式下**整份取代** values/themes.xml 的同名樣式（Android 的 style 不跨
+      配置合併），所以白天那份加的 ui* 兜底值在這裡不會生效——崩潰日誌走的正是 Dark 鏈
+      （Theme.Material3.Dark.Dialog）。改任何一個根主題都要兩邊一起改。 -->
     <style name="Theme.SagerNet" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="uiAppBarHeight">?attr/actionBarSize</item>
+        <item name="uiAppBarElevation">4dp</item>
+        <item name="uiAppBarBackground">?attr/colorSurface</item>
+        <item name="uiCardElevation">2dp</item>
+        <item name="uiCardCornerRadius">12dp</item>
+        <item name="uiCardStrokeWidth">0dp</item>
+        <item name="uiCardStrokeColor">@android:color/transparent</item>
+        <item name="uiListItemMargin">0dp</item>
+        <item name="uiListOuterPadding">8dp</item>
         <!-- Missing attributes for night theme -->
         <item name="appBarBackgroundColor">@color/colorSurface</item>
         <item name="cardElevatedSurfaceColor">@color/colorSurfaceContainer</item>
