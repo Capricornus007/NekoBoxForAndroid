@@ -8,7 +8,7 @@ env:
   MIERU_VERSION: v3.34.1
   MDVPN_REF: android-vpnservice-protect-hook
   MDVPN_COMMIT: d481d72d4b86783a87d536c214d2c68cc4e9320e
-  NAIVE_VERSION: v149.0.7827.114-1
+  NAIVE_VERSION: v154.0.8037.49-5
   OLCRTC_REPO: https://github.com/hawkff/olcrtc.git
   OLCRTC_COMMIT: ad5cc1e3d60b657b15ccd26f8db91395bf9630d0
   PROTON_REPO: https://github.com/ProtonVPN/go-vpn-lib.git
