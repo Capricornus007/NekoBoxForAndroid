@@ -54,10 +54,17 @@
 # 補上 cause 之後同一條飄紅立刻變成 `xHTTP packet-up POST failed: use of closed network connection`。
 # mod.2（e9c87b01）：sing-box 把 11 條 fork replace 抬到各 fork 尖端（那批尖端就是 10-11
 # 「Go 吃 feed 尖端 + go 指令抬 1.28」的提交），APK 裡跑的才不再停在 09-30～10-09 那份。
+# mod.4（0537a250）：chore(deps) 整輪——sing-box 自身依賴抬到上游最新，並把 13 條 fork replace
+# 指標跟著各 fork 的新尖端（sing 61708a50／quic-go c7b0124a／sing-quic e8d980d7／sing-tun 9eac20b2／
+# sing-mux b5ac5e2e／sing-snell 2a45f12a／sing-vmess 134c8fa3／wireguard-go 5bd3301f／tailscale b3c17846／
+# utls 2c28a526／gvisor-awg eaadebff／amneziawg-go v3.1.20261008-mod.5）。
+# mod.5（49d4f979）：抬 sing-tun 尖端後 NewUDPForwarder 多出 dispatcher 引數，sing-box 的 amneziawg
+# 呼叫點補 nil（上游 flow dispatcher；nil 在 sing-tun flow_dispatch.go:542 有明確空指標分支）。
+# mod.4 那顆 tag 帶 with_amneziawg 編不過，所以核心版本直接換代到 mod.5，不改已推的 tag。
 # mod.3（53b70f4）：route 吃 sing 的 PacketBuffer 雙重歸還修復，並讓 cachePacketBuffers
 # 自己擋掉 nil—— bufio.NewCachedPacketConn 首行 IncRef() 拿 nil 就是空指標 panic（裝置端
 # tombstone 那族「兩格 unknown、沒有 Abort message」的根）。tag 已打：v1.15.0-alpha.12-mod.3。
-export COMMIT_SING_BOX="53b70f4edabf93351143d08f1c2e6c8799750112"
+export COMMIT_SING_BOX="49d4f979f63430b2783123f5d2e5197852aa2664"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
@@ -68,7 +75,7 @@ export COMMIT_SING_BOX="53b70f4edabf93351143d08f1c2e6c8799750112"
 # SINGBOX_VERSION 要一起改，scripts/check-core-pins.sh 段 1c 就是抓這個的——
 # 「Update sing-box core」那條 bot 只会盲目 +1 計數（它上一輪還寫 alpha.11-mod.41，
 # 就是沒跟上基號換代），換代要人對。
-export VERSION_SING_BOX="1.15.0-alpha.12-mod.3"
+export VERSION_SING_BOX="1.15.0-alpha.12-mod.5"
 export COMMIT_LIBNEKO="1dad84547be59ff2ec5ed7bd2339b0441929edfd"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
@@ -78,7 +85,7 @@ export COMMIT_LIBNEKO="1dad84547be59ff2ec5ed7bd2339b0441929edfd"
 # API），而 sing-box/go.mod 那側的 replace 本來就指到 aceae72d —— 這個 pin 留在 1eabb449 會造成
 # 「本機用 sibling checkout 編得過、CI 用這個 commit 編不過」（CI 實測報 q.peer.WritePackets undefined）。
 # 兩邊必須是同一個 commit。
-export COMMIT_WIREGUARD_GO="b25b023a3c93d7ca0b2833612618e9879a33e439"
+export COMMIT_WIREGUARD_GO="5bd3301fdba3886aa2e79f1234072971dba4f154"
 # 歷史：2026-09-27 曾推到 d5db986（吃下 upstream/dev 的 client API（SetKeepIdleConnections /
 # CloseIdleConnections / ContextWithKeepSession），現值見下方 export。上游 6a3a24d 那個 port hopping 修復我方早已以
 # 32c2895 合併、又在 a8f70b4 把目的地判斷從 IsFqdn 改成 IsDomain，所以 hop.go 那處衝突保留我方。
@@ -94,6 +101,6 @@ export COMMIT_WIREGUARD_GO="b25b023a3c93d7ca0b2833612618e9879a33e439"
 # wireguard-go 與 sing-quic 是 check-core-pins.sh 段 1 的硬配對，所以同輪把
 # sing-box 的 go.mod 與 libcore/go.mod 一起抬（見 sing-box e9c87b01）。
 # trusttunnel 那筆是它自己合併上游 dev 3 條之後的 f90a48e。
-export COMMIT_SING_QUIC="8947bb00ad6f5a49f7213318d97766b90cd30eae"
-export COMMIT_SING_JUICITY="8d0e56af704e38b4fc6a6233112fcb9e998485f2"
-export COMMIT_SING_TRUSTTUNNEL="f90a48e591d26e39d141c989ced07dea73280483"
+export COMMIT_SING_QUIC="e8d980d7061eca1b88a019085b338aceb0b57978"
+export COMMIT_SING_JUICITY="33e0fde5980ffc99ea19a678cc490bd7414c4709"
+export COMMIT_SING_TRUSTTUNNEL="fe43c5b370684ea3e0e0ca328638e5c7aec2d40e"
