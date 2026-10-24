@@ -17,7 +17,7 @@ import io.nekohasekai.sagernet.fmt.gson.GsonConverters
 
 @Database(
     entities = [ProxyGroup::class, ProxyEntity::class, RuleEntity::class],
-    version = 21,
+    version = 22,
     autoMigrations = [
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
@@ -212,6 +212,39 @@ abstract class SagerDatabase : RoomDatabase() {
         }
     }
 
+    /**
+     * Version 22 repairs the v21 identity-hash divergence introduced by the isai merge
+     * (17b31e173), which added `fallbackMode`/`fallbackProfile` to `rules` and regenerated
+     * 21.json (681cb85f... → 4f914bf2...) WITHOUT bumping the version — the same mistake as
+     * 246cb1041 at v16. Devices holding a pre-merge v21 database hard-crash on open because at
+     * equal versions Room only runs the identity-hash check. Idempotent: builds shipped after
+     * the merge already carry the columns (fresh installs of v21-hash-4f914), so add only what
+     * is missing.
+     */
+    object Migration21To22 : Migration(21, 22) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            val existing = database.columnsOf("rules")
+            if ("fallbackMode" !in existing) {
+                database.execSQL("ALTER TABLE `rules` ADD COLUMN `fallbackMode` INTEGER NOT NULL DEFAULT 0")
+            }
+            if ("fallbackProfile" !in existing) {
+                database.execSQL("ALTER TABLE `rules` ADD COLUMN `fallbackProfile` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        private fun SupportSQLiteDatabase.columnsOf(table: String): Set<String> {
+            val names = mutableSetOf<String>()
+            query("PRAGMA table_info(`$table`)").use { cursor ->
+                val nameIndex = cursor.getColumnIndex("name")
+                if (nameIndex < 0) return names
+                while (cursor.moveToNext()) {
+                    cursor.getString(nameIndex)?.let(names::add)
+                }
+            }
+            return names
+        }
+    }
+
     companion object {
         val instance by lazy {
             SagerNet.application.getDatabasePath(Key.DB_PROFILE).parentFile?.mkdirs()
@@ -235,6 +268,7 @@ abstract class SagerDatabase : RoomDatabase() {
                     Migration18To19,
                     Migration19To20,
                     Migration20To21,
+                    Migration21To22,
                 )
                 // Plan 027 Stage 3: the main-thread-DB allowance is behind a build flag so it can
                 // be removed once the app runs StrictMode-clean (debug already ships with it off).
