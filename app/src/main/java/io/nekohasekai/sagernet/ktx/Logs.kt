@@ -1,6 +1,5 @@
 package io.nekohasekai.sagernet.ktx
 
-import io.nekohasekai.sagernet.database.DataStore
 import libcore.Libcore
 import java.io.InputStream
 import java.io.OutputStream
@@ -8,7 +7,7 @@ import java.io.OutputStream
 object Logs {
 
     @Volatile
-    internal var sink: (String) -> Unit = { Libcore.nekoLogPrintln(redactDiagnostic(it)) }
+    internal var sink: (String) -> Unit = { Libcore.nekoLogPrintln(it) }
 
     private fun mkTag(): String {
         val stackTrace = Thread.currentThread().stackTrace
@@ -18,19 +17,19 @@ object Logs {
     // level int use logrus.go
 
     fun d(message: String) {
-        if (DataStore.logLevel in 3..4) sink("[Debug] [${mkTag()}] $message")
+        sink("[Debug] [${mkTag()}] $message")
     }
 
     fun d(message: String, exception: Throwable) {
-        if (DataStore.logLevel in 3..4) sink("[Debug] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
+        sink("[Debug] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
     }
 
     fun i(message: String) {
-        if (DataStore.logLevel in 2..4) sink("[Info] [${mkTag()}] $message")
+        sink("[Info] [${mkTag()}] $message")
     }
 
     fun i(message: String, exception: Throwable) {
-        if (DataStore.logLevel in 2..4) sink("[Info] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
+        sink("[Info] [${mkTag()}] $message" + "\n" + exception.stackTraceToString())
     }
 
     fun w(message: String) {

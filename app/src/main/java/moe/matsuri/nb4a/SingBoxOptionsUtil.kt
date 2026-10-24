@@ -197,7 +197,7 @@ fun generateRemoteRuleSet(url: String, ruleSets: MutableList<RuleSet>, updateInt
         RuleSet().apply {
             type = "remote"
             this.tag = tag
-            format = if (url.substringBefore('?').substringBefore('#').endsWith(".json", ignoreCase = true)) "source" else "binary"
+            format = if (url.substringBefore("?").endsWith(".json")) "source" else "binary"
             this.url = url
             update_interval = updateInterval
         },

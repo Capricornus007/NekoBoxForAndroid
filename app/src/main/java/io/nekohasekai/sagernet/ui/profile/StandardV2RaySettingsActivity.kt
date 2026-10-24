@@ -198,12 +198,6 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
     }
 
     private fun updateView(network: String) {
-        (host.preference as EditTextPreference).dialogLayoutResource =
-            if (network == "http") {
-                R.layout.preference_dialog_multiline_m3
-            } else {
-                R.layout.preference_dialog_edittext_m3
-            }
         host.preference.isVisible = false
         path.preference.isVisible = false
         mKcpSeed.preference.isVisible = false

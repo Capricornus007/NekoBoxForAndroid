@@ -7,16 +7,12 @@ import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
-import io.nekohasekai.sagernet.ktx.MAX_SUBSCRIPTION_BYTES
 import io.nekohasekai.sagernet.ktx.app
-import io.nekohasekai.sagernet.ktx.readBytesLimited
-import io.nekohasekai.sagernet.ktx.redactDiagnostic
 import io.nekohasekai.sagernet.ktx.use
 import io.nekohasekai.sagernet.utils.CrashHandler
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
 
 object SendLog {
     // Cap the neko.log slice included in an exported report (keeps memory bounded).
@@ -34,7 +30,7 @@ object SendLog {
 
         report += "Logcat: \n\n"
 
-        logFile.writeText(redactDiagnostic(report))
+        logFile.writeText(report)
 
         try {
             // Logcat output is plain (no ANSI), so stream it straight to the file to
@@ -47,7 +43,7 @@ object SendLog {
             logFile.appendText("\n")
         } catch (e: Exception) {
             Logs.w(e)
-            logFile.appendText(redactDiagnostic("Export logcat error: " + CrashHandler.formatThrowable(e)))
+            logFile.appendText("Export logcat error: " + CrashHandler.formatThrowable(e))
         }
 
         logFile.appendText("\n")

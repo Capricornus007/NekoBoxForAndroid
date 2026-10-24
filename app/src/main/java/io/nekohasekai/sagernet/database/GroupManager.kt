@@ -17,7 +17,6 @@ object GroupManager {
 
     interface Interface {
         suspend fun confirm(message: String): Boolean
-        suspend fun previewSubscription(message: String): Boolean = confirm(message)
         suspend fun alert(message: String)
         suspend fun onUpdateSuccess(
             group: ProxyGroup,
@@ -114,8 +113,6 @@ object GroupManager {
         }
         clearDeletedSelection(selected, clearSelected)
         pruneTailscaleState()
-        // isai：清掉該組的訂閱歷史（十日更新記錄）。
-        SubscriptionHistory.delete(groupId)
         iterator { groupRemoved(groupId) }
         reconfigureUpdater()
     }
@@ -133,8 +130,6 @@ object GroupManager {
         }
         clearDeletedSelection(selected, clearSelected)
         pruneTailscaleState()
-        // isai：清掉各組的訂閱歷史。
-        group.forEach { SubscriptionHistory.delete(it.id) }
         for (proxyGroup in group) iterator { groupRemoved(proxyGroup.id) }
         reconfigureUpdater()
     }

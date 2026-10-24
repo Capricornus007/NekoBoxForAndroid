@@ -65,11 +65,6 @@ class AssetsActivity : ThemedActivity() {
 
         binding.recyclerView.layoutManager = FixedLinearLayoutManager(binding.recyclerView)
         adapter = AssetAdapter()
-        runOnDefaultDispatcher {
-            // isai：核心 WaitForAssets（等內建資產複製完成）未移植——fork 核心啟動時
-            // 已同步備妥 assets，此處不需等待，直接刷新清單。
-            onMainDispatcher { adapter.reloadAssets() }
-        }
         binding.recyclerView.adapter = adapter
 
         binding.refreshLayout.setOnRefreshListener {

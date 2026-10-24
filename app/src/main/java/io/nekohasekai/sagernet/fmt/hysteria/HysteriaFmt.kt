@@ -570,9 +570,8 @@ fun isMultiPort(hyAddr: String): Boolean {
 }
 
 fun getFirstPort(portStr: String): Int {
-    // isai：連接埠清單可跨行（\n）與逗號混用，取首個連接埠。
-    return normalizePortDashes(portStr).listByLineOrComma().firstOrNull()
-        ?.substringBefore(":")?.substringBefore("-")?.toIntOrNull() ?: 443
+    val normalized = normalizePortDashes(portStr)
+    return normalized.substringBefore(":").substringBefore(",").substringBefore("-").toIntOrNull() ?: 443
 }
 
 fun HysteriaBean.canUseSingBox(): Boolean {
@@ -715,9 +714,8 @@ fun buildSingBoxOutboundHysteriaBean(bean: HysteriaBean): SingBoxOptions.SingBox
     else -> error("error_version $bean.protocolVersion")
 }
 
-fun hopPortsToSingboxList(s: String): List<String> = normalizePortDashes(s).listByLineOrComma().mapNotNull {
-    // isai：支援跨行（\n）與逗號混用的連接埠清單；保留 fork 的數字驗證（壞段略過）。
-    val pRange = it.replace("-", ":")
+fun hopPortsToSingboxList(s: String): List<String> = normalizePortDashes(s).split(",").mapNotNull {
+    val pRange = it.trim().replace("-", ":")
     val parts = pRange.split(":")
     when (parts.size) {
         2 -> if (parts[0].toIntOrNull() != null && parts[1].toIntOrNull() != null) pRange else null

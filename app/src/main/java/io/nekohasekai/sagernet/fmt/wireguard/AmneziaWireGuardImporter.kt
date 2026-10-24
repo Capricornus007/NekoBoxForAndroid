@@ -60,24 +60,12 @@ object AmneziaWireGuardImporter {
         val awgFields = listOf(
             "Jc", "Jmin", "Jmax", "S1", "S2", "S3", "S4",
             "H1", "H2", "H3", "H4", "I1", "I2", "I3", "I4", "I5",
-            "HeaderProtectionKey",
-            "ContentPaddingAddition",
-            "RekeyAfterTime",
-            "RekeyTimeout",
-            "RejectAfterTime",
-            "KeepaliveTimeout",
-            "MaxHandshakeAttempts",
-            "RandomTrailers",
-            "DisableCookies",
-
         )
         val isAmnezia = awgFields.any(iface::contains)
         val explicitMtu = iface.get("MTU")?.toIntOrNull()?.takeIf { it > 0 }
 
         val template = WireGuardBean().applyDefaultValues().apply {
             localAddress = addresses.joinToString("\n")
-            // isai 契約：多 DNS 以 ", " 連接（fork 的讀取端 split('\n', ',') 兩者皆容）。
-            dnsServers = iface.getAll("DNS").joinToString(", ")
             this.privateKey = privateKey
             mtu = explicitMtu ?: if (isAmnezia) AMNEZIA_MOBILE_MTU else mtu
             listenPort = iface.intValue("ListenPort")
@@ -97,37 +85,21 @@ object AmneziaWireGuardImporter {
             i3 = iface.get("I3").orEmpty()
             i4 = iface.get("I4").orEmpty()
             i5 = iface.get("I5").orEmpty()
-            headerProtectionKey = iface.get("HeaderProtectionKey").orEmpty()
-            contentPaddingAddition = iface.get("ContentPaddingAddition").orEmpty()
-            rekeyAfterTime = iface.get("RekeyAfterTime").orEmpty()
-            rekeyTimeout = iface.get("RekeyTimeout").orEmpty()
-            rejectAfterTime = iface.get("RejectAfterTime").orEmpty()
-            keepaliveTimeout = iface.get("KeepaliveTimeout").orEmpty()
-            maxHandshakeAttempts = iface.get("MaxHandshakeAttempts").orEmpty()
-            randomTrailers = iface.boolValue("RandomTrailers")
-            disableCookies = iface.boolValue("DisableCookies")
-            validateAmneziaParameters()
         }
-
-        data class ParsedPeer(val spec: WireGuardPeerSpec, val keepaliveText: String)
 
         val parsedPeers = peers.mapNotNull { peer ->
             val endpoint = peer.get("Endpoint")?.let(::parseEndpoint) ?: return@mapNotNull null
             val publicKey = peer.get("PublicKey")?.takeIf(String::isNotBlank)
                 ?: return@mapNotNull null
-            // isai：PersistentKeepalive 支援範圍（"22-30"）——字串原樣保留進 bean，
-            // Int 欄位（fork endpoint builder 用）取範圍首值；非法值由 validateAmneziaRange 拋錯。
-            val keepaliveText = peer.get("PersistentKeepalive").orEmpty().ifBlank { "0" }.trim()
             WireGuardPeerSpec(
                 host = endpoint.host,
                 port = endpoint.port,
                 publicKey = publicKey,
                 preSharedKey = peer.get("PresharedKey").orEmpty(),
                 allowedIPs = peer.get("AllowedIPs").orEmpty(),
-                keepalive = keepaliveText.substringBefore('-').toIntOrNull()?.takeIf { it >= 0 }
-                    ?: throw IllegalArgumentException("Invalid PersistentKeepalive"),
+                keepalive = peer.intValue("PersistentKeepalive"),
                 reserved = peer.get("Reserved").orEmpty(),
-            ).let { spec -> ParsedPeer(spec, keepaliveText) }
+            )
         }.ifEmpty {
             error("No valid peers")
         }
@@ -135,27 +107,20 @@ object AmneziaWireGuardImporter {
         // 每個 peer 各自宣告了不同的 AllowedIPs，代表這是「按目的位址分流」的一份配置：
         // 拆成 N 份 profile 會讓每份只帶自己那段路由、其餘全部漏走直連，所以併成一份多 peer。
         // 其餘情況（沒寫 AllowedIPs、或重複）是漫遊／備援寫法，維持一比一拆成多份的舊行為。
-        val routed = parsedPeers.filter { it.spec.allowedIPs.isNotBlank() }
+        val routed = parsedPeers.filter { it.allowedIPs.isNotBlank() }
         val routeSplit = parsedPeers.size > 1 &&
             routed.size == parsedPeers.size &&
-            routed.map { it.spec.allowedIPs }.distinct().size == parsedPeers.size
+            routed.map(WireGuardPeerSpec::allowedIPs).distinct().size == parsedPeers.size
 
-        fun profileFor(primary: ParsedPeer, extra: List<ParsedPeer>) = template.clone().apply {
-            val spec = primary.spec
-            serverAddress = spec.host
-            serverPort = spec.port
-            peerPublicKey = spec.publicKey
-            peerPreSharedKey = spec.preSharedKey
-            persistentKeepaliveInterval = spec.keepalive
-            reserved = spec.reserved
-            peerAllowedIps = spec.allowedIPs
-            extraPeers = formatWireGuardPeerBlocks(extra.map(ParsedPeer::spec))
-            // isai 契約：bean.allowedIPs／persistentKeepalive（字串，支援範圍）原樣保留，
-            // 不自動應用為路由（useConfigRoutes 維持 false 由使用者決定）。
-            allowedIPs = spec.allowedIPs
-            persistentKeepalive = primary.keepaliveText
-            validateAmneziaParameters()
-            if (persistentKeepalive.contains('-') && explicitMtu == null) mtu = AMNEZIA_MOBILE_MTU
+        fun profileFor(primary: WireGuardPeerSpec, extra: List<WireGuardPeerSpec>) = template.clone().apply {
+            serverAddress = primary.host
+            serverPort = primary.port
+            peerPublicKey = primary.publicKey
+            peerPreSharedKey = primary.preSharedKey
+            persistentKeepaliveInterval = primary.keepalive
+            reserved = primary.reserved
+            peerAllowedIps = primary.allowedIPs
+            extraPeers = formatWireGuardPeerBlocks(extra)
             initializeDefaultValues()
         }
 
@@ -355,15 +320,7 @@ object AmneziaWireGuardImporter {
 
     private fun hasIniOption(conf: String, key: String): Boolean = Regex("(?im)^\\s*${Regex.escape(key)}\\s*=").containsMatchIn(conf)
 
-    private fun IniSection.boolValue(key: String): Boolean = when (get(key)?.lowercase(Locale.ROOT).orEmpty()) {
-        "", "0", "false" -> false
-        "1", "true" -> true
-        else -> throw IllegalArgumentException("Invalid $key")
-    }
-
-    private fun IniSection.intValue(key: String): Int = get(key)?.let {
-        requireNotNull(it.toIntOrNull()) { "Invalid integer for $key" }
-    } ?: 0
+    private fun IniSection.intValue(key: String): Int = get(key)?.toIntOrNull() ?: 0
 
     private fun JsonObject.stringValue(key: String): String? = get(key)?.takeIf { it.isJsonPrimitive }?.asString?.takeIf(String::isNotBlank)
 

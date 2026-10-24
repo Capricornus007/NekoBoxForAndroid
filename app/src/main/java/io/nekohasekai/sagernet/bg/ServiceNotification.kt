@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED
 import android.os.Build
 import android.text.format.Formatter
@@ -62,11 +61,7 @@ class ServiceNotification(
         }
     }
 
-    @Volatile private var destroyed = false
-
-    val listenPostSpeed: Boolean
-        get() = !destroyed && service.data.state == BaseService.State.Connected &&
-            !service.data.powerRestricted && SagerNet.power.isInteractive
+    var listenPostSpeed = true
 
     suspend fun postNotificationSpeedUpdate(stats: SpeedDisplayData) {
         useBuilder {
@@ -231,9 +226,10 @@ class ServiceNotification(
         }
     }
 
-    // listenPostSpeed 是 isai 的計算屬性（destroyed/電源/互動狀態即時求值），
-    // 不再吃 SCREEN_ON/ACTION 廣播賦值；此 receiver 保留是為了廣播註冊的既有面。
     override fun onReceive(context: Context, intent: Intent) {
+        if (service.data.state == BaseService.State.Connected) {
+            listenPostSpeed = intent.action == Intent.ACTION_SCREEN_ON
+        }
     }
 
     private fun show() {
@@ -242,7 +238,7 @@ class ServiceNotification(
             (service as Service).startForeground(
                 notificationId,
                 notification,
-                if (service is ProxyService) FOREGROUND_SERVICE_TYPE_SPECIAL_USE else FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
+                FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED,
             )
         } else {
             (service as Service).startForeground(notificationId, notification)
@@ -268,7 +264,7 @@ class ServiceNotification(
     }
 
     fun destroy() {
-        destroyed = true
+        listenPostSpeed = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             (service as Service).stopForeground(Service.STOP_FOREGROUND_REMOVE)
         } else {

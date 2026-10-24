@@ -14,17 +14,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <io.nekohasekai.sagernet.widget.StableFastScrollRecyclerView
+        <!-- 互換性のある標準の RecyclerView を使用 -->
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/route_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
             android:padding="?attr/uiListOuterPadding"
-            android:scrollbarSize="0dp"
-            app:fastScrollAutoHide="true"
-            app:fastScrollThumbColor="?colorPrimary"
-            app:fastScrollThumbInactiveColor="?colorPrimary">
-
-        </io.nekohasekai.sagernet.widget.StableFastScrollRecyclerView>
+            android:scrollbarSize="0dp" />
 
     </LinearLayout>
 

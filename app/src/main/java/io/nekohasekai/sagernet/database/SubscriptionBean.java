@@ -15,10 +15,6 @@ public class SubscriptionBean extends Serializable {
     public Boolean deduplication;
     public Boolean updateWhenConnectedOnly;
     public String customUserAgent;
-    // isai：訂閱請求附硬體識別/自訂 header（序列化 v6 起）。
-    public Boolean sendHwid;
-    public String customHwidParams;
-    public String customHeaders;
     public Boolean autoUpdate;
     public Integer autoUpdateDelay;
     public Integer lastUpdated;
@@ -38,7 +34,7 @@ public class SubscriptionBean extends Serializable {
 
     @Override
     public void serializeToBuffer(ByteBufferOutput output) {
-        output.writeInt(6);
+        output.writeInt(5);
 
         output.writeInt(type);
 
@@ -60,16 +56,10 @@ public class SubscriptionBean extends Serializable {
 
         // v5（原 v4）：serverDnsResolver 之前漏了持久化，補上（見欄位註解）。
         output.writeString(serverDnsResolver);
-        // v6（isai）：訂閱 HWID 與自訂 header。
-        output.writeBoolean(sendHwid);
-        output.writeString(customHwidParams);
-        output.writeString(customHeaders);
     }
 
     public void serializeForShare(ByteBufferOutput output) {
-        // v3（isai）：尾端追加 sendHwid/customHwidParams/serverDnsResolver/customHeaders
-        // （順序對齊 isai 上游 share v2，合併前 v3 尚未發佈，直接補齊 serverDnsResolver）。
-        output.writeInt(3);
+        output.writeInt(2);
 
         output.writeInt(type);
 
@@ -79,10 +69,6 @@ public class SubscriptionBean extends Serializable {
         output.writeBoolean(deduplication);
         output.writeBoolean(updateWhenConnectedOnly);
         output.writeString(customUserAgent);
-        output.writeBoolean(sendHwid);
-        output.writeString(customHwidParams);
-        output.writeString(serverDnsResolver);
-        output.writeString(customHeaders);
     }
 
     @Override
@@ -115,12 +101,6 @@ public class SubscriptionBean extends Serializable {
         if (version >= 4) {
             serverDnsResolver = input.readString();
         }
-        // v6（isai）起才有 HWID/自訂 header。
-        if (version >= 6) {
-            sendHwid = input.readBoolean();
-            customHwidParams = input.readString();
-            customHeaders = input.readString();
-        }
     }
 
     public void deserializeFromShare(ByteBufferInput input) {
@@ -137,13 +117,6 @@ public class SubscriptionBean extends Serializable {
             input.readBoolean();
             input.readString();
         }
-        // v3（isai）：分享尾端追加 HWID/自訂 HWID 參數/訂閱 DNS resolver/自訂 header。
-        if (version >= 3) {
-            sendHwid = input.readBoolean();
-            customHwidParams = input.readString();
-            serverDnsResolver = input.readString();
-            customHeaders = input.readString();
-        }
     }
 
     @Override
@@ -154,9 +127,6 @@ public class SubscriptionBean extends Serializable {
         if (deduplication == null) deduplication = false;
         if (updateWhenConnectedOnly == null) updateWhenConnectedOnly = false;
         if (customUserAgent == null) customUserAgent = "";
-        if (sendHwid == null) sendHwid = false;
-        if (customHwidParams == null) customHwidParams = "";
-        if (customHeaders == null) customHeaders = "";
         if (autoUpdate == null) autoUpdate = false;
         if (autoUpdateDelay == null) autoUpdateDelay = 1440;
         if (lastUpdated == null) lastUpdated = 0;

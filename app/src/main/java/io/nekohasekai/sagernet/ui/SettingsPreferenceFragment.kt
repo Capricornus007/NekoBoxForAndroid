@@ -9,7 +9,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -19,11 +18,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.SpeedTestSettings
 import io.nekohasekai.sagernet.bg.RuleAssetUpdater
 import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.database.InitialConfiguration
-import io.nekohasekai.sagernet.database.NetworkSettingsHistory
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
-import io.nekohasekai.sagernet.database.preference.PublicDatabase
-import io.nekohasekai.sagernet.fmt.directFallbackConfig
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.EbpfProbe
 import io.nekohasekai.sagernet.root.RootLanSharing
@@ -31,9 +26,6 @@ import io.nekohasekai.sagernet.root.RootManager
 import io.nekohasekai.sagernet.utils.AppLocale
 import io.nekohasekai.sagernet.utils.Theme
 import io.nekohasekai.sagernet.widget.enableCollapsibleCategories
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import moe.matsuri.nb4a.ui.*
 import java.io.File
 
@@ -41,15 +33,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     private lateinit var isProxyApps: SwitchPreferenceCompat
     private lateinit var globalCustomConfig: EditConfigPreference
-    private var checkpointTaken = false
-    private var shownGlobalConfig: String? = null
-
-    private fun checkpoint() {
-        if (!checkpointTaken) {
-            checkpointTaken = NetworkSettingsHistory.capture()
-            findPreference<Preference>("restoreNetworkSettings")?.isEnabled = NetworkSettingsHistory.available()
-        }
-    }
 
     // 最近一次 eBPF 探針的完整結果（要複製的就是這串）與那幾行顯示文字；null ＝ 還沒探過。
     // 探一次要起三回 su 進程，不存起來的話「複製」那顆只能重探或報空；顯示也要在偏好頁
@@ -67,7 +50,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private val reloadListener = Preference.OnPreferenceChangeListener { _, _ ->
-        checkpoint()
         needReload()
         true
     }
@@ -250,33 +232,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = DataStore.configurationStore
         DataStore.initGlobal()
         addPreferencesFromResource(R.xml.global_preferences)
-        findPreference<Preference>("networkProfilesScreen")!!.setOnPreferenceClickListener {
-            startActivity(android.content.Intent(requireContext(), NetworkProfilesActivity::class.java))
-            true
-        }
-        findPreference<Preference>("restoreNetworkSettings")!!.apply {
-            isEnabled = NetworkSettingsHistory.available()
-            setOnPreferenceClickListener {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.restore_network_settings)
-                    .setMessage(R.string.restore_network_settings_confirm)
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            try {
-                                withContext(Dispatchers.IO) { NetworkSettingsHistory.restore() }
-                                if (DataStore.serviceState.started) SagerNet.reloadService(force = true)
-                                activity?.recreate()
-                            } catch (e: Exception) {
-                                Logs.d("Network settings restore failed", e)
-                                context?.let { Toast.makeText(it, R.string.restore_network_settings_failed, Toast.LENGTH_LONG).show() }
-                            }
-                        }
-                    }.show()
-                true
-            }
-        }
-
         val nightTheme = findPreference<SimpleMenuPreference>(Key.NIGHT_THEME)!!
         val dynamicColors = findPreference<SwitchPreferenceCompat>(Key.DYNAMIC_COLORS)!!
 
@@ -398,8 +353,12 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             newValue
         }
 
+        val profileTrafficStatistics =
+            findPreference<SwitchPreferenceCompat>(Key.PROFILE_TRAFFIC_STATISTICS)!!
         val speedInterval = findPreference<SimpleMenuPreference>(Key.SPEED_INTERVAL)!!
-        speedInterval.setOnPreferenceChangeListener { _, _ ->
+        profileTrafficStatistics.isEnabled = speedInterval.value.toString() != "0"
+        speedInterval.setOnPreferenceChangeListener { _, newValue ->
+            profileTrafficStatistics.isEnabled = newValue.toString() != "0"
             needReload()
             true
         }
@@ -501,43 +460,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         trafficSniffing.onPreferenceChangeListener = reloadListener
         bypassLan.onPreferenceChangeListener = reloadListener
         bypassLanInCore.onPreferenceChangeListener = reloadListener
-        findPreference<SwitchPreferenceCompat>(Key.DIRECT_FALLBACK)!!.onPreferenceChangeListener = reloadListener
-        findPreference<EditTextPreference>(Key.DIRECT_FALLBACK_URL)!!.setOnPreferenceChangeListener { preference, value ->
-            try {
-                directFallbackConfig("proxy", value.toString(), DataStore.directFallbackInterval, DataStore.directFallbackRequired, DataStore.directFallbackFailures, DataStore.directFallbackRecoveries)
-                reloadListener.onPreferenceChange(preference, value)
-            } catch (_: IllegalArgumentException) {
-                Toast.makeText(requireContext(), R.string.direct_fallback_invalid_url, Toast.LENGTH_LONG).show()
-                false
-            }
-        }
-        findPreference<EditTextPreference>(Key.DIRECT_FALLBACK_INTERVAL)!!.apply {
-            setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-            setOnPreferenceChangeListener { preference, value ->
-                val seconds = value.toString().toIntOrNull()
-                if (seconds != null && seconds in 5..3600) {
-                    reloadListener.onPreferenceChange(preference, value)
-                } else {
-                    Toast.makeText(requireContext(), R.string.direct_fallback_invalid_interval, Toast.LENGTH_LONG).show()
-                    false
-                }
-            }
-        }
-        for (key in listOf(Key.DIRECT_FALLBACK_REQUIRED, Key.DIRECT_FALLBACK_FAILURES, Key.DIRECT_FALLBACK_RECOVERIES)) {
-            findPreference<EditTextPreference>(key)!!.apply {
-                setOnBindEditTextListener(EditTextPreferenceModifiers.Number)
-                setOnPreferenceChangeListener { preference, value ->
-                    val count = value.toString().toIntOrNull()
-                    val maximum = if (key == Key.DIRECT_FALLBACK_REQUIRED) DataStore.directFallbackUrl.lineSequence().map(String::trim).filter(String::isNotBlank).distinct().count().coerceAtMost(8) else 10
-                    if (count != null && count in 1..maximum) {
-                        reloadListener.onPreferenceChange(preference, value)
-                    } else {
-                        Toast.makeText(requireContext(), getString(R.string.direct_fallback_invalid_count, maximum), Toast.LENGTH_LONG).show()
-                        false
-                    }
-                }
-            }
-        }
         mtu.onPreferenceChangeListener = reloadListener
 
         val concurrentDial = findPreference<SwitchPreferenceCompat>(Key.CONCURRENT_DIAL)!!
@@ -731,9 +653,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             isProxyApps.isChecked = DataStore.proxyApps
         }
         if (::globalCustomConfig.isInitialized) {
-            val current = DataStore.configurationStore.getString(Key.GLOBAL_CUSTOM_CONFIG).orEmpty()
-            if (shownGlobalConfig != null && shownGlobalConfig != current) needReload()
-            shownGlobalConfig = current
             globalCustomConfig.notifyChanged()
         }
     }

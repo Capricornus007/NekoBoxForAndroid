@@ -283,59 +283,30 @@ data class ProxyEntity(
 
     fun displayType(): String = ProtocolRegistry.forType(type)?.displayType?.invoke(this) ?: when (type) {
         TYPE_SOCKS -> socksBean?.protocolName() ?: "SOCKS"
-
         TYPE_HTTP -> if (httpBean?.isTLS() == true) "HTTPS" else "HTTP"
-
         TYPE_SS -> "Shadowsocks"
-
         TYPE_SSR -> "ShadowsocksR"
-
         TYPE_VMESS -> if (vmessBean?.isVLESS == true) "VLESS" else "VMess"
-
         TYPE_TROJAN -> "Trojan"
-
         TYPE_TROJAN_GO -> "Trojan-Go"
-
         TYPE_MIERU -> "Mieru"
-
         TYPE_NAIVE -> "Naïve"
-
         TYPE_HYSTERIA -> "Hysteria" + (hysteriaBean?.protocolVersion ?: "")
-
         TYPE_SSH -> "SSH"
-
-        TYPE_WG -> when {
-            wgBean?.hasAmneziaV3Options() == true -> "AmneziaWG 3.1"
-            wgBean?.isAmneziaWG == true -> "AmneziaWG 2.0"
-            else -> "WireGuard"
-        }
-
+        TYPE_WG -> if (wgBean?.isAmneziaWG == true) "AmneziaWG 2.0" else "WireGuard"
         TYPE_TUIC -> "TUIC"
-
         TYPE_JUICITY -> "Juicity"
-
         TYPE_SHADOWQUIC -> "ShadowQUIC"
-
         TYPE_TRUSTTUNNEL -> "TrustTunnel"
-
         TYPE_MASQUE -> "MASQUE"
-
         TYPE_OPENVPN -> "OpenVPN"
-
         TYPE_SHADOWTLS -> "ShadowTLS"
-
         TYPE_ANYTLS -> "AnyTLS"
-
         TYPE_CHAIN -> chainName
-
         TYPE_WATERFALL -> waterfallName
-
         TYPE_FASTEST -> fastestName
-
         TYPE_BALANCER -> balancerName
-
         TYPE_CONFIG -> configBean?.displayType() ?: "Config"
-
         else -> "Undefined type $type"
     }
 

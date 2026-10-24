@@ -42,8 +42,7 @@
                 <com.google.android.material.checkbox.MaterialCheckBox
                     android:id="@+id/backup_configurations"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-        android:minHeight="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginTop="8dp"
                     android:checked="true"
                     android:text="@string/backup_groups_and_configurations"
@@ -52,8 +51,7 @@
                 <com.google.android.material.checkbox.MaterialCheckBox
                     android:id="@+id/backup_rules"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-        android:minHeight="48dp"
+                    android:layout_height="48dp"
                     android:checked="true"
                     android:text="@string/backup_rules"
                     android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
@@ -61,8 +59,7 @@
                 <com.google.android.material.checkbox.MaterialCheckBox
                     android:id="@+id/backup_settings"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-        android:minHeight="48dp"
+                    android:layout_height="48dp"
                     android:checked="true"
                     android:text="@string/backup_settings"
                     android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
@@ -75,27 +72,12 @@
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:hint="@string/backup_encryption_password"
-                    app:helperText="@string/backup_encryption_summary">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/backup_password"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword"
-                        android:saveEnabled="false"
-                        android:maxLength="1024" />
-                </com.google.android.material.textfield.TextInputLayout>
-
+                <!-- M3 按鈕 -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/action_share"
                     style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-        android:minHeight="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginTop="20dp"
                     android:text="@string/share" />
 
@@ -103,8 +85,7 @@
                     android:id="@+id/action_export"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-        android:minHeight="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginTop="8dp"
                     android:text="@string/action_export_file" />
 
@@ -112,8 +93,7 @@
                     android:id="@+id/action_import_file"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-        android:minHeight="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginTop="8dp"
                     android:text="@string/action_import_file" />
 
@@ -151,8 +131,7 @@
                     android:id="@+id/webdav_settings"
                     style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-        android:minHeight="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginTop="20dp"
                     android:text="@string/webdav_settings" />
 
@@ -160,8 +139,7 @@
                     android:id="@+id/backup_to_webdav"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-        android:minHeight="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginTop="8dp"
                     android:text="@string/backup_to_webdav" />
 
@@ -169,8 +147,7 @@
                     android:id="@+id/restore_from_webdav"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-        android:minHeight="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginTop="8dp"
                     android:text="@string/restore_from_webdav" />
 

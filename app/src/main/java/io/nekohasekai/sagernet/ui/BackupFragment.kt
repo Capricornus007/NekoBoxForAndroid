@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import android.provider.OpenableColumns
-import android.text.InputType
 import android.view.View
-import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -35,7 +33,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import moe.matsuri.nb4a.utils.Util
@@ -54,7 +51,6 @@ import java.io.IOException
 import java.util.*
 import java.util.zip.ZipInputStream
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 private suspend fun Call.awaitResponse(): Response = suspendCancellableCoroutine { continuation ->
     continuation.invokeOnCancellation { cancel() }
@@ -73,14 +69,13 @@ private suspend fun Call.awaitResponse(): Response = suspendCancellableCoroutine
     )
 }
 
-internal fun backupFileName(now: Date = Date(), extension: String = "json"): String {
+internal fun backupFileName(now: Date = Date()): String {
     val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(now)
-    return "nekobox_backup_$timestamp.$extension"
+    return "nekobox_backup_$timestamp.json"
 }
 
 class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
-    private lateinit var binding: LayoutBackupBinding
     private var pendingExportData: ByteArray? = null
     private var isBackupInProgress = false
     private var isRestoreInProgress = false
@@ -92,7 +87,6 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         backupJob?.cancel()
         backupJob = null
         isBackupInProgress = false
-        if (::binding.isInitialized) binding.backupPassword.text?.clear()
         snackbar?.dismiss()
         snackbar = null
         pendingExportData = null
@@ -146,7 +140,6 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = LayoutBackupBinding.bind(view)
-        this.binding = binding
 
         binding.actionExport.setOnClickListener {
             if (backupIsBusy()) {
@@ -171,8 +164,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                     pendingExportData = exportData
                     startFilesForResult(
                         exportSettings,
-                        // isai：加密備份用 .nbk 副檔名。
-                        backupFileName(extension = backupExtension(exportData)),
+                        backupFileName(),
                     )
                     destinationPending = true
                 } catch (e: CancellationException) {
@@ -210,8 +202,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                         val shareDir = File(app.cacheDir, "share").apply { mkdirs() }
                         File(
                             shareDir,
-                            // isai：加密備份用 .nbk 副檔名。
-                            backupFileName(extension = backupExtension(shareData)),
+                            backupFileName(),
                         ).also { it.writeBytes(shareData) }
                     }
                     startActivity(
@@ -421,9 +412,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                     "WebDAV backup failed: ${e.message ?: ""}"
                 }
 
-                onMainDispatcher {
-                    MessageStore.showMessage(activity, errorMessage)
-                }
+                MessageStore.showMessage(activity, errorMessage)
             } finally {
                 isBackupInProgress = false
             }
@@ -580,7 +569,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
                             val binding = LayoutProgressBinding.inflate(layoutInflater)
                             binding.content.text = getString(R.string.backup_importing)
-                            val dialog = MaterialAlertDialogBuilder(requireContext())
+                            val dialog = AlertDialog.Builder(requireContext())
                                 .setView(binding.root)
                                 .setCancelable(false)
                                 .show()
@@ -629,44 +618,12 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
     fun Parcelable.toBase64Str(): String {
         val parcel = Parcel.obtain()
+        writeToParcel(parcel, 0)
         try {
-            writeToParcel(parcel, 0)
             return Util.b64EncodeUrlSafe(parcel.marshall())
         } finally {
             parcel.recycle()
         }
-    }
-
-    // isai：加密備份的副檔名（nbk = 已加密）。
-    private fun backupExtension(bytes: ByteArray, zipped: Boolean = false) = if (BackupEncryption.isEncrypted(bytes)) {
-        "nbk"
-    } else if (zipped) {
-        "zip"
-    } else {
-        "json"
-    }
-
-    // isai：從備份畫面的密碼欄讀加密密碼（空 = 不加密）。
-    private fun backupPasswordChars(): CharArray = runBlocking(Dispatchers.Main) {
-        if (!isAdded || view == null) {
-            CharArray(0)
-        } else {
-            binding.backupPassword.text?.toString()?.toCharArray() ?: CharArray(0)
-        }
-    }
-
-    // isai：加密備份（帶 magic header）解密；無密碼或解密失敗丟出可讀錯誤。
-    private fun decryptIfEncrypted(bytes: ByteArray): ByteArray {
-        if (!BackupEncryption.isEncrypted(bytes)) return bytes
-        val password = runBlocking(Dispatchers.Main) {
-            if (!isAdded || view == null) {
-                CharArray(0)
-            } else {
-                binding.backupPassword.text?.toString()?.toCharArray() ?: CharArray(0)
-            }
-        }
-        if (password.isEmpty()) throw Exception(getString(R.string.backup_encryption_password))
-        return BackupEncryption.decrypt(bytes, password)
     }
 
     private suspend fun doBackup(
@@ -693,11 +650,8 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                 put("settings", BackupFormatV2.encodeSettings(PublicDatabase.kvPairDao.all()))
             }
         }
-        val archive = encodeBackupArchive(out.toStringPretty(), format)
-        // isai：填了備份密碼就整檔加密（AES + magic header）。
-        val password = backupPasswordChars()
-        require(password.isEmpty() || password.size >= 8) { getString(R.string.backup_password_short) }
-        return if (password.isNotEmpty()) BackupEncryption.encrypt(archive, password) else archive
+
+        return encodeBackupArchive(out.toStringPretty(), format)
     }
 
     val importFile = registerForActivityResult(ActivityResultContracts.GetContent()) { file ->
@@ -720,7 +674,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
             .substringAfterLast('/')
             .substringAfter(':')
 
-        if (!fileName.endsWith(".json") && !fileName.endsWith(".zip") && !fileName.endsWith(".nbk")) {
+        if (!fileName.endsWith(".json") && !fileName.endsWith(".zip")) {
             onMainDispatcher {
                 if (!isAdded) return@onMainDispatcher
                 snackbar(getString(R.string.backup_not_file, fileName)).show()
@@ -729,23 +683,21 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         }
 
         try {
-            val bytes = requireContext().contentResolver.openInputStream(file)!!.use { input ->
+            val content = requireContext().contentResolver.openInputStream(file)!!.use { input ->
                 if (fileName.endsWith(".zip")) {
                     ZipInputStream(BufferedInputStream(input)).use { zis ->
                         zis.nextEntry?.let { entry ->
                             if (entry.name.endsWith(".json")) {
-                                zis.readBytesBounded()
+                                zis.readBytesBounded().toString(Charsets.UTF_8)
                             } else {
                                 throw Exception("Invalid backup file format")
                             }
                         } ?: throw Exception("Invalid backup file format")
                     }
                 } else {
-                    input.readBytesBounded()
+                    input.readBytesBounded().toString(Charsets.UTF_8)
                 }
             }
-            // isai：加密備份（magic header）用備份畫面的密碼欄解密；其餘原樣。
-            val content = String(decryptIfEncrypted(bytes), Charsets.UTF_8)
 
             val json = JSONObject(content)
             onMainDispatcher {
@@ -768,7 +720,7 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
 
                         val binding = LayoutProgressBinding.inflate(layoutInflater)
                         binding.content.text = getString(R.string.backup_importing)
-                        val dialog = MaterialAlertDialogBuilder(requireContext())
+                        val dialog = AlertDialog.Builder(requireContext())
                             .setView(binding.root)
                             .setCancelable(false)
                             .show()

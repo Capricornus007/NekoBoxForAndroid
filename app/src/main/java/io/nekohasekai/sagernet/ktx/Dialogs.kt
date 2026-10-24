@@ -63,16 +63,7 @@ fun AlertDialog.tryToShow() {
             "activity=${activity.javaClass.name}",
     )
     try {
-        var owner = context
-        while (owner is ContextWrapper && owner !is Activity) {
-            val base = owner.baseContext
-            if (base === owner) return
-            owner = base
-        }
-        val activity = owner as? Activity ?: return
-        if (!activity.isFinishing && !activity.isDestroyed) {
-            show()
-        }
+        show()
     } catch (e: Exception) {
         Logs.e("AlertDialog.tryToShow failed while showing on a resolved Activity", e)
     }

@@ -26,9 +26,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.SubscriptionFilterMode
 import io.nekohasekai.sagernet.database.*
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
-import io.nekohasekai.sagernet.fmt.dnsServerConfig
 import io.nekohasekai.sagernet.group.GroupUpdater
-import io.nekohasekai.sagernet.group.parseSubscriptionHeaders
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
@@ -74,14 +72,11 @@ class GroupSettingsActivity(
         DataStore.subscriptionDeduplication = subscription.deduplication
         DataStore.subscriptionUpdateWhenConnectedOnly = subscription.updateWhenConnectedOnly
         DataStore.subscriptionUserAgent = subscription.customUserAgent
-        DataStore.subscriptionSendHwid = subscription.sendHwid
-        DataStore.subscriptionCustomHwidParams = subscription.customHwidParams
-        DataStore.subscriptionServerDns = subscription.serverDnsResolver
-        DataStore.subscriptionHeaders = subscription.customHeaders
         DataStore.subscriptionAutoUpdate = subscription.autoUpdate
         DataStore.subscriptionAutoUpdateDelay = subscription.autoUpdateDelay
         DataStore.subscriptionFilterMode = subscription.filterMode
         DataStore.subscriptionFilterRegex = subscription.filterRegex
+        DataStore.subscriptionServerDns = subscription.serverDnsResolver ?: ""
     }
 
     fun ProxyGroup.serialize() {
@@ -122,14 +117,11 @@ class GroupSettingsActivity(
                 deduplication = DataStore.subscriptionDeduplication
                 updateWhenConnectedOnly = DataStore.subscriptionUpdateWhenConnectedOnly
                 customUserAgent = DataStore.subscriptionUserAgent
-                sendHwid = DataStore.subscriptionSendHwid
-                customHwidParams = DataStore.subscriptionCustomHwidParams
-                serverDnsResolver = DataStore.subscriptionServerDns.trim()
-                customHeaders = DataStore.subscriptionHeaders
                 autoUpdate = DataStore.subscriptionAutoUpdate
                 autoUpdateDelay = DataStore.subscriptionAutoUpdateDelay
                 filterMode = DataStore.subscriptionFilterMode
                 filterRegex = DataStore.subscriptionFilterRegex
+                serverDnsResolver = DataStore.subscriptionServerDns
             }
         }
     }
@@ -143,7 +135,6 @@ class GroupSettingsActivity(
 
         frontProxyPreference = findPreference(Key.GROUP_FRONT_PROXY)!!
         frontProxyPreference.apply {
-            value = DataStore.frontProxyTmp.toString()
             setEntries(R.array.front_proxy_entry)
             setEntryValues(R.array.front_proxy_value)
             value = DataStore.frontProxyTmp.toString()
@@ -167,7 +158,6 @@ class GroupSettingsActivity(
         }
         landingProxyPreference = findPreference(Key.GROUP_LANDING_PROXY)!!
         landingProxyPreference.apply {
-            value = DataStore.landingProxyTmp.toString()
             setEntries(R.array.front_proxy_entry)
             setEntryValues(R.array.front_proxy_value)
             value = DataStore.landingProxyTmp.toString()
@@ -226,22 +216,6 @@ class GroupSettingsActivity(
         subscriptionAutoUpdate.setOnPreferenceChangeListener { _, newValue ->
             subscriptionAutoUpdateDelay.isEnabled = (newValue as Boolean)
             true
-        }
-
-        fun validateInput(key: String, validate: (String) -> Unit) {
-            findPreference<EditTextPreference>(key)!!.setOnPreferenceChangeListener { _, value ->
-                try {
-                    validate(value as String)
-                    true
-                } catch (e: IllegalArgumentException) {
-                    Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
-                    false
-                }
-            }
-        }
-        validateInput(Key.SUBSCRIPTION_HEADERS) { parseSubscriptionHeaders(it) }
-        validateInput(Key.SUBSCRIPTION_SERVER_DNS) {
-            if (it.isNotBlank()) dnsServerConfig(it, "check", "dns-local", "direct")
         }
 
         val subscriptionFilterMode =

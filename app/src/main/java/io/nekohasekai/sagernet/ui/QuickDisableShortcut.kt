@@ -37,10 +37,7 @@ class QuickDisableShortcut :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        android.app.AlertDialog.Builder(this).setMessage(io.nekohasekai.sagernet.R.string.confirm_stop_service)
-            .setPositiveButton(android.R.string.ok) { _, _ -> connection.connect(this, this) }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> finish() }
-            .setOnCancelListener { finish() }.show()
+        connection.connect(this, this)
         if (Build.VERSION.SDK_INT >= 25) {
             getSystemService<ShortcutManager>()!!.reportShortcutUsed("disable")
         }

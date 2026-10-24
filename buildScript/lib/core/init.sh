@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -eo pipefail
 
 source "buildScript/init/env.sh"
 

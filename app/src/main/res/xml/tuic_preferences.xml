@@ -28,12 +28,12 @@
             app:icon="@drawable/ic_settings_password"
             app:key="serverPassword"
             app:title="@string/password" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             app:icon="@drawable/ic_baseline_legend_toggle_24"
             app:key="serverALPN"
             app:title="@string/alpn"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             app:icon="@drawable/ic_baseline_vpn_key_24"
             app:key="serverCertificates"
             app:title="@string/certificates"

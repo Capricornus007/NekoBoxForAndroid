@@ -1098,18 +1098,4 @@
     <string name="openvpn_tls_version_min">Минимальная версия TLS</string>
     <string name="openvpn_topology">Топология</string>
     <string name="openvpn_transport">Протокол</string>
-<string name="amoled_theme">Чисто черный фон (AMOLED)</string>
-<string name="amoled_theme_summary">Использовать абсолютно черный фон в темной теме</string>
-<string name="app_theme">Цвет акцента</string>
-    <string name="authenticated_http_proxy_unavailable">HTTP-прокси Android VPN не поддерживает обязательные логин и пароль.</string>
-    <string name="clash_api_token">Токен Clash API</string>
-    <string name="clash_api_token_summary">Показать или скопировать токен доступа к панели</string>
-    <string name="confirm_stop_service">Остановить работающий прокси?</string>
-    <string name="confirm_clear_cache">Остановить прокси, очистить кэш ядра и перезапустить приложение?</string>
-    <string name="downloads_proxy_only">Обновления только через прокси</string>
-    <string name="downloads_proxy_only_summary">Для обновления подписок и GeoIP/GeoSite нужен работающий локальный SOCKS-прокси. Прямое подключение отключено.</string>
-    <string name="backup_encryption_password">Пароль резервной копии (необязательно)</string>
-    <string name="backup_encryption_summary">От 8 символов для защиты экспорта, отправки и копий в WebDAV. Пустое поле — копия без шифрования. Пароль не сохраняется.</string>
-    <string name="backup_password_short">Пароль резервной копии должен содержать минимум 8 символов.</string>
-    <string name="backup_decrypt_failed">Неверный пароль или повреждённая копия. Данные не восстановлены.</string>
 </resources>

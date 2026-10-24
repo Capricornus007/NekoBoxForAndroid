@@ -19,5 +19,4 @@
         android:title="@string/route_manage_assets"
         app:showAsAction="never" />
 
-    <item android:id="@+id/action_check_routes" android:title="@string/route_check_overlaps" app:showAsAction="never" />
 </menu>

@@ -8,8 +8,7 @@
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/backup_configurations"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
+        android:layout_height="48dp"
         android:checked="true"
         android:text="@string/backup_groups_and_configurations"
         android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
@@ -17,8 +16,7 @@
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/backup_rules"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
+        android:layout_height="48dp"
         android:checked="true"
         android:text="@string/backup_rules"
         android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
@@ -26,8 +24,7 @@
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/backup_settings"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
+        android:layout_height="48dp"
         android:checked="true"
         android:text="@string/backup_settings"
         android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />

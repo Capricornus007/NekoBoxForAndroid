@@ -64,7 +64,7 @@
 # mod.3（53b70f4）：route 吃 sing 的 PacketBuffer 雙重歸還修復，並讓 cachePacketBuffers
 # 自己擋掉 nil—— bufio.NewCachedPacketConn 首行 IncRef() 拿 nil 就是空指標 panic（裝置端
 # tombstone 那族「兩格 unknown、沒有 Abort message」的根）。tag 已打：v1.15.0-alpha.12-mod.3。
-export COMMIT_SING_BOX="f51d38fb3489ec410fdc026ed72f3588db995676"
+export COMMIT_SING_BOX="49d4f979f63430b2783123f5d2e5197852aa2664"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
@@ -75,7 +75,7 @@ export COMMIT_SING_BOX="f51d38fb3489ec410fdc026ed72f3588db995676"
 # SINGBOX_VERSION 要一起改，scripts/check-core-pins.sh 段 1c 就是抓這個的——
 # 「Update sing-box core」那條 bot 只会盲目 +1 計數（它上一輪還寫 alpha.11-mod.41，
 # 就是沒跟上基號換代），換代要人對。
-export VERSION_SING_BOX="1.15.0-alpha.12-mod.6"
+export VERSION_SING_BOX="1.15.0-alpha.12-mod.5"
 export COMMIT_LIBNEKO="1dad84547be59ff2ec5ed7bd2339b0441929edfd"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to

@@ -25,29 +25,29 @@
             app:key="routeDomain"
             app:title="@string/rule_domain"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             app:icon="@drawable/ic_baseline_add_road_24"
             app:key="routeIP"
             app:title="@string/rule_dst_ip"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:icon="@drawable/ic_maps_directions_boat"
             app:key="routePort"
             app:title="@string/rule_dst_port"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             app:icon="@drawable/ic_baseline_local_bar_24"
             app:key="routeSource"
             app:title="@string/rule_src_ip"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             app:icon="@drawable/ic_baseline_home_24"
             app:key="routeSourcePort"
             app:title="@string/rule_src_port"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             app:icon="@drawable/ic_baseline_rule_folder_24"
             app:key="routeRuleset"
             app:title="@string/rule_ruleset"
@@ -59,7 +59,7 @@
             app:key="routeNetwork"
             app:title="@string/rule_network"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             app:icon="@drawable/ic_baseline_layers_24"
             app:key="routeProtocol"
             app:title="@string/rule_protocol"
@@ -69,9 +69,5 @@
             app:key="routeOutbound"
             app:title="@string/rule_outbound"
             app:useSimpleSummaryProvider="true" />
-        <moe.matsuri.nb4a.ui.SimpleMenuPreference app:key="routeFallbackMode"
-            app:title="@string/route_fallback_mode" app:summary="@string/route_fallback_hint"
-            app:entries="@array/route_fallback_entries" app:entryValues="@array/route_fallback_values" />
-        <Preference app:key="routeFallbackProfile" app:title="@string/route_fallback_profile" />
     </PreferenceCategory>
 </PreferenceScreen>

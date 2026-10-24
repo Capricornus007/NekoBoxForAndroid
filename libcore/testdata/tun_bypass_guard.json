@@ -1,1 +1,0 @@
-{"type":"logical","mode":"and","action":"reject","rules":[{"inbound":["tun-in"]},{"type":"logical","mode":"or","invert":true,"rules":[{"user_id":[12345,20001]},{"user_id":[1051],"port":[53,853]}]}]}

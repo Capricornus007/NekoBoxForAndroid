@@ -29,12 +29,12 @@
             app:key="sni"
             app:title="@string/sni"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             app:icon="@drawable/ic_baseline_legend_toggle_24"
             app:key="alpn"
             app:title="@string/alpn"
             app:useSimpleSummaryProvider="true" />
-        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+        <EditTextPreference
             app:icon="@drawable/ic_baseline_vpn_key_24"
             app:key="certificates"
             app:title="@string/certificates"

@@ -242,13 +242,11 @@ object ProfileManager {
     }
 
     suspend fun deleteRule(ruleId: Long) {
-        NetworkSettingsHistory.capture()
         SagerDatabase.rulesDao.deleteById(ruleId)
         ruleIterator { onRemoved(ruleId) }
     }
 
     suspend fun deleteRules(rules: List<RuleEntity>) {
-        NetworkSettingsHistory.capture()
         SagerDatabase.rulesDao.deleteRules(rules)
         ruleIterator {
             rules.forEach {

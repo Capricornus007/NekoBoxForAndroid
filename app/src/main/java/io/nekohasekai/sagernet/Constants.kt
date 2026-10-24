@@ -21,9 +21,6 @@ object Key {
 
     const val APP_EXPERT = "isExpert"
     const val APP_THEME = "appTheme"
-
-    // isai：純黑（AMOLED）主題開關；主題機制未移植，保留鍵位供 InitialConfiguration 寫初值。
-    const val AMOLED_THEME = "amoledTheme"
     const val USE_SYSTEM_THEME = "useSystemTheme"
     const val NIGHT_THEME = "nightTheme"
 
@@ -74,12 +71,6 @@ object Key {
 
     const val BYPASS_LAN = "bypassLan"
     const val BYPASS_LAN_IN_CORE = "bypassLanInCore"
-    const val DIRECT_FALLBACK = "directFallback"
-    const val DIRECT_FALLBACK_URL = "directFallbackUrl"
-    const val DIRECT_FALLBACK_INTERVAL = "directFallbackInterval"
-    const val DIRECT_FALLBACK_REQUIRED = "directFallbackRequired"
-    const val DIRECT_FALLBACK_FAILURES = "directFallbackFailures"
-    const val DIRECT_FALLBACK_RECOVERIES = "directFallbackRecoveries"
     const val CONCURRENT_DIAL = "concurrentDial"
 
     const val MIXED_PORT = "mixedPort" // migration source
@@ -150,7 +141,6 @@ object Key {
     const val ADAPTIVE_TRAFFIC_POLLING = "adaptiveTrafficPolling"
     const val PROFILE_TRAFFIC_STATISTICS = "profileTrafficStatistics"
     const val SHOW_SYSTEM_APPS = "showSystemApps"
-    const val DOWNLOADS_PROXY_ONLY = "downloadsProxyOnly"
 
     const val PROFILE_DIRTY = "profileDirty"
     const val PROFILE_ID = "profileId"
@@ -161,11 +151,6 @@ object Key {
     const val FASTEST_SOURCE_GROUP = "fastestSourceGroup"
     const val FASTEST_NAME_REGEX = "fastestNameRegex"
     const val FASTEST_IGNORE_CASE = "fastestIgnoreCase"
-    const val FASTEST_PROTOCOL_FILTER_MODE = "fastestProtocolFilterMode"
-    const val FASTEST_PROTOCOLS = "fastestProtocols"
-    const val FASTEST_HEALTH_CHECK = "fastestHealthCheck"
-    const val FASTEST_FAILURE_COOLDOWN = "fastestFailureCooldown"
-    const val FASTEST_HEALTH_URL = "fastestHealthUrl"
     const val FASTEST_REGEX_OPTIONS = "fastestRegexOptions"
     const val FASTEST_REGEX_PREVIEW = "fastestRegexPreview"
 
@@ -305,14 +290,11 @@ object Key {
     const val DEFAULT_SUBSCRIPTION_USER_AGENT = "defaultSubscriptionUserAgent"
     const val SPOOF_USER_AGENT = "spoofUserAgent"
     const val AUTO_SELECT_LOWEST_LATENCY = "autoSelectLowestLatency"
-    const val SUBSCRIPTION_SEND_HWID = "subscriptionSendHwid"
-    const val SUBSCRIPTION_CUSTOM_HWID_PARAMS = "subscriptionCustomHwidParams"
-    const val SUBSCRIPTION_SERVER_DNS = "subscriptionServerDns"
-    const val SUBSCRIPTION_HEADERS = "subscriptionHeaders"
     const val SUBSCRIPTION_AUTO_UPDATE = "subscriptionAutoUpdate"
     const val SUBSCRIPTION_AUTO_UPDATE_DELAY = "subscriptionAutoUpdateDelay"
     const val SUBSCRIPTION_FILTER_MODE = "subscriptionFilterMode"
     const val SUBSCRIPTION_FILTER_REGEX = "subscriptionFilterRegex"
+    const val SUBSCRIPTION_SERVER_DNS = "subscriptionServerDns"
 
     // Balancer
     const val BALANCER_TYPE = "balancerType"
@@ -330,7 +312,6 @@ object Key {
 
     //
     const val APP_TLS_VERSION = "appTLSVersion"
-    const val ENABLE_CLASH_API = "enableClashAPI"
 
     const val ENABLE_TLS_FRAGMENT = "enableTLSFragment"
 

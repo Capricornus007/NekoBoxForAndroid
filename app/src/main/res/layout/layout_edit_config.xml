@@ -13,7 +13,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:background="?attr/colorOutlineVariant" />
+        android:background="@android:color/darker_gray" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -31,7 +31,6 @@
 
     <LinearLayout
         android:id="@+id/keyboard_container"
-        android:background="?attr/colorSurfaceContainerHigh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="0dp"
@@ -39,21 +38,18 @@
 
         <ImageView
             android:id="@+id/action_tab"
-            android:contentDescription="@string/editor_tab"
-            android:focusable="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="12dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?colorPrimary"
+            android:padding="8dp"
             android:src="@drawable/baseline_keyboard_tab_24"
-            app:tint="?attr/colorOnSurfaceVariant" />
+            app:tint="?colorOnSurface" />
 
         <moe.matsuri.nb4a.ui.ExtendedKeyboard
             android:id="@+id/extended_keyboard"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/colorSurfaceContainerHigh"
+            android:background="?attr/colorSurface"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="6"
@@ -61,37 +57,35 @@
 
         <ImageView
             android:id="@+id/action_undo"
-            android:contentDescription="@string/editor_undo"
-            android:focusable="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="12dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?colorPrimary"
+            android:padding="8dp"
             android:src="@drawable/baseline_undo_24"
-            app:tint="?attr/colorOnSurfaceVariant" />
+            app:tint="?colorOnSurface" />
 
         <ImageView
             android:id="@+id/action_redo"
-            android:contentDescription="@string/editor_redo"
-            android:focusable="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="12dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?colorPrimary"
+            android:padding="8dp"
             android:src="@drawable/baseline_redo_24"
-            app:tint="?attr/colorOnSurfaceVariant" />
+            app:tint="?colorOnSurface" />
 
         <ImageView
             android:id="@+id/action_format"
-            android:contentDescription="@string/editor_format"
-            android:focusable="true"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="12dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?colorPrimary"
+            android:padding="8dp"
             android:src="@drawable/ic_baseline_format_align_left_24"
-            app:tint="?attr/colorOnSurfaceVariant" />
+            app:tint="?colorOnSurface" />
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?colorPrimary" />
 
     </LinearLayout>
 

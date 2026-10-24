@@ -5,7 +5,6 @@ package io.nekohasekai.sagernet.ktx
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -16,32 +15,22 @@ import android.system.Os
 import android.system.OsConstants
 import android.util.TypedValue
 import android.view.View
-import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.preference.Preference
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
-import com.jakewharton.processphoenix.ProcessPhoenix
 import io.nekohasekai.sagernet.BuildConfig
-import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
-import io.nekohasekai.sagernet.aidl.ISagerNetService
-import io.nekohasekai.sagernet.bg.BaseService
-import io.nekohasekai.sagernet.bg.SagerConnection
 import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.ui.MainActivity
-import io.nekohasekai.sagernet.ui.ThemedActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import moe.matsuri.nb4a.utils.NGUtil
@@ -271,75 +260,6 @@ fun View.crossFadeFrom(other: View) {
 fun Context.getColour(@ColorRes colorRes: Int): Int = ContextCompat.getColor(this, colorRes)
 
 fun Context.getColorAttr(@AttrRes resId: Int): Int = MaterialColors.getColor(this, resId, 0)
-
-fun Fragment.snackbar(textId: Int) = (requireActivity() as MainActivity).snackbar(textId)
-fun Fragment.snackbar(text: CharSequence) = (requireActivity() as MainActivity).snackbar(text)
-
-fun ThemedActivity.startFilesForResult(
-    launcher: ActivityResultLauncher<String>,
-    input: String,
-) {
-    try {
-        return launcher.launch(input)
-    } catch (_: ActivityNotFoundException) {
-    } catch (_: SecurityException) {
-    }
-    snackbar(getString(R.string.file_manager_missing)).show()
-}
-
-fun Fragment.startFilesForResult(
-    launcher: ActivityResultLauncher<String>,
-    input: String,
-) {
-    try {
-        return launcher.launch(input)
-    } catch (_: ActivityNotFoundException) {
-    } catch (_: SecurityException) {
-    }
-    (requireActivity() as ThemedActivity).snackbar(getString(R.string.file_manager_missing)).show()
-}
-
-fun Fragment.needReload() {
-    if (DataStore.serviceState.started) {
-        snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {
-            SagerNet.reloadService(force = true)
-        }.show()
-    }
-}
-
-fun Fragment.needRestart() {
-    snackbar(R.string.need_restart).setAction(R.string.apply) {
-        triggerFullRestart(requireContext())
-    }.show()
-}
-
-fun triggerFullRestart(ctx: Context) {
-    runOnDefaultDispatcher {
-        SagerNet.stopService()
-        delay(500)
-        SagerConnection.restartingApp = true
-        val connection = SagerConnection(SagerConnection.CONNECTION_ID_RESTART_BG)
-        connection.connect(
-            ctx,
-            RestartCallback {
-                ProcessPhoenix.triggerRebirth(ctx, Intent(ctx, MainActivity::class.java))
-            },
-        )
-    }
-}
-
-private class RestartCallback(val callback: () -> Unit) : SagerConnection.Callback {
-    override fun stateChanged(
-        state: BaseService.State,
-        profileName: String?,
-        msg: String?,
-    ) {
-    }
-
-    override fun onServiceConnected(service: ISagerNetService) {
-        callback()
-    }
-}
 
 val isExpert: Boolean by lazy { BuildConfig.DEBUG || DataStore.isExpert }
 const val isOss = BuildConfig.FLAVOR == "oss"

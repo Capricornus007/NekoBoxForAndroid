@@ -30,11 +30,4 @@ interface ISagerNetService {
   // Live routed connections as JSON (ConnectionEntry array); closed ones too when the
   // bounded history is enabled through connection diagnostics.
   String connections(boolean includeClosed);
-
-  // isai diagnostics: bounded history JSON filtered by query.
-  String getRuntimeDiagnostics(String historyQuery);
-  // isai probes: DNS (tag) + HTTPS URL reachability check via the running config.
-  String configuredProbe(long expectedProfileId, String tag, String dnsTag, String httpsUrl);
-  // isai probes: direct vs proxied domain/DNS-target resolution comparison.
-  String networkProbe(long expectedProfileId, boolean direct, String domain, String dnsTarget);
 }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 21,
-    "identityHash": "4f914bf26c9fe703f5b8ac9705f5f288",
+    "identityHash": "681cb85f399748103a7767d53fafb148",
     "entities": [
       {
         "tableName": "proxy_groups",
@@ -344,7 +344,7 @@
       },
       {
         "tableName": "rules",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `config` TEXT NOT NULL DEFAULT '', `userOrder` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, `domains` TEXT NOT NULL, `ip` TEXT NOT NULL, `port` TEXT NOT NULL, `sourcePort` TEXT NOT NULL, `network` TEXT NOT NULL, `source` TEXT NOT NULL, `protocol` TEXT NOT NULL, `ruleset` TEXT NOT NULL DEFAULT '', `outbound` INTEGER NOT NULL, `packages` TEXT NOT NULL, `fallbackMode` INTEGER NOT NULL DEFAULT 0, `fallbackProfile` INTEGER NOT NULL DEFAULT 0)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `config` TEXT NOT NULL DEFAULT '', `userOrder` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, `domains` TEXT NOT NULL, `ip` TEXT NOT NULL, `port` TEXT NOT NULL, `sourcePort` TEXT NOT NULL, `network` TEXT NOT NULL, `source` TEXT NOT NULL, `protocol` TEXT NOT NULL, `ruleset` TEXT NOT NULL DEFAULT '', `outbound` INTEGER NOT NULL, `packages` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -437,20 +437,6 @@
             "columnName": "packages",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "fallbackMode",
-            "columnName": "fallbackMode",
-            "affinity": "INTEGER",
-            "notNull": true,
-            "defaultValue": "0"
-          },
-          {
-            "fieldPath": "fallbackProfile",
-            "columnName": "fallbackProfile",
-            "affinity": "INTEGER",
-            "notNull": true,
-            "defaultValue": "0"
           }
         ],
         "primaryKey": {
@@ -463,7 +449,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4f914bf26c9fe703f5b8ac9705f5f288')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '681cb85f399748103a7767d53fafb148')"
     ]
   }
 }
