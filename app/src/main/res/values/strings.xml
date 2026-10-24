@@ -429,6 +429,8 @@
     <string name="group_basic">Basic</string>
     <string name="group_settings">Group Settings</string>
     <string name="subscription">Subscription</string>
+    <string name="subscription_send_hwid">Send HWID</string>
+    <string name="subscription_send_hwid_summary">Send HWID, Android version, and device model when updating this subscription</string>
     <string name="subscription_settings">Subscription Settings</string>
     <string name="group_type">Group Type</string>
     <string name="subscription_type">Subscription Type</string>
@@ -589,6 +591,23 @@
     <string name="tailscale_accept_routes_sum">Reach subnets advertised by other nodes</string>
     <string name="tailscale_only_tcp_443">Always use DERP</string>
     <string name="tailscale_only_tcp_443_sum">Relay all peer traffic over TCP 443 and send no UDP. Required for a chain in front of Tailscale, otherwise direct peer connections leave from this device.</string>
+    <string name="amneziawg_category">AmneziaWG</string>
+    <string name="amneziawg_jc">Jc (junk packets)</string>
+    <string name="amneziawg_jmin">Jmin (junk min size)</string>
+    <string name="amneziawg_jmax">Jmax (junk max size)</string>
+    <string name="amneziawg_s1">S1</string>
+    <string name="amneziawg_s2">S2</string>
+    <string name="amneziawg_s3">S3</string>
+    <string name="amneziawg_s4">S4</string>
+    <string name="amneziawg_h1">H1</string>
+    <string name="amneziawg_h2">H2</string>
+    <string name="amneziawg_h3">H3</string>
+    <string name="amneziawg_h4">H4</string>
+    <string name="amneziawg_i1">I1</string>
+    <string name="amneziawg_i2">I2</string>
+    <string name="amneziawg_i3">I3</string>
+    <string name="amneziawg_i4">I4</string>
+    <string name="amneziawg_i5">I5</string>
 
     <string name="cloudflare_wrap" translatable="false">Cloudflare Warp</string>
     <string name="warp_license">CloudFlare Warp is a free WireGuard VPN provider. By using it, you
@@ -879,23 +898,6 @@
     <string name="action_close">Close</string>
     <string name="action_masterdnsvpn">MasterDNS VPN</string>
     <string name="action_olcrtc">OLC RTC</string>
-    <string name="amneziawg_category">AmneziaWG</string>
-    <string name="amneziawg_h1">Header 1</string>
-    <string name="amneziawg_h2">Header 2</string>
-    <string name="amneziawg_h3">Header 3</string>
-    <string name="amneziawg_h4">Header 4</string>
-    <string name="amneziawg_i1">Init 1</string>
-    <string name="amneziawg_i2">Init 2</string>
-    <string name="amneziawg_i3">Init 3</string>
-    <string name="amneziawg_i4">Init 4</string>
-    <string name="amneziawg_i5">Init 5</string>
-    <string name="amneziawg_jc">Junk Count</string>
-    <string name="amneziawg_jmax">Junk Max</string>
-    <string name="amneziawg_jmin">Junk Min</string>
-    <string name="amneziawg_s1">S1</string>
-    <string name="amneziawg_s2">S2</string>
-    <string name="amneziawg_s3">S3</string>
-    <string name="amneziawg_s4">S4</string>
     <string name="balancer_use_front_proxy">Use Front Proxy</string>
     <string name="balancer_use_landing_proxy">Use Landing Proxy</string>
     <string name="battery_optimization_disabled">Battery optimization disabled</string>
@@ -1214,4 +1216,20 @@
     <string name="openvpn_tls_version_min">Minimum TLS version</string>
     <string name="openvpn_topology">Topology</string>
     <string name="openvpn_transport">Protocol</string>
+    <string name="amoled_theme">AMOLED Dark Theme</string>
+    <string name="amoled_theme_summary">Pure black background in dark mode</string>
+    <string name="app_theme">Accent Color</string>
+    <string name="authenticated_http_proxy_unavailable">Android VPN HTTP proxy does not support the required username and password.</string>
+    <string name="clash_api_token">Clash API token</string>
+    <string name="clash_api_token_summary">Show or copy the dashboard access token</string>
+    <string name="confirm_stop_service">Stop the running proxy?</string>
+    <string name="confirm_clear_cache">Stop the proxy, clear the core cache and restart the app?</string>
+    <string name="downloads_proxy_only">Updates only through proxy</string>
+    <string name="downloads_proxy_only_summary">Subscription and GeoIP/GeoSite updates require the running local SOCKS proxy. Direct fallback is disabled.</string>
+    <string name="backup_encryption_password">Backup password (optional)</string>
+    <string name="backup_encryption_summary">At least 8 characters protects exported, shared and WebDAV backups. Leave empty for an unencrypted backup. The password is not saved.</string>
+    <string name="backup_password_short">Use at least 8 characters for the backup password.</string>
+    <string name="backup_decrypt_failed">Incorrect password or damaged backup. Nothing was restored.</string>
+    <string name="subscription_custom_hwid_params">Custom HWID parameters</string>
+    <string name="subscription_custom_hwid_params_summary">Format: hwid=value,os=value,osVersion=value,model=value. Leave empty to use this device values; when filled, only listed values are sent.</string>
 </resources>

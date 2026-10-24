@@ -181,7 +181,12 @@ abstract class GroupUpdater {
                     finishUpdate(proxyGroup)
                     throw e
                 } catch (e: Throwable) {
-                    Logs.w(e)
+                    // isai：訂閱回應異常單獨記（安靜地），其餘照舊記完整堆疊。
+                    if (e is SubscriptionResponseException) {
+                        Logs.d("Subscription import failed: ${e.problem}", e)
+                    } else {
+                        Logs.w(e)
+                    }
                     // Background/scheduled refreshes have nobody looking at the screen: only a
                     // user-initiated update reports the failure, everything else just logs it.
                     if (byUser) userInterface?.onUpdateFailure(proxyGroup, e.readableMessage)
@@ -194,7 +199,7 @@ abstract class GroupUpdater {
         suspend fun finishUpdate(proxyGroup: ProxyGroup) {
             updating.remove(proxyGroup.id)
             progress.remove(proxyGroup.id)
-            GroupManager.postUpdate(proxyGroup)
+            GroupManager.postUpdate(proxyGroup.id)
         }
     }
 }

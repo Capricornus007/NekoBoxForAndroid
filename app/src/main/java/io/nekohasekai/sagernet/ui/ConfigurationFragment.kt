@@ -1,5 +1,9 @@
 package io.nekohasekai.sagernet.ui
 
+import io.nekohasekai.sagernet.ktx.MAX_SUBSCRIPTION_BYTES
+import io.nekohasekai.sagernet.ktx.readBytesLimited
+
+import android.content.DialogInterface
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -20,6 +24,7 @@ import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceDataStore
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter

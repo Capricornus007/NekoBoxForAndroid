@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DbExecutors
+import io.nekohasekai.sagernet.database.InitialConfiguration
 
 @Database(entities = [KeyValuePair::class], version = 1)
 abstract class PublicDatabase : RoomDatabase() {
@@ -13,6 +14,7 @@ abstract class PublicDatabase : RoomDatabase() {
         val instance by lazy {
             SagerNet.application.getDatabasePath(Key.DB_PROFILE).parentFile?.mkdirs()
             Room.databaseBuilder(SagerNet.application, PublicDatabase::class.java, Key.DB_PUBLIC)
+                .addCallback(InitialConfiguration.settingsCallback)
                 .setJournalMode(JournalMode.TRUNCATE)
                 .enableMultiInstanceInvalidation()
                 .setQueryExecutor(DbExecutors.query)

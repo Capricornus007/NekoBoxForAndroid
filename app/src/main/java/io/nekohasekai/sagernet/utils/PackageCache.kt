@@ -5,6 +5,9 @@ import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import io.nekohasekai.sagernet.Key
+import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.listenForPackageChanges
 import kotlinx.coroutines.runBlocking
@@ -19,9 +22,9 @@ object PackageCache {
     lateinit var installedPluginPackages: Map<String, PackageInfo>
     lateinit var installedApps: Map<String, ApplicationInfo>
     lateinit var packageMap: Map<String, Int>
-
     @Volatile
     var uidMap: Map<Int, Set<String>> = emptyMap()
+        private set
     val loaded = Mutex(true)
     var registerd = AtomicBoolean(false)
 
@@ -31,8 +34,17 @@ object PackageCache {
         try {
             reload()
             app.listenForPackageChanges(false) {
+                val previous = packageMap
                 reload()
                 labelMap.clear()
+                // isai：per-app 模式下安裝/移除 App 改變 UID 集合，重啟讓 TUN 守衛規則跟上。
+                if (previous != packageMap && DataStore.proxyApps && DataStore.serviceMode == Key.MODE_VPN) {
+                    runOnMainDispatcher {
+                        DataStore.baseService?.apply {
+                            scheduleNetworkProfileRestart("installed-apps", "UIDs-updated")
+                        }
+                    }
+                }
             }
         } catch (e: Throwable) {
             // Never leave `loaded` permanently locked or block a later retry: on a

@@ -224,6 +224,8 @@ abstract class SagerDatabase : RoomDatabase() {
                 SagerNet.application.getDatabasePath(Key.DB_PROFILE),
             )
             Room.databaseBuilder(SagerNet.application, SagerDatabase::class.java, Key.DB_PROFILE)
+                // isai：首次建庫時種入預設路由規則（無損：僅在空庫生效）。
+                .addCallback(InitialConfiguration.routesCallback)
                 .setJournalMode(JournalMode.TRUNCATE)
                 .addMigrations(
                     Migration13To14,

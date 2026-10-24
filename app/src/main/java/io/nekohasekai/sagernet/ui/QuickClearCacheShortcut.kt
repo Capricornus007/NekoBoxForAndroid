@@ -15,6 +15,9 @@ class QuickClearCacheShortcut : Activity() {
             getSystemService<ShortcutManager>()!!.reportShortcutUsed("clear-cache-restart")
         }
 
-        recoverVlessTlsStateAndRestart(this)
+        android.app.AlertDialog.Builder(this).setMessage(io.nekohasekai.sagernet.R.string.confirm_clear_cache)
+            .setPositiveButton(android.R.string.ok) { _, _ -> recoverVlessTlsStateAndRestart(this) }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> finish() }
+            .setOnCancelListener { finish() }.show()
     }
 }

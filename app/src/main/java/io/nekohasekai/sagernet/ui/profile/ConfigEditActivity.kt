@@ -22,6 +22,7 @@ import io.github.rosemoe.sora.widget.subscribeAlways
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.NetworkSettingsHistory
 import io.nekohasekai.sagernet.databinding.LayoutEditConfigBinding
 import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.ktx.readableMessage
@@ -184,6 +185,7 @@ class ConfigEditActivity : ThemedActivity() {
     fun saveAndExit() {
         formatText()?.let {
             if (useConfigStore) {
+                if (key == Key.GLOBAL_CUSTOM_CONFIG && DataStore.configurationStore.getString(key).orEmpty() != it) NetworkSettingsHistory.capture()
                 DataStore.configurationStore.putString(key, it)
             } else {
                 DataStore.profileCacheStore.putString(key, it)

@@ -1,0 +1,57 @@
+package io.nekohasekai.sagernet.database
+
+import com.esotericsoftware.kryo.io.ByteBufferInput
+import com.esotericsoftware.kryo.io.ByteBufferOutput
+import org.junit.Assert.*
+import org.junit.Test
+
+class SubscriptionBeanTest {
+    @Test fun versionFourAndShareRoundTripPreserveNewSettings() {
+        val source = SubscriptionBean().apply {
+            initializeDefaultValues()
+            link = "https://subscription.test/nodes"
+            sendHwid = true
+            customHwidParams = "hwid=fixture"
+            serverDnsResolver = "https://dns.example/dns-query"
+            customHeaders = "Authorization: Bearer fixture"
+        }
+        for (share in listOf(false, true)) {
+            val output = ByteBufferOutput(1024)
+            if (share) source.serializeForShare(output) else source.serializeToBuffer(output)
+            val restored = SubscriptionBean().apply {
+                if (share) deserializeFromShare(ByteBufferInput(output.toBytes())) else deserializeFromBuffer(ByteBufferInput(output.toBytes()))
+                initializeDefaultValues()
+            }
+            assertEquals(source.link, restored.link)
+            assertEquals(source.customHwidParams, restored.customHwidParams)
+            assertEquals(source.sendHwid, restored.sendHwid)
+            assertEquals(source.serverDnsResolver, restored.serverDnsResolver)
+            assertEquals(source.customHeaders, restored.customHeaders)
+        }
+    }
+    @Test fun oldVersionThreeKeepsHwidAndDefaultsNewFields() {
+        val output = ByteBufferOutput(1024)
+        output.writeInt(3)
+        output.writeInt(0)
+        output.writeString("https://old.example")
+        output.writeBoolean(false)
+        output.writeBoolean(true)
+        output.writeBoolean(false)
+        output.writeString("old-agent")
+        output.writeBoolean(true)
+        output.writeInt(1440)
+        output.writeInt(100)
+        output.writeString("")
+        output.writeInt(0)
+        output.writeString("")
+        // 合併後 v3/v4 是 fork 的舊格式：filterRegex 之後是一對已移除功能的欄位（布林＋字串），
+        // 讀取時必須吃掉且不得誤解為 HWID（HWID 自 v6 起才在 buffer 中持久化）。
+        output.writeBoolean(true)
+        output.writeString("hwid=old")
+        val restored = SubscriptionBean().apply { deserializeFromBuffer(ByteBufferInput(output.toBytes())); initializeDefaultValues() }
+        assertFalse(restored.sendHwid)
+        assertEquals("", restored.customHwidParams)
+        assertEquals("", restored.serverDnsResolver)
+        assertEquals("", restored.customHeaders)
+    }
+}

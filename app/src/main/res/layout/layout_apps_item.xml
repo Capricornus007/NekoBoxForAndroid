@@ -67,7 +67,8 @@
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/itemcheck"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
+        android:minHeight="48dp"
             android:clickable="false"
             android:focusable="false"
             android:focusableInTouchMode="false"

@@ -2,6 +2,7 @@ package io.nekohasekai.sagernet.utils
 
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.LinkProperties
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
@@ -183,6 +184,20 @@ object DefaultNetworkListener {
             lastNetwork = null
             lastUpdateAt = 0L
             offer(NetworkMessage.Lost(network))
+        }
+
+        // isai：DNS/路由等鏈路屬性變化（介面名不變）也要觸發 Update，供網絡指紋比對。
+        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+            val now = SystemClock.elapsedRealtime()
+            if (lastNetwork == network) {
+                cancelPending()
+                val runnable = Runnable {
+                    lastUpdateAt = SystemClock.elapsedRealtime()
+                    offer(NetworkMessage.Update(network))
+                }
+                pendingUpdate = runnable
+                mainHandler.postDelayed(runnable, 500L)
+            }
         }
     }
 

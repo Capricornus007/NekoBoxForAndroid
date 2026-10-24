@@ -207,6 +207,24 @@ fun buildSingBoxEndpointWireGuardBean(bean: WireGuardBean): SingBoxOptions.Endpo
     mtu = bean.mtu?.takeIf { it > 0 }
     listen_port = bean.listenPort?.takeIf { it > 0 }
     peers = buildWireGuardPeers(bean)
+
+    // isai 的 AmneziaWG 新版混淆參數（header protection 等）：fork 的 endpoint 格式沒有
+    // 對應欄位，透過 _hack_config_map 併入輸出；核心不認得時會被忽略，資料本身保留在 bean。
+    if (bean.isAmneziaWG) {
+        bean.headerProtectionKey?.takeIf { it.isNotBlank() }?.let { hack("header_protection_key", it.trim()) }
+        bean.contentPaddingAddition?.takeIf { it.isNotBlank() }?.let { hack("content_padding_addition", it.trim()) }
+        bean.rekeyAfterTime?.takeIf { it.isNotBlank() }?.let { hack("rekey_after_time", it.trim()) }
+        bean.rekeyTimeout?.takeIf { it.isNotBlank() }?.let { hack("rekey_timeout", it.trim()) }
+        bean.rejectAfterTime?.takeIf { it.isNotBlank() }?.let { hack("reject_after_time", it.trim()) }
+        bean.keepaliveTimeout?.takeIf { it.isNotBlank() }?.let { hack("keepalive_timeout", it.trim()) }
+        bean.maxHandshakeAttempts?.takeIf { it.isNotBlank() }?.let { hack("max_handshake_attempts", it.trim()) }
+        if (bean.randomTrailers == true) hack("random_trailers", true)
+        if (bean.disableCookies == true) hack("disable_cookies", true)
+    }
+}
+
+private fun SingBoxOptions.Endpoint_WireGuardOptions.hack(key: String, value: Any) {
+    (_hack_config_map ?: HashMap<String, Any>().also { _hack_config_map = it })[key] = value
 }
 
 /**
@@ -360,8 +378,67 @@ fun formatWireGuardPeerBlocks(specs: List<WireGuardPeerSpec>): String = buildStr
 
 private fun formatWireGuardEndpointAddress(host: String, port: Int): String = if (host.contains(':')) "[$host]:$port" else "$host:$port"
 
-@Deprecated("WireGuard is an endpoint in sing-box 1.14+")
-fun buildSingBoxOutboundWireguardBean(bean: WireGuardBean): SingBoxOptions.Endpoint_WireGuardOptions = buildSingBoxEndpointWireGuardBean(bean)
+/**
+ * isai 的 outbound 形式 WireGuard 出站（含 peers hack 與 AmneziaWG 參數驗證）。
+ * fork 主路徑已改用 endpoint（buildSingBoxEndpointWireGuardBean）；此函數保留 isai 的
+ * 行為契約（單元測試斷言 _hack_config_map["peers"] 的 allowed_ips／keepalive／驗證拋錯），
+ * 供需要 Outbound 形式的呼叫端使用。
+ */
+fun buildSingBoxOutboundWireguardBean(bean: WireGuardBean): SingBoxOptions.Outbound_WireGuardOptions {
+    bean.validateAmneziaParameters()
+    val allowed = if (bean.useConfigRoutes == true) normalizeWireGuardLocalAddresses(bean.allowedIPs) else listOf("0.0.0.0/0", "::/0")
+    return SingBoxOptions.Outbound_WireGuardOptions().apply {
+        type = "wireguard"
+        server = bean.serverAddress
+        server_port = bean.serverPort
+        local_address = normalizeWireGuardLocalAddresses(bean.localAddress)
+        private_key = normalizeBase64Key(bean.privateKey)
+        peer_public_key = normalizeBase64Key(bean.peerPublicKey)
+        pre_shared_key = normalizeBase64Key(bean.peerPreSharedKey)
+        mtu = bean.mtu
+        if (bean.reserved.isNotBlank()) reserved = genReserved(bean.reserved)
+        if (bean.useConfigRoutes == true || bean.persistentKeepalive.isNotBlank() && bean.persistentKeepalive.trim() != "0") {
+            (_hack_config_map ?: HashMap<String, Any>().also { _hack_config_map = it })["peers"] = listOf(
+                linkedMapOf<String, Any>(
+                    "server" to bean.serverAddress,
+                    "server_port" to bean.serverPort,
+                    "public_key" to normalizeBase64Key(bean.peerPublicKey),
+                    "pre_shared_key" to normalizeBase64Key(bean.peerPreSharedKey),
+                    "allowed_ips" to allowed,
+                    "persistent_keepalive_interval" to bean.persistentKeepalive.trim(),
+                ).apply { if (bean.reserved.isNotBlank()) put("reserved", genReserved(bean.reserved)) },
+            )
+        }
+        if (bean.isAmneziaWG) {
+            val hack = _hack_config_map ?: HashMap<String, Any>().also { _hack_config_map = it }
+            bean.jc?.let { hack["jc"] = it }
+            bean.jmin?.let { hack["jmin"] = it }
+            bean.jmax?.let { hack["jmax"] = it }
+            bean.s1?.let { hack["s1"] = it }
+            bean.s2?.let { hack["s2"] = it }
+            bean.s3?.let { hack["s3"] = it }
+            bean.s4?.let { hack["s4"] = it }
+            bean.h1?.takeIf { it.isNotBlank() }?.let { hack["h1"] = it.trim() }
+            bean.h2?.takeIf { it.isNotBlank() }?.let { hack["h2"] = it.trim() }
+            bean.h3?.takeIf { it.isNotBlank() }?.let { hack["h3"] = it.trim() }
+            bean.h4?.takeIf { it.isNotBlank() }?.let { hack["h4"] = it.trim() }
+            bean.i1?.takeIf { it.isNotBlank() }?.let { hack["i1"] = it }
+            bean.i2?.takeIf { it.isNotBlank() }?.let { hack["i2"] = it }
+            bean.i3?.takeIf { it.isNotBlank() }?.let { hack["i3"] = it }
+            bean.i4?.takeIf { it.isNotBlank() }?.let { hack["i4"] = it }
+            bean.i5?.takeIf { it.isNotBlank() }?.let { hack["i5"] = it }
+            bean.headerProtectionKey?.takeIf { it.isNotBlank() }?.let { hack["header_protection_key"] = it.trim() }
+            bean.contentPaddingAddition?.takeIf { it.isNotBlank() }?.let { hack["content_padding_addition"] = it.trim() }
+            bean.rekeyAfterTime?.takeIf { it.isNotBlank() }?.let { hack["rekey_after_time"] = it.trim() }
+            bean.rekeyTimeout?.takeIf { it.isNotBlank() }?.let { hack["rekey_timeout"] = it.trim() }
+            bean.rejectAfterTime?.takeIf { it.isNotBlank() }?.let { hack["reject_after_time"] = it.trim() }
+            bean.keepaliveTimeout?.takeIf { it.isNotBlank() }?.let { hack["keepalive_timeout"] = it.trim() }
+            bean.maxHandshakeAttempts?.takeIf { it.isNotBlank() }?.let { hack["max_handshake_attempts"] = it.trim() }
+            if (bean.randomTrailers == true) hack["random_trailers"] = true
+            if (bean.disableCookies == true) hack["disable_cookies"] = true
+        }
+    }
+}
 
 private fun normalizeBase64Key(value: String): String {
     if (value.isBlank()) return value

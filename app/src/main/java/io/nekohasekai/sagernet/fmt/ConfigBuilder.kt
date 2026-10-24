@@ -8,10 +8,11 @@ import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.TunImplementation
 import io.nekohasekai.sagernet.bg.VpnService
+import io.nekohasekai.sagernet.database.RuleEntity
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
-import io.nekohasekai.sagernet.database.ProxyEntity.Companion.TYPE_CONFIG
 import io.nekohasekai.sagernet.database.ProxyGroup
+import io.nekohasekai.sagernet.database.ProxyEntity.Companion.TYPE_CONFIG
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.ConfigBuildResult.IndexEntity
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
@@ -52,6 +53,7 @@ import io.nekohasekai.sagernet.fmt.v2ray.buildSingBoxOutboundStandardV2RayBean
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.fmt.wireguard.buildSingBoxEndpointWireGuardBean
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.fmt.wireguard.normalizeWireGuardLocalAddresses
 import io.nekohasekai.sagernet.ktx.isIpAddress
 import io.nekohasekai.sagernet.ktx.mkPort
 import io.nekohasekai.sagernet.ktx.readableMessage
@@ -95,9 +97,12 @@ const val LOCALHOST = "127.0.0.1"
 private val GROUP_OUTBOUND_TYPES = setOf("selector", "urltest")
 
 internal fun SingBoxOption.applyDomainStrategyIfSupported(domainStrategy: String) {
-    val outboundType = asMap()["type"] as? String
-    if (outboundType !in GROUP_OUTBOUND_TYPES) {
-        _hack_config_map["domain_strategy"] = domainStrategy
+    val options = asMap()
+    val outboundType = options["type"] as? String
+    if (outboundType !in GROUP_OUTBOUND_TYPES && options["domain_resolver"] == null) {
+        // The pinned 1.12 core resolves through DNS rules or the user's default
+        // resolver. A fixed server reference becomes stale after JSON overrides.
+        _hack_config_map["domain_strategy"] = options["domain_strategy"] as? String ?: domainStrategy
     }
 }
 
@@ -376,6 +381,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     // Per-port credentials for authenticated external-plugin SOCKS loopbacks (#1166).
     val localProxyCredentials = HashMap<Int, Pair<String, String>>()
     val readableNames = mutableSetOf(TAG_DIRECT, TAG_BYPASS, TAG_BLOCK, TAG_FRAGMENT, TAG_MIXED, TAG_PROXY)
+
+    // isai：Direct fallback 出站（訂閱節點全掛時的直連回退）。
+    val tunBypassPackages = linkedSetOf<String>()
+    val tunBypassUserIds = linkedSetOf<Int>()
+    val useDirectFallback = !forTest && DataStore.directFallback
+    val directRouteTag = if (useDirectFallback) TAG_DIRECT_FALLBACK else TAG_BYPASS
     val group = SagerDatabase.groupDao.getById(proxy.groupId)
 
     fun ProxyEntity.resolveChainInternal(): MutableList<ProxyEntity> {
@@ -483,7 +494,23 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 }.toHashSet().toList(),
             ).associateBy { it.id }
         }
-    val buildSelector = !forTest && group?.isSelector == true && !forExport
+    // isai：規則級/全域 direct-fallback 工具（ruleDirectTag/ruleDirectDns 給規則生成段用）。
+    val needsGlobalFallback = useDirectFallback || extraRules.any { it.outbound == -1L && it.fallbackMode == 2 }
+    val ruleFallbacks = extraRules.filter { it.outbound == -1L && it.fallbackMode == 3 }
+        .associate { it.id to "direct-fallback-rule-" + it.id }
+    val fallbackDnsTags = linkedMapOf<String, String>().apply {
+        if (needsGlobalFallback) put(TAG_DIRECT_FALLBACK, DNS_DIRECT_FALLBACK)
+        ruleFallbacks.values.forEach { put(it, "dns-" + it) }
+    }
+    fun ruleDirectTag(rule: RuleEntity): String = when (rule.fallbackMode) {
+        1 -> TAG_BYPASS
+        2 -> TAG_DIRECT_FALLBACK
+        3 -> ruleFallbacks.getValue(rule.id)
+        else -> directRouteTag
+    }
+    fun ruleDirectDns(rule: RuleEntity) = fallbackDnsTags[ruleDirectTag(rule)] ?: "dns-direct"
+    val importedWireGuard = (proxy.requireBean() as? WireGuardBean)?.takeIf { it.useConfigRoutes == true && !forTest }
+    val buildSelector = !forTest && group?.isSelector == true && !forExport && importedWireGuard == null
     // A Tailscale node has one saved identity, so one config can run one instance of a profile.
     // Every selector member would get its own copy of a Tailscale landing proxy (each with a
     // different detour).
@@ -503,6 +530,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     val hostResolvers = HashMap<String, MutableSet<String>>()
     val nonCustomFinalHosts = hashSetOf<String>()
     val groupCache = HashMap<Long, ProxyGroup?>()
+
+    // isai：訂閱專用 DNS resolver（組的 serverDnsResolver）。
+    val subscriptionResolvers = linkedMapOf<String, String>()
+    val subscriptionGroups = mutableMapOf<Long, ProxyGroup?>()
     val isVPN = DataStore.serviceMode == Key.MODE_VPN
     // eBPF 模式沒有 VpnService：裝置流量由內核裡的 eBPF 程式抓進 ebpf-in，
     // 路由／DNS 規則對「裝置入站」的引用要跟著換標籤，否則掛在 tun-in 上的規則永遠命中不了。
@@ -515,9 +546,13 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         else -> "tun-in"
     }
     val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST
-    val remoteDns = DataStore.remoteDns.split("\n")
+    val needLocalProxyInbounds = !isVPN || DataStore.allowAccess
+    val networkPolicy = if (forTest || forExport) null else io.nekohasekai.sagernet.database.NetworkProfiles.select().policy
+    val remoteDns = (networkPolicy?.remoteDns?.takeIf { it.isNotBlank() } ?: importedWireGuard?.dnsServers?.takeIf { it.isNotBlank() } ?: DataStore.remoteDns).split('\n', ',')
+
+    // fork 註：上面 isai 的鏈優先序 = 網絡策略 DNS > 匯入 WG 的 dnsServers > 全域設定。
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
-    val directDNS = DataStore.directDns.split("\n")
+    val directDNS = (networkPolicy?.directDns?.takeIf { it.isNotBlank() } ?: DataStore.directDns).split("\n")
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
     val dnsHosts by lazy { parseDnsHosts(DataStore.dnsHosts) }
     val enableDnsRouting = DataStore.enableDnsRouting
@@ -557,6 +592,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 // 所以不再設定 external_ui。
                 clash_api = ClashAPIOptions().apply {
                     external_controller = "127.0.0.1:9090"
+                    // isai：有設定 secret 時帶上（外部面板授權）。
+                    // fork golden 契約：匯出配置不得攜帶本機 secret。
+                    secret = if (forExport) null else DataStore.clashApiSecret.takeIf { it.isNotBlank() }
                 }
             }
         }
@@ -1025,7 +1063,24 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     // 测速配置必须与正式连接一致（对齐 husi）：沿用统一的服务器
                     // 域名解析策略。曾强制空——测速解析出的 IP/协议族与真实路径不同。
                     _hack_custom_config = bean.customOutboundJson
-                    applyDomainStrategyIfSupported(defaultServerDomainStrategy)
+                    // isai：訂閱組有設 serverDnsResolver 時，此出站改掛專屬 resolver（dns-sub-*）。
+                    val resolver = subscriptionGroups.getOrPut(proxyEntity.groupId) {
+                        SagerDatabase.groupDao.getById(proxyEntity.groupId)
+                    }?.subscription?.serverDnsResolver.orEmpty().trim()
+                    val outboundMap = asMap()
+                    val serverHost = outboundMap["server"] as? String
+                    if (resolver.isNotEmpty() && !proxyEntity.needExternal() &&
+                        !serverHost.isNullOrBlank() && !serverHost.isIpAddress() &&
+                        outboundMap["domain_resolver"] == null && outboundMap["type"] !in GROUP_OUTBOUND_TYPES) {
+                        val resolverTag = "dns-sub-" + proxyEntity.groupId
+                        subscriptionResolvers[resolverTag] = resolver
+                        _hack_config_map["domain_resolver"] = mapOf(
+                            "server" to resolverTag,
+                            "strategy" to (outboundMap["domain_strategy"] ?: defaultServerDomainStrategy),
+                        )
+                    } else applyDomainStrategyIfSupported(
+                        if (forTest) "" else defaultServerDomainStrategy
+                    )
                     // OwnBox c12d3e08e：TCP socket 加 IP_BIND_ADDRESS_NO_PORT，同一來源位址
                     // 不再先佔用一個連接埠，大量併發時不會把自己綁死（核心只在 Linux/Android
                     // 有效，不支援時靜默忽略）。
@@ -1187,17 +1242,22 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     } else {
                         "fastest"
                     }
+                    // isai：最快節點（TYPE_FASTEST）的活健檢查與失敗冷卻。
+                    if (entity.type == ProxyEntity.TYPE_FASTEST) {
+                        if (bean.healthCheck) {
+                            io.nekohasekai.sagernet.fmt.internal.validateHealthUrl(bean.healthUrl)
+                            health_check = true
+                            health_dns_server = "dns-remote"
+                            health_url = bean.healthUrl
+                        }
+                        failure_cooldown = bean.failureCooldown
+                    }
                     managed_by_parent = managedByParent
                     wait_for_initial = true
                 },
             )
 
-            trafficMap[groupTag] = buildList {
-                add(entity)
-                candidateTags.forEach { tag ->
-                    addAll(trafficMap[tag].orEmpty())
-                }
-            }.distinctBy { it.id }
+            trafficMap[groupTag] = listOf(entity)
             return groupTag
         }
         buildDynamicGroupImpl = ::buildDynamicGroup
@@ -1253,7 +1313,23 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             tagMap[key] = buildChain(key, p)
         }
 
-        val mainProxyTag = (if (buildSelector || useAutoSelect) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
+        // isai：匯入的 WireGuard conf（useConfigRoutes）直接以 bypass 為 final，讓 allowed_ips 接管路由。
+        val mainProxyTag = if (importedWireGuard != null) TAG_BYPASS
+            else (if (buildSelector || useAutoSelect) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
+
+        // isai：per-app TUN 守衛規則（UID 白名單時代理 Apps 的 DNS/流量導流防護）。
+        fun buildPerAppTunGuardRules(): List<Rule> {
+            if (forTest || !isVPN || !DataStore.proxyApps) return emptyList()
+            PackageCache.awaitLoadSync()
+            val selectedUids = DataStore.individual.lineSequence().map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .mapNotNull { PackageCache[it]?.takeIf { uid -> uid >= 1000 } }.toSet()
+            val resolverUids = (VpnService.ANDROID_DNS_PACKAGES.mapNotNull { PackageCache[it] } + listOf(1000, 1051)).distinct()
+            return listOf(perAppTunGuard(
+                selectedUids, PackageCache.packageMap.values.toSet(), android.os.Process.myUid(),
+                DataStore.bypass, resolverUids
+            ))
+        }
 
         // Tailnet destinations (peer addresses, advertised subnets, MagicDNS names) go to the
         // node that knows them, even when another outbound is the final one. The exit node's
@@ -1453,7 +1529,8 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     ) {
                         when (rule.outbound) {
                             -1L -> {
-                                userDNSRuleList += makeDnsRuleObj().apply { server = "dns-direct" }
+                                // isai：-1（bypass）規則的 DNS 走 ruleDirectDns（可為 direct-fallback 專屬 DNS）。
+                                userDNSRuleList += makeDnsRuleObj().apply { server = ruleDirectDns(rule) }
                             }
 
                             -2L -> {
@@ -1480,7 +1557,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     }
                     outbound = when (val outId = rule.outbound) {
                         0L -> mainProxyTag
-                        -1L -> TAG_BYPASS
+                        -1L -> ruleDirectTag(rule)
                         -2L -> TAG_BLOCK
                         else -> if (outId == proxy.id) mainProxyTag else tagMap[outId] ?: ""
                     }
@@ -1546,6 +1623,25 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     _hack_config_map["bind_address_no_port"] = true
                 },
             )
+        }
+
+        if (needsGlobalFallback) {
+            outbounds.add(Outbound().apply {
+                _hack_config_map.putAll(directFallbackConfig(
+                    mainProxyTag, DataStore.directFallbackUrl, DataStore.directFallbackInterval,
+                    DataStore.directFallbackRequired, DataStore.directFallbackFailures, DataStore.directFallbackRecoveries
+                ))
+            })
+        }
+
+        for (rule in extraRules.filter { it.id in ruleFallbacks }) {
+            val backupTag = if (rule.fallbackProfile == proxy.id) mainProxyTag else tagMap[rule.fallbackProfile]
+            require(!backupTag.isNullOrBlank()) { "Fallback profile is missing for route ${rule.displayName()}" }
+            outbounds.add(Outbound().apply {
+                _hack_config_map.putAll(directFallbackConfig(backupTag, DataStore.directFallbackUrl,
+                    DataStore.directFallbackInterval, DataStore.directFallbackRequired, DataStore.directFallbackFailures,
+                    DataStore.directFallbackRecoveries, ruleFallbacks.getValue(rule.id)))
+            })
         }
 
         if (DataStore.enableTLSFragment) {
@@ -1619,6 +1715,18 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             )
         }
 
+        // isai：direct-fallback 專屬 DNS（規則級/全域回退用），與 dns-direct 保持獨立。
+        for ((fallbackTag, dnsTag) in fallbackDnsTags) {
+            // Keep dns-direct independent: proxy endpoints and the control probe
+            // must not resolve through the group that depends on their results.
+            val address = directFallbackDnsAddress(directDNS.firstOrNull(), remoteDns.firstOrNull())
+            dns.servers.add(DNSServerOptions().apply {
+                _hack_config_map.putAll(dnsServerConfig(
+                    address, dnsTag, "dns-local", fallbackTag
+                ))
+            })
+        }
+
         remoteDns.firstOrNull().let {
             if (!forTest) {
                 dns.servers.add(
@@ -1679,6 +1787,19 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             // dns-direct (dns.final_).
             dns.rules = tailscaleDnsRules
         } else {
+            if (fallbackDnsTags.isNotEmpty()) {
+                route.rules.add(0, Rule_DefaultOptions().apply {
+                    outbound = TAG_BYPASS
+                    ip_is_private = true
+                })
+            }
+            // DNS interception must precede LAN: the virtual DNS IP is private.
+            if (importedWireGuard != null) {
+                route.rules.add(0, Rule_DefaultOptions().apply {
+                    ip_cidr = normalizeWireGuardLocalAddresses(importedWireGuard.allowedIPs)
+                    outbound = mainProxyTag
+                })
+            }
             route.rules.add(
                 0,
                 Rule_DefaultOptions().apply {
@@ -1832,6 +1953,35 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 )
             }
         }
+        val dnsStrategies = mapOf(
+            "dns-direct" to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")),
+            DNS_DIRECT_FALLBACK to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")),
+            "dns-remote" to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-remote")),
+            "dns-fake" to genDomainStrategy(true),
+        ) + fallbackDnsTags.values.associateWith { autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")) }
+        dns.rules = dns.rules.toMutableList().apply {
+            filterIsInstance<DNSRule_DefaultOptions>().forEach { rule ->
+                // fork 契約：DNS 層封鎖把規則指到 dns-block（rcode://success）伺服器，規則
+                // 本身保留 server 欄位（TailscaleConfigTest／ProtocolRegistryDispatchTest
+                // 都以此斷言）。isai 的 useBlockedDNSResponse 改寫為 action: predefined，
+                // 僅保留供直接單元測試（DnsServerConfigTest），生成路徑不套用。
+                dnsStrategies[rule.server]?.let { strategy ->
+                    rule._hack_config_map["strategy"] = strategy
+                }
+            }
+            // isai 會把 dns.final_ 明示成一條 fallback rule（帶 strategy）。fork 的行為是
+            // 依賴 dns.final 欄位本身、不另加 rule——測速（forTest）配置的 rules 必須只有
+            // preferred_by 條目（TailscaleConfigTest 契約），此處照 fork 契約在 test 場景不加。
+            if (!forTest) {
+                add(DNSRule_DefaultOptions().apply {
+                    server = dns.final_
+                    _hack_config_map["strategy"] = dnsStrategies[server] ?: ""
+                })
+            }
+        }
+        if (!forTest && isVPN) route.rules.add(0, virtualDnsTlsRejectRule())
+        route.rules.addAll(0, buildPerAppTunGuardRules())
+
 
         // Moving WireGuard from outbounds to endpoints removes the old implicit first-outbound
         // fallback. Keep the selected main tag explicit so endpoint-only profiles do not fall
@@ -1856,6 +2006,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             globalCustomConfig = if (forTest) "" else DataStore.globalCustomConfig,
             profileCustomConfig = proxy.requireBean().customConfigJson,
         )
+        // isai：訂閱專屬 resolver（dns-sub-*）在 root config 生成後注入 DNS servers。
+        @Suppress("UNCHECKED_CAST")
+        applySubscriptionDns(configMap as MutableMap<String, Any>, subscriptionResolvers)
         ConfigBuildResult(
             gson.toJson(configMap),
             externalIndexMap,

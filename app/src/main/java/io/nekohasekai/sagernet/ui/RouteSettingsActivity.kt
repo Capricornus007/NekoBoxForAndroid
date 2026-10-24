@@ -72,6 +72,8 @@ class RouteSettingsActivity(
         DataStore.routeSource = source
         DataStore.routeProtocol = protocol
         DataStore.routeRuleset = ruleset
+        DataStore.routeFallbackMode = fallbackMode
+        DataStore.routeFallbackProfile = fallbackProfile
         DataStore.routeOutboundRule = outbound
         DataStore.routeOutbound = when (outbound) {
             0L -> 0
@@ -99,6 +101,8 @@ class RouteSettingsActivity(
             2 -> -2L
             else -> DataStore.routeOutboundRule
         }
+        fallbackMode = DataStore.routeFallbackMode
+        fallbackProfile = DataStore.routeFallbackProfile
         packages = DataStore.routePackages.split("\n").filter { it.isNotBlank() }.toSet()
 
         if (DataStore.editingId == 0L) {
@@ -143,6 +147,17 @@ class RouteSettingsActivity(
         }
     }
 
+    private var backupPreference: Preference? = null
+    private val selectFallbackProfile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val id = result.data?.getLongExtra(ProfileSelectActivity.EXTRA_PROFILE_ID, 0L) ?: 0L
+            if (id > 0) {
+                DataStore.routeFallbackProfile = id
+                backupPreference?.summary = ProfileManager.getProfile(id)?.displayName()
+            }
+        }
+    }
+
     val selectAppList = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) { (_, _) ->
@@ -160,6 +175,20 @@ class RouteSettingsActivity(
         apps = findPreference(Key.ROUTE_PACKAGES)!!
         packagesRegex = findPreference(Key.ROUTE_PACKAGES_REGEX_LIST)!!
 
+        val fallback = findPreference<Preference>("routeFallbackMode")!!
+        backupPreference = findPreference("routeFallbackProfile")
+        fun updateFallback(mode: Int = DataStore.routeFallbackMode, out: Int = DataStore.routeOutbound) {
+            fallback.isVisible = out == 1
+            backupPreference?.isVisible = out == 1 && mode == 3
+            backupPreference?.summary = ProfileManager.getProfile(DataStore.routeFallbackProfile)?.displayName()
+                ?: getString(androidx.preference.R.string.not_set)
+        }
+        updateFallback()
+        fallback.setOnPreferenceChangeListener { _, value -> updateFallback(value.toString().toInt()); true }
+        backupPreference?.setOnPreferenceClickListener {
+            selectFallbackProfile.launch(Intent(this@RouteSettingsActivity, ProfileSelectActivity::class.java)); true
+        }
+
         outbound.setOnPreferenceChangeListener { _, newValue ->
             if (newValue.toString() == OutboundPreference.VALUE_SELECT_PROFILE) {
                 selectProfileForAdd.launch(
@@ -174,6 +203,7 @@ class RouteSettingsActivity(
                 )
                 false
             } else {
+                updateFallback(out = newValue.toString().toInt())
                 true
             }
         }
@@ -369,6 +399,12 @@ class RouteSettingsActivity(
             return
         }
 
+        if (DataStore.routeOutbound == 1 && DataStore.routeFallbackMode == 3 &&
+            ProfileManager.getProfile(DataStore.routeFallbackProfile) == null) {
+            onMainDispatcher { Toast.makeText(this@RouteSettingsActivity, R.string.route_fallback_missing, Toast.LENGTH_LONG).show() }
+            return
+        }
+        io.nekohasekai.sagernet.database.NetworkSettingsHistory.capture()
         val editingId = DataStore.editingId
         if (editingId == 0L) {
             if (intent.hasExtra(EXTRA_PACKAGE_NAME)) {
