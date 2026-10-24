@@ -3,10 +3,10 @@ package io.nekohasekai.sagernet.ui
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
@@ -60,7 +60,7 @@ class NetworkProfilesActivity : ThemedActivity() {
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 if (Build.VERSION.SDK_INT == 29) backgroundPermission.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                else permissionSettings.launch(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")))
+                else permissionSettings.launch(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "package:$packageName".toUri()))
             }.show()
     }
     private val selectProfile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

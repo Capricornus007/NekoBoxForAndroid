@@ -20,6 +20,7 @@
     android:layout_width="48dp"
     android:layout_height="48dp"
     android:background="?selectableItemBackground"
+    tools:ignore="Overdraw"
     android:gravity="center"
     android:paddingBottom="2dp"
     android:textColor="?attr/colorOnSurfaceVariant"

@@ -70,6 +70,8 @@ object RawUpdater : GroupUpdater() {
      * rejects is logged and skipped instead of aborting the whole update.
      */
     // isai：訂閱請求的 HWID/自訂 header 支援。
+    // ANDROID_ID 是訂閱端拿來辨識裝置的既有協議，不是廣告追蹤；HardwareIds 規則屬誤報。
+    @SuppressLint("HardwareIds")
     private fun buildHwidHeaders(customParams: String?): Map<String, String> {
         val params = if (customParams.isNullOrBlank()) {
             mapOf(

@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.database
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Network
@@ -41,6 +42,9 @@ object NetworkProfiles {
         require(policies.map { it.transport to it.ssid }.distinct().size == policies.size)
         DataStore.networkProfiles = gson.toJson(policies)
     }
+    // UNKNOWN_SSID 是 API 30 才有的常量，但它是編譯期字串常量（inlined 進 bytecode），
+    // 在 minSdk 23 的舊機上比較不會碰任何新 API；lint 的 InlinedApi 在這裡是誤報。
+    @SuppressLint("InlinedApi")
     @Suppress("DEPRECATION")
     fun select(network: Network? = SagerNet.underlyingNetwork ?: SagerNet.connectivity.activeNetwork): Selection {
         if (!DataStore.networkProfilesEnabled || network == null) return Selection("disabled", null)
@@ -55,7 +59,7 @@ object NetworkProfiles {
         val ssidAccess = ContextCompat.checkSelfPermission(SagerNet.application, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
             (Build.VERSION.SDK_INT < 29 || ContextCompat.checkSelfPermission(SagerNet.application, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED)
         val ssid = if (transport == "wifi" && ssidAccess) {
-            runCatching { (SagerNet.application.getSystemService(Context.WIFI_SERVICE) as WifiManager).connectionInfo?.ssid }
+            runCatching { (SagerNet.application.getApplicationContext().getSystemService(Context.WIFI_SERVICE) as WifiManager).connectionInfo?.ssid }
                 .getOrNull()?.removeSurrounding("\"")?.takeUnless { it == WifiManager.UNKNOWN_SSID || it.isBlank() }
         } else null
         val policy = matchNetworkProfile(policies(), transport, ssid)?.takeIf { SagerDatabase.proxyDao.getById(it.profileId) != null }

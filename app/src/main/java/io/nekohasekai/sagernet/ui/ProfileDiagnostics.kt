@@ -1,3 +1,7 @@
+// kotlinx.coroutines.* 的 wildcard import 讓 Job 的 member isActive/cancel 與
+// extension 撞名；這裡全部都是呼叫 member（語義相同），lint 的提醒屬誤報。
+@file:android.annotation.SuppressLint("MemberExtensionConflict")
+
 package io.nekohasekai.sagernet.ui
 
 import android.app.Dialog
