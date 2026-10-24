@@ -6,8 +6,7 @@ require (
 	// 与 Throne 2e7182b9ea99947a409fee30f74df83752ab763c 的测速基线一致。
 	github.com/Mahdi-zarei/speedtest-go v1.7.13-0.20260107171856-79c565dfd83a
 	// v0.1.6签名与 v1.13.15 锁定版一致。
-	// isai 合併：require 抬到 v0.3.1（規則 15），實際由下方 replace 指向本地 ../../sing-juicity。
-	github.com/exclavenetwork/sing-juicity v0.3.1
+	github.com/exclavenetwork/sing-juicity v0.3.0-beta.1
 	github.com/exclavenetwork/sing-shadowquic v0.0.0-20260801175020-65c7acc31f93
 	github.com/gofrs/uuid/v5 v5.5.1
 	github.com/matsuridayo/libneko v0.0.0-00010101000000-000000000000
@@ -24,13 +23,6 @@ require (
 	golang.org/x/mobile v0.0.0-20261011034528-197770444867
 	golang.org/x/net v0.61.0
 	golang.org/x/sys v0.49.0
-)
-
-// isai 合併帶進的直接依賴：http_test.go import metacubex/utls（由下方 replace 導向
-// Capricornus007/utls fork 尖端）；sing-quic 供 quic 相關測試直接引用（同樣有 replace）。
-require (
-	github.com/metacubex/utls v1.8.7
-	github.com/sagernet/sing-quic v0.7.0-beta.2.0.20261023034421-e8d980d7061e
 )
 
 require (

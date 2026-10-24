@@ -70,9 +70,6 @@ func (p *platformLocalDNSTransport) ExchangeAsync(ctx context.Context, message *
 }
 
 func (p *platformLocalDNSTransport) Exchange(ctx context.Context, message *mDNS.Msg) (*mDNS.Msg, error) {
-	if len(message.Question) != 1 {
-		return nil, E.New("expected one DNS question")
-	}
 	if p.raw && rawQueryFunc != nil {
 		// Raw - only available on Android 10 and above
 
@@ -182,9 +179,4 @@ func (c *ExchangeContext) ErrorCode(code int32) {
 func (c *ExchangeContext) ErrnoCode(code int32) {
 	c.error = syscall.Errno(code)
 	c.done()
-}
-
-func (p *platformLocalDNSTransport) Reset() {}
-func (p *platformLocalDNSTransport) ExchangeAsync(ctx context.Context, message *mDNS.Msg, callback func(*mDNS.Msg, error)) {
-	go func() { response, err := p.Exchange(ctx, message); callback(response, err) }()
 }
