@@ -36,14 +36,16 @@ class FastScrollGeometryTest {
 
     @Test fun uniformRowsAndTwoColumnGridSeekRoundTrip() {
         // Grid metrics use row count, including an incomplete final row.
-        for (rows in listOf(13, 61, 100)) for (p in listOf(0f, .1f, .5f, .9f, 1f)) {
-            val (row, offset) = FastScrollGeometry.target(p, rows, 400, 80)
-            val before = row - offset / 80f
-            val after = rows - before - 400 / 80f
-            assertEquals(p, FastScrollGeometry.progress(before, after), .001f)
-            if (p == 1f) {
-                assertEquals(rows - 1, row)
-                assertEquals(320, offset)
+        for (rows in listOf(13, 61, 100)) {
+            for (p in listOf(0f, .1f, .5f, .9f, 1f)) {
+                val (row, offset) = FastScrollGeometry.target(p, rows, 400, 80)
+                val before = row - offset / 80f
+                val after = rows - before - 400 / 80f
+                assertEquals(p, FastScrollGeometry.progress(before, after), .001f)
+                if (p == 1f) {
+                    assertEquals(rows - 1, row)
+                    assertEquals(320, offset)
+                }
             }
         }
     }

@@ -7,9 +7,9 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.listenForPackageChanges
+import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -22,6 +22,7 @@ object PackageCache {
     lateinit var installedPluginPackages: Map<String, PackageInfo>
     lateinit var installedApps: Map<String, ApplicationInfo>
     lateinit var packageMap: Map<String, Int>
+
     @Volatile
     var uidMap: Map<Int, Set<String>> = emptyMap()
         private set

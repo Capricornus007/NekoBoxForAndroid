@@ -55,6 +55,7 @@ abstract class BoxInstance(
     private val olcrtcReadyMarkers = hashMapOf<Int, File>()
     private val olcrtcReadyMarkerOwner = UUID.randomUUID().toString()
     private var cacheFiles = ArrayList<File>()
+
     // isai：取消進行中的核心啟動（stopRunner 對 in-flight start 用）。
     fun cancelStart() {
         if (::box.isInitialized) box.cancelStart()

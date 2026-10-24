@@ -289,9 +289,12 @@ class AmneziaWireGuardImporterTest {
         assertEquals("192.0.2.11", profiles[1].serverAddress)
         assertEquals("", profiles[0].extraPeers)
     }
+
     @Test fun importsAwg31ConfAndPackedVpnWithAllAdvancedFields() {
-        val key=Base64.getEncoder().encodeToString(ByteArray(32){1})
-        val config=regularWireGuardConf().replace("[Peer]", """
+        val key = Base64.getEncoder().encodeToString(ByteArray(32) { 1 })
+        val config = regularWireGuardConf().replace(
+            "[Peer]",
+            """
             HeaderProtectionKey = $key
             ContentPaddingAddition = 0-96
             S1 = 12
@@ -306,24 +309,25 @@ class AmneziaWireGuardImporterTest {
             RandomTrailers = true
             DisableCookies = 1
             [Peer]
-        """.trimIndent())+"\nPersistentKeepalive = 22-30"
-        for (bean in listOf(parse(config),AmneziaWireGuardImporter.parseVpn(encodeVpn(rootWithContainers(awgContainer(config)),true)).single())) {
-            assertEquals(key,bean.headerProtectionKey)
-            assertEquals("0-96",bean.contentPaddingAddition)
-            assertEquals("100-120",bean.rekeyAfterTime)
-            assertEquals("5-8",bean.rekeyTimeout)
-            assertEquals("180-200",bean.rejectAfterTime)
-            assertEquals("10-15",bean.keepaliveTimeout)
-            assertEquals("10-18",bean.maxHandshakeAttempts)
-            assertEquals(true,bean.randomTrailers)
-            assertEquals(true,bean.disableCookies)
-            assertEquals("22-30",bean.persistentKeepalive)
-            assertEquals(1280,bean.mtu)
+            """.trimIndent(),
+        ) + "\nPersistentKeepalive = 22-30"
+        for (bean in listOf(parse(config), AmneziaWireGuardImporter.parseVpn(encodeVpn(rootWithContainers(awgContainer(config)), true)).single())) {
+            assertEquals(key, bean.headerProtectionKey)
+            assertEquals("0-96", bean.contentPaddingAddition)
+            assertEquals("100-120", bean.rekeyAfterTime)
+            assertEquals("5-8", bean.rekeyTimeout)
+            assertEquals("180-200", bean.rejectAfterTime)
+            assertEquals("10-15", bean.keepaliveTimeout)
+            assertEquals("10-18", bean.maxHandshakeAttempts)
+            assertEquals(true, bean.randomTrailers)
+            assertEquals(true, bean.disableCookies)
+            assertEquals("22-30", bean.persistentKeepalive)
+            assertEquals(1280, bean.mtu)
         }
-        assertThrows(IllegalArgumentException::class.java){parse(config.replace("DisableCookies = 1","DisableCookies = wrong"))}
+        assertThrows(IllegalArgumentException::class.java) { parse(config.replace("DisableCookies = 1", "DisableCookies = wrong")) }
     }
 
-    private fun parse(config:String)=AmneziaWireGuardImporter.parseWireGuard(config).single()
+    private fun parse(config: String) = AmneziaWireGuardImporter.parseWireGuard(config).single()
 
     private fun assertReason(reason: AmneziaWireGuardImporter.ErrorReason, vpn: String) {
         val error = assertThrows(AmneziaWireGuardImporter.ImportException::class.java) {

@@ -14,7 +14,10 @@ class TunAccessGuardTest {
         for (bypass in listOf(false, true)) {
             val rule = perAppTunGuard(
                 if (bypass) setOf(23456) else setOf(12345),
-                setOf(12345, 23456, 1000, 1212345), 20001, bypass, listOf(1000, 1051)
+                setOf(12345, 23456, 1000, 1212345),
+                20001,
+                bypass,
+                listOf(1000, 1051),
             )
             val name = if (bypass) "bypass" else "allow"
             val fixture = File("../libcore/testdata/tun_${name}_guard.json")

@@ -35,9 +35,11 @@ object InitialConfiguration {
             rules.forEachIndexed { index, rule ->
                 db.execSQL(
                     "INSERT INTO rules (name, config, userOrder, enabled, domains, ip, port, sourcePort, network, source, protocol, ruleset, outbound, packages, fallbackMode, fallbackProfile) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    arrayOf<Any>(rule.name, rule.config, index + 1, 1, rule.domains, rule.ip, rule.port,
+                    arrayOf<Any>(
+                        rule.name, rule.config, index + 1, 1, rule.domains, rule.ip, rule.port,
                         rule.sourcePort, rule.network, rule.source, rule.protocol, rule.ruleset,
-                        rule.outbound, "", rule.fallbackMode, rule.fallbackProfile),
+                        rule.outbound, "", rule.fallbackMode, rule.fallbackProfile,
+                    ),
                 )
             }
         }
@@ -89,12 +91,14 @@ object InitialConfiguration {
         KeyValuePair(Key.TRAFFIC_SNIFFING).put("1"),
         KeyValuePair("domain_strategy_for_direct").put("prefer_ipv4"),
         KeyValuePair(Key.DIRECT_DNS).put("localhost"),
-        KeyValuePair(Key.INDIVIDUAL).put(listOf(
-            "app.bearium.browser", "com.google.ar.core", "com.google.android.gsf",
-            "org.kde.kdeconnect_tp", "app.mihon", "ru.nspk.mirpay",
-            "com.notcvnt.rknhardering", "com.termux", "com.avito.android",
-            "com.google.android.gms", "ru.ufanet.smarthome",
-        ).joinToString("\n")),
+        KeyValuePair(Key.INDIVIDUAL).put(
+            listOf(
+                "app.bearium.browser", "com.google.ar.core", "com.google.android.gsf",
+                "org.kde.kdeconnect_tp", "app.mihon", "ru.nspk.mirpay",
+                "com.notcvnt.rknhardering", "com.termux", "com.avito.android",
+                "com.google.android.gms", "ru.ufanet.smarthome",
+            ).joinToString("\n"),
+        ),
         KeyValuePair(Key.ENABLE_DNS_ROUTING).put(false),
         KeyValuePair("domain_strategy_for_server").put("auto"),
         KeyValuePair(Key.RULES_PROVIDER).put("0"),
@@ -110,21 +114,31 @@ object InitialConfiguration {
         KeyValuePair(Key.AMOLED_THEME).put(false),
         KeyValuePair(Key.DYNAMIC_COLORS).put(true),
         KeyValuePair(Key.LOG_LEVEL).put("1"),
-        KeyValuePair(Key.DIRECT_FALLBACK_URL).put(listOf(
-            "https://www.kernel.org",
-            "http://cp.cloudflare.com/generate_204",
-            "http://www.gstatic.com/generate_204",
-            "http://detectportal.firefox.com/success.txt",
-        ).joinToString("\n")),
+        KeyValuePair(Key.DIRECT_FALLBACK_URL).put(
+            listOf(
+                "https://www.kernel.org",
+                "http://cp.cloudflare.com/generate_204",
+                "http://www.gstatic.com/generate_204",
+                "http://detectportal.firefox.com/success.txt",
+            ).joinToString("\n"),
+        ),
         KeyValuePair(Key.DIRECT_FALLBACK_REQUIRED).put("2"),
         KeyValuePair(Key.REMOTE_DNS).put("https://dns.adguard-dns.com/dns-query"),
     )
 
     fun rules(lanName: String, domainName: String, ipName: String): List<RuleEntity> = listOf(
-        RuleEntity(name = lanName, enabled = true, outbound = -1,
-            config = """{"ip_is_private":true,"outbound":"direct"}"""),
-        RuleEntity(name = domainName, enabled = true, outbound = -1,
-            domains = "geosite:category-ru"),
+        RuleEntity(
+            name = lanName,
+            enabled = true,
+            outbound = -1,
+            config = """{"ip_is_private":true,"outbound":"direct"}""",
+        ),
+        RuleEntity(
+            name = domainName,
+            enabled = true,
+            outbound = -1,
+            domains = "geosite:category-ru",
+        ),
         RuleEntity(name = ipName, enabled = true, outbound = -1, ip = "geoip:ru"),
     )
 }

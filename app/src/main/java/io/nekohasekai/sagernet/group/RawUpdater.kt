@@ -4,18 +4,19 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.provider.Settings
 import androidx.core.net.toUri
+import androidx.room.withTransaction
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SubscriptionFilterMode
 import io.nekohasekai.sagernet.database.*
-import io.nekohasekai.sagernet.fmt.internal.ChainBean
-import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.fmt.AbstractBean
+import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
 import io.nekohasekai.sagernet.fmt.amneziawg.toAmneziaWGBean
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria1Json
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria2Json
+import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.openvpn.parseOpenVPNConfig
 import io.nekohasekai.sagernet.fmt.parseSingBoxEndpoint
@@ -52,7 +53,6 @@ import org.json.JSONTokener
 import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
-import androidx.room.withTransaction
 import org.yaml.snakeyaml.error.YAMLException
 
 @Suppress("EXPERIMENTAL_API_USAGE")
@@ -80,7 +80,7 @@ object RawUpdater : GroupUpdater() {
                 "osversion" to Build.VERSION.RELEASE.orEmpty(),
                 "model" to listOf(Build.MANUFACTURER, Build.MODEL)
                     .filter { it.isNotBlank() }
-                    .joinToString(" ")
+                    .joinToString(" "),
             )
         } else {
             buildMap {
@@ -106,9 +106,7 @@ object RawUpdater : GroupUpdater() {
 
     private val allowedHwidParams = setOf("hwid", "os", "osversion", "model")
 
-    private fun String.isValidHeaderValue(): Boolean {
-        return isNotEmpty() && length < 1000 && none { it == '\n' || it == '\r' }
-    }
+    private fun String.isValidHeaderValue(): Boolean = isNotEmpty() && length < 1000 && none { it == '\n' || it == '\r' }
 
     /**
      * Apply the subscription name filter. Matching ignores case - people type "hk" for a
@@ -180,7 +178,6 @@ object RawUpdater : GroupUpdater() {
         userInterface: GroupManager.Interface?,
         byUser: Boolean,
     ) {
-
         val groupSnapshot = KryoConverters.serialize(proxyGroup)
         val link = subscription.link
         var proxies: List<AbstractBean>

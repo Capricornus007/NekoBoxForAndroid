@@ -29,20 +29,14 @@ fun libcore.BoxInstance.cancelStart() {
 /**
  * isai：執行期診斷快照（連線／規則／DNS 對照）。核心未攜帶，回報不支援。
  */
-fun libcore.BoxInstance.runtimeDiagnostics(historyQuery: String?): String {
-    return "{\"supported\":false,\"reason\":\"isai diagnostics core not ported\"}"
-}
+fun libcore.BoxInstance.runtimeDiagnostics(historyQuery: String?): String = "{\"supported\":false,\"reason\":\"isai diagnostics core not ported\"}"
 
 /**
  * isai：真實網路探測（直連／代理路徑的 DNS＋HTTPS 檢查）。核心未攜帶，回報不支援。
  */
-fun libcore.BoxInstance.networkProbe(tag: String, domain: String, dnsTarget: String): String {
-    return "{\"supported\":false,\"reason\":\"isai diagnostics core not ported\"}"
-}
+fun libcore.BoxInstance.networkProbe(tag: String, domain: String, dnsTarget: String): String = "{\"supported\":false,\"reason\":\"isai diagnostics core not ported\"}"
 
 /**
  * isai：按配置參數執行一次探測。核心未攜帶，回報不支援。
  */
-fun libcore.BoxInstance.configuredProbe(tag: String, dnsTag: String, httpsUrl: String): String {
-    return "{\"supported\":false,\"reason\":\"isai diagnostics core not ported\"}"
-}
+fun libcore.BoxInstance.configuredProbe(tag: String, dnsTag: String, httpsUrl: String): String = "{\"supported\":false,\"reason\":\"isai diagnostics core not ported\"}"

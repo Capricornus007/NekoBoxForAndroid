@@ -21,6 +21,7 @@ object Key {
 
     const val APP_EXPERT = "isExpert"
     const val APP_THEME = "appTheme"
+
     // isai：純黑（AMOLED）主題開關；主題機制未移植，保留鍵位供 InitialConfiguration 寫初值。
     const val AMOLED_THEME = "amoledTheme"
     const val USE_SYSTEM_THEME = "useSystemTheme"

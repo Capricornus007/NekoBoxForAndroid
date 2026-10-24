@@ -18,11 +18,13 @@ class SubscriptionDnsConfigTest {
         assertEquals("/dns-query?account=fixture", resolver["path"])
         assertFalse(resolver.containsKey("detour"))
     }
+
     @Test fun explicitUserResolversAndRemovedOutboundsArePreserved() {
         val config = linkedMapOf<String, Any>("outbounds" to listOf(mapOf("domain_resolver" to "user-resolver")))
         applySubscriptionDns(config, mapOf("dns-sub-1" to "1.1.1.1"))
         assertFalse(config.containsKey("dns"))
     }
+
     @Test fun aUserOverrideOfTheSameTagIsNotReplaced() {
         val original = mapOf("tag" to "dns-sub-1", "type" to "local")
         val config = linkedMapOf<String, Any>("outbounds" to listOf(mapOf("domain_resolver" to "dns-sub-1")), "dns" to linkedMapOf("servers" to listOf(original)))

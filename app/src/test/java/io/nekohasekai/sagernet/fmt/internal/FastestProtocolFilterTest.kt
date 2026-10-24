@@ -11,12 +11,26 @@ import org.junit.Test
 class FastestProtocolFilterTest {
     private val hy1 = hysteria(1, 1)
     private val hy2 = hysteria(2, 2)
-    private val vless = ProxyEntity(id = 3, type = ProxyEntity.TYPE_VMESS,
-        vmessBean = VMessBean().apply { alterId = -1; initializeDefaultValues(); name = "Hysteria 2 misleading name" })
+    private val vless = ProxyEntity(
+        id = 3,
+        type = ProxyEntity.TYPE_VMESS,
+        vmessBean = VMessBean().apply {
+            alterId = -1
+            initializeDefaultValues()
+            name = "Hysteria 2 misleading name"
+        },
+    )
     private val candidates = listOf(hy2, vless, hy1)
 
-    private fun hysteria(id: Long, version: Int) = ProxyEntity(id = id, type = ProxyEntity.TYPE_HYSTERIA,
-        hysteriaBean = HysteriaBean().apply { initializeDefaultValues(); protocolVersion = version; name = "VLESS misleading name" })
+    private fun hysteria(id: Long, version: Int) = ProxyEntity(
+        id = id,
+        type = ProxyEntity.TYPE_HYSTERIA,
+        hysteriaBean = HysteriaBean().apply {
+            initializeDefaultValues()
+            protocolVersion = version
+            name = "VLESS misleading name"
+        },
+    )
 
     @Test fun defaultsPreserveOrderWithoutLookingUpAnyHops() {
         assertSame(candidates, FastestProtocolFilter.filter(candidates, 0, emptySet(), { error("unexpected lookup") }))
@@ -40,9 +54,14 @@ class FastestProtocolFilterTest {
     }
 
     @Test fun filtersAllChainHopsAndGroupFrontLandingHopsWithoutChangingChain() {
-        val chain = ProxyEntity(id = 4, type = ProxyEntity.TYPE_CHAIN, chainBean = ChainBean().apply {
-            initializeDefaultValues(); proxies = listOf(vless.id, hy2.id)
-        })
+        val chain = ProxyEntity(
+            id = 4,
+            type = ProxyEntity.TYPE_CHAIN,
+            chainBean = ChainBean().apply {
+                initializeDefaultValues()
+                proxies = listOf(vless.id, hy2.id)
+            },
+        )
         val byId = (candidates + chain).associateBy { it.id }
         assertTrue(FastestProtocolFilter.filter(listOf(chain), 0, setOf("hysteria2"), byId::get).isEmpty())
         assertEquals(listOf(vless.id, hy2.id), chain.chainBean!!.proxies)
@@ -57,10 +76,12 @@ class FastestProtocolFilterTest {
 
     @Test fun invalidImportedFilterIsRejected() {
         for ((mode, keys) in listOf(2 to emptySet(), 0 to setOf("typo"))) {
-            assertEquals(FastestCandidateResolutionError.INVALID_PROTOCOL_FILTER,
+            assertEquals(
+                FastestCandidateResolutionError.INVALID_PROTOCOL_FILTER,
                 assertThrows(FastestCandidateResolutionException::class.java) {
                     FastestProtocolFilter.filter(candidates, mode, keys, { null })
-                }.error)
+                }.error,
+            )
         }
     }
 
@@ -88,7 +109,8 @@ class FastestProtocolFilterTest {
 
     @Test fun cloningKeepsExclusionsAndIsIndependent() {
         val source = ChainBean().apply {
-            initializeDefaultValues(); strategy = ChainBean.STRATEGY_FASTEST
+            initializeDefaultValues()
+            strategy = ChainBean.STRATEGY_FASTEST
             protocols = arrayListOf("hysteria", "hysteria2")
         }
         val clone = source.clone()

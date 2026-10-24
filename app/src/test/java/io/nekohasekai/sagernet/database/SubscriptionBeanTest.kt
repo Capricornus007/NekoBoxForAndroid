@@ -29,6 +29,7 @@ class SubscriptionBeanTest {
             assertEquals(source.customHeaders, restored.customHeaders)
         }
     }
+
     @Test fun oldVersionThreeKeepsHwidAndDefaultsNewFields() {
         val output = ByteBufferOutput(1024)
         output.writeInt(3)
@@ -48,7 +49,10 @@ class SubscriptionBeanTest {
         // 讀取時必須吃掉且不得誤解為 HWID（HWID 自 v6 起才在 buffer 中持久化）。
         output.writeBoolean(true)
         output.writeString("hwid=old")
-        val restored = SubscriptionBean().apply { deserializeFromBuffer(ByteBufferInput(output.toBytes())); initializeDefaultValues() }
+        val restored = SubscriptionBean().apply {
+            deserializeFromBuffer(ByteBufferInput(output.toBytes()))
+            initializeDefaultValues()
+        }
         assertFalse(restored.sendHwid)
         assertEquals("", restored.customHwidParams)
         assertEquals("", restored.serverDnsResolver)

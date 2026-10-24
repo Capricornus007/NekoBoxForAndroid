@@ -5,18 +5,17 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.*
-import io.nekohasekai.sagernet.database.RouteOverlap
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProfileManager
+import io.nekohasekai.sagernet.database.RouteOverlap
 import io.nekohasekai.sagernet.database.RuleEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.databinding.LayoutEmptyRouteBinding
@@ -26,6 +25,7 @@ import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.ktx.getColorAttr
 import io.nekohasekai.sagernet.widget.ListListener
 import io.nekohasekai.sagernet.widget.UndoSnackbarManager
+import kotlinx.coroutines.*
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 class RouteFragment :
@@ -215,6 +215,7 @@ class RouteFragment :
                     .setNegativeButton(R.string.no, null)
                     .show()
             }
+
             R.id.action_check_routes -> {
                 viewLifecycleOwner.lifecycleScope.launch {
                     val findings = withContext(Dispatchers.Default) {
@@ -224,22 +225,29 @@ class RouteFragment :
                         MaterialAlertDialogBuilder(activity).setTitle(R.string.route_check_overlaps)
                             .setMessage(R.string.route_check_no_overlaps).setPositiveButton(android.R.string.ok, null).show()
                     } else {
-                        val labels = findings.map { finding -> getString(
-                            if (finding.duplicate) R.string.route_overlap_duplicate else R.string.route_overlap_shadowed,
-                            finding.later.displayName(), finding.earlier.displayName()) }.toTypedArray()
+                        val labels = findings.map { finding ->
+                            getString(
+                                if (finding.duplicate) R.string.route_overlap_duplicate else R.string.route_overlap_shadowed,
+                                finding.later.displayName(),
+                                finding.earlier.displayName(),
+                            )
+                        }.toTypedArray()
                         MaterialAlertDialogBuilder(activity).setTitle(R.string.route_check_overlaps)
                             .setItems(labels) { _, which ->
                                 val finding = findings[which]
                                 val rules = arrayOf(finding.earlier, finding.later)
                                 MaterialAlertDialogBuilder(activity).setTitle(R.string.route_overlap_open)
                                     .setItems(rules.map { it.displayName() }.toTypedArray()) { _, index ->
-                                        startActivity(Intent(activity, RouteSettingsActivity::class.java)
-                                            .putExtra(RouteSettingsActivity.EXTRA_ROUTE_ID, rules[index].id))
+                                        startActivity(
+                                            Intent(activity, RouteSettingsActivity::class.java)
+                                                .putExtra(RouteSettingsActivity.EXTRA_ROUTE_ID, rules[index].id),
+                                        )
                                     }.setNegativeButton(android.R.string.cancel, null).show()
                             }.setPositiveButton(android.R.string.ok, null).show()
                     }
                 }
             }
+
             R.id.action_manage_assets -> {
                 startActivity(Intent(requireContext(), AssetsActivity::class.java))
             }

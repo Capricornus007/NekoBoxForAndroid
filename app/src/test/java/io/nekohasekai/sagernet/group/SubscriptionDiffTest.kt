@@ -6,6 +6,7 @@ import org.junit.Test
 
 class SubscriptionDiffTest {
     private fun bean() = WireGuardBean().apply { initializeDefaultValues() }
+
     @Test fun secretsAreRepresentedOnlyByCategory() {
         val old = bean()
         val updated = old.clone().apply {
@@ -17,8 +18,13 @@ class SubscriptionDiffTest {
         assertEquals(setOf("credentials", "dns", "allowed_ips"), changes)
         assertFalse(changes.joinToString().contains("test-private-value"))
     }
+
     @Test fun preservedLocalOverridesDoNotCreatePreviewChanges() {
-        val old = bean().apply { customConfigJson = "local"; customOutboundJson = "override"; useConfigRoutes = true }
+        val old = bean().apply {
+            customConfigJson = "local"
+            customOutboundJson = "override"
+            useConfigRoutes = true
+        }
         val incoming = bean()
         assertTrue(subscriptionChanges(old, incoming).isEmpty())
         incoming.serverAddress = "192.0.2.1"

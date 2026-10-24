@@ -145,7 +145,9 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             val selected = DataStore.fastestProtocols
             protocolSelection.summary = if (selected.isEmpty()) {
                 getString(if (mode == 0) R.string.fastest_protocol_all else R.string.fastest_protocol_none)
-            } else protocolKeys.indices.filter { protocolKeys[it] in selected }.joinToString(", ") { protocolLabels[it] }
+            } else {
+                protocolKeys.indices.filter { protocolKeys[it] in selected }.joinToString(", ") { protocolLabels[it] }
+            }
         }
         updateProtocolSummary()
         protocolMode.setOnPreferenceChangeListener { _, value ->

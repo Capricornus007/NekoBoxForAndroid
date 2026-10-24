@@ -9,9 +9,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
-import androidx.work.NetworkType
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy.UPDATE
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import androidx.work.multiprocess.RemoteWorkManager
@@ -56,7 +56,6 @@ object SubscriptionUpdater {
     private const val WORK_NAME = "SubscriptionUpdater"
 
     suspend fun reconfigureUpdater() {
-
         val subscriptions = SagerDatabase.groupDao.subscriptions()
             .mapNotNull { group -> group.subscription?.let { group to it } }
             .filter { (_, sub) -> sub.autoUpdate }
@@ -76,7 +75,7 @@ object SubscriptionUpdater {
             UPDATE,
             PeriodicWorkRequest.Builder(UpdateTask::class.java, schedule.intervalMinutes, TimeUnit.MINUTES)
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)                .apply {
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS).apply {
                     if (schedule.initialDelaySeconds > 0) {
                         setInitialDelay(schedule.initialDelaySeconds, TimeUnit.SECONDS)
                     }
@@ -134,7 +133,8 @@ object SubscriptionUpdater {
                     attempted = true
                     if (!GroupUpdater.executeUpdate(profile, false)) {
                         failed = true
-                    }                }
+                    }
+                }
             }
 
             try {
@@ -164,6 +164,7 @@ object SubscriptionUpdater {
                 nm.notify(2, notification.build())
             } catch (e: SecurityException) {
                 Logs.w("subscription notification update skipped", e)
-            }        }
+            }
+        }
     }
 }

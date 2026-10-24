@@ -14,7 +14,9 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScroller
 
 /** Reuses the existing thumb, animations and section popup, with variable-height row geometry. */
 class StableFastScrollRecyclerView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0,
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
 ) : FastScrollRecyclerView(context, attrs, defStyleAttr) {
     private val scrollbar: FastScroller
     private val bounds = Rect()
@@ -46,8 +48,11 @@ class StableFastScrollRecyclerView @JvmOverloads constructor(
         var high = (adapter?.itemCount ?: 1) - 1
         while (low < high) {
             val mid = (low + high) ushr 1
-            if (grid.spanSizeLookup.getSpanGroupIndex(mid, grid.spanCount) < row) low = mid + 1
-            else high = mid
+            if (grid.spanSizeLookup.getSpanGroupIndex(mid, grid.spanCount) < row) {
+                low = mid + 1
+            } else {
+                high = mid
+            }
         }
         return low
     }
@@ -74,7 +79,8 @@ class StableFastScrollRecyclerView @JvmOverloads constructor(
         val last = manager.findLastVisibleItemPosition()
         if (count == 0 || first == NO_POSITION || last == NO_POSITION ||
             height - paddingTop - paddingBottom <= scrollbar.thumbHeight ||
-            (!canScrollVertically(-1) && !canScrollVertically(1))) {
+            (!canScrollVertically(-1) && !canScrollVertically(1))
+        ) {
             thumbX = -1
             thumbY = -1
             scrollbar.setThumbPosition(-1, -1)
@@ -111,8 +117,12 @@ class StableFastScrollRecyclerView @JvmOverloads constructor(
         pendingSeek = null
         val rowBounds = rowBounds(row) ?: return
         val rows = rowOf((adapter?.itemCount ?: 1) - 1) + 1
-        val (_, offset) = FastScrollGeometry.target(progress, rows,
-            height - paddingTop - paddingBottom, rowBounds.second - rowBounds.first)
+        val (_, offset) = FastScrollGeometry.target(
+            progress,
+            rows,
+            height - paddingTop - paddingBottom,
+            rowBounds.second - rowBounds.first,
+        )
         // Align using the actual laid-out height, including margins, before the frame is drawn.
         scrollBy(0, rowBounds.first - paddingTop - offset)
     }

@@ -10,9 +10,11 @@ class MultilineEditTextPreference @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = TypedArrayUtils.getAttr(
-        context, R.attr.editTextPreferenceStyle, android.R.attr.editTextPreferenceStyle
+        context,
+        R.attr.editTextPreferenceStyle,
+        android.R.attr.editTextPreferenceStyle,
     ),
-    defStyleRes: Int = 0
+    defStyleRes: Int = 0,
 ) : EditTextPreference(context, attrs, defStyleAttr, defStyleRes) {
     init {
         dialogLayoutResource = R.layout.preference_dialog_multiline_m3

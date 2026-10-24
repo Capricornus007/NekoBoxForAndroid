@@ -8,10 +8,9 @@ internal fun String.isLocalDnsAddress(): Boolean = trim().let {
     it.equals("local", ignoreCase = true) || it.equals("localhost", ignoreCase = true)
 }
 
-internal fun directFallbackDnsAddress(directAddress: String?, remoteAddress: String?): String =
-    directAddress?.takeUnless { it.isLocalDnsAddress() }
-        ?: remoteAddress?.takeUnless { it.isLocalDnsAddress() }
-        ?: "https://dns.google/dns-query"
+internal fun directFallbackDnsAddress(directAddress: String?, remoteAddress: String?): String = directAddress?.takeUnless { it.isLocalDnsAddress() }
+    ?: remoteAddress?.takeUnless { it.isLocalDnsAddress() }
+    ?: "https://dns.google/dns-query"
 
 internal fun DNSRule_DefaultOptions.useBlockedDNSResponse() {
     server = null
@@ -27,7 +26,9 @@ internal fun dnsServerConfig(address: String, tag: String, bootstrap: String, de
     // Bare localhost selects Android's resolver; explicit udp://localhost or
     // a loopback IP still denotes a real DNS server listening on that address.
     if (input.isLocalDnsAddress()) return server.apply { put("type", "local") }
-    val raw = if (input.contains("://")) input else {
+    val raw = if (input.contains("://")) {
+        input
+    } else {
         val host = if (!input.startsWith("[") && input.count { it == ':' } > 1) "[$input]" else input
         "udp://$host"
     }

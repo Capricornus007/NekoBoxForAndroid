@@ -397,7 +397,7 @@ fun buildSingBoxOutboundWireguardBean(bean: WireGuardBean): SingBoxOptions.Outbo
         pre_shared_key = normalizeBase64Key(bean.peerPreSharedKey)
         mtu = bean.mtu
         if (bean.reserved.isNotBlank()) reserved = genReserved(bean.reserved)
-        if (bean.useConfigRoutes == true || bean.persistentKeepalive.isNotBlank() && bean.persistentKeepalive.trim() != "0") {
+        if (bean.useConfigRoutes == true || (bean.persistentKeepalive.isNotBlank() && bean.persistentKeepalive.trim() != "0")) {
             (_hack_config_map ?: HashMap<String, Any>().also { _hack_config_map = it })["peers"] = listOf(
                 linkedMapOf<String, Any>(
                     "server" to bean.serverAddress,

@@ -12,14 +12,23 @@ import java.security.MessageDigest
 object SubscriptionHistory {
     private const val LIMIT = 64 * 1024 * 1024
     private fun file(id: Long) = AtomicFile(File(SagerNet.application.noBackupFilesDir, "subscription-$id.previous"))
-    @Synchronized fun available(id: Long) = runCatching { file(id).openRead().use { }; true }.getOrDefault(false)
+
+    @Synchronized fun available(id: Long) = runCatching {
+        file(id).openRead().use { }
+        true
+    }.getOrDefault(false)
+
     @Synchronized fun delete(id: Long) = file(id).delete()
 
     @Synchronized fun capture(group: ProxyGroup, profiles: List<ProxyEntity>) {
         val bytes = ByteArrayOutputStream().also { buffer ->
             DataOutputStream(buffer).use { output ->
                 output.writeInt(1)
-                fun write(value: ByteArray) { require(buffer.size().toLong() + value.size + 4 <= LIMIT); output.writeInt(value.size); output.write(value) }
+                fun write(value: ByteArray) {
+                    require(buffer.size().toLong() + value.size + 4 <= LIMIT)
+                    output.writeInt(value.size)
+                    output.write(value)
+                }
                 write(KryoConverters.serialize(group))
                 output.writeInt(profiles.size)
                 profiles.forEach { write(KryoConverters.serialize(it)) }
@@ -28,8 +37,13 @@ object SubscriptionHistory {
         require(bytes.size <= LIMIT) { "Subscription undo snapshot is too large" }
         val target = file(group.id)
         val stream = target.startWrite()
-        try { stream.write(bytes); target.finishWrite(stream) }
-        catch (e: Exception) { target.failWrite(stream); throw e }
+        try {
+            stream.write(bytes)
+            target.finishWrite(stream)
+        } catch (e: Exception) {
+            target.failWrite(stream)
+            throw e
+        }
     }
 
     fun revision(profiles: List<ProxyEntity>): ByteArray {
@@ -46,8 +60,14 @@ object SubscriptionHistory {
         add(DataStore.selectedProxy)
         if (DataStore.serviceState.started) add(DataStore.currentProfile)
         NetworkProfiles.policies().forEach { add(it.profileId) }
-        SagerDatabase.rulesDao.allRules().forEach { add(it.outbound); add(it.fallbackProfile) }
-        SagerDatabase.groupDao.allGroups().forEach { add(it.frontProxy); add(it.landingProxy) }
+        SagerDatabase.rulesDao.allRules().forEach {
+            add(it.outbound)
+            add(it.fallbackProfile)
+        }
+        SagerDatabase.groupDao.allGroups().forEach {
+            add(it.frontProxy)
+            add(it.landingProxy)
+        }
         SagerDatabase.proxyDao.getAll().forEach { (it.requireBean() as? ChainBean)?.proxies?.let(::addAll) }
     }
 
@@ -80,7 +100,12 @@ object SubscriptionHistory {
         check(removedIds.intersect(referencedProfiles()).isEmpty()) { SagerNet.application.getString(R.string.subscription_undo_referenced) }
         check(SagerDatabase.proxyDao.getEntities(oldIds.toList()).all { it.groupId == id }) { "Profile ID conflict" }
         val currentById = current.associateBy { it.id }
-        oldProfiles.forEach { profile -> currentById[profile.id]?.let { profile.tx = it.tx; profile.rx = it.rx } }
+        oldProfiles.forEach { profile ->
+            currentById[profile.id]?.let {
+                profile.tx = it.tx
+                profile.rx = it.rx
+            }
+        }
         SagerDatabase.proxyDao.deleteByGroup(id)
         SagerDatabase.proxyDao.insert(oldProfiles)
         SagerDatabase.groupDao.getById(id)?.let { group ->

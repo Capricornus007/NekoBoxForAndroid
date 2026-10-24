@@ -1,12 +1,12 @@
 package io.nekohasekai.sagernet.bg
 
+import android.app.KeyguardManager
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
-import android.app.KeyguardManager
 import android.widget.Toast
 import io.nekohasekai.sagernet.Action
 import io.nekohasekai.sagernet.BootReceiver
@@ -15,14 +15,14 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.aidl.ISagerNetService
 import io.nekohasekai.sagernet.aidl.ISagerNetServiceCallback
 import io.nekohasekai.sagernet.bg.proto.ProxyInstance
+import io.nekohasekai.sagernet.bg.proto.TAILSCALE_READY_TIMEOUT_MS
 import io.nekohasekai.sagernet.bg.proto.configuredProbe
 import io.nekohasekai.sagernet.bg.proto.networkProbe
 import io.nekohasekai.sagernet.bg.proto.resetProbeHealth
 import io.nekohasekai.sagernet.bg.proto.runtimeDiagnostics
 import io.nekohasekai.sagernet.bg.proto.setProbesPaused
-import io.nekohasekai.sagernet.bg.proto.TAILSCALE_READY_TIMEOUT_MS
-import io.nekohasekai.sagernet.database.NetworkProfiles
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.NetworkProfiles
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.tailscale.pruneTailscaleState
@@ -35,7 +35,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
@@ -44,6 +43,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import libcore.Libcore
 import moe.matsuri.nb4a.Protocols
@@ -96,10 +96,13 @@ class BaseService {
 
     class Data internal constructor(private val service: Interface) {
         @Volatile var state = State.Stopped
+
         // isai 電源探針狀態：鎖屏/閒置時暫停健康檢查（見 updateProbePowerState）。
         @Volatile var powerRestricted = false
+
         // isai 網絡指紋：網絡屬性變化（DNS/路由/MTU…）比對用，決定是否 resetProbeHealth。
         var networkSignature: String? = null
+
         // isai 網絡策略指紋：NetworkProfilePolicy 選中節點的 identity 快取。
         var networkPolicySignature: String? = null
 
@@ -408,8 +411,13 @@ class BaseService {
             val current = data ?: error("Service is unavailable")
             val proxy = current.proxy ?: error("Core is not running")
             check(current.state == State.Connected && proxy.isInitialized() && DataStore.currentProfile == expectedProfileId) { "Profile is no longer active" }
-            val tag = if (direct) "direct" else if (proxy.config.selectorGroupId > 0) "proxy"
-                else proxy.config.profileTagMap[proxy.profile.id] ?: error("Proxy outbound is unavailable")
+            val tag = if (direct) {
+                "direct"
+            } else if (proxy.config.selectorGroupId > 0) {
+                "proxy"
+            } else {
+                proxy.config.profileTagMap[proxy.profile.id] ?: error("Proxy outbound is unavailable")
+            }
             return proxy.box.networkProbe(tag, domain, dnsTarget)
         }
 
@@ -825,7 +833,10 @@ class BaseService {
                 val link = network?.let { SagerNet.connectivity.getLinkProperties(it) }
                 // isai 網絡指紋：拿完整網絡屬性（位址/DNS/路由/MTU/私人 DNS）建簽名，
                 // 比單純介面名更靈敏——DNS 換了但介面沒變時也要 resetProbeHealth（冷卻探針）。
-                if (link == null) { upstreamInterfaceName = null; return@start }
+                if (link == null) {
+                    upstreamInterfaceName = null
+                    return@start
+                }
                 val newName = buildString {
                     append(network).append('|').append(link.interfaceName)
                     append('|').append(link.linkAddresses.map { it.toString() }.sorted())

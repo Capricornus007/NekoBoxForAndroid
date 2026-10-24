@@ -276,8 +276,7 @@ class SagerNet :
         )
 
         // isai 相容：force=true 走硬重啟（BaseService receiver 轉 stopRunner(restart=true)）。
-        fun reloadService(force: Boolean) =
-            application.sendBroadcast(Intent(Action.RELOAD).setPackage(application.packageName).putExtra("force", force))
+        fun reloadService(force: Boolean) = application.sendBroadcast(Intent(Action.RELOAD).setPackage(application.packageName).putExtra("force", force))
 
         fun restartService() = application.sendBroadcast(Intent(Action.RESTART).setPackage(application.packageName))
 

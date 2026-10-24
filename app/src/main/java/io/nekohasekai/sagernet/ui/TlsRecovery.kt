@@ -47,9 +47,13 @@ private suspend fun awaitServiceStopped(activity: Activity) {
     val ready = kotlinx.coroutines.CompletableDeferred<io.nekohasekai.sagernet.aidl.ISagerNetService>()
     val connection = io.nekohasekai.sagernet.bg.SagerConnection(io.nekohasekai.sagernet.bg.SagerConnection.CONNECTION_ID_SHORTCUT, true)
     val callback = object : io.nekohasekai.sagernet.bg.SagerConnection.Callback {
-        override fun onServiceConnected(service: io.nekohasekai.sagernet.aidl.ISagerNetService) { ready.complete(service) }
+        override fun onServiceConnected(service: io.nekohasekai.sagernet.aidl.ISagerNetService) {
+            ready.complete(service)
+        }
         override fun stateChanged(state: io.nekohasekai.sagernet.bg.BaseService.State, profileName: String?, msg: String?) {}
-        override fun onBinderDied() { ready.completeExceptionally(IllegalStateException("Service disconnected during recovery")) }
+        override fun onBinderDied() {
+            ready.completeExceptionally(IllegalStateException("Service disconnected during recovery"))
+        }
     }
     try {
         onMainDispatcher { connection.connect(activity, callback) }

@@ -21,9 +21,11 @@ import io.nekohasekai.sagernet.database.ProxyEntity.Companion.TYPE_WG
 
 internal object FastestProtocolFilter {
     // Stable identifiers: never use a node's editable name to identify its protocol.
-    val keys = listOf("socks", "http", "shadowsocks", "shadowsocksr", "vmess", "vless",
+    val keys = listOf(
+        "socks", "http", "shadowsocks", "shadowsocksr", "vmess", "vless",
         "trojan", "trojan-go", "naive", "hysteria", "hysteria2", "tuic", "juicity",
-        "ssh", "wireguard", "shadowtls", "mieru", "anytls", "custom")
+        "ssh", "wireguard", "shadowtls", "mieru", "anytls", "custom",
+    )
 
     fun protocol(profile: ProxyEntity): String = when (profile.type) {
         TYPE_SOCKS -> "socks"
@@ -45,8 +47,12 @@ internal object FastestProtocolFilter {
         else -> "custom"
     }
 
-    fun filter(candidates: List<ProxyEntity>, mode: Int, protocols: Set<String>,
-        lookup: (Long) -> ProxyEntity?, extraHops: (ProxyEntity) -> List<ProxyEntity> = { emptyList() },
+    fun filter(
+        candidates: List<ProxyEntity>,
+        mode: Int,
+        protocols: Set<String>,
+        lookup: (Long) -> ProxyEntity?,
+        extraHops: (ProxyEntity) -> List<ProxyEntity> = { emptyList() },
     ): List<ProxyEntity> {
         if (mode !in 0..1 || protocols.any { it !in keys }) {
             throw FastestCandidateResolutionException(FastestCandidateResolutionError.INVALID_PROTOCOL_FILTER)

@@ -1,7 +1,7 @@
 package io.nekohasekai.sagernet.ktx
 
-import libcore.Libcore
 import io.nekohasekai.sagernet.database.DataStore
+import libcore.Libcore
 import java.io.InputStream
 import java.io.OutputStream
 

@@ -12,12 +12,16 @@ class InitialConfigurationTest {
         val settings = InitialConfiguration.settings()
         val keys = settings.map { it.key }
         assertEquals(keys.size, keys.distinct().size)
-        assertTrue(keys.none { it in setOf(
-            Key.CLASH_API_SECRET, Key.MIXED_PASSWORD, Key.MIXED_USERNAME,
-            Key.MIXED_PORT, Key.SOCKS_PORT, Key.HTTP_PORT,
-            Key.PROFILE_CURRENT, Key.PROFILE_ID, Key.PROFILE_GROUP,
-            "webdavPassword", "webdavServer", "networkProfiles",
-        ) })
+        assertTrue(
+            keys.none {
+                it in setOf(
+                    Key.CLASH_API_SECRET, Key.MIXED_PASSWORD, Key.MIXED_USERNAME,
+                    Key.MIXED_PORT, Key.SOCKS_PORT, Key.HTTP_PORT,
+                    Key.PROFILE_CURRENT, Key.PROFILE_ID, Key.PROFILE_GROUP,
+                    "webdavPassword", "webdavServer", "networkProfiles",
+                )
+            },
+        )
         assertEquals(false, settings.single { it.key == Key.GLOBAL_ALLOW_INSECURE }.boolean)
         assertEquals(false, settings.single { it.key == Key.ALLOW_ACCESS }.boolean)
         // SagerNet must not apply the older UI migration over the seeded dynamic theme.
@@ -30,9 +34,12 @@ class InitialConfigurationTest {
         fun int(key: String) = settings.getValue(key).string!!.toInt()
         assertEquals(true, settings.getValue(Key.DIRECT_FALLBACK).boolean)
         val config = directFallbackConfig(
-            "proxy", settings.getValue(Key.DIRECT_FALLBACK_URL).string!!,
-            int(Key.DIRECT_FALLBACK_INTERVAL), int(Key.DIRECT_FALLBACK_REQUIRED),
-            int(Key.DIRECT_FALLBACK_FAILURES), int(Key.DIRECT_FALLBACK_RECOVERIES),
+            "proxy",
+            settings.getValue(Key.DIRECT_FALLBACK_URL).string!!,
+            int(Key.DIRECT_FALLBACK_INTERVAL),
+            int(Key.DIRECT_FALLBACK_REQUIRED),
+            int(Key.DIRECT_FALLBACK_FAILURES),
+            int(Key.DIRECT_FALLBACK_RECOVERIES),
         )
         assertFalse(config.isEmpty())
         assertEquals(4, settings.getValue(Key.DIRECT_FALLBACK_URL).string!!.lines().size)

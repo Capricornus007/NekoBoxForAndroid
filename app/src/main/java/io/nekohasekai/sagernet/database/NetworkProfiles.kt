@@ -5,9 +5,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Network
-import android.os.Build
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
+import android.os.Build
 import androidx.core.content.ContextCompat
 import com.google.gson.reflect.TypeToken
 import io.nekohasekai.sagernet.SagerNet
@@ -42,6 +42,7 @@ object NetworkProfiles {
         require(policies.map { it.transport to it.ssid }.distinct().size == policies.size)
         DataStore.networkProfiles = gson.toJson(policies)
     }
+
     // UNKNOWN_SSID 是 API 30 才有的常量，但它是編譯期字串常量（inlined 進 bytecode），
     // 在 minSdk 23 的舊機上比較不會碰任何新 API；lint 的 InlinedApi 在這裡是誤報。
     @SuppressLint("InlinedApi")
@@ -61,7 +62,9 @@ object NetworkProfiles {
         val ssid = if (transport == "wifi" && ssidAccess) {
             runCatching { (SagerNet.application.getApplicationContext().getSystemService(Context.WIFI_SERVICE) as WifiManager).connectionInfo?.ssid }
                 .getOrNull()?.removeSurrounding("\"")?.takeUnless { it == WifiManager.UNKNOWN_SSID || it.isBlank() }
-        } else null
+        } else {
+            null
+        }
         val policy = matchNetworkProfile(policies(), transport, ssid)?.takeIf { SagerDatabase.proxyDao.getById(it.profileId) != null }
         // Private identifier; never write it or the SSID/DNS overrides to the log.
         return Selection("$transport|${ssid.orEmpty()}|${policy?.hashCode()}", policy)

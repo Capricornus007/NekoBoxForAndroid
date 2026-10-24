@@ -17,21 +17,25 @@ object BackupEncryption {
     private const val ITERATIONS = 1_300_000
     private val headerBytes = magic.size + SALT_BYTES + IV_BYTES
 
-    fun isEncrypted(bytes: ByteArray): Boolean =
-        bytes.size >= magic.size && magic.indices.all { bytes[it] == magic[it] }
+    fun isEncrypted(bytes: ByteArray): Boolean = bytes.size >= magic.size && magic.indices.all { bytes[it] == magic[it] }
 
     private fun cipher(mode: Int, password: CharArray, header: ByteArray): Cipher {
         val salt = header.copyOfRange(magic.size, magic.size + SALT_BYTES)
         val iv = header.copyOfRange(magic.size + SALT_BYTES, headerBytes)
         val spec = PBEKeySpec(password, salt, ITERATIONS, 256)
-        val key = try { SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec).encoded }
-        finally { spec.clearPassword() }
+        val key = try {
+            SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(spec).encoded
+        } finally {
+            spec.clearPassword()
+        }
         return try {
             Cipher.getInstance("AES/GCM/NoPadding").apply {
                 init(mode, SecretKeySpec(key, "AES"), GCMParameterSpec(TAG_BYTES * 8, iv))
                 updateAAD(header)
             }
-        } finally { key.fill(0) }
+        } finally {
+            key.fill(0)
+        }
     }
 
     fun encrypt(bytes: ByteArray, password: CharArray): ByteArray {

@@ -1,8 +1,8 @@
 package io.nekohasekai.sagernet.utils
 
 import android.net.ConnectivityManager
-import android.net.Network
 import android.net.LinkProperties
+import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build

@@ -9,11 +9,8 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
-import androidx.preference.*
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import androidx.preference.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import io.nekohasekai.sagernet.Key
@@ -24,8 +21,9 @@ import io.nekohasekai.sagernet.bg.RuleAssetUpdater
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.InitialConfiguration
 import io.nekohasekai.sagernet.database.NetworkSettingsHistory
-import io.nekohasekai.sagernet.database.preference.PublicDatabase
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
+import io.nekohasekai.sagernet.database.preference.PublicDatabase
+import io.nekohasekai.sagernet.fmt.directFallbackConfig
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.EbpfProbe
 import io.nekohasekai.sagernet.root.RootLanSharing
@@ -33,8 +31,10 @@ import io.nekohasekai.sagernet.root.RootManager
 import io.nekohasekai.sagernet.utils.AppLocale
 import io.nekohasekai.sagernet.utils.Theme
 import io.nekohasekai.sagernet.widget.enableCollapsibleCategories
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import moe.matsuri.nb4a.ui.*
-import io.nekohasekai.sagernet.fmt.directFallbackConfig
 import java.io.File
 
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
@@ -251,7 +251,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         DataStore.initGlobal()
         addPreferencesFromResource(R.xml.global_preferences)
         findPreference<Preference>("networkProfilesScreen")!!.setOnPreferenceClickListener {
-            startActivity(android.content.Intent(requireContext(), NetworkProfilesActivity::class.java)); true
+            startActivity(android.content.Intent(requireContext(), NetworkProfilesActivity::class.java))
+            true
         }
         findPreference<Preference>("restoreNetworkSettings")!!.apply {
             isEnabled = NetworkSettingsHistory.available()
@@ -275,7 +276,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 true
             }
         }
-
 
         val nightTheme = findPreference<SimpleMenuPreference>(Key.NIGHT_THEME)!!
         val dynamicColors = findPreference<SwitchPreferenceCompat>(Key.DYNAMIC_COLORS)!!
@@ -529,8 +529,12 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 setOnPreferenceChangeListener { preference, value ->
                     val count = value.toString().toIntOrNull()
                     val maximum = if (key == Key.DIRECT_FALLBACK_REQUIRED) DataStore.directFallbackUrl.lineSequence().map(String::trim).filter(String::isNotBlank).distinct().count().coerceAtMost(8) else 10
-                    if (count != null && count in 1..maximum) reloadListener.onPreferenceChange(preference, value)
-                    else { Toast.makeText(requireContext(), getString(R.string.direct_fallback_invalid_count, maximum), Toast.LENGTH_LONG).show(); false }
+                    if (count != null && count in 1..maximum) {
+                        reloadListener.onPreferenceChange(preference, value)
+                    } else {
+                        Toast.makeText(requireContext(), getString(R.string.direct_fallback_invalid_count, maximum), Toast.LENGTH_LONG).show()
+                        false
+                    }
                 }
             }
         }

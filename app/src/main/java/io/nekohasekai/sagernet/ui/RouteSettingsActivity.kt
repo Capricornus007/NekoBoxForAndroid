@@ -184,9 +184,13 @@ class RouteSettingsActivity(
                 ?: getString(androidx.preference.R.string.not_set)
         }
         updateFallback()
-        fallback.setOnPreferenceChangeListener { _, value -> updateFallback(value.toString().toInt()); true }
+        fallback.setOnPreferenceChangeListener { _, value ->
+            updateFallback(value.toString().toInt())
+            true
+        }
         backupPreference?.setOnPreferenceClickListener {
-            selectFallbackProfile.launch(Intent(this@RouteSettingsActivity, ProfileSelectActivity::class.java)); true
+            selectFallbackProfile.launch(Intent(this@RouteSettingsActivity, ProfileSelectActivity::class.java))
+            true
         }
 
         outbound.setOnPreferenceChangeListener { _, newValue ->
@@ -400,7 +404,8 @@ class RouteSettingsActivity(
         }
 
         if (DataStore.routeOutbound == 1 && DataStore.routeFallbackMode == 3 &&
-            ProfileManager.getProfile(DataStore.routeFallbackProfile) == null) {
+            ProfileManager.getProfile(DataStore.routeFallbackProfile) == null
+        ) {
             onMainDispatcher { Toast.makeText(this@RouteSettingsActivity, R.string.route_fallback_missing, Toast.LENGTH_LONG).show() }
             return
         }

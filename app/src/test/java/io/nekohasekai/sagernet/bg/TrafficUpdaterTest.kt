@@ -22,7 +22,10 @@ class TrafficUpdaterTest {
         val changes = Channel<Unit>(Channel.CONFLATED)
         var reads = 0
         val item = TrafficUpdater.TrafficLooperData("proxy")
-        val updater = TrafficUpdater(listOf(item), { _, _ -> reads++; 3000L })
+        val updater = TrafficUpdater(listOf(item), { _, _ ->
+            reads++
+            3000L
+        })
         val update = async(start = CoroutineStart.UNDISPATCHED) {
             val resumed = TrafficUpdater.awaitUpdate(1, { restricted }, changes)
             assertTrue(resumed)
@@ -60,6 +63,7 @@ class TrafficUpdaterTest {
         assertTrue(update.isCancelled)
         changes.close()
     }
+
     @Test fun disabledSpeedStillPollsTotals() {
         assertEquals(1000L, TrafficUpdater.pollingInterval(0))
         assertEquals(500L, TrafficUpdater.pollingInterval(500))
@@ -81,7 +85,10 @@ class TrafficUpdaterTest {
         val first = TrafficUpdater.TrafficLooperData("shared")
         val second = TrafficUpdater.TrafficLooperData("shared")
         val other = TrafficUpdater.TrafficLooperData("other")
-        val updater = TrafficUpdater(listOf(first, second, other), { _, _ -> calls++; 15 }, { now })
+        val updater = TrafficUpdater(listOf(first, second, other), { _, _ ->
+            calls++
+            15
+        }, { now })
         now = 1000
         updater.updateAll()
         assertEquals(4, calls)

@@ -129,7 +129,9 @@ class TrafficUpdater(
                 if (powerRestricted()) {
                     resumed = true
                     powerChanged.receive()
-                } else withTimeoutOrNull(pollingInterval(speedInterval)) { powerChanged.receive() }
+                } else {
+                    withTimeoutOrNull(pollingInterval(speedInterval)) { powerChanged.receive() }
+                }
             } while (powerRestricted())
             return resumed
         }

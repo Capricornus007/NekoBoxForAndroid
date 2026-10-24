@@ -31,8 +31,9 @@ object BackupRestore {
             }
             room.runInTransaction {
                 restoreProfilesAndRules()
-                if (settingsKeys == null) db.execSQL("DELETE FROM restore_settings.KeyValuePair")
-                else {
+                if (settingsKeys == null) {
+                    db.execSQL("DELETE FROM restore_settings.KeyValuePair")
+                } else {
                     require(settingsKeys.isNotEmpty())
                     db.execSQL("DELETE FROM restore_settings.KeyValuePair WHERE `key` IN (${settingsKeys.joinToString { "?" }})", settingsKeys.toTypedArray())
                 }

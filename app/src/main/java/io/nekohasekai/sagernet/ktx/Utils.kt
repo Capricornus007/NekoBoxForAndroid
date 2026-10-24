@@ -270,15 +270,14 @@ fun View.crossFadeFrom(other: View) {
 
 fun Context.getColour(@ColorRes colorRes: Int): Int = ContextCompat.getColor(this, colorRes)
 
-fun Context.getColorAttr(@AttrRes resId: Int): Int {
-    return MaterialColors.getColor(this, resId, 0)
-}
+fun Context.getColorAttr(@AttrRes resId: Int): Int = MaterialColors.getColor(this, resId, 0)
 
 fun Fragment.snackbar(textId: Int) = (requireActivity() as MainActivity).snackbar(textId)
 fun Fragment.snackbar(text: CharSequence) = (requireActivity() as MainActivity).snackbar(text)
 
 fun ThemedActivity.startFilesForResult(
-    launcher: ActivityResultLauncher<String>, input: String
+    launcher: ActivityResultLauncher<String>,
+    input: String,
 ) {
     try {
         return launcher.launch(input)
@@ -289,7 +288,8 @@ fun ThemedActivity.startFilesForResult(
 }
 
 fun Fragment.startFilesForResult(
-    launcher: ActivityResultLauncher<String>, input: String
+    launcher: ActivityResultLauncher<String>,
+    input: String,
 ) {
     try {
         return launcher.launch(input)
@@ -319,9 +319,12 @@ fun triggerFullRestart(ctx: Context) {
         delay(500)
         SagerConnection.restartingApp = true
         val connection = SagerConnection(SagerConnection.CONNECTION_ID_RESTART_BG)
-        connection.connect(ctx, RestartCallback {
-            ProcessPhoenix.triggerRebirth(ctx, Intent(ctx, MainActivity::class.java))
-        })
+        connection.connect(
+            ctx,
+            RestartCallback {
+                ProcessPhoenix.triggerRebirth(ctx, Intent(ctx, MainActivity::class.java))
+            },
+        )
     }
 }
 
@@ -329,7 +332,7 @@ private class RestartCallback(val callback: () -> Unit) : SagerConnection.Callba
     override fun stateChanged(
         state: BaseService.State,
         profileName: String?,
-        msg: String?
+        msg: String?,
     ) {
     }
 

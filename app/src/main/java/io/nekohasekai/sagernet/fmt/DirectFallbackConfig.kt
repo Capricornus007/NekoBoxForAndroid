@@ -10,8 +10,10 @@ internal fun directFallbackConfig(proxyTag: String, url: String, intervalSeconds
     require(urls.size in 1..8 && required in 1..urls.size && failures in 1..10 && recoveries in 1..10) { "Invalid fallback thresholds" }
     for (link in urls) {
         val uri = URI.create(link)
-        require(uri.scheme in setOf("https", "http") && !uri.host.isNullOrBlank() &&
-            uri.userInfo == null && uri.fragment == null && (uri.port == -1 || uri.port in 1..65535)) {
+        require(
+            uri.scheme in setOf("https", "http") && !uri.host.isNullOrBlank() &&
+                uri.userInfo == null && uri.fragment == null && (uri.port == -1 || uri.port in 1..65535),
+        ) {
             "Invalid control site URL"
         }
     }
@@ -23,6 +25,6 @@ internal fun directFallbackConfig(proxyTag: String, url: String, intervalSeconds
         "url" to urls.first(), "control_urls" to urls, "required_successes" to required,
         "failure_threshold" to failures, "recovery_threshold" to recoveries, "interval" to "${intervalSeconds}s", "timeout" to "3s",
         "idle_timeout" to "${intervalSeconds}s", "wait_for_initial" to true,
-        "interrupt_exist_connections" to true
+        "interrupt_exist_connections" to true,
     )
 }

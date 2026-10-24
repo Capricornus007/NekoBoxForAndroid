@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import android.provider.OpenableColumns
-import android.view.View
 import android.text.InputType
+import android.view.View
 import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -189,7 +189,6 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
             }
         }
 
-
         binding.actionShare.setOnClickListener {
             if (backupIsBusy()) {
                 showMessage(R.string.backup_in_progress)
@@ -240,7 +239,6 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
                 }
             }
         }
-
 
         binding.actionImportFile.setOnClickListener {
             startFilesForResult(importFile, "*/*")
@@ -639,24 +637,33 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
         }
     }
 
-
     // isai：加密備份的副檔名（nbk = 已加密）。
-    private fun backupExtension(bytes: ByteArray, zipped: Boolean = false) =
-        if (BackupEncryption.isEncrypted(bytes)) "nbk" else if (zipped) "zip" else "json"
+    private fun backupExtension(bytes: ByteArray, zipped: Boolean = false) = if (BackupEncryption.isEncrypted(bytes)) {
+        "nbk"
+    } else if (zipped) {
+        "zip"
+    } else {
+        "json"
+    }
 
     // isai：從備份畫面的密碼欄讀加密密碼（空 = 不加密）。
     private fun backupPasswordChars(): CharArray = runBlocking(Dispatchers.Main) {
-        if (!isAdded || view == null) CharArray(0)
-        else binding.backupPassword.text?.toString()?.toCharArray() ?: CharArray(0)
+        if (!isAdded || view == null) {
+            CharArray(0)
+        } else {
+            binding.backupPassword.text?.toString()?.toCharArray() ?: CharArray(0)
+        }
     }
-
 
     // isai：加密備份（帶 magic header）解密；無密碼或解密失敗丟出可讀錯誤。
     private fun decryptIfEncrypted(bytes: ByteArray): ByteArray {
         if (!BackupEncryption.isEncrypted(bytes)) return bytes
         val password = runBlocking(Dispatchers.Main) {
-            if (!isAdded || view == null) CharArray(0)
-            else binding.backupPassword.text?.toString()?.toCharArray() ?: CharArray(0)
+            if (!isAdded || view == null) {
+                CharArray(0)
+            } else {
+                binding.backupPassword.text?.toString()?.toCharArray() ?: CharArray(0)
+            }
         }
         if (password.isEmpty()) throw Exception(getString(R.string.backup_encryption_password))
         return BackupEncryption.decrypt(bytes, password)
@@ -805,7 +812,6 @@ class BackupFragment : NamedFragment(R.layout.layout_backup) {
             DatabaseBackupRestoreOperations,
         )
     }
-
 
     private fun showMessage(message: String) {
         MessageStore.showMessage(message)

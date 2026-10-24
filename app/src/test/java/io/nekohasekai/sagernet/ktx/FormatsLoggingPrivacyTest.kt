@@ -32,7 +32,8 @@ class FormatsLoggingPrivacyTest {
         // lateinit 不會被框架賦值——照 ConfigBuilderTestEnv 的手法補上（不跑 onCreate，
         // 避免載入 JVM 環境不可用的原生庫）。
         val alreadyAttached = try {
-            SagerNet.application; true
+            SagerNet.application
+            true
         } catch (_: UninitializedPropertyAccessException) {
             false
         }

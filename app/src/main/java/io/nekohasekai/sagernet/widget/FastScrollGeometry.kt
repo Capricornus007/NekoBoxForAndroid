@@ -12,12 +12,14 @@ internal object FastScrollGeometry {
 
     fun dragProgress(raw: Float, height: Int, thumb: Int, top: Int, bottom: Int): Float {
         val track = height - top - bottom - thumb
-        return if (track <= 0 || !raw.isFinite()) 0f
-        else ((raw * (height - thumb) - top) / track).coerceIn(0f, 1f)
+        return if (track <= 0 || !raw.isFinite()) {
+            0f
+        } else {
+            ((raw * (height - thumb) - top) / track).coerceIn(0f, 1f)
+        }
     }
 
-    fun thumbTop(progress: Float, height: Int, thumb: Int, top: Int, bottom: Int): Int =
-        top + ((height - top - bottom - thumb).coerceAtLeast(0) * progress.coerceIn(0f, 1f)).roundToInt()
+    fun thumbTop(progress: Float, height: Int, thumb: Int, top: Int, bottom: Int): Int = top + ((height - top - bottom - thumb).coerceAtLeast(0) * progress.coerceIn(0f, 1f)).roundToInt()
 
     // Seek by row, aligning the point within that row with the same point in the viewport.
     fun target(progress: Float, rowCount: Int, viewport: Int, rowHeight: Int): Pair<Int, Int> {

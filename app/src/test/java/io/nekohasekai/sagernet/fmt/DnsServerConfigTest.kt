@@ -1,14 +1,17 @@
 package io.nekohasekai.sagernet.fmt
 
+import moe.matsuri.nb4a.SingBoxOptions.DNSRule_DefaultOptions
 import org.junit.Assert.*
 import org.junit.Test
-import moe.matsuri.nb4a.SingBoxOptions.DNSRule_DefaultOptions
 
 class DnsServerConfigTest {
     @Test fun bareLocalhostUsesAndroidSystemDNSRatherThanLoopbackUDP() {
         for (address in listOf("local", "localhost", " LocalHost ", "LOCAL")) {
-            assertEquals(address, mapOf("type" to "local", "tag" to "dns-direct"),
-                dnsServerConfig(address, "dns-direct", "dns-local", "direct"))
+            assertEquals(
+                address,
+                mapOf("type" to "local", "tag" to "dns-direct"),
+                dnsServerConfig(address, "dns-direct", "dns-local", "direct"),
+            )
         }
     }
 
@@ -24,8 +27,12 @@ class DnsServerConfigTest {
     @Test fun systemDNSAliasesDoNotDisableTheProxyDetourOfFallbackDNS() {
         val remote = "https://dns.example.test/custom"
         for (direct in listOf("local", "localhost", " LocalHost ")) {
-            val server = dnsServerConfig(directFallbackDnsAddress(direct, remote),
-                DNS_DIRECT_FALLBACK, "dns-local", TAG_DIRECT_FALLBACK)
+            val server = dnsServerConfig(
+                directFallbackDnsAddress(direct, remote),
+                DNS_DIRECT_FALLBACK,
+                "dns-local",
+                TAG_DIRECT_FALLBACK,
+            )
             assertEquals("https", server["type"])
             assertEquals("dns.example.test", server["server"])
             assertEquals(TAG_DIRECT_FALLBACK, server["detour"])

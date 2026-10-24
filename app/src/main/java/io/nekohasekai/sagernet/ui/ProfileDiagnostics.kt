@@ -54,7 +54,10 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
         setNavigationOnClickListener { dialog.dismiss() }
     }
     root.addView(toolbar, LinearLayout.LayoutParams(-1, -2))
-    val content = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(16), dp(8), dp(16), dp(24)) }
+    val content = LinearLayout(context).apply {
+        orientation = LinearLayout.VERTICAL
+        setPadding(dp(16), dp(8), dp(16), dp(24))
+    }
     val scroll = ScrollView(context).apply { addView(content) }
     root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
     ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
@@ -68,8 +71,16 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
             cardElevation = 0f
             setCardBackgroundColor(MaterialColors.getColor(this, if (emphasis) com.google.android.material.R.attr.colorPrimaryContainer else com.google.android.material.R.attr.colorSurfaceContainer, 0))
         }
-        val body = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(16), dp(16), dp(16), dp(16)) }
-        body.addView(TextView(context).apply { setText(title); setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium) })
+        val body = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), dp(16), dp(16), dp(16))
+        }
+        body.addView(
+            TextView(context).apply {
+                setText(title)
+                setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_TitleMedium)
+            },
+        )
         card.addView(body)
         content.addView(card, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
         return body
@@ -81,14 +92,20 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     }
     val overview = card(R.string.diagnostics_overview, true)
     val validationView = overview.label().apply { setText(R.string.diagnostics_loading) }
-    val configButton = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply { setText(R.string.menu_configuration); isEnabled = false }
+    val configButton = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+        setText(R.string.menu_configuration)
+        isEnabled = false
+    }
     overview.addView(configButton)
     val groupsView = card(R.string.diagnostics_live_state).label()
     val probesCard = card(R.string.diagnostics_active_tests)
     val probesView = probesCard.label().apply { setText(R.string.diagnostics_probe_hint) }
     fun probeInput(title: Int, value: String): TextInputEditText {
         val layout = TextInputLayout(context, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply { hint = getString(title) }
-        val edit = TextInputEditText(layout.context).apply { setSingleLine(true); setText(value) }
+        val edit = TextInputEditText(layout.context).apply {
+            setSingleLine(true)
+            setText(value)
+        }
         layout.addView(edit, LinearLayout.LayoutParams(-1, -2))
         probesCard.addView(layout, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
         return edit
@@ -97,14 +114,17 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     val probeDns = probeInput(R.string.diagnostics_probe_dns, "1.1.1.1:53")
     val runProbes = MaterialButton(context).apply { setText(R.string.diagnostics_run_checks) }
     probesCard.addView(runProbes, ViewGroup.LayoutParams(-1, -2))
-    probesCard.addView(MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
-        setText(R.string.network_profiles_edit_profile)
-        setOnClickListener {
-            val subscription = io.nekohasekai.sagernet.database.SagerDatabase.groupDao.getById(profile.groupId)?.subscription != null
-            dialog.dismiss()
-            startActivity(profile.settingIntent(context, subscription))
-        }
-    }, ViewGroup.LayoutParams(-1, -2))
+    probesCard.addView(
+        MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+            setText(R.string.network_profiles_edit_profile)
+            setOnClickListener {
+                val subscription = io.nekohasekai.sagernet.database.SagerDatabase.groupDao.getById(profile.groupId)?.subscription != null
+                dialog.dismiss()
+                startActivity(profile.settingIntent(context, subscription))
+            }
+        },
+        ViewGroup.LayoutParams(-1, -2),
+    )
     var probeJob: Job? = null
     runProbes.setOnClickListener {
         if (profile.id != DataStore.currentProfile || !DataStore.serviceState.connected) {
@@ -127,29 +147,42 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
                     results += buildString {
                         append(title)
                         append("\nUDP: ").append(getString(if (result.optString("udp") == "response") R.string.diagnostics_reachable else R.string.diagnostics_unreachable))
-                        append("\nDNS (UDP): ").append(if (result.optString("outbound_dns_udp") == "response")
-                            "rcode ${result.optInt("rcode")} · ${result.optInt("answers")} · ${result.optInt("dns_ms")} ms" else getString(R.string.diagnostics_query_failed))
+                        append("\nDNS (UDP): ").append(
+                            if (result.optString("outbound_dns_udp") == "response") {
+                                "rcode ${result.optInt("rcode")} · ${result.optInt("answers")} · ${result.optInt("dns_ms")} ms"
+                            } else {
+                                getString(R.string.diagnostics_query_failed)
+                            },
+                        )
                         if (result.optBoolean("truncated")) append(" · truncated")
                         append("\nTCP dial: ").append(if (result.optString("tcp") == "dialed") "${result.optInt("tcp_ms")} ms" else getString(R.string.diagnostics_query_failed))
                         append("\nTLS: ").append(if (result.optString("tls") == "verified") "${result.optInt("tls_ms")} ms" else getString(R.string.diagnostics_query_failed))
                         result.optJSONObject("mtu")?.let { mtu ->
-                            append("\nMTU: ").append(when (mtu.optString("state")) {
-                                "verified-inner-packet" -> getString(R.string.diagnostics_mtu_verified, mtu.optInt("largest_verified"), mtu.optInt("configured_mtu"))
-                                "unsupported" -> getString(R.string.diagnostics_mtu_unsupported)
-                                "busy" -> getString(R.string.diagnostics_mtu_busy)
-                                else -> getString(R.string.diagnostics_mtu_unknown)
-                            })
-                            mtu.optJSONArray("samples")?.let { samples -> for (n in 0 until samples.length()) {
-                                val sample = samples.getJSONObject(n)
-                                append("\n  ").append(sample.optInt("size")).append(" B · ").append(if (sample.optBoolean("received")) "${sample.optInt("rtt_ms")} ms" else getString(R.string.diagnostics_mtu_no_reply))
-                            } }
+                            append("\nMTU: ").append(
+                                when (mtu.optString("state")) {
+                                    "verified-inner-packet" -> getString(R.string.diagnostics_mtu_verified, mtu.optInt("largest_verified"), mtu.optInt("configured_mtu"))
+                                    "unsupported" -> getString(R.string.diagnostics_mtu_unsupported)
+                                    "busy" -> getString(R.string.diagnostics_mtu_busy)
+                                    else -> getString(R.string.diagnostics_mtu_unknown)
+                                },
+                            )
+                            mtu.optJSONArray("samples")?.let { samples ->
+                                for (n in 0 until samples.length()) {
+                                    val sample = samples.getJSONObject(n)
+                                    append("\n  ").append(sample.optInt("size")).append(" B · ").append(if (sample.optBoolean("received")) "${sample.optInt("rtt_ms")} ms" else getString(R.string.diagnostics_mtu_no_reply))
+                                }
+                            }
                         }
                     }
                     probesView.text = results.joinToString("\n\n") + "\n\n" + getString(R.string.diagnostics_probe_result_hint)
                 }
-            } catch (cancelled: CancellationException) { throw cancelled }
-            catch (e: Exception) { probesView.text = results.joinToString("\n\n") + "\n" + redactDiagnostic(e.readableMessage) }
-            finally { runProbes.isEnabled = true }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                probesView.text = results.joinToString("\n\n") + "\n" + redactDiagnostic(e.readableMessage)
+            } finally {
+                runProbes.isEnabled = true
+            }
         }
     }
     val comparisonCard = card(R.string.diagnostics_compare_nodes)
@@ -172,7 +205,10 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     }
     comparisonUrlLayout.addView(comparisonUrl)
     comparisonCard.addView(comparisonUrlLayout)
-    val comparisonRun = MaterialButton(context).apply { setText(R.string.diagnostics_compare_run); isEnabled = false }
+    val comparisonRun = MaterialButton(context).apply {
+        setText(R.string.diagnostics_compare_run)
+        isEnabled = false
+    }
     comparisonCard.addView(comparisonRun)
     val comparisonResult = comparisonCard.label()
     val comparisonTargets = mutableListOf<Pair<String, String>>()
@@ -187,17 +223,23 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     }
     fun updateComparisonTargets(state: JSONObject?) {
         if (comparisonJob?.isActive == true) return
-        fun entries(key: String): List<Pair<String,String>> {
+        fun entries(key: String): List<Pair<String, String>> {
             val array = state?.optJSONArray(key) ?: return emptyList()
             return (0 until array.length()).mapNotNull { array.optJSONObject(it) }.map { it.optString("tag") to it.optString("type") }
         }
-        comparisonTargets.clear(); comparisonTargets.addAll(entries("probe_targets"))
-        comparisonDns.clear(); comparisonDns.addAll(entries("dns_servers"))
+        comparisonTargets.clear()
+        comparisonTargets.addAll(entries("probe_targets"))
+        comparisonDns.clear()
+        comparisonDns.addAll(entries("dns_servers"))
         chosenTargets.retainAll(comparisonTargets.map { it.first }.toSet())
         if (!comparisonInitialized && comparisonTargets.isNotEmpty()) {
             val groups = state?.optJSONArray("groups")
-            val active = if (groups == null) null else (0 until groups.length()).mapNotNull { groups.optJSONObject(it) }
-                .firstOrNull { it.optString("strategy") == "fastest" }?.optJSONObject("tcp")?.optString("current")
+            val active = if (groups == null) {
+                null
+            } else {
+                (0 until groups.length()).mapNotNull { groups.optJSONObject(it) }
+                    .firstOrNull { it.optString("strategy") == "fastest" }?.optJSONObject("tcp")?.optString("current")
+            }
             comparisonTargets.firstOrNull { it.first == active }?.let { chosenTargets.add(it.first) }
                 ?: comparisonTargets.firstOrNull { it.first != "direct" }?.let { chosenTargets.add(it.first) }
             comparisonInitialized = true
@@ -217,9 +259,15 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
                 if (enabled && checked.size >= 8) {
                     (dialog as androidx.appcompat.app.AlertDialog).listView.setItemChecked(which, false)
                     android.widget.Toast.makeText(context, R.string.diagnostics_compare_limit, android.widget.Toast.LENGTH_SHORT).show()
-                } else if (enabled) checked.add(tag) else checked.remove(tag)
+                } else if (enabled) {
+                    checked.add(tag)
+                } else {
+                    checked.remove(tag)
+                }
             }.setPositiveButton(android.R.string.ok) { _, _ ->
-                chosenTargets.clear(); chosenTargets.addAll(checked); comparisonButtons()
+                chosenTargets.clear()
+                chosenTargets.addAll(checked)
+                comparisonButtons()
             }.setNegativeButton(android.R.string.cancel, null)
         picker.show()
     }
@@ -227,7 +275,9 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
         val choices = comparisonDns.toList()
         MaterialAlertDialogBuilder(context).setTitle(R.string.diagnostics_compare_choose_dns)
             .setSingleChoiceItems(choices.map { "${it.first} · ${it.second}" }.toTypedArray(), choices.indexOfFirst { it.first == chosenDns }) { dialog, which ->
-                chosenDns = choices[which].first; comparisonButtons(); dialog.dismiss()
+                chosenDns = choices[which].first
+                comparisonButtons()
+                dialog.dismiss()
             }.setNegativeButton(android.R.string.cancel, null).show()
     }
     fun renderConfiguredProbe(result: JSONObject): String = buildString {
@@ -238,12 +288,14 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
             if (it.has("ms")) append(" · ").append(it.optLong("ms")).append(" ms")
             if (it.has("error")) append(" · ").append(probeLabel(it.optString("error")))
         }
-        for (type in listOf("a", "aaaa")) dns?.optJSONObject(type)?.let {
-            append("\n").append(type.uppercase()).append(": ").append(probeLabel(it.optString("state")))
-            if (it.has("rcode")) append(" · rcode ").append(it.optInt("rcode"))
-            if (it.has("addresses")) append(" · ").append(it.optInt("addresses"))
-            append(" · ").append(it.optLong("ms")).append(" ms")
-            if (it.has("error")) append(" · ").append(probeLabel(it.optString("error")))
+        for (type in listOf("a", "aaaa")) {
+            dns?.optJSONObject(type)?.let {
+                append("\n").append(type.uppercase()).append(": ").append(probeLabel(it.optString("state")))
+                if (it.has("rcode")) append(" · rcode ").append(it.optInt("rcode"))
+                if (it.has("addresses")) append(" · ").append(it.optInt("addresses"))
+                append(" · ").append(it.optLong("ms")).append(" ms")
+                if (it.has("error")) append(" · ").append(probeLabel(it.optString("error")))
+            }
         }
         result.optJSONObject("https")?.let {
             append("\nTCP: ").append(probeLabel(it.optString("tcp", "not-tested")))
@@ -268,7 +320,9 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
             return@setOnClickListener
         }
         comparisonUrlLayout.error = null
-        comparisonRun.isEnabled = false; targetsButton.isEnabled = false; dnsButton.isEnabled = false
+        comparisonRun.isEnabled = false
+        targetsButton.isEnabled = false
+        dnsButton.isEnabled = false
         comparisonJob = lifecycleScope.launch {
             val reports = mutableListOf<String>()
             try {
@@ -281,15 +335,25 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
                     reports += "$tag · $dns\n" + renderConfiguredProbe(result)
                 }
                 comparisonResult.text = reports.joinToString("\n\n") + "\n\n" + getString(R.string.diagnostics_compare_result_hint)
-            } catch (cancelled: CancellationException) { throw cancelled }
-            catch (e: Exception) { comparisonResult.text = reports.joinToString("\n\n") + "\n" + redactDiagnostic(e.readableMessage) }
-            finally { comparisonRun.isEnabled = true; targetsButton.isEnabled = true; dnsButton.isEnabled = true }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (e: Exception) {
+                comparisonResult.text = reports.joinToString("\n\n") + "\n" + redactDiagnostic(e.readableMessage)
+            } finally {
+                comparisonRun.isEnabled = true
+                targetsButton.isEnabled = true
+                dnsButton.isEnabled = true
+            }
         }
     }
     val historyCard = card(R.string.diagnostics_connection_history)
     fun filter(title: Int): TextInputEditText {
         val layout = TextInputLayout(context, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply { hint = getString(title) }
-        val edit = TextInputEditText(layout.context).apply { setSingleLine(true); maxLines = 1; filters = arrayOf(android.text.InputFilter.LengthFilter(256)) }
+        val edit = TextInputEditText(layout.context).apply {
+            setSingleLine(true)
+            maxLines = 1
+            filters = arrayOf(android.text.InputFilter.LengthFilter(256))
+        }
         layout.addView(edit, LinearLayout.LayoutParams(-1, -2))
         historyCard.addView(layout, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
         return edit
@@ -299,15 +363,29 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
     val nodeFilter = filter(R.string.diagnostics_filter_node)
     val historySummary = historyCard.label()
     val historyView = historyCard.label()
-    val olderHistory = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply { setText(R.string.diagnostics_history_older); isEnabled = false }
-    val latestHistory = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply { setText(R.string.diagnostics_history_latest); isEnabled = false }
+    val olderHistory = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+        setText(R.string.diagnostics_history_older)
+        isEnabled = false
+    }
+    val latestHistory = MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+        setText(R.string.diagnostics_history_latest)
+        isEnabled = false
+    }
     historyCard.addView(olderHistory)
     historyCard.addView(latestHistory)
     var historyBefore = 0L
     var nextHistoryBefore = 0L
     var historyVersion = 0
-    olderHistory.setOnClickListener { historyBefore = nextHistoryBefore; historyVersion++; olderHistory.isEnabled = false }
-    latestHistory.setOnClickListener { historyBefore = 0; historyVersion++; latestHistory.isEnabled = false }
+    olderHistory.setOnClickListener {
+        historyBefore = nextHistoryBefore
+        historyVersion++
+        olderHistory.isEnabled = false
+    }
+    latestHistory.setOnClickListener {
+        historyBefore = 0
+        historyVersion++
+        latestHistory.isEnabled = false
+    }
     var runtimeState: JSONObject? = null
     fun time(value: String): String = runCatching { DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault()).format(Instant.parse(value)) }.getOrDefault("")
     fun renderHistory() {
@@ -336,7 +414,9 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
                 when (event.optString("kind")) {
                     "route" -> append("\n").append(event.optString("network")).append(" ").append(event.optString("domain")).append(" ").append(event.optString("destination"))
                         .append("\n").append(event.optString("rule")).append(" → ").append(event.optString("outbound"))
+
                     "selected" -> append("\n").append(getString(R.string.diagnostics_selected_node)).append(": ").append(event.optString("outbound"))
+
                     "dns" -> append("\nDNS ").append(event.optString("domain")).append(" → ").append(event.optString("server"))
                         .append(" · type ").append(event.optInt("query_type")).append(" · ")
                         .append(if (event.optBoolean("failed")) getString(R.string.diagnostics_query_failed) else "rcode ${event.optInt("rcode")}")
@@ -346,84 +426,109 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
         }
         historyView.text = redactDiagnostic(report.ifBlank { getString(R.string.diagnostics_no_matching_events) })
     }
-    listOf(appFilter, domainFilter, nodeFilter).forEach { edit -> edit.addTextChangedListener(object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { historyBefore = 0; historyVersion++ }
-        override fun afterTextChanged(s: Editable?) = Unit
-    }) }
+    listOf(appFilter, domainFilter, nodeFilter).forEach { edit ->
+        edit.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                historyBefore = 0
+                historyVersion++
+            }
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+    }
     fun renderRuntime(state: JSONObject?) {
         runtimeState = state
         updateComparisonTargets(state)
         val report = StringBuilder()
         val groups = state?.optJSONArray("groups")
-        if (state == null) report.append(getString(R.string.diagnostics_not_active))
-        else if (groups == null || groups.length() == 0) report.append(getString(R.string.diagnostics_no_groups))
-        else for (index in 0 until groups.length()) {
-            val group = groups.getJSONObject(index)
-            if (report.isNotEmpty()) report.append("\n\n")
-            report.append(group.optString("tag"))
-            for (network in listOf("tcp", "udp")) {
-                val selected = group.optJSONObject(network) ?: continue
-                report.append("\n").append(network.uppercase()).append(": ").append(selected.optString("current").ifBlank { "—" })
-                val reason = when (selected.optString("reason")) {
-                    "initial-selection" -> R.string.diagnostics_initial_selection
-                    "no-successful-probe" -> R.string.diagnostics_no_probe
-                    "control-site-unreachable" -> R.string.diagnostics_control_unreachable
-                    "direct-recovered" -> R.string.diagnostics_direct_recovered
-                    "previous-unavailable" -> R.string.diagnostics_previous_unavailable
-                    "higher-priority-available" -> R.string.diagnostics_priority_available
-                    "lower-latency" -> R.string.diagnostics_lower_latency
-                    else -> R.string.diagnostics_no_candidate
+        if (state == null) {
+            report.append(getString(R.string.diagnostics_not_active))
+        } else if (groups == null || groups.length() == 0) {
+            report.append(getString(R.string.diagnostics_no_groups))
+        } else {
+            for (index in 0 until groups.length()) {
+                val group = groups.getJSONObject(index)
+                if (report.isNotEmpty()) report.append("\n\n")
+                report.append(group.optString("tag"))
+                for (network in listOf("tcp", "udp")) {
+                    val selected = group.optJSONObject(network) ?: continue
+                    report.append("\n").append(network.uppercase()).append(": ").append(selected.optString("current").ifBlank { "—" })
+                    val reason = when (selected.optString("reason")) {
+                        "initial-selection" -> R.string.diagnostics_initial_selection
+                        "no-successful-probe" -> R.string.diagnostics_no_probe
+                        "control-site-unreachable" -> R.string.diagnostics_control_unreachable
+                        "direct-recovered" -> R.string.diagnostics_direct_recovered
+                        "previous-unavailable" -> R.string.diagnostics_previous_unavailable
+                        "higher-priority-available" -> R.string.diagnostics_priority_available
+                        "lower-latency" -> R.string.diagnostics_lower_latency
+                        else -> R.string.diagnostics_no_candidate
+                    }
+                    report.append(" · ").append(getString(reason)).append(" · ").append(time(selected.optString("changed_at")))
                 }
-                report.append(" · ").append(getString(reason)).append(" · ").append(time(selected.optString("changed_at")))
+                group.optJSONObject("fallback")?.let { fallback ->
+                    report.append("\n").append(getString(R.string.diagnostics_fallback_rounds, fallback.optInt("failed_rounds"), fallback.optInt("failure_threshold"), fallback.optInt("healthy_rounds"), fallback.optInt("recovery_threshold")))
+                    report.append("\n").append(getString(R.string.diagnostics_control_quorum, fallback.optInt("successes"), fallback.optInt("required"), fallback.optLong("timeout_ms")))
+                    fallback.optString("checked_at").takeIf(String::isNotBlank)?.let { timestamp ->
+                        val age = runCatching { java.time.Duration.between(Instant.parse(timestamp), Instant.now()).seconds.coerceAtLeast(0) }.getOrDefault(0)
+                        report.append("\n").append(getString(R.string.diagnostics_last_check, time(timestamp), age))
+                    }
+                    if (fallback.optString("round_state") == "cancelled") report.append("\n").append(probeLabel("cancelled"))
+                    fallback.optJSONArray("sites")?.let { sites ->
+                        for (n in 0 until sites.length()) {
+                            val site = sites.getJSONObject(n)
+                            report.append("\n").append(site.optString("host")).append(": ").append(
+                                getString(
+                                    when (site.optString("state")) {
+                                        "reachable" -> R.string.diagnostics_reachable
+                                        "unreachable" -> R.string.diagnostics_unreachable
+                                        "cancelled" -> R.string.diagnostics_probe_cancelled
+                                        else -> R.string.diagnostics_not_checked
+                                    },
+                                ),
+                            )
+                            if (site.has("elapsed_ms")) {
+                                report.append(" · ").append(site.optLong("elapsed_ms")).append(" ms")
+                            } else if (site.has("rtt_ms")) {
+                                report.append(" · ").append(site.optInt("rtt_ms")).append(" ms")
+                            }
+                            if (site.has("reason")) report.append(" · ").append(probeLabel(site.optString("reason")))
+                            if (site.has("http_status")) report.append(" · HTTP ").append(site.optInt("http_status"))
+                        }
+                    }
+                }
+                group.optJSONArray("candidates")?.let { candidates ->
+                    for (n in 0 until candidates.length()) {
+                        val candidate = candidates.getJSONObject(n)
+                        report.append("\n  ").append(candidate.optString("tag")).append(" · ")
+                            .append(if (candidate.optBoolean("reachable")) "${candidate.optInt("rtt_ms")} ms" else getString(R.string.diagnostics_no_probe))
+                        candidate.optJSONObject("health")?.let { health ->
+                            report.append(" · ").append(getString(R.string.diagnostics_health_failures, health.optInt("failures")))
+                            if (health.optString("error").isNotBlank()) report.append(" · ").append(probeLabel(health.optString("error")))
+                            val retry = health.optString("retry_at")
+                            if (runCatching { Instant.parse(retry).isAfter(Instant.now()) }.getOrDefault(false)) {
+                                report.append("\n    ").append(getString(R.string.diagnostics_cooldown_until, time(retry), health.optInt("failures")))
+                            }
+                        }
+                    }
+                }
             }
-            group.optJSONObject("fallback")?.let { fallback ->
-                report.append("\n").append(getString(R.string.diagnostics_fallback_rounds, fallback.optInt("failed_rounds"), fallback.optInt("failure_threshold"), fallback.optInt("healthy_rounds"), fallback.optInt("recovery_threshold")))
-                report.append("\n").append(getString(R.string.diagnostics_control_quorum, fallback.optInt("successes"), fallback.optInt("required"), fallback.optLong("timeout_ms")))
-                fallback.optString("checked_at").takeIf(String::isNotBlank)?.let { timestamp ->
-                    val age = runCatching { java.time.Duration.between(Instant.parse(timestamp), Instant.now()).seconds.coerceAtLeast(0) }.getOrDefault(0)
-                    report.append("\n").append(getString(R.string.diagnostics_last_check, time(timestamp), age))
-                }
-                if (fallback.optString("round_state") == "cancelled") report.append("\n").append(probeLabel("cancelled"))
-                fallback.optJSONArray("sites")?.let { sites -> for (n in 0 until sites.length()) {
-                    val site = sites.getJSONObject(n)
-                    report.append("\n").append(site.optString("host")).append(": ").append(getString(when (site.optString("state")) {
-                        "reachable" -> R.string.diagnostics_reachable
-                        "unreachable" -> R.string.diagnostics_unreachable
-                        "cancelled" -> R.string.diagnostics_probe_cancelled
-                        else -> R.string.diagnostics_not_checked
-                    }))
-                    if (site.has("elapsed_ms")) report.append(" · ").append(site.optLong("elapsed_ms")).append(" ms")
-                    else if (site.has("rtt_ms")) report.append(" · ").append(site.optInt("rtt_ms")).append(" ms")
-                    if (site.has("reason")) report.append(" · ").append(probeLabel(site.optString("reason")))
-                    if (site.has("http_status")) report.append(" · HTTP ").append(site.optInt("http_status"))
-                } }
-            }
-            group.optJSONArray("candidates")?.let { candidates -> for (n in 0 until candidates.length()) {
-                val candidate = candidates.getJSONObject(n)
-                report.append("\n  ").append(candidate.optString("tag")).append(" · ")
-                    .append(if (candidate.optBoolean("reachable")) "${candidate.optInt("rtt_ms")} ms" else getString(R.string.diagnostics_no_probe))
-                candidate.optJSONObject("health")?.let { health ->
-                    report.append(" · ").append(getString(R.string.diagnostics_health_failures, health.optInt("failures")))
-                    if (health.optString("error").isNotBlank()) report.append(" · ").append(probeLabel(health.optString("error")))
-                    val retry = health.optString("retry_at")
-                    if (runCatching { Instant.parse(retry).isAfter(Instant.now()) }.getOrDefault(false))
-                        report.append("\n    ").append(getString(R.string.diagnostics_cooldown_until, time(retry), health.optInt("failures")))
-                }
-            } }
         }
-        state?.optJSONArray("wireguard")?.let { wireguard -> for (index in 0 until wireguard.length()) {
-            val wg = wireguard.getJSONObject(index)
-            report.append("\n\nWG/AWG · ").append(wg.optString("tag")).append(" · MTU ").append(wg.optInt("mtu"))
-            wg.optJSONArray("peers")?.let { peers -> for (n in 0 until peers.length()) {
-                val peer = peers.getJSONObject(n)
-                val handshake = peer.optLong("last_handshake_time_sec")
-                report.append("\n#").append(peer.optInt("index")).append(" · ").append(getString(R.string.diagnostics_handshake)).append(": ")
-                    .append(if (handshake > 0) DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault()).format(Instant.ofEpochSecond(handshake)) else getString(R.string.diagnostics_handshake_never))
-                report.append("\nRX ").append(peer.optLong("rx_bytes")).append(" B · TX ").append(peer.optLong("tx_bytes")).append(" B")
-            } }
-            report.append("\n").append(getString(R.string.diagnostics_wg_counters_hint))
-        } }
+        state?.optJSONArray("wireguard")?.let { wireguard ->
+            for (index in 0 until wireguard.length()) {
+                val wg = wireguard.getJSONObject(index)
+                report.append("\n\nWG/AWG · ").append(wg.optString("tag")).append(" · MTU ").append(wg.optInt("mtu"))
+                wg.optJSONArray("peers")?.let { peers ->
+                    for (n in 0 until peers.length()) {
+                        val peer = peers.getJSONObject(n)
+                        val handshake = peer.optLong("last_handshake_time_sec")
+                        report.append("\n#").append(peer.optInt("index")).append(" · ").append(getString(R.string.diagnostics_handshake)).append(": ")
+                            .append(if (handshake > 0) DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault()).format(Instant.ofEpochSecond(handshake)) else getString(R.string.diagnostics_handshake_never))
+                        report.append("\nRX ").append(peer.optLong("rx_bytes")).append(" B · TX ").append(peer.optLong("tx_bytes")).append(" B")
+                    }
+                }
+                report.append("\n").append(getString(R.string.diagnostics_wg_counters_hint))
+            }
+        }
         groupsView.text = (if (state?.optBoolean("probes_paused") == true) getString(R.string.diagnostics_probes_paused) + "\n\n" else "") + redactDiagnostic(report.toString())
         renderHistory()
     }
@@ -450,12 +555,15 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
                 val json = JSONObject(config)
                 val report = StringBuilder(validation)
                 val inbounds = json.optJSONArray("inbounds")
-                if (inbounds != null) for (index in 0 until inbounds.length()) {
-                    val inbound = inbounds.optJSONObject(index) ?: continue
-                    if (inbound.optString("type") in setOf("socks", "http", "mixed") &&
-                        inbound.optString("listen") in setOf("0.0.0.0", "::", "") &&
-                        (inbound.optJSONArray("users")?.length() ?: 0) == 0) {
-                        report.append("\n\n").append(getString(R.string.diagnostics_listener_without_auth)).append(" ").append(inbound.optString("tag"))
+                if (inbounds != null) {
+                    for (index in 0 until inbounds.length()) {
+                        val inbound = inbounds.optJSONObject(index) ?: continue
+                        if (inbound.optString("type") in setOf("socks", "http", "mixed") &&
+                            inbound.optString("listen") in setOf("0.0.0.0", "::", "") &&
+                            (inbound.optJSONArray("users")?.length() ?: 0) == 0
+                        ) {
+                            report.append("\n\n").append(getString(R.string.diagnostics_listener_without_auth)).append(" ").append(inbound.optString("tag"))
+                        }
                     }
                 }
 
@@ -476,7 +584,12 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
             validationView.text = summary
             configButton.isEnabled = true
             configButton.setOnClickListener {
-                val text = TextView(context).apply { setPadding(dp(16), dp(8), dp(16), dp(8)); setTextIsSelectable(true); typeface = Typeface.MONOSPACE; this.text = preview }
+                val text = TextView(context).apply {
+                    setPadding(dp(16), dp(8), dp(16), dp(8))
+                    setTextIsSelectable(true)
+                    typeface = Typeface.MONOSPACE
+                    this.text = preview
+                }
                 MaterialAlertDialogBuilder(context).setTitle(R.string.menu_configuration)
                     .setView(ScrollView(context).apply { addView(text) }).setPositiveButton(android.R.string.ok, null).show()
             }
@@ -486,38 +599,49 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
                     val query = JSONObject().put("app", appFilter.text.toString()).put("domain", domainFilter.text.toString())
                         .put("outbound", nodeFilter.text.toString()).put("before", historyBefore).put("limit", 100).toString()
                     val state = withContext(Dispatchers.IO) {
-                        if (profile.id == DataStore.currentProfile && DataStore.serviceState.connected)
+                        if (profile.id == DataStore.currentProfile && DataStore.serviceState.connected) {
                             runCatching { connection.service?.getRuntimeDiagnostics(query)?.let(::JSONObject) }.getOrNull()
-                        else null
+                        } else {
+                            null
+                        }
                     }
                     if (version == historyVersion) renderRuntime(state)
                     delay(2000)
                 }
             }
-        } catch (cancelled: CancellationException) { throw cancelled }
-        catch (e: Exception) { validationView.text = redactDiagnostic(e.readableMessage) }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (e: Exception) {
+            validationView.text = redactDiagnostic(e.readableMessage)
+        }
     }
-    dialog.setOnDismissListener { job.cancel(); probeJob?.cancel(); comparisonJob?.cancel() }
+    dialog.setOnDismissListener {
+        job.cancel()
+        probeJob?.cancel()
+        comparisonJob?.cancel()
+    }
 }
 
-private fun MainActivity.probeLabel(code: String): String = getString(when (code) {
-    "reachable" -> R.string.diagnostics_probe_reachable
-    "unreachable" -> R.string.diagnostics_probe_unreachable
-    "timeout" -> R.string.diagnostics_probe_timeout
-    "cancelled" -> R.string.diagnostics_probe_cancelled
-    "certificate" -> R.string.diagnostics_probe_certificate
-    "connection" -> R.string.diagnostics_probe_connection
-    "tls" -> R.string.diagnostics_probe_tls
-    "http-status" -> R.string.diagnostics_probe_http_status
-    "answered" -> R.string.diagnostics_probe_answered
-    "resolved" -> R.string.diagnostics_probe_resolved
-    "numeric-address" -> R.string.diagnostics_probe_numeric_address
-    "unsupported" -> R.string.diagnostics_probe_unsupported
-    "dns-response" -> R.string.diagnostics_probe_dns_response
-    "invalid-response" -> R.string.diagnostics_probe_invalid_response
-    "connected" -> R.string.diagnostics_probe_connected
-    "verified" -> R.string.diagnostics_probe_verified
-    "started" -> R.string.diagnostics_probe_started
-    "failed" -> R.string.diagnostics_probe_failed
-    else -> R.string.diagnostics_probe_not_tested
-})
+private fun MainActivity.probeLabel(code: String): String = getString(
+    when (code) {
+        "reachable" -> R.string.diagnostics_probe_reachable
+        "unreachable" -> R.string.diagnostics_probe_unreachable
+        "timeout" -> R.string.diagnostics_probe_timeout
+        "cancelled" -> R.string.diagnostics_probe_cancelled
+        "certificate" -> R.string.diagnostics_probe_certificate
+        "connection" -> R.string.diagnostics_probe_connection
+        "tls" -> R.string.diagnostics_probe_tls
+        "http-status" -> R.string.diagnostics_probe_http_status
+        "answered" -> R.string.diagnostics_probe_answered
+        "resolved" -> R.string.diagnostics_probe_resolved
+        "numeric-address" -> R.string.diagnostics_probe_numeric_address
+        "unsupported" -> R.string.diagnostics_probe_unsupported
+        "dns-response" -> R.string.diagnostics_probe_dns_response
+        "invalid-response" -> R.string.diagnostics_probe_invalid_response
+        "connected" -> R.string.diagnostics_probe_connected
+        "verified" -> R.string.diagnostics_probe_verified
+        "started" -> R.string.diagnostics_probe_started
+        "failed" -> R.string.diagnostics_probe_failed
+        else -> R.string.diagnostics_probe_not_tested
+    },
+)

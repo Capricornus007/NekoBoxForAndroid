@@ -7,11 +7,11 @@ import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
-import io.nekohasekai.sagernet.ktx.use
-import io.nekohasekai.sagernet.ktx.app
-import io.nekohasekai.sagernet.ktx.redactDiagnostic
-import io.nekohasekai.sagernet.ktx.readBytesLimited
 import io.nekohasekai.sagernet.ktx.MAX_SUBSCRIPTION_BYTES
+import io.nekohasekai.sagernet.ktx.app
+import io.nekohasekai.sagernet.ktx.readBytesLimited
+import io.nekohasekai.sagernet.ktx.redactDiagnostic
+import io.nekohasekai.sagernet.ktx.use
 import io.nekohasekai.sagernet.utils.CrashHandler
 import java.io.File
 import java.io.FileInputStream

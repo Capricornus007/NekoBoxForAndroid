@@ -8,11 +8,11 @@ import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.TunImplementation
 import io.nekohasekai.sagernet.bg.VpnService
-import io.nekohasekai.sagernet.database.RuleEntity
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
-import io.nekohasekai.sagernet.database.ProxyGroup
 import io.nekohasekai.sagernet.database.ProxyEntity.Companion.TYPE_CONFIG
+import io.nekohasekai.sagernet.database.ProxyGroup
+import io.nekohasekai.sagernet.database.RuleEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.ConfigBuildResult.IndexEntity
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
@@ -52,8 +52,8 @@ import io.nekohasekai.sagernet.fmt.v2ray.StandardV2RayBean
 import io.nekohasekai.sagernet.fmt.v2ray.buildSingBoxOutboundStandardV2RayBean
 import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.fmt.wireguard.buildSingBoxEndpointWireGuardBean
-import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.fmt.wireguard.normalizeWireGuardLocalAddresses
+import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.isIpAddress
 import io.nekohasekai.sagernet.ktx.mkPort
 import io.nekohasekai.sagernet.ktx.readableMessage
@@ -549,8 +549,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
     val needLocalProxyInbounds = !isVPN || DataStore.allowAccess
     val networkPolicy = if (forTest || forExport) null else io.nekohasekai.sagernet.database.NetworkProfiles.select().policy
     val remoteDns = (networkPolicy?.remoteDns?.takeIf { it.isNotBlank() } ?: importedWireGuard?.dnsServers?.takeIf { it.isNotBlank() } ?: DataStore.remoteDns).split('\n', ',')
-
-    // fork 註：上面 isai 的鏈優先序 = 網絡策略 DNS > 匯入 WG 的 dnsServers > 全域設定。
+        // fork 註：上面 isai 的鏈優先序 = 網絡策略 DNS > 匯入 WG 的 dnsServers > 全域設定。
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
     val directDNS = (networkPolicy?.directDns?.takeIf { it.isNotBlank() } ?: DataStore.directDns).split("\n")
         .mapNotNull { dns -> dns.trim().takeIf { it.isNotBlank() && !it.startsWith("#") } }
@@ -1071,16 +1070,19 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     val serverHost = outboundMap["server"] as? String
                     if (resolver.isNotEmpty() && !proxyEntity.needExternal() &&
                         !serverHost.isNullOrBlank() && !serverHost.isIpAddress() &&
-                        outboundMap["domain_resolver"] == null && outboundMap["type"] !in GROUP_OUTBOUND_TYPES) {
+                        outboundMap["domain_resolver"] == null && outboundMap["type"] !in GROUP_OUTBOUND_TYPES
+                    ) {
                         val resolverTag = "dns-sub-" + proxyEntity.groupId
                         subscriptionResolvers[resolverTag] = resolver
                         _hack_config_map["domain_resolver"] = mapOf(
                             "server" to resolverTag,
                             "strategy" to (outboundMap["domain_strategy"] ?: defaultServerDomainStrategy),
                         )
-                    } else applyDomainStrategyIfSupported(
-                        if (forTest) "" else defaultServerDomainStrategy
-                    )
+                    } else {
+                        applyDomainStrategyIfSupported(
+                            if (forTest) "" else defaultServerDomainStrategy,
+                        )
+                    }
                     // OwnBox c12d3e08e：TCP socket 加 IP_BIND_ADDRESS_NO_PORT，同一來源位址
                     // 不再先佔用一個連接埠，大量併發時不會把自己綁死（核心只在 Linux/Android
                     // 有效，不支援時靜默忽略）。
@@ -1314,8 +1316,11 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         }
 
         // isai：匯入的 WireGuard conf（useConfigRoutes）直接以 bypass 為 final，讓 allowed_ips 接管路由。
-        val mainProxyTag = if (importedWireGuard != null) TAG_BYPASS
-            else (if (buildSelector || useAutoSelect) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
+        val mainProxyTag = if (importedWireGuard != null) {
+            TAG_BYPASS
+        } else {
+            (if (buildSelector || useAutoSelect) TAG_PROXY else tagMap[proxy.id]) ?: TAG_PROXY
+        }
 
         // isai：per-app TUN 守衛規則（UID 白名單時代理 Apps 的 DNS/流量導流防護）。
         fun buildPerAppTunGuardRules(): List<Rule> {
@@ -1325,10 +1330,15 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 .filter { it.isNotEmpty() }
                 .mapNotNull { PackageCache[it]?.takeIf { uid -> uid >= 1000 } }.toSet()
             val resolverUids = (VpnService.ANDROID_DNS_PACKAGES.mapNotNull { PackageCache[it] } + listOf(1000, 1051)).distinct()
-            return listOf(perAppTunGuard(
-                selectedUids, PackageCache.packageMap.values.toSet(), android.os.Process.myUid(),
-                DataStore.bypass, resolverUids
-            ))
+            return listOf(
+                perAppTunGuard(
+                    selectedUids,
+                    PackageCache.packageMap.values.toSet(),
+                    android.os.Process.myUid(),
+                    DataStore.bypass,
+                    resolverUids,
+                ),
+            )
         }
 
         // Tailnet destinations (peer addresses, advertised subnets, MagicDNS names) go to the
@@ -1626,22 +1636,40 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         }
 
         if (needsGlobalFallback) {
-            outbounds.add(Outbound().apply {
-                _hack_config_map.putAll(directFallbackConfig(
-                    mainProxyTag, DataStore.directFallbackUrl, DataStore.directFallbackInterval,
-                    DataStore.directFallbackRequired, DataStore.directFallbackFailures, DataStore.directFallbackRecoveries
-                ))
-            })
+            outbounds.add(
+                Outbound().apply {
+                    _hack_config_map.putAll(
+                        directFallbackConfig(
+                            mainProxyTag,
+                            DataStore.directFallbackUrl,
+                            DataStore.directFallbackInterval,
+                            DataStore.directFallbackRequired,
+                            DataStore.directFallbackFailures,
+                            DataStore.directFallbackRecoveries,
+                        ),
+                    )
+                },
+            )
         }
 
         for (rule in extraRules.filter { it.id in ruleFallbacks }) {
             val backupTag = if (rule.fallbackProfile == proxy.id) mainProxyTag else tagMap[rule.fallbackProfile]
             require(!backupTag.isNullOrBlank()) { "Fallback profile is missing for route ${rule.displayName()}" }
-            outbounds.add(Outbound().apply {
-                _hack_config_map.putAll(directFallbackConfig(backupTag, DataStore.directFallbackUrl,
-                    DataStore.directFallbackInterval, DataStore.directFallbackRequired, DataStore.directFallbackFailures,
-                    DataStore.directFallbackRecoveries, ruleFallbacks.getValue(rule.id)))
-            })
+            outbounds.add(
+                Outbound().apply {
+                    _hack_config_map.putAll(
+                        directFallbackConfig(
+                            backupTag,
+                            DataStore.directFallbackUrl,
+                            DataStore.directFallbackInterval,
+                            DataStore.directFallbackRequired,
+                            DataStore.directFallbackFailures,
+                            DataStore.directFallbackRecoveries,
+                            ruleFallbacks.getValue(rule.id),
+                        ),
+                    )
+                },
+            )
         }
 
         if (DataStore.enableTLSFragment) {
@@ -1720,11 +1748,18 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             // Keep dns-direct independent: proxy endpoints and the control probe
             // must not resolve through the group that depends on their results.
             val address = directFallbackDnsAddress(directDNS.firstOrNull(), remoteDns.firstOrNull())
-            dns.servers.add(DNSServerOptions().apply {
-                _hack_config_map.putAll(dnsServerConfig(
-                    address, dnsTag, "dns-local", fallbackTag
-                ))
-            })
+            dns.servers.add(
+                DNSServerOptions().apply {
+                    _hack_config_map.putAll(
+                        dnsServerConfig(
+                            address,
+                            dnsTag,
+                            "dns-local",
+                            fallbackTag,
+                        ),
+                    )
+                },
+            )
         }
 
         remoteDns.firstOrNull().let {
@@ -1788,17 +1823,23 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             dns.rules = tailscaleDnsRules
         } else {
             if (fallbackDnsTags.isNotEmpty()) {
-                route.rules.add(0, Rule_DefaultOptions().apply {
-                    outbound = TAG_BYPASS
-                    ip_is_private = true
-                })
+                route.rules.add(
+                    0,
+                    Rule_DefaultOptions().apply {
+                        outbound = TAG_BYPASS
+                        ip_is_private = true
+                    },
+                )
             }
             // DNS interception must precede LAN: the virtual DNS IP is private.
             if (importedWireGuard != null) {
-                route.rules.add(0, Rule_DefaultOptions().apply {
-                    ip_cidr = normalizeWireGuardLocalAddresses(importedWireGuard.allowedIPs)
-                    outbound = mainProxyTag
-                })
+                route.rules.add(
+                    0,
+                    Rule_DefaultOptions().apply {
+                        ip_cidr = normalizeWireGuardLocalAddresses(importedWireGuard.allowedIPs)
+                        outbound = mainProxyTag
+                    },
+                )
             }
             route.rules.add(
                 0,
@@ -1973,15 +2014,16 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             // 依賴 dns.final 欄位本身、不另加 rule——測速（forTest）配置的 rules 必須只有
             // preferred_by 條目（TailscaleConfigTest 契約），此處照 fork 契約在 test 場景不加。
             if (!forTest) {
-                add(DNSRule_DefaultOptions().apply {
-                    server = dns.final_
-                    _hack_config_map["strategy"] = dnsStrategies[server] ?: ""
-                })
+                add(
+                    DNSRule_DefaultOptions().apply {
+                        server = dns.final_
+                        _hack_config_map["strategy"] = dnsStrategies[server] ?: ""
+                    },
+                )
             }
         }
         if (!forTest && isVPN) route.rules.add(0, virtualDnsTlsRejectRule())
         route.rules.addAll(0, buildPerAppTunGuardRules())
-
 
         // Moving WireGuard from outbounds to endpoints removes the old implicit first-outbound
         // fallback. Keep the selected main tag explicit so endpoint-only profiles do not fall

@@ -1,10 +1,7 @@
 package io.nekohasekai.sagernet.ui
 
-import io.nekohasekai.sagernet.ktx.MAX_SUBSCRIPTION_BYTES
-import io.nekohasekai.sagernet.ktx.readBytesLimited
-
-import android.content.DialogInterface
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -58,11 +55,13 @@ import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
+import io.nekohasekai.sagernet.ktx.MAX_SUBSCRIPTION_BYTES
 import io.nekohasekai.sagernet.ktx.SubscriptionFoundException
 import io.nekohasekai.sagernet.ktx.USER_AGENT
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.readBytesBounded
+import io.nekohasekai.sagernet.ktx.readBytesLimited
 import io.nekohasekai.sagernet.ktx.readTextBounded
 import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher

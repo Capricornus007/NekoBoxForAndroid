@@ -10,9 +10,13 @@ internal object RouteOverlap {
         for ((index, later) in enabled.withIndex()) {
             for (earlier in enabled.take(index)) {
                 if (covers(earlier, later)) {
-                    result += Finding(earlier, later, sameMatch(earlier, later) &&
-                        earlier.outbound == later.outbound && earlier.fallbackMode == later.fallbackMode &&
-                        earlier.fallbackProfile == later.fallbackProfile)
+                    result += Finding(
+                        earlier,
+                        later,
+                        sameMatch(earlier, later) &&
+                            earlier.outbound == later.outbound && earlier.fallbackMode == later.fallbackMode &&
+                            earlier.fallbackProfile == later.fallbackProfile,
+                    )
                     break // The first matching rule is the useful explanation.
                 }
             }
@@ -22,14 +26,21 @@ internal object RouteOverlap {
     }
 
     private fun tokens(value: String) = value.split(',', '\n').map(String::trim).filter(String::isNotEmpty).toSet()
-    private fun fields(rule: RuleEntity) = listOf(rule.ip, rule.port, rule.sourcePort, rule.network,
-        rule.source, rule.protocol, rule.ruleset).map(::tokens) + listOf(rule.packages)
+    private fun fields(rule: RuleEntity) = listOf(
+        rule.ip,
+        rule.port,
+        rule.sourcePort,
+        rule.network,
+        rule.source,
+        rule.protocol,
+        rule.ruleset,
+    ).map(::tokens) + listOf(rule.packages)
     private fun sameMatch(a: RuleEntity, b: RuleEntity) = fields(a) == fields(b) &&
         domains(a.domains) == domains(b.domains)
 
     private fun domains(value: String) = tokens(value).map { token ->
         val lower = token.lowercase(java.util.Locale.ROOT)
-        if (listOf("domain:","full:","regexp:","keyword:","geosite:").any(token::startsWith)) lower else "domain:$lower"
+        if (listOf("domain:", "full:", "regexp:", "keyword:", "geosite:").any(token::startsWith)) lower else "domain:$lower"
     }.toSet()
 
     private fun covers(a: RuleEntity, b: RuleEntity): Boolean {
@@ -43,8 +54,13 @@ internal object RouteOverlap {
         if (ad == bd && af == bf) return true
         // Mixed address/geodata conditions have special OR semantics; only exact duplicates above.
         if (a.ip.isNotBlank() || b.ip.isNotBlank() || a.ruleset.isNotBlank() || b.ruleset.isNotBlank()) return false
-        if (af.zip(bf).any { (upper, lower) -> upper.isNotEmpty() &&
-                (lower.isEmpty() || !upper.containsAll(lower)) }) return false
+        if (af.zip(bf).any { (upper, lower) ->
+                upper.isNotEmpty() &&
+                    (lower.isEmpty() || !upper.containsAll(lower))
+            }
+        ) {
+            return false
+        }
         if (ad.isEmpty()) return true
         if (bd.isEmpty()) return false
         return bd.all { lower -> ad.any { upper -> domainCovers(upper, lower) } }

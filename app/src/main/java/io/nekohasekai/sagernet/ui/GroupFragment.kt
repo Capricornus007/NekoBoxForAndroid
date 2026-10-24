@@ -1,6 +1,5 @@
 package io.nekohasekai.sagernet.ui
 
-import androidx.room.withTransaction
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -14,6 +13,7 @@ import androidx.core.view.*
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.withTransaction
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.R
@@ -483,11 +483,12 @@ class GroupFragment :
                 if (proxyGroup.ungrouped || proxyGroup.id in GroupUpdater.updating) {
                     popup.menu.removeItem(R.id.action_delete_group)
 
-                // isai：訂閱回滾（SubscriptionHistory）可用性。
-                popup.menu.findItem(R.id.action_undo_subscription).apply {
-                    isVisible = proxyGroup.type == GroupType.SUBSCRIPTION
-                    isEnabled = SubscriptionHistory.available(proxyGroup.id) && proxyGroup.id !in GroupUpdater.updating
-                }                }
+                    // isai：訂閱回滾（SubscriptionHistory）可用性。
+                    popup.menu.findItem(R.id.action_undo_subscription).apply {
+                        isVisible = proxyGroup.type == GroupType.SUBSCRIPTION
+                        isEnabled = SubscriptionHistory.available(proxyGroup.id) && proxyGroup.id !in GroupUpdater.updating
+                    }
+                }
                 popup.setOnMenuItemClickListener(this)
                 popup.show()
             }

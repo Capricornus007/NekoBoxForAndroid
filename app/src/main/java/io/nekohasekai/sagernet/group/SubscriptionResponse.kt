@@ -13,7 +13,8 @@ internal fun subscriptionResponseProblem(text: String): SubscriptionResponseProb
     if (start.startsWith("{")) {
         val json = runCatching { com.google.gson.JsonParser.parseString(start).asJsonObject }.getOrNull()
         if (json != null && (json.has("error") || json.has("message")) &&
-            !json.has("outbounds") && !json.has("proxies") && !json.has("configs") && !json.has("server")) {
+            !json.has("outbounds") && !json.has("proxies") && !json.has("configs") && !json.has("server")
+        ) {
             return SubscriptionResponseProblem.JSON_ERROR
         }
     }
