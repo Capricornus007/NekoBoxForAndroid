@@ -1081,4 +1081,41 @@
     <string name="openvpn_tls_version_min">En düşük TLS sürümü</string>
     <string name="openvpn_topology">Topoloji</string>
     <string name="openvpn_transport">Protokol</string>
+    <string name="action_amneziawg">AmneziaWG</string>
+    <string name="bottomsheet_drag_handle_clicked">Sürükleme tutamağı tıklandı</string>
+    <string name="card_style">Kart</string>
+    <string name="card_style_classic">Klasik</string>
+    <string name="card_style_stroke">Kenar çizgisi</string>
+    <string name="close">Kapat</string>
+    <string name="copy_current_link">Bağlantıyı Kopyala</string>
+    <string name="custom_ua_hint">Özel User-Agent</string>
+    <string name="default_subscription_user_agent">Varsayılan abonelik User-Agent</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="hide_unavailable_profiles">Kullanılamayan profilleri gizle</string>
+    <string name="local_proxy_settings">Yerel Proxy Ayarları</string>
+    <string name="pinned_certchain_sha256">Sabitlenmiş Sertifika SHA256</string>
+    <string name="please_update" formatted="false">Uygulamanız çok eski (%s). %s tarihinde çalışmayı durduracak. Lütfen güncelleyin!</string>
+    <string name="please_update_force" formatted="false">Uygulamanız çok eski (%s). %s tarihinde çalışmayı durdurdu. Lütfen güncelleyin!</string>
+    <string name="port_out_of_range">Port 1–65535 aralığında olmalı</string>
+    <string name="proton_session_expired">Proton oturumunuz reddedildi. Lütfen yeniden giriş yapın.</string>
+    <string name="proxy_password">Proxy Parolası</string>
+    <string name="proxy_username">Proxy Kullanıcı Adı</string>
+    <string name="qrcode_format_sn">SN Link</string>
+    <string name="qrcode_format_standard">Standart</string>
+    <string name="qrcode_sn_hint">Sing-box ve Neko için özel serileştirilmiş bağlantı (sn://)</string>
+    <string name="qrcode_standard_hint">Standart URI biçimi (genel istemcilerle uyumlu)</string>
+    <string name="reality_public_key">Reality ortak anahtarı</string>
+    <string name="reality_short_id">Reality kısa kimliği</string>
+    <string name="reset_to_default">Varsayılana sıfırla</string>
+    <string name="select_ua_preset">Hazır User-Agent seç</string>
+    <string name="shadowquic_sunny_quic">Sunny QUIC</string>
+    <string name="shadowquic_udp_over_stream">Akış üzerinden UDP</string>
+    <string name="shadowquic_zero_rtt">0-RTT el sıkışması</string>
+    <string name="socks_port">SOCKS5 Proxy Portu</string>
+    <string name="trusttunnel_quic">QUIC (HTTP/3)</string>
+    <string name="ua_updated_toast">User-Agent güncellendi</string>
+    <string name="udp_over_tcp">TCP üzerinden UDP</string>
+    <string name="update_existing_subscriptions_ua">Mevcut aboneliklerin User-Agent bilgisini güncelle</string>
+    <string name="waterfall_settings">Şelale Ayarları</string>
 </resources>

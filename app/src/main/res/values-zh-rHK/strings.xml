@@ -1110,4 +1110,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="openvpn_tls_version_min">最小 TLS 版本</string>
     <string name="openvpn_topology">拓撲</string>
     <string name="openvpn_transport">協定</string>
+    <string name="please_update" formatted="false">您的 APP (%s) 太舊了喵，%s 再不更新就沒的用了喵～</string>
+    <string name="please_update_force" formatted="false">您的 APP (%s) 版本過舊，已於 %s 停止工作，請立即升級。</string>
 </resources>
