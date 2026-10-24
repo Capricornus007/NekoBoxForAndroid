@@ -1222,6 +1222,8 @@
     <string name="authenticated_http_proxy_unavailable">Android VPN HTTP proxy does not support the required username and password.</string>
     <string name="clash_api_token">Clash API token</string>
     <string name="clash_api_token_summary">Show or copy the dashboard access token</string>
+    <string name="enable_clash_api">Enable Clash API</string>
+    <string name="enable_clash_api_summary">Provide clash api and yacd dashboard at 127.0.0.1:9090</string>
     <string name="confirm_stop_service">Stop the running proxy?</string>
     <string name="confirm_clear_cache">Stop the proxy, clear the core cache and restart the app?</string>
     <string name="downloads_proxy_only">Updates only through proxy</string>

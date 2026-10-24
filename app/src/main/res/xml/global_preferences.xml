@@ -391,6 +391,11 @@
             app:key="restartProfileOnNetworkChange"
             app:title="@string/restart_profile_on_network_change"
             app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/baseline_construction_24"
+            app:key="enableClashAPI"
+            app:summary="@string/enable_clash_api_summary"
+            app:title="@string/enable_clash_api" />
         <Preference app:key="clashApiSecret" app:dependency="enableClashAPI"
             app:title="@string/clash_api_token" app:summary="@string/clash_api_token_summary" />
         <SwitchPreferenceCompat
