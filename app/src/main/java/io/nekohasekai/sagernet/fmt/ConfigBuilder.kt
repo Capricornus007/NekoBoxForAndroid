@@ -612,6 +612,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         dns = DNSOptions().apply {
             servers = mutableListOf()
             rules = mutableListOf()
+            // 遷移備註（sing-box 1.16 將移除，1.15 僅警告、仍生效，故保留）：
+            //   官方 migration「Migrate independent DNS cache」＝直接刪掉此欄位，
+            //   新 DNS 架構下快取隔離已是預設行為。等本倉 core 升到 ≥1.16 時，
+            //   連同 SingBoxOptions.DNSOptions.independent_cache 一起移除即可，功能不丟失。
             independent_cache = true
             disable_expire = true
         }
@@ -638,6 +642,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         type = "tun"
                         tag = "tun-in"
                         interface_name = "tun0"
+                        // 遷移備註（sing-box 1.15 標記棄用、1.17 才移除，現仍生效故保留）：
+                        //   官方 migration「Migrate TUN stack」＝刪掉 stack 欄位，改用 sing-tun
+                        //   自帶的統一 TCP/IP 堆疊。等 core 升到 ≥1.17 時移除本 when 區塊與
+                        //   DataStore.tunImplementation 選項；届时若新堆疊實測有差異再定。
                         stack = when (DataStore.tunImplementation) {
                             TunImplementation.GVISOR -> "gvisor"
                             TunImplementation.SYSTEM -> "system"
@@ -1889,7 +1897,13 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                         disable_cache = true
                         // 停用 IPv6 時不發假 v6 位址、也不代答 AAAA：讓應用自己走 IPv4，
                         // 比給它一個必然被拒的 fake v6 更接近「沒有 IPv6」的實感。
-                        query_type = if (ipv6Mode == IPv6Mode.DISABLE) listOf("A") else listOf("A", "AAAA")
+                        // 家族限制走 query_type（sing-box 1.14+ 新格式欄位），不再用規則層
+                        // legacy `strategy`——後者與本條 query_type 同配置會被 1.15 啟動拒收。
+                        query_type = when (ipv6Mode) {
+                            IPv6Mode.DISABLE -> listOf("A")
+                            IPv6Mode.ONLY -> listOf("AAAA")
+                            else -> listOf("A", "AAAA")
+                        }
                     },
                 )
             }
@@ -1909,6 +1923,10 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             dns.rules.add(
                 0,
                 DNSRule_DefaultOptions().apply {
+                    // 遷移備註（OptionOutboundDNSRuleItem，1.12 標記、1.15 仍解析未致命）：
+                    //   官方新格式是把「出口自己的域名解析」改用 route.default_domain_resolver
+                    //   或 dial 欄位的 domain_resolver，而非在 DNS 規則上掛 outbound。屬結構性
+                    //   改動，等 core 真拒絕時再連同 dns-direct 的 address_resolver 一起重整。
                     outbound = mutableListOf("any")
                     server = "dns-direct"
                 },
@@ -1994,34 +2012,17 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                 )
             }
         }
-        val dnsStrategies = mapOf(
-            "dns-direct" to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")),
-            DNS_DIRECT_FALLBACK to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")),
-            "dns-remote" to autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-remote")),
-            "dns-fake" to genDomainStrategy(true),
-        ) + fallbackDnsTags.values.associateWith { autoDnsDomainStrategy(SingBoxOptionsUtil.domainStrategy("dns-direct")) }
-        dns.rules = dns.rules.toMutableList().apply {
-            filterIsInstance<DNSRule_DefaultOptions>().forEach { rule ->
-                // fork 契約：DNS 層封鎖把規則指到 dns-block（rcode://success）伺服器，規則
-                // 本身保留 server 欄位（TailscaleConfigTest／ProtocolRegistryDispatchTest
-                // 都以此斷言）。isai 的 useBlockedDNSResponse 改寫為 action: predefined，
-                // 僅保留供直接單元測試（DnsServerConfigTest），生成路徑不套用。
-                dnsStrategies[rule.server]?.let { strategy ->
-                    rule._hack_config_map["strategy"] = strategy
-                }
-            }
-            // isai 會把 dns.final_ 明示成一條 fallback rule（帶 strategy）。fork 的行為是
-            // 依賴 dns.final 欄位本身、不另加 rule——測速（forTest）配置的 rules 必須只有
-            // preferred_by 條目（TailscaleConfigTest 契約），此處照 fork 契約在 test 場景不加。
-            if (!forTest) {
-                add(
-                    DNSRule_DefaultOptions().apply {
-                        server = dns.final_
-                        _hack_config_map["strategy"] = dnsStrategies[server] ?: ""
-                    },
-                )
-            }
-        }
+        // fork 契約：域名解析策略一律掛在 DNS **伺服器**層（見上方 dns-direct／dns-remote／
+        // fallback 的 strategy 賦值），規則層不寫 legacy `strategy`。
+        //
+        // isai 合併（17b31e173）曾在每條 DNS 規則上注入 `strategy`，並把 dns.final_ 明示成一條
+        // 帶 strategy 的 fallback 規則。sing-box 1.14 起把「規則層 strategy」標記為 legacy，
+        // 1.15.0-alpha.12（本倉捆綁 core）更把「同時存在 query_type 規則（關閉 legacy DNS 模式）
+        // 與規則層 strategy（依賴 legacy 模式）」判定為啟動致命衝突：
+        //   create service: initialize dns router: Legacy `strategy` DNS rule action option ...
+        // fake-ip／dnsHosts 規則本就帶 query_type，故該注入必炸、服務起不來。
+        // 規則層家族限制已由 fake-ip 規則的 query_type 承接，server 層 strategy 覆蓋其餘場景，
+        // dns.final_ 欄位本身即最終回退、無需另加規則——整段移除，新舊 core 通吃。
         if (!forTest && isVPN) route.rules.add(0, virtualDnsTlsRejectRule())
         route.rules.addAll(0, buildPerAppTunGuardRules())
 
