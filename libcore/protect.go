@@ -19,6 +19,34 @@ type protectServer struct {
 	done     chan struct{}
 }
 
+// protectSocketPath 是主进程 protect server 的监听地址，由 InitCore 用
+// internalAssets（filesDir）推导，两个进程算出同一个绝对路径。
+var protectSocketPath string
+
+// StartProtectServer 由主进程调用（只有它持有 VpnService）。:bg 进程里的
+// box 通过 SCM_RIGHTS 把 socket fd 送到这里，再由主进程执行
+// VpnService.protect——protect 必须在持有 VpnService 的进程里调用，
+// 在 :bg 里调用 DataStore.vpnService 永远是 null，会让所有出站 socket
+// 带上 VPN fwmark 回环进自己的 TUN（DNS connection refused 的根因）。
+func StartProtectServer() {
+	log.Println("[protect] StartProtectServer isBg=", isBgProcess, "path=", protectSocketPath)
+	if isBgProcess || protectSocketPath == "" {
+		log.Println("[protect] skipped")
+		return
+	}
+	if protectCloser != nil {
+		protectCloser.Close()
+	}
+	protectCloser = serveProtect(protectSocketPath, func(fd int) {
+		intfBox.AutoDetectInterfaceControl(int32(fd))
+	})
+	if protectCloser == nil {
+		log.Println("[protect] serveProtect FAILED for", protectSocketPath)
+	} else {
+		log.Println("[protect] listening on", protectSocketPath)
+	}
+}
+
 func (p *protectServer) Close() error {
 	err := p.listener.Close()
 	<-p.done

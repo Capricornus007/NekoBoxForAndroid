@@ -58,23 +58,25 @@ func (w *boxPlatformInterfaceWrapper) AutoDetectInterfaceControl(fd int) error {
 // byeDPI 的出口 socket 是在 C 线程里自己 socket()/connect() 出来的，绕过了
 // sing-box 的 dialer，只能由 libcore/protocol/byedpi 直接回调这个函数。
 func protectSocketFD(fd int) error {
-	// call protect_path
-	if !isBgProcess {
-		err := sendFdToProtect(fd, "protect_path")
-		if err == nil {
-			return nil
-		}
-		// protect 服务不存在/无监听 = VPN 未运行，无需 protect，放行；
-		// 其余失败（如 100ms ack 超时）说明 VPN 在跑但 protect 异常，必须
-		// fail-fast——吞掉错误会让未 protect 的测速流量回环进 tun，经当前
-		// 节点"套娃"出站，测速结果与节点直连可用性彻底脱节。
-		if errors.Is(err, unix.ENOENT) || errors.Is(err, unix.ECONNREFUSED) {
-			return nil
-		}
-		return E.Cause(err, "protect fd via protect_path")
+	// server 由主进程的 StartProtectServer 提供（只有主进程持有 VpnService）。
+	// 不管 box 跑在主进程还是 :bg，都优先把 fd 送过去：主进程自连也能工作，
+	// 而且路径是绝对路径，不会像旧代码那样因 cwd 是 "/" 而静默建不起来。
+	if protectSocketPath == "" {
+		return intfBox.AutoDetectInterfaceControl(int32(fd))
 	}
-	// bg process call VPNService
-	return intfBox.AutoDetectInterfaceControl(int32(fd))
+	err := sendFdToProtect(fd, protectSocketPath)
+	if err == nil {
+		return nil
+	}
+	// 服务不存在/无监听 = server 尚未起来：主进程可以自己 protect，:bg 只能放行。
+	if errors.Is(err, unix.ENOENT) || errors.Is(err, unix.ECONNREFUSED) {
+		if !isBgProcess {
+			return intfBox.AutoDetectInterfaceControl(int32(fd))
+		}
+		return nil
+	}
+	// 其余失败（如 100ms ack 超时）说明 server 在跑但异常，必须 fail-fast。
+	return E.Cause(err, "protect fd via protect_path")
 }
 
 func (w *boxPlatformInterfaceWrapper) UsePlatformInterface() bool {

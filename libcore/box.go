@@ -400,7 +400,8 @@ func (b *BoxInstance) Wake() {
 
 func (b *BoxInstance) SetAsMain() {
 	mainInstance = b
-	goServeProtect(true)
+	// protect server 不在这里起：本进程是 :bg，没有 VpnService，
+	// callback 只会打到 null 上。改由主进程的 StartProtectServer 提供。
 }
 
 func (b *BoxInstance) SetV2rayStats(outbounds string) {
