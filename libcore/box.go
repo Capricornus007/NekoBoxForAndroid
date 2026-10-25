@@ -415,11 +415,17 @@ func (b *BoxInstance) SetV2rayStats(outbounds string) {
 		Enabled:   true,
 		Outbounds: strings.Split(outbounds, "\n"),
 	})
+	log.Println("[stats] SetV2rayStats outbounds=", outbounds)
 	b.Box.Router().AppendTracker(b.v2api.StatsService())
 }
 
+var queryStatsNilOnce sync.Once
+
 func (b *BoxInstance) QueryStats(tag, direct string) int64 {
 	if b.v2api == nil {
+		queryStatsNilOnce.Do(func() {
+			log.Println("[stats] QueryStats before SetV2rayStats, returning 0 for", tag, direct)
+		})
 		return 0
 	}
 	return b.v2api.QueryStats(fmt.Sprintf("outbound>>>%s>>>traffic>>>%s", tag, direct))

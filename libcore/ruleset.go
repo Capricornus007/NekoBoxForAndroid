@@ -13,6 +13,7 @@ package libcore
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -99,6 +100,20 @@ func convertGeoRuleSetToSRS(tag string, code string, dbPath string, isGeoIP bool
 		if srsInfo, err := os.Stat(dst); err == nil && srsInfo.ModTime().After(dbInfo.ModTime()) {
 			return dst, nil
 		}
+	} else if os.IsNotExist(err) {
+		// db 缺失（全新安装尚未下载规则库）时生成空规则集：sing-box 对
+		// local rule-set 开档失败是致命的，会连带拒绝整份配置导致完全断网；
+		// 退化成空集只失去这一条分流，等 db 下载后 mtime 更新会自动重建。
+		log.Println("[ruleset] db missing, writing empty rule-set:", dbPath)
+		file, err := os.Create(dst)
+		if err != nil {
+			return "", err
+		}
+		defer file.Close()
+		if err := srs.Write(file, option.PlainRuleSet{}, C.RuleSetVersionCurrent); err != nil {
+			return "", err
+		}
+		return dst, nil
 	}
 
 	var rules []option.HeadlessRule
