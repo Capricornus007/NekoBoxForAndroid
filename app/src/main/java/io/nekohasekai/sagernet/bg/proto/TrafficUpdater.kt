@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.bg.proto
 
 import android.os.SystemClock
+import io.nekohasekai.sagernet.BuildConfig
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -74,6 +75,10 @@ class TrafficUpdater(
             rx = box!!.queryStats(item.tag, "downlink")
         }
 
+        // TEMP-PROBE(2026-10-25): 排查「延遲正常但上下傳 0 B/s」——把原始計數器回傳打進 logcat。
+        if (BuildConfig.DEBUG) {
+            android.util.Log.i("NekoTraffic", "tag=${item.tag} rawTx=$tx rawRx=$rx interval=${now - base} last=${item.lastUpdate}")
+        }
         // add diff
         item.rx += rx
         item.tx += tx
