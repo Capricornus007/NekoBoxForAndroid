@@ -19,7 +19,6 @@ import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.ui.VpnRequestActivity
 import io.nekohasekai.sagernet.utils.Subnet
-import libcore.Libcore
 import moe.matsuri.nb4a.hevtun.HevTunRuntime
 import android.net.VpnService as BaseVpnService
 
@@ -57,14 +56,6 @@ class VpnService :
 
     override suspend fun startProcesses() {
         DataStore.vpnService = this
-        // protect server 必须起在持有 VpnService 的进程（本进程）：:bg 里的 box
-        // 通过 Unix socket 把 socket fd 送过来，这里再执行 protect(fd)。
-        try {
-            Libcore.startProtectServer()
-            Logs.d("protect: startProtectServer() returned")
-        } catch (t: Throwable) {
-            Logs.w("protect: startProtectServer failed", t)
-        }
         super.startProcesses()
         if (DataStore.enableHevTun) {
             // hev 模式：由 app 自己建 TUN 并把 fd 交给原生 hev-socks5-tunnel，

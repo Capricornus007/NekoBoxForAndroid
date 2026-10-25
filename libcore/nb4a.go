@@ -37,7 +37,6 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 ) {
 	defer device.DeferPanicToError("InitCore", func(err error) { log.Println(err) })
 	isBgProcess = strings.HasSuffix(process, ":bg")
-	protectSocketPath = filepath.Join(internalAssets, "box_protect_path")
 
 	// 記憶體策略（mod-49，2026-09-17 真機實測修訂）：
 	// 空載存活堆僅 ~40MB、6×20MB 併發穿透下載峰值 ~47MB（clash /memory inuse）。
