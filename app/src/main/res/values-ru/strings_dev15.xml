@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fastest_protocol_filter_mode">Фильтр протоколов</string>
+    <string name="fastest_protocols">Протоколы</string>
+    <string name="fastest_protocol_all">Разрешены все протоколы</string>
+    <string name="fastest_protocol_none">Протоколы не выбраны</string>
+    <string name="fastest_protocol_reset">Сбросить фильтр</string>
+    <string name="fastest_protocol_no_candidates">После фильтрации не осталось кандидатов. Измените фильтр протоколов или список узлов.</string>
+    <string name="fastest_protocol_invalid">Некорректный фильтр протоколов. Сбросьте его и выберите протоколы заново.</string>
+    <string name="fastest_candidates_preview">Предпросмотр кандидатов</string>
+    <string-array name="fastest_protocol_modes">
+        <item>Исключать выбранные</item>
+        <item>Разрешать только выбранные</item>
+    </string-array>
+    <string-array name="fastest_protocol_entries">
+        <item>SOCKS</item>
+        <item>HTTP / HTTPS</item>
+        <item>Shadowsocks</item>
+        <item>ShadowsocksR</item>
+        <item>VMess</item>
+        <item>VLESS</item>
+        <item>Trojan</item>
+        <item>Trojan-Go</item>
+        <item>Naïve</item>
+        <item>Hysteria 1</item>
+        <item>Hysteria 2</item>
+        <item>TUIC</item>
+        <item>Juicity</item>
+        <item>SSH</item>
+        <item>WireGuard / AmneziaWG</item>
+        <item>ShadowTLS</item>
+        <item>Mieru</item>
+        <item>AnyTLS</item>
+        <item>Пользовательский JSON / плагины</item>
+    </string-array>
+</resources>

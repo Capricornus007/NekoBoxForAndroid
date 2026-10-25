@@ -132,7 +132,13 @@ dependencies {
     implementation("com.google.guava:guava:33.7.1-android")
     testImplementation("junit:junit:4.13.2")
 
+    // fork 的列表快滑（FastScrollerBuilder/PopupTextProvider）。
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")
+    // isai 的 StableFastScrollRecyclerView 用：庫內捆的舊 recyclerview/appcompat 由本倉的 androidx 版本接管
+    implementation("com.simplecityapps:recyclerview-fastscroll:2.0.1") {
+        exclude(group = "androidx.recyclerview")
+        exclude(group = "androidx.appcompat")
+    }
 
     implementation("androidx.room:room-runtime:2.8.4")
     ksp("androidx.room:room-compiler:2.8.4")

@@ -13,6 +13,8 @@ import io.nekohasekai.sagernet.*
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.fmt.LOCALHOST
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
+import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
+import io.nekohasekai.sagernet.fmt.wireguard.normalizeWireGuardLocalAddresses
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.RootLanSharing
 import io.nekohasekai.sagernet.ui.VpnRequestActivity
@@ -32,7 +34,7 @@ class VpnService :
         const val HEV_MAPDNS_VLAN4 = "100.64.0.0"
         const val PRIVATE_VLAN6_CLIENT = "fdfe:dcba:9876::1"
         const val PRIVATE_VLAN6_ROUTER = "fdfe:dcba:9876::2"
-        private val ANDROID_DNS_PACKAGES = listOf(
+        internal val ANDROID_DNS_PACKAGES = listOf(
             "android",
             "com.android.resolv",
             "com.google.android.resolv",
@@ -163,6 +165,13 @@ class VpnService :
             builder.addRoute("0.0.0.0", 0)
             if (v6Ready) {
                 builder.addRoute("::", 0)
+            }
+        }
+        val wireguard = data.proxy?.profile?.requireBean() as? WireGuardBean
+        if (DataStore.bypassLan && wireguard?.useConfigRoutes == true) {
+            normalizeWireGuardLocalAddresses(wireguard.allowedIPs).forEach {
+                val subnet = Subnet.fromString(it)!!
+                if (ipv6Mode != IPv6Mode.DISABLE || ':' !in it) builder.addRoute(subnet.address.hostAddress!!, subnet.prefixSize)
             }
         }
 

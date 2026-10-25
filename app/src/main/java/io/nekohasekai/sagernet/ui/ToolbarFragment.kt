@@ -23,6 +23,7 @@ open class ToolbarFragment : Fragment {
         // the correct generic lookup.
         toolbar = view.findViewById(R.id.toolbar)
         toolbar.setNavigationIcon(R.drawable.ic_navigation_menu)
+        toolbar.setNavigationContentDescription(R.string.open_navigation_menu)
         toolbar.setNavigationOnClickListener {
             (activity as MainActivity).binding.drawerLayout.openDrawer(GravityCompat.START)
         }

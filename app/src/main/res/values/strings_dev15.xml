@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fastest_protocol_filter_mode">Protocol filter</string>
+    <string name="fastest_protocols">Protocols</string>
+    <string name="fastest_protocol_all">All protocols allowed</string>
+    <string name="fastest_protocol_none">No protocols selected</string>
+    <string name="fastest_protocol_reset">Reset filter</string>
+    <string name="fastest_protocol_no_candidates">No candidates remain after applying the filters. Change the protocol filter or candidate list.</string>
+    <string name="fastest_protocol_invalid">Invalid protocol filter. Reset the filter and select protocols again.</string>
+    <string name="fastest_candidates_preview">Preview candidates</string>
+    <string-array name="fastest_protocol_modes">
+        <item>Exclude selected</item>
+        <item>Allow selected only</item>
+    </string-array>
+    <string-array name="fastest_protocol_entries">
+        <item>SOCKS</item>
+        <item>HTTP / HTTPS</item>
+        <item>Shadowsocks</item>
+        <item>ShadowsocksR</item>
+        <item>VMess</item>
+        <item>VLESS</item>
+        <item>Trojan</item>
+        <item>Trojan-Go</item>
+        <item>Naïve</item>
+        <item>Hysteria 1</item>
+        <item>Hysteria 2</item>
+        <item>TUIC</item>
+        <item>Juicity</item>
+        <item>SSH</item>
+        <item>WireGuard / AmneziaWG</item>
+        <item>ShadowTLS</item>
+        <item>Mieru</item>
+        <item>AnyTLS</item>
+        <item>Custom JSON / plugins</item>
+    </string-array>
+    <string-array name="fastest_protocol_mode_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="fastest_protocol_values">
+        <item>socks</item>
+        <item>http</item>
+        <item>shadowsocks</item>
+        <item>shadowsocksr</item>
+        <item>vmess</item>
+        <item>vless</item>
+        <item>trojan</item>
+        <item>trojan-go</item>
+        <item>naive</item>
+        <item>hysteria</item>
+        <item>hysteria2</item>
+        <item>tuic</item>
+        <item>juicity</item>
+        <item>ssh</item>
+        <item>wireguard</item>
+        <item>shadowtls</item>
+        <item>mieru</item>
+        <item>anytls</item>
+        <item>custom</item>
+    </string-array>
+</resources>

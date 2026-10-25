@@ -244,8 +244,14 @@ class SagerNet :
         fun getClipboardText(): String = clipboard.primaryClip?.takeIf { it.itemCount > 0 }
             ?.getItemAt(0)?.text?.toString() ?: ""
 
-        fun trySetPrimaryClip(clip: String) = try {
-            clipboard.setPrimaryClip(ClipData.newPlainText(null, clip))
+        fun trySetPrimaryClip(clip: String, sensitive: Boolean = false) = try {
+            val data = ClipData.newPlainText(null, clip)
+            if (sensitive && Build.VERSION.SDK_INT >= 33) {
+                data.description.extras = android.os.PersistableBundle().apply {
+                    putBoolean(android.content.ClipDescription.EXTRA_IS_SENSITIVE, true)
+                }
+            }
+            clipboard.setPrimaryClip(data)
             true
         } catch (e: RuntimeException) {
             Logs.w(e)
@@ -268,6 +274,9 @@ class SagerNet :
                 if (profileId >= 0L) putExtra(Action.EXTRA_PROFILE_ID, profileId)
             },
         )
+
+        // isai 相容：force=true 走硬重啟（BaseService receiver 轉 stopRunner(restart=true)）。
+        fun reloadService(force: Boolean) = application.sendBroadcast(Intent(Action.RELOAD).setPackage(application.packageName).putExtra("force", force))
 
         fun restartService() = application.sendBroadcast(Intent(Action.RESTART).setPackage(application.packageName))
 

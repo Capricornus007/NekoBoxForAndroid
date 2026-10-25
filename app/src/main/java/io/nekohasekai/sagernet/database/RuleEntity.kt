@@ -28,6 +28,9 @@ data class RuleEntity(
     var ruleset: String = "",
     var outbound: Long = 0,
     var packages: Set<String> = emptySet(),
+    // 0 inherits global, 1 always direct, 2 direct/global proxy, 3 direct/backup profile.
+    @ColumnInfo(defaultValue = "0") var fallbackMode: Int = 0,
+    @ColumnInfo(defaultValue = "0") var fallbackProfile: Long = 0L,
 ) : Parcelable {
 
     fun displayName(): String = name.takeIf { it.isNotBlank() } ?: app.getString(R.string.rule_default_name, id)

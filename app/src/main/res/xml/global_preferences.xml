@@ -163,6 +163,25 @@
     </io.nekohasekai.sagernet.widget.CollapsibleCategory>
 
     <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/cag_route">
+
+        <Preference app:key="networkProfilesScreen" app:title="@string/network_profiles" app:summary="@string/network_profiles_summary" />
+        <SwitchPreferenceCompat
+            app:key="directFallback"
+            app:title="@string/direct_fallback"
+            app:summary="@string/direct_fallback_summary" />
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+            app:key="directFallbackUrl"
+            app:defaultValue="https://www.kernel.org"
+            app:title="@string/direct_fallback_url"
+            app:summary="@string/direct_fallback_url_summary" />
+        <EditTextPreference
+            app:key="directFallbackInterval"
+            app:defaultValue="30"
+            app:title="@string/direct_fallback_interval"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference app:key="directFallbackRequired" app:defaultValue="1" app:title="@string/direct_fallback_required" app:useSimpleSummaryProvider="true" />
+        <EditTextPreference app:key="directFallbackFailures" app:defaultValue="1" app:title="@string/direct_fallback_failures" app:useSimpleSummaryProvider="true" />
+        <EditTextPreference app:key="directFallbackRecoveries" app:defaultValue="1" app:title="@string/direct_fallback_recoveries" app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_navigation_apps"
             app:key="proxyApps"
@@ -255,12 +274,13 @@
     </io.nekohasekai.sagernet.widget.CollapsibleCategory>
 
     <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/cag_dns">
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:defaultValue="https://dns.google/dns-query"
             app:icon="@drawable/ic_action_dns"
             app:key="remoteDns"
             app:title="@string/remote_dns"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:dialogMessage="@string/dns_server_input_help" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="auto"
             app:entries="@array/dns_network_select"
@@ -268,12 +288,13 @@
             app:key="domain_strategy_for_remote"
             app:title="@string/domain_strategy_for_remote"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:defaultValue="https://1.1.1.1/dns-query"
             app:icon="@drawable/ic_action_dns"
             app:key="directDns"
             app:title="@string/direct_dns"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:dialogMessage="@string/dns_server_input_help" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="auto"
             app:entries="@array/dns_network_select"
@@ -371,6 +392,13 @@
             app:title="@string/restart_profile_on_network_change"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
+            app:icon="@drawable/baseline_construction_24"
+            app:key="enableClashAPI"
+            app:summary="@string/enable_clash_api_summary"
+            app:title="@string/enable_clash_api" />
+        <Preference app:key="clashApiSecret" app:dependency="enableClashAPI"
+            app:title="@string/clash_api_token" app:summary="@string/clash_api_token_summary" />
+        <SwitchPreferenceCompat
             app:defaultValue="true"
             app:icon="@drawable/ic_baseline_flip_camera_android_24"
             app:key="networkChangeResetConnections"
@@ -387,6 +415,11 @@
         <SwitchPreferenceCompat
             app:key="allowInsecureOnRequest"
             app:title="@string/allow_insecure_on_request_sum" />
+        <SwitchPreferenceCompat
+            app:key="downloadsProxyOnly"
+            app:defaultValue="false"
+            app:title="@string/downloads_proxy_only"
+            app:summary="@string/downloads_proxy_only_summary" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="1.2"
             app:entries="@array/app_tls_version"
@@ -407,6 +440,10 @@
         <SwitchPreferenceCompat
             app:key="showBottomBar"
             app:title="@string/show_bottom_bar" />
+        <Preference
+            app:key="restoreNetworkSettings"
+            app:icon="@drawable/baseline_undo_24"
+            app:title="@string/restore_network_settings" />
         <Preference
             app:icon="@drawable/baseline_undo_24"
             app:key="resetSettings"

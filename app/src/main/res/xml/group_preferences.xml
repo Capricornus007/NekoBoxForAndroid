@@ -57,6 +57,12 @@
             app:summary="@string/force_resolve_sum"
             app:title="@string/force_resolve" />
 
+        <EditTextPreference
+            app:icon="@drawable/ic_action_dns"
+            app:key="subscriptionServerDns"
+            app:title="@string/subscription_server_dns"
+            app:useSimpleSummaryProvider="true" />
+
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_baseline_import_contacts_24"
             app:key="subscriptionDeduplication"
@@ -99,6 +105,23 @@
             app:icon="@drawable/ic_baseline_grid_3x3_24"
             app:key="subscriptionUserAgent"
             app:title="@string/subscription_user_agent"
+            app:useSimpleSummaryProvider="true" />
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+            app:icon="@drawable/ic_baseline_grid_3x3_24"
+            app:key="subscriptionHeaders"
+            app:title="@string/subscription_headers"
+            app:useSimpleSummaryProvider="false"
+            app:summary="@string/subscription_headers_summary" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="subscriptionSendHwid"
+            app:summary="@string/subscription_send_hwid_summary"
+            app:title="@string/subscription_send_hwid" />
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+            app:icon="@drawable/ic_baseline_grid_3x3_24"
+            app:key="subscriptionCustomHwidParams"
+            app:summary="@string/subscription_custom_hwid_params_summary"
+            app:title="@string/subscription_custom_hwid_params"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_baseline_flip_camera_android_24"

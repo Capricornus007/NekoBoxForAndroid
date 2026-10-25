@@ -16,8 +16,14 @@
          wifi_ssid / wifi_bssid 規則用）。未宣告時只能拿到遮罩值，部分版本直接拋
          SecurityException。normal 權限、安裝即授予、不會彈窗。 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- isai 網絡診斷（NetworkProfilePolicy / ReadWIFIState）：以 SSID/BSSID 識別網絡。
+         僅宣告，runtime 不強制請求；背景定位屬危險權限，未授予時診斷自動降級。 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -73,6 +79,7 @@
             android:name="android.app.shortcuts"
             android:resource="@xml/shortcuts" />
 
+        <activity android:name="io.nekohasekai.sagernet.ui.NetworkProfilesActivity" android:exported="false" />
         <activity
             android:name="io.nekohasekai.sagernet.ui.BlankActivity"
             android:configChanges="uiMode" />
@@ -357,9 +364,11 @@
         <service
             android:name="io.nekohasekai.sagernet.bg.ProxyService"
             android:exported="false"
-            android:foregroundServiceType="systemExempted"
-            android:process=":bg"
-            tools:ignore="ForegroundServicePermission" />
+            android:foregroundServiceType="specialUse"
+            android:process=":bg">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="User-controlled local SOCKS/HTTP proxy service" />
+        </service>
 
         <service
             android:name="io.nekohasekai.sagernet.bg.VpnService"

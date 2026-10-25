@@ -20,6 +20,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
 import androidx.core.view.size
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceDataStore
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
@@ -39,6 +40,7 @@ import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.GroupManager
 import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.database.ProxyGroup
+import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.database.SubscriptionBean
 import io.nekohasekai.sagernet.database.preference.OnPreferenceDataStoreChangeListener
 import io.nekohasekai.sagernet.databinding.LayoutMainBinding
@@ -58,6 +60,9 @@ import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import io.nekohasekai.sagernet.plugin.PluginTrust
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import moe.matsuri.nb4a.plugin.Plugins
 import moe.matsuri.nb4a.utils.Util
 import java.util.Locale
@@ -218,7 +223,11 @@ class MainActivity :
         val fromShortcut = intent.getBooleanExtra(EXTRA_CLEAR_CACHE_AND_RESTART, false)
         if (!fromShortcut && intent.action != ACTION_CLEAR_CACHE_AND_RESTART) return false
 
-        clearAppCacheAndRestart()
+        intent.removeExtra(EXTRA_CLEAR_CACHE_AND_RESTART)
+        intent.action = null
+        MaterialAlertDialogBuilder(this).setMessage(R.string.confirm_clear_cache)
+            .setPositiveButton(android.R.string.ok) { _, _ -> clearAppCacheAndRestart() }
+            .setNegativeButton(android.R.string.cancel, null).show()
         return true
     }
 
@@ -588,6 +597,26 @@ class MainActivity :
             R.id.nav_tools -> displayFragment(ToolsFragment())
 
             R.id.nav_logcat -> displayFragment(LogcatFragment())
+
+            R.id.nav_diagnostics -> {
+                binding.drawerLayout.closeDrawers()
+                lifecycleScope.launch {
+                    val profileId = DataStore.currentProfile.takeIf { DataStore.serviceState.started && it > 0 }
+                        ?: DataStore.selectedProxy
+                    val profile = withContext(Dispatchers.IO) { SagerDatabase.proxyDao.getById(profileId) }
+                    if (profile == null) {
+                        snackbar(getString(R.string.diagnostics_select_profile)).show()
+                    } else {
+                        showProfileDiagnostics(profile)
+                    }
+                }
+                return true
+            }
+
+            R.id.nav_faq -> {
+                launchCustomTab("https://matsuridayo.github.io/")
+                return false
+            }
 
             R.id.nav_about -> displayFragment(AboutFragment())
 
