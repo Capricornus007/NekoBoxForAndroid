@@ -1137,4 +1137,46 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="openvpn_tls_version_min">Versi TLS minimum</string>
     <string name="openvpn_topology">Topologi</string>
     <string name="openvpn_transport">Protokol</string>
+    <string name="close">Tutup</string>
+    <string name="copy_current_link">Salin Tautan</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="qrcode_format_standard">Standar</string>
+    <string name="qrcode_format_sn">Tautan SN</string>
+    <string name="qrcode_standard_hint">Format URI standar (kompatibel dengan klien umum)</string>
+    <string name="qrcode_sn_hint">Tautan berseri khusus Sing-box &amp; Neko (sn://)</string>
+    <string name="subscription_send_hwid">Kirim HWID</string>
+    <string name="subscription_send_hwid_summary">Kirim HWID, versi Android, dan model perangkat saat memperbarui langganan ini</string>
+    <string name="please_update" formatted="false">APLIKASI Anda terlalu lama (%s). Dan akan berhenti bekerja pada %s. Tolong
+        perbarui!</string>
+    <string name="please_update_force" formatted="false">APLIKASI Anda terlalu lama (%s). Dan telah berhenti bekerja pada %s.
+        Mohon perbarui!</string>
+    <string name="subscription_direct_fallback">Jatuh ke koneksi langsung untuk langganan</string>
+    <string name="subscription_direct_fallback_summary">Coba ulang langganan secara langsung jika proksi lokal gagal. Hindari jika URL membawa token.</string>
+    <string name="adaptive_traffic_polling">Pemantauan lalu lintas adaptif</string>
+    <string name="adaptive_traffic_polling_summary">Kurangi frekuensi pemantauan penghitung lalu lintas saat berada di latar belakang atau layar mati.</string>
+    <string name="local_proxy_settings">Pengaturan Proksi Lokal</string>
+    <string name="port_out_of_range">Port harus berada dalam rentang 1–65535</string>
+    <string name="socks_port">Port Proksi SOCKS5</string>
+    <string name="proxy_username">Nama Pengguna Proksi</string>
+    <string name="proxy_password">Kata Sandi Proksi</string>
+    <string name="proton_session_expired">Sesi Proton Anda ditolak. Silakan masuk lagi.</string>
+    <string name="amoled_theme">Tema Gelap AMOLED</string>
+    <string name="amoled_theme_summary">Latar belakang hitam pekat di mode gelap</string>
+    <string name="app_theme">Warna Aksen</string>
+    <string name="authenticated_http_proxy_unavailable">Proksi HTTP VPN Android tidak mendukung nama pengguna dan kata sandi yang diperlukan.</string>
+    <string name="clash_api_token">Token API Clash</string>
+    <string name="clash_api_token_summary">Tampilkan atau salin token akses dasbor</string>
+    <string name="enable_clash_api">Aktifkan API Clash</string>
+    <string name="enable_clash_api_summary">Sediakan clash api dan dasbor yacd di 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">Hentikan proksi yang berjalan?</string>
+    <string name="confirm_clear_cache">Hentikan proksi, bersihkan cache inti, dan mulai ulang aplikasi?</string>
+    <string name="downloads_proxy_only">Pembaruan hanya melalui proksi</string>
+    <string name="downloads_proxy_only_summary">Pembaruan langganan serta GeoIP/GeoSite memerlukan proksi SOCKS lokal yang berjalan. Fallback langsung dinonaktifkan.</string>
+    <string name="backup_encryption_password">Kata sandi cadangan (opsional)</string>
+    <string name="backup_encryption_summary">Minimal 8 karakter melindungi cadangan yang diekspor, dibagikan, dan WebDAV. Kosongkan untuk cadangan tanpa enkripsi. Kata sandi tidak disimpan.</string>
+    <string name="backup_password_short">Gunakan minimal 8 karakter untuk kata sandi cadangan.</string>
+    <string name="backup_decrypt_failed">Kata sandi salah atau cadangan rusak. Tidak ada yang dipulihkan.</string>
+    <string name="subscription_custom_hwid_params">Parameter HWID kustom</string>
+    <string name="subscription_custom_hwid_params_summary">Format: hwid=value,os=value,osVersion=value,model=value. Kosongkan untuk memakai nilai perangkat ini; jika diisi, hanya nilai yang tercantum yang dikirim.</string>
 </resources>

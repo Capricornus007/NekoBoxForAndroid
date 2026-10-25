@@ -1158,4 +1158,24 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="ua_updated_toast">UA aggiornato</string>
     <string name="udp_over_tcp">UDP su TCP</string>
     <string name="update_existing_subscriptions_ua">Aggiorna l\'UA degli abbonamenti esistenti</string>
+    <string name="amoled_theme">Tema scuro AMOLED</string>
+    <string name="amoled_theme_summary">Sfondo nero puro in modalità scura</string>
+    <string name="app_theme">Colore di accento</string>
+    <string name="authenticated_http_proxy_unavailable">Il proxy HTTP della VPN Android non supporta il nome utente e la password richiesti.</string>
+    <string name="backup_decrypt_failed">Password errata o backup danneggiato. Non è stato ripristinato nulla.</string>
+    <string name="backup_encryption_password">Password del backup (facoltativa)</string>
+    <string name="backup_encryption_summary">Almeno 8 caratteri proteggono i backup esportati, condivisi e WebDAV. Lascia vuoto per un backup non criptato. La password non viene salvata.</string>
+    <string name="backup_password_short">Usa almeno 8 caratteri per la password del backup.</string>
+    <string name="clash_api_token">Token API Clash</string>
+    <string name="clash_api_token_summary">Mostra o copia il token di accesso del pannello</string>
+    <string name="confirm_clear_cache">Fermare il proxy, svuotare la cache del core e riavviare l\'app?</string>
+    <string name="confirm_stop_service">Fermare il proxy in esecuzione?</string>
+    <string name="downloads_proxy_only">Aggiornamenti solo tramite proxy</string>
+    <string name="downloads_proxy_only_summary">Gli aggiornamenti di sottoscrizioni e GeoIP/GeoSite richiedono il proxy SOCKS locale in esecuzione. Il fallback diretto è disabilitato.</string>
+    <string name="enable_clash_api">Abilita API Clash</string>
+    <string name="enable_clash_api_summary">Fornisce API Clash e dashboard yacd su 127.0.0.1:9090</string>
+    <string name="subscription_custom_hwid_params">Parametri HWID personalizzati</string>
+    <string name="subscription_custom_hwid_params_summary">Formato: hwid=valore,os=valore,osVersion=valore,model=valore. Lascia vuoto per usare i valori di questo dispositivo; quando compilato, vengono inviati solo i valori elencati.</string>
+    <string name="subscription_send_hwid">Invia HWID</string>
+    <string name="subscription_send_hwid_summary">Invia HWID, versione Android e modello del dispositivo durante l\'aggiornamento di questa sottoscrizione</string>
 </resources>

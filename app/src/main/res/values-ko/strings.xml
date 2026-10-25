@@ -1092,4 +1092,24 @@
     <string name="use_system_theme_summary">시스템 Monet 색상 사용 (Android 12+)</string>
     <string name="waterfall_settings">워터폴 설정</string>
     <string name="webdav_insecure_url">안전하지 않은 WebDAV URL</string>
+    <string name="amoled_theme">AMOLED 다크 테마</string>
+    <string name="amoled_theme_summary">다크 모드에서 순수 검정 배경</string>
+    <string name="app_theme">강조 색상</string>
+    <string name="authenticated_http_proxy_unavailable">Android VPN HTTP 프록시는 필수 사용자 이름과 비밀번호를 지원하지 않습니다.</string>
+    <string name="backup_decrypt_failed">비밀번호가 잘못되었거나 백업이 손상되었습니다. 복원된 항목이 없습니다.</string>
+    <string name="backup_encryption_password">백업 비밀번호 (선택)</string>
+    <string name="backup_encryption_summary">8자 이상이면 내보내기, 공유, WebDAV 백업을 보호합니다. 비어 있으면 암호화 없이 백업됩니다. 비밀번호는 저장되지 않습니다.</string>
+    <string name="backup_password_short">백업 비밀번호는 최소 8자 이상 사용하세요.</string>
+    <string name="clash_api_token">Clash API 토큰</string>
+    <string name="clash_api_token_summary">대시보드 액세스 토큰 표시 또는 복사</string>
+    <string name="confirm_clear_cache">프록시를 중지하고 코어 캐시를 지운 다음 앱을 다시 시작할까요?</string>
+    <string name="confirm_stop_service">실행 중인 프록시를 중지할까요?</string>
+    <string name="downloads_proxy_only">프록시로만 업데이트</string>
+    <string name="downloads_proxy_only_summary">구독 및 GeoIP/GeoSite 업데이트에는 실행 중인 로컬 SOCKS 프록시가 필요합니다. 직접 연결 폴백이 비활성화됩니다.</string>
+    <string name="enable_clash_api">Clash API 활성화</string>
+    <string name="enable_clash_api_summary">127.0.0.1:9090에 Clash API 및 yacd 대시보드를 제공합니다</string>
+    <string name="subscription_custom_hwid_params">사용자 지정 HWID 매개변수</string>
+    <string name="subscription_custom_hwid_params_summary">형식: hwid=값,os=값,osVersion=값,model=값. 비어 있으면 이 기기의 값을 사용하고, 입력하면 나열된 값만 전송됩니다.</string>
+    <string name="subscription_send_hwid">HWID 전송</string>
+    <string name="subscription_send_hwid_summary">이 구독을 업데이트할 때 HWID, Android 버전, 기기 모델을 전송합니다</string>
 </resources>

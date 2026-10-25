@@ -479,9 +479,9 @@
     <string name="tuic_disable_sni">تعطيل SNI</string>
     <string name="tuic_reduce_rtt">تمكين مصافحة QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">شهادة SHA256 المثبتة</string>
-    <string name="please_update" formatted="false">التطبيق الخاص بك قديم جدًا (%1$s). وسيتوقف عن العمل في %2$s. يرجى
+    <string name="please_update" formatted="false">التطبيق الخاص بك قديم جدًا (%s). وسيتوقف عن العمل في %s. يرجى
         التحديث!</string>
-    <string name="please_update_force" formatted="false">التطبيق الخاص بك قديم جدًا (%1$s). وقد توقف عن العمل في %2$s.
+    <string name="please_update_force" formatted="false">التطبيق الخاص بك قديم جدًا (%s). وقد توقف عن العمل في %s.
         يرجى التحديث!</string>
     <string name="connection_test_delete_unavailable">مسح غير المتاح</string>
     <string name="move">نقل</string>
@@ -1143,4 +1143,24 @@
     <string name="ua_updated_toast">تم تحديث UA</string>
     <string name="udp_over_tcp">UDP عبر TCP</string>
     <string name="update_existing_subscriptions_ua">تحديث UA للاشتراكات الموجودة</string>
+    <string name="subscription_send_hwid">إرسال HWID</string>
+    <string name="subscription_send_hwid_summary">إرسال HWID وإصدار Android وطراز الجهاز عند تحديث هذا الاشتراك</string>
+    <string name="amoled_theme">سمة داكنة AMOLED</string>
+    <string name="amoled_theme_summary">خلفية سوداء نقية في الوضع الداكن</string>
+    <string name="app_theme">لون التمييز</string>
+    <string name="authenticated_http_proxy_unavailable">لا يدعم وكيل HTTP الخاص بشبكة Android VPN اسم المستخدم وكلمة المرور المطلوبَين.</string>
+    <string name="clash_api_token">رمز Clash API</string>
+    <string name="clash_api_token_summary">إظهار أو نسخ رمز الوصول إلى لوحة التحكم</string>
+    <string name="enable_clash_api">تفعيل Clash API</string>
+    <string name="enable_clash_api_summary">توفير Clash API ولوحة yacd على 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">إيقاف الوكيل قيد التشغيل؟</string>
+    <string name="confirm_clear_cache">إيقاف الوكيل ومسح ذاكرة التخزين المؤقت وإعادة تشغيل التطبيق؟</string>
+    <string name="downloads_proxy_only">التحديثات عبر الوكيل فقط</string>
+    <string name="downloads_proxy_only_summary">تتطلب تحديثات الاشتراك وGeoIP/GeoSite تشغيل وكيل SOCKS المحلي. تم تعطيل الرجوع المباشر.</string>
+    <string name="backup_encryption_password">كلمة مرور النسخ الاحتياطي (اختياري)</string>
+    <string name="backup_encryption_summary">توفر 8 أحرف على الأقل حماية للنسخ الاحتياطية المُصدَّرة والمُشاركة ونسخ WebDAV. اتركها فارغة لنسخة غير مشفرة. لا تُحفَظ كلمة المرور.</string>
+    <string name="backup_password_short">استخدم 8 أحرف على الأقل لكلمة مرور النسخ الاحتياطي.</string>
+    <string name="backup_decrypt_failed">كلمة مرور غير صحيحة أو نسخة احتياطية تالفة. لم تتم استعادة أي شيء.</string>
+    <string name="subscription_custom_hwid_params">معلمات HWID مخصصة</string>
+    <string name="subscription_custom_hwid_params_summary">التنسيق: hwid=value,os=value,osVersion=value,model=value. اتركها فارغة لاستخدام قيم هذا الجهاز؛ وعند ملئها، تُرسَل القيم المذكورة فقط.</string>
 </resources>

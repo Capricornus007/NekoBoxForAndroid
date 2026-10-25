@@ -1104,4 +1104,24 @@
     <string name="unavailable">Недаступны</string>
     <string name="update_existing_subscriptions_ua">Абнавіць User-Agent існуючых падпісак</string>
     <string name="version_x">Версія (%s)</string>
+    <string name="subscription_send_hwid">Адпраўляць HWID</string>
+    <string name="subscription_send_hwid_summary">Адпраўляць HWID, версію Android і мадэль прылады пры абнаўленні гэтай падпіскі</string>
+    <string name="amoled_theme">Цёмная тэма AMOLED</string>
+    <string name="amoled_theme_summary">Чысты чорны фон у цёмным рэжыме</string>
+    <string name="app_theme">Акцэнтны колер</string>
+    <string name="authenticated_http_proxy_unavailable">HTTP-проксі VPN Android не падтрымлівае патрабаваныя лагін і пароль.</string>
+    <string name="clash_api_token">Токен Clash API</string>
+    <string name="clash_api_token_summary">Паказаць або скапіраваць токен доступу да панэлі</string>
+    <string name="enable_clash_api">Уключыць Clash API</string>
+    <string name="enable_clash_api_summary">Забяспечыць clash api і панэль yacd на 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">Спыніць працу праксі?</string>
+    <string name="confirm_clear_cache">Спыніць праксі, ачысціць кэш ядра і перазапусціць дадатак?</string>
+    <string name="downloads_proxy_only">Абнаўленні толькі праз праксі</string>
+    <string name="downloads_proxy_only_summary">Абнаўленні падпісак і GeoIP/GeoSite патрабуюць працуючага лакальнага SOCKS-проксі. Прамое запасное злучэнне адключанае.</string>
+    <string name="backup_encryption_password">Пароль для рэзервовай копіі (неабавязкова)</string>
+    <string name="backup_encryption_summary">Прынамсі 8 знакаў абараняюць экспартаваныя, агульныя і WebDAV рэзервовыя копіі. Пакіньце пустым для неўшыфраванай рэзервовай копіі. Пароль не захоўваецца.</string>
+    <string name="backup_password_short">Выкарыстоўвайце прынамсі 8 знакаў для пароля рэзервовай копіі.</string>
+    <string name="backup_decrypt_failed">Няслушны пароль або пашкоджаная рэзервовая копія. Нічога не адноўлена.</string>
+    <string name="subscription_custom_hwid_params">Уласныя параметры HWID</string>
+    <string name="subscription_custom_hwid_params_summary">Фармат: hwid=значэнне,os=значэнне,osVersion=значэнне,model=значэнне. Пакіньце пустым, каб выкарыстоўваць значэнні гэтай прылады; калі запоўнена, адпраўляюцца толькі пералічаныя значэнні.</string>
 </resources>

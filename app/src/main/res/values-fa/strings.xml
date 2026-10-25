@@ -1153,4 +1153,24 @@
     <string name="ua_updated_toast">User-Agent به‌روزرسانی شد</string>
     <string name="udp_over_tcp">UDP روی TCP</string>
     <string name="update_existing_subscriptions_ua">به‌روزرسانی User-Agent اشتراک‌های موجود</string>
+    <string name="subscription_send_hwid">ارسال HWID</string>
+    <string name="subscription_send_hwid_summary">ارسال HWID، نسخهٔ اندروید و مدل دستگاه هنگام به‌روزرسانی این اشتراک</string>
+    <string name="amoled_theme">تم تیرهٔ AMOLED</string>
+    <string name="amoled_theme_summary">پس‌زمینهٔ کاملاً مشکی در حالت تیره</string>
+    <string name="app_theme">رنگ تأکیدی</string>
+    <string name="authenticated_http_proxy_unavailable">پراکسی HTTP اندروید (VPN) از نام کاربری و رمز عبور مورد نیاز پشتیبانی نمی‌کند.</string>
+    <string name="clash_api_token">توکن Clash API</string>
+    <string name="clash_api_token_summary">نمایش یا کپی توکن دسترسی به داشبورد</string>
+    <string name="enable_clash_api">فعال‌سازی Clash API</string>
+    <string name="enable_clash_api_summary">فراهم‌کردن clash api و داشبورد yacd در 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">سرویس پراکسی در حال اجرا متوقف شود؟</string>
+    <string name="confirm_clear_cache">پراکسی متوقف، حافظهٔ نهان هسته پاک و برنامه دوباره راه‌اندازی شود؟</string>
+    <string name="downloads_proxy_only">به‌روزرسانی فقط از طریق پراکسی</string>
+    <string name="downloads_proxy_only_summary">به‌روزرسانی اشتراک و GeoIP/GeoSite به پراکسی SOCKS محلی در حال اجرا نیاز دارد. بازگشت مستقیم غیرفعال است.</string>
+    <string name="backup_encryption_password">رمز عبور پشتیبان‌گیری (اختیاری)</string>
+    <string name="backup_encryption_summary">حداقل ۸ نویسه از پشتیبان‌های صادرشده، به‌اشتراک‌گذاشته‌شده و WebDAV محافظت می‌کند. برای پشتیبان بدون رمزگذاری خالی بگذارید. رمز عبور ذخیره نمی‌شود.</string>
+    <string name="backup_password_short">برای رمز عبور پشتیبان‌گیری حداقل از ۸ نویسه استفاده کنید.</string>
+    <string name="backup_decrypt_failed">رمز عبور نادرست یا پشتیبان خراب است. هیچ‌چیز بازیابی نشد.</string>
+    <string name="subscription_custom_hwid_params">پارامترهای سفارشی HWID</string>
+    <string name="subscription_custom_hwid_params_summary">قالب: hwid=value,os=value,osVersion=value,model=value. برای استفاده از مقادیر این دستگاه خالی بگذارید؛ هنگام تکمیل، فقط مقادیر فهرست‌شده ارسال می‌شوند.</string>
 </resources>

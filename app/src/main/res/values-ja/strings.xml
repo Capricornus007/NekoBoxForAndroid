@@ -1094,6 +1094,26 @@
     <string name="ui_style_expressive">エクスプレッシブ</string>
     <string name="update_existing_subscriptions_ua">既存のサブスクリプションの UA を更新</string>
     <string name="use_system_theme">システムテーマを使用</string>
+    <string name="amoled_theme">AMOLED ダークテーマ</string>
+    <string name="amoled_theme_summary">ダークモードで純黒の背景を使用する</string>
+    <string name="app_theme">アクセントカラー</string>
+    <string name="authenticated_http_proxy_unavailable">Android VPN の HTTP プロキシはユーザー名とパスワードに対応していません。</string>
+    <string name="clash_api_token">Clash API トークン</string>
+    <string name="clash_api_token_summary">ダッシュボードのアクセストークンを表示またはコピーします</string>
+    <string name="enable_clash_api">Clash API を有効化</string>
+    <string name="enable_clash_api_summary">127.0.0.1:9090 で clash api と yacd ダッシュボードを提供します</string>
+    <string name="confirm_stop_service">実行中のプロキシを停止しますか？</string>
+    <string name="confirm_clear_cache">プロキシを停止し、コアのキャッシュをクリアしてアプリを再起動しますか？</string>
+    <string name="downloads_proxy_only">更新はプロキシ経由のみ</string>
+    <string name="downloads_proxy_only_summary">サブスクリプションと GeoIP/GeoSite の更新には、実行中のローカル SOCKS プロキシが必要です。直接フォールバックは無効です。</string>
+    <string name="backup_encryption_password">バックアップパスワード（任意）</string>
+    <string name="backup_encryption_summary">8文字以上にすると、エクスポート・共有・WebDAV バックアップを保護します。暗号化しないバックアップの場合は空のままにします。パスワードは保存されません。</string>
+    <string name="backup_password_short">バックアップパスワードは8文字以上にしてください。</string>
+    <string name="backup_decrypt_failed">パスワードが正しくないか、バックアップが破損しています。何も復元されませんでした。</string>
+    <string name="subscription_send_hwid">HWID を送信</string>
+    <string name="subscription_send_hwid_summary">このサブスクリプションを更新するとき、HWID、Android バージョン、端末モデルを送信します</string>
+    <string name="subscription_custom_hwid_params">カスタム HWID パラメータ</string>
+    <string name="subscription_custom_hwid_params_summary">形式: hwid=値,os=値,osVersion=値,model=値。空のままにするとこの端末の値を使用します。</string>
     <string name="use_system_theme_summary">システムの Monet カラーを使用（Android 12+）</string>
     <string name="waterfall_settings">ウォーターフォール設定</string>
     <string name="webdav_insecure_url">安全でない WebDAV URL</string>

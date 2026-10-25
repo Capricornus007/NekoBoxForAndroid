@@ -1142,4 +1142,46 @@
     <string name="openvpn_tls_version_min">Version TLS minimale</string>
     <string name="openvpn_topology">Topologie</string>
     <string name="openvpn_transport">Protocole</string>
+    <string name="adaptive_traffic_polling">Interrogation adaptative du trafic</string>
+    <string name="adaptive_traffic_polling_summary">Interroger moins souvent écran éteint ou application en arrière-plan.</string>
+    <string name="amoled_theme">Thème sombre AMOLED</string>
+    <string name="amoled_theme_summary">Fond noir pur en mode sombre</string>
+    <string name="app_theme">Couleur d’accent</string>
+    <string name="authenticated_http_proxy_unavailable">Le proxy HTTP VPN Android ne prend pas en charge le nom d’utilisateur et le mot de passe requis.</string>
+    <string name="backup_decrypt_failed">Mot de passe incorrect ou sauvegarde endommagée. Rien n’a été restauré.</string>
+    <string name="backup_encryption_password">Mot de passe de sauvegarde (facultatif)</string>
+    <string name="backup_encryption_summary">Au moins 8 caractères protègent les sauvegardes exportées, partagées et WebDAV. Laisser vide pour une sauvegarde non chiffrée. Le mot de passe n’est pas enregistré.</string>
+    <string name="backup_password_short">Utilisez au moins 8 caractères pour le mot de passe de sauvegarde.</string>
+    <string name="clash_api_token">Jeton de l’API Clash</string>
+    <string name="clash_api_token_summary">Afficher ou copier le jeton d’accès au tableau de bord</string>
+    <string name="close">Fermer</string>
+    <string name="confirm_clear_cache">Arrêter le proxy, vider le cache du noyau et redémarrer l’application ?</string>
+    <string name="confirm_stop_service">Arrêter le proxy en cours d’exécution ?</string>
+    <string name="copy_current_link">Copier le lien</string>
+    <string name="downloads_proxy_only">Mises à jour uniquement via le proxy</string>
+    <string name="downloads_proxy_only_summary">Les mises à jour d’abonnements et de GeoIP/GeoSite nécessitent le proxy SOCKS local actif. Le repli direct est désactivé.</string>
+    <string name="enable_clash_api">Activer l’API Clash</string>
+    <string name="enable_clash_api_summary">Fournir l’API Clash et le tableau de bord yacd sur 127.0.0.1:9090</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="local_proxy_settings">Paramètres du proxy local</string>
+    <string name="please_update">Votre application est trop ancienne (%1$s). Et cessera de fonctionner à %2$s. Veuillez
+        la mettre à jour !</string>
+    <string name="please_update_force">Votre application est trop ancienne (%1$s). Et a cessé de fonctionner à %2$s.
+        Veuillez la mettre à jour !</string>
+    <string name="port_out_of_range">Le port doit être dans la plage 1–65535</string>
+    <string name="proton_session_expired">Votre session Proton a été refusée. Veuillez vous reconnecter.</string>
+    <string name="proxy_password">Mot de passe du proxy</string>
+    <string name="proxy_username">Nom d\'utilisateur du proxy</string>
+    <string name="qrcode_format_sn">Lien SN</string>
+    <string name="qrcode_format_standard">Standard</string>
+    <string name="qrcode_sn_hint">Lien sérialisé dédié à Sing-box &amp; Neko (sn://)</string>
+    <string name="qrcode_standard_hint">Format URI standard (compatible avec les clients courants)</string>
+    <string name="socks_port">Port du proxy SOCKS5</string>
+    <string name="subscription_custom_hwid_params">Paramètres HWID personnalisés</string>
+    <string name="subscription_custom_hwid_params_summary">Format : hwid=valeur,os=valeur,osVersion=valeur,model=valeur. Laisser vide pour utiliser les valeurs de cet appareil ; si rempli, seules les valeurs listées sont envoyées.</string>
+    <string name="subscription_direct_fallback">Repli en connexion directe pour les abonnements</string>
+    <string name="subscription_direct_fallback_summary">Réessayer l’abonnement en direct si le proxy local échoue. À éviter si l’URL contient un token.</string>
+    <string name="subscription_send_hwid">Envoyer HWID</string>
+    <string name="subscription_send_hwid_summary">Envoyer HWID, version Android et modèle de l’appareil lors de la mise à jour de cet abonnement</string>
 </resources>

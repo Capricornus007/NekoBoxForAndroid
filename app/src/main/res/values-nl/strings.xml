@@ -1130,4 +1130,24 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="ua_updated_toast">UA bijgewerkt</string>
     <string name="udp_over_tcp">UDP via TCP</string>
     <string name="update_existing_subscriptions_ua">UA van bestaande abonnementen bijwerken</string>
+    <string name="amoled_theme">AMOLED donker thema</string>
+    <string name="amoled_theme_summary">Zuiver zwarte achtergrond in de donkere modus</string>
+    <string name="app_theme">Accentkleur</string>
+    <string name="authenticated_http_proxy_unavailable">De HTTP-proxy van Android VPN ondersteunt de vereiste gebruikersnaam en het wachtwoord niet.</string>
+    <string name="backup_decrypt_failed">Onjuist wachtwoord of beschadigde back-up. Er is niets hersteld.</string>
+    <string name="backup_encryption_password">Back-upwachtwoord (optioneel)</string>
+    <string name="backup_encryption_summary">Ten minste 8 tekens beschermt geëxporteerde, gedeelde en WebDAV-back-ups. Laat leeg voor een niet-gecodeerde back-up. Het wachtwoord wordt niet opgeslagen.</string>
+    <string name="backup_password_short">Gebruik ten minste 8 tekens voor het back-upwachtwoord.</string>
+    <string name="clash_api_token">Clash API-token</string>
+    <string name="clash_api_token_summary">Toon of kopieer de toegangstoken van het dashboard</string>
+    <string name="confirm_clear_cache">Proxy stoppen, core-cache wissen en de app opnieuw starten?</string>
+    <string name="confirm_stop_service">De actieve proxy stoppen?</string>
+    <string name="downloads_proxy_only">Alleen updates via proxy</string>
+    <string name="downloads_proxy_only_summary">Updates voor abonnementen en GeoIP/GeoSite vereisen de actieve lokale SOCKS-proxy. Directe fallback is uitgeschakeld.</string>
+    <string name="enable_clash_api">Clash API inschakelen</string>
+    <string name="enable_clash_api_summary">Clash API en yacd-dashboard leveren op 127.0.0.1:9090</string>
+    <string name="subscription_custom_hwid_params">Aangepaste HWID-parameters</string>
+    <string name="subscription_custom_hwid_params_summary">Formaat: hwid=waarde,os=waarde,osVersion=waarde,model=waarde. Leeg laten om de waarden van dit apparaat te gebruiken; bij invulling worden alleen de vermelde waarden verzonden.</string>
+    <string name="subscription_send_hwid">HWID verzenden</string>
+    <string name="subscription_send_hwid_summary">HWID, Android-versie en apparaatmodel verzenden bij het bijwerken van dit abonnement</string>
 </resources>

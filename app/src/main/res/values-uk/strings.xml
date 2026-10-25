@@ -1150,4 +1150,24 @@
     <string name="udp_over_tcp">UDP через TCP</string>
     <string name="update_existing_subscriptions_ua">Оновити User-Agent наявних підписок</string>
     <string name="xhttp_settings">Налаштування XHTTP</string>
+    <string name="amoled_theme">Темна тема AMOLED</string>
+    <string name="amoled_theme_summary">Чисто чорний фон у темному режимі</string>
+    <string name="app_theme">Акцентний колір</string>
+    <string name="authenticated_http_proxy_unavailable">HTTP-проксі Android VPN не підтримує необхідні ім\'я користувача та пароль.</string>
+    <string name="backup_decrypt_failed">Неправильний пароль або пошкоджений резервний файл. Нічого не відновлено.</string>
+    <string name="backup_encryption_password">Пароль резервної копії (необов\'язково)</string>
+    <string name="backup_encryption_summary">Щонайменше 8 символів захищають експортовані, спільні та WebDAV резервні копії. Залиште порожнім для незашифрованої резервної копії. Пароль не зберігається.</string>
+    <string name="backup_password_short">Використовуйте щонайменше 8 символів для пароля резервної копії.</string>
+    <string name="clash_api_token">Токен Clash API</string>
+    <string name="clash_api_token_summary">Показати або скопіювати токен доступу до панелі</string>
+    <string name="confirm_clear_cache">Зупинити проксі, очистити кеш ядра та перезапустити застосунок?</string>
+    <string name="confirm_stop_service">Зупинити запущене проксі?</string>
+    <string name="downloads_proxy_only">Оновлення лише через проксі</string>
+    <string name="downloads_proxy_only_summary">Оновлення підписок і GeoIP/GeoSite вимагають запущеного локального SOCKS-проксі. Прямий резервний варіант вимкнено.</string>
+    <string name="enable_clash_api">Увімкнути Clash API</string>
+    <string name="enable_clash_api_summary">Надає Clash API та панель yacd на 127.0.0.1:9090</string>
+    <string name="subscription_custom_hwid_params">Власні параметри HWID</string>
+    <string name="subscription_custom_hwid_params_summary">Формат: hwid=значення,os=значення,osVersion=значення,model=значення. Залиште порожнім, щоб використати значення цього пристрою; якщо заповнено, надсилаються лише вказані значення.</string>
+    <string name="subscription_send_hwid">Надсилати HWID</string>
+    <string name="subscription_send_hwid_summary">Надсилати HWID, версію Android і модель пристрою під час оновлення цієї підписки</string>
 </resources>

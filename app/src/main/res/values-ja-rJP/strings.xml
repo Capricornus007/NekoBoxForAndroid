@@ -13,6 +13,26 @@
     <string name="menu_about">概要</string>
     <string name="theme">テーマ</string>
     <string name="use_system_theme">システムテーマを使用</string>
+    <string name="amoled_theme">AMOLED ダークテーマ</string>
+    <string name="amoled_theme_summary">ダークモードで純黒の背景を使用する</string>
+    <string name="app_theme">アクセントカラー</string>
+    <string name="authenticated_http_proxy_unavailable">Android VPN の HTTP プロキシはユーザー名とパスワードに対応していません。</string>
+    <string name="clash_api_token">Clash API トークン</string>
+    <string name="clash_api_token_summary">ダッシュボードのアクセストークンを表示またはコピーします</string>
+    <string name="enable_clash_api">Clash API を有効化</string>
+    <string name="enable_clash_api_summary">127.0.0.1:9090 で clash api と yacd ダッシュボードを提供します</string>
+    <string name="confirm_stop_service">実行中のプロキシを停止しますか？</string>
+    <string name="confirm_clear_cache">プロキシを停止し、コアのキャッシュをクリアしてアプリを再起動しますか？</string>
+    <string name="downloads_proxy_only">更新はプロキシ経由のみ</string>
+    <string name="downloads_proxy_only_summary">サブスクリプションと GeoIP/GeoSite の更新には、実行中のローカル SOCKS プロキシが必要です。直接フォールバックは無効です。</string>
+    <string name="backup_encryption_password">バックアップパスワード（任意）</string>
+    <string name="backup_encryption_summary">8文字以上にすると、エクスポート・共有・WebDAV バックアップを保護します。暗号化しないバックアップの場合は空のままにします。パスワードは保存されません。</string>
+    <string name="backup_password_short">バックアップパスワードは8文字以上にしてください。</string>
+    <string name="backup_decrypt_failed">パスワードが正しくないか、バックアップが破損しています。何も復元されませんでした。</string>
+    <string name="subscription_send_hwid">HWID を送信</string>
+    <string name="subscription_send_hwid_summary">このサブスクリプションを更新するとき、HWID、Android バージョン、端末モデルを送信します</string>
+    <string name="subscription_custom_hwid_params">カスタム HWID パラメータ</string>
+    <string name="subscription_custom_hwid_params_summary">形式: hwid=値,os=値,osVersion=値,model=値。空のままにするとこの端末の値を使用します。</string>
     <string name="use_system_theme_summary">システムMonetカラーを使用（Android 12以上）</string>
     <string name="document">ドキュメント</string>
     <string name="group_default">未グループ化</string>
@@ -234,6 +254,14 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="action_export_msg">エクスポート成功！</string>
     <string name="action_export_err">エクスポートに失敗しました。</string>
     <string name="action_import_msg">インポートに成功しました！</string>
+    <string name="close">閉じる</string>
+    <string name="copy_current_link">リンクをコピー</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="qrcode_format_standard">標準</string>
+    <string name="qrcode_format_sn">SN リンク</string>
+    <string name="qrcode_standard_hint">標準 URI 形式（一般的なクライアントと互換）</string>
+    <string name="qrcode_sn_hint">sing-box &amp; Neko 専用のシリアライズリンク（sn://）</string>
     <string name="action_import_err">インポートに失敗しました。</string>
     <string name="file_manager_missing">お使いのデバイスにはAndroid標準のファイルセレクターがありません。
         Material Filesなどのファイルセレクターをインストールしてください。</string>
@@ -893,6 +921,10 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="tun_implementation_hev_override">Hev TUN が管理しています。選択するには無効にしてください</string>
     <string name="enable_hev_tun">Hev TUN を有効化</string>
     <string name="enable_hev_tun_summary">hev-socks5-tunnel で TUN デバイスを作成</string>
+    <string name="subscription_direct_fallback">直接フォールバック</string>
+    <string name="subscription_direct_fallback_summary">ローカルプロキシで購読を取得できないとき、直接接続で再試行します。URL に token が含まれる場合は有効にしないでください。</string>
+    <string name="adaptive_traffic_polling">アダプティブなトラフィックポーリング</string>
+    <string name="adaptive_traffic_polling_summary">バックグラウンドまたは画面オフのときは、トラフィックカウンターのポーリング頻度を下げます</string>
     <string name="speed_test_mode">スピードテスト方式</string>
     <string name="speed_test_mode_download">ダウンロードのみ</string>
     <string name="speed_test_mode_download_upload">ダウンロード + アップロード</string>
@@ -930,6 +962,11 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="byedpi_cli_strategy">CLI戦略</string>
     <string name="byedpi_cli_summary" tools:ignore="TypographyDashes">内蔵byeDPIへの引数（例: --split 0 --disorder 1）</string>
     <string name="udp_fragment">UDP フラグメンテーション</string>
+    <string name="local_proxy_settings">ローカルプロキシ設定</string>
+    <string name="port_out_of_range">ポートは 1〜65535 の範囲で指定してください</string>
+    <string name="socks_port">SOCKS5 プロキシポート</string>
+    <string name="proxy_username">プロキシユーザー名</string>
+    <string name="proxy_password">プロキシパスワード</string>
     <string name="card_style">カード</string>
     <string name="card_style_classic">クラシック</string>
     <string name="card_style_stroke">枠線</string>
@@ -1023,6 +1060,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_sign_out">サインアウト</string>
     <string name="proton_signed_in">サインイン済み</string>
     <string name="proton_not_signed_in">未サインイン</string>
+    <string name="proton_session_expired">Proton セッションが拒否されました。もう一度サインインしてください。</string>
     <string name="proton_refresh">サーバーを更新</string>
     <string name="proton_add">追加</string>
     <string name="proton_added">%s を追加しました</string>

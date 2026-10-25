@@ -1118,4 +1118,24 @@
     <string name="udp_over_tcp">TCP üzerinden UDP</string>
     <string name="update_existing_subscriptions_ua">Mevcut aboneliklerin User-Agent bilgisini güncelle</string>
     <string name="waterfall_settings">Şelale Ayarları</string>
+    <string name="amoled_theme">AMOLED koyu tema</string>
+    <string name="amoled_theme_summary">Karanlık modda saf siyah arka plan</string>
+    <string name="app_theme">Vurgu rengi</string>
+    <string name="authenticated_http_proxy_unavailable">Android VPN HTTP proxy\'si gereken kullanıcı adını ve parolayı desteklemiyor.</string>
+    <string name="backup_decrypt_failed">Yanlış parola veya bozuk yedek. Hiçbir şey geri yüklenmedi.</string>
+    <string name="backup_encryption_password">Yedek parolası (isteğe bağlı)</string>
+    <string name="backup_encryption_summary">En az 8 karakter, dışa aktarılan, paylaşılan ve WebDAV yedeklerini korur. Şifrelenmemiş yedek için boş bırakın. Parola kaydedilmez.</string>
+    <string name="backup_password_short">Yedek parolası için en az 8 karakter kullanın.</string>
+    <string name="clash_api_token">Clash API belirteci</string>
+    <string name="clash_api_token_summary">Panel erişim belirtecini göster veya kopyala</string>
+    <string name="confirm_clear_cache">Proxy durdurulsun, çekirdek önbelleği temizlensin ve uygulama yeniden başlatılsın mı?</string>
+    <string name="confirm_stop_service">Çalışan proxy durdurulsun mu?</string>
+    <string name="downloads_proxy_only">Yalnızca proxy üzerinden güncellemeler</string>
+    <string name="downloads_proxy_only_summary">Abonelik ve GeoIP/GeoSite güncellemeleri, çalışan yerel SOCKS proxy\'si gerektirir. Doğrudan geri dönüş devre dışıdır.</string>
+    <string name="enable_clash_api">Clash API\'yi etkinleştir</string>
+    <string name="enable_clash_api_summary">127.0.0.1:9090 adresinde Clash API ve yacd panelini sağlar</string>
+    <string name="subscription_custom_hwid_params">Özel HWID parametreleri</string>
+    <string name="subscription_custom_hwid_params_summary">Biçim: hwid=değer,os=değer,osVersion=değer,model=değer. Bu cihazın değerlerini kullanmak için boş bırakın; doldurulduğunda yalnızca listelenen değerler gönderilir.</string>
+    <string name="subscription_send_hwid">HWID gönder</string>
+    <string name="subscription_send_hwid_summary">Bu aboneliği güncellerken HWID, Android sürümü ve cihaz modelini gönder</string>
 </resources>

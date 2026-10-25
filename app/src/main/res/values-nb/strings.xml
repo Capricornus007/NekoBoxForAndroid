@@ -590,8 +590,8 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="tuic_disable_sni">Deaktiver SNI</string>
     <string name="tuic_reduce_rtt">Aktiver 0-RTT QUIC-håndtrykk</string>
     <string name="pinned_certchain_sha256">Festet sertifikat SHA256</string>
-    <string name="please_update" formatted="false">Appen din er for gammel (%1$s). Den vil slutte å fungere %2$s. Vennligst oppdater!</string>
-    <string name="please_update_force" formatted="false">Appen din er for gammel (%1$s). Den har sluttet å fungere fra %2$s. Vennligst oppdater!</string>
+    <string name="please_update" formatted="false">Appen din er for gammel (%s). Den vil slutte å fungere %s. Vennligst oppdater!</string>
+    <string name="please_update_force" formatted="false">Appen din er for gammel (%s). Den har sluttet å fungere fra %s. Vennligst oppdater!</string>
     <string name="connection_test_delete_unavailable">Fjern utilgjengelige</string>
     <string name="move">Flytt</string>
     <string name="exe_prefer_provider">Foretrukket plugin-leverandør</string>
@@ -1152,4 +1152,24 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="socks_port">Port for SOCKS5-proxy</string>
     <string name="ua_updated_toast">UA oppdatert</string>
     <string name="update_existing_subscriptions_ua">Oppdater UA for eksisterende abonnementer</string>
+    <string name="subscription_send_hwid">Send HWID</string>
+    <string name="subscription_send_hwid_summary">Send HWID, Android-versjon og enhetsmodell når dette abonnementet oppdateres</string>
+    <string name="amoled_theme">AMOLED-mørktema</string>
+    <string name="amoled_theme_summary">Rent svart bakgrunn i mørk modus</string>
+    <string name="app_theme">Aksentfarge</string>
+    <string name="authenticated_http_proxy_unavailable">Android-VPN-HTTP-proxy støtter ikke påkrevd brukernavn og passord.</string>
+    <string name="clash_api_token">Clash API-token</string>
+    <string name="clash_api_token_summary">Vis eller kopier tilgangstokenet til dashbordet</string>
+    <string name="enable_clash_api">Aktiver Clash API</string>
+    <string name="enable_clash_api_summary">Tilby Clash API og yacd-dashbord på 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">Stoppe proxyen som kjører?</string>
+    <string name="confirm_clear_cache">Stoppe proxyen, tømme kjernens hurtigbuffer og starte appen på nytt?</string>
+    <string name="downloads_proxy_only">Oppdateringer bare via proxy</string>
+    <string name="downloads_proxy_only_summary">Oppdateringer av abonnement og GeoIP/GeoSite krever at den lokale SOCKS-proxyen kjører. Direkte fallback er deaktivert.</string>
+    <string name="backup_encryption_password">Sikkerhetskopieringspassord (valgfritt)</string>
+    <string name="backup_encryption_summary">Minst 8 tegn beskytter eksporterte, delte og WebDAV-sikkerhetskopier. La stå tomt for ukryptert sikkerhetskopi. Passordet lagres ikke.</string>
+    <string name="backup_password_short">Bruk minst 8 tegn i sikkerhetskopieringspassordet.</string>
+    <string name="backup_decrypt_failed">Feil passord eller skadet sikkerhetskopi. Ingenting ble gjenopprettet.</string>
+    <string name="subscription_custom_hwid_params">Egendefinerte HWID-parametere</string>
+    <string name="subscription_custom_hwid_params_summary">Format: hwid=verdi,os=verdi,osVersion=verdi,model=verdi. La stå tomt for å bruke denne enhetens verdier; når feltet er fylt, sendes bare de oppførte verdiene.</string>
 </resources>
