@@ -863,12 +863,12 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
 
             R.id.action_update_subscription -> {
-                val group = DataStore.currentGroup()
-                if (group.type != GroupType.SUBSCRIPTION) {
-                    snackbar(R.string.group_not_subscription).show()
-                    Logs.e("onMenuItemClick: Group(${group.displayName()}) is not subscription")
-                } else {
-                    runOnLifecycleDispatcher {
+                runOnLifecycleDispatcher {
+                    val group = withContext(Dispatchers.IO) { DataStore.currentGroup() }
+                    if (group.type != GroupType.SUBSCRIPTION) {
+                        snackbar(R.string.group_not_subscription).show()
+                        Logs.e("onMenuItemClick: Group(${group.displayName()}) is not subscription")
+                    } else {
                         GroupUpdater.startUpdate(group, true)
                     }
                 }
@@ -1069,7 +1069,13 @@ class ConfigurationFragment @JvmOverloads constructor(
 
     private fun speedTest() {
         if (anyTestRunning()) return
-        val group = DataStore.currentGroup()
+        runOnLifecycleDispatcher {
+            val group = withContext(Dispatchers.IO) { DataStore.currentGroup() }
+            withContext(Dispatchers.Main) { speedTestBody(group) }
+        }
+    }
+
+    private fun speedTestBody(group: ProxyGroup) {
         val binding = LayoutProgressListBinding.inflate(layoutInflater)
         val builder = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.speed_test_group)
@@ -1267,8 +1273,14 @@ class ConfigurationFragment @JvmOverloads constructor(
             return
         }
         if (speedTestJob.isRunning()) return
+        runOnLifecycleDispatcher {
+            val group = withContext(Dispatchers.IO) { DataStore.currentGroup() }
+            withContext(Dispatchers.Main) { urlTestBody(group) }
+        }
+    }
+
+    private fun urlTestBody(group: ProxyGroup) {
         val results = mutableListOf<ProxyEntity>()
-        val group = DataStore.currentGroup()
 
         fun refreshRows(profiles: Collection<ProxyEntity>) {
             adapter.groupFragments[group.id]?.adapter?.applyProfileState(profiles)
