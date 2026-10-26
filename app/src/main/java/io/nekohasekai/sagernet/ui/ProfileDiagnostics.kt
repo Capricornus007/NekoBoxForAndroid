@@ -31,9 +31,9 @@ import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.fmt.buildConfig
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.readableMessage
-import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.redactConfigJson
 import io.nekohasekai.sagernet.ktx.redactDiagnostic
+import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import kotlinx.coroutines.*
 import libcore.Libcore
 import moe.matsuri.nb4a.net.LocalResolverImpl

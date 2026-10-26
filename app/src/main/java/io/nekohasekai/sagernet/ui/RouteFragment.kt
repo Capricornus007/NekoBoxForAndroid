@@ -428,8 +428,11 @@ class RouteFragment :
                 profileType.text = rule.mkSummary()
                 routeOutbound.text = when (val ob = ruleEntity.outbound) {
                     0L -> getString(R.string.route_proxy)
+
                     -1L -> getString(R.string.route_bypass)
+
                     -2L -> getString(R.string.route_block)
+
                     else -> ruleAdapter.outboundNames[ob]
                         ?: ProfileManager.getProfile(ob)?.displayName()
                         ?: getString(R.string.error_title)

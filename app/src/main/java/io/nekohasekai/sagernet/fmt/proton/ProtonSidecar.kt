@@ -467,25 +467,24 @@ object ProtonSidecar {
         }
     }
 
-    suspend fun nodes(country: String = "", limit: Int = 0, maxTier: Int = 0): ProtonNodesState =
-        withContext(Dispatchers.IO) {
-            if (!sessionFile.exists()) {
-                return@withContext ProtonNodesState(false, error = "not logged in")
-            }
-            val args = ArrayList(listOf("nodes", "--state", sessionFile.absolutePath))
-            if (country.isNotEmpty()) args += listOf("--country", country)
-            if (limit > 0) args += listOf("--limit", limit.toString())
-            if (maxTier > 0) args += listOf("--tier", maxTier.toString())
-            when (val result = runSidecar(args, null)) {
-                is ProtonOutcome.Success -> ProtonJson.parseNodes(result.json)
+    suspend fun nodes(country: String = "", limit: Int = 0, maxTier: Int = 0): ProtonNodesState = withContext(Dispatchers.IO) {
+        if (!sessionFile.exists()) {
+            return@withContext ProtonNodesState(false, error = "not logged in")
+        }
+        val args = ArrayList(listOf("nodes", "--state", sessionFile.absolutePath))
+        if (country.isNotEmpty()) args += listOf("--country", country)
+        if (limit > 0) args += listOf("--limit", limit.toString())
+        if (maxTier > 0) args += listOf("--tier", maxTier.toString())
+        when (val result = runSidecar(args, null)) {
+            is ProtonOutcome.Success -> ProtonJson.parseNodes(result.json)
 
-                is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
-                    ProtonJson.parseNodes(result.stdout)
-                } else {
-                    ProtonNodesState(false, error = result.message)
-                }
+            is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
+                ProtonJson.parseNodes(result.stdout)
+            } else {
+                ProtonNodesState(false, error = result.message)
             }
         }
+    }
 
     fun logout() {
         if (!sessionFile.delete() && sessionFile.exists()) {

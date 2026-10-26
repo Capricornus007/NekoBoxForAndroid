@@ -56,8 +56,7 @@ class NetworkProfilesActivity : ThemedActivity() {
         }
     }
 
-    private fun profileLabel(profileId: Long, fallback: String): String =
-        profileNames[profileId] ?: fallback
+    private fun profileLabel(profileId: Long, fallback: String): String = profileNames[profileId] ?: fallback
 
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
     private val permission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -148,7 +147,7 @@ class NetworkProfilesActivity : ThemedActivity() {
                 isChecked = DataStore.networkProfilesEnabled
                 setOnCheckedChangeListener { _, checked ->
                     // 快照必須排在寫入前，capture＋寫入＋重載放同一背景作業
-                    //（capture 查 PublicDatabase、主線跑會被吞掉＝回滾點失效）
+                    // （capture 查 PublicDatabase、主線跑會被吞掉＝回滾點失效）
                     runOnDefaultDispatcher {
                         NetworkSettingsHistory.capture()
                         DataStore.networkProfilesEnabled = checked
