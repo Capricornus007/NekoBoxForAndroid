@@ -62,7 +62,8 @@ func TestOvpnCommandWritesMaterialAndConfig(t *testing.T) {
 	statePath := writeTestSession(t, dir)
 	var stdout, stderr bytes.Buffer
 	code := runOvpn([]string{"--state", statePath, "--out-dir", outDir, "--api-url", srv.URL,
-		"--host", "ch-ll-007.protonvpn.net", "--port", "1194", "--proto", "udp"}, &stdout, &stderr)
+		"--host", "ch-ll-007.protonvpn.net", "--port", "1194", "--proto", "udp",
+		"--username", "tester@proton.me"}, &stdout, &stderr)
 	if code != 0 {
 		t.Fatalf("runOvpn exit=%d out=%q stderr=%q", code, stdout.String(), stderr.String())
 	}
@@ -84,7 +85,8 @@ func TestOvpnCommandWritesMaterialAndConfig(t *testing.T) {
 		t.Fatalf("out = %+v, want ok with the API expiry", out)
 	}
 	for _, want := range []string{"remote ch-ll-007.protonvpn.net 1194 udp", "cipher AES-256-GCM",
-		"<tls-crypt>", "<ca>", "<cert>", "<key>", "auth-user-pass", "remote-cert-tls server", "SIGNED"} {
+		"<tls-crypt>", "<ca>", "<cert>", "<key>", "auth-user-pass", `setenv USERNAME "tester@proton.me"`,
+		"remote-cert-tls server", "SIGNED"} {
 		if !strings.Contains(out.Config, want) {
 			t.Errorf("config missing %q:\n%s", want, out.Config)
 		}
@@ -142,5 +144,19 @@ func TestOvpnCommandReportsExpiryWhenSessionRejected(t *testing.T) {
 	}
 	if out.OK || out.Code != codeSessionExpired {
 		t.Errorf("out = %+v, want code %s so the app can route to sign-in", out, codeSessionExpired)
+	}
+}
+
+// TestOvpnConfigOmitsAuthUserPassWithoutUsername 釘住官方模板的條件式寫法：
+// 沒有帳密就不發 auth-user-pass，避免把「一定要密碼」這個假設塞進剖面。
+func TestOvpnConfigOmitsAuthUserPassWithoutUsername(t *testing.T) {
+	cfg := openvpnConfig("nl-001.protonvpn.net", 443, "tcp", "PRIV", "CERT", "")
+	if strings.Contains(cfg, "auth-user-pass") || strings.Contains(cfg, "setenv USERNAME") {
+		t.Errorf("config without username still carries auth-user-pass:\n%s", cfg)
+	}
+	for _, want := range []string{"remote nl-001.protonvpn.net 443 tcp", "<cert>", "CERT", "PRIV"} {
+		if !strings.Contains(cfg, want) {
+			t.Errorf("config missing %q", want)
+		}
 	}
 }

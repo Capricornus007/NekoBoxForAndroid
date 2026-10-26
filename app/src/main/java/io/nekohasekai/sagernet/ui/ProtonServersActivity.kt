@@ -342,7 +342,11 @@ class ProtonServersActivity : ThemedActivity() {
             // 只講 OpenVPN／ProTun 的那批機器沒有 WG 金鑰，不能硬生一份 peer 空白、
             // 點下去必定連不上的 WireGuard 剖面；生出來比不生更壞。
             if (!node.hasWireGuardKey) {
-                if (!isFinishing && !isDestroyed) binding.status.setText(R.string.proton_needs_ovpn_config)
+                if (node.canUse(ProtonNode.PROTOCOL_OPENVPN)) {
+                    importOpenVpn(node)
+                } else if (!isFinishing && !isDestroyed) {
+                    binding.status.setText(R.string.proton_needs_ovpn_config)
+                }
                 return@launch
             }
             val pair = ProtonSidecar.keyPair()
@@ -382,6 +386,45 @@ class ProtonServersActivity : ThemedActivity() {
                 Logs.w("proton import failed", e)
                 if (!isFinishing && !isDestroyed) {
                     binding.status.text = e.localizedMessage ?: e.toString()
+                }
+            }
+        }
+    }
+
+    // OpenVPN 節點：向 Proton 換一張本機客戶端憑證（sidecar ovpn），拼出自包含 .ovpn，
+    // 交給 nb4a 現成的 OpenVPN 解析器生剖面。**全程不問任何東西**：帳號名取自已存的
+    // 登入記錄／狀態檔，憑證自動換、自動落地，按下去就多一個能用的節點。
+    private fun importOpenVpn(node: ProtonNode) {
+        lifecycleScope.launch {
+            val ovpn = ProtonSidecar.ovpn(node.endpoint, if (node.port > 0) node.port else OPENVPN_PORT, "udp")
+            if (isFinishing || isDestroyed) return@launch
+            if (!ovpn.ok) {
+                if (ovpn.code == ProtonSidecar.SESSION_EXPIRED) {
+                    showSessionExpired()
+                } else {
+                    binding.status.text = ovpn.error
+                }
+                return@launch
+            }
+            try {
+                val parsed = parseOpenVPNConfig(ovpn.config)
+                val bean = parsed.bean
+                bean.name = "${node.name} (OpenVPN)"
+                val (groupId, created) = ProtonGroups.ensure()
+                ProfileManager.createProfile(groupId, bean)
+                if (isFinishing || isDestroyed) return@launch
+                if (created) {
+                    Toast.makeText(
+                        this@ProtonServersActivity,
+                        getString(R.string.proton_group_added, ProtonGroups.NAME),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+                binding.status.text = getString(R.string.proton_added, node.name)
+            } catch (e: Exception) {
+                Logs.w("proton openvpn import failed", e)
+                if (!isFinishing && !isDestroyed) {
+                    binding.status.text = e.readableMessage
                 }
             }
         }

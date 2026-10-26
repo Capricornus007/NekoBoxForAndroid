@@ -50,6 +50,10 @@ type loginInput struct {
 
 type storedCredential struct {
 	UID          string `json:"uid"`
+	// Username 是登入時那個帳號名。存進狀態檔是為了「登一次就夠」：OpenVPN 的
+	// auth-user-pass 要填帳號名，不能回頭叫用戶再打一次（App 那邊登完就把密碼欄清空，
+	// 也不該再問）。舊狀態檔沒這欄時為空字串，呼叫端退回自己的記錄值。
+	Username     string `json:"username,omitempty"`
 	UserID       string `json:"userId"`
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
@@ -151,6 +155,7 @@ func runLogin(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 
 	cred := storedCredential{
 		UID:          auth.UID,
+		Username:     in.Username,
 		UserID:       auth.UserID,
 		AccessToken:  auth.AccessToken,
 		RefreshToken: auth.RefreshToken,

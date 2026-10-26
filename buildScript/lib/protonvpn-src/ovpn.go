@@ -140,7 +140,10 @@ func fetchOpenVPNCertificate(ctx context.Context, apiURL string, cred storedCred
 // OpenVPNConfigFmt.kt 的 MATERIAL_BLOCKS），自包含一份就好帶、也好核；
 // 同時仍把四份材料寫檔，讓用戶能把同一份憑證拿去別處用。
 // remote 的 host/埠/協定由呼叫端從 /vpn/v2/logicals 那台的 EntryPerProtocol 挑。
-func openvpnConfig(host string, port int, proto, privPEM, certPEM string) string {
+// username 為空時不寫 auth-user-pass：官方 Windows 端 ConfigTemplate.cs:55-57 就是
+// 「帳號與密碼都有值才加這條」，憑證式連線不假設一定要帳密。nb4a 的解析器也照這個
+// 語意走（沒這條就不會要求補密碼）。
+func openvpnConfig(host string, port int, proto, privPEM, certPEM, username string) string {
 	var b strings.Builder
 	b.WriteString("client\ndev tun\nremote " + host + " " + fmt.Sprint(port) + " " + proto + "\n")
 	b.WriteString("proto " + proto + "\n")
@@ -149,7 +152,9 @@ func openvpnConfig(host string, port int, proto, privPEM, certPEM string) string
 	b.WriteString("persist-key\npersist-tun\nping 15\nping-restart 0\nping-timer-rem\n")
 	b.WriteString("reneg-sec 0\nhand-window 15\nconnect-timeout 10\nconnect-retry-max 1\n")
 	b.WriteString("remote-cert-tls server\nkey-direction 1\ndisable-dco\n")
-	b.WriteString("auth-user-pass\n")
+	if username != "" {
+		b.WriteString("auth-user-pass\nsetenv USERNAME \"" + username + "\"\n")
+	}
 	b.WriteString("<tls-crypt>\n" + strings.TrimSpace(protonTLSCryptKey) + "\n</tls-crypt>\n")
 	b.WriteString("<ca>\n" + strings.TrimSpace(protonOpenvpnCA) + "\n</ca>\n")
 	b.WriteString("<cert>\n" + strings.TrimSpace(certPEM) + "\n</cert>\n")
@@ -198,6 +203,7 @@ func runOvpn(args []string, stdout, stderr io.Writer) int {
 	host := command.String("host", "", "server hostname to dial (required)")
 	port := command.Int("port", 0, "port to dial (required)")
 	proto := command.String("proto", "udp", "udp or tcp")
+	username := command.String("username", "", "account name for auth-user-pass; empty falls back to the login name in the session file")
 	duration := command.String("duration", "", `certificate duration, e.g. "6000000 min" (empty = API default)`)
 	apiURL := command.String("api-url", defaultProtonAPIURL, "API base URL")
 	timeoutSec := command.Int("timeout", 60, "overall deadline in seconds")
@@ -217,6 +223,12 @@ func runOvpn(args []string, stdout, stderr io.Writer) int {
 	cred, err := readCredentialFile(*statePath)
 	if err != nil {
 		return emitOvpn(stdout, ovpnOutput{Error: err.Error()})
+	}
+
+	// 「登一次就夠」：沒明確指定就用狀態檔裡的登入名，用戶不需要再打任何東西。
+	name := *username
+	if name == "" {
+		name = cred.Username
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSec)*time.Second)
@@ -255,7 +267,7 @@ func runOvpn(args []string, stdout, stderr io.Writer) int {
 	}
 
 	return emitOvpn(stdout, ovpnOutput{
-		OK: true, Config: openvpnConfig(*host, *port, *proto, privPEM, cert.Certificate),
+		OK: true, Config: openvpnConfig(*host, *port, *proto, privPEM, cert.Certificate, name),
 		KeyPath: keyPath, CertPath: certPath, CAPath: caPath, TLSKeyPath: tlsKeyPath,
 		Host: *host, Port: *port, Proto: *proto, ExpiresAt: cert.ExpirationTime,
 	})
