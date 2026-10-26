@@ -1146,8 +1146,8 @@
     <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="openvpn_ns_certificate_type">ns-cert-type</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
-    <string name="traffic_uplink">%s | %s/s ↑</string>
-    <string name="traffic_downlink">%s | %s/s ↓</string>
+    <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>
     <string name="traffic_uplink_total">%s ↑</string>
     <string name="traffic_downlink_total">%s ↓</string>
     <string name="masque_kernel_tx">核心 TX</string>

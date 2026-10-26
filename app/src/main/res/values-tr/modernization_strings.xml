@@ -9,13 +9,13 @@
     <string name="restore_network_settings_failed">Ağ ayarları geri yüklenemedi. Gerekli profiller silinmiş olabilir.</string>
     <string name="diagnostics_handshake">Son el sıkışma</string>
     <string name="diagnostics_handshake_never">henüz yok</string>
-    <string name="diagnostics_wg_counters_hint">Eş tel sayacı. Bir HTTP testi UDP'yi veya yol MTU'sunu doğrulamaz. Uygulama başına filtreleme ile, atfedilebilir bir UID'si olmayan ICMP engellenmiş kalır.</string>
+    <string name="diagnostics_wg_counters_hint">Eş tel sayacı. Bir HTTP testi UDP\'yi veya yol MTU\'sunu doğrulamaz. Uygulama başına filtreleme ile, atfedilebilir bir UID\'si olmayan ICMP engellenmiş kalır.</string>
     <string name="diagnostics_connection_history">Son yönlendirme kararları</string>
     <string name="diagnostics_history_debug_only">Geçmişi toplamak için hata ayıklama veya izleme günlüğünü etkinleştirip bağlantıyı yeniden başlatın. Bağlantı kimliği olmayan DNS sorguları ayrı gösterilir.</string>
     <string name="diagnostics_selected_node">Seçilen düğüm</string>
     <string name="diagnostics_query_failed">başarısız</string>
-    <string name="direct_fallback_required">Kontrol başına başarılı kontrol URL'si</string>
-    <string name="direct_fallback_failures">Proxy'ye geçmeden önceki başarısız kontroller</string>
+    <string name="direct_fallback_required">Kontrol başına başarılı kontrol URL\'si</string>
+    <string name="direct_fallback_failures">Proxy\'ye geçmeden önceki başarısız kontroller</string>
     <string name="direct_fallback_recoveries">Doğrudana dönmeden önceki başarılı kontroller</string>
     <string name="direct_fallback_invalid_count">1 ile %1$d arasında bir sayı girin.</string>
 </resources>

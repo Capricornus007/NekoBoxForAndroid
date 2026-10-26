@@ -906,9 +906,9 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="speed_test_url_invalid">Voer een geldige HTTP- of HTTPS-URL in</string>
     <string name="mixed_auth_username_hint">Gebruikersnaam (laat beide leeg voor geen authenticatie)</string>
     <string name="mixed_auth_no_auth">Niet ingesteld (geen authenticatie)</string>
-    <string name="profile_requiring_plugin">Profiel %1$s vereist de %2$s-plug-in, maar
+    <string name="profile_requiring_plugin" formatted="false">Profiel %1$s vereist de %2$s-plug-in, maar
         deze is niet gevonden.</string>
-    <string name="plugin_exists_but_on_shit_system">Profiel %1$s vereist de %2$s-plug-in, maar uw
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profiel %1$s vereist de %2$s-plug-in, maar uw
         eigenaar van propriëtaire apparatuur (meestal surveillance kapitaalreuzen en malwaremakers)
         heeft met uw Android geknoeid, waardoor de plug-in onbruikbaar is.</string>
     <string name="lan_sharing">LAN-delen</string>

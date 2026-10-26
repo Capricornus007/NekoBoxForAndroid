@@ -447,7 +447,7 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Bestätigen</string>
     <string name="missing_plugin">Fehlendes Plugin</string>
-    <string name="profile_requiring_plugin">Profil %s benötigt das Plugin %s, aber es wurde nicht gefunden.</string>
+    <string name="profile_requiring_plugin" formatted="false">Profil %s benötigt das Plugin %s, aber es wurde nicht gefunden.</string>
     <string name="install_from_play_store">Aus dem Play Store installieren</string>
     <string name="install_from_fdroid">Aus F-Droid installieren</string>
     <string name="download">Herunterladen</string>
@@ -462,7 +462,7 @@
     <string name="server_dns_subscription_sum">Optionaler DNS nur zum Auflösen von Server-Domains dieses Abonnements.</string>
     <string name="server_dns_invalid">Eigener Server-DNS ungültig. Verwende https://, tls://, quic:// oder host[:port]</string>
     <string name="subscription_used">%s verbraucht</string>
-    <string name="subscription_traffic">%s verbraucht / %s verbleibend</string>
+    <string name="subscription_traffic" formatted="false">%s verbraucht / %s verbleibend</string>
     <string name="subscription_expire">Läuft ab: %s</string>
     <string name="subscription_import">Abonnement importieren</string>
     <string name="subscription_import_message">Abonnement %s wirklich importieren? Wenn du von</string>
@@ -485,7 +485,7 @@
     <string name="group_order_origin">Original</string>
     <string name="group_order_by_name">Nach Name</string>
     <string name="group_order_by_delay">Nach Latenz</string>
-    <string name="plugin_exists_but_on_shit_system">Profil %s benötigt das Plugin %s, aber deine proprietäre Ausrüstung</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profil %s benötigt das Plugin %s, aber deine proprietäre Ausrüstung</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks-Android-Plugin)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Shadowsocks-Android-Plugin)</string>
     <string name="tcp_connections">%d TCP-Verbindungen</string>

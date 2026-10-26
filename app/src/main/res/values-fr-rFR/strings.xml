@@ -925,8 +925,8 @@
     <string name="speed_test_stage_cancelled">Annulé</string>
     <string name="speed_test_stage_error">Erreur</string>
     <string name="speed_test_url_invalid">Saisissez une URL HTTP ou HTTPS valide</string>
-    <string name="profile_requiring_plugin">Le profil %s nécessite l\'installation du plugin %s, mais il est introuvable.</string>
-    <string name="plugin_exists_but_on_shit_system">Le profil %1$s nécessite le plugin %2$s, mais votre
+    <string name="profile_requiring_plugin" formatted="false">Le profil %s nécessite l\'installation du plugin %s, mais il est introuvable.</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Le profil %1$s nécessite le plugin %2$s, mais votre
         fournisseur d\'équipement propriétaire (généralement des géants du capital de surveillance et des créateurs de logiciels malveillants)
         a altéré votre Android, rendant le plugin inutilisable.</string>
     <string name="plugin_approval_conflict_message">Plus d\'un paquet non approuvé fournit ce plugin : %1$s\n\nRésolvez le conflit avant d\'approuver un paquet.</string>
@@ -1165,9 +1165,9 @@
     <string name="format_snlink_lower">snlink</string>
     <string name="format_snlink_upper">SNLINK</string>
     <string name="local_proxy_settings">Paramètres du proxy local</string>
-    <string name="please_update">Votre application est trop ancienne (%1$s). Et cessera de fonctionner à %2$s. Veuillez
+    <string name="please_update" formatted="false">Votre application est trop ancienne (%1$s). Et cessera de fonctionner à %2$s. Veuillez
         la mettre à jour !</string>
-    <string name="please_update_force">Votre application est trop ancienne (%1$s). Et a cessé de fonctionner à %2$s.
+    <string name="please_update_force" formatted="false">Votre application est trop ancienne (%1$s). Et a cessé de fonctionner à %2$s.
         Veuillez la mettre à jour !</string>
     <string name="port_out_of_range">Le port doit être dans la plage 1–65535</string>
     <string name="proton_session_expired">Votre session Proton a été refusée. Veuillez vous reconnecter.</string>

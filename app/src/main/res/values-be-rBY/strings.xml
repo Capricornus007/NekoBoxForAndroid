@@ -893,7 +893,7 @@
     <string name="speed_test_stage_cancelled">Скасавана</string>
     <string name="speed_test_stage_error">Памылка</string>
     <string name="speed_test_url_invalid">Увядзіце карэктны HTTP- ці HTTPS-URL</string>
-    <string name="profile_requiring_plugin">Профіль %s патрабуе ўсталёўкі плагіна %s, але ён не знойдзен.</string>
+    <string name="profile_requiring_plugin" formatted="false">Профіль %s патрабуе ўсталёўкі плагіна %s, але ён не знойдзен.</string>
     <string name="mixed_auth_username_hint">Імя карыстальніка (пакіньце абодва поля пустымі, каб без аўтэнтыфікацыі)</string>
     <string name="mixed_auth_no_auth">Не зададзена (без аўтэнтыфікацыі)</string>
     <string name="lan_sharing">Агульны доступ па LAN</string>

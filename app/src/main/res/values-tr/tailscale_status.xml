@@ -45,9 +45,9 @@
     <string name="tailscale_status_no_peers">Bildirilen eş yok</string>
     <string name="tailscale_status_inventory">%2$d eşten %1$d tanesi gösteriliyor — envanter eksik</string>
     <string name="tailscale_status_inventory_complete">%1$d eş</string>
-    <string name="tailscale_status_ping">Eşi ping'le</string>
+    <string name="tailscale_status_ping">Eşi ping\'le</string>
     <string name="tailscale_status_ping_summary">Açık disco RTT testi, en fazla beş örnek ve on saniye. Otomatik tarama yok.</string>
-    <string name="tailscale_status_ping_pending">Eş RTT'si ölçülüyor…</string>
+    <string name="tailscale_status_ping_pending">Eş RTT\'si ölçülüyor…</string>
     <string name="tailscale_status_ping_result">%1$s · %2$s · %3$s</string>
     <string name="tailscale_status_ping_latency">%1$.1f ms</string>
     <string name="tailscale_status_ping_error">Ping başarısız</string>
@@ -60,7 +60,7 @@
     <string name="tailscale_status_login_origin">Giriş kaynağı: %1$s</string>
     <string name="tailscale_login_http_warning">Bu giriş sayfası HTTPS koruması olmadan HTTP kullanıyor. Giriş bağlantısı ve oturum açma verileri ağdaki başkalarına ifşa olabilir. Yalnızca bu bağlantıya güveniyorsanız devam edin.</string>
     <string name="tailscale_login_continue">Devam et</string>
-    <string name="tailscale_status_login_invalid">Giriş adresi kullanılamıyor veya güvensiz. Kaydedilen kontrol URL'sini kontrol edin.</string>
+    <string name="tailscale_status_login_invalid">Giriş adresi kullanılamıyor veya güvensiz. Kaydedilen kontrol URL\'sini kontrol edin.</string>
     <string name="tailscale_status_login_warning">Kimliği doğrulanmamış varsayılan VPN rotası veya Android VPN kilidi, tarayıcının bu sayfaya ulaşmasını engelleyebilir. Bu ekran VPN veya kilit ayarlarını değiştirmez ve yönlendirmeyi atlar.</string>
     <string name="tailscale_editor_conflict">Kimlik veya kaydedilen çıkış değişti. Taslaklarınız hâlâ burada. Çıkışı değiştirmeden önce kaydedilen profili gözden geçirmek için editörü yeniden açın.</string>
     <string name="tailscale_editor_save_failed">Profil kaydedilemedi. Taslaklarınız hâlâ burada.</string>

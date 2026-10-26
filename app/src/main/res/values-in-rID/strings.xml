@@ -906,9 +906,9 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="speed_test_url_invalid">Masukkan URL HTTP atau HTTPS yang valid</string>
     <string name="mixed_auth_username_hint">Nama pengguna (biarkan keduanya kosong tanpa autentikasi)</string>
     <string name="mixed_auth_no_auth">Belum diatur (tanpa autentikasi)</string>
-    <string name="profile_requiring_plugin">Profil %1$s memerlukan plugin %2$s untuk diinstal, tetapi
+    <string name="profile_requiring_plugin" formatted="false">Profil %1$s memerlukan plugin %2$s untuk diinstal, tetapi
         tidak ditemukan.</string>
-    <string name="plugin_exists_but_on_shit_system">Profil %1$s memerlukan plugin %2$s, tetapi vendor peralatan berpemilik Anda (biasanya raksasa kapital pengawasan dan pembuat malware)
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profil %1$s memerlukan plugin %2$s, tetapi vendor peralatan berpemilik Anda (biasanya raksasa kapital pengawasan dan pembuat malware)
         merusak Android Anda, membuat plugin tidak dapat digunakan.</string>
     <string name="lan_sharing">Berbagi LAN</string>
     <string name="lan_sharing_requires_root">Berbagi LAN membutuhkan root</string>

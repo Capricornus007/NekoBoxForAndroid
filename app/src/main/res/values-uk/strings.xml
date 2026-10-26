@@ -915,8 +915,8 @@
     <string name="available" translatable="false">%dмс</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing недоступний</string>
     <string name="ooc_subscription_token" translatable="false">OOCv1 API Token</string>
-    <string name="traffic_uplink" translatable="false">%s | %s/с ↑</string>
-    <string name="traffic_downlink" translatable="false">%s | %s/с ↓</string>
+    <string name="traffic_uplink" translatable="false" formatted="false">%s | %s/с ↑</string>
+    <string name="traffic_downlink" translatable="false" formatted="false">%s | %s/с ↓</string>
     <string name="traffic_uplink_total" translatable="false">Всього %s ↑</string>
     <string name="traffic_downlink_total" translatable="false">Всього %s ↓</string>
     <string name="cloudflare_wrap" translatable="false">Cloudflare Warp</string>

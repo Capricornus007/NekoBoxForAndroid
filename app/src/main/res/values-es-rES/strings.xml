@@ -922,7 +922,7 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="speed_test_stage_cancelled">Cancelado</string>
     <string name="speed_test_stage_error">Error</string>
     <string name="speed_test_url_invalid">Introduce una URL HTTP o HTTPS válida</string>
-    <string name="profile_requiring_plugin">El perfil %s requiere instalar el plugin %s, pero no se encontró.</string>
+    <string name="profile_requiring_plugin" formatted="false">El perfil %s requiere instalar el plugin %s, pero no se encontró.</string>
     <string name="plugin_approval_conflict_message">Más de un paquete no confiable proporciona este plugin: %1$s\n\nResuelve el conflicto antes de aprobar un paquete.</string>
     <string name="ws_max_early_data">Early data máxima</string>
     <string name="speed_test_finished_summary">Finalizado: %1$d, fallidos: %2$d, cancelados: %3$d</string>
@@ -1159,8 +1159,8 @@ Si debe usarlo, pruebe N=2 primero para
     <string name="format_snlink_lower">snlink</string>
     <string name="format_snlink_upper">SNLINK</string>
     <string name="local_proxy_settings">Ajustes del proxy local</string>
-    <string name="please_update">Tu app es demasiado antigua (%s) y dejará de funcionar el %s. ¡Actualízala!</string>
-    <string name="please_update_force">Tu app es demasiado antigua (%s) y dejó de funcionar el %s. ¡Actualízala!</string>
+    <string name="please_update" formatted="false">Tu app es demasiado antigua (%s) y dejará de funcionar el %s. ¡Actualízala!</string>
+    <string name="please_update_force" formatted="false">Tu app es demasiado antigua (%s) y dejó de funcionar el %s. ¡Actualízala!</string>
     <string name="port_out_of_range">El puerto debe estar en el rango 1–65535</string>
     <string name="proton_session_expired">Tu sesión de Proton fue rechazada. Inicia sesión de nuevo.</string>
     <string name="proxy_password">Contraseña del proxy</string>

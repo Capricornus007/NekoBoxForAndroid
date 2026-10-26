@@ -57,11 +57,11 @@
  
     <string name="group_status_proxies">%d proxys</string>
  
-    <string name="group_status_proxies_subscription">%d proxys | Actualizado el %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d proxys | Actualizado el %s</string>
  
     <string name="group_no_difference">%s: Sin diferencia</string>
  
-    <string name="group_updated">%s: %d proxys actualizados</string>
+    <string name="group_updated" formatted="false">%s: %d proxys actualizados</string>
  
     <string name="group_show_diff">Diferencia</string>
  
@@ -768,7 +768,7 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Confirmar</string>
     <string name="missing_plugin">Falta un plugin</string>
-    <string name="profile_requiring_plugin">El perfil %s requiere instalar el plugin %s, pero no se encontró.</string>
+    <string name="profile_requiring_plugin" formatted="false">El perfil %s requiere instalar el plugin %s, pero no se encontró.</string>
     <string name="action_learn_more">MÁS INFORMACIÓN</string>
     <string name="action_download">DESCARGAR</string>
     <string name="install_from_play_store">Instalar desde Play Store</string>
@@ -786,7 +786,7 @@
     <string name="server_dns_subscription_sum">DNS opcional usado solo para resolver dominios de servidores en esta suscripción.</string>
     <string name="server_dns_invalid">DNS de servidor personalizado no válido. Usa https://, tls://, quic:// o host[:puerto]</string>
     <string name="subscription_used">%s usado</string>
-    <string name="subscription_traffic">%s usado / %s restante</string>
+    <string name="subscription_traffic" formatted="false">%s usado / %s restante</string>
     <string name="subscription_expire">Caduca: %s</string>
     <string name="subscription_import">Importar suscripción</string>
     <string name="subscription_import_message">¿Confirmas que quieres importar la suscripción %s? Si vienes</string>
@@ -809,7 +809,7 @@
     <string name="group_order_origin">Original</string>
     <string name="group_order_by_name">Por nombre</string>
     <string name="group_order_by_delay">Por retardo</string>
-    <string name="plugin_exists_but_on_shit_system">El perfil %s requiere el plugin %s, pero tu equipo propietario</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">El perfil %s requiere el plugin %s, pero tu equipo propietario</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (plugin de Shadowsocks Android)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (plugin de Shadowsocks Android)</string>
     <string name="tcp_connections">%d conexiones TCP</string>

@@ -889,7 +889,7 @@
     <string name="speed_test_url_invalid">Geçerli bir HTTP veya HTTPS URL\'si girin</string>
     <string name="reboot_required">VPN hizmeti başlatılamadı. Cihazı yeniden başlatmanız gerekebilir.</string>
     <string name="speed_detail">Proxy： %1$s↑ %2$s↓\nDirekt： %3$s↑ %4$s↓</string>
-    <string name="profile_requiring_plugin">%s profili, %s eklentisinin yüklü olmasını gerektiriyor, ancak bulunamadı.</string>
+    <string name="profile_requiring_plugin" formatted="false">%s profili, %s eklentisinin yüklü olmasını gerektiriyor, ancak bulunamadı.</string>
     <string name="mixed_auth_username_hint">Kullanıcı adı (kimlik doğrulaması yoksa ikisini de boş bırakın)</string>
     <string name="mixed_auth_no_auth">Ayarlanmadı (kimlik doğrulaması yok)</string>
     <string name="obfs">Şaşırtmaca</string>
@@ -910,7 +910,7 @@
     <string name="route_packages_regex_summary">Paket adlarını düzenli ifadelerle eşleştiren rotaları uygular. Kapalıyken bu girdiler yok sayılır.</string>
     <string name="api_port">API Portu</string>
     <string name="subscription_user_agent">Kullanıcı Kimliği</string>
-    <string name="plugin_exists_but_on_shit_system">Profil %1$s, %2$s eklentisini gerektiriyor, ancak
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profil %1$s, %2$s eklentisini gerektiriyor, ancak
         tescilli ekipman sağlayıcınız (genellikle gözetim kapitalizmi devleri ve kötü amaçlı yazılım üreticileri)
         Android\'inize müdahale ederek eklentiyi kullanılamaz hale getirdi.</string>
     <string name="mixed_auth_config">Kimlik doğrulamayı yapılandır</string>

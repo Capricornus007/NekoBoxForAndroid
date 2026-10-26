@@ -5,8 +5,8 @@
     <string name="wireguard_use_config_routes_summary">Для вибраного автономного профілю AllowedIPs використовує тунель, а інші IP ідуть напряму. Групи зберігають свою DNS-політику. Типово вимкнено.</string>
     <string name="subscription_server_dns">DNS для серверів підписки</string>
     <string name="subscription_headers">HTTP-заголовки</string>
-    <string name="subscription_headers_summary">Одне Ім'я: значення на рядок. Значення приховані й не пересилаються іншому джерелу.</string>
+    <string name="subscription_headers_summary">Одне Ім\'я: значення на рядок. Значення приховані й не пересилаються іншому джерелу.</string>
     <string name="subscription_remove_referenced">Оновлення видаляє профілі, що використовуються в маршрутах або групах:\n%1$s\n\nВидалити їх? Наявні посилання перестануть працювати.</string>
-    <string name="subscription_requires_manual_update">Це оновлення видаляє пов'язані профілі. Оновіть підписку вручну, щоб переглянути зміни.</string>
+    <string name="subscription_requires_manual_update">Це оновлення видаляє пов\'язані профілі. Оновіть підписку вручну, щоб переглянути зміни.</string>
     <string name="subscription_changed_during_update">Профілі змінилися під час перегляду оновлення. Спробуйте ще раз.</string>
 </resources>

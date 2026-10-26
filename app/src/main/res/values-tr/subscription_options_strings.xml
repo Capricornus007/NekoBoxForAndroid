@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="wireguard_imported_options">İçe aktarılan ağ ayarları</string>
-    <string name="wireguard_use_config_routes">İçe aktarılan rotaları ve DNS'i kullan</string>
-    <string name="wireguard_use_config_routes_summary">Seçilen bağımsız bir profil için AllowedIPs tüneli kullanır, diğer IP'ler doğrudan gider. Gruplar DNS politikalarını korur. Varsayılan olarak devre dışıdır.</string>
+    <string name="wireguard_use_config_routes">İçe aktarılan rotaları ve DNS\'i kullan</string>
+    <string name="wireguard_use_config_routes_summary">Seçilen bağımsız bir profil için AllowedIPs tüneli kullanır, diğer IP\'ler doğrudan gider. Gruplar DNS politikalarını korur. Varsayılan olarak devre dışıdır.</string>
     <string name="subscription_server_dns">Abonelik sunucuları için DNS</string>
     <string name="subscription_headers">HTTP başlıkları</string>
     <string name="subscription_headers_summary">Satır başına bir Ad: değer. Değerler gizlenir ve başka bir kaynağa iletilmez.</string>

@@ -918,8 +918,8 @@
     <string name="speed_test_stage_cancelled">أُلغيت</string>
     <string name="speed_test_stage_error">خطأ</string>
     <string name="speed_test_url_invalid">أدخل رابط HTTP أو HTTPS صالحًا</string>
-    <string name="profile_requiring_plugin">الملف التعريفي %s يتطلب تثبيت الإضافة %s، ولكنها غير موجودة.</string>
-    <string name="plugin_exists_but_on_shit_system">يتطلب الملف التعریف %s المكوّن الإضافي %s، لكن بائع المعدات المملوكة لك (عادةً عمالقة المراقبة وصانع البرامج الضارة) تلاعب بجهاز أندرويد، مما يجعل المكون الإضافي غير قابل للاستخدام.</string>
+    <string name="profile_requiring_plugin" formatted="false">الملف التعريفي %s يتطلب تثبيت الإضافة %s، ولكنها غير موجودة.</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">يتطلب الملف التعریف %s المكوّن الإضافي %s، لكن بائع المعدات المملوكة لك (عادةً عمالقة المراقبة وصانع البرامج الضارة) تلاعب بجهاز أندرويد، مما يجعل المكون الإضافي غير قابل للاستخدام.</string>
     <string name="plugin_approval_conflict_message">توفر أكثر من حزمة غير موثوقة هذا الملحق: %1$s\n\nأزل التعارض قبل الموافقة على حزمة.</string>
     <string name="ws_max_early_data">الحد الأقصى للبيانات المبكرة</string>
     <string name="speed_test_finished_summary">انتهى: %1$d، فشل: %2$d، أُلغي: %3$d</string>

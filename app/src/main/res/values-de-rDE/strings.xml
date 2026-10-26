@@ -911,7 +911,7 @@
     <string name="speed_test_stage_cancelled">Abgebrochen</string>
     <string name="speed_test_stage_error">Fehler</string>
     <string name="speed_test_url_invalid">Gib eine gültige HTTP- oder HTTPS-URL ein</string>
-    <string name="profile_requiring_plugin">Für Profil %s ist das Plugin %s erforderlich, aber es wurde nicht gefunden.</string>
+    <string name="profile_requiring_plugin" formatted="false">Für Profil %s ist das Plugin %s erforderlich, aber es wurde nicht gefunden.</string>
     <string name="mixed_auth_username_hint">Benutzername (beide leer lassen = keine Authentifizierung)</string>
     <string name="mixed_auth_no_auth">Nicht festgelegt (keine Authentifizierung)</string>
     <string name="plugin_approval_conflict_message">Mehr als ein nicht vertrauenswürdiges Paket stellt dieses Plugin bereit: %1$s\n\nBeseitigen Sie den Konflikt, bevor Sie ein Paket genehmigen.</string>
@@ -1150,8 +1150,8 @@
     <string name="format_snlink_lower">snlink</string>
     <string name="format_snlink_upper">SNLINK</string>
     <string name="local_proxy_settings">Lokale Proxy-Einstellungen</string>
-    <string name="please_update">Ihre App ist zu alt (%s). Sie funktioniert ab %s nicht mehr. Bitte aktualisieren!</string>
-    <string name="please_update_force">Ihre App ist zu alt (%s). Sie funktioniert seit %s nicht mehr. Bitte aktualisieren!</string>
+    <string name="please_update" formatted="false">Ihre App ist zu alt (%s). Sie funktioniert ab %s nicht mehr. Bitte aktualisieren!</string>
+    <string name="please_update_force" formatted="false">Ihre App ist zu alt (%s). Sie funktioniert seit %s nicht mehr. Bitte aktualisieren!</string>
     <string name="port_out_of_range">Der Port muss im Bereich 1–65535 liegen.</string>
     <string name="proton_session_expired">Ihre Proton-Sitzung wurde abgelehnt. Bitte erneut anmelden.</string>
     <string name="proxy_password">Proxy-Passwort</string>

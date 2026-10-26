@@ -46,7 +46,7 @@
     <string name="tailscale_status_inventory">Показано %1$d з %2$d пірів — інвентар неповний</string>
     <string name="tailscale_status_inventory_complete">%1$d пірів</string>
     <string name="tailscale_status_ping">Пінг піра</string>
-    <string name="tailscale_status_ping_summary">Явний disco RTT-тест, до п'яти зразків і десяти секунд. Автоматичного сканування немає.</string>
+    <string name="tailscale_status_ping_summary">Явний disco RTT-тест, до п\'яти зразків і десяти секунд. Автоматичного сканування немає.</string>
     <string name="tailscale_status_ping_pending">Вимірювання RTT піра…</string>
     <string name="tailscale_status_ping_result">%1$s · %2$s · %3$s</string>
     <string name="tailscale_status_ping_latency">%1$.1f ms</string>
@@ -58,7 +58,7 @@
     <string name="tailscale_status_cancel_request">Скасувати запит</string>
     <string name="tailscale_status_cancel_request_summary">Зміну виходу, що вже зберігається, треба або завершити збереження, або відкотити.</string>
     <string name="tailscale_status_login_origin">Джерело входу: %1$s</string>
-    <string name="tailscale_login_http_warning">Ця сторінка входу використовує HTTP без захисту HTTPS. Посилання входу та дані входу можуть бути розкриті іншим у мережі. Продовжуйте, лише якщо довіряєте цьому з'єднанню.</string>
+    <string name="tailscale_login_http_warning">Ця сторінка входу використовує HTTP без захисту HTTPS. Посилання входу та дані входу можуть бути розкриті іншим у мережі. Продовжуйте, лише якщо довіряєте цьому з\'єднанню.</string>
     <string name="tailscale_login_continue">Продовжити</string>
     <string name="tailscale_status_login_invalid">Адреса входу недоступна або небезпечна. Перевірте збережену контрольну URL.</string>
     <string name="tailscale_status_login_warning">Неавтентифікований типовий VPN-маршрут або блокування VPN Android може завадити браузеру досягти цієї сторінки. Цей екран не змінює налаштування VPN або блокування і не обходить маршрутизацію.</string>

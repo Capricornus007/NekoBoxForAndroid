@@ -81,9 +81,9 @@
     <string name="group_delete_confirm_prompt">Вы ўпэўненыя, што хочаце выдаліць гэтую групу\?</string>
     <string name="group_diff">Розніца (%s)</string>
     <string name="group_show_diff">Розніца</string>
-    <string name="group_updated">%s: Абноўлены %d проксі</string>
+    <string name="group_updated" formatted="false">%s: Абноўлены %d проксі</string>
     <string name="group_no_difference">%s: няма розніцы</string>
-    <string name="group_status_proxies_subscription">%d проксі | Абноўлена %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d проксі | Абноўлена %s</string>
     <string name="group_status_proxies">%d проксі</string>
     <string name="group_status_empty_subscription">Пакуль не абноўлена</string>
     <string name="group_status_empty">Пустая група</string>
@@ -481,7 +481,7 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Пацвердзіць</string>
     <string name="missing_plugin">Адсутнічае плагін</string>
-    <string name="profile_requiring_plugin">Профіль %s патрабуе ўсталёўкі плагіна %s, але ён не знойдзены.</string>
+    <string name="profile_requiring_plugin" formatted="false">Профіль %s патрабуе ўсталёўкі плагіна %s, але ён не знойдзены.</string>
     <string name="action_learn_more">ДАВЕДАЦЦА БОЛЬШ</string>
     <string name="action_download">ЗАГРУЗІЦЬ</string>
     <string name="install_from_play_store">Усталяваць з Play Store</string>
@@ -499,7 +499,7 @@
     <string name="server_dns_subscription_sum">Дадатковы DNS толькі для вырашэння даменаў сервераў гэтай падпіскі.</string>
     <string name="server_dns_invalid">Недапушчальны DNS сервера. Выкарыстоўвайце https://, tls://, quic:// або host[:port]</string>
     <string name="subscription_used">%s выкарыстана</string>
-    <string name="subscription_traffic">%s выкарыстана / %s засталося</string>
+    <string name="subscription_traffic" formatted="false">%s выкарыстана / %s засталося</string>
     <string name="subscription_expire">Скончыцца: %s</string>
     <string name="subscription_import">Імпарт падпіскі</string>
     <string name="subscription_import_message">Пацвердзіце імпарт падпіскі %s? Калі вы</string>
@@ -522,11 +522,11 @@
     <string name="group_order_origin">Зыходны</string>
     <string name="group_order_by_name">Па назве</string>
     <string name="group_order_by_delay">Па затрымцы</string>
-    <string name="plugin_exists_but_on_shit_system">Профіль %s патрабуе плагін %s, але ваша прылада</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Профіль %s патрабуе плагін %s, але ваша прылада</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (плагін Shadowsocks Android)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (плагін Shadowsocks Android)</string>
-    <string name="traffic_uplink">%s | %s/с ↑</string>
-    <string name="traffic_downlink">%s | %s/с ↓</string>
+    <string name="traffic_uplink" formatted="false">%s | %s/с ↑</string>
+    <string name="traffic_downlink" formatted="false">%s | %s/с ↓</string>
     <string name="traffic_uplink_total">%s ↑</string>
     <string name="traffic_downlink_total">%s ↓</string>
     <string name="tcp_connections">%d TCP-злучэнняў</string>

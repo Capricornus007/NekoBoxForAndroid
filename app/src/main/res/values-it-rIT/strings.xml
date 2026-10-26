@@ -905,9 +905,9 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="speed_test_url_invalid">Inserisci un URL HTTP o HTTPS valido</string>
     <string name="mixed_auth_username_hint">Nome utente (lascia entrambi vuoti per nessuna autenticazione)</string>
     <string name="mixed_auth_no_auth">Non impostato (nessuna autenticazione)</string>
-    <string name="profile_requiring_plugin">Il profilo %1$s richiede l\'installazione del plugin %2$s, ma
+    <string name="profile_requiring_plugin" formatted="false">Il profilo %1$s richiede l\'installazione del plugin %2$s, ma
         non è stato trovato.</string>
-    <string name="plugin_exists_but_on_shit_system">Il profilo %1$s richiede il plugin %2$s, ma il tuo
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Il profilo %1$s richiede il plugin %2$s, ma il tuo
         fornitore di apparecchiature proprietarie (di solito giganti del capitale di sorveglianza e produttori di malware)
         ha manomesso il tuo Android, rendendo il plugin inutilizzabile.</string>
     <string name="lan_sharing">Condivisione LAN</string>

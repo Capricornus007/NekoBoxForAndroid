@@ -509,8 +509,8 @@
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks Android Plugin)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Shadowsocks Android Plugin)</string>
 
-    <string name="traffic_uplink" translatable="false">%s | %s/s ↑</string>
-    <string name="traffic_downlink" translatable="false">%s | %s/s ↓</string>
+    <string name="traffic_uplink" translatable="false" formatted="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" translatable="false" formatted="false">%s | %s/s ↓</string>
 
     <string name="traffic_uplink_total" translatable="false">%s ↑</string>
     <string name="traffic_downlink_total" translatable="false">%s ↓</string>

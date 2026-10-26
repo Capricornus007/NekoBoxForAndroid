@@ -668,9 +668,9 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="speed_test_stage_cancelled">Cancelado</string>
     <string name="speed_test_stage_error">Erro</string>
     <string name="speed_test_url_invalid">Informe uma URL HTTP ou HTTPS válida</string>
-    <string name="profile_requiring_plugin">O perfil %1$s requer que o plugin %2$s esteja instalado, mas
+    <string name="profile_requiring_plugin" formatted="false">O perfil %1$s requer que o plugin %2$s esteja instalado, mas
         não foi encontrado.</string>
-    <string name="plugin_exists_but_on_shit_system">O perfil %1$s requer o plugin %2$s, mas o seu
+    <string name="plugin_exists_but_on_shit_system" formatted="false">O perfil %1$s requer o plugin %2$s, mas o seu
         fabricante de equipamento proprietário (geralmente gigantes do capital de vigilância e criadores de malware)
         adulterou seu Android, tornando o plugin inutilizável.</string>
     <string name="speed_test_finished_summary">Concluídos: %1$d, falharam: %2$d, cancelados: %3$d</string>

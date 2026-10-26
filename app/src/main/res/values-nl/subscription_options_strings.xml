@@ -2,7 +2,7 @@
 <resources>
     <string name="wireguard_imported_options">Geïmporteerde netwerkinstellingen</string>
     <string name="wireguard_use_config_routes">Geïmporteerde routes en DNS gebruiken</string>
-    <string name="wireguard_use_config_routes_summary">Voor een geselecteerd zelfstandig profiel gebruikt AllowedIPs de tunnel en gaan andere IP's direct. Groepen behouden hun DNS-beleid. Standaard uitgeschakeld.</string>
+    <string name="wireguard_use_config_routes_summary">Voor een geselecteerd zelfstandig profiel gebruikt AllowedIPs de tunnel en gaan andere IP\'s direct. Groepen behouden hun DNS-beleid. Standaard uitgeschakeld.</string>
     <string name="subscription_server_dns">DNS voor abonnementsservers</string>
     <string name="subscription_headers">HTTP-headers</string>
     <string name="subscription_headers_summary">Eén Naam: waarde per regel. Waarden worden verborgen en niet doorgestuurd naar een andere oorsprong.</string>

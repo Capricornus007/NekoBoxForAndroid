@@ -402,7 +402,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="subscription_user_agent">使用者代理</string>
     <string name="confirm">確認</string>
     <string name="missing_plugin">缺失外掛程式</string>
-    <string name="profile_requiring_plugin">設定檔 %s 需要外掛程式 %s，但其未被安裝。</string>
+    <string name="profile_requiring_plugin" formatted="false">設定檔 %s 需要外掛程式 %s，但其未被安裝。</string>
     <string name="action_learn_more">深入了解</string>
     <string name="action_download">下載</string>
     <string name="install_from_play_store">從 Play 商店安裝</string>
@@ -421,7 +421,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="server_dns_subscription_sum">可選的 DNS 設定，僅用於解析此訂閱中的伺服器網域名稱。留空則使用預設行為。接受 https://、tls://、quic:// 以及 host[:port]。</string>
     <string name="server_dns_invalid">自訂伺服器 DNS 不正確。請使用 https://、tls://、quic:// 或 host[:port] 或留空。</string>
     <string name="subscription_used">已用 %s</string>
-    <string name="subscription_traffic">已用 %s / 剩餘 %s</string>
+    <string name="subscription_traffic" formatted="false">已用 %s / 剩餘 %s</string>
     <string name="subscription_expire">到期：%s</string>
     <string name="subscription_import">匯入訂閱</string>
     <string name="subscription_import_message">確認要匯入訂閱 %s？如果您來自不受信任的來源，這樣做可能會導致您的 IP 和此行為被洩露。</string>
@@ -444,7 +444,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="group_order_origin">原始</string>
     <string name="group_order_by_name">按名稱</string>
     <string name="group_order_by_delay">按延遲</string>
-    <string name="plugin_exists_but_on_shit_system">設定檔 %s 需要外掛程式 %s，但是您的專有設備提供商（通常也是監視資本主義巨頭和惡意軟體製造商）篡改了你的 Android 系統，使此外掛程式不可用。</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">設定檔 %s 需要外掛程式 %s，但是您的專有設備提供商（通常也是監視資本主義巨頭和惡意軟體製造商）篡改了你的 Android 系統，使此外掛程式不可用。</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks Android 外掛程式)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Shadowsocks Android 外掛程式)</string>
     <string name="tcp_connections">%d 個 TCP 連線</string>
@@ -1150,8 +1150,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="connection_test_icmp_ping">ICMPing</string>
     <string name="openvpn_ns_certificate_type">ns-cert-type</string>
     <string name="ooc_subscription_token">OOCv1 API Token</string>
-    <string name="traffic_uplink">%s | %s/s ↑</string>
-    <string name="traffic_downlink">%s | %s/s ↓</string>
+    <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>
     <string name="traffic_uplink_total">%s ↑</string>
     <string name="traffic_downlink_total">%s ↓</string>
     <string name="masque_kernel_tx">核心 TX</string>

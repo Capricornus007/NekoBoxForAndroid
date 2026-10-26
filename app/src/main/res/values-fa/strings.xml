@@ -895,8 +895,8 @@
     <string name="append_http_proxy_security_message">پس از فعال‌سازی، برنامه‌های دیگر در این دستگاه می‌توانند مستقیماً از پورت پروکسی محلی استفاده کنند.\n\nتوصیه: تنها در صورتی که به تمام برنامه‌های نصب‌شده اعتماد دارید، این گزینه را فعال کنید.</string>
     <string name="enable_anyway">همچنان فعال کن</string>
     <string name="ooc_subscription_token">مشخصه OOCv1 API</string>
-    <string name="traffic_uplink" translatable="false">%s | %s/s ↑</string>
-    <string name="traffic_downlink" translatable="false">%s | %s/s ↓</string>
+    <string name="traffic_uplink" translatable="false" formatted="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" translatable="false" formatted="false">%s | %s/s ↓</string>
     <string name="traffic_uplink_total" translatable="false">%s ↑</string>
     <string name="traffic_downlink_total" translatable="false">%s ↓</string>
     <string name="cloudflare_wrap" translatable="false">Cloudflare Warp</string>

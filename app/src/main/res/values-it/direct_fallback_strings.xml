@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="direct_fallback">Fallback proxy per rotte dirette</string>
-    <string name="direct_fallback_summary">Se il sito di controllo non è raggiungibile direttamente, usa il proxy selezionato per le rotte dirette. Ripristina l'accesso diretto al recupero. La LAN resta diretta. Le connessioni esistenti vengono ristabilite.</string>
+    <string name="direct_fallback_summary">Se il sito di controllo non è raggiungibile direttamente, usa il proxy selezionato per le rotte dirette. Ripristina l\'accesso diretto al recupero. La LAN resta diretta. Le connessioni esistenti vengono ristabilite.</string>
     <string name="direct_fallback_url">Siti di controllo</string>
-    <string name="direct_fallback_url_summary">Un URL HTTP(S) per riga, fino a 8. Viene testato solo l'accesso diretto; il quorum configurato e i controlli consecutivi controllano la commutazione.</string>
+    <string name="direct_fallback_url_summary">Un URL HTTP(S) per riga, fino a 8. Viene testato solo l\'accesso diretto; il quorum configurato e i controlli consecutivi controllano la commutazione.</string>
     <string name="direct_fallback_interval">Intervallo di controllo (secondi)</string>
     <string name="direct_fallback_invalid_url">Inserisci un URL HTTP o HTTPS valido senza credenziali né frammento.</string>
-    <string name="direct_fallback_invalid_interval">L'intervallo di controllo deve essere compreso tra 5 e 3600 secondi.</string>
+    <string name="direct_fallback_invalid_interval">L\'intervallo di controllo deve essere compreso tra 5 e 3600 secondi.</string>
     <string name="dns_server_input_help">local o localhost usa il DNS Android della rete sottostante. Per usare un server DNS in esecuzione su questo dispositivo, specifica esplicitamente udp://127.0.0.1:53.</string>
 </resources>

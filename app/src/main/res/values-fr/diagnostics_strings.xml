@@ -6,7 +6,7 @@
     <string name="diagnostics_listener_without_auth">Écouteur accessible depuis le LAN sans mot de passe :</string>
     <string name="diagnostics_no_groups">Les décisions de groupe sont disponibles pour un profil actif avec des groupes dynamiques.</string>
     <string name="diagnostics_initial_selection">Sélection initiale</string>
-    <string name="diagnostics_no_probe">Aucun candidat n'a réussi la vérification de disponibilité</string>
+    <string name="diagnostics_no_probe">Aucun candidat n\'a réussi la vérification de disponibilité</string>
     <string name="diagnostics_control_unreachable">Site de contrôle inaccessible en accès direct</string>
     <string name="diagnostics_direct_recovered">Accès direct restauré</string>
     <string name="diagnostics_previous_unavailable">Candidat précédent indisponible</string>
@@ -14,5 +14,5 @@
     <string name="diagnostics_lower_latency">Candidat à latence inférieure sélectionné</string>
     <string name="diagnostics_no_candidate">Aucun candidat compatible</string>
     <string name="diagnostics_refresh">Actualiser</string>
-    <string name="diagnostics_no_app_guard">Aucune règle UID/paquet de rejet trouvée dans la configuration du core. Vérifiez les restrictions d'applications, en particulier dans le JSON personnalisé.</string>
+    <string name="diagnostics_no_app_guard">Aucune règle UID/paquet de rejet trouvée dans la configuration du core. Vérifiez les restrictions d\'applications, en particulier dans le JSON personnalisé.</string>
 </resources>

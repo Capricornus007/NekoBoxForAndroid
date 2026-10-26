@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">Tek değer veya aralık, örneğin 25 veya 25-30. Protokol varsayılanını kullanmak için boş bırakın. Süreler saniyedir; MaxHandshakeAttempts bir sayıdır; ContentPaddingAddition bayttır.</string>
-    <string name="amneziawg_header_key_hint">Sunucudan 32 baytlık anahtar (Base64 veya onaltılık). Başlık koruması için S1, S2, S3 ve S4'ün en az 12 bayt olması gerekir.</string>
+    <string name="amneziawg_header_key_hint">Sunucudan 32 baytlık anahtar (Base64 veya onaltılık). Başlık koruması için S1, S2, S3 ve S4\'ün en az 12 bayt olması gerekir.</string>
     <string name="amneziawg_random_trailers_hint">Paket art bilgilerini rastgeleleştirin (AWG 3.1).</string>
     <string name="amneziawg_disable_cookies_hint">Protokol çerezlerini devre dışı bırakın. Yalnızca sunucu yapılandırmanız gerektiriyorsa etkinleştirin.</string>
 </resources>

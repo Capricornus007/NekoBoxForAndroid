@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">Valeur unique ou plage, par exemple 25 ou 25-30. Laisser vide pour la valeur par défaut du protocole. Les durées sont en secondes ; MaxHandshakeAttempts est un compte ; ContentPaddingAddition est en octets.</string>
-    <string name="amneziawg_header_key_hint">Clé de 32 octets provenant du serveur (Base64 ou hexadécimal). La protection d'en-tête exige que S1, S2, S3 et S4 fassent au moins 12 octets.</string>
+    <string name="amneziawg_header_key_hint">Clé de 32 octets provenant du serveur (Base64 ou hexadécimal). La protection d\'en-tête exige que S1, S2, S3 et S4 fassent au moins 12 octets.</string>
     <string name="amneziawg_random_trailers_hint">Aléatoiriser les remplissages de paquets (AWG 3.1).</string>
-    <string name="amneziawg_disable_cookies_hint">Désactiver les cookies de protocole. Activer uniquement si la configuration du serveur l'exige.</string>
+    <string name="amneziawg_disable_cookies_hint">Désactiver les cookies de protocole. Activer uniquement si la configuration du serveur l\'exige.</string>
 </resources>
