@@ -53,7 +53,12 @@ class TunAccessGuardTest {
     // 整条 reject；而 remoteDns/directDns 都指向它，等于全机 DNS 陪葬。
     @Test fun rootResolverGetsOnlyItsDnsPorts() {
         val rule = perAppTunGuard(
-            setOf(12345), setOf(12345, 1000), 20001, false, listOf(1051), listOf(53, 853, 443),
+            setOf(12345),
+            setOf(12345, 1000),
+            20001,
+            false,
+            listOf(1051),
+            listOf(53, 853, 443),
         )
         val b = branches(rule)
         assertEquals(3, b.size)
