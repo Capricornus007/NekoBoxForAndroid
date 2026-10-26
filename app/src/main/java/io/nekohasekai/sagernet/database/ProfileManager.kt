@@ -8,6 +8,8 @@ import io.nekohasekai.sagernet.fmt.tailscale.pruneTailscaleState
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.applyDefaultValues
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.sql.SQLException
 import java.util.*
@@ -112,9 +114,15 @@ object ProfileManager {
         val profile = ProxyEntity(groupId = groupId).apply {
             id = 0
             putBean(bean)
-            userOrder = SagerDatabase.proxyDao.nextOrder(groupId) ?: 1
         }
-        profile.id = SagerDatabase.proxyDao.addProxy(profile)
+        // nextOrder/addProxy 是阻塞式 Room 查詢：呼叫端若在 Main.immediate 協程
+        // （如 Proton 清單頁的「加入」）就會在主線碰 DB，debug 版（ALLOW_MAIN_THREAD_DB=false）
+        // 直接拋「Cannot access database on the main thread」。DB 寫入挪到 IO，
+        // onAdd 廣播留在呼叫端執行緒（監聽器可能更新 UI）。
+        withContext(Dispatchers.IO) {
+            profile.userOrder = SagerDatabase.proxyDao.nextOrder(groupId) ?: 1
+            profile.id = SagerDatabase.proxyDao.addProxy(profile)
+        }
         iterator { onAdd(profile) }
         return profile
     }
