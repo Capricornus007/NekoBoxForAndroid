@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tailscale_status_title">Tailscale-status</string>
-    <string name="tailscale_status_entry">Status, pålogging og peer-diagnostikk for den lagrede profilen. Lagrede endringer brukes ikke.</string>
+    <string name="tailscale_status_entry">Status, pålogging og peer-diagnostikk for den lagrede profilen. Ulagrede endringer brukes ikke.</string>
     <string name="tailscale_status_connecting">Kobler til tjenesten…</string>
     <string name="tailscale_status_stopped">Denne lagrede noden kjører ikke. Å åpne dette skjermbildet starter den ikke.</string>
     <string name="tailscale_status_check">Kontroller / logg inn</string>
@@ -17,8 +17,8 @@
     <string name="tailscale_status_interactive_auth">Interaktiv pålogging konfigurert</string>
     <string name="tailscale_status_self">Denne noden</string>
     <string name="tailscale_status_unknown">Utilgjengelig</string>
-    <string name="tailscale_status_online">Pålogget</string>
-    <string name="tailscale_status_offline">Frakoblet</string>
+    <string name="tailscale_status_online">Online</string>
+    <string name="tailscale_status_offline">Offline</string>
     <string name="tailscale_status_expired">Node-nøkkel utløpt</string>
     <string name="tailscale_status_expiry">Nøkkelutløp: %1$s</string>
     <string name="tailscale_status_expiry_unknown">Nøkkelutløp utilgjengelig</string>
@@ -33,8 +33,8 @@
     <string name="tailscale_status_exit_action">Endre og lagre utgang</string>
     <string name="tailscale_status_exit_confirm">Bruk %1$s på denne noden og lagre den i profilen? Skjermbildet venter på bekreftelse fra både node og database.</string>
     <string name="tailscale_status_none_warning">Ingen holder bare tailnet-adresser tilgjengelige; den gir ikke en Internett-utgang.</string>
-    <string name="tailscale_status_exit_pending">Bruker og lagrer utgangsvalg…</string>
-    <string name="tailscale_status_exit_saved">Utgang brukt og lagret</string>
+    <string name="tailscale_status_exit_pending">Anvender og lagrer utgangsvalg…</string>
+    <string name="tailscale_status_exit_saved">Utgang anvendt og lagret</string>
     <string name="tailscale_status_exit_next_start">Utgang lagret for neste start</string>
     <string name="tailscale_status_exit_unchanged">Utgangsendring mislyktes; forrige valg uendret</string>
     <string name="tailscale_status_exit_rolled_back">Lagring mislyktes; forrige live-utgang gjenopprettet</string>

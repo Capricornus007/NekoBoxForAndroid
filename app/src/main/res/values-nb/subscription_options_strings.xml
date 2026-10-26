@@ -5,8 +5,8 @@
     <string name="wireguard_use_config_routes_summary">For en valgt frittstående profil bruker AllowedIPs tunnelen, og andre IP-er går direkte. Grupper beholder sin DNS-policy. Deaktivert som standard.</string>
     <string name="subscription_server_dns">DNS for abonnementsservere</string>
     <string name="subscription_headers">HTTP-header</string>
-    <string name="subscription_headers_summary">Ét Navn: verdi per linje. Verdier skjules og videresendes ikke til en annen opprinnelse.</string>
+    <string name="subscription_headers_summary">Ét navn: verdi per linje. Verdier skjules og videresendes ikke til en annen opprinnelse.</string>
     <string name="subscription_remove_referenced">Oppdateringen fjerner profiler som brukes i ruter eller grupper:\n%1$s\n\nFjerne dem? Eksisterende referanser vil slutte å fungere.</string>
-    <string name="subscription_requires_manual_update">Denne oppdateringen fjerner referert(e) profil(er). Oppdater abonnementet manuelt for å se endringene.</string>
+    <string name="subscription_requires_manual_update">Denne oppdateringen fjerner profiler som det vises til. Oppdater abonnementet manuelt for å se endringene.</string>
     <string name="subscription_changed_during_update">Profiler endret seg mens oppdateringen ble gjennomgått. Prøv igjen.</string>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="direct_fallback">میان‌بُر پروکسی برای مسیرهای مستقیم</string>
-    <string name="direct_fallback_summary">اگر وب‌سایت کنترل مستقیماً در دسترس نباشد، از پروکسی انتخاب‌شده برای مسیرهای مستقیم استفاده کنید. هنگام بازیابی، دسترسی مستقیم برمی‌گردد. شبکه محلی مستقیم باقی می‌ماند. اتصالات موجود دوباره متصل می‌شوند.</string>
+    <string name="direct_fallback_summary">اگر وب‌سایت کنترل مستقیماً در دسترس نباشد، از پروکسی انتخاب‌شده برای مسیرهای مستقیم استفاده کنید. هنگام بازیابی، دسترسی مستقیم برمی‌گردد. LAN مستقیم باقی می‌ماند. اتصالات موجود دوباره متصل می‌شوند.</string>
     <string name="direct_fallback_url">وب‌سایت‌های کنترل</string>
     <string name="direct_fallback_url_summary">یک URL HTTP(S) در هر خط، تا ۸ مورد. فقط دسترسی مستقیم آزمایش می‌شود؛ حد نصاب پیکربندی‌شده و بررسی‌های متوالی تعویض را کنترل می‌کنند.</string>
     <string name="direct_fallback_interval">فاصله بررسی (ثانیه)</string>

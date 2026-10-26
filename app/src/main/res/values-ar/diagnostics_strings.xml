@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="profile_diagnostics">تحقق من الإعدادات والمسارات</string>
-    <string name="diagnostics_config_valid">قبل التكوين من قبل النواة</string>
+    <string name="diagnostics_config_valid">تم قبول التكوين من قِبل النواة</string>
     <string name="diagnostics_config_invalid">خطأ في الإعدادات</string>
-    <string name="diagnostics_listener_without_auth">مستمع يمكن الوصول إليه من الشبكة المحلية بدون كلمة مرور:</string>
+    <string name="diagnostics_listener_without_auth">مستمع يمكن الوصول إليه من LAN بدون كلمة مرور:</string>
     <string name="diagnostics_no_groups">قرارات المجموعة متاحة لملف شخصي قيد التشغيل مع مجموعات ديناميكية.</string>
     <string name="diagnostics_initial_selection">الاختيار الأولي</string>
     <string name="diagnostics_no_probe">لم يجتز أي مرشح فحص التوفر</string>

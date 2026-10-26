@@ -4,7 +4,7 @@
     <string name="diagnostics_config_valid">Konfigurasjonen ble akseptert av kjernen</string>
     <string name="diagnostics_config_invalid">Konfigurasjonsfeil</string>
     <string name="diagnostics_listener_without_auth">Lytter tilgjengelig fra LAN uten passord:</string>
-    <string name="diagnostics_no_groups">Gruppebeslutninger er tilgjengelige for en kjørende profil med dynamiske grupper.</string>
+    <string name="diagnostics_no_groups">Gruppebeslutninger er tilgjengelige for en profil som kjører med dynamiske grupper.</string>
     <string name="diagnostics_initial_selection">Første valg</string>
     <string name="diagnostics_no_probe">Ingen kandidat besto tilgjengelighetskontrollen</string>
     <string name="diagnostics_control_unreachable">Kontrollnettsted utilgjengelig via direkte tilgang</string>

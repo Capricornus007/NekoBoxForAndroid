@@ -17,5 +17,5 @@
     <string name="direct_fallback_required">URLهای کنترل موفق به ازای هر بررسی</string>
     <string name="direct_fallback_failures">بررسی‌های ناموفق پیش از تعویض به پروکسی</string>
     <string name="direct_fallback_recoveries">بررسی‌های موفق پیش از بازگشت به مستقیم</string>
-    <string name="direct_fallback_invalid_count">عددی از ۱ تا %1$d وارد کنید.</string>
+    <string name="direct_fallback_invalid_count">عددی از 1 تا %1$d وارد کنید.</string>
 </resources>

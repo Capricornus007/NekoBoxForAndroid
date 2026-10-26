@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="direct_fallback">احتياطي الوكيل للمسارات المباشرة</string>
-    <string name="direct_fallback_summary">إذا كان موقع التحكم غير قابل للوصول مباشرة، استخدم الوكيل المحدد للمسارات المباشرة. استعد الوصول المباشر عند التعافي. تظل الشبكة المحلية مباشرة. تتم إعادة الاتصالات الحالية.</string>
+    <string name="direct_fallback_summary">إذا كان موقع التحكم غير قابل للوصول مباشرة، استخدم الوكيل المحدد للمسارات المباشرة. استعد الوصول المباشر عند التعافي. يبقى LAN مباشراً. تتم إعادة الاتصالات الحالية.</string>
     <string name="direct_fallback_url">مواقع التحكم</string>
     <string name="direct_fallback_url_summary">عنوان HTTP(S) واحد لكل سطر، حتى 8. يتم اختبار الوصول المباشر فقط؛ يتحكم النصاب المكون والفحوص المتتابعة في التبديل.</string>
     <string name="direct_fallback_interval">فاصل الفحص (ثوانٍ)</string>

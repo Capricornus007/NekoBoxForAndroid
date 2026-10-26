@@ -3,7 +3,7 @@
     <string name="subscription_response_empty">أعاد خادم الاشتراك استجابة فارغة.</string>
     <string name="subscription_response_html">أعاد الخادم صفحة ويب بدلاً من اشتراك. تحقق من الرابط وحساب المزود.</string>
     <string name="subscription_response_json_error">أعاد الخادم خطأ JSON بدلاً من اشتراك.</string>
-    <string name="subscription_response_unsupported">لم يتم العثور على ملفات تعريف وكيل مدعومة في الاستجابة.</string>
+    <string name="subscription_response_unsupported">لم يتم العثور على ملفات وكيل مدعومة في الاستجابة.</string>
     <string name="restore_network_settings">استعادة إعدادات الشبكة السابقة</string>
     <string name="restore_network_settings_confirm">استعادة إعدادات DNS والتوجيه والاتصال السابقة؟</string>
     <string name="restore_network_settings_failed">تعذرت استعادة إعدادات الشبكة. ربما تم حذف الملفات الشخصية المطلوبة.</string>
