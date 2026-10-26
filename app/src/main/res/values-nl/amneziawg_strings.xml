@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">Eén waarde of bereik, bijvoorbeeld 25 of 25-30. Leeg laten voor de protocolstandaard. Tijden in seconden; MaxHandshakeAttempts is een telling; ContentPaddingAddition in bytes.</string>
+    <string name="amneziawg_header_key_hint">32-byte sleutel van de server (Base64 of hexadecimaal). Header-bescherming vereist dat S1, S2, S3 en S4 minstens 12 bytes zijn.</string>
+    <string name="amneziawg_random_trailers_hint">Packet-trailers randomiseren (AWG 3.1).</string>
+    <string name="amneziawg_disable_cookies_hint">Protocol-cookies uitschakelen. Alleen inschakelen wanneer de serverconfiguratie dit vereist.</string>
+</resources>

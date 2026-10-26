@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">De abonnementsserver gaf een lege respons.</string>
+    <string name="subscription_response_html">De server gaf een webpagina in plaats van een abonnement terug. Controleer de link en het provideraccount.</string>
+    <string name="subscription_response_json_error">De server gaf een JSON-fout in plaats van een abonnement terug.</string>
+    <string name="subscription_response_unsupported">Geen ondersteunde proxy-profielen gevonden in de respons.</string>
+    <string name="restore_network_settings">Vorige netwerkinstellingen herstellen</string>
+    <string name="restore_network_settings_confirm">De vorige DNS-, routerings- en verbindingsinstellingen herstellen?</string>
+    <string name="restore_network_settings_failed">Kon netwerkinstellingen niet herstellen. De vereiste profielen zijn mogelijk verwijderd.</string>
+    <string name="diagnostics_handshake">Laatste handshake</string>
+    <string name="diagnostics_handshake_never">nog geen</string>
+    <string name="diagnostics_wg_counters_hint">Peer-draadtellers. Een HTTP-test verifieert noch UDP noch pad-MTU. Bij app-filtering blijft ICMP zonder toerekenbare UID geblokkeerd.</string>
+    <string name="diagnostics_connection_history">Recente routeringsbeslissingen</string>
+    <string name="diagnostics_history_debug_only">Schakel debug- of trace-logging in en start de verbinding opnieuw om geschiedenis te verzamelen. DNS-query's zonder verbindings-ID worden apart weergegeven.</string>
+    <string name="diagnostics_selected_node">Geselecteerde node</string>
+    <string name="diagnostics_query_failed">mislukt</string>
+    <string name="direct_fallback_required">Geslaagde controle-URL's per controle</string>
+    <string name="direct_fallback_failures">Mislukte controles voor omschakeling naar proxy</string>
+    <string name="direct_fallback_recoveries">Geslaagde controles voor terugkeer naar direct</string>
+    <string name="direct_fallback_invalid_count">Voer een getal in van 1 tot %1$d.</string>
+</resources>
