@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">قيمة مفردة أو نطاق، على سبيل المثال 25 أو 25-30. اتركه فارغًا لاستخدام افتراضي البروتوكول. الأوقات بالثواني؛ MaxHandshakeAttempts هو عدد؛ ContentPaddingAddition بالبايت.</string>
+    <string name="amneziawg_header_key_hint">مفتاح 32 بايت من الخادم (Base64 أو سداسي عشري). يتطلب حماية الرأس أن يكون S1 وS2 وS3 وS4 بحد أدنى 12 بايت.</string>
+    <string name="amneziawg_random_trailers_hint">عشوائية ذيول الحزم (AWG 3.1).</string>
+    <string name="amneziawg_disable_cookies_hint">تعطيل ملفات تعريف الارتباط للبروتوكول. يمكنك التمكين فقط عندما يتطلب ذلك إعداد الخادم.</string>
+</resources>

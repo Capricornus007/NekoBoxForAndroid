@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wireguard_imported_options">إعدادات الشبكة المستوردة</string>
+    <string name="wireguard_use_config_routes">استخدم المسارات وDNS المستوردة</string>
+    <string name="wireguard_use_config_routes_summary">لملف شخصي مستقل محدد، يستخدم AllowedIPs النفق وتذهب عناوين IP الأخرى مباشرة. تحتفظ المجموعات بسياسة DNS الخاصة بها. معطّل افتراضيًا.</string>
+    <string name="subscription_server_dns">DNS لخوادم الاشتراك</string>
+    <string name="subscription_headers">ترويسات HTTP</string>
+    <string name="subscription_headers_summary">اسم واحد: قيمة لكل سطر. تُخفى القيم ولا تُعاد توجيهها إلى مصدر آخر.</string>
+    <string name="subscription_remove_referenced">يقوم التحديث بإزالة الملفات الشخصية المستخدمة في المسارات أو المجموعات:\n%1$s\n\nإزالتها؟ ستتوقف المراجع الحالية عن العمل.</string>
+    <string name="subscription_requires_manual_update">يقوم هذا التحديث بإزالة الملفات الشخصية المُشار إليها. حدّث الاشتراك يدويًا لمراجعة التغييرات.</string>
+    <string name="subscription_changed_during_update">تغيرت الملفات الشخصية أثناء مراجعة التحديث. حاول مرة أخرى.</string>
+</resources>

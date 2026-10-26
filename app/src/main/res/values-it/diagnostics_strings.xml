@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_diagnostics">Verifica configurazione e rotte</string>
+    <string name="diagnostics_config_valid">Configurazione accettata dal core</string>
+    <string name="diagnostics_config_invalid">Errore di configurazione</string>
+    <string name="diagnostics_listener_without_auth">Listener accessibile dalla LAN senza password:</string>
+    <string name="diagnostics_no_groups">Le decisioni di gruppo sono disponibili per un profilo in esecuzione con gruppi dinamici.</string>
+    <string name="diagnostics_initial_selection">Selezione iniziale</string>
+    <string name="diagnostics_no_probe">Nessun candidato ha superato il controllo di disponibilità</string>
+    <string name="diagnostics_control_unreachable">Sito di controllo non raggiungibile tramite accesso diretto</string>
+    <string name="diagnostics_direct_recovered">Accesso diretto ripristinato</string>
+    <string name="diagnostics_previous_unavailable">Candidato precedente non disponibile</string>
+    <string name="diagnostics_priority_available">Candidato con priorità superiore disponibile</string>
+    <string name="diagnostics_lower_latency">Selezionato candidato con latenza inferiore</string>
+    <string name="diagnostics_no_candidate">Nessun candidato compatibile</string>
+    <string name="diagnostics_refresh">Aggiorna</string>
+    <string name="diagnostics_no_app_guard">Nessuna regola UID/pacchetto di rifiuto trovata nella configurazione del core. Controlla le restrizioni delle app, in particolare nel JSON personalizzato.</string>
+</resources>

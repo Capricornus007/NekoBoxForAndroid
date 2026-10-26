@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">Repli proxy pour les routes directes</string>
+    <string name="direct_fallback_summary">Si le site de contrôle est inaccessible directement, utilise le proxy sélectionné pour les routes directes. Restaure l'accès direct à la reprise. Le LAN reste direct. Les connexions existantes sont rétablies.</string>
+    <string name="direct_fallback_url">Sites de contrôle</string>
+    <string name="direct_fallback_url_summary">Une URL HTTP(S) par ligne, jusqu'à 8. Seul l'accès direct est testé ; le quorum configuré et les vérifications consécutives contrôlent le basculement.</string>
+    <string name="direct_fallback_interval">Intervalle de vérification (secondes)</string>
+    <string name="direct_fallback_invalid_url">Saisissez une URL HTTP ou HTTPS valide sans identifiants ni fragment.</string>
+    <string name="direct_fallback_invalid_interval">L'intervalle de vérification doit être compris entre 5 et 3600 secondes.</string>
+    <string name="dns_server_input_help">local ou localhost utilise le DNS Android du réseau sous-jacent. Pour utiliser un serveur DNS exécuté sur cet appareil, spécifiez explicitement udp://127.0.0.1:53.</string>
+</resources>

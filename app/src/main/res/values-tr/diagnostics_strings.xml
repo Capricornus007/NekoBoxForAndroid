@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_diagnostics">Yapılandırmayı ve rotaları kontrol et</string>
+    <string name="diagnostics_config_valid">Yapılandırma çekirdek tarafından kabul edildi</string>
+    <string name="diagnostics_config_invalid">Yapılandırma hatası</string>
+    <string name="diagnostics_listener_without_auth">LAN'dan parolasız erişilebilen dinleyici:</string>
+    <string name="diagnostics_no_groups">Grup kararları, dinamik gruplara sahip çalışan bir profil için kullanılabilir.</string>
+    <string name="diagnostics_initial_selection">İlk seçim</string>
+    <string name="diagnostics_no_probe">Hiçbir aday kullanılabilirlik kontrolünü geçemedi</string>
+    <string name="diagnostics_control_unreachable">Kontrol web sitesine doğrudan erişimle ulaşılamıyor</string>
+    <string name="diagnostics_direct_recovered">Doğrudan erişim geri yüklendi</string>
+    <string name="diagnostics_previous_unavailable">Önceki aday kullanılamıyor</string>
+    <string name="diagnostics_priority_available">Daha yüksek öncelikli aday kullanılabilir</string>
+    <string name="diagnostics_lower_latency">Daha düşük gecikmeli aday seçildi</string>
+    <string name="diagnostics_no_candidate">Uyumlu aday yok</string>
+    <string name="diagnostics_refresh">Yenile</string>
+    <string name="diagnostics_no_app_guard">Çekirdek yapılandırmasında reddeden UID/paket kuralı bulunamadı. Özellikle özel JSON'da olmak üzunde uygulama kısıtlamalarını kontrol edin.</string>
+</resources>

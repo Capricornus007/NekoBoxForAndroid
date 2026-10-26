@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">Le serveur d'abonnement a renvoyé une réponse vide.</string>
+    <string name="subscription_response_html">Le serveur a renvoyé une page web au lieu d'un abonnement. Vérifiez le lien et le compte fournisseur.</string>
+    <string name="subscription_response_json_error">Le serveur a renvoyé une erreur JSON au lieu d'un abonnement.</string>
+    <string name="subscription_response_unsupported">Aucun profil proxy pris en charge trouvé dans la réponse.</string>
+    <string name="restore_network_settings">Restaurer les paramètres réseau précédents</string>
+    <string name="restore_network_settings_confirm">Restaurer les paramètres DNS, de routage et de connexion précédents ?</string>
+    <string name="restore_network_settings_failed">Impossible de restaurer les paramètres réseau. Les profils requis ont peut-être été supprimés.</string>
+    <string name="diagnostics_handshake">Dernier handshake</string>
+    <string name="diagnostics_handshake_never">aucun pour l'instant</string>
+    <string name="diagnostics_wg_counters_hint">Compteurs filaire du pair. Un test HTTP ne vérifie ni UDP ni le MTU du chemin. Avec le filtrage par application, l'ICMP sans UID attribuable reste bloqué.</string>
+    <string name="diagnostics_connection_history">Décisions de routage récentes</string>
+    <string name="diagnostics_history_debug_only">Activez la journalisation debug ou trace et redémarrez la connexion pour recueillir l'historique. Les requêtes DNS sans ID de connexion sont affichées séparément.</string>
+    <string name="diagnostics_selected_node">Nœud sélectionné</string>
+    <string name="diagnostics_query_failed">échec</string>
+    <string name="direct_fallback_required">URLs de contrôle réussies par vérification</string>
+    <string name="direct_fallback_failures">Vérifications échouées avant le basculement vers le proxy</string>
+    <string name="direct_fallback_recoveries">Vérifications réussies avant le retour au direct</string>
+    <string name="direct_fallback_invalid_count">Saisissez un nombre de 1 à %1$d.</string>
+</resources>

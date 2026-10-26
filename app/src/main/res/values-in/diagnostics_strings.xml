@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_diagnostics">Periksa konfigurasi dan rute</string>
+    <string name="diagnostics_config_valid">Konfigurasi diterima oleh core</string>
+    <string name="diagnostics_config_invalid">Kesalahan konfigurasi</string>
+    <string name="diagnostics_listener_without_auth">Listener dapat diakses dari LAN tanpa kata sandi:</string>
+    <string name="diagnostics_no_groups">Keputusan grup tersedia untuk profil yang berjalan dengan grup dinamis.</string>
+    <string name="diagnostics_initial_selection">Pemilihan awal</string>
+    <string name="diagnostics_no_probe">Tidak ada kandidat yang lulus pemeriksaan ketersediaan</string>
+    <string name="diagnostics_control_unreachable">Situs kontrol tidak dapat diakses melalui akses langsung</string>
+    <string name="diagnostics_direct_recovered">Akses langsung dipulihkan</string>
+    <string name="diagnostics_previous_unavailable">Kandidat sebelumnya tidak tersedia</string>
+    <string name="diagnostics_priority_available">Kandidat dengan prioritas lebih tinggi tersedia</string>
+    <string name="diagnostics_lower_latency">Kandidat dengan latensi lebih rendah dipilih</string>
+    <string name="diagnostics_no_candidate">Tidak ada kandidat yang kompatibel</string>
+    <string name="diagnostics_refresh">Segarkan</string>
+    <string name="diagnostics_no_app_guard">Tidak ada aturan UID/paket penolakan yang ditemukan dalam konfigurasi core. Periksa pembatasan aplikasi, terutama dalam JSON khusus.</string>
+</resources>

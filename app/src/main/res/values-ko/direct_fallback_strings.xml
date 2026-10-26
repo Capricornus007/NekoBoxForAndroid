@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">직접 경로용 프록시 폴백</string>
+    <string name="direct_fallback_summary">제어 사이트에 직접 접근할 수 없는 경우 직접 경로에 선택한 프록시를 사용합니다. 복구되면 직접 접근으로 되돌아갑니다. LAN은 직접 유지됩니다. 기존 연결은 다시 연결됩니다.</string>
+    <string name="direct_fallback_url">제어 사이트</string>
+    <string name="direct_fallback_url_summary">한 줄에 하나의 HTTP(S) URL, 최대 8개. 직접 접근만 테스트됩니다. 구성된 정족수와 연속 검사가 전환을 제어합니다.</string>
+    <string name="direct_fallback_interval">검사 간격(초)</string>
+    <string name="direct_fallback_invalid_url">자격 증명이나 프래그먼트 없이 유효한 HTTP 또는 HTTPS URL을 입력하세요.</string>
+    <string name="direct_fallback_invalid_interval">검사 간격은 5초에서 3600초 사이여야 합니다.</string>
+    <string name="dns_server_input_help">local 또는 localhost는 기본 네트워크의 Android DNS를 사용합니다. 이 기기에서 실행 중인 DNS 서버를 사용하려면 udp://127.0.0.1:53을 명시적으로 지정하세요.</string>
+</resources>

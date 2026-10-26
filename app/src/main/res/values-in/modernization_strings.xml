@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">Server langganan mengembalikan respons kosong.</string>
+    <string name="subscription_response_html">Server mengembalikan halaman web alih-alih langganan. Periksa tautan dan akun penyedia.</string>
+    <string name="subscription_response_json_error">Server mengembalikan kesalahan JSON alih-alih langganan.</string>
+    <string name="subscription_response_unsupported">Tidak ada profil proxy yang didukung ditemukan dalam respons.</string>
+    <string name="restore_network_settings">Pulihkan pengaturan jaringan sebelumnya</string>
+    <string name="restore_network_settings_confirm">Pulihkan pengaturan DNS, perutean, dan koneksi sebelumnya?</string>
+    <string name="restore_network_settings_failed">Tidak dapat memulihkan pengaturan jaringan. Profil yang diperlukan mungkin telah dihapus.</string>
+    <string name="diagnostics_handshake">Handshake terbaru</string>
+    <string name="diagnostics_handshake_never">belum ada</string>
+    <string name="diagnostics_wg_counters_hint">Penghitung kabel peer. Tes HTTP tidak memverifikasi UDP atau MTU jalur. Dengan pemfilteran per-aplikasi, ICMP tanpa UID yang dapat diatribusikan tetap diblokir.</string>
+    <string name="diagnostics_connection_history">Keputusan perutean terbaru</string>
+    <string name="diagnostics_history_debug_only">Aktifkan pencatatan debug atau trace dan mulai ulang koneksi untuk mengumpulkan riwayat. Kueri DNS tanpa ID koneksi ditampilkan secara terpisah.</string>
+    <string name="diagnostics_selected_node">Node yang dipilih</string>
+    <string name="diagnostics_query_failed">gagal</string>
+    <string name="direct_fallback_required">URL kontrol berhasil per pemeriksaan</string>
+    <string name="direct_fallback_failures">Pemeriksaan gagal sebelum beralih ke proxy</string>
+    <string name="direct_fallback_recoveries">Pemeriksaan berhasil sebelum kembali ke langsung</string>
+    <string name="direct_fallback_invalid_count">Masukkan angka dari 1 hingga %1$d.</string>
+</resources>

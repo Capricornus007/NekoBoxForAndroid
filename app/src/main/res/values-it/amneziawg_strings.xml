@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">Valore singolo o intervallo, ad esempio 25 o 25-30. Lascia vuoto per usare il valore predefinito del protocollo. I tempi sono in secondi; MaxHandshakeAttempts è un conteggio; ContentPaddingAddition è in byte.</string>
+    <string name="amneziawg_header_key_hint">Chiave a 32 byte dal server (Base64 o esadecimale). La protezione dell'intestazione richiede che S1, S2, S3 e S4 siano almeno 12 byte.</string>
+    <string name="amneziawg_random_trailers_hint">Randomizza i trailer dei pacchetti (AWG 3.1).</string>
+    <string name="amneziawg_disable_cookies_hint">Disattiva i cookie del protocollo. Abilitalo solo se richiesto dalla configurazione del server.</string>
+</resources>

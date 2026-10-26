@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_diagnostics">Konfiguration und Routen prüfen</string>
+    <string name="diagnostics_config_valid">Konfiguration vom Core akzeptiert</string>
+    <string name="diagnostics_config_invalid">Konfigurationsfehler</string>
+    <string name="diagnostics_listener_without_auth">Listener ohne Passwort aus dem LAN erreichbar:</string>
+    <string name="diagnostics_no_groups">Gruppenentscheidungen sind nur für ein aktives Profil mit dynamischen Gruppen verfügbar.</string>
+    <string name="diagnostics_initial_selection">Erste Auswahl</string>
+    <string name="diagnostics_no_probe">Kein Kandidat hat die Verfügbarkeitsprüfung bestanden</string>
+    <string name="diagnostics_control_unreachable">Kontrollwebsite über direkte Verbindung nicht erreichbar</string>
+    <string name="diagnostics_direct_recovered">Direkte Verbindung wiederhergestellt</string>
+    <string name="diagnostics_previous_unavailable">Vorheriger Kandidat nicht verfügbar</string>
+    <string name="diagnostics_priority_available">Kandidat mit höherer Priorität verfügbar</string>
+    <string name="diagnostics_lower_latency">Kandidat mit niedrigerer Latenz ausgewählt</string>
+    <string name="diagnostics_no_candidate">Kein kompatibler Kandidat</string>
+    <string name="diagnostics_refresh">Aktualisieren</string>
+    <string name="diagnostics_no_app_guard">Keine UID-/Paketregel zum Blockieren in der Core-Konfiguration gefunden. Prüfen Sie App-Beschränkungen, insbesondere in benutzerdefiniertem JSON.</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wireguard_imported_options">Impostazioni di rete importate</string>
+    <string name="wireguard_use_config_routes">Usa rotte e DNS importati</string>
+    <string name="wireguard_use_config_routes_summary">Per un profilo autonomo selezionato, AllowedIPs usa il tunnel e le altre IP vanno direttamente. I gruppi mantengono la loro policy DNS. Disabilitato per impostazione predefinita.</string>
+    <string name="subscription_server_dns">DNS per server di sottoscrizione</string>
+    <string name="subscription_headers">Intestazioni HTTP</string>
+    <string name="subscription_headers_summary">Un Nome: valore per riga. I valori sono nascosti e non vengono inoltrati a un'altra origine.</string>
+    <string name="subscription_remove_referenced">L'aggiornamento rimuove i profili usati in rotte o gruppi:\n%1$s\n\nRimuoverli? I riferimenti esistenti smetteranno di funzionare.</string>
+    <string name="subscription_requires_manual_update">Questo aggiornamento rimuove profili referenziati. Aggiorna manualmente la sottoscrizione per rivedere le modifiche.</string>
+    <string name="subscription_changed_during_update">I profili sono cambiati durante la revisione dell'aggiornamento. Riprova.</string>
+</resources>

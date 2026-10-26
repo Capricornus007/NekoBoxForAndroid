@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wireguard_imported_options">Importierte Netzwerkeinstellungen</string>
+    <string name="wireguard_use_config_routes">Importierte Routen und DNS verwenden</string>
+    <string name="wireguard_use_config_routes_summary">Für ein ausgewähltes eigenständiges Profil verwendet AllowedIPs den Tunnel, andere IPs gehen direkt. Gruppen behalten ihre DNS-Richtlinie. Standardmäßig deaktiviert.</string>
+    <string name="subscription_server_dns">DNS für Abonnement-Server</string>
+    <string name="subscription_headers">HTTP-Header</string>
+    <string name="subscription_headers_summary">Ein Name: Wert pro Zeile. Werte werden ausgeblendet und nicht an einen anderen Ursprung weitergeleitet.</string>
+    <string name="subscription_remove_referenced">Das Update entfernt Profile, die in Routen oder Gruppen verwendet werden:\n%1$s\n\nEntfernen? Vorhandene Verweise funktionieren dann nicht mehr.</string>
+    <string name="subscription_requires_manual_update">Dieses Update entfernt referenzierte Profile. Aktualisieren Sie das Abonnement manuell, um die Änderungen zu prüfen.</string>
+    <string name="subscription_changed_during_update">Profile haben sich während der Überprüfung des Updates geändert. Erneut versuchen.</string>
+</resources>

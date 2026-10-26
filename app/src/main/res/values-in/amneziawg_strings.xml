@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">Nilai tunggal atau rentang, misalnya 25 atau 25-30. Biarkan kosong untuk menggunakan bawaan protokol. Waktu dalam satuan detik; MaxHandshakeAttempts adalah jumlah; ContentPaddingAddition dalam byte.</string>
+    <string name="amneziawg_header_key_hint">Kunci 32 byte dari server (Base64 atau heksadesimal). Perlindungan header mengharuskan S1, S2, S3, dan S4 masing-masing minimal 12 byte.</string>
+    <string name="amneziawg_random_trailers_hint">Acak trailer paket (AWG 3.1).</string>
+    <string name="amneziawg_disable_cookies_hint">Nonaktifkan cookie protokol. Aktifkan hanya bila diwajibkan oleh konfigurasi server Anda.</string>
+</resources>

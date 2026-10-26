@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">サブスクリプションサーバーが空の応答を返しました。</string>
+    <string name="subscription_response_html">サーバーがサブスクリプションではなく Web ページを返しました。リンクとプロバイダーアカウントを確認してください。</string>
+    <string name="subscription_response_json_error">サーバーがサブスクリプションではなく JSON エラーを返しました。</string>
+    <string name="subscription_response_unsupported">応答にサポートされているプロキシブロファイルが見つかりませんでした。</string>
+    <string name="restore_network_settings">以前のネットワーク設定を復元</string>
+    <string name="restore_network_settings_confirm">以前の DNS、ルーティング、接続設定を復元しますか？</string>
+    <string name="restore_network_settings_failed">ネットワーク設定を復元できませんでした。必要なプロファイルが削除された可能性があります。</string>
+    <string name="diagnostics_handshake">最新のハンドシェイク</string>
+    <string name="diagnostics_handshake_never">まだなし</string>
+    <string name="diagnostics_wg_counters_hint">ピアのワイヤカウンター。HTTP テストでは UDP やパス MTU を検証しません。アプリごとのフィルタリングでは、帰属可能な UID のない ICMP はブロックされたままです。</string>
+    <string name="diagnostics_connection_history">最近のルーティング決定</string>
+    <string name="diagnostics_history_debug_only">デバッグまたはトレースログを有効にし、接続を再起動して履歴を収集してください。接続 ID のない DNS クエリは別途表示されます。</string>
+    <string name="diagnostics_selected_node">選択されたノード</string>
+    <string name="diagnostics_query_failed">失敗</string>
+    <string name="direct_fallback_required">チェックごとの成功した制御 URL</string>
+    <string name="direct_fallback_failures">プロキシへの切り替え前の失敗したチェック</string>
+    <string name="direct_fallback_recoveries">直接に戻る前の成功したチェック</string>
+    <string name="direct_fallback_invalid_count">1 から %1$d までの数値を入力してください。</string>
+</resources>

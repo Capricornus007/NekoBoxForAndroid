@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_diagnostics">تحقق من الإعدادات والمسارات</string>
+    <string name="diagnostics_config_valid">قبل التكوين من قبل النواة</string>
+    <string name="diagnostics_config_invalid">خطأ في الإعدادات</string>
+    <string name="diagnostics_listener_without_auth">مستمع يمكن الوصول إليه من الشبكة المحلية بدون كلمة مرور:</string>
+    <string name="diagnostics_no_groups">قرارات المجموعة متاحة لملف شخصي قيد التشغيل مع مجموعات ديناميكية.</string>
+    <string name="diagnostics_initial_selection">الاختيار الأولي</string>
+    <string name="diagnostics_no_probe">لم يجتز أي مرشح فحص التوفر</string>
+    <string name="diagnostics_control_unreachable">موقع التحكم غير متاح عبر الوصول المباشر</string>
+    <string name="diagnostics_direct_recovered">تمت استعادة الوصول المباشر</string>
+    <string name="diagnostics_previous_unavailable">المرشح السابق غير متاح</string>
+    <string name="diagnostics_priority_available">يتوفر مرشح ذو أولوية أعلى</string>
+    <string name="diagnostics_lower_latency">تم اختيار مرشح بزمن وصول أقل</string>
+    <string name="diagnostics_no_candidate">لا يوجد مرشح متوافق</string>
+    <string name="diagnostics_refresh">تحديث</string>
+    <string name="diagnostics_no_app_guard">لم يتم العثور على قاعدة UID/حزمة للرفض في إعدادات النواة. تحقق من قيود التطبيقات، خاصة في JSON المخصص.</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">Doğrudan rotalar için proxy yedeği</string>
+    <string name="direct_fallback_summary">Kontrol sitesine doğrudan erişilemiyorsa, doğrudan rotalar için seçilen proxy kullanılır. Kurtarıldığında doğrudan erişim geri yüklenir. LAN doğrudan kalır. Mevcut bağlantılar yeniden bağlanır.</string>
+    <string name="direct_fallback_url">Kontrol siteleri</string>
+    <string name="direct_fallback_url_summary">Satır başına bir HTTP(S) URL'si, en fazla 8. Yalnızca doğrudan erişim test edilir; yapılandırılan yeter sayı ve art arda kontroller geçişi kontrol eder.</string>
+    <string name="direct_fallback_interval">Kontrol aralığı (saniye)</string>
+    <string name="direct_fallback_invalid_url">Kimlik bilgisi veya parça içermeyen geçerli bir HTTP veya HTTPS URL'si girin.</string>
+    <string name="direct_fallback_invalid_interval">Kontrol aralığı 5 ile 3600 saniye arasında olmalıdır.</string>
+    <string name="dns_server_input_help">local veya localhost, altta yatan ağın Android DNS'ini kullanır. Bu cihazda çalışan bir DNS sunucusu kullanmak için udp://127.0.0.1:53 adresini açıkça belirtin.</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">Одне значення або діапазон, наприклад 25 або 25-30. Залиште порожнім, щоб використати типове для протоколу. Час у секундах; MaxHandshakeAttempts — це кількість; ContentPaddingAddition — у байтах.</string>
+    <string name="amneziawg_header_key_hint">32-байтовий ключ від сервера (Base64 або шістнадцятковий). Захист заголовка вимагає, щоб S1, S2, S3 і S4 мали принаймні 12 байтів.</string>
+    <string name="amneziawg_random_trailers_hint">Рандомізувати трейлери пакетів (AWG 3.1).</string>
+    <string name="amneziawg_disable_cookies_hint">Вимкнути протокольні куки. Увімкніть, лише якщо цього вимагає конфігурація вашого сервера.</string>
+</resources>

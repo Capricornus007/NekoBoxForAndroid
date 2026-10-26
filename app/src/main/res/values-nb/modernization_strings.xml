@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">Abonnementserveren returnerte et tomt svar.</string>
+    <string name="subscription_response_html">Serveren returnerte en nettside i stedet for et abonnement. Sjekk lenken og leverandørkontoen.</string>
+    <string name="subscription_response_json_error">Serveren returnerte en JSON-feil i stedet for et abonnement.</string>
+    <string name="subscription_response_unsupported">Ingen støttede proxy-profiler funnet i svaret.</string>
+    <string name="restore_network_settings">Gjenopprett forrige nettverksinnstillinger</string>
+    <string name="restore_network_settings_confirm">Gjenopprett de forrige DNS-, ruting- og tilkoblingsinnstillingene?</string>
+    <string name="restore_network_settings_failed">Kunne ikke gjenopprette nettverksinnstillingene. De nødvendige profilene kan ha blitt slettet.</string>
+    <string name="diagnostics_handshake">Siste handtrykk</string>
+    <string name="diagnostics_handshake_never">ingen ennå</string>
+    <string name="diagnostics_wg_counters_hint">Peer-ledningstellere. En HTTP-test verifiserer verken UDP eller sti-MTU. Med filtrering per app forblir ICMP uten tilskrivbar UID blokkert.</string>
+    <string name="diagnostics_connection_history">Nylige rutebeslutninger</string>
+    <string name="diagnostics_history_debug_only">Aktiver feilsøkings- eller sporinglogging og start tilkoblingen på nytt for å samle historikk. DNS-spørringer uten tilkoblings-ID vises separat.</string>
+    <string name="diagnostics_selected_node">Valgt node</string>
+    <string name="diagnostics_query_failed">mislyktes</string>
+    <string name="direct_fallback_required">Vellykkede kontroll-URL-er per kontroll</string>
+    <string name="direct_fallback_failures">Mislykkede kontroller før bytte til proxy</string>
+    <string name="direct_fallback_recoveries">Vellykkede kontroller før retur til direkte</string>
+    <string name="direct_fallback_invalid_count">Skriv inn et tall fra 1 til %1$d.</string>
+</resources>

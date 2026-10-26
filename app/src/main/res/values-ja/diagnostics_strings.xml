@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_diagnostics">設定とルートを確認</string>
+    <string name="diagnostics_config_valid">コアに設定が受け入れられました</string>
+    <string name="diagnostics_config_invalid">設定エラー</string>
+    <string name="diagnostics_listener_without_auth">パスワードなしで LAN からアクセス可能なリスナー：</string>
+    <string name="diagnostics_no_groups">グループの決定は、動的グループを持つ実行中のプロファイルで利用できます。</string>
+    <string name="diagnostics_initial_selection">初期選択</string>
+    <string name="diagnostics_no_probe">可用性チェックに合格した候補がありません</string>
+    <string name="diagnostics_control_unreachable">制御サイトは直接アクセスでは利用できません</string>
+    <string name="diagnostics_direct_recovered">直接アクセスが復旧しました</string>
+    <string name="diagnostics_previous_unavailable">前の候補が利用できません</string>
+    <string name="diagnostics_priority_available">優先度の高い候補が利用可能</string>
+    <string name="diagnostics_lower_latency">遅延の少ない候補が選択されました</string>
+    <string name="diagnostics_no_candidate">互換性のある候補がありません</string>
+    <string name="diagnostics_refresh">更新</string>
+    <string name="diagnostics_no_app_guard">コア設定に拒否する UID/パッケージルールが見つかりませんでした。アプリの制限、特にカスタム JSON を確認してください。</string>
+</resources>

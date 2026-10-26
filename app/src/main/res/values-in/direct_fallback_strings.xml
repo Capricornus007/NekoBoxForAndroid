@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">Fallback proxy untuk rute langsung</string>
+    <string name="direct_fallback_summary">Jika situs kontrol tidak dapat dijangkau secara langsung, gunakan proxy yang dipilih untuk rute langsung. Pulihkan akses langsung saat pulih. LAN tetap langsung. Koneksi yang ada disambungkan kembali.</string>
+    <string name="direct_fallback_url">Situs kontrol</string>
+    <string name="direct_fallback_url_summary">Satu URL HTTP(S) per baris, hingga 8. Hanya akses langsung yang diuji; kuorum yang dikonfigurasi dan pemeriksaan berturut-turut mengontrol peralihan.</string>
+    <string name="direct_fallback_interval">Interval pemeriksaan (detik)</string>
+    <string name="direct_fallback_invalid_url">Masukkan URL HTTP atau HTTPS yang valid tanpa kredensial atau fragmen.</string>
+    <string name="direct_fallback_invalid_interval">Interval pemeriksaan harus antara 5 hingga 3600 detik.</string>
+    <string name="dns_server_input_help">local atau localhost menggunakan DNS Android pada jaringan yang mendasarinya. Untuk menggunakan server DNS yang berjalan di perangkat ini, tentukan secara eksplisit udp://127.0.0.1:53.</string>
+</resources>

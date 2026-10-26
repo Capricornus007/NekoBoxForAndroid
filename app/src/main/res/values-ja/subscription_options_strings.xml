@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wireguard_imported_options">インポートしたネットワーク設定</string>
+    <string name="wireguard_use_config_routes">インポートしたルートと DNS を使用</string>
+    <string name="wireguard_use_config_routes_summary">選択したスタンドアローンのプロファイルでは、AllowedIPs がトンネルを使用し、それ以外の IP は直接通信します。グループは DNS ポリシーを維持します。既定では無効です。</string>
+    <string name="subscription_server_dns">サブスクリプションサーバーの DNS</string>
+    <string name="subscription_headers">HTTP ヘッダー</string>
+    <string name="subscription_headers_summary">1 行に 1 つの Name: value。値は非表示になり、別のオリジンには転送されません。</string>
+    <string name="subscription_remove_referenced">この更新はルートやグループで使用されているプロファイルを削除します：\n%1$s\n\n削除しますか？既存の参照は機能しなくなります。</string>
+    <string name="subscription_requires_manual_update">この更新は参照されているプロファイルを削除します。変更を確認するにはサブスクリプションを手動で更新してください。</string>
+    <string name="subscription_changed_during_update">更新の確認中にプロファイルが変更されました。もう一度お試しください。</string>
+</resources>
