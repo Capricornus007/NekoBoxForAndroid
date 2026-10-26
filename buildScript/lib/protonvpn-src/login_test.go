@@ -54,6 +54,7 @@ var knownProducts = map[string]bool{
 //   - web-account 是 2026-10-08 量過的，未再驗證，且不是本倉庫身分，保留觀察；
 //   - windows/linux/web-vpn 在 2026-10-26 實測已被閘門整組殺掉（2001 / 5002），列進來
 //     讓 mock 跟真站一致地把它們擋下。
+//
 // 官方 VPN 手機端（android-vpn）改走免密碼 session 流程的舊說法已不適用：現在 android-vpn
 // 走密碼 SRP 反而能登。
 var routeBlocked = map[string]string{
@@ -146,7 +147,7 @@ func TestAppVersionHeaderMatchesProtonsFormatRule(t *testing.T) {
 		"solar-vpn@1.0.0":       "Platform `solar` is not valid",
 		"android-vpn@1.0.0":     "This version of the app is no longer supported",
 		"android-vpn@5.20.98.0": "Invalid access token", // 2026-10-26 晚：modulus 要 token，首登死
-		"windows-vpn@5.20.74.0": "Invalid input",       // 2026-10-26：windows/linux 已死
+		"windows-vpn@5.20.74.0": "Invalid input",        // 2026-10-26：windows/linux 已死
 		"linux-vpn@5.20.74.0":   "Invalid input",
 		"web-vpn@5.20.74.0":     "Invalid app version", // 2026-10-26：web-vpn 吃 5002
 		"web-account@5.5.5.5":   "Invalid access token",

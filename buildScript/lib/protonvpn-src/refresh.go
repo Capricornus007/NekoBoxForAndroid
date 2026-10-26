@@ -114,7 +114,7 @@ func isRejectionStatus(status int) bool {
 }
 
 type refreshOutput struct {
-	OK      bool   `json:"ok"`
+	OK bool `json:"ok"`
 	// Renewed 區分「真的換到新一組」與「本來就沒到期、什麼都不用做」：
 	// App 排程拿它決定要不要記一次刷新事件，不能把空轉當成功。
 	Renewed bool   `json:"renewed"`
