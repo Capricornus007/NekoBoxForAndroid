@@ -15,6 +15,8 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.fmt.openvpn.parseOpenVPNConfig
+import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.databinding.ActivityProtonServersBinding
 import io.nekohasekai.sagernet.fmt.proton.ProtonFilter
@@ -437,5 +439,8 @@ class ProtonServersActivity : ThemedActivity() {
         private const val SERVER_IP = "10.2.0.1"
         private const val CLIENT_IP_V6 = "2a07:b944::2:2"
         private const val SERVER_IP_V6 = "2a07:b944::2:1"
+
+        // 節點沒帶埠時的退回值：Proton 官方 OpenVPN 的 UDP 埠（官網設定檔模板用同一個）。
+        private const val OPENVPN_PORT = 1194
     }
 }
