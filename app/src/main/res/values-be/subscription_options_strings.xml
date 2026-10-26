@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wireguard_imported_options">Налады сеткі з канфігурацыі</string>
+    <string name="wireguard_use_config_routes">Использовать импортированные маршруты і DNS</string>
+    <string name="wireguard_use_config_routes_summary">Для выбранного одиночного профілю AllowedIPs ідуць у туннель, остальные IP — напрамую. групы сохраняют общую DNS-политику. Па змаўчанні выключено.</string>
+    <string name="subscription_server_dns">DNS для серверов падпіскі</string>
+    <string name="subscription_headers">HTTP-заголовки</string>
+    <string name="subscription_headers_summary">По одному Name: value на строку. Значэнні скрыты і не передаюцца пры перанакіраванні на другой сайт.</string>
+    <string name="subscription_remove_referenced">Абнаўленне выдаліць профілі, выкарыстоўваемыя маршрутами або группами:\n%1$s\n\nВыдаліць их? Існуючыя спасылкі перастануць працаваць.</string>
+    <string name="subscription_requires_manual_update">Абнаўленне выдаляе выкарыстоўваемыя профілі. Абнавіце падпіску уручную для прагляду змяненняў.</string>
+    <string name="subscription_changed_during_update">Во час прагляду абнаўлення профілі змяніліся. Паўтарыце абнаўленне.</string>
+</resources>
