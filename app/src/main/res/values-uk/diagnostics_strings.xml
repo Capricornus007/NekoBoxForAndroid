@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="profile_diagnostics">Перевірити конфігурацію та маршрути</string>
-    <string name="diagnostics_config_valid">Конфігурацію прийнято ядром</string>
-    <string name="diagnostics_config_invalid">Помилка конфігурації</string>
-    <string name="diagnostics_listener_without_auth">Слухач доступний з LAN без пароля:</string>
-    <string name="diagnostics_no_groups">Групові рішення доступні для запущеного профілю з динамічними групами.</string>
-    <string name="diagnostics_initial_selection">Початковий вибір</string>
-    <string name="diagnostics_no_probe">Жоден кандидат не пройшов перевірку доступності</string>
-    <string name="diagnostics_control_unreachable">Контрольний сайт недоступний через прямий доступ</string>
-    <string name="diagnostics_direct_recovered">Прямий доступ відновлено</string>
-    <string name="diagnostics_previous_unavailable">Попередній кандидат недоступний</string>
-    <string name="diagnostics_priority_available">Доступний кандидат з вищим пріоритетом</string>
-    <string name="diagnostics_lower_latency">Вибрано кандидата з меншою затримкою</string>
-    <string name="diagnostics_no_candidate">Немає сумісного кандидата</string>
-    <string name="diagnostics_refresh">Оновити</string>
-    <string name="diagnostics_no_app_guard">У конфігурації ядра не знайдено блокуючого правила UID/пакета. Перевірте обмеження застосунків, особливо у власному JSON.</string>
 </resources>

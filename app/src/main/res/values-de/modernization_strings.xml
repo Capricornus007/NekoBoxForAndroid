@@ -7,13 +7,6 @@
     <string name="restore_network_settings">Vorherige Netzwerkeinstellungen wiederherstellen</string>
     <string name="restore_network_settings_confirm">Die vorherigen DNS-, Routing- und Verbindungseinstellungen wiederherstellen?</string>
     <string name="restore_network_settings_failed">Netzwerkeinstellungen konnten nicht wiederhergestellt werden. Die benötigten Profile wurden möglicherweise gelöscht.</string>
-    <string name="diagnostics_handshake">Letzter Handshake</string>
-    <string name="diagnostics_handshake_never">noch keiner</string>
-    <string name="diagnostics_wg_counters_hint">Peer-Wire-Zähler. Ein HTTP-Test verifiziert weder UDP noch Path-MTU. Bei App-Filterung bleibt ICMP ohne zurechenbare UID blockiert.</string>
-    <string name="diagnostics_connection_history">Aktuelle Routing-Entscheidungen</string>
-    <string name="diagnostics_history_debug_only">Aktivieren Sie Debug- oder Trace-Logging und starten Sie die Verbindung neu, um Verlauf zu sammeln. DNS-Abfragen ohne Verbindungs-ID werden separat angezeigt.</string>
-    <string name="diagnostics_selected_node">Ausgewählter Knoten</string>
-    <string name="diagnostics_query_failed">fehlgeschlagen</string>
     <string name="direct_fallback_required">Erfolgreiche Kontroll-URLs pro Prüfung</string>
     <string name="direct_fallback_failures">Fehlgeschlagene Prüfungen vor Wechsel zum Proxy</string>
     <string name="direct_fallback_recoveries">Erfolgreiche Prüfungen vor Rückkehr zur Direktverbindung</string>

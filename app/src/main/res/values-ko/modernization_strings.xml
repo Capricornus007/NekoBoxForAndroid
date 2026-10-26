@@ -7,13 +7,6 @@
     <string name="restore_network_settings">이전 네트워크 설정 복원</string>
     <string name="restore_network_settings_confirm">이전 DNS, 라우팅 및 연결 설정을 복원하시겠습니까?</string>
     <string name="restore_network_settings_failed">네트워크 설정을 복원할 수 없습니다. 필요한 프로필이 삭제되었을 수 있습니다.</string>
-    <string name="diagnostics_handshake">최근 핸드셰이크</string>
-    <string name="diagnostics_handshake_never">아직 없음</string>
-    <string name="diagnostics_wg_counters_hint">피어 와이어 카운터. HTTP 테스트는 UDP나 경로 MTU를 검증하지 않습니다. 앱별 필터링에서는 귀속 가능한 UID가 없는 ICMP는 차단된 상태로 유지됩니다.</string>
-    <string name="diagnostics_connection_history">최근 라우팅 결정</string>
-    <string name="diagnostics_history_debug_only">기록을 수집하려면 디버그 또는 추적 로깅을 활성화하고 연결을 다시 시작하세요. 연결 ID가 없는 DNS 쿼리는 별도로 표시됩니다.</string>
-    <string name="diagnostics_selected_node">선택된 노드</string>
-    <string name="diagnostics_query_failed">실패</string>
     <string name="direct_fallback_required">검사별 성공한 제어 URL</string>
     <string name="direct_fallback_failures">프록시로 전환하기 전 실패한 검사</string>
     <string name="direct_fallback_recoveries">직접으로 돌아가기 전 성공한 검사</string>

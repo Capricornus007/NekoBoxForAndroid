@@ -7,13 +7,6 @@
     <string name="restore_network_settings">Вярнуць папярэднія налады сеткі</string>
     <string name="restore_network_settings_confirm">Аднавіць папярэднія DNS, маршруты і параметры падлучэння?</string>
     <string name="restore_network_settings_failed">Не ўдалося аднавіць налады сеткі. Магчыма, выкарыстоўваемыя профілі были выдалены.</string>
-    <string name="diagnostics_handshake">Апошні handshake</string>
-    <string name="diagnostics_handshake_never">яшчэ не было</string>
-    <string name="diagnostics_wg_counters_hint">Лічыльнікі транспарту піра. HTTP-тэст не правярае UDP і MTU шляхі. пры фільтрацыі по прыкладанням ICMP без пацверджанага UID застаецца закрыты.</string>
-    <string name="diagnostics_connection_history">Апошнія рашэнні маршрутызацыі</string>
-    <string name="diagnostics_history_debug_only">Для сбора гісторыі уключыце debug або trace і перазапусціце злучэнне. DNS-запыты без ідэнтыфікатара злучэнні паказаны асобна.</string>
-    <string name="diagnostics_selected_node">Выбраны вузел</string>
-    <string name="diagnostics_query_failed">памылка</string>
     <string name="direct_fallback_required">Даступныях сайтаў для паспяховай праверкі</string>
     <string name="direct_fallback_failures">Няўдалых проверок для пераходу на проксі</string>
     <string name="direct_fallback_recoveries">Паспяховых проверок для вяртання напрамую</string>

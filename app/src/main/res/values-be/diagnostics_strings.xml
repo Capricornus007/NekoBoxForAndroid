@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="profile_diagnostics">Праверка канфігурацыі і маршрутаў</string>
-    <string name="diagnostics_config_valid">Канфігурацыя прынята ядром</string>
-    <string name="diagnostics_config_invalid">Памылка канфігурацыі</string>
-    <string name="diagnostics_listener_without_auth">Порт даступны з лакальнай сеткі без пароля:</string>
-    <string name="diagnostics_no_groups">Рашэнні груп даступныя для запушчанага профілю з динамическими группами.</string>
-    <string name="diagnostics_initial_selection">Выбор пры запуске</string>
-    <string name="diagnostics_no_probe">Нет кандидата, прошедшяго праверку даступнасці</string>
-    <string name="diagnostics_control_unreachable">Кантрольны сайт недаступны напрамую</string>
-    <string name="diagnostics_direct_recovered">Прамы доступ адноўлены</string>
-    <string name="diagnostics_previous_unavailable">Папярэдні вузел недаступны</string>
-    <string name="diagnostics_priority_available">Даступны вузел з больш высокім прыоритетом</string>
-    <string name="diagnostics_lower_latency">Выбран вузел з меньшей задержкой</string>
-    <string name="diagnostics_no_candidate">Нет подходящяго вузла</string>
-    <string name="diagnostics_refresh">Обновить</string>
-    <string name="diagnostics_no_app_guard">В канфігурацыі ядра не знойдзены блакавальныя правілы UID/пакетаў. Праверце абмежаванні прыкладанняў, особенно у карыстальніцкім JSON.</string>
 </resources>

@@ -7,13 +7,6 @@
     <string name="restore_network_settings">Restaurar as configurações de rede anteriores</string>
     <string name="restore_network_settings_confirm">Restaurar as configurações anteriores de DNS, roteamento e conexão?</string>
     <string name="restore_network_settings_failed">Não foi possível restaurar as configurações de rede. Os perfis necessários podem ter sido excluídos.</string>
-    <string name="diagnostics_handshake">Último handshake</string>
-    <string name="diagnostics_handshake_never">ainda nenhum</string>
-    <string name="diagnostics_wg_counters_hint">Contadores de fio do par. Um teste HTTP não verifica UDP nem o MTU do caminho. Com a filtragem por app, o ICMP sem UID atribuível permanece bloqueado.</string>
-    <string name="diagnostics_connection_history">Decisões de roteamento recentes</string>
-    <string name="diagnostics_history_debug_only">Ative o log debug ou trace e reinicie a conexão para coletar o histórico. Consultas DNS sem ID de conexão são exibidas separadamente.</string>
-    <string name="diagnostics_selected_node">Nó selecionado</string>
-    <string name="diagnostics_query_failed">falhou</string>
     <string name="direct_fallback_required">URLs de controle bem-sucedidas por verificação</string>
     <string name="direct_fallback_failures">Verificações falhas antes de trocar para o proxy</string>
     <string name="direct_fallback_recoveries">Verificações bem-sucedidas antes de voltar ao direto</string>

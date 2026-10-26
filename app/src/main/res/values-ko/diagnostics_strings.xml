@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="profile_diagnostics">구성 및 경로 확인</string>
-    <string name="diagnostics_config_valid">코어에서 구성을 수락했습니다</string>
-    <string name="diagnostics_config_invalid">구성 오류</string>
-    <string name="diagnostics_listener_without_auth">암호 없이 LAN에서 접근 가능한 리스너:</string>
-    <string name="diagnostics_no_groups">그룹 결정은 동적 그룹이 있는 실행 중인 프로필에서 사용할 수 있습니다.</string>
-    <string name="diagnostics_initial_selection">초기 선택</string>
-    <string name="diagnostics_no_probe">가용성 검사를 통과한 후보가 없습니다</string>
-    <string name="diagnostics_control_unreachable">제어 웹사이트를 직접 접근으로 이용할 수 없습니다</string>
-    <string name="diagnostics_direct_recovered">직접 접근이 복구되었습니다</string>
-    <string name="diagnostics_previous_unavailable">이전 후보를 사용할 수 없음</string>
-    <string name="diagnostics_priority_available">더 높은 우선순위 후보 사용 가능</string>
-    <string name="diagnostics_lower_latency">대기 시간이 짧은 후보가 선택되었습니다</string>
-    <string name="diagnostics_no_candidate">호환되는 후보 없음</string>
-    <string name="diagnostics_refresh">새로 고침</string>
-    <string name="diagnostics_no_app_guard">코어 구성에서 거부하는 UID/패키지 규칙을 찾을 수 없습니다. 앱 제한 사항, 특히 사용자 지정 JSON을 확인하세요.</string>
 </resources>

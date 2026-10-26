@@ -7,13 +7,6 @@
     <string name="restore_network_settings">بازیابی تنظیمات شبکه قبلی</string>
     <string name="restore_network_settings_confirm">تنظیمات DNS، مسیریابی و اتصال قبلی بازیابی شود؟</string>
     <string name="restore_network_settings_failed">بازیابی تنظیمات شبکه ممکن نبود. ممکن است پروفایل‌های مورد نیاز حذف شده باشند.</string>
-    <string name="diagnostics_handshake">تازه‌ترین handshake</string>
-    <string name="diagnostics_handshake_never">هنوز هیچ</string>
-    <string name="diagnostics_wg_counters_hint">شمارنده‌های سیم همتا. یک آزمون HTTP نه UDP و نه MTU مسیر را تأیید نمی‌کند. با فیلتر کردن به ازای هر برنامه، ICMP بدون UID قابل انتساب مسدود می‌ماند.</string>
-    <string name="diagnostics_connection_history">تصمیمات مسیریابی اخیر</string>
-    <string name="diagnostics_history_debug_only">ثبت خطایابی یا ردیابی را فعال کنید و اتصال را برای جمع‌آوری تاریخچه راه‌اندازی مجدد کنید. پرس‌وجوهای DNS بدون شناسه اتصال جداگانه نمایش داده می‌شوند.</string>
-    <string name="diagnostics_selected_node">گره انتخاب‌شده</string>
-    <string name="diagnostics_query_failed">ناموفق</string>
     <string name="direct_fallback_required">URLهای کنترل موفق به ازای هر بررسی</string>
     <string name="direct_fallback_failures">بررسی‌های ناموفق پیش از تعویض به پروکسی</string>
     <string name="direct_fallback_recoveries">بررسی‌های موفق پیش از بازگشت به مستقیم</string>

@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="profile_diagnostics">Configuratie en routes controleren</string>
-    <string name="diagnostics_config_valid">Configuratie geaccepteerd door de core</string>
-    <string name="diagnostics_config_invalid">Configuratiefout</string>
-    <string name="diagnostics_listener_without_auth">Listener bereikbaar vanuit LAN zonder wachtwoord:</string>
-    <string name="diagnostics_no_groups">Groepsbeslissingen zijn beschikbaar voor een actief profiel met dynamische groepen.</string>
-    <string name="diagnostics_initial_selection">Initiële selectie</string>
-    <string name="diagnostics_no_probe">Geen enkele kandidaat is geslaagd voor de beschikbaarheidscontrole</string>
-    <string name="diagnostics_control_unreachable">Controlesite onbereikbaar via directe toegang</string>
-    <string name="diagnostics_direct_recovered">Directe toegang hersteld</string>
-    <string name="diagnostics_previous_unavailable">Vorige kandidaat niet beschikbaar</string>
-    <string name="diagnostics_priority_available">Kandidaat met hogere prioriteit beschikbaar</string>
-    <string name="diagnostics_lower_latency">Kandidaat met lagere latentie geselecteerd</string>
-    <string name="diagnostics_no_candidate">Geen compatibele kandidaat</string>
-    <string name="diagnostics_refresh">Vernieuwen</string>
-    <string name="diagnostics_no_app_guard">Geen UID/pakket-regel voor weigering gevonden in de core-configuratie. Controleer app-beperkingen, vooral in aangepaste JSON.</string>
 </resources>

@@ -140,10 +140,10 @@ class ProtonActivity : ThemedActivity() {
     // 它不存名稱），所以名稱是登入當時記下的；舊工作階段沒記過就誠實說沒記，不拿 UID 充數。
     private fun renderAccountLine(signedIn: Boolean) {
         if (!signedIn) {
-            binding.signedInAs.visibility = View.GONE
+            binding.signedInRow.visibility = View.GONE
             return
         }
-        binding.signedInAs.visibility = View.VISIBLE
+        binding.signedInRow.visibility = View.VISIBLE
         val account = DataStore.protonAccount
         if (account.isEmpty()) {
             binding.signedInAs.setText(R.string.proton_signed_in_unknown)

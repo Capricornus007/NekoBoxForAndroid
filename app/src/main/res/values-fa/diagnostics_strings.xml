@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="profile_diagnostics">بررسی پیکربندی و مسیرها</string>
-    <string name="diagnostics_config_valid">پیکربندی توسط هسته پذیرفته شد</string>
-    <string name="diagnostics_config_invalid">خطای پیکربندی</string>
-    <string name="diagnostics_listener_without_auth">شنونده از طریق LAN بدون گذرواژه در دسترس است:</string>
-    <string name="diagnostics_no_groups">تصمیمات گروهی برای یک پروفایل در حال اجرا با گروه‌های پویا در دسترس است.</string>
-    <string name="diagnostics_initial_selection">انتخاب اولیه</string>
-    <string name="diagnostics_no_probe">هیچ نامزدی بررسی در دسترس بودن را نگذراند</string>
-    <string name="diagnostics_control_unreachable">وب‌سایت کنترل از طریق دسترسی مستقیم در دسترس نیست</string>
-    <string name="diagnostics_direct_recovered">دسترسی مستقیم بازیابی شد</string>
-    <string name="diagnostics_previous_unavailable">نامزد قبلی در دسترس نیست</string>
-    <string name="diagnostics_priority_available">نامزد با اولویت بالاتر در دسترس است</string>
-    <string name="diagnostics_lower_latency">نامزد با تأخیر کمتر انتخاب شد</string>
-    <string name="diagnostics_no_candidate">هیچ نامزد سازگاری وجود ندارد</string>
-    <string name="diagnostics_refresh">بازخوانی</string>
-    <string name="diagnostics_no_app_guard">هیچ قانون UID/بسته ردکننده در پیکربندی هسته یافت نشد. محدودیت‌های برنامه، به‌ویژه در JSON سفارشی، را بررسی کنید.</string>
 </resources>

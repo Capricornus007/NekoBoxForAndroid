@@ -7,13 +7,6 @@
     <string name="restore_network_settings">还原先前的网路设定</string>
     <string name="restore_network_settings_confirm">要还原先前的 DNS、路由与连接设定吗？</string>
     <string name="restore_network_settings_failed">无法还原网路设定。所需的设定档可能已被删除。</string>
-    <string name="diagnostics_handshake">最近一次握手</string>
-    <string name="diagnostics_handshake_never">尚无</string>
-    <string name="diagnostics_wg_counters_hint">对等节点的线路计数器。HTTP 测试无法验证 UDP 或路径 MTU。在按应用过滤的情况下，无法归属 UID 的 ICMP 封包仍会被阻挡。</string>
-    <string name="diagnostics_connection_history">近期的路由决策</string>
-    <string name="diagnostics_history_debug_only">请启用除错或追踪日志，并重新启动连接以搜集历史记录。没有连接 ID 的 DNS 查询会另外显示。</string>
-    <string name="diagnostics_selected_node">已选择的节点</string>
-    <string name="diagnostics_query_failed">失败</string>
     <string name="direct_fallback_required">每次检查需达成的控制网址成功数</string>
     <string name="direct_fallback_failures">切换至代理前的失败检查次数</string>
     <string name="direct_fallback_recoveries">切回直连前的成功检查次数</string>

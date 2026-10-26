@@ -1,18 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="profile_diagnostics">Kontroller konfigurasjon og ruter</string>
-    <string name="diagnostics_config_valid">Konfigurasjonen ble akseptert av kjernen</string>
-    <string name="diagnostics_config_invalid">Konfigurasjonsfeil</string>
-    <string name="diagnostics_listener_without_auth">Lytter tilgjengelig fra LAN uten passord:</string>
-    <string name="diagnostics_no_groups">Gruppebeslutninger er tilgjengelige for en profil som kjører med dynamiske grupper.</string>
-    <string name="diagnostics_initial_selection">Første valg</string>
-    <string name="diagnostics_no_probe">Ingen kandidat besto tilgjengelighetskontrollen</string>
-    <string name="diagnostics_control_unreachable">Kontrollnettsted utilgjengelig via direkte tilgang</string>
-    <string name="diagnostics_direct_recovered">Direkte tilgang gjenopprettet</string>
-    <string name="diagnostics_previous_unavailable">Forrige kandidat utilgjengelig</string>
-    <string name="diagnostics_priority_available">Kandidat med høyere prioritet tilgjengelig</string>
-    <string name="diagnostics_lower_latency">Kandidat med lavere latenstid valgt</string>
-    <string name="diagnostics_no_candidate">Ingen kompatibel kandidat</string>
-    <string name="diagnostics_refresh">Oppdater</string>
-    <string name="diagnostics_no_app_guard">Ingen avvisende UID/pakke-regel funnet i kjernekonfigurasjonen. Sjekk appbegrensninger, spesielt i egendefinert JSON.</string>
 </resources>

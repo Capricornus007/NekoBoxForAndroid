@@ -607,21 +607,6 @@ class MainActivity :
 
             R.id.nav_logcat -> displayFragment(LogcatFragment())
 
-            R.id.nav_diagnostics -> {
-                binding.drawerLayout.closeDrawers()
-                lifecycleScope.launch {
-                    val profileId = DataStore.currentProfile.takeIf { DataStore.serviceState.started && it > 0 }
-                        ?: DataStore.selectedProxy
-                    val profile = withContext(Dispatchers.IO) { SagerDatabase.proxyDao.getById(profileId) }
-                    if (profile == null) {
-                        snackbar(getString(R.string.diagnostics_select_profile)).show()
-                    } else {
-                        showProfileDiagnostics(profile)
-                    }
-                }
-                return true
-            }
-
             R.id.nav_faq -> {
                 launchCustomTab("https://matsuridayo.github.io/")
                 return false
