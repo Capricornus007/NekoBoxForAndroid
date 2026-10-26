@@ -198,7 +198,7 @@ replace github.com/sagernet/sing-snell => github.com/Capricornus007/sing-snell v
 replace github.com/sagernet/wireguard-go => ../../wireguard-go
 
 // replace github.com/sagernet/sing-quic => github.com/matsuridayo/sing-quic v0.0.0-20241009042333-b49ce60d9b36
-replace github.com/sagernet/sing-quic => github.com/Capricornus007/sing-quic v0.7.0-beta.2.0.20261023034421-e8d980d7061e
+replace github.com/sagernet/sing-quic => github.com/Capricornus007/sing-quic v0.7.0-beta.2.0.20261023050252-3f72bc0d75eb
 
 // replace github.com/sagernet/sing => ../../sing
 

@@ -71,7 +71,7 @@
 # ContextWithIsExternalConnection 在 alpha.13 起需 isExternal 參數，libcore 4 處調用
 # 已改為 (ctx, true)——見 commit 1d2360c1d。基號換到 alpha.13（上游 tag v1.15.0-alpha.13
 # 自 7fc12b8f4 起在我方歷史裡）。
-export COMMIT_SING_BOX="9b01b1bff15d03753ef922f746d2b7c213c73f87"
+export COMMIT_SING_BOX="c366be05df71b670fcdc4072793102c64c7210f3"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
@@ -92,7 +92,7 @@ export COMMIT_LIBNEKO="1dad84547be59ff2ec5ed7bd2339b0441929edfd"
 # API），而 sing-box/go.mod 那側的 replace 本來就指到 aceae72d —— 這個 pin 留在 1eabb449 會造成
 # 「本機用 sibling checkout 編得過、CI 用這個 commit 編不過」（CI 實測報 q.peer.WritePackets undefined）。
 # 兩邊必須是同一個 commit。
-export COMMIT_WIREGUARD_GO="5bd3301fdba3886aa2e79f1234072971dba4f154"
+export COMMIT_WIREGUARD_GO="4261874ba2bdac6db349856c258b357e28ed7ce4"
 # 歷史：2026-09-27 曾推到 d5db986（吃下 upstream/dev 的 client API（SetKeepIdleConnections /
 # CloseIdleConnections / ContextWithKeepSession），現值見下方 export。上游 6a3a24d 那個 port hopping 修復我方早已以
 # 32c2895 合併、又在 a8f70b4 把目的地判斷從 IsFqdn 改成 IsDomain，所以 hop.go 那處衝突保留我方。
@@ -108,6 +108,6 @@ export COMMIT_WIREGUARD_GO="5bd3301fdba3886aa2e79f1234072971dba4f154"
 # wireguard-go 與 sing-quic 是 check-core-pins.sh 段 1 的硬配對，所以同輪把
 # sing-box 的 go.mod 與 libcore/go.mod 一起抬（見 sing-box e9c87b01）。
 # trusttunnel 那筆是它自己合併上游 dev 3 條之後的 f90a48e。
-export COMMIT_SING_QUIC="e8d980d7061eca1b88a019085b338aceb0b57978"
+export COMMIT_SING_QUIC="3f72bc0d75eba20781a46d3b96b1119219fdc1ff"
 export COMMIT_SING_JUICITY="33e0fde5980ffc99ea19a678cc490bd7414c4709"
-export COMMIT_SING_TRUSTTUNNEL="fe43c5b370684ea3e0e0ca328638e5c7aec2d40e"
+export COMMIT_SING_TRUSTTUNNEL="660f39539f7018418fe85181700c09bdc8475959"
