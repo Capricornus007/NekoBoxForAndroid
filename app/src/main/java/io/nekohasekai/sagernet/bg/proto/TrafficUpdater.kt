@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.bg.proto
 
 import android.os.SystemClock
-import io.nekohasekai.sagernet.BuildConfig
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -56,11 +55,14 @@ class TrafficUpdater(
         // isai：時鐘可注入（fork 主路徑預設 SystemClock 單調時鐘，行為不變）。
         // isai 語意：updater 構造當下即起算——首輪輪詢沒有 prior 對照，interval=0，
         // 只累計 delta、不計速率；其後以 item.lastUpdate / lastClock 較大者為基準。
+        // 2026-10-26 修正：interval 必須按 item 自己的上次查詢時間算。基準若取
+        // max(item.lastUpdate, lastClock)，同一輪先查的 item 會把全域 lastClock 推到 now，
+        // 後面每個 item 的分母都變 0〜1ms：速率在 0 與千倍暴值間跳動（FAB 永遠顯示 0 B/s）。
+        // lastClock 現在只當「該 item 從未被查過」的首查兜底。
         val now = clock()
-        val base = maxOf(item.lastUpdate, lastClock)
+        val base = item.lastUpdate.takeIf { it != 0L } ?: lastClock
         val interval = now - base
         item.lastUpdate = now
-        lastClock = now
 
         // query（fork 主路徑走 box；isai 路徑走注入的 lambda）。
         // interval<=0（同一 tick 內第二次輪詢）仍要讀：原生計數器是「讀即重置」，
@@ -75,10 +77,6 @@ class TrafficUpdater(
             rx = box!!.queryStats(item.tag, "downlink")
         }
 
-        // TEMP-PROBE(2026-10-25): 排查「延遲正常但上下傳 0 B/s」——把原始計數器回傳打進 logcat。
-        if (BuildConfig.DEBUG) {
-            android.util.Log.i("NekoTraffic", "tag=${item.tag} rawTx=$tx rawRx=$rx interval=${now - base} last=${item.lastUpdate}")
-        }
         // add diff
         item.rx += rx
         item.tx += tx
