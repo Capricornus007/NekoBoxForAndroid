@@ -61,6 +61,9 @@ var routeBlocked = map[string]string{
 	"windows-vpn": "Invalid input",        // 2026-10-26：windows/linux 身分已死
 	"linux-vpn":   "Invalid input",
 	"web-vpn":     "Invalid app version", // 2026-10-26：web-vpn 吃 5002
+	// 2026-10-26 晚間實測反轉：android-vpn 的 /auth/v4/modulus 現在要求持 token
+	// （GET 匿名 → 401 Invalid access token），首次登錄（無 token）被鎖死。
+	"android-vpn": "Invalid access token",
 }
 
 // minSupported 是「版本被淘汰」的下界，只填**量測過**的那條：android-vpn 實測 5.9.0.0 可過、
@@ -74,6 +77,11 @@ var minSupported = map[string][]int{
 func appVersionGate(v string) string {
 	if v == "" {
 		return "Missing x-pm-appversion header"
+	}
+	// other 身分走「Other_<版本>」底線格式（非 name@version）。2026-10-26 晚間沿 SRP
+	// 全鏈實測：Other_1.0.0 取 modulus 200、SRP POST 走到 422「用戶名不存在」= 登錄鏈通。
+	if ok, _ := regexp.MatchString(`^Other_[0-9]+\.[0-9]+\.[0-9]+$`, v); ok {
+		return ""
 	}
 	name, version, ok := strings.Cut(v, "@")
 	if !ok {
@@ -129,7 +137,6 @@ func TestAppVersionHeaderMatchesProtonsFormatRule(t *testing.T) {
 		"NB4A_1.0.0":            "Invalid app version",
 		"Otherx_1.0.0":          "Invalid app version",
 		"Other_1.0":             "Invalid app version",
-		"Other_1.0.0":           "Invalid app version", // 2026-10-26：other 整條已死
 		"android-vpn":           "Invalid app version",
 		"android-vpn@":          "Invalid app version",
 		"NB4A@1.0.0":            "Application name must be in lowercase",
@@ -138,6 +145,7 @@ func TestAppVersionHeaderMatchesProtonsFormatRule(t *testing.T) {
 		"android-nb4a@1.0.0":    "Product `nb4a` is not valid",
 		"solar-vpn@1.0.0":       "Platform `solar` is not valid",
 		"android-vpn@1.0.0":     "This version of the app is no longer supported",
+		"android-vpn@5.20.98.0": "Invalid access token", // 2026-10-26 晚：modulus 要 token，首登死
 		"windows-vpn@5.20.74.0": "Invalid input",       // 2026-10-26：windows/linux 已死
 		"linux-vpn@5.20.74.0":   "Invalid input",
 		"web-vpn@5.20.74.0":     "Invalid app version", // 2026-10-26：web-vpn 吃 5002
@@ -154,11 +162,12 @@ func TestAppVersionHeaderMatchesProtonsFormatRule(t *testing.T) {
 			t.Errorf("appVersionGate(%q) = %q，期望開頭是 %q", v, got, want)
 		}
 	}
-	// 2026-10-26 對 /auth/v4/info 量出來真的能過閘門的字串（回 401 只差登入令牌）：
-	// android-vpn@<版本>=5.9。其他身分（other_/windows/linux/web-vpn）在 2026-10-26 已被
-	// 閘門整組殺掉，不再列這裡（見上方 routeBlocked 與 bad 表）。
+	// 2026-10-26 晚間沿 SRP 全鏈（GET modulus → POST /auth/v4/）重量的結論：
+	// 唯一可走通登錄鏈的是 Other_<三段版本>；android-vpn 的 modulus 端點已要求持 token
+	// （首次登錄死），從好清單移除並進 routeBlocked。白天在 /auth/v4/info 上量的結論作廢——
+	// 那道門與 SRP 登錄鏈的門不是同一道。
 	for _, v := range []string{
-		"android-vpn@5.20.98.0", "android-vpn@5.9.0.0", "android-vpn@5.30.0.0",
+		"Other_1.0.0",
 	} {
 		if got := appVersionGate(v); got != "" {
 			t.Errorf("appVersionGate(%q) = %q，這個格式 Proton 是收的", v, got)

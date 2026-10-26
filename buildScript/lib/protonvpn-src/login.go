@@ -18,29 +18,20 @@ import (
 
 // protonAppVersion 是 x-pm-appversion 的內容，決定 Proton 把 NB4A 當成哪個客戶端身分。
 //
-// Proton 的版本閘門只認「<平台>-<產品>@<版本>」這種官方客戶端身分（來源見下方常數來源）。
-// 第三方/通用身分（other_<版本>、windows-vpn、linux-vpn、web-vpn）在 2026-10-26 實測已全部被拒：
+// Proton 的閘門會隨時間移動，2026-10-26 晚間電腦側實測矩號（POST/GET 公測端點、假帳號）：
 //
-//	"Other_1.0.0"           -> 400/2001 Invalid input（other 這條已被閘門殺掉）
-//	"Other_5.20.74.0"       -> 400/2001 Invalid input
-//	"windows-vpn@5.20.74.0" -> 400/2001 Invalid input
-//	"linux-vpn@5.20.74.0"   -> 400/2001 Invalid input
+//	"Other_1.0.0"           -> GET /auth/v4/modulus = 200（匿名可取）；
+//	                          POST /auth/v4/ SRP 走到「422 username does not exist」= 全鏈路通
+//	"android-vpn@5.20.98.0" -> GET /auth/v4/modulus = 401 Invalid access token——
+//	                          官方 Android 身分現在要求持 token 才能開始 SRP，
+//	                          首次登錄（無 token）被鎖死，第三方不可用
 //	"web-vpn@5.20.74.0"     -> 400/5002 Invalid app version
-//	"android-vpn@4.0.0.0"   -> 422/5003 版本過舊（有最低版本門檻）
-//	"android-vpn@5.9.0.0"   -> 401 Invalid access token（閘門放行，只差登入令牌）
-//	"android-vpn@5.30.0.0"  -> 401 Invalid access token（沒上限，5.30 也過）
-//	"android-vpn@5.20.98.0" -> 401 Invalid access token（最新穩定版，即此處寫死值）
 //
-// 量測方法同前：公開端點 /auth/v4/info 在驗 token 之前就先過版本閘門，所以不需要帳密。
-// 結論：2026-10-26 起唯一能過閘門的是 android-vpn@<版本>=~5.9；版本太低吃 5003，太高無上限。
-// 這裡寫死最新穩定版 5.20.98.0（2026-10-19 釋出），盡量拖晚被 5003 判過期的時間。
-// 這是隨 Proton 改閘門就會失效的硬編碼——下次再報 400/5002，就回這裡調版本或身分。
-//
-// 身分來源（官方 Android 客戶端）：
-//
-//	app/src/main/java/com/protonvpn/android/utils/Constants.kt:73  MOBILE_CLIENT_ID = "android-vpn"
-//	app/src/main/java/com/protonvpn/android/api/VpnApiClient.kt:49 "${clientId}@" + versionName()
-const protonAppVersion = "android-vpn@5.20.98.0"
+// 先前（2026-10-26 白天）把身分改成 android-vpn 的依據是在 /auth/v4/info 端點上的量測，
+// 該端點的門與 SRP 登錄鏈的門不是同一道；晚間沿 SRP 實鏈重測後結論反轉：
+// 登錄鏈唯一可走通的是 Other_1.0.0。若 Proton 之後把 Other 的 SRP 也閘掉，
+// 就得回到這層做「modulus 用 Other、SRP/後續用 android-vpn」的混合身分。
+const protonAppVersion = "Other_1.0.0"
 
 const defaultProtonAPIURL = "https://api.protonmail.ch"
 
