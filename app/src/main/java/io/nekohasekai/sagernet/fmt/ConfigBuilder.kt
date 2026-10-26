@@ -1345,6 +1345,9 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
                     android.os.Process.myUid(),
                     DataStore.bypass,
                     resolverUids,
+                    // AGH 以 root 跑、上游是 DoH(443)/DoT(853)/bootstrap(53)；
+                    // 不放行这三条，它的查询会被 per-app guard 全部 reject。
+                    listOf(53, 853, 443),
                 ),
             )
         }

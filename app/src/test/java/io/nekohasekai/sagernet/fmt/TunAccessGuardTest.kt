@@ -47,4 +47,33 @@ class TunAccessGuardTest {
         assertEquals(listOf("tun-in"), rule.inbound)
         assertNull(rule.user_id)
     }
+
+    // Android 的 per-app VPN 会把 uid 0-999（系统保留段，含 root）一并吸进 tun0。
+    // 以 root 运行的 DNS 服务（AdGuardHome 等）若不被显式放行，其上游 DoH 会被 guard
+    // 整条 reject；而 remoteDns/directDns 都指向它，等于全机 DNS 陪葬。
+    @Test fun rootResolverGetsOnlyItsDnsPorts() {
+        val rule = perAppTunGuard(
+            setOf(12345), setOf(12345, 1000), 20001, false, listOf(1051), listOf(53, 853, 443),
+        )
+        val b = branches(rule)
+        assertEquals(3, b.size)
+        val root = b[2] as Rule_DefaultOptions
+        assertEquals(listOf(0), root.user_id)
+        assertEquals(listOf(53, 853, 443), root.port)
+    }
+
+    @Test fun rootResolverBranchAbsentByDefault() {
+        val rule = perAppTunGuard(setOf(12345), setOf(12345), 20001, false, listOf(1051))
+        assertEquals(2, branches(rule).size)
+    }
+
+    @Test fun rootResolverKeepsGuardStructuredWithoutAppUids() {
+        // selectedUids 为空时 appUid 自己仍会进 allowed，所以是「appUid + root」两条，
+        // 而不是退化成一条无 user_id 的「全部 reject」。
+        val rule = perAppTunGuard(emptySet(), emptySet(), 20001, false, emptyList(), listOf(443))
+        val b = branches(rule)
+        assertEquals(2, b.size)
+        assertEquals(listOf(20001), (b[0] as Rule_DefaultOptions).user_id)
+        assertEquals(listOf(0), (b[1] as Rule_DefaultOptions).user_id)
+    }
 }
