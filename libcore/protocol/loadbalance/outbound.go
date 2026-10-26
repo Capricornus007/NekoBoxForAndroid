@@ -277,12 +277,12 @@ func (s *LoadBalance) ListenPacket(ctx context.Context, destination M.Socksaddr)
 // the handler path gets the same strategy, failover and per-candidate timeout as the
 // dial path instead of being pinned to one member with no way out.
 func (s *LoadBalance) NewConnection(ctx context.Context, conn net.Conn, metadata adapter.InboundContext, onClose N.CloseHandlerFunc) {
-	ctx = interrupt.ContextWithIsExternalConnection(ctx)
+	ctx = interrupt.ContextWithIsExternalConnection(ctx, true)
 	s.connection.NewConnection(ctx, s, conn, metadata, onClose)
 }
 
 func (s *LoadBalance) NewPacketConnection(ctx context.Context, conn N.PacketConn, metadata adapter.InboundContext, onClose N.CloseHandlerFunc) {
-	ctx = interrupt.ContextWithIsExternalConnection(ctx)
+	ctx = interrupt.ContextWithIsExternalConnection(ctx, true)
 	s.connection.NewPacketConnection(ctx, s, conn, metadata, onClose)
 }
 
