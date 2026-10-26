@@ -1039,6 +1039,7 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_added">%s aggiunto</string>
     <string name="proton_no_nodes">Nessun server utilizzabile</string>
     <string name="proton_node_count">%1$d server, %2$d ignorati</string>
+    <string name="proton_filtered_by_tier">Filtrato per il livello account %1$d</string>
     <string name="proton_sidecar_missing">Questa versione non include l\'assistente Proton.</string>
     <string name="proton_2fa_required">Questo account richiede un codice 2FA.</string>
     <string name="proton_auto_login">Accesso automatico</string>

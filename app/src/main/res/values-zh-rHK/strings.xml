@@ -1012,6 +1012,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_added">已加入 %s</string>
     <string name="proton_no_nodes">沒有可用的伺服器</string>
     <string name="proton_node_count">%1$d 個伺服器，略過 %2$d 個</string>
+    <string name="proton_filtered_by_tier">已依帳號層級（第 %1$d 級）過濾</string>
     <string name="proton_sidecar_missing">此版本未內含 Proton 協助元件。</string>
     <string name="proton_2fa_required">此帳號需要 2FA 代碼。</string>
     <string name="proton_auto_login">自動登入</string>

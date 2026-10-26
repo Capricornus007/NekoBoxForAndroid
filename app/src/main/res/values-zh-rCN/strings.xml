@@ -1012,6 +1012,7 @@
     <string name="proton_added">已添加 %s</string>
     <string name="proton_no_nodes">没有可用的服务器</string>
     <string name="proton_node_count">%1$d 个服务器，跳过 %2$d 个</string>
+    <string name="proton_filtered_by_tier">已按账号层级（第 %1$d 级）过滤</string>
     <string name="proton_sidecar_missing">此版本未包含 Proton 辅助组件。</string>
     <string name="proton_2fa_required">此账户需要 2FA 验证码。</string>
     <string name="proton_auto_login">自动登录</string>

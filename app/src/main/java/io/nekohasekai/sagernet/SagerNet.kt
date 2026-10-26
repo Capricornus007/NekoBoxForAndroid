@@ -123,7 +123,11 @@ class SagerNet :
             Theme.apply(this)
             Theme.applyNightTheme()
             AppLocale.apply()
-            DataStore.migrateSubscriptionUserAgents()
+            // migrateSubscriptionUserAgents() 查 groupDao（阻塞 DAO）且內部 catch Throwable：
+            // 在 Application.onCreate 主線跑會被靜默吞掉，遷移等於完全沒執行。交背景。
+            runOnDefaultDispatcher {
+                DataStore.migrateSubscriptionUserAgents()
+            }
             runOnDefaultDispatcher {
                 DefaultNetworkListener.start(this) {
                     underlyingNetwork = it

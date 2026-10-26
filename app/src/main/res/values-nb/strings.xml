@@ -1030,6 +1030,7 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="proton_added">%s lagt til</string>
     <string name="proton_no_nodes">Ingen brukbare tjenere</string>
     <string name="proton_node_count">%1$d tjenere, %2$d hoppet over</string>
+    <string name="proton_filtered_by_tier">Filtrert etter kontonivå %1$d</string>
     <string name="proton_sidecar_missing">Denne versjonen inneholder ikke Proton-hjelperen.</string>
     <string name="proton_2fa_required">Denne kontoen krever en 2FA-kode.</string>
     <string name="proton_auto_login">Automatisk pålogging</string>

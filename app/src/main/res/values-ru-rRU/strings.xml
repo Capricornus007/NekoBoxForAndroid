@@ -1088,6 +1088,7 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="proton_added">Добавлено: %s</string>
     <string name="proton_no_nodes">Нет доступных серверов</string>
     <string name="proton_node_count">Серверов: %1$d, пропущено: %2$d</string>
+    <string name="proton_filtered_by_tier">Отфильтровано по уровню учётной записи %1$d</string>
     <string name="proton_sidecar_missing">В этой сборке нет вспомогательного модуля Proton.</string>
     <string name="proton_2fa_required">Для этого аккаунта нужен код 2FA.</string>
     <string name="proton_auto_login">Автовход</string>

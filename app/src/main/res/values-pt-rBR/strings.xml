@@ -990,6 +990,7 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="proton_added">%s adicionado</string>
     <string name="proton_no_nodes">Nenhum servidor utilizável</string>
     <string name="proton_node_count">%1$d servidores, %2$d ignorados</string>
+    <string name="proton_filtered_by_tier">Filtrado pelo nível da conta %1$d</string>
     <string name="proton_sidecar_missing">Esta versão não inclui o auxiliar do Proton.</string>
     <string name="proton_2fa_required">Esta conta precisa de um código 2FA.</string>
     <string name="proton_auto_login">Login automático</string>

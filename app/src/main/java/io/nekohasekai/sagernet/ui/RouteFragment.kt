@@ -261,8 +261,22 @@ class RouteFragment :
         UndoSnackbarManager.Interface<RuleEntity> {
 
         val ruleList = ArrayList<RuleEntity>()
+
+        // displayOutbound() 對正數 outbound 會同步查 Room，onBindViewHolder 在主線——
+        // debug 版关了 allowMainThreadQueries 後直接閃退。列表刷新時在背景把
+        // id→顯示名 預載進這個 map，綁定只讀快取。
+        @Volatile
+        var outboundNames: Map<Long, String> = emptyMap()
+
         suspend fun reload() {
             val rules = ProfileManager.getRules()
+            val outboundIds = rules.map { it.outbound }.filter { it > 0L }.distinct()
+            val names = if (outboundIds.isEmpty()) {
+                emptyMap()
+            } else {
+                ProfileManager.getProfiles(outboundIds).associate { it.id to it.displayName() }
+            }
+            outboundNames = names
             ruleListView.post {
                 ruleList.clear()
                 ruleList.addAll(rules)
@@ -412,7 +426,14 @@ class RouteFragment :
                 rule = ruleEntity
                 profileName.text = rule.displayName()
                 profileType.text = rule.mkSummary()
-                routeOutbound.text = rule.displayOutbound()
+                routeOutbound.text = when (val ob = ruleEntity.outbound) {
+                    0L -> getString(R.string.route_proxy)
+                    -1L -> getString(R.string.route_bypass)
+                    -2L -> getString(R.string.route_block)
+                    else -> ruleAdapter.outboundNames[ob]
+                        ?: ProfileManager.getProfile(ob)?.displayName()
+                        ?: getString(R.string.error_title)
+                }
 
                 // set text color based on route type
                 val ctx = itemView.context

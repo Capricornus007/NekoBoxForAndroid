@@ -1004,6 +1004,7 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_added">%s ditambahkan</string>
     <string name="proton_no_nodes">Tidak ada server yang bisa dipakai</string>
     <string name="proton_node_count">%1$d server, %2$d dilewati</string>
+    <string name="proton_filtered_by_tier">Difilter menurut tingkat akun %1$d</string>
     <string name="proton_sidecar_missing">Build ini tidak menyertakan pembantu Proton.</string>
     <string name="proton_2fa_required">Akun ini memerlukan kode 2FA.</string>
     <string name="proton_auto_login">Masuk otomatis</string>

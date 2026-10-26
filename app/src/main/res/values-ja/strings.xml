@@ -846,6 +846,7 @@
     <string name="proton_added">%s を追加しました</string>
     <string name="proton_no_nodes">利用可能なサーバーがありません</string>
     <string name="proton_node_count">サーバー %1$d 件、スキップ %2$d 件</string>
+    <string name="proton_filtered_by_tier">アカウントのティア %1$d で絞り込み済み</string>
     <string name="proton_sidecar_missing">このビルドには Proton ヘルパーが含まれていません。</string>
     <string name="proton_2fa_required">このアカウントは 2FA コードが必要です。</string>
     <string name="proton_auto_login">自動サインイン</string>

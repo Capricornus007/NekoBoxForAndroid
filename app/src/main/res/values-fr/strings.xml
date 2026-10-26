@@ -1033,6 +1033,7 @@
     <string name="proton_added">%s ajouté</string>
     <string name="proton_no_nodes">Aucun serveur utilisable</string>
     <string name="proton_node_count">%1$d serveurs, %2$d ignorés</string>
+    <string name="proton_filtered_by_tier">Filtré selon le niveau de compte %1$d</string>
     <string name="proton_sidecar_missing">Cette version n\'inclut pas l\'assistant Proton.</string>
     <string name="proton_2fa_required">Ce compte exige un code 2FA.</string>
     <string name="proton_auto_login">Connexion automatique</string>

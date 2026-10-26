@@ -1029,6 +1029,7 @@
     <string name="proton_added">%s hinzugefügt</string>
     <string name="proton_no_nodes">Keine nutzbaren Server</string>
     <string name="proton_node_count">%1$d Server, %2$d übersprungen</string>
+    <string name="proton_filtered_by_tier">Nach Kontostufe %1$d gefiltert</string>
     <string name="proton_sidecar_missing">Dieser Build enthält keinen Proton-Helfer.</string>
     <string name="proton_2fa_required">Dieses Konto benötigt einen 2FA-Code.</string>
     <string name="proton_auto_login">Automatische Anmeldung</string>

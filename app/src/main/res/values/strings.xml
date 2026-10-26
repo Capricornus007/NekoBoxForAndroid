@@ -1100,6 +1100,7 @@
     <string name="proton_added">Added %s</string>
     <string name="proton_no_nodes">No usable servers</string>
     <string name="proton_node_count">%1$d servers, %2$d skipped</string>
+    <string name="proton_filtered_by_tier">Filtered by account tier %1$d</string>
     <string name="proton_sidecar_missing">This build does not include the Proton helper.</string>
     <string name="proton_2fa_required">This account needs a 2FA code.</string>
     <string name="proton_auto_login">Auto sign-in</string>

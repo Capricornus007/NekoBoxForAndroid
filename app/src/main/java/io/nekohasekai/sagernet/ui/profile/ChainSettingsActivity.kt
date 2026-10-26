@@ -175,15 +175,24 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             true
         }
 
-        val subscriptionGroups = SagerDatabase.groupDao.allGroups()
-            .filter { it.type == GroupType.SUBSCRIPTION }
-        sourceGroup.entries = subscriptionGroups.map { it.displayName() }.toTypedArray()
-        sourceGroup.entryValues = subscriptionGroups.map { it.id.toString() }.toTypedArray()
-        sourceGroup.isEnabled = subscriptionGroups.isNotEmpty()
+        // allGroups() 阻塞、createPreferences 跑在主線建偏好樹時：改背景取好再回填
+        var subscriptionGroups: List<io.nekohasekai.sagernet.database.ProxyGroup> = emptyList()
         fun selectDefaultSourceGroupIfNeeded() {
             if (DataStore.fastestSourceGroup == 0L) {
                 DataStore.fastestSourceGroup = subscriptionGroups.firstOrNull()?.id ?: 0L
             }
+        }
+        fun applySubscriptionGroups(groups: List<io.nekohasekai.sagernet.database.ProxyGroup>) {
+            subscriptionGroups = groups
+            sourceGroup.entries = groups.map { it.displayName() }.toTypedArray()
+            sourceGroup.entryValues = groups.map { it.id.toString() }.toTypedArray()
+            sourceGroup.isEnabled = groups.isNotEmpty()
+            selectDefaultSourceGroupIfNeeded()
+        }
+        runOnDefaultDispatcher {
+            val groups = SagerDatabase.groupDao.allGroups()
+                .filter { it.type == GroupType.SUBSCRIPTION }
+            onMainDispatcher { applySubscriptionGroups(groups) }
         }
 
         fun updateCandidateMode(mode: Int) {

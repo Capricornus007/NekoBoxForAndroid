@@ -149,16 +149,21 @@ class GroupSettingsActivity(
             value = DataStore.frontProxyTmp.toString()
             setOnPreferenceChangeListener { _, newValue ->
                 if (newValue.toString() == OutboundPreference.VALUE_SELECT_PROFILE) {
-                    selectProfileForAddFront.launch(
-                        Intent(
-                            this@GroupSettingsActivity,
-                            ProfileSelectActivity::class.java,
-                        ).apply {
-                            ProfileManager.getProfile(DataStore.frontProxy)?.let {
-                                putExtra(ProfileSelectActivity.EXTRA_SELECTED, it)
-                            }
-                        },
-                    )
+                    // getProfile 阻塞、回呼在主線：背景取好 entity 再開選剖面頁
+                    val selectedId = DataStore.frontProxy
+                    runOnDefaultDispatcher {
+                        val selected = ProfileManager.getProfile(selectedId)
+                        onMainDispatcher {
+                            selectProfileForAddFront.launch(
+                                Intent(
+                                    this@GroupSettingsActivity,
+                                    ProfileSelectActivity::class.java,
+                                ).apply {
+                                    selected?.let { putExtra(ProfileSelectActivity.EXTRA_SELECTED, it) }
+                                },
+                            )
+                        }
+                    }
                     false
                 } else {
                     true
@@ -173,16 +178,20 @@ class GroupSettingsActivity(
             value = DataStore.landingProxyTmp.toString()
             setOnPreferenceChangeListener { _, newValue ->
                 if (newValue.toString() == OutboundPreference.VALUE_SELECT_PROFILE) {
-                    selectProfileForAddLanding.launch(
-                        Intent(
-                            this@GroupSettingsActivity,
-                            ProfileSelectActivity::class.java,
-                        ).apply {
-                            ProfileManager.getProfile(DataStore.landingProxy)?.let {
-                                putExtra(ProfileSelectActivity.EXTRA_SELECTED, it)
-                            }
-                        },
-                    )
+                    val selectedId = DataStore.landingProxy
+                    runOnDefaultDispatcher {
+                        val selected = ProfileManager.getProfile(selectedId)
+                        onMainDispatcher {
+                            selectProfileForAddLanding.launch(
+                                Intent(
+                                    this@GroupSettingsActivity,
+                                    ProfileSelectActivity::class.java,
+                                ).apply {
+                                    selected?.let { putExtra(ProfileSelectActivity.EXTRA_SELECTED, it) }
+                                },
+                            )
+                        }
+                    }
                     false
                 } else {
                     true

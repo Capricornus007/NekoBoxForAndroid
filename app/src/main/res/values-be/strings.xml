@@ -929,6 +929,7 @@
     <string name="proton_added">Дададзена: %s</string>
     <string name="proton_no_nodes">Няма прыдатных сервераў</string>
     <string name="proton_node_count">Сервераў: %1$d, прапушчана: %2$d</string>
+    <string name="proton_filtered_by_tier">Адфільтрана па ўзроўні ўліковага запісу %1$d</string>
     <string name="proton_sidecar_missing">Гэтая зборка не змяшчае дапаможны модуль Proton.</string>
     <string name="proton_2fa_required">Гэтаму акаўнту патрэбны код 2FA.</string>
     <string name="proton_auto_login">Аўтаўваход</string>

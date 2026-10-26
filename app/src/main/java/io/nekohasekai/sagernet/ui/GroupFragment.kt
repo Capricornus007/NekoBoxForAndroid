@@ -303,9 +303,11 @@ class GroupFragment :
         override suspend fun groupRemoved(groupId: Long) {
             val index = groupList.indexOfFirst { it.id == groupId }
             if (index == -1) return
+            // allGroups() 是阻塞 DAO：先在背景查好，再回主線動 UI
+            val remaining = SagerDatabase.groupDao.allGroups().size
             onMainDispatcher {
                 undoManager.flush()
-                if (SagerDatabase.groupDao.allGroups().size <= 2) {
+                if (remaining <= 2) {
                     runOnDefaultDispatcher {
                         reload()
                     }

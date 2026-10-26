@@ -1000,6 +1000,7 @@
     <string name="proton_added">%s اضافه شد</string>
     <string name="proton_no_nodes">هیچ سرور قابل استفاده‌ای نیست</string>
     <string name="proton_node_count">%1$d سرور، %2$d نادیده گرفته شد</string>
+    <string name="proton_filtered_by_tier">بر اساس سطح حساب %1$d فیلتر شد</string>
     <string name="proton_sidecar_missing">این نسخه شامل کمک‌برنامه Proton نیست.</string>
     <string name="proton_2fa_required">این حساب به کد 2FA نیاز دارد.</string>
     <string name="proton_auto_login">ورود خودکار</string>

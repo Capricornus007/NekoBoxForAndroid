@@ -841,6 +841,7 @@
     <string name="proton_added">%s 추가됨</string>
     <string name="proton_no_nodes">사용 가능한 서버가 없습니다</string>
     <string name="proton_node_count">서버 %1$d개, 건너뛴 %2$d개</string>
+    <string name="proton_filtered_by_tier">계정 티어 %1$d(으)로 필터링됨</string>
     <string name="proton_sidecar_missing">이 빌드에는 Proton 도우미가 포함되어 있지 않습니다.</string>
     <string name="proton_2fa_required">이 계정은 2FA 코드가 필요합니다.</string>
     <string name="proton_auto_login">자동 로그인</string>

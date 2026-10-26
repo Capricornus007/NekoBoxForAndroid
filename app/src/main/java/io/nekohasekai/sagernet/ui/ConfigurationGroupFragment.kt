@@ -1440,33 +1440,46 @@ class ConfigurationGroupFragment : Fragment() {
 
         private fun handleShareMenu(item: MenuItem, profileId: Long): Boolean {
             val profile = adapter?.profileById(profileId) ?: return true
-            try {
-                val name = profile.displayName().orEmpty()
-                when (item.itemId) {
-                    R.id.action_standard_qr -> showMultiFormatCode(profile, name, initialIsSn = false)
+            // exportConfig() 會查 groupDao/proxyDao/rulesDao（全阻塞），回呼在主線：
+            // debug 版原本只在 catch 後彈錯誤框＝匯出永遠失敗。整段交背景，UI 回饋回主線。
+            runOnDefaultDispatcher {
+                try {
+                    val name = profile.displayName().orEmpty()
+                    when (item.itemId) {
+                        R.id.action_standard_qr -> onMainDispatcher { showMultiFormatCode(profile, name, initialIsSn = false) }
 
-                    R.id.action_standard_clipboard -> export(profile.toStdLink())
+                        R.id.action_standard_clipboard -> onMainDispatcher { export(profile.toStdLink()) }
 
-                    R.id.action_universal_qr -> showMultiFormatCode(profile, name, initialIsSn = true)
+                        R.id.action_universal_qr -> onMainDispatcher { showMultiFormatCode(profile, name, initialIsSn = true) }
 
-                    R.id.action_universal_clipboard -> export(
-                        profile.requireBean().toUniversalLink(),
-                    )
+                        R.id.action_universal_clipboard -> onMainDispatcher {
+                            export(
+                                profile.requireBean().toUniversalLink(),
+                            )
+                        }
 
-                    R.id.action_config_export_clipboard -> export(profile.exportConfig().first)
+                        R.id.action_config_export_clipboard -> {
+                            val text = profile.exportConfig().first
+                            onMainDispatcher { export(text) }
+                        }
 
-                    R.id.action_config_export_file -> {
-                        val config = profile.exportConfig()
-                        DataStore.serverConfig = config.first
-                        startFilesForResult(
-                            (parentFragment as ConfigurationFragment).exportConfig,
-                            config.second,
-                        )
+                        R.id.action_config_export_file -> {
+                            val config = profile.exportConfig()
+                            DataStore.serverConfig = config.first
+                            onMainDispatcher {
+                                startFilesForResult(
+                                    (parentFragment as ConfigurationFragment).exportConfig,
+                                    config.second,
+                                )
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Logs.w(e)
+                    onMainDispatcher {
+                        (activity as MainActivity).snackbar(e.readableMessage).show()
                     }
                 }
-            } catch (e: Exception) {
-                Logs.w(e)
-                (activity as MainActivity).snackbar(e.readableMessage).show()
             }
             return true
         }

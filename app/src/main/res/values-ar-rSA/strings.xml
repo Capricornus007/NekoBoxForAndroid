@@ -1035,6 +1035,7 @@
     <string name="proton_added">تمت إضافة %s</string>
     <string name="proton_no_nodes">لا توجد خوادم قابلة للاستخدام</string>
     <string name="proton_node_count">%1$d خوادم، تم تخطي %2$d</string>
+    <string name="proton_filtered_by_tier">تمت التصفية حسب مستوى الحساب %1$d</string>
     <string name="proton_sidecar_missing">لا يتضمن هذا الإصدار مساعد Proton.</string>
     <string name="proton_2fa_required">هذا الحساب يتطلب رمز 2FA.</string>
     <string name="proton_auto_login">تسجيل الدخول التلقائي</string>

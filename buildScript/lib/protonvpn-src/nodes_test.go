@@ -487,3 +487,89 @@ func TestProtocolCapsIsCaseInsensitiveDedupedAndOrdered(t *testing.T) {
 		t.Errorf("caps = %v, want nil for a domain with no signal at all", empty)
 	}
 }
+
+// TestNodesTierFilterDropsPaidServers 釘住「按帳號層級取節點」：免費層（tier 1）
+// 不該看到 Tier 2 的付費機器——匯進來只會多一堆連不上的節點。
+// fixture 裡 JP#1/JP#2 是 Tier 2，無公鑰/離線群組/域離線是 Tier 0/2；
+// --tier 1 之後唯一該留下的是 ID 12（無公鑰那台照常進清單，靠 protocols 表能力）。
+func TestNodesTierFilterDropsPaidServers(t *testing.T) {
+	srv, _ := mockServer(t, serverListFixture, http.StatusOK)
+	defer srv.Close()
+	statePath := writeTestSession(t, t.TempDir())
+
+	out, _ := runNodesWith(t, srv.URL, statePath, "--tier", "1")
+	// fixture 裡唯一 Tier<=1 的那台（ID 12）沒有 WG 金鑰也沒有 per-protocol 條目，
+	// 本來就進不了清單；重點是兩台 Tier 2 的可用機（10、11）必須被層級擋掉。
+	if len(out.Servers) != 0 || out.OK {
+		t.Fatalf("tier 1 gave ok=%v %+v, want the two paid nodes filtered out", out.OK, out.Servers)
+	}
+	if out.MaxTier != 1 {
+		t.Errorf("maxTier = %d, want it echoed back as 1", out.MaxTier)
+	}
+	// 10、11、14 是被層級擋掉的付費機，12 缺鑰匙、13 離線群組本來就丟。
+	if out.Dropped != 5 {
+		t.Errorf("dropped = %d, want 5 (all five fixture rows: 3 paid + 2 unusable)", out.Dropped)
+	}
+
+	// 全被層級濾光時要講明是層級不夠，不能只報「清單裡沒有可用的」。
+	const onlyPaid = `{"LogicalServers":[
+	 {"ID":"21","Name":"JP#21 付費","Tier":2,"State":"up","ExitCountry":"jp",
+	  "StatusReference":{"Index":21,"Penalty":0.1,"Cost":0},
+	  "Servers":[{"Domain":"jp21.protonvpn.net","EntryIP":"1.2.3.7","Status":1,"X25519PublicKey":"FFFFAl=="}]}
+	]}`
+	srv2, _ := mockServer(t, onlyPaid, http.StatusOK)
+	defer srv2.Close()
+	out, _ = runNodesWith(t, srv2.URL, statePath, "--tier", "1")
+	if out.OK || !strings.Contains(out.Error, "plan tier 1") {
+		t.Fatalf("error = %q (ok=%v), want it to name the plan tier", out.Error, out.OK)
+	}
+
+	// 不帶 --tier 維持舊行為：不過濾（0＝不知道層級）。
+	out, _ = runNodesWith(t, srv.URL, statePath)
+	if len(out.Servers) != 2 || out.Servers[0].ID != "10" {
+		t.Fatalf("without --tier got %+v, want the unfiltered pair starting at 10", out.Servers)
+	}
+}
+
+// TestTierReportsAccountMaxTier 驗證 tier 子命令讀的是 /vpn/v2（官方 getVPNInfo 的
+// 路由），以及「回包沒帶 MaxTier」必須報錯而不是回 0 讓呼叫端誤會成免費層。
+func TestTierReportsAccountMaxTier(t *testing.T) {
+	var gotPath string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"Code":0,"VPN":{"Status":1,"PlanName":"free","MaxTier":1,"MaxConnect":2}}`))
+	}))
+	defer srv.Close()
+
+	statePath := writeTestSession(t, t.TempDir())
+	var stdout, stderr bytes.Buffer
+	code := runTier([]string{"--state", statePath, "--api-url", srv.URL}, &stdout, &stderr)
+	if code != 0 {
+		t.Fatalf("runTier exit=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	}
+	if gotPath != "/vpn/v2" {
+		t.Errorf("path = %q, want /vpn/v2", gotPath)
+	}
+	var out tierOutput
+	if err := json.Unmarshal(bytes.TrimSpace(stdout.Bytes()), &out); err != nil {
+		t.Fatalf("parse %q: %v", stdout.String(), err)
+	}
+	if !out.OK || out.MaxTier != 1 || out.Plan != "free" {
+		t.Fatalf("out = %+v, want ok maxTier=1 plan=free", out)
+	}
+
+	srvMissing := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"Code":0,"VPN":{"Status":1,"MaxConnect":2}}`))
+	}))
+	defer srvMissing.Close()
+	stdout.Reset()
+	code = runTier([]string{"--state", statePath, "--api-url", srvMissing.URL}, &stdout, &stderr)
+	if err := json.Unmarshal(bytes.TrimSpace(stdout.Bytes()), &out); err != nil {
+		t.Fatalf("parse %q: %v", stdout.String(), err)
+	}
+	if code == 0 || out.OK || !strings.Contains(out.Error, "did not report") {
+		t.Fatalf("missing MaxTier gave code=%d out=%+v, want a loud error", code, out)
+	}
+}

@@ -9,6 +9,8 @@ import androidx.preference.PreferenceViewHolder
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProfileManager
+import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
+import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import moe.matsuri.nb4a.ui.SimpleMenuPreference
 
 class OutboundPreference
@@ -28,9 +30,37 @@ class OutboundPreference
         layoutResource = R.layout.preference_dropdown_reselectable
     }
 
+    // getSummary() 由 AndroidX 在主線同步呼叫，而它原本要查 Room（getProfile）。
+    // debug 版关了 allowMainThreadQueries → 開路由／分組設定頁即閃退。
+    // 名字改在背景取好，主線只讀這個欄位。
+    @Volatile
+    private var selectedProfileName: String? = null
+
+    private fun refreshSelectedProfileName() {
+        if (value != VALUE_SELECT_PROFILE) {
+            selectedProfileName = null
+            return
+        }
+        val profileId = DataStore.profileCacheStore.getLong(key + "Long") ?: 0L
+        if (profileId <= 0L) {
+            selectedProfileName = null
+            return
+        }
+        runOnDefaultDispatcher {
+            val name = ProfileManager.getProfile(profileId)?.displayName()
+            runOnMainDispatcher {
+                if (selectedProfileName != name) {
+                    selectedProfileName = name
+                    notifyChanged()
+                }
+            }
+        }
+    }
+
     override fun setValue(value: String?) {
         val oldValue = this.value
         super.setValue(value)
+        refreshSelectedProfileName()
         if (oldValue == value) {
             notifyChanged()
         }
@@ -46,6 +76,7 @@ class OutboundPreference
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         dropdownOpened = false
         super.onBindViewHolder(holder)
+        refreshSelectedProfileName()
 
         // findViewById (not ViewBinding): binds into the AndroidX preference-row ViewHolder
         // (holder.itemView), which is not an app layout binding.
@@ -73,12 +104,7 @@ class OutboundPreference
 
     override fun getSummary(): CharSequence? {
         if (value == VALUE_SELECT_PROFILE) {
-            val routeOutbound = DataStore.profileCacheStore.getLong(key + "Long") ?: 0
-            if (routeOutbound > 0) {
-                ProfileManager.getProfile(routeOutbound)?.displayName()?.let {
-                    return it
-                }
-            }
+            selectedProfileName?.let { return it }
         }
         return super.getSummary()
     }

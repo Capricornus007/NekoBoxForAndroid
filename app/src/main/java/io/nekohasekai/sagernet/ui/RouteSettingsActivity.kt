@@ -153,8 +153,17 @@ class RouteSettingsActivity(
             val id = result.data?.getLongExtra(ProfileSelectActivity.EXTRA_PROFILE_ID, 0L) ?: 0L
             if (id > 0) {
                 DataStore.routeFallbackProfile = id
-                backupPreference?.summary = ProfileManager.getProfile(id)?.displayName()
+                setFallbackSummary(id)
             }
+        }
+    }
+
+    // getProfile 是阻塞 DAO，回呼／監聽器都跑在主線：名字交背景取、只把字串貼回 summary
+    private fun setFallbackSummary(id: Long) {
+        runOnDefaultDispatcher {
+            val name = ProfileManager.getProfile(id)?.displayName()
+                ?: getString(androidx.preference.R.string.not_set)
+            onMainDispatcher { backupPreference?.summary = name }
         }
     }
 
@@ -180,8 +189,7 @@ class RouteSettingsActivity(
         fun updateFallback(mode: Int = DataStore.routeFallbackMode, out: Int = DataStore.routeOutbound) {
             fallback.isVisible = out == 1
             backupPreference?.isVisible = out == 1 && mode == 3
-            backupPreference?.summary = ProfileManager.getProfile(DataStore.routeFallbackProfile)?.displayName()
-                ?: getString(androidx.preference.R.string.not_set)
+            setFallbackSummary(DataStore.routeFallbackProfile)
         }
         updateFallback()
         fallback.setOnPreferenceChangeListener { _, value ->
@@ -195,16 +203,21 @@ class RouteSettingsActivity(
 
         outbound.setOnPreferenceChangeListener { _, newValue ->
             if (newValue.toString() == OutboundPreference.VALUE_SELECT_PROFILE) {
-                selectProfileForAdd.launch(
-                    Intent(
-                        this@RouteSettingsActivity,
-                        ProfileSelectActivity::class.java,
-                    ).apply {
-                        ProfileManager.getProfile(DataStore.routeOutboundRule)?.let {
-                            putExtra(ProfileSelectActivity.EXTRA_SELECTED, it)
-                        }
-                    },
-                )
+                // 選剖面頁要帶「當前已選」的 entity：getProfile 阻塞、這裡是主線，交背景取好再開頁
+                val selectedId = DataStore.routeOutboundRule
+                runOnDefaultDispatcher {
+                    val selected = ProfileManager.getProfile(selectedId)
+                    onMainDispatcher {
+                        selectProfileForAdd.launch(
+                            Intent(
+                                this@RouteSettingsActivity,
+                                ProfileSelectActivity::class.java,
+                            ).apply {
+                                selected?.let { putExtra(ProfileSelectActivity.EXTRA_SELECTED, it) }
+                            },
+                        )
+                    }
+                }
                 false
             } else {
                 updateFallback(out = newValue.toString().toInt())

@@ -80,6 +80,18 @@ abstract class ProfileSettingsActivity<T : AbstractBean>(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 旋轉／進程重建時原本跳過下面的初始化分支，選單程式碼才第一次碰
+        // proxyEntity 的 lazy → getById 落在主線 → debug 版直接閃退。
+        // 一律在背景預熱 lazy，主線讀到的永远是快取值。
+        if (savedInstanceState != null && DataStore.editingId != 0L) {
+            runOnDefaultDispatcher {
+                try {
+                    proxyEntity
+                } catch (e: Exception) {
+                    Logs.w(e)
+                }
+            }
+        }
         onBackPressedDispatcher.addCallback(this) {
             if (DataStore.dirty) {
                 UnsavedChangesDialogFragment().apply { key() }

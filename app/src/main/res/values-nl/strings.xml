@@ -994,6 +994,7 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="proton_added">%s toegevoegd</string>
     <string name="proton_no_nodes">Geen bruikbare servers</string>
     <string name="proton_node_count">%1$d servers, %2$d overgeslagen</string>
+    <string name="proton_filtered_by_tier">Gefilterd op accountniveau %1$d</string>
     <string name="proton_sidecar_missing">Deze build bevat geen Proton-hulpprogramma.</string>
     <string name="proton_2fa_required">Deze account heeft een 2FA-code nodig.</string>
     <string name="proton_auto_login">Automatisch inloggen</string>

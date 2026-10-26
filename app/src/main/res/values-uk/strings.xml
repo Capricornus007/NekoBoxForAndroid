@@ -1017,6 +1017,7 @@
     <string name="proton_added">Додано: %s</string>
     <string name="proton_no_nodes">Немає придатних серверів</string>
     <string name="proton_node_count">Серверів: %1$d, пропущено: %2$d</string>
+    <string name="proton_filtered_by_tier">Відфільтровано за рівнем облікового запису %1$d</string>
     <string name="proton_sidecar_missing">Ця збірка не містить допоміжного модуля Proton.</string>
     <string name="proton_2fa_required">Для цього облікового запису потрібен код 2FA.</string>
     <string name="proton_auto_login">Автоувхід</string>

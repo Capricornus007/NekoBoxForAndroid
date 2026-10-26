@@ -148,7 +148,19 @@ class ProtonServersActivity : ThemedActivity() {
         fetching = true
         binding.refreshLayout.isRefreshing = true
         lifecycleScope.launch {
-            val result = ProtonSidecar.nodes()
+            // 先問帳號是第幾層（免費 1／Plus 2／Visionary 3），清單就只取這個層級以下
+            // 的機器。問不到時 maxTier=0＝不過濾，維持舊行為：把「不知道」當成
+            // 「免費層」會無端砍掉付費帳號能用的節點。
+            val tier = ProtonSidecar.tier()
+            if (tier.code == ProtonSidecar.SESSION_EXPIRED) {
+                fetching = false
+                if (isFinishing || isDestroyed) return@launch
+                binding.refreshLayout.isRefreshing = false
+                showSessionExpired()
+                return@launch
+            }
+            if (!tier.ok) Logs.w("proton: plan tier unavailable: ${tier.error}")
+            val result = ProtonSidecar.nodes(maxTier = if (tier.ok) tier.maxTier else 0)
             fetching = false
             if (isFinishing || isDestroyed) return@launch
             binding.refreshLayout.isRefreshing = false
@@ -205,6 +217,11 @@ class ProtonServersActivity : ThemedActivity() {
             )
         } else {
             count
+        }
+        // 有過濾就要講：不然「少了幾百台」看起來像回應壞了，而不是層級不夠。
+        if (state.maxTier > 0) {
+            binding.status.text = binding.status.text.toString() + " · " +
+                getString(R.string.proton_filtered_by_tier, state.maxTier)
         }
         renderNodes()
     }

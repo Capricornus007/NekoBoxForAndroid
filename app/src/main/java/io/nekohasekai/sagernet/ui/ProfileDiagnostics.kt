@@ -29,7 +29,9 @@ import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.fmt.buildConfig
+import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.readableMessage
+import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.redactConfigJson
 import io.nekohasekai.sagernet.ktx.redactDiagnostic
 import kotlinx.coroutines.*
@@ -118,9 +120,15 @@ internal fun MainActivity.showProfileDiagnostics(profile: ProxyEntity) {
         MaterialButton(context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
             setText(R.string.network_profiles_edit_profile)
             setOnClickListener {
-                val subscription = io.nekohasekai.sagernet.database.SagerDatabase.groupDao.getById(profile.groupId)?.subscription != null
-                dialog.dismiss()
-                startActivity(profile.settingIntent(context, subscription))
+                // groupDao.getById 阻塞、點擊回呼在主線：先背景算好是否訂閱組再開頁
+                runOnDefaultDispatcher {
+                    val subscription = io.nekohasekai.sagernet.database.SagerDatabase.groupDao
+                        .getById(profile.groupId)?.subscription != null
+                    onMainDispatcher {
+                        dialog.dismiss()
+                        startActivity(profile.settingIntent(context, subscription))
+                    }
+                }
             }
         },
         ViewGroup.LayoutParams(-1, -2),

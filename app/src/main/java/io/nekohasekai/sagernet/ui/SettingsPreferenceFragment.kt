@@ -45,9 +45,14 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     private var shownGlobalConfig: String? = null
 
     private fun checkpoint() {
-        if (!checkpointTaken) {
-            checkpointTaken = NetworkSettingsHistory.capture()
-            findPreference<Preference>("restoreNetworkSettings")?.isEnabled = NetworkSettingsHistory.available()
+        if (checkpointTaken) return
+        // capture() 主線跑會被自己的 catch 吞掉 → 設定頁回滾點永遠存不下。交背景。
+        runOnDefaultDispatcher {
+            val taken = NetworkSettingsHistory.capture()
+            onMainDispatcher {
+                checkpointTaken = taken
+                findPreference<Preference>("restoreNetworkSettings")?.isEnabled = NetworkSettingsHistory.available()
+            }
         }
     }
 

@@ -60,7 +60,15 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var currentProfile by configurationStore.long(Key.PROFILE_CURRENT)
 
     var selectedProxy by configurationStore.long(Key.PROFILE_ID)
-    var selectedGroup by configurationStore.long(Key.PROFILE_GROUP) { currentGroupId() }
+    var selectedGroup by configurationStore.long(Key.PROFILE_GROUP) { currentGroupIdCached() }
+
+    // 讀 take 路徑（key 存在）完全不碰庫；只有在 PROFILE_GROUP 尚未寫入時
+    // （首次啟動，ConfigurationFragment.initAndShow 會在背景經 currentGroup() 建立）
+    // 才退回會查庫的 currentGroupId()。
+    private fun currentGroupIdCached(): Long {
+        val cached = configurationStore.getLong(Key.PROFILE_GROUP, -1L)
+        return if (cached > 0L) cached else currentGroupId()
+    }
 
     var vpnService: VpnService? = null
     var baseService: BaseService.Interface? = null

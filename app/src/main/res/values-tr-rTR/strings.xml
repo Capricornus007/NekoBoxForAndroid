@@ -1030,6 +1030,7 @@
     <string name="proton_added">%s eklendi</string>
     <string name="proton_no_nodes">Kullanılabilir sunucu yok</string>
     <string name="proton_node_count">%1$d sunucu, %2$d atlandı</string>
+    <string name="proton_filtered_by_tier">Hesap seviyesi %1$d ile filtrelendi</string>
     <string name="proton_sidecar_missing">Bu derleme Proton yardımcısını içermiyor.</string>
     <string name="proton_2fa_required">Bu hesap 2FA kodu gerektiriyor.</string>
     <string name="proton_auto_login">Otomatik oturum açma</string>

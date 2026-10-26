@@ -289,6 +289,9 @@ type nodesOutput struct {
 	// "broken response" without hiding perfectly dialable servers.
 	Dropped int    `json:"dropped"`
 	Error   string `json:"error,omitempty"`
+	// MaxTier 是這次過濾用的帳號層級上限（0＝沒過濾）。UI 拿它決定要不要在清單上
+	// 註明「已按免費層過濾」，也免得再用「少掉的節點＝壞了」來解讀 dropped。
+	MaxTier int `json:"maxTier,omitempty"`
 	// Code is the machine-readable twin of Error. Error is prose meant for a human
 	// (and Proton rewords things), so "route the user back to sign-in" must never be
 	// decided by matching an English sentence. Only session_expired exists today.
@@ -299,12 +302,132 @@ type nodesOutput struct {
 // only recovery is a fresh sign-in, which is why the app needs to recognise it.
 const codeSessionExpired = "session_expired"
 
+// vpnInfo 是 Proton「帳號本身」的 VPN 資訊回包。端點與欄位取自官方 Android 客戶端
+// （ProtonVPN/android-app）：api/ProtonVPNRetrofit.kt 的
+//
+//	@GET("vpn/v2") suspend fun getVPNInfo(): VpnInfoResponse
+//
+// 其 models/login/VPNInfo.kt 帶 MaxTier/PlanName/MaxConnect。實測（2026-10-26）
+// GET /vpn/v2 未帶 token 回 401「Invalid access token」，路由存在。
+// 免費層 MaxTier=1、Plus=2、Visionary/Business=3；MaxTier 可能整個缺席
+// （官方模型把它宣告為 Int?），所以這裡用指標區分「0」與「沒給」。
+type vpnInfo struct {
+	MaxTier    *int   `json:"MaxTier"`
+	PlanName   string `json:"PlanName"`
+	MaxConnect int    `json:"MaxConnect"`
+	Status     int    `json:"Status"`
+}
+
+type vpnInfoResponse struct {
+	Code       int     `json:"Code"`
+	VPN        vpnInfo `json:"VPN"`
+	Subscribed int     `json:"Subscribed"`
+	Delinquent int     `json:"Delinquent"`
+}
+
+// fetchVPNInfo 用存著的憑證讀帳號 VPN 資訊。401/403 照全倉慣例回報為工作階段過期，
+// 讓呼叫端能觸發既有的換 token 重試路徑。
+func fetchVPNInfo(ctx context.Context, apiURL string, cred storedCredential) (vpnInfo, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, strings.TrimRight(apiURL, "/")+"/vpn/v2", nil)
+	if err != nil {
+		return vpnInfo{}, err
+	}
+	req.Header.Set("Authorization", "Bearer "+cred.AccessToken)
+	req.Header.Set("x-pm-uid", cred.UID)
+	req.Header.Set("x-pm-appversion", protonAppVersion)
+	req.Header.Set("x-pm-apiversion", protonAPIVersion)
+	req.Header.Set("Accept", protonAccept)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return vpnInfo{}, err
+	}
+	defer res.Body.Close()
+
+	switch {
+	case res.StatusCode == http.StatusUnauthorized, res.StatusCode == http.StatusForbidden:
+		return vpnInfo{}, errSessionExpired
+	case res.StatusCode != http.StatusOK:
+		return vpnInfo{}, fmt.Errorf("API returned HTTP %d", res.StatusCode)
+	}
+
+	var parsed vpnInfoResponse
+	if err := json.NewDecoder(res.Body).Decode(&parsed); err != nil {
+		return vpnInfo{}, fmt.Errorf("decode vpn info: %w", err)
+	}
+	return parsed.VPN, nil
+}
+
+type tierOutput struct {
+	OK      bool   `json:"ok"`
+	MaxTier int    `json:"maxTier,omitempty"`
+	Plan    string `json:"plan,omitempty"`
+	Error   string `json:"error,omitempty"`
+	Code    string `json:"code,omitempty"`
+}
+
+func emitTier(stdout io.Writer, out tierOutput) int {
+	if err := json.NewEncoder(stdout).Encode(out); err != nil {
+		return 1
+	}
+	if !out.OK {
+		return 1
+	}
+	return 0
+}
+
+// runTier 回答「這個帳號能用到第幾層節點」，給 App 在匯入前決定 --tier。
+func runTier(args []string, stdout, stderr io.Writer) int {
+	command := flag.NewFlagSet("tier", flag.ContinueOnError)
+	command.SetOutput(stderr)
+	statePath := command.String("state", "", "stored session to read (required)")
+	apiURL := command.String("api-url", defaultProtonAPIURL, "API base URL")
+	timeoutSec := command.Int("timeout", 30, "overall deadline in seconds")
+	if err := command.Parse(args); err != nil {
+		return 2
+	}
+	if *statePath == "" {
+		fmt.Fprintln(stderr, "protonvpn: tier: --state is required")
+		return 2
+	}
+	cred, err := readCredentialFile(*statePath)
+	if err != nil {
+		return emitTier(stdout, tierOutput{Error: err.Error()})
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSec)*time.Second)
+	defer cancel()
+
+	info, err := fetchVPNInfo(ctx, *apiURL, cred)
+	if err != nil && errors.Is(err, errSessionExpired) {
+		refreshed, rerr := refreshSession(ctx, *apiURL, *statePath, cred)
+		switch {
+		case rerr != nil:
+			return emitTier(stdout, tierOutput{Error: errSessionExpired.Error(), Code: codeSessionExpired})
+		default:
+			info, err = fetchVPNInfo(ctx, *apiURL, refreshed)
+		}
+	}
+	if err != nil {
+		code := ""
+		if errors.Is(err, errSessionExpired) {
+			code = codeSessionExpired
+		}
+		return emitTier(stdout, tierOutput{Error: err.Error(), Code: code})
+	}
+	if info.MaxTier == nil {
+		// 回包沒帶 MaxTier：講明，讓呼叫端選擇不過濾，別把「不知道」當成「免費層」。
+		return emitTier(stdout, tierOutput{Error: "Proton did not report a plan tier"})
+	}
+	return emitTier(stdout, tierOutput{OK: true, MaxTier: *info.MaxTier, Plan: info.PlanName})
+}
+
 func runNodes(args []string, stdout, stderr io.Writer) int {
 	command := flag.NewFlagSet("nodes", flag.ContinueOnError)
 	command.SetOutput(stderr)
 	statePath := command.String("state", "", "stored session to read (required)")
 	limit := command.Int("limit", 0, "return at most this many usable nodes")
 	country := command.String("country", "", "only this exit country, e.g. JP")
+	tier := command.Int("tier", 0, "drop servers above this plan tier (0 = do not filter)")
 	apiURL := command.String("api-url", defaultProtonAPIURL, "API base URL")
 	timeoutSec := command.Int("timeout", 30, "overall deadline in seconds")
 	if err := command.Parse(args); err != nil {
@@ -346,16 +469,21 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 		return emitNodes(stdout, nodesOutput{Error: err.Error()})
 	}
 
-	servers, dropped := selectNodes(resp, *country, *limit)
+	servers, dropped := selectNodes(resp, *country, *limit, *tier)
 	if len(servers) == 0 {
 		// Reporting an empty success would let the UI say "this account has no
 		// servers", which is a different claim from "nothing in the list was usable".
+		tierNote := ""
+		if *tier > 0 {
+			tierNote = fmt.Sprintf(" for plan tier %d", *tier)
+		}
 		return emitNodes(stdout, nodesOutput{
 			Dropped: dropped,
-			Error:   fmt.Sprintf("no usable servers in the response (%d dropped)", dropped),
+			MaxTier: *tier,
+			Error:   fmt.Sprintf("no usable servers in the response (%d dropped)%s", dropped, tierNote),
 		})
 	}
-	return emitNodes(stdout, nodesOutput{OK: true, Servers: servers, Dropped: dropped})
+	return emitNodes(stdout, nodesOutput{OK: true, Servers: servers, Dropped: dropped, MaxTier: *tier})
 }
 
 func fetchLogicalServers(ctx context.Context, apiURL string, cred storedCredential) (*logicalServersResp, error) {
@@ -410,12 +538,20 @@ func fetchLogicalServers(ctx context.Context, apiURL string, cred storedCredenti
 // 也沒有任何帶 per-protocol 條目的 domain。協定能力由 nodeView.Protocols 表達，所以
 // 「只有 OpenVPN／ProTun」的伺服器要照常進清單（wgPublicKey 留空），不能算丟棄——
 // Dropped 這欄的用途還是讓 UI 分得出「節點少」與「回應壞了」。
-func selectNodes(resp *logicalServersResp, country string, limit int) ([]nodeView, int) {
+//
+// maxTier 是帳號層級上限（免費＝1）：Tier 高於它的伺服器是「這帳號連不上」的付費節點，
+// 匯進來只會製造連不上的節點，一律丟棄（計進 dropped）。maxTier <= 0 表示不知道層級、
+// 不過濾。
+func selectNodes(resp *logicalServersResp, country string, limit int, maxTier int) ([]nodeView, int) {
 	var usable []nodeView
 	dropped := 0
 
 	for _, ls := range resp.LogicalServers {
 		if ls.State != "" && ls.State != "up" {
+			dropped++
+			continue
+		}
+		if maxTier > 0 && ls.Tier > maxTier {
 			dropped++
 			continue
 		}

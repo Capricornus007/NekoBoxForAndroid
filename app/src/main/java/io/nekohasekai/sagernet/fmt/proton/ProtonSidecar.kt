@@ -135,6 +135,15 @@ class ProtonCaptchaAnswer(
     val error: String = "",
 )
 
+class ProtonTierState(
+    val ok: Boolean,
+    // 帳號可用的節點層級上限：免費＝1、Plus＝2、Visionary/Business＝3；0＝不知道。
+    val maxTier: Int = 0,
+    val plan: String = "",
+    val error: String = "",
+    val code: String = "",
+)
+
 class ProtonNodesState(
     val ok: Boolean,
     val nodes: List<ProtonNode> = emptyList(),
@@ -146,6 +155,9 @@ class ProtonNodesState(
     // 原始 payload 只從網路那條路帶回來，給磁碟快取用：存解析後的物件會逼這裡
     // 再實作一套序列化，而讀回來時又得走第二套解析，兩套不一致最難查。
     val raw: String = "",
+    // 這次清單是按第幾層過濾過的（0＝沒過濾）。清單頁拿它標「已按免費層過濾」，
+    // 免得用戶把「少掉的節點」看成「壞掉的回應」。
+    val maxTier: Int = 0,
 )
 
 // Parsing is kept free of process and Android types so it can be covered by JVM
@@ -206,6 +218,23 @@ object ProtonJson {
         return out
     }
 
+    fun parseTier(text: String): ProtonTierState {
+        val obj = runCatching { JSONObject(text) }.getOrNull()
+            ?: return ProtonTierState(false, error = "sidecar returned no JSON")
+        if (!obj.optBoolean("ok")) {
+            return ProtonTierState(
+                false,
+                error = obj.optString("error", "unknown error"),
+                code = obj.optString("code", ""),
+            )
+        }
+        return ProtonTierState(
+            ok = true,
+            maxTier = obj.optInt("maxTier"),
+            plan = obj.optString("plan", ""),
+        )
+    }
+
     fun parseNodes(text: String): ProtonNodesState {
         val obj = runCatching { JSONObject(text) }.getOrNull()
             ?: return ProtonNodesState(false, error = "sidecar returned no JSON")
@@ -214,6 +243,8 @@ object ProtonJson {
                 false,
                 error = obj.optString("error", "unknown error"),
                 code = obj.optString("code", ""),
+                dropped = obj.optInt("dropped"),
+                maxTier = obj.optInt("maxTier"),
             )
         }
         val array = obj.optJSONArray("servers") ?: return ProtonNodesState(
@@ -258,6 +289,7 @@ object ProtonJson {
             ok = nodes.isNotEmpty(),
             nodes = nodes,
             dropped = obj.optInt("dropped"),
+            maxTier = obj.optInt("maxTier"),
             error = if (nodes.isEmpty()) obj.optString("error", "no usable servers") else "",
             raw = text,
         )
@@ -379,23 +411,43 @@ object ProtonSidecar {
         }
     }
 
-    suspend fun nodes(country: String = "", limit: Int = 0): ProtonNodesState = withContext(Dispatchers.IO) {
+    // 帳號的節點層級上限（免費 1／Plus 2／Visionary 3）。清單頁拿它決定 --tier，
+    // 免費帳號就不會再被塞一堆連不上的付費節點。拿不到時回 ok=false，
+    // 呼叫端要的是「照舊不過濾」而不是「當成免費層」，別把不知道當 0 層。
+    suspend fun tier(): ProtonTierState = withContext(Dispatchers.IO) {
         if (!sessionFile.exists()) {
-            return@withContext ProtonNodesState(false, error = "not logged in")
+            return@withContext ProtonTierState(false, error = "not logged in")
         }
-        val args = ArrayList(listOf("nodes", "--state", sessionFile.absolutePath))
-        if (country.isNotEmpty()) args += listOf("--country", country)
-        if (limit > 0) args += listOf("--limit", limit.toString())
-        when (val result = runSidecar(args, null)) {
-            is ProtonOutcome.Success -> ProtonJson.parseNodes(result.json)
+        when (val result = runSidecar(listOf("tier", "--state", sessionFile.absolutePath), null)) {
+            is ProtonOutcome.Success -> ProtonJson.parseTier(result.json)
 
             is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
-                ProtonJson.parseNodes(result.stdout)
+                ProtonJson.parseTier(result.stdout)
             } else {
-                ProtonNodesState(false, error = result.message)
+                ProtonTierState(false, error = result.message)
             }
         }
     }
+
+    suspend fun nodes(country: String = "", limit: Int = 0, maxTier: Int = 0): ProtonNodesState =
+        withContext(Dispatchers.IO) {
+            if (!sessionFile.exists()) {
+                return@withContext ProtonNodesState(false, error = "not logged in")
+            }
+            val args = ArrayList(listOf("nodes", "--state", sessionFile.absolutePath))
+            if (country.isNotEmpty()) args += listOf("--country", country)
+            if (limit > 0) args += listOf("--limit", limit.toString())
+            if (maxTier > 0) args += listOf("--tier", maxTier.toString())
+            when (val result = runSidecar(args, null)) {
+                is ProtonOutcome.Success -> ProtonJson.parseNodes(result.json)
+
+                is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
+                    ProtonJson.parseNodes(result.stdout)
+                } else {
+                    ProtonNodesState(false, error = result.message)
+                }
+            }
+        }
 
     fun logout() {
         if (!sessionFile.delete() && sessionFile.exists()) {
