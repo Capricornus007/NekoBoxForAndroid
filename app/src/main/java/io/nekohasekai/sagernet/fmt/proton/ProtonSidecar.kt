@@ -135,6 +135,14 @@ class ProtonCaptchaAnswer(
     val error: String = "",
 )
 
+class ProtonRefreshState(
+    val ok: Boolean,
+    // 真的換到新一組 token（false＋ok＝本來就沒到期，什麼都不用做）。
+    val renewed: Boolean = false,
+    val error: String = "",
+    val code: String = "",
+)
+
 class ProtonTierState(
     val ok: Boolean,
     // 帳號可用的節點層級上限：免費＝1、Plus＝2、Visionary/Business＝3；0＝不知道。
@@ -216,6 +224,17 @@ object ProtonJson {
             array.optString(i).takeIf { it.isNotEmpty() }?.let { out += it }
         }
         return out
+    }
+
+    fun parseRefresh(text: String): ProtonRefreshState {
+        val obj = runCatching { JSONObject(text) }.getOrNull()
+            ?: return ProtonRefreshState(false, error = "sidecar returned no JSON")
+        return ProtonRefreshState(
+            ok = obj.optBoolean("ok"),
+            renewed = obj.optBoolean("renewed"),
+            error = obj.optString("error", ""),
+            code = obj.optString("code", ""),
+        )
     }
 
     fun parseTier(text: String): ProtonTierState {
@@ -407,6 +426,25 @@ object ProtonSidecar {
                 ProtonJson.parseCaptchaSolve(result.stdout)
             } else {
                 ProtonCaptchaAnswer(false, error = result.message)
+            }
+        }
+    }
+
+    // 主動續期：開機進主頁時喊一次。等 401 才換，在「清單剛好沒被讀到」的日子裡
+    // 等於永不續期，而 Proton 的 refresh token 是輪換制的——斷檔就只能重登
+    // （2026-10-13 那輪「一直踢回登入頁」的根因之一）。
+    // 回傳只給呼叫端記日誌用：失敗一律不打擾用戶，真的過期時由清單那條路導向重登。
+    suspend fun refresh(): ProtonRefreshState = withContext(Dispatchers.IO) {
+        if (!sessionFile.exists()) {
+            return@withContext ProtonRefreshState(false, error = "not logged in")
+        }
+        when (val result = runSidecar(listOf("refresh", "--state", sessionFile.absolutePath), null)) {
+            is ProtonOutcome.Success -> ProtonJson.parseRefresh(result.json)
+
+            is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
+                ProtonJson.parseRefresh(result.stdout)
+            } else {
+                ProtonRefreshState(false, error = result.message)
             }
         }
     }

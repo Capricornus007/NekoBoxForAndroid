@@ -91,6 +91,15 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MessageStore.setCurrentActivity(this)
+        // Proton 登入過就主動續一次期：等 401 才換，在「沒去開節點頁」的日子裡
+        // 等於永不續期，而 Proton 的 refresh token 是輪換制，斷檔就只能重登。
+        // 成敗都不打擾用戶（真的過期時由取節點那條路導向重登）。
+        if (savedInstanceState == null && io.nekohasekai.sagernet.fmt.proton.ProtonSidecar.hasSession()) {
+            runOnDefaultDispatcher {
+                val state = io.nekohasekai.sagernet.fmt.proton.ProtonSidecar.refresh()
+                if (!state.ok) Logs.d("proton: proactive token refresh skipped: ${state.error}")
+            }
+        }
         val animateInitialControls = savedInstanceState == null
 
         binding = LayoutMainBinding.inflate(layoutInflater)

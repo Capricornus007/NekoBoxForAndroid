@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -224,5 +226,60 @@ func TestRefreshSessionWritesNothingWhenProtonRejectsIt(t *testing.T) {
 	}
 	if cred := readStoredCredential(t, statePath); cred.AccessToken != "token-test" {
 		t.Errorf("session was rewritten after a failed refresh: %+v", cred)
+	}
+}
+
+// TestRefreshCommandRenewsInPlace 釘住主動續期：換到的一組要落回同一個狀態檔，
+// 並回報 renewed=true（App 靠它分辨「真的換了」與「本來就沒到期」）。
+func TestRefreshCommandRenewsInPlace(t *testing.T) {
+	srv, _, refreshHits := renewingServer(t, "token-new", "refresh-new")
+	defer srv.Close()
+
+	statePath := writeTestSession(t, t.TempDir())
+	var stdout, stderr bytes.Buffer
+	code := runRefresh([]string{"--state", statePath, "--api-url", srv.URL}, &stdout, &stderr)
+	if code != 0 {
+		t.Fatalf("runRefresh exit=%d stdout=%q stderr=%q", code, stdout.String(), stderr.String())
+	}
+	var out refreshOutput
+	if err := json.Unmarshal(bytes.TrimSpace(stdout.Bytes()), &out); err != nil {
+		t.Fatalf("parse %q: %v", stdout.String(), err)
+	}
+	if !out.OK || !out.Renewed {
+		t.Fatalf("out = %+v, want ok and renewed", out)
+	}
+	if *refreshHits != 1 {
+		t.Errorf("refresh endpoint hit %d times, want exactly 1", *refreshHits)
+	}
+	cred := readStoredCredential(t, statePath)
+	if cred.AccessToken != "token-new" || cred.RefreshToken != "refresh-new" {
+		t.Errorf("session file = %+v, want the rotated pair written back", cred)
+	}
+}
+
+// TestRefreshCommandFailsLoudlyWithoutARefreshToken：舊狀態檔沒有 RefreshToken 時
+// 必須報 session_expired，讓 App 去重登；報成功會讓用戶以為續好了。
+func TestRefreshCommandFailsLoudlyWithoutARefreshToken(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "session.json")
+	payload, err := json.Marshal(storedCredential{UID: "uid-test", AccessToken: "token-test"})
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if err := os.WriteFile(path, payload, 0o600); err != nil {
+		t.Fatalf("write session: %v", err)
+	}
+
+	var stdout, stderr bytes.Buffer
+	code := runRefresh([]string{"--state", path, "--api-url", "http://127.0.0.1:1"}, &stdout, &stderr)
+	if code == 0 {
+		t.Fatalf("exit=%d with no refresh token, want failure", code)
+	}
+	var out refreshOutput
+	if err := json.Unmarshal(bytes.TrimSpace(stdout.Bytes()), &out); err != nil {
+		t.Fatalf("parse %q: %v", stdout.String(), err)
+	}
+	if out.OK || out.Code != codeSessionExpired {
+		t.Errorf("out = %+v, want code %s", out, codeSessionExpired)
 	}
 }
