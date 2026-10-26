@@ -15,10 +15,9 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.fmt.openvpn.parseOpenVPNConfig
-import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.databinding.ActivityProtonServersBinding
+import io.nekohasekai.sagernet.fmt.openvpn.parseOpenVPNConfig
 import io.nekohasekai.sagernet.fmt.proton.ProtonFilter
 import io.nekohasekai.sagernet.fmt.proton.ProtonGroups
 import io.nekohasekai.sagernet.fmt.proton.ProtonJson
@@ -29,6 +28,7 @@ import io.nekohasekai.sagernet.fmt.proton.ProtonSidecar
 import io.nekohasekai.sagernet.fmt.proton.placeLabel
 import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.readableMessage
 import kotlinx.coroutines.launch
 
 /**

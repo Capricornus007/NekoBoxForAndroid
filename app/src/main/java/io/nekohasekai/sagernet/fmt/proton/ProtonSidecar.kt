@@ -507,35 +507,34 @@ object ProtonSidecar {
 
     // OpenVPN 那條路（#71）：本機生成金鑰、向 Proton 換簽客戶端憑證，換回一份自包含
     // .ovpn。材料檔寫在 app 私有目錄（不在備份範圍），憑證到期（expiresAt）要重簽。
-    suspend fun ovpn(host: String, port: Int, proto: String): ProtonOvpnState =
-        withContext(Dispatchers.IO) {
-            if (!sessionFile.exists()) {
-                return@withContext ProtonOvpnState(false, error = "not logged in")
-            }
-            if (host.isEmpty() || port <= 0) {
-                return@withContext ProtonOvpnState(false, error = "missing server address")
-            }
-            val outDir = File(SagerNet.application.filesDir, "proton-openvpn").apply { mkdirs() }
-            val args = mutableListOf(
-                "ovpn", "--state", sessionFile.absolutePath,
-                "--out-dir", outDir.absolutePath,
-                "--host", host, "--port", port.toString(), "--proto", proto,
-            )
-            // 帳號名優先取狀態檔（登一次就存了）；舊狀態檔沒這欄才退回 App 的記錄，
-            // 兩處都沒有就不傳 --username：sidecar 會省掉 auth-user-pass，
-            // 而不是回頭叫用戶再打一次。
-            val account = DataStore.protonAccount
-            if (account.isNotBlank()) args += listOf("--username", account)
-            when (val result = runSidecar(args, null)) {
-                is ProtonOutcome.Success -> ProtonJson.parseOvpn(result.json)
+    suspend fun ovpn(host: String, port: Int, proto: String): ProtonOvpnState = withContext(Dispatchers.IO) {
+        if (!sessionFile.exists()) {
+            return@withContext ProtonOvpnState(false, error = "not logged in")
+        }
+        if (host.isEmpty() || port <= 0) {
+            return@withContext ProtonOvpnState(false, error = "missing server address")
+        }
+        val outDir = File(SagerNet.application.filesDir, "proton-openvpn").apply { mkdirs() }
+        val args = mutableListOf(
+            "ovpn", "--state", sessionFile.absolutePath,
+            "--out-dir", outDir.absolutePath,
+            "--host", host, "--port", port.toString(), "--proto", proto,
+        )
+        // 帳號名優先取狀態檔（登一次就存了）；舊狀態檔沒這欄才退回 App 的記錄，
+        // 兩處都沒有就不傳 --username：sidecar 會省掉 auth-user-pass，
+        // 而不是回頭叫用戶再打一次。
+        val account = DataStore.protonAccount
+        if (account.isNotBlank()) args += listOf("--username", account)
+        when (val result = runSidecar(args, null)) {
+            is ProtonOutcome.Success -> ProtonJson.parseOvpn(result.json)
 
-                is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
-                    ProtonJson.parseOvpn(result.stdout)
-                } else {
-                    ProtonOvpnState(false, error = result.message)
-                }
+            is ProtonOutcome.Failed -> if (ProtonJson.looksLikeJson(result.stdout)) {
+                ProtonJson.parseOvpn(result.stdout)
+            } else {
+                ProtonOvpnState(false, error = result.message)
             }
         }
+    }
 
     suspend fun nodes(country: String = "", limit: Int = 0, maxTier: Int = 0): ProtonNodesState = withContext(Dispatchers.IO) {
         if (!sessionFile.exists()) {
