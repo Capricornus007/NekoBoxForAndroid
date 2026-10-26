@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_diagnostics">检查设定与路由</string>
+    <string name="diagnostics_config_valid">核心已接受设定</string>
+    <string name="diagnostics_config_invalid">设定错误</string>
+    <string name="diagnostics_listener_without_auth">监听器可从区域网路存取但未设密码：</string>
+    <string name="diagnostics_no_groups">群组决策仅适用于正在运行、且具有动态群组的设定档。</string>
+    <string name="diagnostics_initial_selection">初始选择</string>
+    <string name="diagnostics_no_probe">没有候选节点通过可用性检查</string>
+    <string name="diagnostics_control_unreachable">控制网站无法透过直连存取</string>
+    <string name="diagnostics_direct_recovered">直连已恢复</string>
+    <string name="diagnostics_previous_unavailable">先前的候选节点已不可用</string>
+    <string name="diagnostics_priority_available">有更高优先级的候选节点可用</string>
+    <string name="diagnostics_lower_latency">已选择延迟较低的候选节点</string>
+    <string name="diagnostics_no_candidate">没有相容的候选节点</string>
+    <string name="diagnostics_refresh">重新整理</string>
+    <string name="diagnostics_no_app_guard">核心设定中找不到拒绝 UID／套件名的规则。请检查应用限制，特别是自定义 JSON 中的设定。</string>
+</resources>

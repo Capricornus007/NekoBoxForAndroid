@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wireguard_imported_options">汇入的网路设定</string>
+    <string name="wireguard_use_config_routes">使用汇入的路由与 DNS</string>
+    <string name="wireguard_use_config_routes_summary">对于选取的独立设定档，AllowedIPs 会走隧道，其余 IP 则直连。群组会保留其 DNS 政策。预设停用。</string>
+    <string name="subscription_server_dns">订阅伺服器的 DNS</string>
+    <string name="subscription_headers">HTTP 标头</string>
+    <string name="subscription_headers_summary">每行一个「名称: 值」。数值会被隐藏，且不会转送到其他来源。</string>
+    <string name="subscription_remove_referenced">此次更新会移除路由或群组中使用的设定档：\n%1$s\n\n要移除它们吗？既有的参照将会失效。</string>
+    <string name="subscription_requires_manual_update">此次更新会移除被参照的设定档。请手动更新订阅以检阅变更。</string>
+    <string name="subscription_changed_during_update">在检阅更新期间设定档发生变更。请再试一次。</string>
+</resources>

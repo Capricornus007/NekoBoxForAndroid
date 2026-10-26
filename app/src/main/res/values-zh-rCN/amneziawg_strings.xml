@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">单一数值或范围，例如 25 或 25-30。留空则使用协定预设值。时间单位为秒；MaxHandshakeAttempts 为次数；ContentPaddingAddition 为位元组。</string>
+    <string name="amneziawg_header_key_hint">来自伺服器的 32 位元组金钥（Base64 或十六进位）。标头保护要求 S1、S2、S3 与 S4 至少为 12 位元组。</string>
+    <string name="amneziawg_random_trailers_hint">随机化封包尾部（AWG 3.1）。</string>
+    <string name="amneziawg_disable_cookies_hint">停用协定 cookies。仅在伺服器设定需要时才启用。</string>
+</resources>

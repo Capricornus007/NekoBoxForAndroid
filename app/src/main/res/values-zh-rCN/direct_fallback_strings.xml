@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">直连路由的代理备援</string>
+    <string name="direct_fallback_summary">若控制网站无法直连，则对直连路由改用所选代理。恢复直连后即切回。区域网路仍维持直连。既有的连接会重新建立。</string>
+    <string name="direct_fallback_url">控制网站</string>
+    <string name="direct_fallback_url_summary">每行一个 HTTP(S) 网址，最多 8 个。仅测试直连存取；切换由设定的法定数与连续检查次数控制。</string>
+    <string name="direct_fallback_interval">检查间隔（秒）</string>
+    <string name="direct_fallback_invalid_url">请输入不含帐号密码或锚点的有效 HTTP 或 HTTPS 网址。</string>
+    <string name="direct_fallback_invalid_interval">检查间隔必须介于 5 到 3600 秒之间。</string>
+    <string name="dns_server_input_help">local 或 localhost 会使用底层网路的 Android DNS。若要使用本机执行的 DNS 伺服器，请明确指定 udp://127.0.0.1:53。</string>
+</resources>

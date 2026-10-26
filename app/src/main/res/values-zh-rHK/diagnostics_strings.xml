@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_diagnostics">檢查設定與路由</string>
+    <string name="diagnostics_config_valid">核心已接受設定</string>
+    <string name="diagnostics_config_invalid">設定錯誤</string>
+    <string name="diagnostics_listener_without_auth">監聽器可從區域網絡存取但未設密碼：</string>
+    <string name="diagnostics_no_groups">群組決策僅適用於正在運行、且具有動態群組的設定檔。</string>
+    <string name="diagnostics_initial_selection">初始選擇</string>
+    <string name="diagnostics_no_probe">沒有候選節點通過可用性檢查</string>
+    <string name="diagnostics_control_unreachable">控制網站無法透過直連存取</string>
+    <string name="diagnostics_direct_recovered">直連已恢復</string>
+    <string name="diagnostics_previous_unavailable">先前的候選節點已不可用</string>
+    <string name="diagnostics_priority_available">有更高優先級的候選節點可用</string>
+    <string name="diagnostics_lower_latency">已選擇延遲較低的候選節點</string>
+    <string name="diagnostics_no_candidate">沒有相容的候選節點</string>
+    <string name="diagnostics_refresh">重新整理</string>
+    <string name="diagnostics_no_app_guard">核心設定中找不到拒絕 UID／套件名的規則。請檢查應用程式限制，特別是自訂 JSON 中的設定。</string>
+</resources>
