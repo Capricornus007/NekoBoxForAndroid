@@ -64,7 +64,14 @@
 # mod.3（53b70f4）：route 吃 sing 的 PacketBuffer 雙重歸還修復，並讓 cachePacketBuffers
 # 自己擋掉 nil—— bufio.NewCachedPacketConn 首行 IncRef() 拿 nil 就是空指標 panic（裝置端
 # tombstone 那族「兩格 unknown、沒有 Abort message」的根）。tag 已打：v1.15.0-alpha.12-mod.3。
-export COMMIT_SING_BOX="49d4f979f63430b2783123f5d2e5197852aa2664"
+# mod.7（9b01b1bf）= 吃進 upstream/testing 109 筆（alpha.13, 824dbcfb4 起的 NAT/masque/
+# tailscale 大重構落地）＋ fork 7 筆修正：tailscale endpoint 合併殘留修復、watchState
+# 補回 exitNodePending 局部宣告、清掉合併帶入的 28 個未使用 import、tailscale DNS 路由
+# 接回 fork 的最長後綴匹配、sing-tun 指針擡到今日合併（40 筆 forward flow/NAT 重構）。
+# ContextWithIsExternalConnection 在 alpha.13 起需 isExternal 參數，libcore 4 處調用
+# 已改為 (ctx, true)——見 commit 1d2360c1d。基號換到 alpha.13（上游 tag v1.15.0-alpha.13
+# 自 7fc12b8f4 起在我方歷史裡）。
+export COMMIT_SING_BOX="9b01b1bff15d03753ef922f746d2b7c213c73f87"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
@@ -75,7 +82,7 @@ export COMMIT_SING_BOX="49d4f979f63430b2783123f5d2e5197852aa2664"
 # SINGBOX_VERSION 要一起改，scripts/check-core-pins.sh 段 1c 就是抓這個的——
 # 「Update sing-box core」那條 bot 只会盲目 +1 計數（它上一輪還寫 alpha.11-mod.41，
 # 就是沒跟上基號換代），換代要人對。
-export VERSION_SING_BOX="1.15.0-alpha.12-mod.5"
+export VERSION_SING_BOX="1.15.0-alpha.13-mod.7"
 export COMMIT_LIBNEKO="1dad84547be59ff2ec5ed7bd2339b0441929edfd"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
