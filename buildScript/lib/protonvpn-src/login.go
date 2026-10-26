@@ -16,33 +16,31 @@ import (
 	proton "github.com/ProtonMail/go-proton-api"
 )
 
-// protonAppVersion 是 x-pm-appversion 的內容。Proton 的正式閘門有兩種合法寫法：
-// 「<平台>-<產品>@<版本>」（官方客戶端）與「other_<版本>」（放行第三方客戶端），
-// 用錯分隔符會被逐段糾正（2026-10-08 用公開端點 /auth/v4/info 逐個字串量測得來，
-// 該端點在驗 token 之前就會先過版本閘門，所以不需要帳密）：
+// protonAppVersion 是 x-pm-appversion 的內容，決定 Proton 把 NB4A 當成哪個客戶端身分。
 //
-//	"NB4A_1.0.0"                  -> 400/5002 Invalid app version
-//	"NB4A@1.0.0"                  -> 400/2064 Application platform and product must be separated by a dash
-//	"android-nb4a@1.0.0"          -> 400/2064 Product `nb4a` is not valid
-//	"NB4A-android@1.0.0"          -> 400/2064 Application name must be in lowercase
-//	"Otherx_1.0.0"                -> 400/5002 Invalid app version（底線寫法只認 other 這個字）
-//	"android-vpn@1.0.0"           -> 422/5003 This version of the app is no longer supported
-//	"android-vpn@5.20.57.0"       -> 401 Invalid access token
-//	"android-vpn@99.0.0"          -> 401 Invalid access token
-//	"windows-vpn@5.20.57.0"       -> 200
-//	"Other_1.0.0" / "other_1.0.0" -> 200（other 這條不比較版本號）
+// Proton 的版本閘門只認「<平台>-<產品>@<版本>」這種官方客戶端身分（來源見下方常數來源）。
+// 第三方/通用身分（other_<版本>、windows-vpn、linux-vpn、web-vpn）在 2026-10-26 實測已全部被拒：
 //
-// 那兩記 401 是這版的死因：`android-vpn` 這組合被 Proton 在路由層整個拒掉（官方 VPN App
-// 已改走免密碼的 session 流程），跟我們的 token 無關——連不存在的用戶名都吃 401，而且換成
-// 99.0.0 也一樣；同一支產品換成 windows-vpn 就 200，所以擋的不是 product=vpn 整個類別。
-// 因此改用專門留給第三方客戶端的 other_<版本>：不冒充官方身分，也不會跟著官方的版本淘汰
-// 跑步機過期（上面那條 5003 就是會過期的常數會遇到的事）。
+//	"Other_1.0.0"           -> 400/2001 Invalid input（other 這條已被閘門殺掉）
+//	"Other_5.20.74.0"       -> 400/2001 Invalid input
+//	"windows-vpn@5.20.74.0" -> 400/2001 Invalid input
+//	"linux-vpn@5.20.74.0"   -> 400/2001 Invalid input
+//	"web-vpn@5.20.74.0"     -> 400/5002 Invalid app version
+//	"android-vpn@4.0.0.0"   -> 422/5003 版本過舊（有最低版本門檻）
+//	"android-vpn@5.9.0.0"   -> 401 Invalid access token（閘門放行，只差登入令牌）
+//	"android-vpn@5.30.0.0"  -> 401 Invalid access token（沒上限，5.30 也過）
+//	"android-vpn@5.20.98.0" -> 401 Invalid access token（最新穩定版，即此處寫死值）
 //
-// 格式與值取自 Proton 公開源碼與 go-proton-api 的第三方用法；官方 Android 客戶端的身分是
+// 量測方法同前：公開端點 /auth/v4/info 在驗 token 之前就先過版本閘門，所以不需要帳密。
+// 結論：2026-10-26 起唯一能過閘門的是 android-vpn@<版本>=~5.9；版本太低吃 5003，太高無上限。
+// 這裡寫死最新穩定版 5.20.98.0（2026-10-19 釋出），盡量拖晚被 5003 判過期的時間。
+// 這是隨 Proton 改閘門就會失效的硬編碼——下次再報 400/5002，就回這裡調版本或身分。
+//
+// 身分來源（官方 Android 客戶端）：
 //
 //	app/src/main/java/com/protonvpn/android/utils/Constants.kt:73  MOBILE_CLIENT_ID = "android-vpn"
 //	app/src/main/java/com/protonvpn/android/api/VpnApiClient.kt:49 "${clientId}@" + versionName()
-const protonAppVersion = "Other_1.0.0"
+const protonAppVersion = "android-vpn@5.20.98.0"
 
 const defaultProtonAPIURL = "https://api.protonmail.ch"
 
