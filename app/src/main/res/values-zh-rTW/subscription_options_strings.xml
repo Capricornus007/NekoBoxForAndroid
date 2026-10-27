@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="wireguard_imported_options">匯入的網路設定</string>
-    <string name="wireguard_use_config_routes">使用匯入的路由與 DNS</string>
-    <string name="wireguard_use_config_routes_summary">對於選取的獨立設定檔，AllowedIPs 會走隧道，其餘 IP 則直連。群組會保留其 DNS 政策。預設停用。</string>
+    <string name="wireguard_use_config_routes">使用匯入的分流與 DNS</string>
+    <string name="wireguard_use_config_routes_summary">選獨立設定檔時，AllowedIPs 走隧道、其他 IP 直接連；分組會維持原本的 DNS 規則。預設關閉。</string>
     <string name="subscription_server_dns">訂閱伺服器的 DNS</string>
     <string name="subscription_headers">HTTP 標頭</string>
-    <string name="subscription_headers_summary">每行一個「名稱: 值」。數值會被隱藏，且不會轉送到其他來源。</string>
-    <string name="subscription_remove_referenced">此次更新會移除路由或群組中使用的設定檔：\n%1$s\n\n要移除它們嗎？既有的參照將會失效。</string>
-    <string name="subscription_requires_manual_update">此次更新會移除被參照的設定檔。請手動更新訂閱以檢閱變更。</string>
-    <string name="subscription_changed_during_update">在檢閱更新期間設定檔發生變更。請再試一次。</string>
+    <string name="subscription_headers_summary">每行一個「名稱: 值」。值會被隱藏，也不會送到別的主機。</string>
+    <string name="subscription_remove_referenced">這次更新會移除分流或分組正在用的設定檔：\n%1$s\n\n要移除嗎？移掉後那些引用就會失效。</string>
+    <string name="subscription_requires_manual_update">這次更新會移除被引用的設定檔。請手動更新訂閱，先看過變更。</string>
+    <string name="subscription_changed_during_update">在你檢視期間設定檔又變了。請再試一次。</string>
 </resources>

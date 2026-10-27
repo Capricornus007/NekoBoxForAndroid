@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="profile_diagnostics">檢查設定與路由</string>
+    <string name="profile_diagnostics">檢查設定與分流</string>
 </resources>
