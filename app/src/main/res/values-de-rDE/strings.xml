@@ -1151,8 +1151,6 @@
     <string name="format_snlink_lower">snlink</string>
     <string name="format_snlink_upper">SNLINK</string>
     <string name="local_proxy_settings">Lokale Proxy-Einstellungen</string>
-    <string name="please_update" formatted="false">Ihre App ist zu alt (%s). Sie funktioniert ab %s nicht mehr. Bitte aktualisieren!</string>
-    <string name="please_update_force" formatted="false">Ihre App ist zu alt (%s). Sie funktioniert seit %s nicht mehr. Bitte aktualisieren!</string>
     <string name="port_out_of_range">Der Port muss im Bereich 1–65535 liegen.</string>
     <string name="proton_session_expired">Ihre Proton-Sitzung wurde abgelehnt. Bitte erneut anmelden.</string>
     <string name="proxy_password">Proxy-Passwort</string>

@@ -1152,8 +1152,6 @@
     <string name="format_snlink_lower">snlink</string>
     <string name="format_snlink_upper">SNLINK</string>
     <string name="local_proxy_settings">Yerel proxy ayarları</string>
-    <string name="please_update" formatted="false">Uygulamanız çok eski (%s) ve %s tarihinde çalışmayı durduracak. Lütfen güncelleyin!</string>
-    <string name="please_update_force" formatted="false">Uygulamanız çok eski (%s) ve %s tarihinde çalışmayı durdurdu. Lütfen güncelleyin!</string>
     <string name="port_out_of_range">Bağlantı noktası 1–65535 aralığında olmalıdır</string>
     <string name="proton_session_expired">Proton oturumunuz reddedildi. Lütfen yeniden giriş yapın.</string>
     <string name="proxy_password">Proxy parolası</string>

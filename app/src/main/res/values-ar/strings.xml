@@ -479,10 +479,6 @@
     <string name="tuic_disable_sni">تعطيل SNI</string>
     <string name="tuic_reduce_rtt">تمكين مصافحة QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">شهادة SHA256 المثبتة</string>
-    <string name="please_update" formatted="false">التطبيق الخاص بك قديم جدًا (%s). وسيتوقف عن العمل في %s. يرجى
-        التحديث!</string>
-    <string name="please_update_force" formatted="false">التطبيق الخاص بك قديم جدًا (%s). وقد توقف عن العمل في %s.
-        يرجى التحديث!</string>
     <string name="connection_test_delete_unavailable">مسح غير المتاح</string>
     <string name="move">نقل</string>
     <string name="exe_prefer_provider">المزود المفضل للإضافة</string>

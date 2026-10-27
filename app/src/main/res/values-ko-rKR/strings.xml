@@ -474,8 +474,6 @@
     <string name="tuic_disable_sni">SNI 비활성화</string>
     <string name="tuic_reduce_rtt">0-RTT QUIC 핸드셰이크 활성화</string>
     <string name="pinned_certchain_sha256">고정 인증서 SHA256</string>
-    <string name="please_update" formatted="false">앱이 너무 오래되었습니다 (%s). %s에 작동이 중지됩니다. 업데이트하세요!</string>
-    <string name="please_update_force" formatted="false">앱이 너무 오래되었습니다 (%s). %s에 작동이 중지되었습니다. 업데이트하세요!</string>
     <string name="connection_test_delete_unavailable">사용 불가 지우기</string>
     <string name="move">이동</string>
     <string name="exe_prefer_provider">플러그인 선호 제공자</string>

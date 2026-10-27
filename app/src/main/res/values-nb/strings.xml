@@ -590,8 +590,6 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="tuic_disable_sni">Deaktiver SNI</string>
     <string name="tuic_reduce_rtt">Aktiver 0-RTT QUIC-håndtrykk</string>
     <string name="pinned_certchain_sha256">Festet sertifikat SHA256</string>
-    <string name="please_update" formatted="false">Appen din er for gammel (%s). Den vil slutte å fungere %s. Vennligst oppdater!</string>
-    <string name="please_update_force" formatted="false">Appen din er for gammel (%s). Den har sluttet å fungere fra %s. Vennligst oppdater!</string>
     <string name="connection_test_delete_unavailable">Fjern utilgjengelige</string>
     <string name="move">Flytt</string>
     <string name="exe_prefer_provider">Foretrukket plugin-leverandør</string>

@@ -1162,8 +1162,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="format_snlink_lower">snlink</string>
     <string name="format_snlink_upper">SNLINK</string>
     <string name="local_proxy_settings">Lokale proxy-instellingen</string>
-    <string name="please_update" formatted="false">Uw app is te oud (%s) en stopt met werken op %s. Werk bij!</string>
-    <string name="please_update_force" formatted="false">Uw app is te oud (%s) en is gestopt met werken op %s. Werk bij!</string>
     <string name="port_out_of_range">De poort moet tussen 1 en 65535 liggen</string>
     <string name="proton_session_expired">Uw Proton-sessie is afgewezen. Meld u opnieuw aan.</string>
     <string name="proxy_password">Proxywachtwoord</string>

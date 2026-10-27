@@ -1144,10 +1144,6 @@
     <string name="qrcode_sn_hint">رابط متسلسل مخصص لـSing-box وNeko (sn://)</string>
     <string name="subscription_send_hwid">إرسال HWID</string>
     <string name="subscription_send_hwid_summary">إرسال HWID وإصدار Android وطراز الجهاز عند تحديث هذا الاشتراك</string>
-    <string name="please_update" formatted="false">تطبيقك قديم جدًا (%s). وسيتوقف عن العمل في %s. يرجى
-        التحديث!</string>
-    <string name="please_update_force" formatted="false">تطبيقك قديم جدًا (%s). وقد توقف عن العمل في %s.
-        يرجى التحديث!</string>
     <string name="subscription_direct_fallback">الرجوع إلى الاتصال المباشر للاشتراكات</string>
     <string name="subscription_direct_fallback_summary">إعادة محاولة الاشتراك مباشرة إذا فشل الوكيل المحلي. تجنّب ذلك إذا كان الرابط يحمل رمزًا.</string>
     <string name="adaptive_traffic_polling">استطلاع حركة مرور تكيفي</string>

@@ -1314,8 +1314,6 @@
     <string name="hide_unavailable_profiles">Ocultar perfiles no disponibles</string>
     <string name="local_proxy_settings">Ajustes del proxy local</string>
     <string name="pinned_certchain_sha256">SHA256 del certificado anclado</string>
-    <string name="please_update" formatted="false">Tu app es demasiado antigua (%s) y dejará de funcionar el %s. ¡Actualízala!</string>
-    <string name="please_update_force" formatted="false">Tu app es demasiado antigua (%s) y dejó de funcionar el %s. ¡Actualízala!</string>
     <string name="port_out_of_range">El puerto debe estar en el rango 1–65535</string>
     <string name="proton_session_expired">Tu sesión de Proton fue rechazada. Inicia sesión de nuevo.</string>
     <string name="proxy_password">Contraseña del proxy</string>

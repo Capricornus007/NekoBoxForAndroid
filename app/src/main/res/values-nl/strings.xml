@@ -595,10 +595,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="tuic_disable_sni">SNI uitschakelen</string>
     <string name="tuic_reduce_rtt">0-RTT QUIC-handshake inschakelen</string>
     <string name="pinned_certchain_sha256">Pinned Certificate SHA256</string>
-    <string name="please_update" formatted="false">Uw APP is te oud (%1$s). En zal stoppen met werken op %2$s. Gelieve
-        te updaten!</string>
-    <string name="please_update_force" formatted="false">Uw APP is te oud (%1$s). En is gestopt met werken op %2$s.
-        Gelieve te updaten!</string>
     <string name="connection_test_delete_unavailable">Wis niet beschikbaar</string>
     <string name="move">Verplaatsen</string>
     <string name="exe_prefer_provider">Plugin voorkeursprovider</string>

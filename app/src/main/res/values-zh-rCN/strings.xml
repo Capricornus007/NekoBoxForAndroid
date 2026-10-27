@@ -479,8 +479,6 @@
     <string name="tuic_disable_sni">禁用 SNI</string>
     <string name="tuic_reduce_rtt">启用 0-RTT QUIC 握手</string>
     <string name="pinned_certchain_sha256">固定证书 SHA256</string>
-    <string name="please_update" formatted="false">您的 APP (%s) 太旧了喵，%s 再不更新就没的用了喵～</string>
-    <string name="please_update_force" formatted="false">您的 APP (%s) 版本过旧，已于 %s 停止工作，请立即升级。</string>
     <string name="connection_test_delete_unavailable">清除不可用</string>
     <string name="move">移动</string>
     <string name="exe_prefer_provider">插件首选提供程序</string>

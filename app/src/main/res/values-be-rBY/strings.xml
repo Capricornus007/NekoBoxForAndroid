@@ -1134,10 +1134,6 @@
     <string name="qrcode_sn_hint">Спецыяльная серыялізаваная спасылка Sing-box &amp; Neko (sn://)</string>
     <string name="subscription_send_hwid">Адпраўляць HWID</string>
     <string name="subscription_send_hwid_summary">Адпраўляць HWID, версію Android і мадэль прылады пры абнаўленні гэтай падпіскі</string>
-    <string name="please_update" formatted="false">Ваш дадатак занадта стары (%s). Ён перастане працаваць %s. Калі ласка,
-        абнавіцеся!</string>
-    <string name="please_update_force" formatted="false">Ваш дадатак занадта стары (%s). Ён ужо перастаў працаваць %s.
-        Калі ласка, абнавіцеся!</string>
     <string name="subscription_direct_fallback">Пераход на прамое злучэнне для падпісак</string>
     <string name="subscription_direct_fallback_summary">Паўтарыць падпіску напрамую, калі лакальны праксі не спрацаваў. Пазбягайце, калі URL утрымлівае токен.</string>
     <string name="adaptive_traffic_polling">Адаптыўны апыт трафіку</string>

@@ -1148,10 +1148,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="qrcode_sn_hint">Tautan berseri khusus Sing-box &amp; Neko (sn://)</string>
     <string name="subscription_send_hwid">Kirim HWID</string>
     <string name="subscription_send_hwid_summary">Kirim HWID, versi Android, dan model perangkat saat memperbarui langganan ini</string>
-    <string name="please_update" formatted="false">APLIKASI Anda terlalu lama (%s). Dan akan berhenti bekerja pada %s. Tolong
-        perbarui!</string>
-    <string name="please_update_force" formatted="false">APLIKASI Anda terlalu lama (%s). Dan telah berhenti bekerja pada %s.
-        Mohon perbarui!</string>
     <string name="subscription_direct_fallback">Jatuh ke koneksi langsung untuk langganan</string>
     <string name="subscription_direct_fallback_summary">Coba ulang langganan secara langsung jika proksi lokal gagal. Hindari jika URL membawa token.</string>
     <string name="adaptive_traffic_polling">Pemantauan lalu lintas adaptif</string>

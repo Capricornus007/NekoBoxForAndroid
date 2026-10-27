@@ -572,10 +572,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="tuic_disable_sni">Nonaktifkan SNI</string>
     <string name="tuic_reduce_rtt">Aktifkan handshake QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">Sertifikat PIN SHA256</string>
-    <string name="please_update" formatted="false">APLIKASI Anda terlalu lama (%s). Dan akan berhenti bekerja pada %s. Tolong
-        perbarui!</string>
-    <string name="please_update_force" formatted="false">APLIKASI Anda terlalu lama (%s). Dan telah berhenti bekerja pada %s.
-        Tolong perbarui!</string>
     <string name="connection_test_delete_unavailable">Hapus yang tidak tersedia</string>
     <string name="move">Pindahkan</string>
     <string name="exe_prefer_provider">Penyedia Pilihan Plugin</string>

@@ -1117,8 +1117,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="format_snlink_upper">SNLINK</string>
     <string name="local_proxy_settings">Configurações do proxy local</string>
     <string name="olcrtc_vp8_fps">FPS do VP8</string>
-    <string name="please_update" formatted="false">Seu aplicativo está muito antigo (%s) e deixará de funcionar em %s. Atualize!</string>
-    <string name="please_update_force" formatted="false">Seu aplicativo está muito antigo (%s) e parou de funcionar em %s. Atualize!</string>
     <string name="port_out_of_range">A porta deve estar entre 1 e 65535</string>
     <string name="probe_url">URL de teste</string>
     <string name="proton_session_expired">Sua sessão do Proton foi rejeitada. Entre novamente.</string>

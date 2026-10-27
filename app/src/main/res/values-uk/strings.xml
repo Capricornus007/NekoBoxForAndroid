@@ -616,8 +616,6 @@
     <string name="tuic_disable_sni">Вимкнути SNI</string>
     <string name="tuic_reduce_rtt">Увімкнути 0-RTT QUIC рукостискання</string>
     <string name="pinned_certchain_sha256">Закріплений сертифікат SHA256</string>
-    <string name="please_update" formatted="false">Ваш ДОДАТОК занадто старий (%s). І перестане працювати %s. Будь ласка,\n        оновіть!</string>
-    <string name="please_update_force" formatted="false">Ваш ДОДАТОК занадто старий (%s). І перестав працювати %s.\n        Будь ласка, оновіть!</string>
     <string name="connection_test_delete_unavailable">Очистити недоступні</string>
     <string name="move">Перемістити</string>
     <string name="exe_prefer_provider">Бажаний постачальник плагінів</string>

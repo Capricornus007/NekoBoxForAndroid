@@ -636,8 +636,6 @@
     <string name="rules_geosite_url">rules geosite URL</string>
     <string name="rules_geoip_url">rules geoip URL</string>
     <string name="pinned_certchain_sha256">SHA256 закреплённого сертификата</string>
-    <string name="please_update" formatted="false">Ваше приложение слишком старое (%s). И перестанет работать %s. Пожалуйста, обновите!</string>
-    <string name="please_update_force" formatted="false">Ваше приложение слишком старое (%s). И перестало работать %s. Пожалуйста, обновите!</string>
     <string name="exe_prefer_provider">Предпочитаемый поставщик плагина</string>
     <string name="save">Сохранить</string>
     <string name="resolve_server">Разрешать адрес сервера согласно политике IPv6</string>

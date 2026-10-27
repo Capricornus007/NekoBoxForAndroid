@@ -595,10 +595,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="tuic_disable_sni">Disabilita SNI</string>
     <string name="tuic_reduce_rtt">Abilita handshake QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">SHA256 del certificato fissato</string>
-    <string name="please_update" formatted="false">La tua app è troppo vecchia (%1$s). Smetterà di funzionare il %2$s. Per favore,
-        aggiornala!</string>
-    <string name="please_update_force" formatted="false">La tua app è troppo vecchia (%1$s). Ha smesso di funzionare il %2$s.
-        Per favore, aggiornala!</string>
     <string name="connection_test_delete_unavailable">Cancella non disponibili</string>
     <string name="move">Sposta</string>
     <string name="exe_prefer_provider">Provider preferito del plugin</string>

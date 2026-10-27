@@ -1096,8 +1096,6 @@
     <string name="hide_unavailable_profiles">Kullanılamayan profilleri gizle</string>
     <string name="local_proxy_settings">Yerel Proxy Ayarları</string>
     <string name="pinned_certchain_sha256">Sabitlenmiş Sertifika SHA256</string>
-    <string name="please_update" formatted="false">Uygulamanız çok eski (%s). %s tarihinde çalışmayı durduracak. Lütfen güncelleyin!</string>
-    <string name="please_update_force" formatted="false">Uygulamanız çok eski (%s). %s tarihinde çalışmayı durdurdu. Lütfen güncelleyin!</string>
     <string name="port_out_of_range">Port 1–65535 aralığında olmalı</string>
     <string name="proton_session_expired">Proton oturumunuz reddedildi. Lütfen yeniden giriş yapın.</string>
     <string name="proxy_password">Proxy Parolası</string>

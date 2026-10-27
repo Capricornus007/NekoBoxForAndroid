@@ -1082,10 +1082,6 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="amneziawg_s4">S4</string>
     <string name="shadowquic_sunny_quic">Sunny QUIC</string>
     <string name="trusttunnel_quic">QUIC (HTTP/3)</string>
-    <string name="please_update" formatted="false">Appen din er for gammel (%s). Den slutter å fungere ved %s. Vennligst
-        oppdater!</string>
-    <string name="please_update_force" formatted="false">Appen din er for gammel (%s). Den har sluttet å fungere ved %s.
-        Vennligst oppdater!</string>
     <string name="ech_query_server_name">Server for ECH-oppslag</string>
     <string name="action_amneziawg">AmneziaWG</string>
     <string name="bottomsheet_drag_handle_clicked">Dra-håndtak klikket</string>

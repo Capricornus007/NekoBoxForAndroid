@@ -1161,8 +1161,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="format_snlink_lower">snlink</string>
     <string name="format_snlink_upper">SNLINK</string>
     <string name="local_proxy_settings">Impostazioni proxy locale</string>
-    <string name="please_update" formatted="false">La tua app è troppo vecchia (%s) e smetterà di funzionare il %s. Aggiorna!</string>
-    <string name="please_update_force" formatted="false">La tua app è troppo vecchia (%s) e ha smesso di funzionare il %s. Aggiorna!</string>
     <string name="port_out_of_range">La porta deve essere compresa tra 1 e 65535</string>
     <string name="proton_session_expired">La tua sessione Proton è stata rifiutata. Accedi di nuovo.</string>
     <string name="proxy_password">Password del proxy</string>

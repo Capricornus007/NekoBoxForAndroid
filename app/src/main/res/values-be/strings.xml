@@ -1066,8 +1066,6 @@
     <string name="local_proxy_settings">Настройкі лакальнага проксі</string>
     <string name="oss_licenses">Ліцэнзіі адкрытага ПЗ</string>
     <string name="pinned_certchain_sha256">Замацаваны сертыфікат SHA256</string>
-    <string name="please_update" formatted="false">Ваш дадатак занадта стары (%s). І перанстане працаваць %s. Калі ласка, абнавіце!</string>
-    <string name="please_update_force" formatted="false">Ваш дадатак занадта стары (%s). І перастаў працаваць %s. Калі ласка, абнавіце!</string>
     <string name="plugin_auto_connect_unlock_only">Гэты плагін можа не працаваць з Auto Connect</string>
     <string name="port_out_of_range">Порт павінен быць у дыяпазоне 1–65535</string>
     <string name="probe_interval">Інтэрвал назірання балансіра</string>

@@ -489,8 +489,6 @@
     <string name="tuic_disable_sni">غیرفعال کردن SNI</string>
     <string name="tuic_reduce_rtt">فعال کردن ارتباط 0-RTT QUIC</string>
 
-    <string name="please_update" formatted="false">نسخه (%s) برنامه شما بسیار قدیمی شده است و در %s متوقف می‌شود. لطفاً به نسخه جدیدتر به‌روزرسانی کنید</string>
-    <string name="please_update_force" formatted="false">برنامه شما خیلی قدیمی شده است (%s). و در %s کار نمی‌کند. باید نسخه جدید را دانلود کنید!</string>
     <string name="connection_test_delete_unavailable">پاک‌کردن غیرقابل‌دسترس‌ها</string>
     <string name="move">حرکت</string>
     <string name="exe_prefer_provider">ارائه‌دهنده برگزیده افزونه‌ها</string>

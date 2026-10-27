@@ -1083,8 +1083,6 @@
     <string name="mtu_help">Die Option lang gedrückt halten, um einen eigenen MTU festzulegen.</string>
     <string name="ooc_subscription_token_invalid">Ungültiges OOCv1-Token</string>
     <string name="pinned_certchain_sha256">SHA256 des angehefteten Zertifikats</string>
-    <string name="please_update" formatted="false">Ihre App ist zu alt (%s). Sie funktioniert ab %s nicht mehr. Bitte aktualisieren!</string>
-    <string name="please_update_force" formatted="false">Ihre App ist zu alt (%s). Sie funktioniert seit %s nicht mehr. Bitte aktualisieren!</string>
     <string name="port_out_of_range">Der Port muss im Bereich 1–65535 liegen.</string>
     <string name="proton_session_expired">Ihre Proton-Sitzung wurde abgelehnt. Bitte erneut anmelden.</string>
     <string name="proxy_password">Proxy-Passwort</string>

@@ -489,8 +489,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="tuic_disable_sni">Отключить SNI</string>
     <string name="tuic_reduce_rtt">Включить 0-RTT QUIC рукопожатие</string>
     <string name="pinned_certchain_sha256">Закрепленный сертификат SHA256</string>
-    <string name="please_update" formatted="false">Ваше приложение слишком старое (%s). И перестанет работать %s. Пожалуйста, обновите!</string>
-    <string name="please_update_force" formatted="false">Ваше приложение слишком старое (%s). И перестало работать %s. Пожалуйста, обновите!</string>
     <string name="connection_test_delete_unavailable">Очистить недоступные</string>
     <string name="move">Переместить</string>
     <string name="exe_prefer_provider">Предпочитаемый провайдер плагинов</string>

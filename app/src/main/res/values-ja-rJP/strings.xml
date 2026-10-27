@@ -508,8 +508,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="tuic_disable_sni">SNIを無効にする</string>
     <string name="tuic_reduce_rtt">0-RTT QUICハンドシェイクを有効にする</string>
     <string name="pinned_certchain_sha256">ピン留め証明書SHA256</string>
-    <string name="please_update" formatted="false">お使いのアプリは古すぎます (%s)。%s に動作を停止します。更新してください！</string>
-    <string name="please_update_force" formatted="false">お使いのアプリは古すぎます (%s)。%s に動作を停止しました。更新してください！</string>
     <string name="connection_test_delete_unavailable">利用不可をクリア</string>
     <string name="move">移動</string>
     <string name="exe_prefer_provider">プラグイン優先プロバイダ</string>

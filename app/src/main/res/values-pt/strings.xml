@@ -590,10 +590,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="tuic_disable_sni">Desabilitar SNI</string>
     <string name="tuic_reduce_rtt">Habilitar handshake QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">Certificado Fixado SHA256</string>
-    <string name="please_update" formatted="false">Seu APP é muito antigo (%1$s). E deixará de funcionar em %2$s. Por favor,
-        atualize!</string>
-    <string name="please_update_force" formatted="false">Seu APP é muito antigo (%1$s). E parou de funcionar em %2$s.
-        Por favor, atualize!</string>
     <string name="connection_test_delete_unavailable">Limpar indisponíveis</string>
     <string name="move">Mover</string>
     <string name="exe_prefer_provider">Provedor Preferido de Plugin</string>
