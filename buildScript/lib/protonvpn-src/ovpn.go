@@ -2,17 +2,15 @@ package main
 
 import (
 	"context"
+	"crypto/ed25519"
 	"crypto/rand"
-	"crypto/rsa"
 	"crypto/x509"
-	"crypto/x509/pkix"
 	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
-	"math/big"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -22,7 +20,7 @@ import (
 )
 
 // OpenVPN 那條路（#71）：Proton 的 OpenVPN 節點不用帳號密碼驗證，而是「客戶端憑證」——
-// 本機生成 RSA 金鑰＋自簽 CSR，把公鑰送給 POST /vpn/v1/certificate，Proton 回簽一張
+// 本機生成 Ed25519 金鑰，把公鑰送給 POST /vpn/v1/certificate，Proton 回簽一張
 // 客戶端憑證，再把它們拼進官方 Windows 客戶端那份 config.ovpn 模板。
 //
 // 證據鏈（全部實查，2026-10-26）：
@@ -39,9 +37,6 @@ import (
 //
 // 這裡刻意不內嵌 <cert>/<key> 而寫成檔案路徑：nb4a 的 OpenVPN 匯入走「檔案＋金鑰檔」
 // 形態，PEM 塞 inline 要赌解析器支援與換行處理，賭不起（規則：不能拿推論冒充資料）。
-
-// openvpnKeyBits 4096 與官方客戶端一致：Proton 的 CA 只簽這個強度，別自己調低。
-const openvpnKeyBits = 4096
 
 // certAPIResponse 是 /vpn/v1/certificate 的回包（頂層 Code＋VPNCertificate 欄位）。
 type certAPIResponse struct {
@@ -60,37 +55,50 @@ type certAPIResponse struct {
 	ServerPubKeyMode string `json:"ServerPublicKeyMode"`
 }
 
-// generateOpenVPNIdentity 產出 RSA 金鑰與自簽 CSR 的公鑰 PEM。
+// generateOpenVPNIdentity 產出 **Ed25519** 金鑰與它的公鑰 PEM。
 //
-// 自簽憑證的 CN 就是 Proton 要看的 device name；有效期取短（1 年）即可，因為 Proton
-// 只從 CSR 裡取公鑰與 CN，回簽的那張才算數。
+// 金鑰演算法不是隨便挑的，是實測與官方碼對出來的：
+//   - 官方 win-app 的 `ConnectionKeyManager` 寫死 `ALGORITHM = KeyAlgorithm.Ed25519`，
+//     並用 `Ed25519Asn1KeyGenerator` 產 ASN.1（也就是 PEM SPKI）金鑰；
+//   - API 上的 `ClientPublicKeyMode` 值叫 "EC"，但它指的是 Curve25519 這一族，
+//     **不是** NIST P-256。2026-10-27 本機直接打 API 驗證：
+//     P-256（PEM／base64 DER／未壓縮點三種寫法）一律回
+//     `HTTP 400 code=2001 无法读取密钥，请提供有效的 EC 密钥`；
+//     換成 Ed25519 公鑰 PEM ⇒ `HTTP 200 code=1000`，直接核發憑證。
+//   - 私鑰寫 PKCS#8（"PRIVATE KEY"）：OpenVPN 2.5+ 支援 Ed25519，nb4a 的 OpenVPN
+//     解析器只把它當檔案內容保存，不做格式轉換。
 func generateOpenVPNIdentity(deviceName string) (privPEM string, pubPEM string, err error) {
-	key, err := rsa.GenerateKey(rand.Reader, openvpnKeyBits)
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		return "", "", fmt.Errorf("generate openvpn key: %w", err)
 	}
-	tmpl := &x509.Certificate{
-		SerialNumber:          big.NewInt(time.Now().UnixNano()),
-		Subject:               pkix.Name{CommonName: deviceName},
-		NotBefore:             time.Now().Add(-time.Hour),
-		NotAfter:              time.Now().AddDate(1, 0, 0),
-		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-		BasicConstraintsValid: true,
-	}
-	der, err := x509.CreateCertificate(rand.Reader, tmpl, tmpl, &key.PublicKey, key)
+	privDER, err := x509.MarshalPKCS8PrivateKey(priv)
 	if err != nil {
-		return "", "", fmt.Errorf("self-sign openvpn request: %w", err)
+		return "", "", fmt.Errorf("marshal openvpn key: %w", err)
 	}
-	privPEM = string(pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)}))
-	pubPEM = string(pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der}))
+	pubDER, err := x509.MarshalPKIXPublicKey(pub)
+	if err != nil {
+		return "", "", fmt.Errorf("marshal openvpn public key: %w", err)
+	}
+	privPEM = string(pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: privDER}))
+	pubPEM = string(pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: pubDER}))
 	return privPEM, pubPEM, nil
 }
 
 // fetchOpenVPNCertificate 用存著的憑證把公鑰送給 Proton 簽。401/403 一律回報
 // errSessionExpired，讓呼叫端能走既有的換 token 重試路徑（與 nodes/tier 同一套）。
-func fetchOpenVPNCertificate(ctx context.Context, apiURL string, cred storedCredential, pubPEM, duration string) (certAPIResponse, error) {
-	body := map[string]string{"ClientPublicKey": pubPEM}
+func fetchOpenVPNCertificate(
+	ctx context.Context, apiURL string, cred storedCredential, pubPEM, deviceName, duration string,
+) (certAPIResponse, error) {
+	// 欄位照官方 win-app 的 CertificateRequest：ClientPublicKey 是 **公鑰**，
+	// ClientPublicKeyMode 說明它的型別（EC），Mode="session" 是連線憑證的模式，
+	// DeviceName 會出現在 Proton 那邊核發的憑證上。
+	body := map[string]string{
+		"ClientPublicKey":     pubPEM,
+		"ClientPublicKeyMode": "EC",
+		"Mode":                "session",
+		"DeviceName":          deviceName,
+	}
 	if duration != "" {
 		body["Duration"] = duration
 	}
@@ -116,6 +124,15 @@ func fetchOpenVPNCertificate(ctx context.Context, apiURL string, cred storedCred
 	case res.StatusCode == http.StatusUnauthorized, res.StatusCode == http.StatusForbidden:
 		return certAPIResponse{}, errSessionExpired
 	case res.StatusCode != http.StatusOK:
+		// 把 Proton 的錯誤內容一起帶上來：只回「HTTP 400」等於把線索丟掉，
+		// 400 的成因（欄位不對／方案不支援／裝置數滿了）只能靠這一段分辨。
+		// 長度上限避免把整頁 HTML 塞進日誌。
+		body, _ := io.ReadAll(io.LimitReader(res.Body, 4096))
+		var api certAPIResponse
+		if json.Unmarshal(body, &api) == nil && (api.Code != 0 || api.Error != "") {
+			return api, fmt.Errorf("certificate request refused: HTTP %d code=%d error=%q",
+				res.StatusCode, api.Code, api.Error)
+		}
 		return certAPIResponse{}, fmt.Errorf("API returned HTTP %d", res.StatusCode)
 	}
 
@@ -256,17 +273,18 @@ func runOvpn(args []string, stdout, stderr io.Writer) int {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSec)*time.Second)
 	defer cancel()
 
-	privPEM, pubPEM, err := generateOpenVPNIdentity(hostnameForDevice(*outDir))
+	deviceName := hostnameForDevice(*outDir)
+	privPEM, pubPEM, err := generateOpenVPNIdentity(deviceName)
 	if err != nil {
 		return emitOvpn(stdout, ovpnOutput{Error: err.Error()})
 	}
-	cert, err := fetchOpenVPNCertificate(ctx, *apiURL, cred, pubPEM, *duration)
+	cert, err := fetchOpenVPNCertificate(ctx, *apiURL, cred, pubPEM, deviceName, *duration)
 	if err != nil && errors.Is(err, errSessionExpired) {
 		refreshed, rerr := refreshSession(ctx, *apiURL, *statePath, cred)
 		if rerr != nil {
 			return emitOvpn(stdout, ovpnOutput{Error: errSessionExpired.Error(), Code: codeSessionExpired})
 		}
-		cert, err = fetchOpenVPNCertificate(ctx, *apiURL, refreshed, pubPEM, *duration)
+		cert, err = fetchOpenVPNCertificate(ctx, *apiURL, refreshed, pubPEM, deviceName, *duration)
 	}
 	if err != nil {
 		code := ""

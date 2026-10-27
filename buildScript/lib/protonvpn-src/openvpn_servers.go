@@ -294,22 +294,42 @@ func sanitizePorts(raw []int) []int {
 }
 
 // buildOpenVpnRow 從一台 logical server 生「OpenVPN 那一列」。
-// 回 false 的情況是這台沒有任何可拨的 OpenVPN 條目（不是錯誤：它可能只是台純 WG 機器）。
-func buildOpenVpnRow(ls logicalServer, defaults clientConfigResponse) (nodeView, bool) {
+//
+// 兩條生法，優先序固定：
+//  1. 這台有 OpenVPNUDP／OpenVPNTCP 條目 ⇒ 用該條目自己的 relay 與埠（精確）；
+//  2. 條目不存在、且**整份回應**都沒有 per-protocol 資料 ⇒ 退回伺服器自己的
+//     Domain ＋ clientconfig 的預設埠，傳輸 udp。
+//
+// 第 2 條是 2026-10-27 手機實測逼出來的：Proton 的 logicals（v2 帶
+// WithEntriesForProtocols、v1、legacy 三條都實打；Other_1.0.0／android-vpn／
+// windows-vpn／linux-vpn 四種身分也都試過）對這個帳號**一台都沒回 EntryPerProtocol**
+// （1614 台、0 台帶條目）。而 Proton 自己下載的 .ovpn 的 remote 寫的就是伺服器網域，
+// 不是 per-protocol relay；第三方客戶端（protonvpn-cli 這類）也是照網域連。
+// 所以「沒有條目就用網域」不是臆測，是回到官方剖面實際用的那一條路。
+//
+// allowDomainFallback 由呼叫端依「整份回應有沒有任何 per-protocol 資料」決定：
+// 上游哪天恢復回條目，這條退路就自動失效，不會把不支援 OpenVPN 的機器也列出來。
+func buildOpenVpnRow(ls logicalServer, defaults clientConfigResponse, allowDomainFallback bool) (nodeView, bool) {
 	for i := range ls.Servers {
 		d := &ls.Servers[i]
 		if d.Status.offline() {
 			continue
 		}
 		entry, transport, ok := d.openVpnEntry()
-		if !ok {
-			continue
+		address := ""
+		var ports []int
+		protocols, secureCore := protocolCapsFor(*d, ls, isOpenVpnFamily)
+		if ok {
+			address = d.openVpnAddress(entry)
+			ports = sanitizePorts(entry.Ports)
+		} else if allowDomainFallback {
+			address = d.Domain
+			transport = transportUDP
+			protocols = []string{protocolOpenVPNName}
 		}
-		address := d.openVpnAddress(entry)
 		if address == "" {
 			continue
 		}
-		ports := sanitizePorts(entry.Ports)
 		if len(ports) == 0 {
 			ports = defaults.openVpnPorts(transport)
 		}
@@ -317,10 +337,9 @@ func buildOpenVpnRow(ls logicalServer, defaults clientConfigResponse) (nodeView,
 		if len(ports) > 0 {
 			port = ports[0]
 		}
-		protocols, secureCore := protocolCapsFor(*d, ls, isOpenVpnFamily)
 		if len(protocols) == 0 {
 			// 理論上不會發生（有條目就有 openvpn），真出現了就是上游給了個認不出名的鍵；
-			// 這種列宁可不生，也不要生一列 UI 筛不出來、又只能靠位置猜的資料。
+			// 這種寧可不生，也不要生一列 UI 篩不出來、又只能靠位置猜的資料。
 			continue
 		}
 		view := nodeViewFromServer(ls)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/ed25519"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
@@ -13,32 +14,37 @@ import (
 	"testing"
 )
 
+// 金鑰形狀釘住官方 win-app 的契約＋本機實測：
+//
+//	`ConnectionKeyManager` 寫死 Ed25519；API 的 `ClientPublicKeyMode` 雖叫 "EC"，
+//	指的是 Curve25519 那族——P-256 會被回 `HTTP 400 code=2001 无法读取密钥`，
+//	Ed25519 公鑰 PEM 則直接 200 核發。這條測試把「別再改回 RSA／P-256」釘住。
 func TestGenerateOpenVPNIdentityProducesParsablePEM(t *testing.T) {
 	privPEM, pubPEM, err := generateOpenVPNIdentity("nb4a-openvpn")
 	if err != nil {
 		t.Fatalf("generate: %v", err)
 	}
 	privBlock, _ := pem.Decode([]byte(privPEM))
-	if privBlock == nil || privBlock.Type != "RSA PRIVATE KEY" {
-		t.Fatalf("private pem = %v", privBlock)
+	if privBlock == nil || privBlock.Type != "PRIVATE KEY" {
+		t.Fatalf("private pem = %v, want a PKCS#8 private key", privBlock)
 	}
-	key, err := x509.ParsePKCS1PrivateKey(privBlock.Bytes)
+	key, err := x509.ParsePKCS8PrivateKey(privBlock.Bytes)
 	if err != nil {
 		t.Fatalf("parse private: %v", err)
 	}
-	if key.N.BitLen() != openvpnKeyBits {
-		t.Errorf("key size = %d, want the %d Proton's CA signs", key.N.BitLen(), openvpnKeyBits)
+	if _, ok := key.(ed25519.PrivateKey); !ok {
+		t.Fatalf("private key type = %T, want ed25519.PrivateKey", key)
 	}
-	certBlock, _ := pem.Decode([]byte(pubPEM))
-	if certBlock == nil || certBlock.Type != "CERTIFICATE" {
-		t.Fatalf("public pem = %v", certBlock)
+	pubBlock, _ := pem.Decode([]byte(pubPEM))
+	if pubBlock == nil || pubBlock.Type != "PUBLIC KEY" {
+		t.Fatalf("public pem = %v, want a bare public key (not a certificate)", pubBlock)
 	}
-	csr, err := x509.ParseCertificate(certBlock.Bytes)
+	parsed, err := x509.ParsePKIXPublicKey(pubBlock.Bytes)
 	if err != nil {
-		t.Fatalf("parse self-signed: %v", err)
+		t.Fatalf("parse public key: %v", err)
 	}
-	if csr.Subject.CommonName != "nb4a-openvpn" {
-		t.Errorf("CN = %q, want the device name Proton lists", csr.Subject.CommonName)
+	if _, ok := parsed.(ed25519.PublicKey); !ok {
+		t.Fatalf("public key type = %T, want ed25519.PublicKey", parsed)
 	}
 }
 
@@ -73,8 +79,17 @@ func TestOvpnCommandWritesMaterialAndConfig(t *testing.T) {
 	if gotAuth != "Bearer token-test" {
 		t.Errorf("Authorization = %q, want the stored bearer token", gotAuth)
 	}
-	if !strings.Contains(gotBody["ClientPublicKey"], "BEGIN CERTIFICATE") {
-		t.Errorf("ClientPublicKey = %q, want the self-signed PEM", gotBody["ClientPublicKey"])
+	if !strings.Contains(gotBody["ClientPublicKey"], "BEGIN PUBLIC KEY") {
+		t.Errorf("ClientPublicKey = %q, want a bare EC public key", gotBody["ClientPublicKey"])
+	}
+	if gotBody["ClientPublicKeyMode"] != "EC" {
+		t.Errorf("ClientPublicKeyMode = %q, want EC（官方 win-app 的預設值）", gotBody["ClientPublicKeyMode"])
+	}
+	if gotBody["Mode"] != "session" {
+		t.Errorf("Mode = %q, want session", gotBody["Mode"])
+	}
+	if gotBody["DeviceName"] == "" {
+		t.Error("DeviceName 不能空：Proton 會把它寫進核發的憑證")
 	}
 
 	var out ovpnOutput

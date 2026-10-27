@@ -525,3 +525,45 @@ func TestParsePortListAndOvpnPortFlags(t *testing.T) {
 		t.Fatalf("exit=%d, want a usage error when neither --port nor --ports is given", code)
 	}
 }
+
+// 沒有 OpenVPN 條目時，「用伺服器網域生一列 OpenVPN」是**明確打開才做**的事：
+// 上游沒給條目與「這台真的不支援 OpenVPN」在一般情況分不出來，所以預設關；
+// App 那側知道自己要 OpenVPN，才帶 --openvpn-domain-fallback 打開。
+// 2026-10-27 手機實測：這個帳號的清單回來完全沒有 OpenVPN 鍵，卻有 121 台帶
+// TLS 尾綴的鍵（被認成 stealth），所以退路一定要跟「有沒有 OpenVPN 鍵」綁，
+// 不能跟「有沒有任何 per-protocol 資料」綁——綁錯就整個不生效。
+func TestNodesOpenVpnDomainFallbackIsOptIn(t *testing.T) {
+	const payload = `{"LogicalServers":[
+	 {"ID":"77","Name":"NL#77","Tier":2,"State":"up","ExitCountry":"nl","City":"Amsterdam",
+	  "Features":1,"Load":5,"Score":2.5,
+	  "Servers":[{"Domain":"nl77.protonvpn.net","EntryIP":"10.0.0.77","Status":1,
+	              "X25519PublicKey":"AAA=",
+	              "EntryPerProtocol":{"WireGuardTLS":{"IPv4":"10.0.0.78"}}}]}
+	]}`
+	srv, _ := mockServer(t, payload, http.StatusOK)
+	defer srv.Close()
+	state := writeTestSession(t, t.TempDir())
+
+	out, code := runNodesWith(t, srv.URL, state)
+	if code != 0 || !out.OK || len(out.Servers) != 1 {
+		t.Fatalf("預設不該多生 OpenVPN 列：code=%d out=%+v", code, out)
+	}
+
+	withFallback, code := runNodesWith(t, srv.URL, state, "--openvpn-domain-fallback")
+	if code != 0 || !withFallback.OK || len(withFallback.Servers) != 2 {
+		t.Fatalf("打開退路應多一列 OpenVPN：code=%d out=%+v", code, withFallback)
+	}
+	ovpn := withFallback.Servers[1]
+	if ovpn.ID != "77"+openVpnRowIDSuffix {
+		t.Errorf("id = %q, want the #openvpn suffix", ovpn.ID)
+	}
+	if ovpn.Endpoint != "nl77.protonvpn.net" || ovpn.Transport != transportUDP {
+		t.Errorf("fallback row = %q/%q, want the server domain over udp", ovpn.Endpoint, ovpn.Transport)
+	}
+	if !slices.Equal(ovpn.Protocols, []string{protocolOpenVPNName}) {
+		t.Errorf("protocols = %v, want [openvpn]", ovpn.Protocols)
+	}
+	if ovpn.PublicKey != "" {
+		t.Errorf("OpenVPN 列不能帶 WG 公鑰（Kotlin 會照它選匯入方式）：%q", ovpn.PublicKey)
+	}
+}

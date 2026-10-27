@@ -595,6 +595,9 @@ object ProtonSidecar {
             return@withContext ProtonNodesState(false, error = "not logged in")
         }
         val args = ArrayList(listOf("nodes", "--state", sessionFile.absolutePath))
+        // 上游完全沒回 OpenVPN 條目時，用伺服器網域生一列（Proton 自己的 .ovpn 就是
+        // 這樣連的）。這是 App 這側主動要的，所以由這裡明確打開，sidecar 預設不做。
+        args += "--openvpn-domain-fallback"
         if (country.isNotEmpty()) args += listOf("--country", country)
         if (limit > 0) args += listOf("--limit", limit.toString())
         if (maxTier > 0) args += listOf("--tier", maxTier.toString())

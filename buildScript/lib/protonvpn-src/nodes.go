@@ -467,6 +467,8 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 	entries := command.String("with-entries-for-protocols", strings.Join(logicalsProtocolEntries, ","),
 		"comma separated protocol keys to ask Proton for in the server list; empty = the old shape without entries")
 	openVpn := command.Bool("openvpn", true, "emit one extra row per server for its OpenVPN entry")
+	openVpnDomain := command.Bool("openvpn-domain-fallback", false,
+		"when upstream sends no OpenVPN per-protocol entry at all, derive the OpenVPN row from the server domain (what Proton's own .ovpn files use)")
 	if err := command.Parse(args); err != nil {
 		return 2
 	}
@@ -517,7 +519,7 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 		}
 	}
 
-	servers, dropped := selectNodes(resp, *country, *limit, *tier, defaults, *openVpn)
+	servers, dropped := selectNodes(resp, *country, *limit, *tier, defaults, *openVpn, *openVpnDomain)
 	truncated := resp.ResponseMetadata.ListIsTruncated
 	if len(servers) == 0 {
 		// Reporting an empty success would let the UI say "this account has no
@@ -640,10 +642,31 @@ func requestLogicalServers(
 // 不過濾。層級／國家過濾發生在生列之前，所以兩種來源受同一條規則管。
 func selectNodes(
 	resp *logicalServersResp, country string, limit int, maxTier int,
-	defaults clientConfigResponse, includeOpenVpn bool,
+	defaults clientConfigResponse, includeOpenVpn bool, openVpnDomainFallback bool,
 ) ([]nodeView, int) {
 	var usable []nodeView
 	dropped := 0
+
+	// 上游這次有沒有給**任何 OpenVPN 條目**：完全沒有才啟用「用伺服器網域生 OpenVPN 列」
+	// 那條退路（理由見 buildOpenVpnRow 的註解）。
+	//
+	// 注意條件是「沒有 OpenVPN 鍵」而不是「沒有任何 per-protocol 資料」：2026-10-27
+	// 手機實測的實際回包裡，多數機器沒有條目、但有 121 台帶著尾端 TLS 的鍵（因此被
+	// 認成 stealth）。用「有任何條目就關退路」當條件，會讓退路整個不啟動——那正是
+	// 第一次上機時 OpenVPN 篩選仍然是空的原因。
+	allowDomainFallback := openVpnDomainFallback
+	for _, ls := range resp.LogicalServers {
+		for _, d := range ls.Servers {
+			for key := range d.EntryPerProtocol {
+				if vpn, _ := splitProtocolKey(key); vpn == protocolOpenVPNName {
+					allowDomainFallback = false
+				}
+			}
+		}
+		if !allowDomainFallback {
+			break
+		}
+	}
 
 	for _, ls := range resp.LogicalServers {
 		if ls.State != "" && ls.State != "up" {
@@ -658,7 +681,7 @@ func selectNodes(
 			continue
 		}
 		wgRow, hasWireGuard := wireGuardRow(ls)
-		ovpnRow, hasOpenVpn := buildOpenVpnRow(ls, defaults)
+		ovpnRow, hasOpenVpn := buildOpenVpnRow(ls, defaults, includeOpenVpn && allowDomainFallback)
 		if !hasWireGuard && !hasOpenVpn {
 			dropped++
 			continue
