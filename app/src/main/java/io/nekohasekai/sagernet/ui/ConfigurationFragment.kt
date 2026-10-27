@@ -1076,6 +1076,9 @@ class ConfigurationFragment @JvmOverloads constructor(
     }
 
     private fun speedTestBody(group: ProxyGroup) {
+        // 讀分組時在 IO 執行緒，回到主線這段窗口內用戶可能已經切走；
+        // layoutInflater／requireContext 在 detach 後會直接拋 IllegalStateException。
+        if (!isAdded) return
         val binding = LayoutProgressListBinding.inflate(layoutInflater)
         val builder = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.speed_test_group)
@@ -1352,6 +1355,9 @@ class ConfigurationFragment @JvmOverloads constructor(
                 val ok = results.count { it.status == 1 }
                 val bad = results.count { it.status != 1 }
                 onMainDispatcher {
+                    // getString 是 Fragment 的方法，用戶中途切走（例如去匯入 Proton 節點）
+                    // 時這裡已經 detach，showToast 自己的 isAdded 攔不住引數先求值。
+                    if (!isAdded) return@onMainDispatcher
                     showToast(getString(R.string.url_test_finished_summary, ok, bad))
                 }
             } finally {
