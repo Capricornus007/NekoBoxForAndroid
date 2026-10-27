@@ -359,4 +359,30 @@ class ProtonFilterTest {
         assertTrue(ProtonFilter(country = "JP", protocol = ProtonNode.PROTOCOL_OPENVPN).apply(protocolNodes).isEmpty())
         assertEquals(listOf("p2"), ids(ProtonFilter(query = "stealth", protocol = ProtonNode.PROTOCOL_STEALTH).apply(protocolNodes)))
     }
+
+    // ===== 一台機器兩列（WireGuard 一列、OpenVPN 一列）=====
+    //
+    // sidecar 從這一輪開始把「同一台的兩種協定」拆成兩列（id 帶 #openvpn 後綴、
+    // 該列的 protocols 只寫自己那一族）。這組測試釘的是拆列之後 UI 必須成立的三件事：
+    // 「全部協定」兩種都看得到、選 OpenVPN 不會混入 WG 列、下拉的數字跟篩選結果一致。
+    @Test
+    fun `a server with both protocols shows one row each and both are reachable`() {
+        val rows = listOf(
+            node("50", "NL#50", "NL", "Amsterdam", protocols = listOf(ProtonNode.PROTOCOL_WIREGUARD)),
+            node(
+                "50#openvpn",
+                "NL#50",
+                "NL",
+                "Amsterdam",
+                protocols = listOf(ProtonNode.PROTOCOL_OPENVPN),
+                publicKey = "",
+            ),
+        )
+        assertEquals(listOf("50", "50#openvpn"), ids(ProtonFilter().apply(rows)))
+        assertEquals(listOf("50"), ids(ProtonFilter(protocol = ProtonNode.PROTOCOL_WIREGUARD).apply(rows)))
+        assertEquals(listOf("50#openvpn"), ids(ProtonFilter(protocol = ProtonNode.PROTOCOL_OPENVPN).apply(rows)))
+        // 只有 OpenVPN 那列該在按鈕上標出協定，WG 列不用（1588 列全標只會把版面撐爆）。
+        assertNull(rows[0].rowProtocolLabel)
+        assertEquals("OpenVPN", rows[1].rowProtocolLabel)
+    }
 }

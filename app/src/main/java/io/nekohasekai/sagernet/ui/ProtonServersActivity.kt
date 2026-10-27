@@ -183,6 +183,12 @@ class ProtonServersActivity : ThemedActivity() {
             if (result.raw.isNotEmpty() && !ProtonNodeCache.save(cacheDir, result.raw)) {
                 Logs.w("proton: failed to cache server list")
             }
+            // 上游自己說這份清單被截斷了（v2 在回應太大時會這樣，官方客戶端用 IncludeID[]
+            // 逐台補回來，我方還沒那條路）。只記日誌：要讓用戶看得見就得加新語系字串，
+            // 而現在最重要的是別把「截斷」當成「這帳號只有這些機器」默默吞掉。
+            if (result.truncated) {
+                Logs.w("proton: upstream sent a truncated server list (${result.nodes.size} rows)")
+            }
             showNodes(result, fromCache = false)
         }
     }
@@ -321,6 +327,14 @@ class ProtonServersActivity : ThemedActivity() {
                 append(getString(R.string.proton_add))
                 append(" · ")
                 append(node.placeLabel())
+                // 同一台機器現在可能有兩顆按鈕（WireGuard 一顆、OpenVPN 一顆），兩邊的
+                // 城市與空閒度一模一樣：不標協定就分不出來點下去會拿到哪種剖面，
+                // 而用戶要的正是「清單裡看得到 OpenVPN 節點」。協定名是專有名詞，
+                // 不進語系檔（全局規則 35）。
+                node.rowProtocolLabel?.let {
+                    append(" · ")
+                    append(it)
+                }
                 if (idle != null) {
                     append(" ")
                     append(getString(R.string.proton_idle, idle))
@@ -341,8 +355,10 @@ class ProtonServersActivity : ThemedActivity() {
 
     private fun import(node: ProtonNode) {
         lifecycleScope.launch {
-            // 只講 OpenVPN／ProTun 的那批機器沒有 WG 金鑰，不能硬生一份 peer 空白、
-            // 點下去必定連不上的 WireGuard 剖面；生出來比不生更壞。
+            // 這一列該走哪條路看的是「它有沒有 WG 金鑰」：sidecar 現在一台機器可能出兩列，
+            // OpenVPN 那一列的 wgPublicKey 刻意留空，就是為了讓它走到下面那條分支。
+            // 只講 OpenVPN／ProTun 的機器不能硬生一份 peer 空白、點下去必定連不上的
+            // WireGuard 剖面；生出來比不生更壞。
             if (!node.hasWireGuardKey) {
                 if (node.canUse(ProtonNode.PROTOCOL_OPENVPN)) {
                     importOpenVpn(node)
@@ -398,7 +414,19 @@ class ProtonServersActivity : ThemedActivity() {
     // 登入記錄／狀態檔，憑證自動換、自動落地，按下去就多一個能用的節點。
     private fun importOpenVpn(node: ProtonNode) {
         lifecycleScope.launch {
-            val ovpn = ProtonSidecar.ovpn(node.endpoint, if (node.port > 0) node.port else OPENVPN_PORT, "udp")
+            // 傳輸要用節點自己那一列的值（OpenVPNUDP→udp、OpenVPNTCP→tcp），不能寫死 udp：
+            // 只給 TCP 鍵的那台用 udp 生出的剖面必定連不上。除此之外一律 udp，
+            // 因為 sidecar 只會把 udp／tcp 兩種交出來（TLS 變體它不列，見 openvpn_servers.go）。
+            val proto = when (node.transport.lowercase()) {
+                "tcp" -> "tcp"
+                else -> "udp"
+            }
+            val ovpn = ProtonSidecar.ovpn(
+                node.endpoint,
+                if (node.port > 0) node.port else OPENVPN_PORT,
+                proto,
+                node.ports,
+            )
             if (isFinishing || isDestroyed) return@launch
             if (!ovpn.ok) {
                 if (ovpn.code == ProtonSidecar.SESSION_EXPIRED) {
@@ -411,7 +439,9 @@ class ProtonServersActivity : ThemedActivity() {
             try {
                 val parsed = parseOpenVPNConfig(ovpn.config)
                 val bean = parsed.bean
-                bean.name = "${node.name} (OpenVPN)"
+                // 名字要帶著是 OpenVPN 這一列：同一台機器的 WG 剖面會叫「NL#50 Amsterdam」，
+                // 兩份剖面長一樣的話用戶在清單裡分不出自己連的是哪一條線。
+                bean.name = "${node.placeLabel()} (OpenVPN)"
                 val (groupId, created) = ProtonGroups.ensure()
                 ProfileManager.createProfile(groupId, bean)
                 if (isFinishing || isDestroyed) return@launch

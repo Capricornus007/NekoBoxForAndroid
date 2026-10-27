@@ -314,4 +314,55 @@ class ProtonSidecarParseTest {
         assertEquals(1, state.nodes.size)
         assertEquals("2", state.nodes[0].id)
     }
+
+    /**
+     * sidecar 現在一台機器可能出兩列，OpenVPN 那列要帶著「這一條線怎麼拨」的資料：
+     * 整份埠清單（多條 remote 配 remote-random，跟官方客戶端同一個做法）與傳輸。
+     * 少了這兩欄，匯入那側就只能猜埠，猜錯的話用戶看到的是「連不上」而不是「沒節點」。
+     */
+    @Test
+    fun readsTheOpenVpnRowWithItsPortsAndTransport() {
+        val state = ProtonJson.parseNodes(
+            """
+            {"ok":true,"dropped":0,"truncated":true,"servers":[
+              {"id":"50","name":"NL#50","penalty":0,"load":4,"score":3.5,"tier":1,"ipv6":true,
+               "country":"nl","city":"Amsterdam","endpoint":"10.0.0.150","domain":"nl50.protonvpn.net",
+               "wgPublicKey":"KKKKAl==","port":51820,"protocols":["wireguard"]},
+              {"id":"50#openvpn","name":"NL#50","penalty":0,"load":4,"score":3.5,"tier":1,"ipv6":true,
+               "country":"nl","city":"Amsterdam","endpoint":"10.0.0.250","domain":"nl50.protonvpn.net",
+               "port":1194,"ports":[1194,4569,5060],"transport":"udp","protocols":["openvpn"]}
+            ]}
+            """.trimIndent(),
+        )
+        assertTrue(state.ok)
+        assertTrue("上游說清單被截斷時必須讓呼叫端看得见", state.truncated)
+        assertEquals(2, state.nodes.size)
+
+        val wg = state.nodes[0]
+        assertTrue(wg.hasWireGuardKey)
+        assertEquals(emptyList<Int>(), wg.ports)
+        assertEquals("", wg.transport)
+
+        val ovpn = state.nodes[1]
+        assertFalse("OpenVPN 列不該有 WG 金鑰：有就會被送去建 WireGuard 剖面", ovpn.hasWireGuardKey)
+        assertTrue(ovpn.canUse(ProtonNode.PROTOCOL_OPENVPN))
+        assertFalse(ovpn.canUse(ProtonNode.PROTOCOL_WIREGUARD))
+        assertEquals("10.0.0.250", ovpn.endpoint)
+        assertEquals(listOf(1194, 4569, 5060), ovpn.ports)
+        assertEquals("udp", ovpn.transport)
+        assertEquals("OpenVPN", ovpn.rowProtocolLabel)
+    }
+
+    /** 舊 sidecar 沒帶 ports／transport 時不能憑空補出埠來。 */
+    @Test
+    fun legacyRowsHaveNoPortList() {
+        val state = ProtonJson.parseNodes(
+            """{"ok":true,"servers":[{"id":"9","name":"JP#9","endpoint":"1.2.3.9","wgPublicKey":"IIIIAl==","port":51820}]}""",
+        )
+        val node = state.nodes.single()
+        assertEquals(emptyList<Int>(), node.ports)
+        assertEquals("", node.transport)
+        assertFalse("舊 payload 沒帶 truncated 欄位時就是沒截斷", state.truncated)
+        assertEquals(ProtonJson.DEFAULT_PORT, node.port)
+    }
 }

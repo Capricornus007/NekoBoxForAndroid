@@ -40,13 +40,33 @@ data class ProtonNode(
     // Server.java：isSecureCoreServer() => d0(features, 1)，跟 isIPv6Supported()
     // 的 d0(features, 16) 同一個 features 位元遮罩、不同位。
     val secureCore: Boolean = false,
+    // 這一列真的能拨的埠清單（sidecar 的 ports）。OpenVPN 那一侧一定要整份：Proton 的
+    // OpenVPN 靠「同一個中繼換埠重試」活下來，官方兩支客戶端都是把整份清單寫成多條
+    // remote 再加 remote-random，只留一個埠的剖面在封埠的網路裡會直接連不上。
+    // WG 那一列也帶（就是它的埠候選），匯入 WG 時仍只用 port。
+    val ports: List<Int> = emptyList(),
+    // 這一列的傳輸（udp／tcp），OpenVPN 列由 sidecar 從它自己那一族的鍵名算出來
+    // （OpenVPNUDP→udp、OpenVPNTCP→tcp）；WG 列留空，因為 WG 的傳輸就是它的埠。
+    // 不能拿它來猜協定：協定以 protocols 為準，這一欄只回答「那条線要怎麼拨」。
+    val transport: String = "",
 ) {
     // 空閒度是他在清單上真正要比的東西，負載只是它的反面。
     val idlePercent: Int? get() = load.takeIf { it in 0..100 }?.let { 100 - it }
 
-    // wgPublicKey 有值才能直接建 WireGuard 剖面；OpenVPN／ProTun 那條要的是 .ovpn 材料，
-    // 目前是「列得出來、點下去會告知還沒接」的狀態。
+    // wgPublicKey 有值才能直接建 WireGuard 剖面。sidecar 現在一台機器可能出兩列
+    // （WG 一列、OpenVPN 一列，後者的 wgPublicKey 刻意留空），所以「沒有金鑰」不是壞節點，
+    // 而是「這一列該走 OpenVPN」——按 protocols 判定，不要按金鑰缺席就把它丟掉。
     val hasWireGuardKey: Boolean get() = publicKey.isNotEmpty()
+
+    // 這一列該在哪顆按鈕上寫什麼協定：只有非 WG 的列需要標記（清單按「全部協定」看時，
+    // 同一台機器的兩列要分得出來哪顆點下去是 OpenVPN）。協定名是專有名詞，
+    // 不進語系檔（全局規則 35），直接顯示 protocolLabel 的原文。
+    val rowProtocolLabel: String?
+        get() = when {
+            hasWireGuardKey -> null
+            canUse(PROTOCOL_OPENVPN) -> protocolLabel(PROTOCOL_OPENVPN)
+            else -> null
+        }
 
     /**
      * 「這台能不能走 [want]」。協定清單有就以清單為準；清單是空的（＝舊 sidecar 寫的舊快取）
@@ -142,6 +162,9 @@ class ProtonOvpnState(
     val config: String = "",
     val host: String = "",
     val port: Int = 0,
+    // sidecar 實際寫進 .ovpn 的整份埠清單（多條 remote 配 remote-random）。留給
+    // 「憑證換好了但連線失敗」那種情況查： ports 缺＝舊 sidecar 只會生單一 remote。
+    val ports: List<Int> = emptyList(),
     val proto: String = "",
     // 憑證到期（epoch 秒）：Proton 的客戶端憑證不是永久的，到期要重簽。
     val expiresAt: Long = 0L,
@@ -180,6 +203,10 @@ class ProtonNodesState(
     // 這次清單是按第幾層過濾過的（0＝沒過濾）。清單頁拿它標「已按免費層過濾」，
     // 免得用戶把「少掉的節點」看成「壞掉的回應」。
     val maxTier: Int = 0,
+    // 上游自己說的「這次只給了一部分」（sidecar 轉出的 truncated）。帶上
+    // WithEntriesForProtocols 之後回應比以前大得多，這個分支真的可能發生；
+    // 現階段只進日誌（要讓用戶看得見就得加新語系字串），但不能當成「這帳號就這些機器」。
+    val truncated: Boolean = false,
 )
 
 // Parsing is kept free of process and Android types so it can be covered by JVM
@@ -287,6 +314,7 @@ object ProtonJson {
             config = config,
             host = obj.optString("host", ""),
             port = obj.optInt("port"),
+            ports = intList(obj.optJSONArray("ports")),
             proto = obj.optString("proto", ""),
             expiresAt = obj.optLong("expiresAt"),
         )
@@ -338,6 +366,10 @@ object ProtonJson {
                 port = item.optInt("port", if (publicKey.isNotEmpty()) DEFAULT_PORT else 0),
                 protocols = protocols,
                 secureCore = item.optBoolean("secureCore"),
+                // 埠清單缺（舊 sidecar／舊快取）時就是空：下面匯入那條路會退回單一 port，
+                // 不能替它臆造一個 Proton 的埠號。
+                ports = intList(item.optJSONArray("ports")),
+                transport = item.optString("transport", ""),
             )
         }
         // An empty list is a failure, not a success with nothing in it: the UI
@@ -347,9 +379,20 @@ object ProtonJson {
             nodes = nodes,
             dropped = obj.optInt("dropped"),
             maxTier = obj.optInt("maxTier"),
+            truncated = obj.optBoolean("truncated"),
             error = if (nodes.isEmpty()) obj.optString("error", "no usable servers") else "",
             raw = text,
         )
+    }
+
+    private fun intList(array: JSONArray?): List<Int> {
+        if (array == null) return emptyList()
+        val out = ArrayList<Int>(array.length())
+        for (i in 0 until array.length()) {
+            val value = array.optInt(i)
+            if (value > 0) out += value
+        }
+        return out
     }
 
     const val DEFAULT_PORT = 51820
@@ -507,19 +550,30 @@ object ProtonSidecar {
 
     // OpenVPN 那條路（#71）：本機生成金鑰、向 Proton 換簽客戶端憑證，換回一份自包含
     // .ovpn。材料檔寫在 app 私有目錄（不在備份範圍），憑證到期（expiresAt）要重簽。
-    suspend fun ovpn(host: String, port: Int, proto: String): ProtonOvpnState = withContext(Dispatchers.IO) {
+    // [ports] 是節點自己帶的整份埠清單（清單列的 ports 欄）：Proton 的 OpenVPN 靠換埠
+    // 重試活下來，官方客戶端也是多條 remote 配 remote-random，所以能給就全給；
+    // [port] 只在沒有清單時當單一值用。**全程不問任何帳密**。
+    suspend fun ovpn(
+        host: String,
+        port: Int,
+        proto: String,
+        ports: List<Int> = emptyList(),
+    ): ProtonOvpnState = withContext(Dispatchers.IO) {
         if (!sessionFile.exists()) {
             return@withContext ProtonOvpnState(false, error = "not logged in")
         }
-        if (host.isEmpty() || port <= 0) {
+        val allPorts = ports.filter { it > 0 }.distinct()
+        val primary = allPorts.firstOrNull() ?: port
+        if (host.isEmpty() || primary <= 0) {
             return@withContext ProtonOvpnState(false, error = "missing server address")
         }
         val outDir = File(SagerNet.application.filesDir, "proton-openvpn").apply { mkdirs() }
         val args = mutableListOf(
             "ovpn", "--state", sessionFile.absolutePath,
             "--out-dir", outDir.absolutePath,
-            "--host", host, "--port", port.toString(), "--proto", proto,
+            "--host", host, "--port", primary.toString(), "--proto", proto,
         )
+        if (allPorts.size > 1) args += listOf("--ports", allPorts.joinToString(","))
         // 帳號名優先取狀態檔（登一次就存了）；舊狀態檔沒這欄才退回 App 的記錄，
         // 兩處都沒有就不傳 --username：sidecar 會省掉 auth-user-pass，
         // 而不是回頭叫用戶再打一次。

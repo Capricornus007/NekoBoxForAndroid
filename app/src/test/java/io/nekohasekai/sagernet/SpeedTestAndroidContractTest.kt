@@ -186,7 +186,7 @@ class SpeedTestAndroidContractTest {
             "values" to Triple("Latency test URL", "URL test this group", "Speed test this group"),
             "values-zh-rCN" to Triple("延迟测试 URL", "URL 测试本组", "速度测试本组"),
             "values-zh-rHK" to Triple("延遲測試 URL", "URL 測試本組", "速度測試本組"),
-            "values-zh-rTW" to Triple("延遲測試 URL", "URL 測試本組", "速度測試本組"),
+            "values-zh-rTW" to Triple("延遲測試網址", "延遲測試這一組", "速度測試這一組"),
         )
 
         expected.forEach { (directory, translations) ->
