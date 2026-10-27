@@ -41,7 +41,6 @@
     <string name="quick_enable">有効化</string>
     <string name="quick_disable">無効化</string>
     <string name="group_default">グループ化されていない</string>
-    <string name="document">ドキュメント（英語）</string>
     <string name="theme">テーマ</string>
     <string name="menu_about">このアプリについて</string>
     <string name="menu_group">グループ</string>
@@ -970,7 +969,6 @@
     <string name="balancer_use_front_proxy">フロントプロキシを使用</string>
     <string name="balancer_use_landing_proxy">ランディングプロキシを使用</string>
     <string name="battery_optimization_disabled">バッテリー最適化：無効</string>
-    <string name="battery_optimization_enabled">バッテリー最適化：有効</string>
     <string name="bottomsheet_drag_handle_clicked">ドラッグハンドルをクリックしました</string>
     <string name="close">閉じる</string>
     <string name="connection_status_connected">接続済み</string>

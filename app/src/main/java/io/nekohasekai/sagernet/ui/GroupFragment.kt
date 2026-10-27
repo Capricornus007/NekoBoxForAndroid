@@ -486,9 +486,13 @@ class GroupFragment :
                     popup.menu.removeItem(R.id.action_delete_group)
 
                     // isai：訂閱回滾（SubscriptionHistory）可用性。
+                    // 用戶 2026-10-27 回報：「上一次的訂閱版本」永遠掛在那裡、看不懂在幹嘛。
+                    // 它只在「這個訂閱有存到上一版快照」時才有作用，所以改成**有快照才出現**
+                    // ——看得見就代表按下去真的能退，不必再解釋為什麼是灰的。
                     popup.menu.findItem(R.id.action_undo_subscription).apply {
-                        isVisible = proxyGroup.type == GroupType.SUBSCRIPTION
-                        isEnabled = SubscriptionHistory.available(proxyGroup.id) && proxyGroup.id !in GroupUpdater.updating
+                        isVisible = proxyGroup.type == GroupType.SUBSCRIPTION &&
+                            SubscriptionHistory.available(proxyGroup.id)
+                        isEnabled = proxyGroup.id !in GroupUpdater.updating
                     }
                 }
                 popup.setOnMenuItemClickListener(this)

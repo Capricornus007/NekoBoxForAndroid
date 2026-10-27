@@ -14,7 +14,6 @@
     <string name="theme">Тема</string>
     <string name="use_system_theme">Використовувати системну тему</string>
     <string name="use_system_theme_summary">Використовувати системні кольори Monet (Android 12+)</string>
-    <string name="document">Документ</string>
     <string name="group_default">Без групи</string>
     <string name="quick_toggle">Переключити</string>
     <string name="quick_enable">Увімкнути</string>
@@ -661,7 +660,6 @@
     <string name="balancer_use_front_proxy">Використовувати початковий проксі</string>
     <string name="balancer_use_landing_proxy">Використовувати кінцевий проксі</string>
     <string name="battery_optimization_disabled">Вимкнено - торкніться, щоб дозволити фонову активність</string>
-    <string name="battery_optimization_enabled">Увімкнено - додаток може працювати без обмежень у фоновому режимі</string>
     <string name="bottomsheet_drag_handle_clicked">bottomsheet drag handle clicked</string>
     <string name="concurrent_dial">Одночасне встановлення з\'єднання</string>
     <string name="concurrent_dial_summary">Увімкнути одночасні з\'єднання для швидшого встановлення мережі, може збільшити споживання батареї</string>

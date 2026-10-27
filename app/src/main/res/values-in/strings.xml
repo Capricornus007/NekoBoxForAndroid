@@ -270,7 +270,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="donate_info">Saya suka uang</string>
     <string name="ignore_battery_optimizations">Abaikan optimasi baterai</string>
     <string name="ignore_battery_optimizations_sum">Hapus beberapa pembatasan</string>
-    <string name="battery_optimization_enabled">Diaktifkan - aplikasi dapat berjalan tanpa batasan di latar belakang</string>
     <string name="battery_optimization_disabled">Dinonaktifkan - ketuk untuk mengizinkan aktivitas latar belakang</string>
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Konfigurasi…</string>
@@ -1110,7 +1109,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="copy_current_link">Salin Tautan</string>
     <string name="custom_ua_hint">User-Agent kustom</string>
     <string name="default_subscription_user_agent">User-Agent langganan bawaan</string>
-    <string name="document">Dokumen</string>
     <string name="format_snlink_lower">snlink</string>
     <string name="format_snlink_upper">SNLINK</string>
     <string name="github">Kode sumber</string>

@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Alte Farben…</string>
     <string name="theme_classic_color_swatch">Farbthema %1$d</string>
-    <string name="document">Dokument</string>
     <string name="group_default">Nicht gruppiert</string>
     <string name="quick_toggle">Umschalten</string>
     <string name="quick_enable">Aktivieren</string>
@@ -305,7 +304,6 @@
     <string name="donate_info">Ich liebe Geld</string>
     <string name="ignore_battery_optimizations">Batterieoptimierungen ignorieren</string>
     <string name="ignore_battery_optimizations_sum">Einige Einschränkungen entfernen</string>
-    <string name="battery_optimization_enabled">Akku-Optimierung: an</string>
     <string name="battery_optimization_disabled">Akku-Optimierung: aus</string>
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Konfigurieren…</string>

@@ -14,7 +14,6 @@
     <string name="theme">Tema</string>
     <string name="use_system_theme">Usar tema do sistema</string>
     <string name="use_system_theme_summary">Usar cores Monet do sistema (Android 12+)</string>
-    <string name="document">Documento</string>
     <string name="group_default">Não agrupado</string>
     <string name="quick_toggle">Alternar</string>
     <string name="quick_enable">Ativar</string>
@@ -749,7 +748,6 @@ Se você precisar usar isso, tente N=2 primeiro para ver se resolve seus problem
     <string name="balancer_use_front_proxy">Use group front proxy</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="battery_optimization_disabled">Desativado - toque para permitir atividade em segundo plano</string>
-    <string name="battery_optimization_enabled">Ativado - o aplicativo pode ser executado sem restrições em segundo plano</string>
     <string name="bottomsheet_drag_handle_clicked">Alça de arrasto tocada</string>
     <string name="concurrent_dial">Discagem Simultânea</string>
     <string name="concurrent_dial_summary">Ative conexões simultâneas para estabelecimento de rede mais rápido; pode aumentar o uso da bateria</string>

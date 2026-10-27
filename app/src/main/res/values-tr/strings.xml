@@ -20,7 +20,6 @@
     <string name="quick_enable">Etkinleştir</string>
     <string name="quick_disable">Devre Dışı Bırak</string>
     <string name="group_default">Gruplandırılmamış</string>
-    <string name="document">Döküman</string>
     <string name="theme">Tema</string>
     <string name="menu_about">Hakkında</string>
     <string name="menu_group">Grup</string>
@@ -277,7 +276,6 @@
     <string name="donate_info">Parayı seviyorum</string>
     <string name="ignore_battery_optimizations">Pil optimizasyonlarını yoksay</string>
     <string name="ignore_battery_optimizations_sum">Bazı kısıtlamaları kaldır</string>
-    <string name="battery_optimization_enabled">Pil Optimizasyonu: açık</string>
     <string name="battery_optimization_disabled">Pil Optimizasyonu: kapalı</string>
     <string name="plugin">Eklenti</string>
     <string name="plugin_configure">Yapılandır…</string>

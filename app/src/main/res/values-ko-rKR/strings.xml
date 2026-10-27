@@ -14,7 +14,6 @@
     <string name="theme">테마</string>
     <string name="use_system_theme">시스템 테마 사용</string>
     <string name="use_system_theme_summary">시스템 Monet 색상 사용 (Android 12+)</string>
-    <string name="document">문서</string>
     <string name="group_default">미분류</string>
     <string name="quick_toggle">전환</string>
     <string name="quick_enable">활성화</string>
@@ -645,7 +644,6 @@
     <string name="balancer_use_front_proxy">사용 앞 프록시</string>
     <string name="balancer_use_landing_proxy">사용 종단 프록시</string>
     <string name="battery_optimization_disabled">배터리 최적화 비활성화됨</string>
-    <string name="battery_optimization_enabled">배터리 최적화 활성화됨</string>
     <string name="bottomsheet_drag_handle_clicked">bottomsheet drag handle clicked</string>
     <string name="concurrent_dial">동시 다이얼</string>
     <string name="concurrent_dial_summary">더 빠른 네트워크 연결을 위해 동시 연결을 활성화합니다. 배터리 사용량이 증가할 수 있습니다</string>

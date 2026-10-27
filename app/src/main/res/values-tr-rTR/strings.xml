@@ -14,7 +14,6 @@
     <string name="theme">Tema</string>
     <string name="use_system_theme">Sistem temasını kullan</string>
     <string name="use_system_theme_summary">Sistem Monet renklerini kullan (Android 12+)</string>
-    <string name="document">Belge</string>
     <string name="group_default">Gruplanmamış</string>
     <string name="quick_toggle">Aç/Kapat</string>
     <string name="quick_enable">Etkinleştir</string>
@@ -642,7 +641,6 @@
     <string name="balancer_use_front_proxy">Use group front proxy</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="battery_optimization_disabled">Pil Optimizasyonu: kapalı</string>
-    <string name="battery_optimization_enabled">Pil Optimizasyonu: açık</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="concurrent_dial">Eşzamanlı Bağlantı</string>
     <string name="concurrent_dial_summary">Daha hızlı ağ kurulumu için eşzamanlı bağlantıları etkinleştir, pil kullanımını artırabilir</string>

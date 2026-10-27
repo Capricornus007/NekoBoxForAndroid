@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">كاتبوتشين</string>
     <string name="theme_classic_colors">ألوان قديمة…</string>
     <string name="theme_classic_color_swatch">نظام ألوان %1$d</string>
-    <string name="document">المستند</string>
     <string name="group_default">غير مجمعة</string>
     <string name="quick_toggle">تبديل</string>
     <string name="quick_enable">تمكين</string>
@@ -265,7 +264,6 @@
     <string name="no_amnezia_awg_profiles">لم يتم العثور على ملفات AmneziaWG في التكوين</string>
     <string name="donate">تبرع</string>
     <string name="donate_info">أنا أحب المال</string>
-    <string name="battery_optimization_enabled">تحسين البطارية: مفعل</string>
     <string name="battery_optimization_disabled">تحسين البطارية: معطل</string>
     <string name="plugin_signer_unreadable">غير قابل للقراءة</string>
     <string name="plugin_signer_rejected">تم حظر حزمة الملحق %1$s بتوقيع %2$s. اتصل مجددًا لمراجعته.</string>

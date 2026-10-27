@@ -14,7 +14,6 @@
     <string name="theme">Тема</string>
     <string name="use_system_theme">Использовать системную тему</string>
     <string name="use_system_theme_summary">Использовать цвета Monet системы (Android 12+)</string>
-    <string name="document">Документ</string>
     <string name="group_default">Без группы</string>
     <string name="quick_toggle">Переключить</string>
     <string name="quick_enable">Включить</string>
@@ -662,7 +661,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="balancer_use_front_proxy">Использовать начальный прокси группы</string>
     <string name="balancer_use_landing_proxy">Использовать конечный прокси группы</string>
     <string name="battery_optimization_disabled">Батарея оптимизация отключена</string>
-    <string name="battery_optimization_enabled">Батарея оптимизация включена</string>
     <string name="bottomsheet_drag_handle_clicked">Двойное нажатие на маркер перемещения</string>
     <string name="concurrent_dial">Параллельное подключение</string>
     <string name="concurrent_dial_summary">Включить параллельные соединения для более быстрого установления сети; может увеличить расход батареи</string>

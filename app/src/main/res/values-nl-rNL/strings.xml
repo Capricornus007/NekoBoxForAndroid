@@ -14,7 +14,6 @@
     <string name="theme">Thema</string>
     <string name="use_system_theme">Gebruik systeemthema</string>
     <string name="use_system_theme_summary">Gebruik systeem Monet-kleuren (Android 12+)</string>
-    <string name="document">Document</string>
     <string name="group_default">Niet-gegroepeerd</string>
     <string name="quick_toggle">Schakelen</string>
     <string name="quick_enable">Inschakelen</string>
@@ -660,7 +659,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="balancer_use_front_proxy">Use group front proxy</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="battery_optimization_disabled">Uitgeschakeld - tik om achtergrondactiviteit toe te staan</string>
-    <string name="battery_optimization_enabled">Ingeschakeld - de app kan onbeperkt op de achtergrond draaien</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="concurrent_dial">Concurrent Dial</string>
     <string name="concurrent_dial_summary">Schakel gelijktijdige verbindingen in voor snellere netwerkopbouw, kan batterijverbruik verhogen</string>

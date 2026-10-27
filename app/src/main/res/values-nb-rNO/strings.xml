@@ -12,7 +12,6 @@
     <string name="theme">Tema</string>
     <string name="use_system_theme">Bruk systemtema</string>
     <string name="use_system_theme_summary">Bruk systemets Monet-farger (Android 12+)</string>
-    <string name="document">Dokument</string>
     <string name="group_default">Ugruppert</string>
     <string name="action_copy">Kopier</string>
     <string name="action_open">Åpne</string>
@@ -750,7 +749,6 @@ Hvis du må bruke dette, prøv N=2 først for å se om det løser problemene din
     <string name="balancer_use_front_proxy">Use group front proxy</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="battery_optimization_disabled">Deaktivert – trykk for å tillate bakgrunnsaktivitet</string>
-    <string name="battery_optimization_enabled">Aktivert – appen kan kjøre ubegrenset i bakgrunnen</string>
     <string name="concurrent_dial">Samtidig oppkobling</string>
     <string name="concurrent_dial_summary">Aktiver samtidige tilkoblinger for raskere nettverksoppretting, kan øke batteribruken</string>
     <string name="connection_status_connected">Tilkoblet</string>

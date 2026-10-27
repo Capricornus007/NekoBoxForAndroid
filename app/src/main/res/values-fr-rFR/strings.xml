@@ -14,7 +14,6 @@
     <string name="theme">Thème</string>
     <string name="use_system_theme">Utiliser le thème système</string>
     <string name="use_system_theme_summary">Utiliser les couleurs Monet du système (Android 12+)</string>
-    <string name="document">Document</string>
     <string name="group_default">Non groupé</string>
     <string name="quick_toggle">Basculer</string>
     <string name="quick_enable">Activer</string>
@@ -667,7 +666,6 @@
     <string name="balancer_use_front_proxy">Use group front proxy</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="battery_optimization_disabled">Batterie optimisée: non</string>
-    <string name="battery_optimization_enabled">Batterie optimisée: oui</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="concurrent_dial">Dial concurrent</string>
     <string name="concurrent_dial_summary">Activer les connexions concurrentes pour un établissement réseau plus rapide, peut augmenter la consommation de la batterie</string>

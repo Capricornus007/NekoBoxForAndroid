@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Cores legadas…</string>
     <string name="theme_classic_color_swatch">Tema de cores %1$d</string>
-    <string name="document">Documento</string>
     <string name="group_default">Não agrupado</string>
     <string name="quick_toggle">Alternar</string>
     <string name="quick_enable">Ativar</string>
@@ -293,7 +292,6 @@
     <string name="donate_info">Eu amo dinheiro</string>
     <string name="ignore_battery_optimizations">Ignorar otimizações de bateria</string>
     <string name="ignore_battery_optimizations_sum">Remover algumas restrições</string>
-    <string name="battery_optimization_enabled">Ativado - o aplicativo pode ser executado sem restrições em segundo plano</string>
     <string name="battery_optimization_disabled">Desativado - toque para permitir atividade em segundo plano</string>
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Configurar…</string>

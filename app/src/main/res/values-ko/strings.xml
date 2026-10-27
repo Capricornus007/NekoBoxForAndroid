@@ -12,7 +12,6 @@
     <string name="quick_enable">활성화</string>
     <string name="quick_disable">비활성화</string>
     <string name="group_default">그룹 해제</string>
-    <string name="document">문서</string>
     <string name="theme">테마</string>
     <string name="menu_about">대하여</string>
     <string name="menu_group">그룹</string>
@@ -965,7 +964,6 @@
     <string name="balancer_use_front_proxy">프런트 프록시 사용</string>
     <string name="balancer_use_landing_proxy">랜딩 프록시 사용</string>
     <string name="battery_optimization_disabled">배터리 최적화 비활성화</string>
-    <string name="battery_optimization_enabled">배터리 최적화 활성화</string>
     <string name="bottomsheet_drag_handle_clicked">드래그 핸들 탭됨</string>
     <string name="close">닫기</string>
     <string name="connection_status_connected">연결됨</string>

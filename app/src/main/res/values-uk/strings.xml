@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Застарілі кольори…</string>
     <string name="theme_classic_color_swatch">Колірна тема %1$d</string>
-    <string name="document">Документ</string>
     <string name="group_default">Без групи</string>
     <string name="quick_toggle">Переключити</string>
     <string name="quick_enable">Увімкнути</string>
@@ -301,7 +300,6 @@
     <string name="donate_info">Я люблю гроші</string>
     <string name="ignore_battery_optimizations">Ігнорувати оптимізацію батареї</string>
     <string name="ignore_battery_optimizations_sum">Зняти деякі обмеження</string>
-    <string name="battery_optimization_enabled">Увімкнено - додаток може працювати без обмежень у фоновому режимі</string>
     <string name="battery_optimization_disabled">Вимкнено - торкніться, щоб дозволити фонову активність</string>
     <string name="plugin">Плагін</string>
     <string name="plugin_configure">Налаштувати…</string>

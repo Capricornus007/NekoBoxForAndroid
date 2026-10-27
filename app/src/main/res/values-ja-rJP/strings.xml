@@ -34,7 +34,6 @@
     <string name="subscription_custom_hwid_params">カスタム HWID パラメータ</string>
     <string name="subscription_custom_hwid_params_summary">形式: hwid=値,os=値,osVersion=値,model=値。空のままにするとこの端末の値を使用します。</string>
     <string name="use_system_theme_summary">システムMonetカラーを使用（Android 12以上）</string>
-    <string name="document">ドキュメント</string>
     <string name="group_default">未グループ化</string>
     <string name="quick_toggle">トグル</string>
     <string name="quick_enable">有効</string>
@@ -672,7 +671,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="balancer_use_front_proxy">フロントプロキシを使用</string>
     <string name="balancer_use_landing_proxy">ランディングプロキシを使用</string>
     <string name="battery_optimization_disabled">バッテリー最適化を無効化</string>
-    <string name="battery_optimization_enabled">バッテリー最適化を有効化</string>
     <string name="bottomsheet_drag_handle_clicked">ドラッグハンドルがクリックされました</string>
     <string name="concurrent_dial">同時ダイアル</string>
     <string name="concurrent_dial_summary">同時接続でネットワーク確立を高速化、バッテリー消費が増加する可能性があります</string>

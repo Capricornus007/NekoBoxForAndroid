@@ -144,7 +144,6 @@
     <string name="dns_hosts">Перезапись домена</string>
     <string name="dns_hosts_dialog_message">По одному в строке. Строки, начинающиеся с #, считаются комментариями. Пример:\nexample.com 1.1.1.1\nwww.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dns_routing_message">Разрешить домены в обходных маршрутах с помощью Direct DNS. Помните о потенциальных утечках DNS</string>
-    <string name="document">Документы</string>
     <string name="domain_strategy">Правило разрешения доменов</string>
     <string name="domain_strategy_for_direct">Правило домена для Прямого</string>
     <string name="domain_strategy_for_remote">Правило домена для Удаленного</string>
@@ -778,7 +777,6 @@
     <string name="balancer_use_front_proxy">Использовать входной прокси</string>
     <string name="balancer_use_landing_proxy">Использовать выходной прокси</string>
     <string name="battery_optimization_disabled">Оптимизация батареи отключена</string>
-    <string name="battery_optimization_enabled">Оптимизация батареи включена</string>
     <string name="concurrent_dial">Параллельное соединение</string>
     <string name="concurrent_dial_summary">Включить параллельные подключения</string>
     <string name="connection_status_connected">Подключено</string>

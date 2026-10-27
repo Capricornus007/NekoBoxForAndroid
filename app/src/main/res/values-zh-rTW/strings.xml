@@ -13,7 +13,6 @@
     <string name="theme">主題</string>
     <string name="use_system_theme">使用系統主題</string>
     <string name="use_system_theme_summary">使用系統動態色彩（Android 12+）</string>
-    <string name="document">文件</string>
     <string name="quick_toggle">切換</string>
     <string name="quick_enable">啟用</string>
     <string name="quick_disable">停用</string>
@@ -708,7 +707,6 @@
     <string name="balancer_use_front_proxy">使用前端代理</string>
     <string name="balancer_use_landing_proxy">使用落地代理</string>
     <string name="battery_optimization_disabled">電池最佳化已停用</string>
-    <string name="battery_optimization_enabled">電池最佳化已啟用</string>
     <string name="concurrent_dial">同時撥號</string>
     <string name="concurrent_dial_summary">同時開多條連線</string>
     <string name="connection_status_connected">已連線</string>

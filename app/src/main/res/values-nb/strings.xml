@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Eldre farger…</string>
     <string name="theme_classic_color_swatch">Fargetema %1$d</string>
-    <string name="document">Dokument</string>
     <string name="group_default">Ugruppert</string>
     <string name="quick_toggle">Veksle</string>
     <string name="quick_enable">Aktiver</string>
@@ -294,7 +293,6 @@
     <string name="donate_info">Jeg elsker penger</string>
     <string name="ignore_battery_optimizations">Ignorer batterioptimaliseringer</string>
     <string name="ignore_battery_optimizations_sum">Fjern noen begrensninger</string>
-    <string name="battery_optimization_enabled">Aktivert – appen kan kjøre ubegrenset i bakgrunnen</string>
     <string name="battery_optimization_disabled">Deaktivert – trykk for å tillate bakgrunnsaktivitet</string>
     <string name="plugin">Plugg inn</string>
     <string name="plugin_configure">Konfigurer…</string>

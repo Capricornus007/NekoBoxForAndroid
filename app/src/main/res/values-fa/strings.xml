@@ -12,7 +12,6 @@
     <string name="menu_group">گروه‌ها</string>
     <string name="menu_about">درباره برنامه</string>
     <string name="theme">ظاهر</string>
-    <string name="document">مستندات</string>
     <string name="group_default">گروه پیش‌فرض</string>
     <string name="quick_toggle">تغییر وضعیت</string>
     <string name="quick_enable">فعال‌سازی</string>
@@ -729,7 +728,6 @@
     <string name="balancer_use_front_proxy">استفاده از پروکسی جلویی</string>
     <string name="balancer_use_landing_proxy">استفاده از پروکسی فرودی</string>
     <string name="battery_optimization_disabled">بهینه‌سازی باتری غیرفعال است</string>
-    <string name="battery_optimization_enabled">بهینه‌سازی باتری فعال است</string>
     <string name="concurrent_dial">اتصال هم‌زمان</string>
     <string name="concurrent_dial_summary">فعال‌سازی اتصالات هم‌زمان</string>
     <string name="connection_status_connected">متصل است</string>

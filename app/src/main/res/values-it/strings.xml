@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Colori classici…</string>
     <string name="theme_classic_color_swatch">Tema colore %1$d</string>
-    <string name="document">Documento</string>
     <string name="group_default">Non raggruppato</string>
     <string name="quick_toggle">Attiva/Disattiva</string>
     <string name="quick_enable">Abilita</string>
@@ -295,7 +294,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="donate_info">Amo i soldi</string>
     <string name="ignore_battery_optimizations">Ignora ottimizzazioni batteria</string>
     <string name="ignore_battery_optimizations_sum">Rimuovi alcune restrizioni</string>
-    <string name="battery_optimization_enabled">Abilitata - l\'app può essere eseguita senza restrizioni in background</string>
     <string name="battery_optimization_disabled">Disabilitata - tocca per consentire l\'attività in background</string>
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Configura…</string>

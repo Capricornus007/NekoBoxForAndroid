@@ -277,7 +277,6 @@
     <string name="certificates">证书 (链)</string>
     <string name="ignore_battery_optimizations">忽略电池优化</string>
     <string name="ignore_battery_optimizations_sum">移除一些限制</string>
-    <string name="document">文档</string>
     <string name="early_data_header_name">前置数据标头</string>
     <string name="config_settings">配置设置</string>
     <string name="custom_config">自定义配置</string>
@@ -722,7 +721,6 @@
     <string name="balancer_use_front_proxy">使用前端代理</string>
     <string name="balancer_use_landing_proxy">使用落地代理</string>
     <string name="battery_optimization_disabled">电池最佳化已停用</string>
-    <string name="battery_optimization_enabled">电池最佳化已启用</string>
     <string name="concurrent_dial">并发拨号</string>
     <string name="concurrent_dial_summary">启用并发连线</string>
     <string name="connection_status_connected">已连线</string>

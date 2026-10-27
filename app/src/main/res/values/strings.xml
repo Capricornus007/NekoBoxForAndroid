@@ -16,7 +16,6 @@
     <string name="theme">Theme</string>
     <string name="use_system_theme">Use system theme</string>
     <string name="use_system_theme_summary">Use system Monet colors (Android 12+)</string>
-    <string name="document">Document</string>
     <string name="group_default">Ungrouped</string>
     <string name="quick_toggle">Toggle</string>
     <string name="quick_enable">Enable</string>
@@ -897,7 +896,6 @@
     <string name="balancer_use_front_proxy">Use Front Proxy</string>
     <string name="balancer_use_landing_proxy">Use Landing Proxy</string>
     <string name="battery_optimization_disabled">Battery optimization disabled</string>
-    <string name="battery_optimization_enabled">Battery optimization enabled</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="concurrent_dial">Concurrent Dial</string>
     <string name="concurrent_dial_summary">Enable concurrent connections</string>

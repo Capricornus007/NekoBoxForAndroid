@@ -14,7 +14,6 @@
     <string name="theme">Tema</string>
     <string name="use_system_theme">Usa tema di sistema</string>
     <string name="use_system_theme_summary">Usa colori Monet di sistema (Android 12+)</string>
-    <string name="document">Documento</string>
     <string name="group_default">Non raggruppato</string>
     <string name="quick_toggle">Attiva/Disattiva</string>
     <string name="quick_enable">Abilita</string>
@@ -659,7 +658,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="balancer_use_front_proxy">Use group front proxy</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="battery_optimization_disabled">Disabilitata - tocca per consentire l\'attività in background</string>
-    <string name="battery_optimization_enabled">Abilitata - l\'app può essere eseguita senza restrizioni in background</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="concurrent_dial">Dial concorrente</string>
     <string name="concurrent_dial_summary">Abilita connessioni simultanee per una creazione più rapida della rete, potrebbe aumentare il consumo della batteria</string>
