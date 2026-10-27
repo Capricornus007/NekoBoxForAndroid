@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wireguard_imported_options">تنظیمات شبکه وارد شده</string>
+    <string name="wireguard_use_config_routes">استفاده از مسیرها و DNS وارد شده</string>
+    <string name="wireguard_use_config_routes_summary">برای یک پروفایل مستقل انتخاب‌شده، AllowedIPs از تونل استفاده می‌کند و سایر آی‌پی‌ها مستقیم می‌روند. گروه‌ها سیاست DNS خود را حفظ می‌کنند. به‌طور پیش‌فرض غیرفعال است.</string>
+    <string name="subscription_server_dns">DNS برای سرورهای اشتراک</string>
+    <string name="subscription_headers">سرآیندهای HTTP</string>
+    <string name="subscription_headers_summary">یک نام: مقدار در هر خط. مقادیر پنهان می‌شوند و به مبدأ دیگری ارسال نمی‌شوند.</string>
+    <string name="subscription_remove_referenced">به‌روزرسانی پروفایل‌های استفاده‌شده در مسیرها یا گروه‌ها را حذف می‌کند:\n%1$s\n\nحذف شوند؟ ارجاع‌های موجود دیگر کار نخواهند کرد.</string>
+    <string name="subscription_requires_manual_update">این به‌روزرسانی پروفایل‌های ارجاع‌شده را حذف می‌کند. برای بررسی تغییرات، اشتراک را به‌صورت دستی به‌روزرسانی کنید.</string>
+    <string name="subscription_changed_during_update">پروفایل‌ها هنگام بررسی به‌روزرسانی تغییر کردند. دوباره تلاش کنید.</string>
+</resources>

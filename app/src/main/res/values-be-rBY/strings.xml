@@ -14,7 +14,6 @@
     <string name="theme">Тэма</string>
     <string name="use_system_theme">Выкарыстоўваць сістэмную тэму</string>
     <string name="use_system_theme_summary">Выкарыстоўваць сістэмныя колеры Monet (Android 12+)</string>
-    <string name="document">Дакумент</string>
     <string name="group_default">Без групы</string>
     <string name="quick_toggle">Пераключыць</string>
     <string name="quick_enable">Уключыць</string>
@@ -649,7 +648,6 @@
     <string name="balancer_use_front_proxy">Use group front proxy</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="battery_optimization_disabled">Выключана - націсніце, каб дазволіць фонавую актыўнасць</string>
-    <string name="battery_optimization_enabled">Уключана - праграма можа працаваць без абмежаванняў у фоне</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="concurrent_dial">Адначасовы Dial</string>
     <string name="concurrent_dial_summary">Уключыце адначасовыя злучэнні для больш хуткага ўсталявання сеткі, можа павялічыць спажыванне батарэі</string>
@@ -893,7 +891,7 @@
     <string name="speed_test_stage_cancelled">Скасавана</string>
     <string name="speed_test_stage_error">Памылка</string>
     <string name="speed_test_url_invalid">Увядзіце карэктны HTTP- ці HTTPS-URL</string>
-    <string name="profile_requiring_plugin">Профіль %s патрабуе ўсталёўкі плагіна %s, але ён не знойдзен.</string>
+    <string name="profile_requiring_plugin" formatted="false">Профіль %s патрабуе ўсталёўкі плагіна %s, але ён не знойдзен.</string>
     <string name="mixed_auth_username_hint">Імя карыстальніка (пакіньце абодва поля пустымі, каб без аўтэнтыфікацыі)</string>
     <string name="mixed_auth_no_auth">Не зададзена (без аўтэнтыфікацыі)</string>
     <string name="lan_sharing">Агульны доступ па LAN</string>
@@ -1025,6 +1023,7 @@
     <string name="proton_added">Дададзена: %s</string>
     <string name="proton_no_nodes">Няма прыдатных сервераў</string>
     <string name="proton_node_count">Сервераў: %1$d, прапушчана: %2$d</string>
+    <string name="proton_filtered_by_tier">Адфільтрана па ўзроўні ўліковага запісу %1$d</string>
     <string name="proton_sidecar_missing">Гэтая зборка не змяшчае дапаможны модуль Proton.</string>
     <string name="proton_2fa_required">Гэтаму акаўнту патрэбны код 2FA.</string>
     <string name="proton_auto_login">Аўтаўваход</string>
@@ -1123,4 +1122,42 @@
     <string name="openvpn_tls_version_min">Мінімальная версія TLS</string>
     <string name="openvpn_topology">Тапалогія</string>
     <string name="openvpn_transport">Пратакол</string>
+    <string name="close">Закрыць</string>
+    <string name="copy_current_link">Скапіраваць спасылку</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="qrcode_format_standard">Стандартны</string>
+    <string name="qrcode_format_sn">SN-спасылка</string>
+    <string name="qrcode_standard_hint">Стандартны фармат URI (сумяшчальны з агульнымі кліентамі)</string>
+    <string name="qrcode_sn_hint">Спецыяльная серыялізаваная спасылка Sing-box &amp; Neko (sn://)</string>
+    <string name="subscription_send_hwid">Адпраўляць HWID</string>
+    <string name="subscription_send_hwid_summary">Адпраўляць HWID, версію Android і мадэль прылады пры абнаўленні гэтай падпіскі</string>
+    <string name="subscription_direct_fallback">Пераход на прамое злучэнне для падпісак</string>
+    <string name="subscription_direct_fallback_summary">Паўтарыць падпіску напрамую, калі лакальны праксі не спрацаваў. Пазбягайце, калі URL утрымлівае токен.</string>
+    <string name="adaptive_traffic_polling">Адаптыўны апыт трафіку</string>
+    <string name="adaptive_traffic_polling_summary">Радзей апытваць лічыльнікі трафіку пры працы ў фонавым рэжыме або пры выключаным экране.</string>
+    <string name="local_proxy_settings">Налады лакальнага праксі</string>
+    <string name="port_out_of_range">Порт павінен быць у дыяпазоне 1–65535</string>
+    <string name="socks_port">Порт SOCKS5-проксі</string>
+    <string name="proxy_username">Імя карыстальніка праксі</string>
+    <string name="proxy_password">Пароль праксі</string>
+    <string name="proton_session_expired">Ваша сесія Proton была адхіленая. Калі ласка, увайдзіце зноў.</string>
+    <string name="amoled_theme">Цёмная тэма AMOLED</string>
+    <string name="amoled_theme_summary">Чысты чорны фон у цёмным рэжыме</string>
+    <string name="app_theme">Акцэнтны колер</string>
+    <string name="authenticated_http_proxy_unavailable">HTTP-проксі VPN Android не падтрымлівае патрабаваныя лагін і пароль.</string>
+    <string name="clash_api_token">Токен Clash API</string>
+    <string name="clash_api_token_summary">Паказаць або скапіраваць токен доступу да панэлі</string>
+    <string name="enable_clash_api">Уключыць Clash API</string>
+    <string name="enable_clash_api_summary">Забяспечыць clash api і панэль yacd на 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">Спыніць працу праксі?</string>
+    <string name="confirm_clear_cache">Спыніць праксі, ачысціць кэш ядра і перазапусціць дадатак?</string>
+    <string name="downloads_proxy_only">Абнаўленні толькі праз праксі</string>
+    <string name="downloads_proxy_only_summary">Абнаўленні падпісак і GeoIP/GeoSite патрабуюць працуючага лакальнага SOCKS-проксі. Прамое запасное злучэнне адключанае.</string>
+    <string name="backup_encryption_password">Пароль для рэзервовай копіі (неабавязкова)</string>
+    <string name="backup_encryption_summary">Прынамсі 8 знакаў абараняюць экспартаваныя, агульныя і WebDAV рэзервовыя копіі. Пакіньце пустым для неўшыфраванай рэзервовай копіі. Пароль не захоўваецца.</string>
+    <string name="backup_password_short">Выкарыстоўвайце прынамсі 8 знакаў для пароля рэзервовай копіі.</string>
+    <string name="backup_decrypt_failed">Няслушны пароль або пашкоджаная рэзервовая копія. Нічога не адноўлена.</string>
+    <string name="subscription_custom_hwid_params">Уласныя параметры HWID</string>
+    <string name="subscription_custom_hwid_params_summary">Фармат: hwid=значэнне,os=значэнне,osVersion=значэнне,model=значэнне. Пакіньце пустым, каб выкарыстоўваць значэнні гэтай прылады; калі запоўнена, адпраўляюцца толькі пералічаныя значэнні.</string>
 </resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">مقدار واحد یا بازه، برای نمونه 25 یا 25-30. برای استفاده از پیش‌فرض پروتکل خالی بگذارید. زمان‌ها به ثانیه است؛ MaxHandshakeAttempts یک تعداد است؛ ContentPaddingAddition به بایت است.</string>
+    <string name="amneziawg_header_key_hint">کلید ۳۲ بایتی از سرور (Base64 یا مبنای شانزده). محافظت از سرآیند نیاز دارد که S1 و S2 و S3 و S4 هر کدام حداقل ۱۲ بایت باشند.</string>
+    <string name="amneziawg_random_trailers_hint">تصادفی کردن تریلرهای بسته (AWG 3.1).</string>
+    <string name="amneziawg_disable_cookies_hint">غیرفعال کردن کوکی‌های پروتکل. فقط زمانی فعال کنید که پیکربندی سرورتان نیاز داشته باشد.</string>
+</resources>

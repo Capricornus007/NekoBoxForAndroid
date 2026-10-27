@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wireguard_imported_options">가져온 네트워크 설정</string>
+    <string name="wireguard_use_config_routes">가져온 경로 및 DNS 사용</string>
+    <string name="wireguard_use_config_routes_summary">선택한 독립 실행형 프로필의 경우 AllowedIPs가 터널을 사용하고 다른 IP는 직접 이동합니다. 그룹은 DNS 정책을 유지합니다. 기본적으로 비활성화됩니다.</string>
+    <string name="subscription_server_dns">구독 서버용 DNS</string>
+    <string name="subscription_headers">HTTP 헤더</string>
+    <string name="subscription_headers_summary">한 줄에 하나의 Name: value. 값은 숨겨지며 다른 출처로 전달되지 않습니다.</string>
+    <string name="subscription_remove_referenced">이 업데이트는 경로나 그룹에서 사용되는 프로필을 제거합니다:\n%1$s\n\n제거하시겠습니까? 기존 참조는 작동하지 않게 됩니다.</string>
+    <string name="subscription_requires_manual_update">이 업데이트는 참조된 프로필을 제거합니다. 변경 사항을 검토하려면 구독을 수동으로 업데이트하세요.</string>
+    <string name="subscription_changed_during_update">업데이트 검토 중에 프로필이 변경되었습니다. 다시 시도하세요.</string>
+</resources>

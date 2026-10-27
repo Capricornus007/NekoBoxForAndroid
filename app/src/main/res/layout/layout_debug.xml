@@ -9,14 +9,16 @@
         android:id="@+id/debug_crash"
         style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:text="@string/debug_button_crash_from_kt" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/reset_settings"
         style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:layout_marginTop="8dp"
         android:text="@string/debug_button_reset_settings" />
 

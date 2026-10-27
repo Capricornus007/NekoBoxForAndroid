@@ -41,7 +41,6 @@
     <string name="quick_enable">有効化</string>
     <string name="quick_disable">無効化</string>
     <string name="group_default">グループ化されていない</string>
-    <string name="document">ドキュメント（英語）</string>
     <string name="theme">テーマ</string>
     <string name="menu_about">このアプリについて</string>
     <string name="menu_group">グループ</string>
@@ -467,8 +466,6 @@
     <string name="tuic_disable_sni">SNI を無効化</string>
     <string name="tuic_reduce_rtt">0-RTT QUIC ハンドシェイクを有効化</string>
     <string name="pinned_certchain_sha256">固定証明書 SHA256</string>
-    <string name="please_update" formatted="false">お使いのアプリは古すぎます (%s)。%s に動作を停止します。更新してください！</string>
-    <string name="please_update_force" formatted="false">お使いのアプリは古すぎます (%s)。%s に動作を停止しました。更新してください！</string>
     <string name="connection_test_delete_unavailable">利用不可をクリア</string>
     <string name="move">移動</string>
     <string name="exe_prefer_provider">プラグインの優先プロバイダー</string>
@@ -846,6 +843,7 @@
     <string name="proton_added">%s を追加しました</string>
     <string name="proton_no_nodes">利用可能なサーバーがありません</string>
     <string name="proton_node_count">サーバー %1$d 件、スキップ %2$d 件</string>
+    <string name="proton_filtered_by_tier">アカウントのティア %1$d で絞り込み済み</string>
     <string name="proton_sidecar_missing">このビルドには Proton ヘルパーが含まれていません。</string>
     <string name="proton_2fa_required">このアカウントは 2FA コードが必要です。</string>
     <string name="proton_auto_login">自動サインイン</string>
@@ -971,7 +969,6 @@
     <string name="balancer_use_front_proxy">フロントプロキシを使用</string>
     <string name="balancer_use_landing_proxy">ランディングプロキシを使用</string>
     <string name="battery_optimization_disabled">バッテリー最適化：無効</string>
-    <string name="battery_optimization_enabled">バッテリー最適化：有効</string>
     <string name="bottomsheet_drag_handle_clicked">ドラッグハンドルをクリックしました</string>
     <string name="close">閉じる</string>
     <string name="connection_status_connected">接続済み</string>
@@ -1094,6 +1091,26 @@
     <string name="ui_style_expressive">エクスプレッシブ</string>
     <string name="update_existing_subscriptions_ua">既存のサブスクリプションの UA を更新</string>
     <string name="use_system_theme">システムテーマを使用</string>
+    <string name="amoled_theme">AMOLED ダークテーマ</string>
+    <string name="amoled_theme_summary">ダークモードで純黒の背景を使用する</string>
+    <string name="app_theme">アクセントカラー</string>
+    <string name="authenticated_http_proxy_unavailable">Android VPN の HTTP プロキシはユーザー名とパスワードに対応していません。</string>
+    <string name="clash_api_token">Clash API トークン</string>
+    <string name="clash_api_token_summary">ダッシュボードのアクセストークンを表示またはコピーします</string>
+    <string name="enable_clash_api">Clash API を有効化</string>
+    <string name="enable_clash_api_summary">127.0.0.1:9090 で clash api と yacd ダッシュボードを提供します</string>
+    <string name="confirm_stop_service">実行中のプロキシを停止しますか？</string>
+    <string name="confirm_clear_cache">プロキシを停止し、コアのキャッシュをクリアしてアプリを再起動しますか？</string>
+    <string name="downloads_proxy_only">更新はプロキシ経由のみ</string>
+    <string name="downloads_proxy_only_summary">サブスクリプションと GeoIP/GeoSite の更新には、実行中のローカル SOCKS プロキシが必要です。直接フォールバックは無効です。</string>
+    <string name="backup_encryption_password">バックアップパスワード（任意）</string>
+    <string name="backup_encryption_summary">8文字以上にすると、エクスポート・共有・WebDAV バックアップを保護します。暗号化しないバックアップの場合は空のままにします。パスワードは保存されません。</string>
+    <string name="backup_password_short">バックアップパスワードは8文字以上にしてください。</string>
+    <string name="backup_decrypt_failed">パスワードが正しくないか、バックアップが破損しています。何も復元されませんでした。</string>
+    <string name="subscription_send_hwid">HWID を送信</string>
+    <string name="subscription_send_hwid_summary">このサブスクリプションを更新するとき、HWID、Android バージョン、端末モデルを送信します</string>
+    <string name="subscription_custom_hwid_params">カスタム HWID パラメータ</string>
+    <string name="subscription_custom_hwid_params_summary">形式: hwid=値,os=値,osVersion=値,model=値。空のままにするとこの端末の値を使用します。</string>
     <string name="use_system_theme_summary">システムの Monet カラーを使用（Android 12+）</string>
     <string name="waterfall_settings">ウォーターフォール設定</string>
     <string name="webdav_insecure_url">安全でない WebDAV URL</string>

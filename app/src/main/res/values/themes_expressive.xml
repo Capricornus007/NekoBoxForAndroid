@@ -20,6 +20,8 @@
         <item name="colorOnSurface">@color/ui_on_surface</item>
         <item name="colorSurfaceVariant">@color/ui_surface_variant</item>
         <item name="colorOnSurfaceVariant">@color/ui_on_surface_variant</item>
+        <item name="colorSurfaceContainerLowest">@color/ui_surface_container_lowest</item>
+        <item name="colorSurfaceContainerHighest">@color/ui_surface_container_highest</item>
         <item name="colorSurfaceContainerLow">@color/ui_surface_container_low</item>
         <item name="colorSurfaceContainer">@color/ui_surface_container</item>
         <item name="colorSurfaceContainerHigh">@color/ui_surface_container_high</item>

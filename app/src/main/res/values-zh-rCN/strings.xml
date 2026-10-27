@@ -277,7 +277,6 @@
     <string name="certificates">证书 (链)</string>
     <string name="ignore_battery_optimizations">忽略电池优化</string>
     <string name="ignore_battery_optimizations_sum">移除一些限制</string>
-    <string name="document">文档</string>
     <string name="early_data_header_name">前置数据标头</string>
     <string name="config_settings">配置设置</string>
     <string name="custom_config">自定义配置</string>
@@ -479,8 +478,6 @@
     <string name="tuic_disable_sni">禁用 SNI</string>
     <string name="tuic_reduce_rtt">启用 0-RTT QUIC 握手</string>
     <string name="pinned_certchain_sha256">固定证书 SHA256</string>
-    <string name="please_update" formatted="false">您的 APP (%s) 太旧了喵，%s 再不更新就没的用了喵～</string>
-    <string name="please_update_force" formatted="false">您的 APP (%s) 版本过旧，已于 %s 停止工作，请立即升级。</string>
     <string name="connection_test_delete_unavailable">清除不可用</string>
     <string name="move">移动</string>
     <string name="exe_prefer_provider">插件首选提供程序</string>
@@ -724,7 +721,6 @@
     <string name="balancer_use_front_proxy">使用前端代理</string>
     <string name="balancer_use_landing_proxy">使用落地代理</string>
     <string name="battery_optimization_disabled">电池最佳化已停用</string>
-    <string name="battery_optimization_enabled">电池最佳化已启用</string>
     <string name="concurrent_dial">并发拨号</string>
     <string name="concurrent_dial_summary">启用并发连线</string>
     <string name="connection_status_connected">已连线</string>
@@ -1012,6 +1008,7 @@
     <string name="proton_added">已添加 %s</string>
     <string name="proton_no_nodes">没有可用的服务器</string>
     <string name="proton_node_count">%1$d 个服务器，跳过 %2$d 个</string>
+    <string name="proton_filtered_by_tier">已按账号层级（第 %1$d 级）过滤</string>
     <string name="proton_sidecar_missing">此版本未包含 Proton 辅助组件。</string>
     <string name="proton_2fa_required">此账户需要 2FA 验证码。</string>
     <string name="proton_auto_login">自动登录</string>
@@ -1109,4 +1106,68 @@
     <string name="openvpn_tls_version_min">最小 TLS 版本</string>
     <string name="openvpn_topology">拓扑</string>
     <string name="openvpn_transport">协议</string>
+
+    <!-- isai 合併新增字串（2026-10-25 補齊） -->
+    <string name="app_name">NekoBox</string>
+    <string name="app_name_long">NekoBox for Android</string>
+    <string name="service_mode_vpn">VPN</string>
+    <string name="action_socks">SOCKS</string>
+    <string name="action_http">HTTP</string>
+    <string name="action_shadowsocks">Shadowsocks</string>
+    <string name="action_shadowsocksr">ShadowsocksR</string>
+    <string name="action_vmess">VMess</string>
+    <string name="action_trojan">Trojan</string>
+    <string name="action_trojan_go">Trojan Go</string>
+    <string name="action_mieru">Mieru</string>
+    <string name="action_naive">Naïve</string>
+    <string name="action_anytls">AnyTLS</string>
+    <string name="action_hysteria">Hysteria</string>
+    <string name="action_ssh">SSH</string>
+    <string name="action_wireguard">WireGuard</string>
+    <string name="action_tailscale">Tailscale</string>
+    <string name="action_tuic">TUIC</string>
+    <string name="action_juicity">Juicity</string>
+    <string name="action_shadowquic">ShadowQUIC</string>
+    <string name="action_trusttunnel">TrustTunnel</string>
+    <string name="action_masque">MASQUE</string>
+    <string name="action_shadowtls">ShadowTLS</string>
+    <string name="action_byedpi">byeDPI</string>
+    <string name="action_openvpn">OpenVPN</string>
+    <string name="leastPing">Ping</string>
+    <string name="v2rayn">V2RayN</string>
+    <string name="available">%dms</string>
+    <string name="tailscale">Tailscale</string>
+    <string name="cloudflare_wrap">Cloudflare Warp</string>
+    <string name="pcap">Pcap</string>
+    <string name="mtu">MTU</string>
+    <string name="proton_secure_core">Secure Core</string>
+    <string name="connection_test_icmp_ping">ICMPing</string>
+    <string name="openvpn_ns_certificate_type">ns-cert-type</string>
+    <string name="ooc_subscription_token">OOCv1 API Token</string>
+    <string name="traffic_uplink" formatted="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" formatted="false">%s | %s/s ↓</string>
+    <string name="traffic_uplink_total">%s ↑</string>
+    <string name="traffic_downlink_total">%s ↓</string>
+    <string name="masque_kernel_tx">核心 TX</string>
+    <string name="masque_kernel_rx">核心 RX</string>
+    <string name="subscription_send_hwid">发送 HWID</string>
+    <string name="subscription_send_hwid_summary">更新此订阅时发送 HWID、Android 版本与设备型号</string>
+    <string name="amoled_theme">AMOLED 深色主題</string>
+    <string name="amoled_theme_summary">深色模式使用純黑背景</string>
+    <string name="app_theme">强调色</string>
+    <string name="authenticated_http_proxy_unavailable">Android 的 VPN HTTP 代理不支援所需的帳號与密码。</string>
+    <string name="clash_api_token">Clash API 令牌</string>
+    <string name="clash_api_token_summary">显示或复制面板访问令牌</string>
+    <string name="enable_clash_api">启用 Clash API</string>
+    <string name="enable_clash_api_summary">在 127.0.0.1:9090 提供 Clash API 与 yacd 面板</string>
+    <string name="confirm_stop_service">要停止正在執行的代理嗎？</string>
+    <string name="confirm_clear_cache">要停止代理、清除核心缓存并重新启动 App 吗？</string>
+    <string name="downloads_proxy_only">仅通过代理更新</string>
+    <string name="downloads_proxy_only_summary">订阅与 GeoIP/GeoSite 更新需要运行中的本机 SOCKS 代理；已禁用直连后备。</string>
+    <string name="backup_encryption_password">备份密码（可选）</string>
+    <string name="backup_encryption_summary">至少 8 个字符可保护导出、分享与 WebDAV 备份。留空则不加密，密码不会被保存。</string>
+    <string name="backup_password_short">备份密码至少要 8 个字符。</string>
+    <string name="backup_decrypt_failed">密码错误或备份已损坏，未还原任何内容。</string>
+    <string name="subscription_custom_hwid_params">自定义 HWID 参数</string>
+    <string name="subscription_custom_hwid_params_summary">格式：hwid=值,os=值,osVersion=值,model=值。留空则使用本机值；填入时只会发送列出的值。</string>
 </resources>

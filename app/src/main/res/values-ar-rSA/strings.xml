@@ -14,7 +14,6 @@
     <string name="theme">السمة</string>
     <string name="use_system_theme">استخدام سمة النظام</string>
     <string name="use_system_theme_summary">استخدام ألوان Monet في النظام (Android 12+)</string>
-    <string name="document">المستند</string>
     <string name="group_default">غير مجمعة</string>
     <string name="quick_toggle">تبديل</string>
     <string name="quick_enable">تمكين</string>
@@ -660,7 +659,6 @@
     <string name="balancer_use_front_proxy">Use group front proxy</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="battery_optimization_disabled">تحسين البطارية: معطل</string>
-    <string name="battery_optimization_enabled">تحسين البطارية: مفعل</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="concurrent_dial">اتصال متزامن</string>
     <string name="concurrent_dial_summary">تمكين الاتصالات المتزامنة لإنشاء الشبكة بشكل أسرع، قد يزيد من استهلاك البطارية</string>
@@ -918,8 +916,8 @@
     <string name="speed_test_stage_cancelled">أُلغيت</string>
     <string name="speed_test_stage_error">خطأ</string>
     <string name="speed_test_url_invalid">أدخل رابط HTTP أو HTTPS صالحًا</string>
-    <string name="profile_requiring_plugin">الملف التعريفي %s يتطلب تثبيت الإضافة %s، ولكنها غير موجودة.</string>
-    <string name="plugin_exists_but_on_shit_system">يتطلب الملف التعریف %s المكوّن الإضافي %s، لكن بائع المعدات المملوكة لك (عادةً عمالقة المراقبة وصانع البرامج الضارة) تلاعب بجهاز أندرويد، مما يجعل المكون الإضافي غير قابل للاستخدام.</string>
+    <string name="profile_requiring_plugin" formatted="false">الملف التعريفي %s يتطلب تثبيت الإضافة %s، ولكنها غير موجودة.</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">يتطلب الملف التعریف %s المكوّن الإضافي %s، لكن بائع المعدات المملوكة لك (عادةً عمالقة المراقبة وصانع البرامج الضارة) تلاعب بجهاز أندرويد، مما يجعل المكون الإضافي غير قابل للاستخدام.</string>
     <string name="plugin_approval_conflict_message">توفر أكثر من حزمة غير موثوقة هذا الملحق: %1$s\n\nأزل التعارض قبل الموافقة على حزمة.</string>
     <string name="ws_max_early_data">الحد الأقصى للبيانات المبكرة</string>
     <string name="speed_test_finished_summary">انتهى: %1$d، فشل: %2$d، أُلغي: %3$d</string>
@@ -1035,6 +1033,7 @@
     <string name="proton_added">تمت إضافة %s</string>
     <string name="proton_no_nodes">لا توجد خوادم قابلة للاستخدام</string>
     <string name="proton_node_count">%1$d خوادم، تم تخطي %2$d</string>
+    <string name="proton_filtered_by_tier">تمت التصفية حسب مستوى الحساب %1$d</string>
     <string name="proton_sidecar_missing">لا يتضمن هذا الإصدار مساعد Proton.</string>
     <string name="proton_2fa_required">هذا الحساب يتطلب رمز 2FA.</string>
     <string name="proton_auto_login">تسجيل الدخول التلقائي</string>
@@ -1133,4 +1132,42 @@
     <string name="openvpn_tls_version_min">أدنى إصدار TLS</string>
     <string name="openvpn_topology">الطوبولوجيا</string>
     <string name="openvpn_transport">البروتوكول</string>
+    <string name="close">إغلاق</string>
+    <string name="copy_current_link">نسخ الرابط</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="qrcode_format_standard">قياسي</string>
+    <string name="qrcode_format_sn">رابط SN</string>
+    <string name="qrcode_standard_hint">تنسيق URI قياسي (متوافق مع العملاء العامين)</string>
+    <string name="qrcode_sn_hint">رابط متسلسل مخصص لـSing-box وNeko (sn://)</string>
+    <string name="subscription_send_hwid">إرسال HWID</string>
+    <string name="subscription_send_hwid_summary">إرسال HWID وإصدار Android وطراز الجهاز عند تحديث هذا الاشتراك</string>
+    <string name="subscription_direct_fallback">الرجوع إلى الاتصال المباشر للاشتراكات</string>
+    <string name="subscription_direct_fallback_summary">إعادة محاولة الاشتراك مباشرة إذا فشل الوكيل المحلي. تجنّب ذلك إذا كان الرابط يحمل رمزًا.</string>
+    <string name="adaptive_traffic_polling">استطلاع حركة مرور تكيفي</string>
+    <string name="adaptive_traffic_polling_summary">استطلاع عدّادات حركة المرور بشكل أقل عند الخلفية أو إيقاف الشاشة.</string>
+    <string name="local_proxy_settings">إعدادات الوكيل المحلي</string>
+    <string name="port_out_of_range">يجب أن يكون المنفذ في النطاق 1–65535</string>
+    <string name="socks_port">منفذ الوكيل SOCKS5</string>
+    <string name="proxy_username">اسم مستخدم الوكيل</string>
+    <string name="proxy_password">كلمة مرور الوكيل</string>
+    <string name="proton_session_expired">تم رفض جلستك في Proton. يرجى تسجيل الدخول مرة أخرى.</string>
+    <string name="amoled_theme">سمة داكنة AMOLED</string>
+    <string name="amoled_theme_summary">خلفية سوداء نقية في الوضع الداكن</string>
+    <string name="app_theme">لون التمييز</string>
+    <string name="authenticated_http_proxy_unavailable">لا يدعم وكيل HTTP الخاص بشبكة Android VPN اسم المستخدم وكلمة المرور المطلوبَين.</string>
+    <string name="clash_api_token">رمز Clash API</string>
+    <string name="clash_api_token_summary">إظهار أو نسخ رمز الوصول إلى لوحة التحكم</string>
+    <string name="enable_clash_api">تفعيل Clash API</string>
+    <string name="enable_clash_api_summary">توفير Clash API ولوحة yacd على 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">إيقاف الوكيل قيد التشغيل؟</string>
+    <string name="confirm_clear_cache">إيقاف الوكيل ومسح ذاكرة التخزين المؤقت وإعادة تشغيل التطبيق؟</string>
+    <string name="downloads_proxy_only">التحديثات عبر الوكيل فقط</string>
+    <string name="downloads_proxy_only_summary">تتطلب تحديثات الاشتراك وGeoIP/GeoSite تشغيل وكيل SOCKS المحلي. تم تعطيل الرجوع المباشر.</string>
+    <string name="backup_encryption_password">كلمة مرور النسخ الاحتياطي (اختياري)</string>
+    <string name="backup_encryption_summary">توفر 8 أحرف على الأقل حماية للنسخ الاحتياطية المُصدَّرة والمُشاركة ونسخ WebDAV. اتركها فارغة لنسخة غير مشفرة. لا تُحفَظ كلمة المرور.</string>
+    <string name="backup_password_short">استخدم 8 أحرف على الأقل لكلمة مرور النسخ الاحتياطي.</string>
+    <string name="backup_decrypt_failed">كلمة مرور غير صحيحة أو نسخة احتياطية تالفة. لم تتم استعادة أي شيء.</string>
+    <string name="subscription_custom_hwid_params">معلمات HWID مخصصة</string>
+    <string name="subscription_custom_hwid_params_summary">التنسيق: hwid=value,os=value,osVersion=value,model=value. اتركها فارغة لاستخدام قيم هذا الجهاز؛ وعند ملئها، تُرسَل القيم المذكورة فقط.</string>
 </resources>

@@ -17,28 +17,27 @@ import (
 	srp "github.com/ProtonMail/go-srp"
 )
 
-// 正式閘門有兩種合法寫法：「<平台>-<產品>@<版本>」與第三方的「other_<版本>」，2026-10-08
-// 用公開端點 /auth/v4/info 逐個字串量測得來（該端點在驗 token 之前就會先過版本閘門，所以
-// 不需要帳密）：
+// 正式閘門只認「<平台>-<產品>@<版本>」這種官方客戶端身分；第三方/通用身分
+// （other_<版本>、windows/linux/web-vpn 等）在 2026-10-26 實測已全部被拒。量測方法同前：
+// 公開端點 /auth/v4/info 在驗 token 之前就先過版本閘門，所以不需要帳密：
 //
 //	"NB4A_1.0.0"             -> 400/5002 Invalid app version
 //	"NB4A@1.0.0"             -> 400/2064 Application platform and product must be separated by a dash
 //	"android-nb4a@1.0.0"     -> 400/2064 Product `nb4a` is not valid
 //	"NB4A-android@1.0.0"     -> 400/2064 Application name must be in lowercase
 //	"Otherx_1.0.0"           -> 400/5002 Invalid app version
-//	"android-vpn@1.0.0"      -> 422/5003 This version of the app is no longer supported
-//	"android-vpn@5.20.57.0"  -> 401 Invalid access token
-//	"windows-vpn@5.20.57.0"  -> 200
-//	"Other_1.0.0"            -> 200
+//	"Other_1.0.0"            -> 400/2001 Invalid input（other 這條已被閘門殺掉）
+//	"windows-vpn@5.20.74.0"  -> 400/2001 Invalid input
+//	"linux-vpn@5.20.74.0"    -> 400/2001 Invalid input
+//	"web-vpn@5.20.74.0"      -> 400/5002 Invalid app version
+//	"android-vpn@4.0.0.0"    -> 422/5003 This version of the app is no longer supported
+//	"android-vpn@5.9.0.0"    -> 401 Invalid access token（閘門放行，只差登入令牌）
+//	"android-vpn@5.20.98.0"  -> 401 Invalid access token（本倉庫寫死值，見 login.go）
 //
 // 這裡刻意不沿用 go-proton-api 那套 mock 的 strings.Split(v,"_") 判式：它放過任意底線寫法、
-// 正式閘門只認 other，照它寫測試就會一路綠而真機永遠登入不進去（我們已經踩過兩次）。
+// 正式閘門只認 other 且已在 2026-10-26 把 other 整條殺掉，照它寫測試就會一路綠而真機永遠
+// 登入不進去（我們已經踩過兩次）。
 var appVersionRE = regexp.MustCompile(`^([^@]+)@([0-9][0-9.]*)$`)
-
-// otherRE 是 Proton 留給第三方客戶端的另一條格式。實測大小寫不敏感、且不比較版本號
-// （Other_0.1.0 也 200），但版本段數有要求：Other_1、Other_1.0、Other_ 都吃 400/5002，
-// Other_1.0.0 與 Other_1.0.0.0 才 200 —— 所以要至少三段數字。
-var otherRE = regexp.MustCompile(`(?i)^other_[0-9]+(\.[0-9]+){2,}$`)
 
 var knownPlatforms = map[string]bool{
 	"android": true, "android_tv": true, "ios": true, "ios_tv": true,
@@ -49,22 +48,30 @@ var knownProducts = map[string]bool{
 	"vpn": true, "account": true, "mail": true, "calendar": true, "pass": true,
 }
 
-// routeBlocked 是「格式合法、版本也沒被淘汰，但 Proton 在路由層直接回 401 Invalid access
-// token」的身分——也就是這組客戶端不讓密碼 SRP 走。只填量過的：android-vpn 無論版本
-// （5.20.57.0 與 99.0.0 都 401）、web-account@5.5.5.5 也 401；同產品換 platform 的
-// windows-vpn／android_tv-vpn 與同 platform 換產品的 android-mail 實測都是 200，所以擋的
-// 是「那個 platform+product 組合」本身，不是 product=vpn 整個類別。官方 VPN 手機端已改走
-// 免密碼的 session 流程，這就是我們 401 的真因。
-var routeBlocked = map[string]bool{
-	"android-vpn": true,
-	"web-account": true,
+// routeBlocked 是「格式合法、版本也沒被淘汰，但 Proton 在路由層直接拒掉」的身分，
+// 值就是 Proton 實際會回的那句錯誤。2026-10-26 起：
+//   - android-vpn 已「解封」——它現在能過版本閘門（回 401 只差登入令牌），不再列這裡；
+//   - web-account 是 2026-10-08 量過的，未再驗證，且不是本倉庫身分，保留觀察；
+//   - windows/linux/web-vpn 在 2026-10-26 實測已被閘門整組殺掉（2001 / 5002），列進來
+//     讓 mock 跟真站一致地把它們擋下。
+//
+// 官方 VPN 手機端（android-vpn）改走免密碼 session 流程的舊說法已不適用：現在 android-vpn
+// 走密碼 SRP 反而能登。
+var routeBlocked = map[string]string{
+	"web-account": "Invalid access token", // 2026-10-08 量測；未再驗證，非本倉庫身分
+	"windows-vpn": "Invalid input",        // 2026-10-26：windows/linux 身分已死
+	"linux-vpn":   "Invalid input",
+	"web-vpn":     "Invalid app version", // 2026-10-26：web-vpn 吃 5002
+	// 2026-10-26 晚間實測反轉：android-vpn 的 /auth/v4/modulus 現在要求持 token
+	// （GET 匿名 → 401 Invalid access token），首次登錄（無 token）被鎖死。
+	"android-vpn": "Invalid access token",
 }
 
-// minSupported 是「版本被淘汰」的下界，只填**量測過**的那條：android-vpn 實測 5.10.0
-// 可過、1.0.0 吃 422/5003。其他身分沒有量過門檻，就不在這裡憑空發明數字，一律只驗格式。
-// 哪天我們改用別的身分，先去量再補。
+// minSupported 是「版本被淘汰」的下界，只填**量測過**的那條：android-vpn 實測 5.9.0.0 可過、
+// 4.0.0.0 吃 422/5003，所以下界取 5.9。其他身分沒有量過門檻，就不在這裡憑空發明數字，
+// 一律只驗格式。哪天我們改用別的身分，先去量再補。
 var minSupported = map[string][]int{
-	"android-vpn": {5, 10},
+	"android-vpn": {5, 9},
 }
 
 // appVersionGate 回空字串代表放行，否則回 Proton 實際會給的那句錯誤。
@@ -72,7 +79,9 @@ func appVersionGate(v string) string {
 	if v == "" {
 		return "Missing x-pm-appversion header"
 	}
-	if otherRE.MatchString(v) {
+	// other 身分走「Other_<版本>」底線格式（非 name@version）。2026-10-26 晚間沿 SRP
+	// 全鏈實測：Other_1.0.0 取 modulus 200、SRP POST 走到 422「用戶名不存在」= 登錄鏈通。
+	if ok, _ := regexp.MatchString(`^Other_[0-9]+\.[0-9]+\.[0-9]+$`, v); ok {
 		return ""
 	}
 	name, version, ok := strings.Cut(v, "@")
@@ -111,9 +120,9 @@ func appVersionGate(v string) string {
 			}
 		}
 	}
-	// 順序是實測出來的：android-vpn@1.0.0 先吃 422/5003（淘汰），过了門檻才吃 401（路由拒）。
-	if routeBlocked[name] {
-		return "Invalid access token"
+	// 通過格式與版本門檻後，若這組身分被 Proton 路由層拒掉，回它實際會給的那句錯誤。
+	if reason, ok := routeBlocked[name]; ok {
+		return reason
 	}
 	return ""
 }
@@ -137,8 +146,10 @@ func TestAppVersionHeaderMatchesProtonsFormatRule(t *testing.T) {
 		"android-nb4a@1.0.0":    "Product `nb4a` is not valid",
 		"solar-vpn@1.0.0":       "Platform `solar` is not valid",
 		"android-vpn@1.0.0":     "This version of the app is no longer supported",
-		"android-vpn@5.20.57.0": "Invalid access token",
-		"android-vpn@99.0.0":    "Invalid access token",
+		"android-vpn@5.20.98.0": "Invalid access token", // 2026-10-26 晚：modulus 要 token，首登死
+		"windows-vpn@5.20.74.0": "Invalid input",        // 2026-10-26：windows/linux 已死
+		"linux-vpn@5.20.74.0":   "Invalid input",
+		"web-vpn@5.20.74.0":     "Invalid app version", // 2026-10-26：web-vpn 吃 5002
 		"web-account@5.5.5.5":   "Invalid access token",
 		"":                      "Missing x-pm-appversion header",
 	}
@@ -152,12 +163,12 @@ func TestAppVersionHeaderMatchesProtonsFormatRule(t *testing.T) {
 			t.Errorf("appVersionGate(%q) = %q，期望開頭是 %q", v, got, want)
 		}
 	}
-	// 全部是 2026-10-08 對 /auth/v4/info 量出來真的 200 的字串：other_ 那條（含大小寫與
-	// 四段版本）、官方 TV 端 android_tv-vpn（Constants.kt:73-74，別把底線判死）、
-	// 同產品換平台的 windows-vpn、以及 android-mail。
+	// 2026-10-26 晚間沿 SRP 全鏈（GET modulus → POST /auth/v4/）重量的結論：
+	// 唯一可走通登錄鏈的是 Other_<三段版本>；android-vpn 的 modulus 端點已要求持 token
+	// （首次登錄死），從好清單移除並進 routeBlocked。白天在 /auth/v4/info 上量的結論作廢——
+	// 那道門與 SRP 登錄鏈的門不是同一道。
 	for _, v := range []string{
-		"Other_1.0.0", "other_1.0.0", "Other_1.0.0.0", "Other_0.1.0",
-		"android_tv-vpn@5.20.57.0", "windows-vpn@5.20.57.0", "android-mail@2.50.0",
+		"Other_1.0.0",
 	} {
 		if got := appVersionGate(v); got != "" {
 			t.Errorf("appVersionGate(%q) = %q，這個格式 Proton 是收的", v, got)

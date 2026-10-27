@@ -93,12 +93,15 @@
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <io.nekohasekai.sagernet.widget.StableFastScrollRecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:scrollbarSize="0dp"
+        app:fastScrollAutoHide="true"
+        app:fastScrollThumbColor="?colorPrimary"
+        app:fastScrollThumbInactiveColor="?colorPrimary"
         android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/layout_apps_item" />

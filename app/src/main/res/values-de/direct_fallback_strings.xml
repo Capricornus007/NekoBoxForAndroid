@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">Proxy-Fallback für direkte Routen</string>
+    <string name="direct_fallback_summary">Wenn die Kontrollwebsite direkt nicht erreichbar ist, wird für direkte Routen der ausgewählte Proxy verwendet. Bei Wiederherstellung der Direktverbindung wird zurückgewechselt. LAN bleibt direkt. Bestehende Verbindungen werden neu aufgebaut.</string>
+    <string name="direct_fallback_url">Kontrollwebsites</string>
+    <string name="direct_fallback_url_summary">Eine HTTP(S)-URL pro Zeile, bis zu 8. Nur die Direktverbindung wird getestet; das konfigurierte Quorum und aufeinanderfolgende Prüfungen steuern den Wechsel.</string>
+    <string name="direct_fallback_interval">Prüfintervall (Sekunden)</string>
+    <string name="direct_fallback_invalid_url">Geben Sie eine gültige HTTP- oder HTTPS-URL ohne Anmeldedaten oder Fragment ein.</string>
+    <string name="direct_fallback_invalid_interval">Das Prüfintervall muss zwischen 5 und 3600 Sekunden liegen.</string>
+    <string name="dns_server_input_help">local oder localhost verwendet das Android-DNS des zugrunde liegenden Netzwerks. Um einen auf diesem Gerät laufenden DNS-Server zu verwenden, geben Sie explizit udp://127.0.0.1:53 an.</string>
+</resources>

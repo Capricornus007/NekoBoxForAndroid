@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">O servidor de assinatura retornou uma resposta vazia.</string>
+    <string name="subscription_response_html">O servidor retornou uma página web em vez de uma assinatura. Verifique o link e a conta do provedor.</string>
+    <string name="subscription_response_json_error">O servidor retornou um erro JSON em vez de uma assinatura.</string>
+    <string name="subscription_response_unsupported">Nenhum perfil proxy suportado encontrado na resposta.</string>
+    <string name="restore_network_settings">Restaurar as configurações de rede anteriores</string>
+    <string name="restore_network_settings_confirm">Restaurar as configurações anteriores de DNS, roteamento e conexão?</string>
+    <string name="restore_network_settings_failed">Não foi possível restaurar as configurações de rede. Os perfis necessários podem ter sido excluídos.</string>
+    <string name="direct_fallback_required">URLs de controle bem-sucedidas por verificação</string>
+    <string name="direct_fallback_failures">Verificações falhas antes de trocar para o proxy</string>
+    <string name="direct_fallback_recoveries">Verificações bem-sucedidas antes de voltar ao direto</string>
+    <string name="direct_fallback_invalid_count">Insira um número de 1 a %1$d.</string>
+</resources>

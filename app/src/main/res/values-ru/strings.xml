@@ -144,7 +144,6 @@
     <string name="dns_hosts">Перезапись домена</string>
     <string name="dns_hosts_dialog_message">По одному в строке. Строки, начинающиеся с #, считаются комментариями. Пример:\nexample.com 1.1.1.1\nwww.example.com 1.1.1.1 1.1.1.2</string>
     <string name="dns_routing_message">Разрешить домены в обходных маршрутах с помощью Direct DNS. Помните о потенциальных утечках DNS</string>
-    <string name="document">Документы</string>
     <string name="domain_strategy">Правило разрешения доменов</string>
     <string name="domain_strategy_for_direct">Правило домена для Прямого</string>
     <string name="domain_strategy_for_remote">Правило домена для Удаленного</string>
@@ -636,8 +635,6 @@
     <string name="rules_geosite_url">rules geosite URL</string>
     <string name="rules_geoip_url">rules geoip URL</string>
     <string name="pinned_certchain_sha256">SHA256 закреплённого сертификата</string>
-    <string name="please_update" formatted="false">Ваше приложение слишком старое (%s). И перестанет работать %s. Пожалуйста, обновите!</string>
-    <string name="please_update_force" formatted="false">Ваше приложение слишком старое (%s). И перестало работать %s. Пожалуйста, обновите!</string>
     <string name="exe_prefer_provider">Предпочитаемый поставщик плагина</string>
     <string name="save">Сохранить</string>
     <string name="resolve_server">Разрешать адрес сервера согласно политике IPv6</string>
@@ -780,7 +777,6 @@
     <string name="balancer_use_front_proxy">Использовать входной прокси</string>
     <string name="balancer_use_landing_proxy">Использовать выходной прокси</string>
     <string name="battery_optimization_disabled">Оптимизация батареи отключена</string>
-    <string name="battery_optimization_enabled">Оптимизация батареи включена</string>
     <string name="concurrent_dial">Параллельное соединение</string>
     <string name="concurrent_dial_summary">Включить параллельные подключения</string>
     <string name="connection_status_connected">Подключено</string>
@@ -1000,6 +996,7 @@
     <string name="proton_added">Добавлено: %s</string>
     <string name="proton_no_nodes">Нет доступных серверов</string>
     <string name="proton_node_count">Серверов: %1$d, пропущено: %2$d</string>
+    <string name="proton_filtered_by_tier">Отфильтровано по уровню учётной записи %1$d</string>
     <string name="proton_sidecar_missing">В этой сборке нет вспомогательного модуля Proton.</string>
     <string name="proton_2fa_required">Для этого аккаунта нужен код 2FA.</string>
     <string name="proton_auto_login">Автовход</string>
@@ -1152,4 +1149,24 @@
     <string name="ua_updated_toast">User-Agent обновлён</string>
     <string name="udp_over_tcp">UDP поверх TCP</string>
     <string name="update_existing_subscriptions_ua">Обновить User-Agent существующих подписок</string>
+<string name="amoled_theme">Чисто черный фон (AMOLED)</string>
+<string name="amoled_theme_summary">Использовать абсолютно черный фон в темной теме</string>
+<string name="app_theme">Цвет акцента</string>
+    <string name="authenticated_http_proxy_unavailable">HTTP-прокси Android VPN не поддерживает обязательные логин и пароль.</string>
+    <string name="clash_api_token">Токен Clash API</string>
+    <string name="clash_api_token_summary">Показать или скопировать токен доступа к панели</string>
+    <string name="confirm_stop_service">Остановить работающий прокси?</string>
+    <string name="confirm_clear_cache">Остановить прокси, очистить кэш ядра и перезапустить приложение?</string>
+    <string name="downloads_proxy_only">Обновления только через прокси</string>
+    <string name="downloads_proxy_only_summary">Для обновления подписок и GeoIP/GeoSite нужен работающий локальный SOCKS-прокси. Прямое подключение отключено.</string>
+    <string name="backup_encryption_password">Пароль резервной копии (необязательно)</string>
+    <string name="backup_encryption_summary">От 8 символов для защиты экспорта, отправки и копий в WebDAV. Пустое поле — копия без шифрования. Пароль не сохраняется.</string>
+    <string name="backup_password_short">Пароль резервной копии должен содержать минимум 8 символов.</string>
+    <string name="backup_decrypt_failed">Неверный пароль или повреждённая копия. Данные не восстановлены.</string>
+    <string name="enable_clash_api">Включить Clash API</string>
+    <string name="enable_clash_api_summary">Предоставляет Clash API и панель yacd на 127.0.0.1:9090</string>
+    <string name="subscription_custom_hwid_params">Свои параметры HWID</string>
+    <string name="subscription_custom_hwid_params_summary">Формат: hwid=значение,os=значение,osVersion=значение,model=значение. Оставьте пустым, чтобы использовать значения этого устройства; если заполнено, отправляются только указанные значения.</string>
+    <string name="subscription_send_hwid">Отправлять HWID</string>
+    <string name="subscription_send_hwid_summary">Отправлять HWID, версию Android и модель устройства при обновлении этой подписки</string>
 </resources>

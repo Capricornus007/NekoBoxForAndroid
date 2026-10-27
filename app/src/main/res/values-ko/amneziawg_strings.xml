@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">단일 값 또는 범위(예: 25 또는 25-30). 비워 두면 프로토콜 기본값을 사용합니다. 시간 단위는 초, MaxHandshakeAttempts는 횟수, ContentPaddingAddition은 바이트입니다.</string>
+    <string name="amneziawg_header_key_hint">서버의 32바이트 키(Base64 또는 16진수). 헤더 보호에는 S1, S2, S3, S4가 각각 최소 12바이트여야 합니다.</string>
+    <string name="amneziawg_random_trailers_hint">패킷 트레일러를 무작위화합니다(AWG 3.1).</string>
+    <string name="amneziawg_disable_cookies_hint">프로토콜 쿠키를 비활성화합니다. 서버 구성에서 필요한 경우에만 활성화하세요.</string>
+</resources>

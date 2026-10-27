@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">Proxy-reserve for direkte ruter</string>
+    <string name="direct_fallback_summary">Hvis kontrollnettstedet ikke er direkte tilgjengelig, brukes den valgte proxyen for direkte ruter. Gjenopprett direkte tilgang når den kommer tilbake. LAN forblir direkte. Eksisterende tilkoblinger kobles på nytt.</string>
+    <string name="direct_fallback_url">Kontrollnettsteder</string>
+    <string name="direct_fallback_url_summary">Én HTTP(S)-URL per linje, opp til 8. Bare direkte tilgang testes; det konfigurerte kvorumet og påfølgende kontroller styrer byttet.</string>
+    <string name="direct_fallback_interval">Kontrollintervall (sekunder)</string>
+    <string name="direct_fallback_invalid_url">Skriv inn en gyldig HTTP- eller HTTPS-URL uten legitimasjon eller fragment.</string>
+    <string name="direct_fallback_invalid_interval">Kontrollintervallet må være fra 5 til 3600 sekunder.</string>
+    <string name="dns_server_input_help">local eller localhost bruker Android-DNS på det underliggende nettverket. For å bruke en DNS-server som kjører på denne enheten, angi udp://127.0.0.1:53 eksplisitt.</string>
+</resources>

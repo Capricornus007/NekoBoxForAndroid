@@ -1,0 +1,13 @@
+<resources>
+    <string name="subscription_response_empty">Subscription server returned an empty response.</string>
+    <string name="subscription_response_html">The server returned a web page instead of a subscription. Check the link and provider account.</string>
+    <string name="subscription_response_json_error">The server returned a JSON error instead of a subscription.</string>
+    <string name="subscription_response_unsupported">No supported proxy profiles found in the response.</string>
+    <string name="restore_network_settings">Restore previous network settings</string>
+    <string name="restore_network_settings_confirm">Restore the previous DNS, routing and connection settings?</string>
+    <string name="restore_network_settings_failed">Could not restore network settings. The required profiles may have been deleted.</string>
+    <string name="direct_fallback_required">Successful control URLs per check</string>
+    <string name="direct_fallback_failures">Failed checks before switching to proxy</string>
+    <string name="direct_fallback_recoveries">Successful checks before returning to direct</string>
+    <string name="direct_fallback_invalid_count">Enter a number from 1 to %1$d.</string>
+</resources>

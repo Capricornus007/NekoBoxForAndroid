@@ -37,10 +37,30 @@
             app:key="fastestIgnoreCase"
             app:title="@string/fastest_regex_ignore_case" />
 
-        <Preference
-            app:icon="@drawable/ic_baseline_manage_search_24"
-            app:key="fastestRegexPreview"
-            app:title="@string/fastest_regex_preview" />
     </PreferenceCategory>
+
+    <moe.matsuri.nb4a.ui.SimpleMenuPreference
+        app:entries="@array/fastest_protocol_modes"
+        app:entryValues="@array/fastest_protocol_mode_values"
+        app:icon="@drawable/ic_baseline_filter_list_24"
+        app:key="fastestProtocolFilterMode"
+        app:title="@string/fastest_protocol_filter_mode"
+        app:useSimpleSummaryProvider="true" />
+
+    <Preference
+        app:icon="@drawable/ic_baseline_filter_list_24"
+        app:key="fastestProtocols"
+        app:title="@string/fastest_protocols" />
+
+    <SwitchPreferenceCompat app:key="fastestHealthCheck" app:defaultValue="false"
+        app:title="@string/fastest_health_check" app:summary="@string/fastest_health_check_hint" />
+    <EditTextPreference app:key="fastestHealthUrl" app:dependency="fastestHealthCheck"
+        app:title="@string/fastest_health_url" app:useSimpleSummaryProvider="true" />
+    <SwitchPreferenceCompat app:key="fastestFailureCooldown" app:defaultValue="false"
+        app:title="@string/fastest_failure_cooldown" app:summary="@string/fastest_failure_cooldown_hint" />
+    <Preference
+        app:icon="@drawable/ic_baseline_manage_search_24"
+        app:key="fastestRegexPreview"
+        app:title="@string/fastest_candidates_preview" />
 
 </PreferenceScreen>

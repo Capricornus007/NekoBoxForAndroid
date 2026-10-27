@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">订阅伺服器回传了空回应。</string>
+    <string name="subscription_response_html">伺服器回传的是网页而非订阅内容。请检查连结与供应商帐号。</string>
+    <string name="subscription_response_json_error">伺服器回传的是 JSON 错误而非订阅内容。</string>
+    <string name="subscription_response_unsupported">回应中找不到任何受支援的代理设定档。</string>
+    <string name="restore_network_settings">还原先前的网路设定</string>
+    <string name="restore_network_settings_confirm">要还原先前的 DNS、路由与连接设定吗？</string>
+    <string name="restore_network_settings_failed">无法还原网路设定。所需的设定档可能已被删除。</string>
+    <string name="direct_fallback_required">每次检查需达成的控制网址成功数</string>
+    <string name="direct_fallback_failures">切换至代理前的失败检查次数</string>
+    <string name="direct_fallback_recoveries">切回直连前的成功检查次数</string>
+    <string name="direct_fallback_invalid_count">请输入 1 到 %1$d 之间的数字。</string>
+</resources>

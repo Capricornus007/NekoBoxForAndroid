@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">訂閱伺服器回傳了空回應。</string>
+    <string name="subscription_response_html">伺服器回傳的是網頁而非訂閱內容。請檢查連結與供應商帳號。</string>
+    <string name="subscription_response_json_error">伺服器回傳的是 JSON 錯誤而非訂閱內容。</string>
+    <string name="subscription_response_unsupported">回應中找不到任何受支援的代理設定檔。</string>
+    <string name="restore_network_settings">還原先前的網絡設定</string>
+    <string name="restore_network_settings_confirm">要還原先前的 DNS、路由與連線設定嗎？</string>
+    <string name="restore_network_settings_failed">無法還原網絡設定。所需的設定檔可能已被刪除。</string>
+    <string name="direct_fallback_required">每次檢查需達成的控制網址成功數</string>
+    <string name="direct_fallback_failures">切換至代理前的失敗檢查次數</string>
+    <string name="direct_fallback_recoveries">切回直連前的成功檢查次數</string>
+    <string name="direct_fallback_invalid_count">請輸入 1 到 %1$d 之間的數字。</string>
+</resources>

@@ -46,8 +46,8 @@ data class ProtonFilter(
         return when (sort) {
             // 空閒度（Proton 的 Load 反過來）優先，同分再用 Proton 自己的 Score 拉開
             // （實測 Load=0 那 61 台的 Score 從 2.979 到 5.970 全不重複，正好分得出來）。
-            // penalty 只當最後一鍵：實測 /vpn/logicals 對每一台都不回 StatusReference，
-            // 也就是 penalty 恆為 0，單靠它等於沒排。
+            // penalty 只當最後一鍵：實測 Proton 的 logicals（sidecar 現在打 /vpn/v2/logicals）
+            // 對每一台都不回 StatusReference，也就是 penalty 恆為 0，單靠它等於沒排。
             Sort.IDLE -> matched.sortedWith(compareBy({ it.loadRank }, { it.scoreRank }, { it.penalty }))
 
             Sort.NAME -> matched.sortedWith(compareBy({ it.name.lowercase() }, { it.loadRank }, { it.scoreRank }))

@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Couleurs legacy…</string>
     <string name="theme_classic_color_swatch">Thème couleur %1$d</string>
-    <string name="document">Document</string>
     <string name="group_default">Non groupé</string>
     <string name="quick_toggle">Basculer</string>
     <string name="quick_enable">Activer</string>
@@ -312,7 +311,6 @@
     <string name="donate_info">J\'aime l\'argent</string>
     <string name="ignore_battery_optimizations">Ignorer les optimisations de la batterie</string>
     <string name="ignore_battery_optimizations_sum">Supprimer certaines restrictions</string>
-    <string name="battery_optimization_enabled">Batterie optimisée: oui</string>
     <string name="battery_optimization_disabled">Batterie optimisée: non</string>
     <string name="plugin">Greffon</string>
     <string name="plugin_configure">Configurer…</string>
@@ -614,10 +612,6 @@
     <string name="tuic_disable_sni">Désactiver SNI</string>
     <string name="tuic_reduce_rtt">Activer la poignée de main QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">Certificat épinglé SHA256</string>
-    <string name="please_update" formatted="false">Votre application est trop ancienne (%1$s). Et cessera de fonctionner à %2$s. Veuillez
-        la mettre à jour !</string>
-    <string name="please_update_force" formatted="false">Votre application est trop ancienne (%1$s). Et a cessé de fonctionner à %2$s.
-        Veuillez la mettre à jour !</string>
     <string name="connection_test_delete_unavailable">Effacer les indisponibles</string>
     <string name="move">Déplacer</string>
     <string name="exe_prefer_provider">Fournisseur préféré du plugin</string>
@@ -1033,6 +1027,7 @@
     <string name="proton_added">%s ajouté</string>
     <string name="proton_no_nodes">Aucun serveur utilisable</string>
     <string name="proton_node_count">%1$d serveurs, %2$d ignorés</string>
+    <string name="proton_filtered_by_tier">Filtré selon le niveau de compte %1$d</string>
     <string name="proton_sidecar_missing">Cette version n\'inclut pas l\'assistant Proton.</string>
     <string name="proton_2fa_required">Ce compte exige un code 2FA.</string>
     <string name="proton_auto_login">Connexion automatique</string>
@@ -1164,4 +1159,24 @@
     <string name="ua_updated_toast">UA mis à jour</string>
     <string name="udp_over_tcp">UDP sur TCP</string>
     <string name="update_existing_subscriptions_ua">Mettre à jour l\'UA des abonnements existants</string>
+    <string name="amoled_theme">Thème sombre AMOLED</string>
+    <string name="amoled_theme_summary">Fond noir pur en mode sombre</string>
+    <string name="app_theme">Couleur d’accent</string>
+    <string name="authenticated_http_proxy_unavailable">Le proxy HTTP VPN Android ne prend pas en charge le nom d’utilisateur et le mot de passe requis.</string>
+    <string name="backup_decrypt_failed">Mot de passe incorrect ou sauvegarde endommagée. Rien n’a été restauré.</string>
+    <string name="backup_encryption_password">Mot de passe de sauvegarde (facultatif)</string>
+    <string name="backup_encryption_summary">Au moins 8 caractères protègent les sauvegardes exportées, partagées et WebDAV. Laisser vide pour une sauvegarde non chiffrée. Le mot de passe n’est pas enregistré.</string>
+    <string name="backup_password_short">Utilisez au moins 8 caractères pour le mot de passe de sauvegarde.</string>
+    <string name="clash_api_token">Jeton de l’API Clash</string>
+    <string name="clash_api_token_summary">Afficher ou copier le jeton d’accès au tableau de bord</string>
+    <string name="confirm_clear_cache">Arrêter le proxy, vider le cache du noyau et redémarrer l’application ?</string>
+    <string name="confirm_stop_service">Arrêter le proxy en cours d’exécution ?</string>
+    <string name="downloads_proxy_only">Mises à jour uniquement via le proxy</string>
+    <string name="downloads_proxy_only_summary">Les mises à jour d’abonnements et de GeoIP/GeoSite nécessitent le proxy SOCKS local actif. Le repli direct est désactivé.</string>
+    <string name="enable_clash_api">Activer l’API Clash</string>
+    <string name="enable_clash_api_summary">Fournir l’API Clash et le tableau de bord yacd sur 127.0.0.1:9090</string>
+    <string name="subscription_custom_hwid_params">Paramètres HWID personnalisés</string>
+    <string name="subscription_custom_hwid_params_summary">Format : hwid=valeur,os=valeur,osVersion=valeur,model=valeur. Laisser vide pour utiliser les valeurs de cet appareil ; si rempli, seules les valeurs listées sont envoyées.</string>
+    <string name="subscription_send_hwid">Envoyer HWID</string>
+    <string name="subscription_send_hwid_summary">Envoyer HWID, version Android et modèle de l’appareil lors de la mise à jour de cet abonnement</string>
 </resources>

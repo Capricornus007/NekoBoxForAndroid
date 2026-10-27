@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">Enkeltverdi eller område, for eksempel 25 eller 25-30. La stå tomt for å bruke protokollstandarden. Tider i sekunder; MaxHandshakeAttempts er et antall; ContentPaddingAddition er i byte.</string>
+    <string name="amneziawg_header_key_hint">32-byte nøkkel fra serveren (Base64 eller heksadesimal). Hodebeskyttelse krever at S1, S2, S3 og S4 er minst 12 byte.</string>
+    <string name="amneziawg_random_trailers_hint">Tilfeldiggjør pakkeetterslep (AWG 3.1).</string>
+    <string name="amneziawg_disable_cookies_hint">Deaktiver protokollcookies. Aktiver bare når serverkonfigurasjonen krever det.</string>
+</resources>

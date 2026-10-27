@@ -14,7 +14,6 @@
     <string name="theme">Tema</string>
     <string name="use_system_theme">Usa tema di sistema</string>
     <string name="use_system_theme_summary">Usa colori Monet di sistema (Android 12+)</string>
-    <string name="document">Documento</string>
     <string name="group_default">Non raggruppato</string>
     <string name="quick_toggle">Attiva/Disattiva</string>
     <string name="quick_enable">Abilita</string>
@@ -659,7 +658,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="balancer_use_front_proxy">Use group front proxy</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="battery_optimization_disabled">Disabilitata - tocca per consentire l\'attività in background</string>
-    <string name="battery_optimization_enabled">Abilitata - l\'app può essere eseguita senza restrizioni in background</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="concurrent_dial">Dial concorrente</string>
     <string name="concurrent_dial_summary">Abilita connessioni simultanee per una creazione più rapida della rete, potrebbe aumentare il consumo della batteria</string>
@@ -905,9 +903,9 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="speed_test_url_invalid">Inserisci un URL HTTP o HTTPS valido</string>
     <string name="mixed_auth_username_hint">Nome utente (lascia entrambi vuoti per nessuna autenticazione)</string>
     <string name="mixed_auth_no_auth">Non impostato (nessuna autenticazione)</string>
-    <string name="profile_requiring_plugin">Il profilo %1$s richiede l\'installazione del plugin %2$s, ma
+    <string name="profile_requiring_plugin" formatted="false">Il profilo %1$s richiede l\'installazione del plugin %2$s, ma
         non è stato trovato.</string>
-    <string name="plugin_exists_but_on_shit_system">Il profilo %1$s richiede il plugin %2$s, ma il tuo
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Il profilo %1$s richiede il plugin %2$s, ma il tuo
         fornitore di apparecchiature proprietarie (di solito giganti del capitale di sorveglianza e produttori di malware)
         ha manomesso il tuo Android, rendendo il plugin inutilizzabile.</string>
     <string name="lan_sharing">Condivisione LAN</string>
@@ -1039,6 +1037,7 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_added">%s aggiunto</string>
     <string name="proton_no_nodes">Nessun server utilizzabile</string>
     <string name="proton_node_count">%1$d server, %2$d ignorati</string>
+    <string name="proton_filtered_by_tier">Filtrato per il livello account %1$d</string>
     <string name="proton_sidecar_missing">Questa versione non include l\'assistente Proton.</string>
     <string name="proton_2fa_required">Questo account richiede un codice 2FA.</string>
     <string name="proton_auto_login">Accesso automatico</string>
@@ -1137,4 +1136,42 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="openvpn_tls_version_min">Versione TLS minima</string>
     <string name="openvpn_topology">Topologia</string>
     <string name="openvpn_transport">Protocollo</string>
+    <string name="adaptive_traffic_polling">Sondaggio adattivo del traffico</string>
+    <string name="adaptive_traffic_polling_summary">Sonda i contatori del traffico meno spesso in background o con lo schermo spento.</string>
+    <string name="amoled_theme">Tema scuro AMOLED</string>
+    <string name="amoled_theme_summary">Sfondo nero puro in modalità scura</string>
+    <string name="app_theme">Colore di accento</string>
+    <string name="authenticated_http_proxy_unavailable">Il proxy HTTP della VPN Android non supporta il nome utente e la password richiesti.</string>
+    <string name="backup_decrypt_failed">Password errata o backup danneggiato. Non è stato ripristinato nulla.</string>
+    <string name="backup_encryption_password">Password del backup (facoltativa)</string>
+    <string name="backup_encryption_summary">Almeno 8 caratteri proteggono i backup esportati, condivisi e WebDAV. Lascia vuoto per un backup non criptato. La password non viene salvata.</string>
+    <string name="backup_password_short">Usa almeno 8 caratteri per la password del backup.</string>
+    <string name="clash_api_token">Token API Clash</string>
+    <string name="clash_api_token_summary">Mostra o copia il token di accesso del pannello</string>
+    <string name="close">Chiudi</string>
+    <string name="confirm_clear_cache">Fermare il proxy, svuotare la cache del core e riavviare l\'app?</string>
+    <string name="confirm_stop_service">Fermare il proxy in esecuzione?</string>
+    <string name="copy_current_link">Copia link</string>
+    <string name="downloads_proxy_only">Aggiornamenti solo tramite proxy</string>
+    <string name="downloads_proxy_only_summary">Gli aggiornamenti di sottoscrizioni e GeoIP/GeoSite richiedono il proxy SOCKS locale in esecuzione. Il fallback diretto è disabilitato.</string>
+    <string name="enable_clash_api">Abilita API Clash</string>
+    <string name="enable_clash_api_summary">Fornisce API Clash e dashboard yacd su 127.0.0.1:9090</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="local_proxy_settings">Impostazioni proxy locale</string>
+    <string name="port_out_of_range">La porta deve essere compresa tra 1 e 65535</string>
+    <string name="proton_session_expired">La tua sessione Proton è stata rifiutata. Accedi di nuovo.</string>
+    <string name="proxy_password">Password del proxy</string>
+    <string name="proxy_username">Nome utente del proxy</string>
+    <string name="qrcode_format_sn">Link SN</string>
+    <string name="qrcode_format_standard">Standard</string>
+    <string name="qrcode_sn_hint">Link serializzato dedicato Sing-box &amp; Neko (sn://)</string>
+    <string name="qrcode_standard_hint">Formato URI standard (compatibile con i client generali)</string>
+    <string name="socks_port">Porta del proxy SOCKS5</string>
+    <string name="subscription_custom_hwid_params">Parametri HWID personalizzati</string>
+    <string name="subscription_custom_hwid_params_summary">Formato: hwid=valore,os=valore,osVersion=valore,model=valore. Lascia vuoto per usare i valori di questo dispositivo; quando compilato, vengono inviati solo i valori elencati.</string>
+    <string name="subscription_direct_fallback">Ripiega sulla connessione diretta per le sottoscrizioni</string>
+    <string name="subscription_direct_fallback_summary">Riprova una sottoscrizione direttamente se il proxy locale fallisce. Evitalo se l\'URL contiene un token.</string>
+    <string name="subscription_send_hwid">Invia HWID</string>
+    <string name="subscription_send_hwid_summary">Invia HWID, versione Android e modello del dispositivo durante l\'aggiornamento di questa sottoscrizione</string>
 </resources>

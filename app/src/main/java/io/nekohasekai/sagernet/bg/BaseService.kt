@@ -1,5 +1,6 @@
 package io.nekohasekai.sagernet.bg
 
+import android.app.KeyguardManager
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -15,7 +16,13 @@ import io.nekohasekai.sagernet.aidl.ISagerNetService
 import io.nekohasekai.sagernet.aidl.ISagerNetServiceCallback
 import io.nekohasekai.sagernet.bg.proto.ProxyInstance
 import io.nekohasekai.sagernet.bg.proto.TAILSCALE_READY_TIMEOUT_MS
+import io.nekohasekai.sagernet.bg.proto.configuredProbe
+import io.nekohasekai.sagernet.bg.proto.networkProbe
+import io.nekohasekai.sagernet.bg.proto.resetProbeHealth
+import io.nekohasekai.sagernet.bg.proto.runtimeDiagnostics
+import io.nekohasekai.sagernet.bg.proto.setProbesPaused
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.NetworkProfiles
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.database.SagerDatabase
 import io.nekohasekai.sagernet.fmt.tailscale.pruneTailscaleState
@@ -36,6 +43,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import libcore.Libcore
 import moe.matsuri.nb4a.Protocols
@@ -89,6 +97,15 @@ class BaseService {
     class Data internal constructor(private val service: Interface) {
         @Volatile var state = State.Stopped
 
+        // isai 電源探針狀態：鎖屏/閒置時暫停健康檢查（見 updateProbePowerState）。
+        @Volatile var powerRestricted = false
+
+        // isai 網絡指紋：網絡屬性變化（DNS/路由/MTU…）比對用，決定是否 resetProbeHealth。
+        var networkSignature: String? = null
+
+        // isai 網絡策略指紋：NetworkProfilePolicy 選中節點的 identity 快取。
+        var networkPolicySignature: String? = null
+
         @Volatile var proxy: ProxyInstance? = null
         var notification: ServiceNotification? = null
         var timeoutMonitorJob: Job? = null
@@ -104,9 +121,16 @@ class BaseService {
             when (intent.action) {
                 Intent.ACTION_SHUTDOWN -> service.persistStats(self)
 
-                Action.RELOAD -> service.reload(
-                    intent.getLongExtra(Action.EXTRA_PROFILE_ID, -1L),
-                )
+                // RELOAD 兩種語義：不帶 extra（或帶 profileId）走輕量 reload 換節點；
+                // isai 的 "force" extra 走硬重啟（等價於 RESTART，核心整個重建）。
+                Action.RELOAD -> if (intent.getBooleanExtra("force", false)) {
+                    Logs.i("BaseService: Action.RELOAD(force) received, forcing stopRunner(restart = true)")
+                    service.stopRunner(restart = true)
+                } else {
+                    service.reload(
+                        intent.getLongExtra(Action.EXTRA_PROFILE_ID, -1L),
+                    )
+                }
 
                 // Ported from own/54c76ba71 (LAN sharing group): a reload keeps the tunnel
                 // object alive, so changes that need a brand new core (e.g. exposing the
@@ -132,7 +156,10 @@ class BaseService {
                             }
                         }
                     }
+                    updateProbePowerState()
                 }
+
+                Intent.ACTION_SCREEN_ON, Intent.ACTION_SCREEN_OFF, Intent.ACTION_USER_PRESENT -> updateProbePowerState()
 
                 Action.RESET_UPSTREAM_CONNECTIONS -> runOnDefaultDispatcher {
                     Libcore.resetAllConnections(true)
@@ -156,6 +183,21 @@ class BaseService {
         // The stop/reload decision core (pendingRestart + stopGeneration); see ServiceStopGate
         // for the invariants and threading contract.
         val stopGate = ServiceStopGate()
+
+        // isai 電源受限探針暫停：鎖屏（KeyguardManager）或 Doze 時暫停核心健康檢查，
+        // 亮屏/解鎖後恢復並通知 TrafficLooper 重算。見 ProbePowerPolicy.pauseHealthChecks。
+        fun updateProbePowerState() {
+            if (state != State.Connected) return
+            val context = service as Context
+            val keyguard = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            val restricted = pauseHealthChecks(SagerNet.power.isInteractive, keyguard.isKeyguardLocked, SagerNet.power.isDeviceIdleMode)
+            val changed = powerRestricted != restricted
+            powerRestricted = restricted
+            // 探針暫停走 IsaiProbeStubs（核心未移植，安全無操作）；
+            // fork 的 TrafficLooper 沒有 isai 的 onPowerChanged 鉤子（輪詢節奏
+            // 由 fork 自己的 pollDelayMs 管），這行不接。
+            proxy?.box?.setProbesPaused(powerRestricted)
+        }
 
         fun changeState(s: State, msg: String? = null) {
             if (state == s && msg == null) return
@@ -354,6 +396,39 @@ class BaseService {
         override fun connections(includeClosed: Boolean): String = data?.proxy?.takeIf {
             it.isInitialized()
         }?.box?.connections(includeClosed) ?: "[]"
+
+        // ---- isai 診斷 AIDL：十分鐘診斷與 DNS/HTTPS 候選檢查的服務端 ----
+
+        override fun getRuntimeDiagnostics(historyQuery: String): String {
+            check(android.os.Binder.getCallingUid() == android.os.Process.myUid()) { "Caller is not the application" }
+            val proxy = data?.proxy ?: return "{\"groups\":[]}"
+            if (!proxy.isInitialized()) return "{\"groups\":[]}"
+            return proxy.box.runtimeDiagnostics(historyQuery)
+        }
+
+        override fun networkProbe(expectedProfileId: Long, direct: Boolean, domain: String, dnsTarget: String): String {
+            check(android.os.Binder.getCallingUid() == android.os.Process.myUid()) { "Caller is not the application" }
+            val current = data ?: error("Service is unavailable")
+            val proxy = current.proxy ?: error("Core is not running")
+            check(current.state == State.Connected && proxy.isInitialized() && DataStore.currentProfile == expectedProfileId) { "Profile is no longer active" }
+            val tag = if (direct) {
+                "direct"
+            } else if (proxy.config.selectorGroupId > 0) {
+                "proxy"
+            } else {
+                proxy.config.profileTagMap[proxy.profile.id] ?: error("Proxy outbound is unavailable")
+            }
+            return proxy.box.networkProbe(tag, domain, dnsTarget)
+        }
+
+        override fun configuredProbe(expectedProfileId: Long, tag: String, dnsTag: String, httpsUrl: String): String {
+            check(android.os.Binder.getCallingUid() == android.os.Process.myUid()) { "Caller is not the application" }
+            val current = data ?: error("Service is unavailable")
+            val proxy = current.proxy ?: error("Core is not running")
+            check(current.state == State.Connected && proxy.isInitialized() && DataStore.currentProfile == expectedProfileId) { "Profile is no longer active" }
+            return proxy.box.configuredProbe(tag, dnsTag, httpsUrl)
+        }
+
         fun stateChanged(s: State, msg: String?) = launch {
             val profileName = profileName
             broadcast { it.stateChanged(s.ordinal, profileName, msg) }
@@ -665,10 +740,13 @@ class BaseService {
             data.changeState(State.Stopping)
 
             runOnMainDispatcher {
-                data.connectingJob?.cancelAndJoin() // ensure stop connecting first
+                val connectingJob = data.connectingJob
+                connectingJob?.cancel()
+                data.proxy?.cancelStart()
+                connectingJob?.join()
                 // we use a coroutineScope here to allow clean-up in parallel
                 coroutineScope {
-                    killProcesses()
+                    withContext(Dispatchers.IO) { killProcesses() }
                     val data = data
                     if (data.closeReceiverRegistered) {
                         unregisterReceiver(data.receiver)
@@ -743,19 +821,48 @@ class BaseService {
                 if (DataStore.baseService !== this@Interface) return@start
                 SagerNet.underlyingNetwork = network
                 DataStore.vpnService?.updateUnderlyingNetwork()
+                val policySelection = NetworkProfiles.select(network)
+                val previousPolicy = data.networkPolicySignature
+                if (network != null && policySelection.identity != "unavailable") {
+                    data.networkPolicySignature = policySelection.identity
+                    if (previousPolicy != null && previousPolicy != policySelection.identity) {
+                        policySelection.policy?.let { DataStore.selectedProxy = it.profileId }
+                        scheduleNetworkProfileRestart("network-policy", "network-policy")
+                    }
+                }
                 val link = network?.let { SagerNet.connectivity.getLinkProperties(it) }
-                    ?: return@start
-                val oldName = upstreamInterfaceName
-                val newName = link.interfaceName ?: return@start
-                upstreamInterfaceName = newName
-                when (
-                    networkChangeAction(
-                        oldName,
-                        newName,
-                        DataStore.restartProfileOnNetworkChange,
-                        DataStore.networkChangeResetConnections,
-                    )
-                ) {
+                // isai 網絡指紋：拿完整網絡屬性（位址/DNS/路由/MTU/私人 DNS）建簽名，
+                // 比單純介面名更靈敏——DNS 換了但介面沒變時也要 resetProbeHealth（冷卻探針）。
+                if (link == null) {
+                    upstreamInterfaceName = null
+                    return@start
+                }
+                val newName = buildString {
+                    append(network).append('|').append(link.interfaceName)
+                    append('|').append(link.linkAddresses.map { it.toString() }.sorted())
+                    append('|').append(link.dnsServers.map { it.hostAddress }.sortedBy { it })
+                    append('|').append(link.routes.map { it.toString() }.sorted())
+                    append('|').append(link.domains).append('|')
+                    // LinkProperties#getMtu 是 API 29；舊機簽名用固定 0，不影響比對語義。
+                    append(if (Build.VERSION.SDK_INT >= 29) link.mtu else 0)
+                    if (Build.VERSION.SDK_INT >= 28) {
+                        append('|').append(link.isPrivateDnsActive).append('|').append(link.privateDnsServerName)
+                    }
+                }
+                val oldName = data.networkSignature
+                data.networkSignature = newName
+                upstreamInterfaceName = link.interfaceName
+                val networkAction = networkChangeAction(
+                    oldName,
+                    newName,
+                    DataStore.restartProfileOnNetworkChange,
+                    DataStore.networkChangeResetConnections,
+                )
+                if (oldName != null && oldName != newName && networkAction == NetworkChangeAction.NONE) {
+                    val active = data.proxy
+                    if (active != null && active.isInitialized()) runOnDefaultDispatcher { active.box.resetProbeHealth() }
+                }
+                when (networkAction) {
                     NetworkChangeAction.RESTART_PROFILE -> {
                         Logs.d("Network changed: $oldName -> $newName")
                         scheduleNetworkProfileRestart(requireNotNull(oldName), newName)
@@ -849,6 +956,13 @@ class BaseService {
                         ipcProfileId > 0L && SagerDatabase.proxyDao.getById(ipcProfileId) != null ->
                             DataStore.selectedProxy = ipcProfileId
                     }
+                    // isai 網絡策略冷啟動：無 IPC 指定節點時，按當前網絡的 NetworkProfile
+                    // 策略選節點（preInit 的 listener 只處理後續變化）。
+                    if (ipcProfileId < 0L) {
+                        val policySelection = NetworkProfiles.select()
+                        data.networkPolicySignature = policySelection.identity
+                        policySelection.policy?.let { DataStore.selectedProxy = it.profileId }
+                    }
                     val profile = SagerDatabase.proxyDao.getById(DataStore.selectedProxy)
                     onMainDispatcher {
                         // Assign connectingJob to the inner connect job from HERE (after
@@ -883,6 +997,9 @@ class BaseService {
                 addAction(Action.CLOSE)
                 // addAction(Action.SWITCH_WAKE_LOCK)
                 addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_USER_PRESENT)
                 addAction(Action.RESET_UPSTREAM_CONNECTIONS)
             }
             androidx.core.content.ContextCompat.registerReceiver(
@@ -919,6 +1036,9 @@ class BaseService {
                         addAction(Intent.ACTION_SHUTDOWN)
                         addAction(Action.CLOSE)
                         addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
+                        addAction(Intent.ACTION_SCREEN_ON)
+                        addAction(Intent.ACTION_SCREEN_OFF)
+                        addAction(Intent.ACTION_USER_PRESENT)
                         addAction(Action.RESET_UPSTREAM_CONNECTIONS)
                     }
                     androidx.core.content.ContextCompat.registerReceiver(
@@ -947,9 +1067,11 @@ class BaseService {
                         stopRunner(false, it.readableMessage)
                     }
 
-                    startProcesses()
+                    withContext(Dispatchers.IO) { startProcesses() }
                     data.changeState(State.Connected)
                     startTimeoutMonitor()
+                    // isai：連上後立即按當前電源/鎖屏狀態決定探針是否暫停。
+                    data.updateProbePowerState()
 
                     lateInit()
                 } catch (_: CancellationException) {

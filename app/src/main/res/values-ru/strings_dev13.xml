@@ -1,0 +1,42 @@
+<resources>
+  <string name="subscription_preview">Предпросмотр: +%1$d · изменено %2$d · удалено %3$d</string>
+  <string name="subscription_preview_hint">Применить изменения? Предыдущую версию профилей можно будет восстановить. Значения ключей и паролей скрыты. Показано до 100 изменений.</string>
+  <string name="subscription_undo">Предыдущая версия подписки</string>
+  <string name="subscription_undo_confirm">Восстановить профили до последнего обновления подписки? Текущие правки профилей этой группы будут заменены. Счётчики трафика сохранятся.</string>
+  <string name="subscription_undo_referenced">Добавленный обновлением профиль используется. Перед откатом переключите VPN на другой профиль и уберите ссылки на этот узел из настроек.</string>
+  <string name="subscription_field_name">название</string>
+  <string name="subscription_field_address">адрес/порт сервера</string>
+  <string name="subscription_field_dns">DNS</string>
+  <string name="subscription_field_allowed_ips">AllowedIPs</string>
+  <string name="subscription_field_tls">TLS</string>
+  <string name="subscription_field_credentials">ключи/пароли (скрыты)</string>
+  <string name="subscription_field_protocol">протокол</string>
+  <string name="subscription_field_parameters">параметры протокола</string>
+  <string name="route_fallback_mode">Резервирование прямого маршрута</string>
+  <string name="route_fallback_hint">Используются контрольные сайты и пороги из общих настроек резервирования. Локальные адреса идут напрямую. Пользовательский JSON маршрута может переопределить эту политику.</string>
+  <string name="route_fallback_profile">Резервный профиль</string>
+  <string name="route_fallback_missing">Выберите существующий профиль</string>
+  <string name="network_profiles">Профили для сетей</string>
+  <string name="network_profiles_enable">Выбирать профиль и DNS по сети</string>
+  <string name="network_profiles_summary">Применяется при запуске VPN и смене сети. Точный SSID имеет приоритет над общим Wi-Fi. Пустые поля DNS наследуют общие настройки. Без доступа к SSID используется общий Wi-Fi. Полные пользовательские конфигурации сохраняют свой DNS.</string>
+  <string name="network_profiles_ssid_permission">Разрешить доступ к SSID (необязательно)</string>
+  <string name="network_profiles_mobile">Мобильная сеть</string>
+  <string name="network_profiles_add">Добавить профиль сети</string>
+  <string name="network_profiles_edit">Настроить профиль сети</string>
+  <string name="network_profiles_ssid">SSID (пусто = любой Wi-Fi)</string>
+  <string name="network_profiles_remote_dns">DNS через прокси (пусто = наследовать)</string>
+  <string name="network_profiles_direct_dns">Прямой DNS (пусто = наследовать)</string>
+  <string name="network_profiles_invalid">Некорректный DNS, профиль или повторяющееся условие сети.</string>
+  <string-array name="route_fallback_entries">
+    <item>Наследовать общую настройку</item>
+    <item>Всегда напрямую</item>
+    <item>Напрямую → текущий прокси</item>
+    <item>Напрямую → резервный профиль</item>
+  </string-array>
+  <string name="network_profiles_edit_profile">Настройки профиля</string>
+  <string name="subscription_preview_title">Предпросмотр обновления подписки</string>
+  <string name="network_profiles_background_reason">Для автоматического выбора по SSID при работе VPN в фоне откройте «Разрешения → Местоположение» и выберите «%1$s». Приложение читает только название подключённого Wi-Fi, без GPS-координат. Это необязательно: общие профили Wi-Fi и мобильной сети работают без доступа к местоположению.</string>
+  <string name="network_profiles_ssid_hint">На Android 10+ для сопоставления SSID нужен точный доступ к местоположению «Всегда» и включённая системная геолокация. Иначе используется общий Wi-Fi, в том числе при открытом приложении.</string>
+  <string name="network_profiles_ssid_ready">Разрешение для SSID предоставлено. Для сопоставления SSID системная геолокация должна быть включена.</string>
+  <string name="network_profiles_always">Разрешить всегда</string>
+</resources>

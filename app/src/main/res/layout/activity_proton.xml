@@ -82,14 +82,32 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/signedInAs"
+            <!-- 「已登入：誰」與登出同一行，登出靠右；登入前整行收掉（不再突兀地常駐）。 -->
+            <LinearLayout
+                android:id="@+id/signedInRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                android:textColor="?attr/colorOnSurface"
-                android:visibility="gone" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/signedInAs"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/signOut"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/proton_sign_out" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -104,14 +122,6 @@
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:text="@string/proton_sign_in" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/signOut"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/proton_sign_out" />
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton

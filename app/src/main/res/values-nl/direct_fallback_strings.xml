@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">Proxy-fallback voor directe routes</string>
+    <string name="direct_fallback_summary">Als de controlesite niet direct bereikbaar is, wordt de geselecteerde proxy gebruikt voor directe routes. Herstelt directe toegang bij herstel. LAN blijft direct. Bestaande verbindingen worden opnieuw opgebouwd.</string>
+    <string name="direct_fallback_url">Controlesites</string>
+    <string name="direct_fallback_url_summary">Eén HTTP(S)-URL per regel, tot 8. Alleen directe toegang wordt getest; het geconfigureerde quorum en opeenvolgende controles sturen de overschakeling.</string>
+    <string name="direct_fallback_interval">Controle-interval (seconden)</string>
+    <string name="direct_fallback_invalid_url">Voer een geldige HTTP- of HTTPS-URL in zonder inloggegevens of fragment.</string>
+    <string name="direct_fallback_invalid_interval">Het controle-interval moet tussen 5 en 3600 seconden liggen.</string>
+    <string name="dns_server_input_help">local of localhost gebruikt het Android-DNS van het onderliggende netwerk. Om een op dit apparaat draaiende DNS-server te gebruiken, geef expliciet udp://127.0.0.1:53 op.</string>
+</resources>

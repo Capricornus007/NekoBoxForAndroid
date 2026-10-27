@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">直連不通時先改走代理</string>
+    <string name="direct_fallback_summary">直連的測試網址連不通時，直連流量改走選定的代理；連通後自動切回。區域網路仍直連，既有連線會重接。</string>
+    <string name="direct_fallback_url">測試用網址</string>
+    <string name="direct_fallback_url_summary">每行一個 HTTP(S) 網址，最多 8 個。只用直連去測這些網址；要連失敗幾次才切代理、連成功幾次才切回，看下面兩個數字</string>
+    <string name="direct_fallback_interval">檢查間隔（秒）</string>
+    <string name="direct_fallback_invalid_url">請輸入有效的 HTTP 或 HTTPS 網址，裡面不要有帳號密碼或 # 後面的片段。</string>
+    <string name="direct_fallback_invalid_interval">檢查間隔要落在 5 到 3600 秒之間。</string>
+    <string name="dns_server_input_help">寫 local 或 localhost 就是直接用底層網路的 Android DNS；要查這台裝置自己跑的 DNS 伺服器，得明確寫 udp://127.0.0.1:53。</string>
+</resources>

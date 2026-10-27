@@ -16,6 +16,9 @@ class ProxyInstance(
 
     var notTmp = true
 
+    // isai：上次 buildConfig 的 selector 群組 id（-1 = 尚未建過 config）。
+    var lastSelectorGroupId = -1L
+
     // Live exit-node switching needs the per-node readiness intent; owned by the instance so
     // teardown clears it together with the box.
     internal val tailscaleReadiness = TailscaleReadinessIntent()
@@ -30,6 +33,8 @@ class ProxyInstance(
     override fun buildConfig() {
         super.buildConfig()
         if (notTmp) Logs.d(safeConfigDiagnostics(config, 0))
+        // isai：記住本次 config 的 selector 群組，供選擇器/流量迴圈比對群組變化。
+        lastSelectorGroupId = super.config.selectorGroupId
     }
 
     // only use this in temporary instance
@@ -45,6 +50,9 @@ class ProxyInstance(
 
     override suspend fun loadConfig() {
         super.loadConfig()
+        // Register before start so the first accepted connection is counted.
+        val tags = config.trafficMap.keys + listOf("proxy", "bypass", "direct")
+        box.setV2rayStats(tags.distinct().joinToString("\n"))
     }
 
     override fun launch() {

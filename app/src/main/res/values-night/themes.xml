@@ -25,6 +25,13 @@
         <item name="uiCardStrokeColor">@android:color/transparent</item>
         <item name="uiListItemMargin">0dp</item>
         <item name="uiListOuterPadding">8dp</item>
+        <!-- 夜間這份整條取代日間樣式（night 限定符優先於 v26），Expressive 那 5 條到這裡就斷了；
+          一律用 ?attr/ 角色引用，讓 Dracula／Nord／Monokai 等跟自己的夜間色板走。 -->
+        <item name="uiSurfaceBackground">?attr/colorSurface</item>
+        <item name="uiStatsBackground">?attr/colorPrimaryContainer</item>
+        <item name="uiStatsForeground">?attr/colorOnPrimaryContainer</item>
+        <item name="uiTabBackground">?attr/colorSurface</item>
+        <item name="uiNavigationItemFill">?attr/colorSecondaryContainer</item>
         <!-- Missing attributes for night theme -->
         <item name="appBarBackgroundColor">@color/colorSurface</item>
         <item name="cardElevatedSurfaceColor">@color/colorSurfaceContainer</item>

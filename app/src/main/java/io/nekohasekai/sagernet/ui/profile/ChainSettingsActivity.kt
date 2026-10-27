@@ -63,6 +63,11 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         DataStore.fastestSourceGroup = sourceGroupId
         DataStore.fastestNameRegex = nameRegex
         DataStore.fastestIgnoreCase = ignoreCase
+        DataStore.fastestProtocolFilterMode = protocolFilterMode
+        DataStore.fastestProtocols = protocols.toSet()
+        DataStore.fastestHealthCheck = healthCheck
+        DataStore.fastestFailureCooldown = failureCooldown
+        DataStore.fastestHealthUrl = healthUrl
     }
 
     override fun ChainBean.serialize() {
@@ -72,6 +77,11 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         sourceGroupId = DataStore.fastestSourceGroup
         nameRegex = DataStore.fastestNameRegex.orEmpty()
         ignoreCase = DataStore.fastestIgnoreCase
+        protocolFilterMode = DataStore.fastestProtocolFilterMode
+        protocols = DataStore.fastestProtocols.sorted()
+        healthCheck = DataStore.fastestHealthCheck
+        failureCooldown = DataStore.fastestFailureCooldown
+        healthUrl = DataStore.fastestHealthUrl.orEmpty()
         proxies = if (isRegexFastest()) {
             DataStore.serverProtocol.split(",").mapNotNull {
                 it.takeIf(String::isNotBlank)?.toLongOrNull()
@@ -83,9 +93,15 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
     }
 
     override suspend fun saveAndExit() {
-        if (isRegexFastest()) {
+        if (currentStrategy == ChainBean.STRATEGY_FASTEST) {
             try {
-                FastestCandidateResolver.resolve(regexFastestBean())
+                if (DataStore.fastestHealthCheck) io.nekohasekai.sagernet.fmt.internal.validateHealthUrl(DataStore.fastestHealthUrl.orEmpty())
+                if (FastestCandidateResolver.resolve(candidateBean()).isEmpty()) {
+                    onMainDispatcher {
+                        Toast.makeText(this@ChainSettingsActivity, R.string.fastest_protocol_no_candidates, Toast.LENGTH_LONG).show()
+                    }
+                    return
+                }
             } catch (e: FastestCandidateResolutionException) {
                 onMainDispatcher {
                     Toast.makeText(
@@ -94,6 +110,9 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
                         Toast.LENGTH_LONG,
                     ).show()
                 }
+                return
+            } catch (e: IllegalArgumentException) {
+                onMainDispatcher { Toast.makeText(this@ChainSettingsActivity, R.string.fastest_health_invalid_url, Toast.LENGTH_LONG).show() }
                 return
             }
         } else if (proxyList.isEmpty()) {
@@ -118,16 +137,62 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
         val sourceGroup = findPreference<SimpleMenuPreference>(Key.FASTEST_SOURCE_GROUP)!!
         val regexOptions = findPreference<PreferenceCategory>(Key.FASTEST_REGEX_OPTIONS)!!
         val preview = findPreference<Preference>(Key.FASTEST_REGEX_PREVIEW)!!
+        val protocolMode = findPreference<SimpleMenuPreference>(Key.FASTEST_PROTOCOL_FILTER_MODE)!!
+        val protocolSelection = findPreference<Preference>(Key.FASTEST_PROTOCOLS)!!
+        val protocolKeys = resources.getStringArray(R.array.fastest_protocol_values)
+        val protocolLabels = resources.getStringArray(R.array.fastest_protocol_entries)
+        fun updateProtocolSummary(mode: Int = DataStore.fastestProtocolFilterMode) {
+            val selected = DataStore.fastestProtocols
+            protocolSelection.summary = if (selected.isEmpty()) {
+                getString(if (mode == 0) R.string.fastest_protocol_all else R.string.fastest_protocol_none)
+            } else {
+                protocolKeys.indices.filter { protocolKeys[it] in selected }.joinToString(", ") { protocolLabels[it] }
+            }
+        }
+        updateProtocolSummary()
+        protocolMode.setOnPreferenceChangeListener { _, value ->
+            updateProtocolSummary(value.toString().toInt())
+            true
+        }
+        protocolSelection.setOnPreferenceClickListener {
+            val selected = DataStore.fastestProtocols.toMutableSet()
+            MaterialAlertDialogBuilder(this@ChainSettingsActivity)
+                .setTitle(R.string.fastest_protocols)
+                .setMultiChoiceItems(protocolLabels, BooleanArray(protocolKeys.size) { protocolKeys[it] in selected }) { _, which, checked ->
+                    if (checked) selected.add(protocolKeys[which]) else selected.remove(protocolKeys[which])
+                }
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    DataStore.fastestProtocols = selected
+                    updateProtocolSummary()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .setNeutralButton(R.string.fastest_protocol_reset) { _, _ ->
+                    DataStore.fastestProtocols = emptySet()
+                    protocolMode.value = "0"
+                    updateProtocolSummary(0)
+                }
+                .show()
+            true
+        }
 
-        val subscriptionGroups = SagerDatabase.groupDao.allGroups()
-            .filter { it.type == GroupType.SUBSCRIPTION }
-        sourceGroup.entries = subscriptionGroups.map { it.displayName() }.toTypedArray()
-        sourceGroup.entryValues = subscriptionGroups.map { it.id.toString() }.toTypedArray()
-        sourceGroup.isEnabled = subscriptionGroups.isNotEmpty()
+        // allGroups() 阻塞、createPreferences 跑在主線建偏好樹時：改背景取好再回填
+        var subscriptionGroups: List<io.nekohasekai.sagernet.database.ProxyGroup> = emptyList()
         fun selectDefaultSourceGroupIfNeeded() {
             if (DataStore.fastestSourceGroup == 0L) {
                 DataStore.fastestSourceGroup = subscriptionGroups.firstOrNull()?.id ?: 0L
             }
+        }
+        fun applySubscriptionGroups(groups: List<io.nekohasekai.sagernet.database.ProxyGroup>) {
+            subscriptionGroups = groups
+            sourceGroup.entries = groups.map { it.displayName() }.toTypedArray()
+            sourceGroup.entryValues = groups.map { it.id.toString() }.toTypedArray()
+            sourceGroup.isEnabled = groups.isNotEmpty()
+            selectDefaultSourceGroupIfNeeded()
+        }
+        runOnDefaultDispatcher {
+            val groups = SagerDatabase.groupDao.allGroups()
+                .filter { it.type == GroupType.SUBSCRIPTION }
+            onMainDispatcher { applySubscriptionGroups(groups) }
         }
 
         fun updateCandidateMode(mode: Int) {
@@ -152,9 +217,10 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             true
         }
         preview.setOnPreferenceClickListener {
+            val bean = candidateBean()
             runOnDefaultDispatcher {
                 val result = runCatching {
-                    FastestCandidateResolver.resolve(regexFastestBean())
+                    FastestCandidateResolver.resolve(bean)
                 }
                 onMainDispatcher {
                     showRegexPreview(result)
@@ -246,12 +312,19 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
     private fun isRegexFastest() = currentStrategy == ChainBean.STRATEGY_FASTEST &&
         DataStore.fastestCandidateMode == ChainBean.CANDIDATE_MODE_REGEX
 
-    private fun regexFastestBean() = ChainBean().apply {
+    private fun candidateBean() = ChainBean().apply {
+        initializeDefaultValues()
         strategy = ChainBean.STRATEGY_FASTEST
-        candidateMode = ChainBean.CANDIDATE_MODE_REGEX
+        candidateMode = DataStore.fastestCandidateMode
         sourceGroupId = DataStore.fastestSourceGroup
         nameRegex = DataStore.fastestNameRegex.orEmpty()
         ignoreCase = DataStore.fastestIgnoreCase
+        protocolFilterMode = DataStore.fastestProtocolFilterMode
+        protocols = DataStore.fastestProtocols.sorted()
+        healthCheck = DataStore.fastestHealthCheck
+        failureCooldown = DataStore.fastestFailureCooldown
+        healthUrl = DataStore.fastestHealthUrl.orEmpty()
+        proxies = proxyList.map { it.id }
     }
 
     private fun fastestResolutionMessage(exception: FastestCandidateResolutionException): String = when (exception.error) {
@@ -271,13 +344,16 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
 
         FastestCandidateResolutionError.DUPLICATE_MANUAL_CANDIDATES ->
             getString(R.string.profile_reference_not_allowed)
+
+        FastestCandidateResolutionError.INVALID_PROTOCOL_FILTER ->
+            getString(R.string.fastest_protocol_invalid)
     }
 
     private fun showRegexPreview(result: Result<List<ProxyEntity>>) {
         val message = result.fold(
             onSuccess = { candidates ->
                 if (candidates.isEmpty()) {
-                    getString(R.string.fastest_regex_preview_no_matches)
+                    getString(R.string.fastest_protocol_no_candidates)
                 } else {
                     buildString {
                         append(getString(R.string.fastest_regex_preview_count, candidates.size))
@@ -295,7 +371,7 @@ class ChainSettingsActivity : ProfileSettingsActivity<ChainBean>(R.layout.layout
             },
         )
         MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.fastest_regex_preview)
+            .setTitle(R.string.fastest_candidates_preview)
             .setMessage(message)
             .setPositiveButton(android.R.string.ok, null)
             .show()

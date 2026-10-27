@@ -74,6 +74,7 @@ jobs:
           chmod +x ./gradlew ./run
           chmod +x buildScript/lib/core.sh buildScript/lib/core/init.sh buildScript/lib/core/build.sh
           chmod +x buildScript/lib/core/get_source.sh buildScript/init/env.sh buildScript/init/env_ndk.sh
+          chmod +x buildScript/init/action/gradle.sh
           chmod +x libcore/init.sh libcore/build.sh
 
       - name: Resolve release metadata
@@ -109,6 +110,20 @@ jobs:
 
       - name: Verify libcore AAR exists
         run: test -f app/libs/libcore.aar
+
+      # 2026-10-25 修：這條鏈產出的是 debug 版（com.nb4a.debug，使用者實測那顆），
+      # 原本直接 ./gradlew 跳過了 assets 下載，導致 APK 內完全沒有 assets/sing-box/，
+      # 裝到手機後 libcore 解不出 geoip/geosite → "bad asset" → sing-box 解析不了
+      # geosite:cn/geoip:cn → 隧道起不來、上下傳速度 0。
+      # 其他四條鏈（build/release/ci/preview）都是靠 `./run init action gradle`
+      # 間接呼叫 buildScript/lib/assets.sh 下載，唯獨這條漏了。補回來。
+      - name: Download geoip/geosite assets (sing-box rule sets)
+        run: ./run init action gradle
+
+      - name: Verify assets are present before packaging
+        run: |
+          test -f app/src/main/assets/sing-box/geoip.db.xz || { echo "::error::geoip.db.xz 沒下載到，APK 會缺 rule-set 資料庫"; exit 1; }
+          test -f app/src/main/assets/sing-box/geosite.db.xz || { echo "::error::geosite.db.xz 沒下載到，APK 會缺 rule-set 資料庫"; exit 1; }
 
       - name: Build installable OSS debug APK
         run: ./gradlew --no-daemon :app:assembleOssDebug

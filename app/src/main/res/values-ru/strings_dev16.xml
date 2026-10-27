@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="route_check_overlaps">Проверить перекрытия правил</string>
+    <string name="route_check_no_overlaps">Очевидных перекрытий не найдено. Пользовательский JSON и сложные условия адресов и rule-set требуют проверки при работе.</string>
+    <string name="route_overlap_duplicate">%1$s: дублирует «%2$s»</string>
+    <string name="route_overlap_shadowed">%1$s: перекрыто правилом «%2$s»</string>
+    <string name="route_overlap_open">Открыть правило</string>
+    <string name="fastest_health_check">Проверять DNS и HTTPS</string>
+    <string name="fastest_health_check_hint">Требовать пригодный ответ настроенного удалённого DNS и подтверждённый ответ HTTPS. До 18 секунд на узел, до трёх проверок одновременно.</string>
+    <string name="fastest_health_url">Контрольный HTTPS-адрес</string>
+    <string name="fastest_health_invalid_url">Укажи HTTPS-адрес без логина, пароля и фрагмента после #.</string>
+    <string name="fastest_failure_cooldown">Временно исключать сбойные узлы</string>
+    <string name="fastest_failure_cooldown_hint">После трёх неудачных проверок — пауза от 30 секунд до 10 минут. Повтор при очередной плановой проверке. При смене сети результаты сбрасываются.</string>
+</resources>

@@ -12,7 +12,6 @@
     <string name="menu_group">گروه‌ها</string>
     <string name="menu_about">درباره برنامه</string>
     <string name="theme">ظاهر</string>
-    <string name="document">مستندات</string>
     <string name="group_default">گروه پیش‌فرض</string>
     <string name="quick_toggle">تغییر وضعیت</string>
     <string name="quick_enable">فعال‌سازی</string>
@@ -489,8 +488,6 @@
     <string name="tuic_disable_sni">غیرفعال کردن SNI</string>
     <string name="tuic_reduce_rtt">فعال کردن ارتباط 0-RTT QUIC</string>
 
-    <string name="please_update" formatted="false">نسخه (%s) برنامه شما بسیار قدیمی شده است و در %s متوقف می‌شود. لطفاً به نسخه جدیدتر به‌روزرسانی کنید</string>
-    <string name="please_update_force" formatted="false">برنامه شما خیلی قدیمی شده است (%s). و در %s کار نمی‌کند. باید نسخه جدید را دانلود کنید!</string>
     <string name="connection_test_delete_unavailable">پاک‌کردن غیرقابل‌دسترس‌ها</string>
     <string name="move">حرکت</string>
     <string name="exe_prefer_provider">ارائه‌دهنده برگزیده افزونه‌ها</string>
@@ -731,7 +728,6 @@
     <string name="balancer_use_front_proxy">استفاده از پروکسی جلویی</string>
     <string name="balancer_use_landing_proxy">استفاده از پروکسی فرودی</string>
     <string name="battery_optimization_disabled">بهینه‌سازی باتری غیرفعال است</string>
-    <string name="battery_optimization_enabled">بهینه‌سازی باتری فعال است</string>
     <string name="concurrent_dial">اتصال هم‌زمان</string>
     <string name="concurrent_dial_summary">فعال‌سازی اتصالات هم‌زمان</string>
     <string name="connection_status_connected">متصل است</string>
@@ -895,8 +891,8 @@
     <string name="append_http_proxy_security_message">پس از فعال‌سازی، برنامه‌های دیگر در این دستگاه می‌توانند مستقیماً از پورت پروکسی محلی استفاده کنند.\n\nتوصیه: تنها در صورتی که به تمام برنامه‌های نصب‌شده اعتماد دارید، این گزینه را فعال کنید.</string>
     <string name="enable_anyway">همچنان فعال کن</string>
     <string name="ooc_subscription_token">مشخصه OOCv1 API</string>
-    <string name="traffic_uplink" translatable="false">%s | %s/s ↑</string>
-    <string name="traffic_downlink" translatable="false">%s | %s/s ↓</string>
+    <string name="traffic_uplink" translatable="false" formatted="false">%s | %s/s ↑</string>
+    <string name="traffic_downlink" translatable="false" formatted="false">%s | %s/s ↓</string>
     <string name="traffic_uplink_total" translatable="false">%s ↑</string>
     <string name="traffic_downlink_total" translatable="false">%s ↓</string>
     <string name="cloudflare_wrap" translatable="false">Cloudflare Warp</string>
@@ -1000,6 +996,7 @@
     <string name="proton_added">%s اضافه شد</string>
     <string name="proton_no_nodes">هیچ سرور قابل استفاده‌ای نیست</string>
     <string name="proton_node_count">%1$d سرور، %2$d نادیده گرفته شد</string>
+    <string name="proton_filtered_by_tier">بر اساس سطح حساب %1$d فیلتر شد</string>
     <string name="proton_sidecar_missing">این نسخه شامل کمک‌برنامه Proton نیست.</string>
     <string name="proton_2fa_required">این حساب به کد 2FA نیاز دارد.</string>
     <string name="proton_auto_login">ورود خودکار</string>
@@ -1153,4 +1150,24 @@
     <string name="ua_updated_toast">User-Agent به‌روزرسانی شد</string>
     <string name="udp_over_tcp">UDP روی TCP</string>
     <string name="update_existing_subscriptions_ua">به‌روزرسانی User-Agent اشتراک‌های موجود</string>
+    <string name="subscription_send_hwid">ارسال HWID</string>
+    <string name="subscription_send_hwid_summary">ارسال HWID، نسخهٔ اندروید و مدل دستگاه هنگام به‌روزرسانی این اشتراک</string>
+    <string name="amoled_theme">تم تیرهٔ AMOLED</string>
+    <string name="amoled_theme_summary">پس‌زمینهٔ کاملاً مشکی در حالت تیره</string>
+    <string name="app_theme">رنگ تأکیدی</string>
+    <string name="authenticated_http_proxy_unavailable">پراکسی HTTP اندروید (VPN) از نام کاربری و رمز عبور مورد نیاز پشتیبانی نمی‌کند.</string>
+    <string name="clash_api_token">توکن Clash API</string>
+    <string name="clash_api_token_summary">نمایش یا کپی توکن دسترسی به داشبورد</string>
+    <string name="enable_clash_api">فعال‌سازی Clash API</string>
+    <string name="enable_clash_api_summary">فراهم‌کردن clash api و داشبورد yacd در 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">سرویس پراکسی در حال اجرا متوقف شود؟</string>
+    <string name="confirm_clear_cache">پراکسی متوقف، حافظهٔ نهان هسته پاک و برنامه دوباره راه‌اندازی شود؟</string>
+    <string name="downloads_proxy_only">به‌روزرسانی فقط از طریق پراکسی</string>
+    <string name="downloads_proxy_only_summary">به‌روزرسانی اشتراک و GeoIP/GeoSite به پراکسی SOCKS محلی در حال اجرا نیاز دارد. بازگشت مستقیم غیرفعال است.</string>
+    <string name="backup_encryption_password">رمز عبور پشتیبان‌گیری (اختیاری)</string>
+    <string name="backup_encryption_summary">حداقل ۸ نویسه از پشتیبان‌های صادرشده، به‌اشتراک‌گذاشته‌شده و WebDAV محافظت می‌کند. برای پشتیبان بدون رمزگذاری خالی بگذارید. رمز عبور ذخیره نمی‌شود.</string>
+    <string name="backup_password_short">برای رمز عبور پشتیبان‌گیری حداقل از ۸ نویسه استفاده کنید.</string>
+    <string name="backup_decrypt_failed">رمز عبور نادرست یا پشتیبان خراب است. هیچ‌چیز بازیابی نشد.</string>
+    <string name="subscription_custom_hwid_params">پارامترهای سفارشی HWID</string>
+    <string name="subscription_custom_hwid_params_summary">قالب: hwid=value,os=value,osVersion=value,model=value. برای استفاده از مقادیر این دستگاه خالی بگذارید؛ هنگام تکمیل، فقط مقادیر فهرست‌شده ارسال می‌شوند.</string>
 </resources>

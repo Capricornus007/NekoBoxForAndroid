@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">كاتبوتشين</string>
     <string name="theme_classic_colors">ألوان قديمة…</string>
     <string name="theme_classic_color_swatch">نظام ألوان %1$d</string>
-    <string name="document">المستند</string>
     <string name="group_default">غير مجمعة</string>
     <string name="quick_toggle">تبديل</string>
     <string name="quick_enable">تمكين</string>
@@ -265,7 +264,6 @@
     <string name="no_amnezia_awg_profiles">لم يتم العثور على ملفات AmneziaWG في التكوين</string>
     <string name="donate">تبرع</string>
     <string name="donate_info">أنا أحب المال</string>
-    <string name="battery_optimization_enabled">تحسين البطارية: مفعل</string>
     <string name="battery_optimization_disabled">تحسين البطارية: معطل</string>
     <string name="plugin_signer_unreadable">غير قابل للقراءة</string>
     <string name="plugin_signer_rejected">تم حظر حزمة الملحق %1$s بتوقيع %2$s. اتصل مجددًا لمراجعته.</string>
@@ -479,10 +477,6 @@
     <string name="tuic_disable_sni">تعطيل SNI</string>
     <string name="tuic_reduce_rtt">تمكين مصافحة QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">شهادة SHA256 المثبتة</string>
-    <string name="please_update" formatted="false">التطبيق الخاص بك قديم جدًا (%1$s). وسيتوقف عن العمل في %2$s. يرجى
-        التحديث!</string>
-    <string name="please_update_force" formatted="false">التطبيق الخاص بك قديم جدًا (%1$s). وقد توقف عن العمل في %2$s.
-        يرجى التحديث!</string>
     <string name="connection_test_delete_unavailable">مسح غير المتاح</string>
     <string name="move">نقل</string>
     <string name="exe_prefer_provider">المزود المفضل للإضافة</string>
@@ -766,7 +760,7 @@
     <string name="tcp_connections">%d اتصالات TCP</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (مكون أندرويد الإضافي Shadowsocks)</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (مكون أندرويد الإضافي Shadowsocks)</string>
-    <string name="plugin_exists_but_on_shit_system">يتطلب الملف التعریف %s المكوّن الإضافي %s، لكن بائع المعدات المملوكة لك (عادةً عمالقة المراقبة وصانع البرامج الضارة) تلاعب بجهاز أندرويد، مما يجعل المكون الإضافي غير قابل للاستخدام.</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">يتطلب الملف التعریف %s المكوّن الإضافي %s، لكن بائع المعدات المملوكة لك (عادةً عمالقة المراقبة وصانع البرامج الضارة) تلاعب بجهاز أندرويد، مما يجعل المكون الإضافي غير قابل للاستخدام.</string>
     <string name="group_order_by_delay">عن طريق التأخير</string>
     <string name="group_order_by_name">بالاسم</string>
     <string name="group_order_origin">أصل</string>
@@ -997,6 +991,7 @@
     <string name="proton_added">تمت إضافة %s</string>
     <string name="proton_no_nodes">لا توجد خوادم قابلة للاستخدام</string>
     <string name="proton_node_count">%1$d خوادم، تم تخطي %2$d</string>
+    <string name="proton_filtered_by_tier">تمت التصفية حسب مستوى الحساب %1$d</string>
     <string name="proton_sidecar_missing">لا يتضمن هذا الإصدار مساعد Proton.</string>
     <string name="proton_2fa_required">هذا الحساب يتطلب رمز 2FA.</string>
     <string name="proton_auto_login">تسجيل الدخول التلقائي</string>
@@ -1143,4 +1138,24 @@
     <string name="ua_updated_toast">تم تحديث UA</string>
     <string name="udp_over_tcp">UDP عبر TCP</string>
     <string name="update_existing_subscriptions_ua">تحديث UA للاشتراكات الموجودة</string>
+    <string name="subscription_send_hwid">إرسال HWID</string>
+    <string name="subscription_send_hwid_summary">إرسال HWID وإصدار Android وطراز الجهاز عند تحديث هذا الاشتراك</string>
+    <string name="amoled_theme">سمة داكنة AMOLED</string>
+    <string name="amoled_theme_summary">خلفية سوداء نقية في الوضع الداكن</string>
+    <string name="app_theme">لون التمييز</string>
+    <string name="authenticated_http_proxy_unavailable">لا يدعم وكيل HTTP الخاص بشبكة Android VPN اسم المستخدم وكلمة المرور المطلوبَين.</string>
+    <string name="clash_api_token">رمز Clash API</string>
+    <string name="clash_api_token_summary">إظهار أو نسخ رمز الوصول إلى لوحة التحكم</string>
+    <string name="enable_clash_api">تفعيل Clash API</string>
+    <string name="enable_clash_api_summary">توفير Clash API ولوحة yacd على 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">إيقاف الوكيل قيد التشغيل؟</string>
+    <string name="confirm_clear_cache">إيقاف الوكيل ومسح ذاكرة التخزين المؤقت وإعادة تشغيل التطبيق؟</string>
+    <string name="downloads_proxy_only">التحديثات عبر الوكيل فقط</string>
+    <string name="downloads_proxy_only_summary">تتطلب تحديثات الاشتراك وGeoIP/GeoSite تشغيل وكيل SOCKS المحلي. تم تعطيل الرجوع المباشر.</string>
+    <string name="backup_encryption_password">كلمة مرور النسخ الاحتياطي (اختياري)</string>
+    <string name="backup_encryption_summary">توفر 8 أحرف على الأقل حماية للنسخ الاحتياطية المُصدَّرة والمُشاركة ونسخ WebDAV. اتركها فارغة لنسخة غير مشفرة. لا تُحفَظ كلمة المرور.</string>
+    <string name="backup_password_short">استخدم 8 أحرف على الأقل لكلمة مرور النسخ الاحتياطي.</string>
+    <string name="backup_decrypt_failed">كلمة مرور غير صحيحة أو نسخة احتياطية تالفة. لم تتم استعادة أي شيء.</string>
+    <string name="subscription_custom_hwid_params">معلمات HWID مخصصة</string>
+    <string name="subscription_custom_hwid_params_summary">التنسيق: hwid=value,os=value,osVersion=value,model=value. اتركها فارغة لاستخدام قيم هذا الجهاز؛ وعند ملئها، تُرسَل القيم المذكورة فقط.</string>
 </resources>

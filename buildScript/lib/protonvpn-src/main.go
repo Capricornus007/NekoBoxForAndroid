@@ -428,6 +428,15 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 	case "nodes":
 		return runNodes(args[1:], stdout, stderr)
 
+	case "refresh":
+		return runRefresh(args[1:], stdout, stderr)
+
+	case "tier":
+		return runTier(args[1:], stdout, stderr)
+
+	case "ovpn":
+		return runOvpn(args[1:], stdout, stderr)
+
 	case "keypair":
 		return runKeyPair(stdout, stderr)
 

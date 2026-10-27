@@ -856,7 +856,7 @@ fun buildSingBoxOutboundStreamSettings(bean: StandardV2RayBean): V2RayTransportO
                 type = "http"
                 if (!bean.isTLS()) method = "GET" // v2ray tcp header
                 if (bean.host.isNotBlank()) {
-                    host = bean.host.split(",")
+                    host = bean.host.listByLineOrComma()
                 }
                 path = bean.path.takeIf { it.isNotBlank() } ?: "/"
             }

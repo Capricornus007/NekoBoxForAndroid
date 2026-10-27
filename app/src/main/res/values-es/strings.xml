@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Colores legado…</string>
     <string name="theme_classic_color_swatch">Tema de color %1$d</string>
-    <string name="document">Documento</string>
     <string name="group_default">Sin grupo</string>
     <string name="quick_toggle">Alternar</string>
     <string name="quick_enable">Habilitar</string>
@@ -57,11 +56,11 @@
  
     <string name="group_status_proxies">%d proxys</string>
  
-    <string name="group_status_proxies_subscription">%d proxys | Actualizado el %s</string>
+    <string name="group_status_proxies_subscription" formatted="false">%d proxys | Actualizado el %s</string>
  
     <string name="group_no_difference">%s: Sin diferencia</string>
  
-    <string name="group_updated">%s: %d proxys actualizados</string>
+    <string name="group_updated" formatted="false">%s: %d proxys actualizados</string>
  
     <string name="group_show_diff">Diferencia</string>
  
@@ -768,7 +767,7 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Confirmar</string>
     <string name="missing_plugin">Falta un plugin</string>
-    <string name="profile_requiring_plugin">El perfil %s requiere instalar el plugin %s, pero no se encontró.</string>
+    <string name="profile_requiring_plugin" formatted="false">El perfil %s requiere instalar el plugin %s, pero no se encontró.</string>
     <string name="action_learn_more">MÁS INFORMACIÓN</string>
     <string name="action_download">DESCARGAR</string>
     <string name="install_from_play_store">Instalar desde Play Store</string>
@@ -786,7 +785,7 @@
     <string name="server_dns_subscription_sum">DNS opcional usado solo para resolver dominios de servidores en esta suscripción.</string>
     <string name="server_dns_invalid">DNS de servidor personalizado no válido. Usa https://, tls://, quic:// o host[:puerto]</string>
     <string name="subscription_used">%s usado</string>
-    <string name="subscription_traffic">%s usado / %s restante</string>
+    <string name="subscription_traffic" formatted="false">%s usado / %s restante</string>
     <string name="subscription_expire">Caduca: %s</string>
     <string name="subscription_import">Importar suscripción</string>
     <string name="subscription_import_message">¿Confirmas que quieres importar la suscripción %s? Si vienes</string>
@@ -809,7 +808,7 @@
     <string name="group_order_origin">Original</string>
     <string name="group_order_by_name">Por nombre</string>
     <string name="group_order_by_delay">Por retardo</string>
-    <string name="plugin_exists_but_on_shit_system">El perfil %s requiere el plugin %s, pero tu equipo propietario</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">El perfil %s requiere el plugin %s, pero tu equipo propietario</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (plugin de Shadowsocks Android)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (plugin de Shadowsocks Android)</string>
     <string name="tcp_connections">%d conexiones TCP</string>
@@ -997,7 +996,6 @@
     <string name="balancer_use_front_proxy">Usar proxy frontal</string>
     <string name="balancer_use_landing_proxy">Usar proxy de aterrizaje</string>
     <string name="battery_optimization_disabled">Optimización de batería desactivada</string>
-    <string name="battery_optimization_enabled">Optimización de batería activada</string>
     <string name="concurrent_dial">Marcado concurrente</string>
     <string name="concurrent_dial_summary">Activar conexiones concurrentes</string>
     <string name="connection_status_connected">Conectado</string>
@@ -1185,6 +1183,7 @@
     <string name="proton_added">%s añadido</string>
     <string name="proton_no_nodes">No hay servidores utilizables</string>
     <string name="proton_node_count">%1$d servidores, %2$d omitidos</string>
+    <string name="proton_filtered_by_tier">Filtrado por el nivel de cuenta %1$d</string>
     <string name="proton_sidecar_missing">Esta compilación no incluye el ayudante de Proton.</string>
     <string name="proton_2fa_required">Esta cuenta necesita un código 2FA.</string>
     <string name="proton_auto_login">Acceso automático</string>
@@ -1313,8 +1312,6 @@
     <string name="hide_unavailable_profiles">Ocultar perfiles no disponibles</string>
     <string name="local_proxy_settings">Ajustes del proxy local</string>
     <string name="pinned_certchain_sha256">SHA256 del certificado anclado</string>
-    <string name="please_update" formatted="false">Tu app es demasiado antigua (%s) y dejará de funcionar el %s. ¡Actualízala!</string>
-    <string name="please_update_force" formatted="false">Tu app es demasiado antigua (%s) y dejó de funcionar el %s. ¡Actualízala!</string>
     <string name="port_out_of_range">El puerto debe estar en el rango 1–65535</string>
     <string name="proton_session_expired">Tu sesión de Proton fue rechazada. Inicia sesión de nuevo.</string>
     <string name="proxy_password">Contraseña del proxy</string>
@@ -1328,4 +1325,24 @@
     <string name="socks_port">Puerto del proxy SOCKS5</string>
     <string name="ua_updated_toast">UA actualizado</string>
     <string name="update_existing_subscriptions_ua">Actualizar el UA de las suscripciones existentes</string>
+    <string name="amoled_theme">Tema oscuro AMOLED</string>
+    <string name="amoled_theme_summary">Fondo negro puro en modo oscuro</string>
+    <string name="app_theme">Color de acento</string>
+    <string name="authenticated_http_proxy_unavailable">El proxy HTTP de VPN Android no admite el nombre de usuario y la contraseña requeridos.</string>
+    <string name="backup_decrypt_failed">Contraseña incorrecta o copia de seguridad dañada. No se restauró nada.</string>
+    <string name="backup_encryption_password">Contraseña de la copia de seguridad (opcional)</string>
+    <string name="backup_encryption_summary">Al menos 8 caracteres protegen las copias exportadas, compartidas y WebDAV. Déjala vacía para una copia sin cifrar. La contraseña no se guarda.</string>
+    <string name="backup_password_short">Usa al menos 8 caracteres para la contraseña de la copia de seguridad.</string>
+    <string name="clash_api_token">Token de la API de Clash</string>
+    <string name="clash_api_token_summary">Mostrar o copiar el token de acceso al panel</string>
+    <string name="confirm_clear_cache">¿Detener el proxy, limpiar la caché del núcleo y reiniciar la app?</string>
+    <string name="confirm_stop_service">¿Detener el proxy en ejecución?</string>
+    <string name="downloads_proxy_only">Actualizaciones solo mediante proxy</string>
+    <string name="downloads_proxy_only_summary">Las actualizaciones de suscripciones y de GeoIP/GeoSite requieren el proxy SOCKS local activo. El reintento directo está desactivado.</string>
+    <string name="enable_clash_api">Activar la API de Clash</string>
+    <string name="enable_clash_api_summary">Proporcionar la API de Clash y el panel yacd en 127.0.0.1:9090</string>
+    <string name="subscription_custom_hwid_params">Parámetros HWID personalizados</string>
+    <string name="subscription_custom_hwid_params_summary">Formato: hwid=valor,os=valor,osVersion=valor,model=valor. Déjalo vacío para usar los valores de este dispositivo; si se rellena, solo se envían los valores indicados.</string>
+    <string name="subscription_send_hwid">Enviar HWID</string>
+    <string name="subscription_send_hwid_summary">Enviar HWID, versión de Android y modelo del dispositivo al actualizar esta suscripción</string>
 </resources>

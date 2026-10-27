@@ -270,7 +270,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="donate_info">Saya suka uang</string>
     <string name="ignore_battery_optimizations">Abaikan optimasi baterai</string>
     <string name="ignore_battery_optimizations_sum">Hapus beberapa pembatasan</string>
-    <string name="battery_optimization_enabled">Diaktifkan - aplikasi dapat berjalan tanpa batasan di latar belakang</string>
     <string name="battery_optimization_disabled">Dinonaktifkan - ketuk untuk mengizinkan aktivitas latar belakang</string>
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Konfigurasi…</string>
@@ -572,10 +571,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="tuic_disable_sni">Nonaktifkan SNI</string>
     <string name="tuic_reduce_rtt">Aktifkan handshake QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">Sertifikat PIN SHA256</string>
-    <string name="please_update" formatted="false">APLIKASI Anda terlalu lama (%1$s). Dan akan berhenti bekerja pada %2$s. Tolong
-        perbarui!</string>
-    <string name="please_update_force" formatted="false">APLIKASI Anda terlalu lama (%1$s). Dan telah berhenti bekerja pada %2$s.
-        Tolong perbarui!</string>
     <string name="connection_test_delete_unavailable">Hapus yang tidak tersedia</string>
     <string name="move">Pindahkan</string>
     <string name="exe_prefer_provider">Penyedia Pilihan Plugin</string>
@@ -1004,6 +999,7 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="proton_added">%s ditambahkan</string>
     <string name="proton_no_nodes">Tidak ada server yang bisa dipakai</string>
     <string name="proton_node_count">%1$d server, %2$d dilewati</string>
+    <string name="proton_filtered_by_tier">Difilter menurut tingkat akun %1$d</string>
     <string name="proton_sidecar_missing">Build ini tidak menyertakan pembantu Proton.</string>
     <string name="proton_2fa_required">Akun ini memerlukan kode 2FA.</string>
     <string name="proton_auto_login">Masuk otomatis</string>
@@ -1113,7 +1109,6 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="copy_current_link">Salin Tautan</string>
     <string name="custom_ua_hint">User-Agent kustom</string>
     <string name="default_subscription_user_agent">User-Agent langganan bawaan</string>
-    <string name="document">Dokumen</string>
     <string name="format_snlink_lower">snlink</string>
     <string name="format_snlink_upper">SNLINK</string>
     <string name="github">Kode sumber</string>
@@ -1158,4 +1153,24 @@ Rekomendasi: Hanya aktifkan ini jika Anda mempercayai semua aplikasi yang terins
     <string name="udp_over_tcp">UDP melalui TCP</string>
     <string name="update_existing_subscriptions_ua">Perbarui User-Agent langganan yang ada</string>
     <string name="version_x">Versi (%s)</string>
+    <string name="subscription_send_hwid">Kirim HWID</string>
+    <string name="subscription_send_hwid_summary">Kirim HWID, versi Android, dan model perangkat saat memperbarui langganan ini</string>
+    <string name="amoled_theme">Tema Gelap AMOLED</string>
+    <string name="amoled_theme_summary">Latar belakang hitam pekat di mode gelap</string>
+    <string name="app_theme">Warna Aksen</string>
+    <string name="authenticated_http_proxy_unavailable">Proksi HTTP VPN Android tidak mendukung nama pengguna dan kata sandi yang diperlukan.</string>
+    <string name="clash_api_token">Token API Clash</string>
+    <string name="clash_api_token_summary">Tampilkan atau salin token akses dasbor</string>
+    <string name="enable_clash_api">Aktifkan API Clash</string>
+    <string name="enable_clash_api_summary">Sediakan clash api dan dasbor yacd di 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">Hentikan proksi yang berjalan?</string>
+    <string name="confirm_clear_cache">Hentikan proksi, bersihkan cache inti, dan mulai ulang aplikasi?</string>
+    <string name="downloads_proxy_only">Pembaruan hanya melalui proksi</string>
+    <string name="downloads_proxy_only_summary">Pembaruan langganan serta GeoIP/GeoSite memerlukan proksi SOCKS lokal yang berjalan. Fallback langsung dinonaktifkan.</string>
+    <string name="backup_encryption_password">Kata sandi cadangan (opsional)</string>
+    <string name="backup_encryption_summary">Minimal 8 karakter melindungi cadangan yang diekspor, dibagikan, dan WebDAV. Kosongkan untuk cadangan tanpa enkripsi. Kata sandi tidak disimpan.</string>
+    <string name="backup_password_short">Gunakan minimal 8 karakter untuk kata sandi cadangan.</string>
+    <string name="backup_decrypt_failed">Kata sandi salah atau cadangan rusak. Tidak ada yang dipulihkan.</string>
+    <string name="subscription_custom_hwid_params">Parameter HWID kustom</string>
+    <string name="subscription_custom_hwid_params_summary">Format: hwid=value,os=value,osVersion=value,model=value. Kosongkan untuk memakai nilai perangkat ini; jika diisi, hanya nilai yang tercantum yang dikirim.</string>
 </resources>

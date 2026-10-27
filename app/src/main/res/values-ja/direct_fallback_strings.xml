@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">直接ルートのプロキシフォールバック</string>
+    <string name="direct_fallback_summary">制御サイトに直接アクセスできない場合、直接ルートに選択したプロキシを使用します。復旧時に直接アクセスを戻します。LAN は直接のままです。既存の接続は再接続されます。</string>
+    <string name="direct_fallback_url">制御サイト</string>
+    <string name="direct_fallback_url_summary">1 行に 1 つの HTTP(S) URL、最大 8 個。直接アクセスのみがテストされます。設定されたクォーラムと連続チェックが切り替えを制御します。</string>
+    <string name="direct_fallback_interval">チェック間隔（秒）</string>
+    <string name="direct_fallback_invalid_url">資格情報やフラグメントのない有効な HTTP または HTTPS の URL を入力してください。</string>
+    <string name="direct_fallback_invalid_interval">チェック間隔は 5 から 3600 秒の間でなければなりません。</string>
+    <string name="dns_server_input_help">local または localhost は、基盤となるネットワークの Android DNS を使用します。このデバイスで動作している DNS サーバーを使用するには、明示的に udp://127.0.0.1:53 を指定してください。</string>
+</resources>

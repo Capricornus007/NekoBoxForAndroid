@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Colori classici…</string>
     <string name="theme_classic_color_swatch">Tema colore %1$d</string>
-    <string name="document">Documento</string>
     <string name="group_default">Non raggruppato</string>
     <string name="quick_toggle">Attiva/Disattiva</string>
     <string name="quick_enable">Abilita</string>
@@ -295,7 +294,6 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="donate_info">Amo i soldi</string>
     <string name="ignore_battery_optimizations">Ignora ottimizzazioni batteria</string>
     <string name="ignore_battery_optimizations_sum">Rimuovi alcune restrizioni</string>
-    <string name="battery_optimization_enabled">Abilitata - l\'app può essere eseguita senza restrizioni in background</string>
     <string name="battery_optimization_disabled">Disabilitata - tocca per consentire l\'attività in background</string>
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Configura…</string>
@@ -595,10 +593,6 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="tuic_disable_sni">Disabilita SNI</string>
     <string name="tuic_reduce_rtt">Abilita handshake QUIC 0-RTT</string>
     <string name="pinned_certchain_sha256">SHA256 del certificato fissato</string>
-    <string name="please_update" formatted="false">La tua app è troppo vecchia (%1$s). Smetterà di funzionare il %2$s. Per favore,
-        aggiornala!</string>
-    <string name="please_update_force" formatted="false">La tua app è troppo vecchia (%1$s). Ha smesso di funzionare il %2$s.
-        Per favore, aggiornala!</string>
     <string name="connection_test_delete_unavailable">Cancella non disponibili</string>
     <string name="move">Sposta</string>
     <string name="exe_prefer_provider">Provider preferito del plugin</string>
@@ -1027,6 +1021,7 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="proton_added">%s aggiunto</string>
     <string name="proton_no_nodes">Nessun server utilizzabile</string>
     <string name="proton_node_count">%1$d server, %2$d ignorati</string>
+    <string name="proton_filtered_by_tier">Filtrato per il livello account %1$d</string>
     <string name="proton_sidecar_missing">Questa versione non include l\'assistente Proton.</string>
     <string name="proton_2fa_required">Questo account richiede un codice 2FA.</string>
     <string name="proton_auto_login">Accesso automatico</string>
@@ -1158,4 +1153,24 @@ Raccomandazione: abilita solo se ti fidi di tutte le app installate.</string>
     <string name="ua_updated_toast">UA aggiornato</string>
     <string name="udp_over_tcp">UDP su TCP</string>
     <string name="update_existing_subscriptions_ua">Aggiorna l\'UA degli abbonamenti esistenti</string>
+    <string name="amoled_theme">Tema scuro AMOLED</string>
+    <string name="amoled_theme_summary">Sfondo nero puro in modalità scura</string>
+    <string name="app_theme">Colore di accento</string>
+    <string name="authenticated_http_proxy_unavailable">Il proxy HTTP della VPN Android non supporta il nome utente e la password richiesti.</string>
+    <string name="backup_decrypt_failed">Password errata o backup danneggiato. Non è stato ripristinato nulla.</string>
+    <string name="backup_encryption_password">Password del backup (facoltativa)</string>
+    <string name="backup_encryption_summary">Almeno 8 caratteri proteggono i backup esportati, condivisi e WebDAV. Lascia vuoto per un backup non criptato. La password non viene salvata.</string>
+    <string name="backup_password_short">Usa almeno 8 caratteri per la password del backup.</string>
+    <string name="clash_api_token">Token API Clash</string>
+    <string name="clash_api_token_summary">Mostra o copia il token di accesso del pannello</string>
+    <string name="confirm_clear_cache">Fermare il proxy, svuotare la cache del core e riavviare l\'app?</string>
+    <string name="confirm_stop_service">Fermare il proxy in esecuzione?</string>
+    <string name="downloads_proxy_only">Aggiornamenti solo tramite proxy</string>
+    <string name="downloads_proxy_only_summary">Gli aggiornamenti di sottoscrizioni e GeoIP/GeoSite richiedono il proxy SOCKS locale in esecuzione. Il fallback diretto è disabilitato.</string>
+    <string name="enable_clash_api">Abilita API Clash</string>
+    <string name="enable_clash_api_summary">Fornisce API Clash e dashboard yacd su 127.0.0.1:9090</string>
+    <string name="subscription_custom_hwid_params">Parametri HWID personalizzati</string>
+    <string name="subscription_custom_hwid_params_summary">Formato: hwid=valore,os=valore,osVersion=valore,model=valore. Lascia vuoto per usare i valori di questo dispositivo; quando compilato, vengono inviati solo i valori elencati.</string>
+    <string name="subscription_send_hwid">Invia HWID</string>
+    <string name="subscription_send_hwid_summary">Invia HWID, versione Android e modello del dispositivo durante l\'aggiornamento di questa sottoscrizione</string>
 </resources>

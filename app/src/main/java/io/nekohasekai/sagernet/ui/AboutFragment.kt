@@ -123,22 +123,20 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
 
         val pm = app.getSystemService(Context.POWER_SERVICE) as PowerManager
         val ignoring = pm.isIgnoringBatteryOptimizations(app.packageName)
-        items += AboutItem(
-            icon = R.drawable.ic_baseline_running_with_errors_24,
-            text = getString(R.string.ignore_battery_optimizations),
-            subText = getString(
-                if (ignoring) {
-                    R.string.battery_optimization_enabled
-                } else {
-                    R.string.battery_optimization_disabled
+        // 使用者裁定（2026-10-27）：系統已經忽略電池最佳化時，這一列**不顯示**——
+        // 看得見就代表按下去還有事要做；哪天使用者自己取消忽略，回來就又會出現。
+        if (!ignoring) {
+            items += AboutItem(
+                icon = R.drawable.ic_baseline_running_with_errors_24,
+                text = getString(R.string.ignore_battery_optimizations),
+                subText = getString(R.string.battery_optimization_disabled),
+                onClick = {
+                    requestIgnoreBatteryOptimizations.launch(
+                        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),
+                    )
                 },
-            ),
-            onClick = {
-                requestIgnoreBatteryOptimizations.launch(
-                    Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS),
-                )
-            },
-        )
+            )
+        }
 
         return items
     }

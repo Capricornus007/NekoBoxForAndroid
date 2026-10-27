@@ -17,7 +17,7 @@
             app:key="serverPort"
             app:title="@string/server_port"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
             app:icon="@drawable/ic_baseline_domain_24"
             app:key="localAddress"
             app:title="@string/wireguard_local_address"
@@ -70,6 +70,15 @@
             app:key="persistentKeepaliveInterval"
             app:title="@string/wireguard_persistent_keepalive"
             app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/wireguard_imported_options">
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+            app:key="dnsServers" app:title="DNS" app:useSimpleSummaryProvider="true" />
+        <io.nekohasekai.sagernet.widget.MultilineEditTextPreference
+            app:key="allowedIPs" app:title="AllowedIPs" app:useSimpleSummaryProvider="true" />
+        <EditTextPreference app:key="persistentKeepalive" app:dialogMessage="@string/amneziawg_range_hint" app:title="PersistentKeepalive" app:defaultValue="0" app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat app:key="useConfigRoutes" app:title="@string/wireguard_use_config_routes" app:summary="@string/wireguard_use_config_routes_summary" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/amneziawg_category">
@@ -160,6 +169,18 @@
             app:key="i5"
             app:title="@string/amneziawg_i5"
             app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="AmneziaWG 3.1">
+        <EditTextPreference app:key="headerProtectionKey" app:title="HeaderProtectionKey" app:dialogLayout="@layout/layout_password_dialog" app:dialogMessage="@string/amneziawg_header_key_hint" />
+        <EditTextPreference app:key="contentPaddingAddition" app:title="ContentPaddingAddition" app:dialogMessage="@string/amneziawg_range_hint" app:useSimpleSummaryProvider="true" />
+        <EditTextPreference app:key="rekeyAfterTime" app:title="RekeyAfterTime" app:dialogMessage="@string/amneziawg_range_hint" app:useSimpleSummaryProvider="true" />
+        <EditTextPreference app:key="rekeyTimeout" app:title="RekeyTimeout" app:dialogMessage="@string/amneziawg_range_hint" app:useSimpleSummaryProvider="true" />
+        <EditTextPreference app:key="rejectAfterTime" app:title="RejectAfterTime" app:dialogMessage="@string/amneziawg_range_hint" app:useSimpleSummaryProvider="true" />
+        <EditTextPreference app:key="keepaliveTimeout" app:title="KeepaliveTimeout" app:dialogMessage="@string/amneziawg_range_hint" app:useSimpleSummaryProvider="true" />
+        <EditTextPreference app:key="maxHandshakeAttempts" app:title="MaxHandshakeAttempts" app:dialogMessage="@string/amneziawg_range_hint" app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat app:key="randomTrailers" app:title="RandomTrailers" app:summary="@string/amneziawg_random_trailers_hint" />
+        <SwitchPreferenceCompat app:key="disableCookies" app:title="DisableCookies" app:summary="@string/amneziawg_disable_cookies_hint" />
     </PreferenceCategory>
 
 </PreferenceScreen>

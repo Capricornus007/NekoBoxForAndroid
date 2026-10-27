@@ -123,7 +123,11 @@ class SagerNet :
             Theme.apply(this)
             Theme.applyNightTheme()
             AppLocale.apply()
-            DataStore.migrateSubscriptionUserAgents()
+            // migrateSubscriptionUserAgents() 查 groupDao（阻塞 DAO）且內部 catch Throwable：
+            // 在 Application.onCreate 主線跑會被靜默吞掉，遷移等於完全沒執行。交背景。
+            runOnDefaultDispatcher {
+                DataStore.migrateSubscriptionUserAgents()
+            }
             runOnDefaultDispatcher {
                 DefaultNetworkListener.start(this) {
                     underlyingNetwork = it
@@ -244,8 +248,14 @@ class SagerNet :
         fun getClipboardText(): String = clipboard.primaryClip?.takeIf { it.itemCount > 0 }
             ?.getItemAt(0)?.text?.toString() ?: ""
 
-        fun trySetPrimaryClip(clip: String) = try {
-            clipboard.setPrimaryClip(ClipData.newPlainText(null, clip))
+        fun trySetPrimaryClip(clip: String, sensitive: Boolean = false) = try {
+            val data = ClipData.newPlainText(null, clip)
+            if (sensitive && Build.VERSION.SDK_INT >= 33) {
+                data.description.extras = android.os.PersistableBundle().apply {
+                    putBoolean(android.content.ClipDescription.EXTRA_IS_SENSITIVE, true)
+                }
+            }
+            clipboard.setPrimaryClip(data)
             true
         } catch (e: RuntimeException) {
             Logs.w(e)
@@ -268,6 +278,9 @@ class SagerNet :
                 if (profileId >= 0L) putExtra(Action.EXTRA_PROFILE_ID, profileId)
             },
         )
+
+        // isai 相容：force=true 走硬重啟（BaseService receiver 轉 stopRunner(restart=true)）。
+        fun reloadService(force: Boolean) = application.sendBroadcast(Intent(Action.RELOAD).setPackage(application.packageName).putExtra("force", force))
 
         fun restartService() = application.sendBroadcast(Intent(Action.RESTART).setPackage(application.packageName))
 

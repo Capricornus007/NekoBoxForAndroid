@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">میان‌بُر پروکسی برای مسیرهای مستقیم</string>
+    <string name="direct_fallback_summary">اگر وب‌سایت کنترل مستقیماً در دسترس نباشد، از پروکسی انتخاب‌شده برای مسیرهای مستقیم استفاده کنید. هنگام بازیابی، دسترسی مستقیم برمی‌گردد. LAN مستقیم باقی می‌ماند. اتصالات موجود دوباره متصل می‌شوند.</string>
+    <string name="direct_fallback_url">وب‌سایت‌های کنترل</string>
+    <string name="direct_fallback_url_summary">یک URL HTTP(S) در هر خط، تا ۸ مورد. فقط دسترسی مستقیم آزمایش می‌شود؛ حد نصاب پیکربندی‌شده و بررسی‌های متوالی تعویض را کنترل می‌کنند.</string>
+    <string name="direct_fallback_interval">فاصله بررسی (ثانیه)</string>
+    <string name="direct_fallback_invalid_url">یک URL معتبر HTTP یا HTTPS بدون اعتبارنامه یا بخش وارد کنید.</string>
+    <string name="direct_fallback_invalid_interval">فاصله بررسی باید بین ۵ تا ۳۶۰۰ ثانیه باشد.</string>
+    <string name="dns_server_input_help">local یا localhost از DNS اندروید روی شبکه زیربنایی استفاده می‌کند. برای استفاده از یک سرور DNS در حال اجرا روی این دستگاه، صراحتاً udp://127.0.0.1:53 را مشخص کنید.</string>
+</resources>

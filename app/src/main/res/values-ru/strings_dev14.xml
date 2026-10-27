@@ -1,0 +1,7 @@
+<resources>
+  <string name="open_navigation_menu">Открыть меню навигации</string>
+  <string name="editor_tab">Добавить отступ</string>
+  <string name="editor_undo">Отменить</string>
+  <string name="editor_redo">Повторить</string>
+  <string name="editor_format">Форматировать JSON</string>
+</resources>

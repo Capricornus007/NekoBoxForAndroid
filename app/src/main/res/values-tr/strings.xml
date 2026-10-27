@@ -20,7 +20,6 @@
     <string name="quick_enable">Etkinleştir</string>
     <string name="quick_disable">Devre Dışı Bırak</string>
     <string name="group_default">Gruplandırılmamış</string>
-    <string name="document">Döküman</string>
     <string name="theme">Tema</string>
     <string name="menu_about">Hakkında</string>
     <string name="menu_group">Grup</string>
@@ -277,7 +276,6 @@
     <string name="donate_info">Parayı seviyorum</string>
     <string name="ignore_battery_optimizations">Pil optimizasyonlarını yoksay</string>
     <string name="ignore_battery_optimizations_sum">Bazı kısıtlamaları kaldır</string>
-    <string name="battery_optimization_enabled">Pil Optimizasyonu: açık</string>
     <string name="battery_optimization_disabled">Pil Optimizasyonu: kapalı</string>
     <string name="plugin">Eklenti</string>
     <string name="plugin_configure">Yapılandır…</string>
@@ -983,6 +981,7 @@
     <string name="proton_added">%s eklendi</string>
     <string name="proton_no_nodes">Kullanılabilir sunucu yok</string>
     <string name="proton_node_count">%1$d sunucu, %2$d atlandı</string>
+    <string name="proton_filtered_by_tier">Hesap seviyesi %1$d ile filtrelendi</string>
     <string name="proton_sidecar_missing">Bu derleme Proton yardımcısını içermiyor.</string>
     <string name="proton_2fa_required">Bu hesap 2FA kodu gerektiriyor.</string>
     <string name="proton_auto_login">Otomatik oturum açma</string>
@@ -1095,8 +1094,6 @@
     <string name="hide_unavailable_profiles">Kullanılamayan profilleri gizle</string>
     <string name="local_proxy_settings">Yerel Proxy Ayarları</string>
     <string name="pinned_certchain_sha256">Sabitlenmiş Sertifika SHA256</string>
-    <string name="please_update" formatted="false">Uygulamanız çok eski (%s). %s tarihinde çalışmayı durduracak. Lütfen güncelleyin!</string>
-    <string name="please_update_force" formatted="false">Uygulamanız çok eski (%s). %s tarihinde çalışmayı durdurdu. Lütfen güncelleyin!</string>
     <string name="port_out_of_range">Port 1–65535 aralığında olmalı</string>
     <string name="proton_session_expired">Proton oturumunuz reddedildi. Lütfen yeniden giriş yapın.</string>
     <string name="proxy_password">Proxy Parolası</string>
@@ -1118,4 +1115,24 @@
     <string name="udp_over_tcp">TCP üzerinden UDP</string>
     <string name="update_existing_subscriptions_ua">Mevcut aboneliklerin User-Agent bilgisini güncelle</string>
     <string name="waterfall_settings">Şelale Ayarları</string>
+    <string name="amoled_theme">AMOLED koyu tema</string>
+    <string name="amoled_theme_summary">Karanlık modda saf siyah arka plan</string>
+    <string name="app_theme">Vurgu rengi</string>
+    <string name="authenticated_http_proxy_unavailable">Android VPN HTTP proxy\'si gereken kullanıcı adını ve parolayı desteklemiyor.</string>
+    <string name="backup_decrypt_failed">Yanlış parola veya bozuk yedek. Hiçbir şey geri yüklenmedi.</string>
+    <string name="backup_encryption_password">Yedek parolası (isteğe bağlı)</string>
+    <string name="backup_encryption_summary">En az 8 karakter, dışa aktarılan, paylaşılan ve WebDAV yedeklerini korur. Şifrelenmemiş yedek için boş bırakın. Parola kaydedilmez.</string>
+    <string name="backup_password_short">Yedek parolası için en az 8 karakter kullanın.</string>
+    <string name="clash_api_token">Clash API belirteci</string>
+    <string name="clash_api_token_summary">Panel erişim belirtecini göster veya kopyala</string>
+    <string name="confirm_clear_cache">Proxy durdurulsun, çekirdek önbelleği temizlensin ve uygulama yeniden başlatılsın mı?</string>
+    <string name="confirm_stop_service">Çalışan proxy durdurulsun mu?</string>
+    <string name="downloads_proxy_only">Yalnızca proxy üzerinden güncellemeler</string>
+    <string name="downloads_proxy_only_summary">Abonelik ve GeoIP/GeoSite güncellemeleri, çalışan yerel SOCKS proxy\'si gerektirir. Doğrudan geri dönüş devre dışıdır.</string>
+    <string name="enable_clash_api">Clash API\'yi etkinleştir</string>
+    <string name="enable_clash_api_summary">127.0.0.1:9090 adresinde Clash API ve yacd panelini sağlar</string>
+    <string name="subscription_custom_hwid_params">Özel HWID parametreleri</string>
+    <string name="subscription_custom_hwid_params_summary">Biçim: hwid=değer,os=değer,osVersion=değer,model=değer. Bu cihazın değerlerini kullanmak için boş bırakın; doldurulduğunda yalnızca listelenen değerler gönderilir.</string>
+    <string name="subscription_send_hwid">HWID gönder</string>
+    <string name="subscription_send_hwid_summary">Bu aboneliği güncellerken HWID, Android sürümü ve cihaz modelini gönder</string>
 </resources>

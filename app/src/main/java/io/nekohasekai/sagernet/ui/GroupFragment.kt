@@ -13,6 +13,7 @@ import androidx.core.view.*
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.withTransaction
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.R
@@ -302,9 +303,11 @@ class GroupFragment :
         override suspend fun groupRemoved(groupId: Long) {
             val index = groupList.indexOfFirst { it.id == groupId }
             if (index == -1) return
+            // allGroups() 是阻塞 DAO：先在背景查好，再回主線動 UI
+            val remaining = SagerDatabase.groupDao.allGroups().size
             onMainDispatcher {
                 undoManager.flush()
-                if (SagerDatabase.groupDao.allGroups().size <= 2) {
+                if (remaining <= 2) {
                     runOnDefaultDispatcher {
                         reload()
                     }
@@ -398,6 +401,29 @@ class GroupFragment :
                     startFilesForResult(exportProfiles, "profiles_${proxyGroup.displayName()}.txt")
                 }
 
+                R.id.action_undo_subscription -> {
+                    runOnDefaultDispatcher {
+                        // Share the updater reservation until the snapshot is consumed after commit.
+                        if (!GroupUpdater.updating.add(proxyGroup.id)) return@runOnDefaultDispatcher
+                        try {
+                            GroupManager.postReload(proxyGroup.id)
+                            val revision = SubscriptionHistory.revision(SagerDatabase.proxyDao.getByGroup(proxyGroup.id))
+                            if (GroupManager.userInterface?.confirm(getString(R.string.subscription_undo_confirm)) != true) return@runOnDefaultDispatcher
+                            SagerDatabase.instance.withTransaction { SubscriptionHistory.restore(proxyGroup.id, revision) }
+                            SubscriptionHistory.delete(proxyGroup.id)
+                            GroupManager.postUpdate(proxyGroup.id)
+                            if (DataStore.serviceState.started) SagerNet.reloadService(true)
+                        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                            throw cancelled
+                        } catch (e: Exception) {
+                            onMainDispatcher { activity.snackbar(redactDiagnostic(e.readableMessage)).show() }
+                        } finally {
+                            GroupUpdater.updating.remove(proxyGroup.id)
+                            GroupManager.postReload(proxyGroup.id)
+                        }
+                    }
+                }
+
                 R.id.action_clear -> {
                     MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.confirm)
                         .setMessage(R.string.clear_profiles_message)
@@ -458,6 +484,16 @@ class GroupFragment :
                 }
                 if (proxyGroup.ungrouped || proxyGroup.id in GroupUpdater.updating) {
                     popup.menu.removeItem(R.id.action_delete_group)
+
+                    // isai：訂閱回滾（SubscriptionHistory）可用性。
+                    // 用戶 2026-10-27 回報：「上一次的訂閱版本」永遠掛在那裡、看不懂在幹嘛。
+                    // 它只在「這個訂閱有存到上一版快照」時才有作用，所以改成**有快照才出現**
+                    // ——看得見就代表按下去真的能退，不必再解釋為什麼是灰的。
+                    popup.menu.findItem(R.id.action_undo_subscription).apply {
+                        isVisible = proxyGroup.type == GroupType.SUBSCRIPTION &&
+                            SubscriptionHistory.available(proxyGroup.id)
+                        isEnabled = proxyGroup.id !in GroupUpdater.updating
+                    }
                 }
                 popup.setOnMenuItemClickListener(this)
                 popup.show()

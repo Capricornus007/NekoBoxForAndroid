@@ -1,6 +1,7 @@
 package io.nekohasekai.sagernet.ui
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -20,6 +21,7 @@ import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceDataStore
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -53,11 +55,13 @@ import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.ktx.MAX_IMPORT_BYTES
+import io.nekohasekai.sagernet.ktx.MAX_SUBSCRIPTION_BYTES
 import io.nekohasekai.sagernet.ktx.SubscriptionFoundException
 import io.nekohasekai.sagernet.ktx.USER_AGENT
 import io.nekohasekai.sagernet.ktx.app
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.readBytesBounded
+import io.nekohasekai.sagernet.ktx.readBytesLimited
 import io.nekohasekai.sagernet.ktx.readTextBounded
 import io.nekohasekai.sagernet.ktx.readableMessage
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
@@ -859,12 +863,12 @@ class ConfigurationFragment @JvmOverloads constructor(
             }
 
             R.id.action_update_subscription -> {
-                val group = DataStore.currentGroup()
-                if (group.type != GroupType.SUBSCRIPTION) {
-                    snackbar(R.string.group_not_subscription).show()
-                    Logs.e("onMenuItemClick: Group(${group.displayName()}) is not subscription")
-                } else {
-                    runOnLifecycleDispatcher {
+                runOnLifecycleDispatcher {
+                    val group = withContext(Dispatchers.IO) { DataStore.currentGroup() }
+                    if (group.type != GroupType.SUBSCRIPTION) {
+                        snackbar(R.string.group_not_subscription).show()
+                        Logs.e("onMenuItemClick: Group(${group.displayName()}) is not subscription")
+                    } else {
                         GroupUpdater.startUpdate(group, true)
                     }
                 }
@@ -1065,7 +1069,16 @@ class ConfigurationFragment @JvmOverloads constructor(
 
     private fun speedTest() {
         if (anyTestRunning()) return
-        val group = DataStore.currentGroup()
+        runOnLifecycleDispatcher {
+            val group = withContext(Dispatchers.IO) { DataStore.currentGroup() }
+            withContext(Dispatchers.Main) { speedTestBody(group) }
+        }
+    }
+
+    private fun speedTestBody(group: ProxyGroup) {
+        // 讀分組時在 IO 執行緒，回到主線這段窗口內用戶可能已經切走；
+        // layoutInflater／requireContext 在 detach 後會直接拋 IllegalStateException。
+        if (!isAdded) return
         val binding = LayoutProgressListBinding.inflate(layoutInflater)
         val builder = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.speed_test_group)
@@ -1263,8 +1276,14 @@ class ConfigurationFragment @JvmOverloads constructor(
             return
         }
         if (speedTestJob.isRunning()) return
+        runOnLifecycleDispatcher {
+            val group = withContext(Dispatchers.IO) { DataStore.currentGroup() }
+            withContext(Dispatchers.Main) { urlTestBody(group) }
+        }
+    }
+
+    private fun urlTestBody(group: ProxyGroup) {
         val results = mutableListOf<ProxyEntity>()
-        val group = DataStore.currentGroup()
 
         fun refreshRows(profiles: Collection<ProxyEntity>) {
             adapter.groupFragments[group.id]?.adapter?.applyProfileState(profiles)
@@ -1336,6 +1355,9 @@ class ConfigurationFragment @JvmOverloads constructor(
                 val ok = results.count { it.status == 1 }
                 val bad = results.count { it.status != 1 }
                 onMainDispatcher {
+                    // getString 是 Fragment 的方法，用戶中途切走（例如去匯入 Proton 節點）
+                    // 時這裡已經 detach，showToast 自己的 isAdded 攔不住引數先求值。
+                    if (!isAdded) return@onMainDispatcher
                     showToast(getString(R.string.url_test_finished_summary, ok, bad))
                 }
             } finally {

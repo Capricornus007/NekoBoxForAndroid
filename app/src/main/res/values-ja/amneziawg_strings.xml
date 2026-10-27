@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">単一の値または範囲（例：25 または 25-30）。空にするとプロトコルのデフォルトを使用します。時間の単位は秒、MaxHandshakeAttempts は回数、ContentPaddingAddition はバイトです。</string>
+    <string name="amneziawg_header_key_hint">サーバーからの 32 バイトのキー（Base64 または 16 進数）。ヘッダー保護には S1、S2、S3、S4 がそれぞれ少なくとも 12 バイト必要です。</string>
+    <string name="amneziawg_random_trailers_hint">パケットのトレーラーをランダム化します（AWG 3.1）。</string>
+    <string name="amneziawg_disable_cookies_hint">プロトコル Cookie を無効にします。サーバー設定で必要な場合にのみ有効にしてください。</string>
+</resources>

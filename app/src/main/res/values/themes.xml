@@ -23,6 +23,13 @@
         <item name="uiCardStrokeColor">@android:color/transparent</item>
         <item name="uiListItemMargin">0dp</item>
         <item name="uiListOuterPadding">8dp</item>
+        <!-- 75a27b532 那波兜底只補了佈局當下有讀的 9 條，這裡補剩下 5 條讓日／夜兩邊對稱；
+          API 23–25 的白天裝置命中不到 values-v26，這條鏈同樣需要值。一律 ?attr/ 不寫死色。 -->
+        <item name="uiSurfaceBackground">?attr/colorSurface</item>
+        <item name="uiStatsBackground">?attr/colorPrimaryContainer</item>
+        <item name="uiStatsForeground">?attr/colorOnPrimaryContainer</item>
+        <item name="uiTabBackground">?attr/colorSurface</item>
+        <item name="uiNavigationItemFill">?attr/colorSecondaryContainer</item>
     </style>
     <style name="Theme.SagerNet.Dialog" parent="Theme.Material3.DayNight.Dialog">
         <item name="windowFixedHeightMajor" type="dimen">95%</item>
@@ -35,6 +42,17 @@
         <item name="uiCardStrokeColor">@android:color/transparent</item>
         <item name="uiListItemMargin">0dp</item>
         <item name="uiListOuterPadding">8dp</item>
+        <!-- 同上補齊 5 條。夜間沒有重定義 Theme.SagerNet.Dialog（values-night 只有根主題），
+          所以這份白天定義日夜共用；用 ?attr/ 間接引用，夜間會自動解析成深色角色值。
+          不抄 Expressive.Dialog 的 @android:color/transparent——那 3 條 transparent 是綁在它
+          自訂的 @drawable/bg_expressive_dialog 視窗背景上的；標準 Dialog 本身
+          uiAppBarBackground 用的就是 ?attr/colorSurface，照同一語意補。
+          （所有 Theme.SagerNet.Dialog.* 配色變體與 Theme.SagerNet.Dialog.Monet 由此繼承。） -->
+        <item name="uiSurfaceBackground">?attr/colorSurface</item>
+        <item name="uiStatsBackground">?attr/colorPrimaryContainer</item>
+        <item name="uiStatsForeground">?attr/colorOnPrimaryContainer</item>
+        <item name="uiTabBackground">?attr/colorSurface</item>
+        <item name="uiNavigationItemFill">?attr/colorSecondaryContainer</item>
     </style>
 
     <style name="AppearanceFoundation.Title" parent="TextAppearance.AppCompat.Title">

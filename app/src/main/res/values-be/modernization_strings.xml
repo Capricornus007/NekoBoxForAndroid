@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">Сервер падпіскі вярнуў пусты адказ.</string>
+    <string name="subscription_response_html">Сервер вярнуў вэб-старонку замест падпіскі. Праверце спасылку і уліковую запіс у правайдара.</string>
+    <string name="subscription_response_json_error">Сервер вярнуў памылку JSON замест падпіскі.</string>
+    <string name="subscription_response_unsupported">В адказе не знойдзены профілі падтрымліваемага фармату.</string>
+    <string name="restore_network_settings">Вярнуць папярэднія налады сеткі</string>
+    <string name="restore_network_settings_confirm">Аднавіць папярэднія DNS, маршруты і параметры падлучэння?</string>
+    <string name="restore_network_settings_failed">Не ўдалося аднавіць налады сеткі. Магчыма, выкарыстоўваемыя профілі были выдалены.</string>
+    <string name="direct_fallback_required">Даступныях сайтаў для паспяховай праверкі</string>
+    <string name="direct_fallback_failures">Няўдалых проверок для пераходу на проксі</string>
+    <string name="direct_fallback_recoveries">Паспяховых проверок для вяртання напрамую</string>
+    <string name="direct_fallback_invalid_count">Увядзіце колькасць ад 1 да %1$d.</string>
+</resources>

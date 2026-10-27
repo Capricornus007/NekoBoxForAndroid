@@ -7,8 +7,11 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy.UPDATE
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkerParameters
 import androidx.work.multiprocess.RemoteWorkManager
@@ -53,8 +56,6 @@ object SubscriptionUpdater {
     private const val WORK_NAME = "SubscriptionUpdater"
 
     suspend fun reconfigureUpdater() {
-        RemoteWorkManager.getInstance(app).cancelUniqueWork(WORK_NAME)
-
         val subscriptions = SagerDatabase.groupDao.subscriptions()
             .mapNotNull { group -> group.subscription?.let { group to it } }
             .filter { (_, sub) -> sub.autoUpdate }
@@ -68,13 +69,13 @@ object SubscriptionUpdater {
                 )
             },
         ) ?: return
-
         // main process
         RemoteWorkManager.getInstance(app).enqueueUniquePeriodicWork(
             WORK_NAME,
             UPDATE,
             PeriodicWorkRequest.Builder(UpdateTask::class.java, schedule.intervalMinutes, TimeUnit.MINUTES)
-                .apply {
+                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS).apply {
                     if (schedule.initialDelaySeconds > 0) {
                         setInitialDelay(schedule.initialDelaySeconds, TimeUnit.SECONDS)
                     }
@@ -142,7 +143,12 @@ object SubscriptionUpdater {
                 Logs.w("subscription notification cancel skipped", e)
             }
 
-            return if (attempted && failed) Result.retry() else Result.success()
+            // isai 語義：有嘗試且有失敗時最多重試 3 次（runAttemptCount），超過改判 failure。
+            return when {
+                attempted && failed && runAttemptCount < 3 -> Result.retry()
+                failed -> Result.failure()
+                else -> Result.success()
+            }
         }
 
         private fun notifyProgress() {

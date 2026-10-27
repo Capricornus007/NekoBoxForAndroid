@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">El servidor de suscripción devolvió una respuesta vacía.</string>
+    <string name="subscription_response_html">El servidor devolvió una página web en lugar de una suscripción. Compruebe el enlace y la cuenta del proveedor.</string>
+    <string name="subscription_response_json_error">El servidor devolvió un error JSON en lugar de una suscripción.</string>
+    <string name="subscription_response_unsupported">No se encontraron perfiles proxy compatibles en la respuesta.</string>
+    <string name="restore_network_settings">Restaurar la configuración de red anterior</string>
+    <string name="restore_network_settings_confirm">¿Restaurar la configuración anterior de DNS, enrutado y conexión?</string>
+    <string name="restore_network_settings_failed">No se pudo restaurar la configuración de red. Los perfiles necesarios pueden haber sido eliminados.</string>
+    <string name="direct_fallback_required">URLs de control exitosas por comprobación</string>
+    <string name="direct_fallback_failures">Comprobaciones fallidas antes de cambiar al proxy</string>
+    <string name="direct_fallback_recoveries">Comprobaciones exitosas antes de volver al directo</string>
+    <string name="direct_fallback_invalid_count">Introduzca un número del 1 al %1$d.</string>
+</resources>

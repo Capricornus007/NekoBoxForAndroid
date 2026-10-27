@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eo pipefail
 
 source "buildScript/init/env.sh"
 export CGO_ENABLED=1

@@ -17,6 +17,7 @@ import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProfileManager
 import io.nekohasekai.sagernet.databinding.ActivityProtonServersBinding
+import io.nekohasekai.sagernet.fmt.openvpn.parseOpenVPNConfig
 import io.nekohasekai.sagernet.fmt.proton.ProtonFilter
 import io.nekohasekai.sagernet.fmt.proton.ProtonGroups
 import io.nekohasekai.sagernet.fmt.proton.ProtonJson
@@ -27,6 +28,7 @@ import io.nekohasekai.sagernet.fmt.proton.ProtonSidecar
 import io.nekohasekai.sagernet.fmt.proton.placeLabel
 import io.nekohasekai.sagernet.group.RawUpdater
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.readableMessage
 import kotlinx.coroutines.launch
 
 /**
@@ -148,7 +150,19 @@ class ProtonServersActivity : ThemedActivity() {
         fetching = true
         binding.refreshLayout.isRefreshing = true
         lifecycleScope.launch {
-            val result = ProtonSidecar.nodes()
+            // 先問帳號是第幾層（免費 1／Plus 2／Visionary 3），清單就只取這個層級以下
+            // 的機器。問不到時 maxTier=0＝不過濾，維持舊行為：把「不知道」當成
+            // 「免費層」會無端砍掉付費帳號能用的節點。
+            val tier = ProtonSidecar.tier()
+            if (tier.code == ProtonSidecar.SESSION_EXPIRED) {
+                fetching = false
+                if (isFinishing || isDestroyed) return@launch
+                binding.refreshLayout.isRefreshing = false
+                showSessionExpired()
+                return@launch
+            }
+            if (!tier.ok) Logs.w("proton: plan tier unavailable: ${tier.error}")
+            val result = ProtonSidecar.nodes(maxTier = if (tier.ok) tier.maxTier else 0)
             fetching = false
             if (isFinishing || isDestroyed) return@launch
             binding.refreshLayout.isRefreshing = false
@@ -168,6 +182,12 @@ class ProtonServersActivity : ThemedActivity() {
             }
             if (result.raw.isNotEmpty() && !ProtonNodeCache.save(cacheDir, result.raw)) {
                 Logs.w("proton: failed to cache server list")
+            }
+            // 上游自己說這份清單被截斷了（v2 在回應太大時會這樣，官方客戶端用 IncludeID[]
+            // 逐台補回來，我方還沒那條路）。只記日誌：要讓用戶看得見就得加新語系字串，
+            // 而現在最重要的是別把「截斷」當成「這帳號只有這些機器」默默吞掉。
+            if (result.truncated) {
+                Logs.w("proton: upstream sent a truncated server list (${result.nodes.size} rows)")
             }
             showNodes(result, fromCache = false)
         }
@@ -205,6 +225,11 @@ class ProtonServersActivity : ThemedActivity() {
             )
         } else {
             count
+        }
+        // 有過濾就要講：不然「少了幾百台」看起來像回應壞了，而不是層級不夠。
+        if (state.maxTier > 0) {
+            binding.status.text = binding.status.text.toString() + " · " +
+                getString(R.string.proton_filtered_by_tier, state.maxTier)
         }
         renderNodes()
     }
@@ -302,6 +327,14 @@ class ProtonServersActivity : ThemedActivity() {
                 append(getString(R.string.proton_add))
                 append(" · ")
                 append(node.placeLabel())
+                // 同一台機器現在可能有兩顆按鈕（WireGuard 一顆、OpenVPN 一顆），兩邊的
+                // 城市與空閒度一模一樣：不標協定就分不出來點下去會拿到哪種剖面，
+                // 而用戶要的正是「清單裡看得到 OpenVPN 節點」。協定名是專有名詞，
+                // 不進語系檔（全局規則 35）。
+                node.rowProtocolLabel?.let {
+                    append(" · ")
+                    append(it)
+                }
                 if (idle != null) {
                     append(" ")
                     append(getString(R.string.proton_idle, idle))
@@ -322,10 +355,16 @@ class ProtonServersActivity : ThemedActivity() {
 
     private fun import(node: ProtonNode) {
         lifecycleScope.launch {
-            // 只講 OpenVPN／ProTun 的那批機器沒有 WG 金鑰，不能硬生一份 peer 空白、
-            // 點下去必定連不上的 WireGuard 剖面；生出來比不生更壞。
+            // 這一列該走哪條路看的是「它有沒有 WG 金鑰」：sidecar 現在一台機器可能出兩列，
+            // OpenVPN 那一列的 wgPublicKey 刻意留空，就是為了讓它走到下面那條分支。
+            // 只講 OpenVPN／ProTun 的機器不能硬生一份 peer 空白、點下去必定連不上的
+            // WireGuard 剖面；生出來比不生更壞。
             if (!node.hasWireGuardKey) {
-                if (!isFinishing && !isDestroyed) binding.status.setText(R.string.proton_needs_ovpn_config)
+                if (node.canUse(ProtonNode.PROTOCOL_OPENVPN)) {
+                    importOpenVpn(node)
+                } else if (!isFinishing && !isDestroyed) {
+                    binding.status.setText(R.string.proton_needs_ovpn_config)
+                }
                 return@launch
             }
             val pair = ProtonSidecar.keyPair()
@@ -370,6 +409,59 @@ class ProtonServersActivity : ThemedActivity() {
         }
     }
 
+    // OpenVPN 節點：向 Proton 換一張本機客戶端憑證（sidecar ovpn），拼出自包含 .ovpn，
+    // 交給 nb4a 現成的 OpenVPN 解析器生剖面。**全程不問任何東西**：帳號名取自已存的
+    // 登入記錄／狀態檔，憑證自動換、自動落地，按下去就多一個能用的節點。
+    private fun importOpenVpn(node: ProtonNode) {
+        lifecycleScope.launch {
+            // 傳輸要用節點自己那一列的值（OpenVPNUDP→udp、OpenVPNTCP→tcp），不能寫死 udp：
+            // 只給 TCP 鍵的那台用 udp 生出的剖面必定連不上。除此之外一律 udp，
+            // 因為 sidecar 只會把 udp／tcp 兩種交出來（TLS 變體它不列，見 openvpn_servers.go）。
+            val proto = when (node.transport.lowercase()) {
+                "tcp" -> "tcp"
+                else -> "udp"
+            }
+            val ovpn = ProtonSidecar.ovpn(
+                node.endpoint,
+                if (node.port > 0) node.port else OPENVPN_PORT,
+                proto,
+                node.ports,
+            )
+            if (isFinishing || isDestroyed) return@launch
+            if (!ovpn.ok) {
+                if (ovpn.code == ProtonSidecar.SESSION_EXPIRED) {
+                    showSessionExpired()
+                } else {
+                    binding.status.text = ovpn.error
+                }
+                return@launch
+            }
+            try {
+                val parsed = parseOpenVPNConfig(ovpn.config)
+                val bean = parsed.bean
+                // 名字要帶著是 OpenVPN 這一列：同一台機器的 WG 剖面會叫「NL#50 Amsterdam」，
+                // 兩份剖面長一樣的話用戶在清單裡分不出自己連的是哪一條線。
+                bean.name = "${node.placeLabel()} (OpenVPN)"
+                val (groupId, created) = ProtonGroups.ensure()
+                ProfileManager.createProfile(groupId, bean)
+                if (isFinishing || isDestroyed) return@launch
+                if (created) {
+                    Toast.makeText(
+                        this@ProtonServersActivity,
+                        getString(R.string.proton_group_added, ProtonGroups.NAME),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+                binding.status.text = getString(R.string.proton_added, node.name)
+            } catch (e: Exception) {
+                Logs.w("proton openvpn import failed", e)
+                if (!isFinishing && !isDestroyed) {
+                    binding.status.text = e.readableMessage
+                }
+            }
+        }
+    }
+
     companion object {
         // Proton's own client constants: the in-tunnel address is fixed rather than
         // assigned, and its DNS is the server side of that same pair.
@@ -377,5 +469,8 @@ class ProtonServersActivity : ThemedActivity() {
         private const val SERVER_IP = "10.2.0.1"
         private const val CLIENT_IP_V6 = "2a07:b944::2:2"
         private const val SERVER_IP_V6 = "2a07:b944::2:1"
+
+        // 節點沒帶埠時的退回值：Proton 官方 OpenVPN 的 UDP 埠（官網設定檔模板用同一個）。
+        private const val OPENVPN_PORT = 1194
     }
 }

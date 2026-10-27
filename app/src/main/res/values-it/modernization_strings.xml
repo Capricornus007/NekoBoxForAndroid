@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">Il server di sottoscrizione ha restituito una risposta vuota.</string>
+    <string name="subscription_response_html">Il server ha restituito una pagina web invece di una sottoscrizione. Controlla il link e l\'account del provider.</string>
+    <string name="subscription_response_json_error">Il server ha restituito un errore JSON invece di una sottoscrizione.</string>
+    <string name="subscription_response_unsupported">Nessun profilo proxy supportato trovato nella risposta.</string>
+    <string name="restore_network_settings">Ripristina le impostazioni di rete precedenti</string>
+    <string name="restore_network_settings_confirm">Ripristinare le precedenti impostazioni DNS, di routing e di connessione?</string>
+    <string name="restore_network_settings_failed">Impossibile ripristinare le impostazioni di rete. I profili necessari potrebbero essere stati eliminati.</string>
+    <string name="direct_fallback_required">URL di controllo riusciti per controllo</string>
+    <string name="direct_fallback_failures">Controlli falliti prima del passaggio al proxy</string>
+    <string name="direct_fallback_recoveries">Controlli riusciti prima del ritorno al diretto</string>
+    <string name="direct_fallback_invalid_count">Inserisci un numero da 1 a %1$d.</string>
+</resources>

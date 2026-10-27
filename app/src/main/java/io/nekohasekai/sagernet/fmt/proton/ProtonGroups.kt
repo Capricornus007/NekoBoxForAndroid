@@ -5,6 +5,8 @@ import io.nekohasekai.sagernet.GroupType
 import io.nekohasekai.sagernet.database.GroupManager
 import io.nekohasekai.sagernet.database.ProxyGroup
 import io.nekohasekai.sagernet.database.SagerDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Proton 節點一律收進一個自己的分組，不再丟進「目前選中的那個組」：混在用戶自己整理的
@@ -22,8 +24,8 @@ object ProtonGroups {
     /**
      * @return 分組 id，以及「這一次是不是新建的」（新建才要 toast，重複進頁面不該一直跳）。
      */
-    suspend fun ensure(): Pair<Long, Boolean> {
-        SagerDatabase.groupDao.allGroups().firstOrNull { it.name == NAME }?.let { return it.id to false }
+    suspend fun ensure(): Pair<Long, Boolean> = withContext(Dispatchers.IO) {
+        SagerDatabase.groupDao.allGroups().firstOrNull { it.name == NAME }?.let { return@withContext it.id to false }
         val group = GroupManager.createGroup(
             ProxyGroup(
                 name = NAME,
@@ -32,6 +34,6 @@ object ProtonGroups {
                 isSelector = true,
             ),
         )
-        return group.id to true
+        group.id to true
     }
 }

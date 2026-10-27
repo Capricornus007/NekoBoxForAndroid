@@ -14,7 +14,6 @@
     <string name="theme">Thema</string>
     <string name="use_system_theme">Gebruik systeemthema</string>
     <string name="use_system_theme_summary">Gebruik systeem Monet-kleuren (Android 12+)</string>
-    <string name="document">Document</string>
     <string name="group_default">Niet-gegroepeerd</string>
     <string name="quick_toggle">Schakelen</string>
     <string name="quick_enable">Inschakelen</string>
@@ -660,7 +659,6 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="balancer_use_front_proxy">Use group front proxy</string>
     <string name="balancer_use_landing_proxy">Use group landing proxy</string>
     <string name="battery_optimization_disabled">Uitgeschakeld - tik om achtergrondactiviteit toe te staan</string>
-    <string name="battery_optimization_enabled">Ingeschakeld - de app kan onbeperkt op de achtergrond draaien</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="concurrent_dial">Concurrent Dial</string>
     <string name="concurrent_dial_summary">Schakel gelijktijdige verbindingen in voor snellere netwerkopbouw, kan batterijverbruik verhogen</string>
@@ -906,9 +904,9 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="speed_test_url_invalid">Voer een geldige HTTP- of HTTPS-URL in</string>
     <string name="mixed_auth_username_hint">Gebruikersnaam (laat beide leeg voor geen authenticatie)</string>
     <string name="mixed_auth_no_auth">Niet ingesteld (geen authenticatie)</string>
-    <string name="profile_requiring_plugin">Profiel %1$s vereist de %2$s-plug-in, maar
+    <string name="profile_requiring_plugin" formatted="false">Profiel %1$s vereist de %2$s-plug-in, maar
         deze is niet gevonden.</string>
-    <string name="plugin_exists_but_on_shit_system">Profiel %1$s vereist de %2$s-plug-in, maar uw
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profiel %1$s vereist de %2$s-plug-in, maar uw
         eigenaar van propriëtaire apparatuur (meestal surveillance kapitaalreuzen en malwaremakers)
         heeft met uw Android geknoeid, waardoor de plug-in onbruikbaar is.</string>
     <string name="lan_sharing">LAN-delen</string>
@@ -1040,6 +1038,7 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="proton_added">%s toegevoegd</string>
     <string name="proton_no_nodes">Geen bruikbare servers</string>
     <string name="proton_node_count">%1$d servers, %2$d overgeslagen</string>
+    <string name="proton_filtered_by_tier">Gefilterd op accountniveau %1$d</string>
     <string name="proton_sidecar_missing">Deze build bevat geen Proton-hulpprogramma.</string>
     <string name="proton_2fa_required">Deze account heeft een 2FA-code nodig.</string>
     <string name="proton_auto_login">Automatisch inloggen</string>
@@ -1138,4 +1137,42 @@ Als u dit moet gebruiken, probeer dan eerst N=2 om te zien of het uw problemen o
     <string name="openvpn_tls_version_min">Minimale TLS-versie</string>
     <string name="openvpn_topology">Topologie</string>
     <string name="openvpn_transport">Protocol</string>
+    <string name="adaptive_traffic_polling">Adaptieve verkeerspolling</string>
+    <string name="adaptive_traffic_polling_summary">Poll verkeerstellers minder vaak op de achtergrond of wanneer het scherm uit is.</string>
+    <string name="amoled_theme">AMOLED donker thema</string>
+    <string name="amoled_theme_summary">Zuiver zwarte achtergrond in de donkere modus</string>
+    <string name="app_theme">Accentkleur</string>
+    <string name="authenticated_http_proxy_unavailable">De HTTP-proxy van Android VPN ondersteunt de vereiste gebruikersnaam en het wachtwoord niet.</string>
+    <string name="backup_decrypt_failed">Onjuist wachtwoord of beschadigde back-up. Er is niets hersteld.</string>
+    <string name="backup_encryption_password">Back-upwachtwoord (optioneel)</string>
+    <string name="backup_encryption_summary">Ten minste 8 tekens beschermt geëxporteerde, gedeelde en WebDAV-back-ups. Laat leeg voor een niet-gecodeerde back-up. Het wachtwoord wordt niet opgeslagen.</string>
+    <string name="backup_password_short">Gebruik ten minste 8 tekens voor het back-upwachtwoord.</string>
+    <string name="clash_api_token">Clash API-token</string>
+    <string name="clash_api_token_summary">Toon of kopieer de toegangstoken van het dashboard</string>
+    <string name="close">Sluiten</string>
+    <string name="confirm_clear_cache">Proxy stoppen, core-cache wissen en de app opnieuw starten?</string>
+    <string name="confirm_stop_service">De actieve proxy stoppen?</string>
+    <string name="copy_current_link">Link kopiëren</string>
+    <string name="downloads_proxy_only">Alleen updates via proxy</string>
+    <string name="downloads_proxy_only_summary">Updates voor abonnementen en GeoIP/GeoSite vereisen de actieve lokale SOCKS-proxy. Directe fallback is uitgeschakeld.</string>
+    <string name="enable_clash_api">Clash API inschakelen</string>
+    <string name="enable_clash_api_summary">Clash API en yacd-dashboard leveren op 127.0.0.1:9090</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="local_proxy_settings">Lokale proxy-instellingen</string>
+    <string name="port_out_of_range">De poort moet tussen 1 en 65535 liggen</string>
+    <string name="proton_session_expired">Uw Proton-sessie is afgewezen. Meld u opnieuw aan.</string>
+    <string name="proxy_password">Proxywachtwoord</string>
+    <string name="proxy_username">Proxygebruikersnaam</string>
+    <string name="qrcode_format_sn">SN-link</string>
+    <string name="qrcode_format_standard">Standaard</string>
+    <string name="qrcode_sn_hint">Speciale geserialiseerde Sing-box &amp; Neko-link (sn://)</string>
+    <string name="qrcode_standard_hint">Standaard URI-indeling (compatibel met algemene clients)</string>
+    <string name="socks_port">SOCKS5-proxypoort</string>
+    <string name="subscription_custom_hwid_params">Aangepaste HWID-parameters</string>
+    <string name="subscription_custom_hwid_params_summary">Formaat: hwid=waarde,os=waarde,osVersion=waarde,model=waarde. Leeg laten om de waarden van dit apparaat te gebruiken; bij invulling worden alleen de vermelde waarden verzonden.</string>
+    <string name="subscription_direct_fallback">Terugvallen op directe verbinding voor abonnementen</string>
+    <string name="subscription_direct_fallback_summary">Probeer een abonnement opnieuw direct als de lokale proxy faalt. Vermijd dit als de URL een token bevat.</string>
+    <string name="subscription_send_hwid">HWID verzenden</string>
+    <string name="subscription_send_hwid_summary">HWID, Android-versie en apparaatmodel verzenden bij het bijwerken van dit abonnement</string>
 </resources>

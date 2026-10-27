@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">サブスクリプションサーバーが空の応答を返しました。</string>
+    <string name="subscription_response_html">サーバーがサブスクリプションではなく Web ページを返しました。リンクとプロバイダーアカウントを確認してください。</string>
+    <string name="subscription_response_json_error">サーバーがサブスクリプションではなく JSON エラーを返しました。</string>
+    <string name="subscription_response_unsupported">応答にサポートされているプロキシブロファイルが見つかりませんでした。</string>
+    <string name="restore_network_settings">以前のネットワーク設定を復元</string>
+    <string name="restore_network_settings_confirm">以前の DNS、ルーティング、接続設定を復元しますか？</string>
+    <string name="restore_network_settings_failed">ネットワーク設定を復元できませんでした。必要なプロファイルが削除された可能性があります。</string>
+    <string name="direct_fallback_required">チェックごとの成功した制御 URL</string>
+    <string name="direct_fallback_failures">プロキシへの切り替え前の失敗したチェック</string>
+    <string name="direct_fallback_recoveries">直接に戻る前の成功したチェック</string>
+    <string name="direct_fallback_invalid_count">1 から %1$d までの数値を入力してください。</string>
+</resources>

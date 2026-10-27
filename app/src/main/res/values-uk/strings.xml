@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Застарілі кольори…</string>
     <string name="theme_classic_color_swatch">Колірна тема %1$d</string>
-    <string name="document">Документ</string>
     <string name="group_default">Без групи</string>
     <string name="quick_toggle">Переключити</string>
     <string name="quick_enable">Увімкнути</string>
@@ -301,7 +300,6 @@
     <string name="donate_info">Я люблю гроші</string>
     <string name="ignore_battery_optimizations">Ігнорувати оптимізацію батареї</string>
     <string name="ignore_battery_optimizations_sum">Зняти деякі обмеження</string>
-    <string name="battery_optimization_enabled">Увімкнено - додаток може працювати без обмежень у фоновому режимі</string>
     <string name="battery_optimization_disabled">Вимкнено - торкніться, щоб дозволити фонову активність</string>
     <string name="plugin">Плагін</string>
     <string name="plugin_configure">Налаштувати…</string>
@@ -616,8 +614,6 @@
     <string name="tuic_disable_sni">Вимкнути SNI</string>
     <string name="tuic_reduce_rtt">Увімкнути 0-RTT QUIC рукостискання</string>
     <string name="pinned_certchain_sha256">Закріплений сертифікат SHA256</string>
-    <string name="please_update" formatted="false">Ваш ДОДАТОК занадто старий (%s). І перестане працювати %s. Будь ласка,\n        оновіть!</string>
-    <string name="please_update_force" formatted="false">Ваш ДОДАТОК занадто старий (%s). І перестав працювати %s.\n        Будь ласка, оновіть!</string>
     <string name="connection_test_delete_unavailable">Очистити недоступні</string>
     <string name="move">Перемістити</string>
     <string name="exe_prefer_provider">Бажаний постачальник плагінів</string>
@@ -915,8 +911,8 @@
     <string name="available" translatable="false">%dмс</string>
     <string name="connection_test_icmp_ping_unavailable">ICMPing недоступний</string>
     <string name="ooc_subscription_token" translatable="false">OOCv1 API Token</string>
-    <string name="traffic_uplink" translatable="false">%s | %s/с ↑</string>
-    <string name="traffic_downlink" translatable="false">%s | %s/с ↓</string>
+    <string name="traffic_uplink" translatable="false" formatted="false">%s | %s/с ↑</string>
+    <string name="traffic_downlink" translatable="false" formatted="false">%s | %s/с ↓</string>
     <string name="traffic_uplink_total" translatable="false">Всього %s ↑</string>
     <string name="traffic_downlink_total" translatable="false">Всього %s ↓</string>
     <string name="cloudflare_wrap" translatable="false">Cloudflare Warp</string>
@@ -1017,6 +1013,7 @@
     <string name="proton_added">Додано: %s</string>
     <string name="proton_no_nodes">Немає придатних серверів</string>
     <string name="proton_node_count">Серверів: %1$d, пропущено: %2$d</string>
+    <string name="proton_filtered_by_tier">Відфільтровано за рівнем облікового запису %1$d</string>
     <string name="proton_sidecar_missing">Ця збірка не містить допоміжного модуля Proton.</string>
     <string name="proton_2fa_required">Для цього облікового запису потрібен код 2FA.</string>
     <string name="proton_auto_login">Автоувхід</string>
@@ -1150,4 +1147,24 @@
     <string name="udp_over_tcp">UDP через TCP</string>
     <string name="update_existing_subscriptions_ua">Оновити User-Agent наявних підписок</string>
     <string name="xhttp_settings">Налаштування XHTTP</string>
+    <string name="amoled_theme">Темна тема AMOLED</string>
+    <string name="amoled_theme_summary">Чисто чорний фон у темному режимі</string>
+    <string name="app_theme">Акцентний колір</string>
+    <string name="authenticated_http_proxy_unavailable">HTTP-проксі Android VPN не підтримує необхідні ім\'я користувача та пароль.</string>
+    <string name="backup_decrypt_failed">Неправильний пароль або пошкоджений резервний файл. Нічого не відновлено.</string>
+    <string name="backup_encryption_password">Пароль резервної копії (необов\'язково)</string>
+    <string name="backup_encryption_summary">Щонайменше 8 символів захищають експортовані, спільні та WebDAV резервні копії. Залиште порожнім для незашифрованої резервної копії. Пароль не зберігається.</string>
+    <string name="backup_password_short">Використовуйте щонайменше 8 символів для пароля резервної копії.</string>
+    <string name="clash_api_token">Токен Clash API</string>
+    <string name="clash_api_token_summary">Показати або скопіювати токен доступу до панелі</string>
+    <string name="confirm_clear_cache">Зупинити проксі, очистити кеш ядра та перезапустити застосунок?</string>
+    <string name="confirm_stop_service">Зупинити запущене проксі?</string>
+    <string name="downloads_proxy_only">Оновлення лише через проксі</string>
+    <string name="downloads_proxy_only_summary">Оновлення підписок і GeoIP/GeoSite вимагають запущеного локального SOCKS-проксі. Прямий резервний варіант вимкнено.</string>
+    <string name="enable_clash_api">Увімкнути Clash API</string>
+    <string name="enable_clash_api_summary">Надає Clash API та панель yacd на 127.0.0.1:9090</string>
+    <string name="subscription_custom_hwid_params">Власні параметри HWID</string>
+    <string name="subscription_custom_hwid_params_summary">Формат: hwid=значення,os=значення,osVersion=значення,model=значення. Залиште порожнім, щоб використати значення цього пристрою; якщо заповнено, надсилаються лише вказані значення.</string>
+    <string name="subscription_send_hwid">Надсилати HWID</string>
+    <string name="subscription_send_hwid_summary">Надсилати HWID, версію Android і модель пристрою під час оновлення цієї підписки</string>
 </resources>

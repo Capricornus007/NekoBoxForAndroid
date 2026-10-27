@@ -17,6 +17,7 @@ import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 
 class SubscriptionUserAgentPreference @JvmOverloads constructor(
     context: Context,
@@ -105,7 +106,10 @@ class SubscriptionUserAgentPreference @JvmOverloads constructor(
                 DataStore.defaultSubscriptionUserAgent = newUa
                 summary = newUa
                 if (cbUpdateAll?.isChecked == true) {
-                    DataStore.migrateSubscriptionUserAgents(targetUa = newUa, forceAll = true)
+                    // migrateSubscriptionUserAgents 查 groupDao（阻塞）且吞掉主線斷言：交背景
+                    runOnDefaultDispatcher {
+                        DataStore.migrateSubscriptionUserAgents(targetUa = newUa, forceAll = true)
+                    }
                 }
                 Toast.makeText(dialogContext, R.string.ua_updated_toast, Toast.LENGTH_SHORT).show()
             }
@@ -115,7 +119,9 @@ class SubscriptionUserAgentPreference @JvmOverloads constructor(
                 DataStore.defaultSubscriptionUserAgent = defaultUa
                 summary = defaultUa
                 if (cbUpdateAll?.isChecked == true) {
-                    DataStore.migrateSubscriptionUserAgents(targetUa = defaultUa, forceAll = true)
+                    runOnDefaultDispatcher {
+                        DataStore.migrateSubscriptionUserAgents(targetUa = defaultUa, forceAll = true)
+                    }
                 }
                 Toast.makeText(dialogContext, R.string.ua_updated_toast, Toast.LENGTH_SHORT).show()
             }

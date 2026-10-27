@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">Сервер підписки повернув порожню відповідь.</string>
+    <string name="subscription_response_html">Сервер повернув вебсторінку замість підписки. Перевірте посилання та обліковий запис провайдера.</string>
+    <string name="subscription_response_json_error">Сервер повернув JSON-помилку замість підписки.</string>
+    <string name="subscription_response_unsupported">У відповіді не знайдено підтримуваних проксі-профілів.</string>
+    <string name="restore_network_settings">Відновити попередні мережеві налаштування</string>
+    <string name="restore_network_settings_confirm">Відновити попередні налаштування DNS, маршрутизації та з\'єднання?</string>
+    <string name="restore_network_settings_failed">Не вдалося відновити мережеві налаштування. Потрібні профілі, можливо, видалено.</string>
+    <string name="direct_fallback_required">Успішні контрольні URL за перевірку</string>
+    <string name="direct_fallback_failures">Невдалі перевірки перед перемиканням на проксі</string>
+    <string name="direct_fallback_recoveries">Успішні перевірки перед поверненням до прямого</string>
+    <string name="direct_fallback_invalid_count">Введіть число від 1 до %1$d.</string>
+</resources>

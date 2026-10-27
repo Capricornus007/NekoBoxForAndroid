@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subscription_response_empty">Abonelik sunucusu boş bir yanıt döndürdü.</string>
+    <string name="subscription_response_html">Sunucu bir abonelik yerine bir web sayfası döndürdü. Bağlantıyı ve sağlayıcı hesabını kontrol edin.</string>
+    <string name="subscription_response_json_error">Sunucu bir abonelik yerine bir JSON hatası döndürdü.</string>
+    <string name="subscription_response_unsupported">Yanıtta desteklenen proxy profili bulunamadı.</string>
+    <string name="restore_network_settings">Önceki ağ ayarlarını geri yükle</string>
+    <string name="restore_network_settings_confirm">Önceki DNS, yönlendirme ve bağlantı ayarları geri yüklenecek mi?</string>
+    <string name="restore_network_settings_failed">Ağ ayarları geri yüklenemedi. Gerekli profiller silinmiş olabilir.</string>
+    <string name="direct_fallback_required">Kontrol başına başarılı kontrol URL\'si</string>
+    <string name="direct_fallback_failures">Proxy\'ye geçmeden önceki başarısız kontroller</string>
+    <string name="direct_fallback_recoveries">Doğrudana dönmeden önceki başarılı kontroller</string>
+    <string name="direct_fallback_invalid_count">1 ile %1$d arasında bir sayı girin.</string>
+</resources>

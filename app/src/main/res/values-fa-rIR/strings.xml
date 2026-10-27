@@ -14,7 +14,6 @@
     <string name="theme">پوسته</string>
     <string name="use_system_theme">استفاده از تم سیستم</string>
     <string name="use_system_theme_summary">استفاده از رنگ‌های Monet سیستم (اندروید ۱۲+)</string>
-    <string name="document">مستند</string>
     <string name="group_default">گروه‌بندی نشده</string>
     <string name="quick_toggle">تغییر وضعیت</string>
     <string name="quick_enable">فعال</string>
@@ -481,8 +480,6 @@
     <string name="tuic_disable_sni">غیرفعال‌سازی SNI</string>
     <string name="tuic_reduce_rtt">فعال‌سازی handshake 0-RTT QUIC</string>
     <string name="pinned_certchain_sha256">SHA256 گواهی پین شده</string>
-    <string name="please_update" formatted="false">نسخه (%s) برنامه شما بسیار قدیمی شده است و در %s متوقف می‌شود. لطفاً به نسخه جدیدتر به‌روزرسانی کنید</string>
-    <string name="please_update_force" formatted="false">برنامه شما خیلی قدیمی شده است (%s). و در %s کار نمی‌کند. باید نسخه جدید را دانلود کنید!</string>
     <string name="connection_test_delete_unavailable">پاک کردن غیرقابل‌دسترس</string>
     <string name="move">انتقال</string>
     <string name="exe_prefer_provider">ارائه‌دهنده ترجیحی Plugin</string>
@@ -656,7 +653,6 @@
     <string name="balancer_use_front_proxy">Use Front Proxy</string>
     <string name="balancer_use_landing_proxy">Use Landing Proxy</string>
     <string name="battery_optimization_disabled">Battery optimization disabled</string>
-    <string name="battery_optimization_enabled">Battery optimization enabled</string>
     <string name="bottomsheet_drag_handle_clicked">Drag handle clicked</string>
     <string name="concurrent_dial">اتصال هم‌زمان</string>
     <string name="concurrent_dial_summary">Enable concurrent connections</string>
@@ -1029,6 +1025,7 @@
     <string name="proton_added">%s اضافه شد</string>
     <string name="proton_no_nodes">هیچ سرور قابل استفاده‌ای نیست</string>
     <string name="proton_node_count">%1$d سرور، %2$d نادیده گرفته شد</string>
+    <string name="proton_filtered_by_tier">بر اساس سطح حساب %1$d فیلتر شد</string>
     <string name="proton_sidecar_missing">این نسخه شامل کمک‌برنامه Proton نیست.</string>
     <string name="proton_2fa_required">این حساب به کد 2FA نیاز دارد.</string>
     <string name="proton_auto_login">ورود خودکار</string>
@@ -1127,4 +1124,42 @@
     <string name="openvpn_tls_version_min">کمترین نسخه TLS</string>
     <string name="openvpn_topology">توپولوژی</string>
     <string name="openvpn_transport">پروتکل</string>
+    <string name="close">بستن</string>
+    <string name="copy_current_link">کپی پیوند</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="qrcode_format_standard">استاندارد</string>
+    <string name="qrcode_format_sn">پیوند SN</string>
+    <string name="qrcode_standard_hint">قالب URI استاندارد (سازگار با کلاینت‌های عمومی)</string>
+    <string name="qrcode_sn_hint">پیوند سریال‌سازی‌شدهٔ اختصاصی sing-box و Neko (sn://)</string>
+    <string name="subscription_send_hwid">ارسال HWID</string>
+    <string name="subscription_send_hwid_summary">ارسال HWID، نسخهٔ اندروید و مدل دستگاه هنگام به‌روزرسانی این اشتراک</string>
+    <string name="subscription_direct_fallback">بازگشت به اتصال مستقیم برای اشتراک‌ها</string>
+    <string name="subscription_direct_fallback_summary">اگر پراکسی محلی ناموفق بود، اشتراک را مستقیماً دوباره امتحان کن. اگر URL حامل توکن است از این کار خودداری کن.</string>
+    <string name="adaptive_traffic_polling">نمونه‌برداری تطبیقی ترافیک</string>
+    <string name="adaptive_traffic_polling_summary">هنگام پس‌زمینه بودن یا خاموش بودن صفحه، شمارنده‌های ترافیک را کمتر نمونه‌برداری کن.</string>
+    <string name="local_proxy_settings">تنظیمات پراکسی محلی</string>
+    <string name="port_out_of_range">پورت باید در بازهٔ ۱ تا ۶۵۵۳۵ باشد</string>
+    <string name="socks_port">پورت پراکسی SOCKS5</string>
+    <string name="proxy_username">نام کاربری پراکسی</string>
+    <string name="proxy_password">رمز عبور پراکسی</string>
+    <string name="proton_session_expired">نشست Proton شما رد شد. لطفاً دوباره وارد شوید.</string>
+    <string name="amoled_theme">تم تیرهٔ AMOLED</string>
+    <string name="amoled_theme_summary">پس‌زمینهٔ کاملاً مشکی در حالت تیره</string>
+    <string name="app_theme">رنگ تأکیدی</string>
+    <string name="authenticated_http_proxy_unavailable">پراکسی HTTP اندروید (VPN) از نام کاربری و رمز عبور مورد نیاز پشتیبانی نمی‌کند.</string>
+    <string name="clash_api_token">توکن Clash API</string>
+    <string name="clash_api_token_summary">نمایش یا کپی توکن دسترسی به داشبورد</string>
+    <string name="enable_clash_api">فعال‌سازی Clash API</string>
+    <string name="enable_clash_api_summary">فراهم‌کردن clash api و داشبورد yacd در 127.0.0.1:9090</string>
+    <string name="confirm_stop_service">سرویس پراکسی در حال اجرا متوقف شود؟</string>
+    <string name="confirm_clear_cache">پراکسی متوقف، حافظهٔ نهان هسته پاک و برنامه دوباره راه‌اندازی شود؟</string>
+    <string name="downloads_proxy_only">به‌روزرسانی فقط از طریق پراکسی</string>
+    <string name="downloads_proxy_only_summary">به‌روزرسانی اشتراک و GeoIP/GeoSite به پراکسی SOCKS محلی در حال اجرا نیاز دارد. بازگشت مستقیم غیرفعال است.</string>
+    <string name="backup_encryption_password">رمز عبور پشتیبان‌گیری (اختیاری)</string>
+    <string name="backup_encryption_summary">حداقل ۸ نویسه از پشتیبان‌های صادرشده، به‌اشتراک‌گذاشته‌شده و WebDAV محافظت می‌کند. برای پشتیبان بدون رمزگذاری خالی بگذارید. رمز عبور ذخیره نمی‌شود.</string>
+    <string name="backup_password_short">برای رمز عبور پشتیبان‌گیری حداقل از ۸ نویسه استفاده کنید.</string>
+    <string name="backup_decrypt_failed">رمز عبور نادرست یا پشتیبان خراب است. هیچ‌چیز بازیابی نشد.</string>
+    <string name="subscription_custom_hwid_params">پارامترهای سفارشی HWID</string>
+    <string name="subscription_custom_hwid_params_summary">قالب: hwid=value,os=value,osVersion=value,model=value. برای استفاده از مقادیر این دستگاه خالی بگذارید؛ هنگام تکمیل، فقط مقادیر فهرست‌شده ارسال می‌شوند.</string>
 </resources>

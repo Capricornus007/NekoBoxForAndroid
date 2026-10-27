@@ -2,7 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"flag"
+	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -107,4 +111,73 @@ func isAuthRejection(err error) bool {
 
 func isRejectionStatus(status int) bool {
 	return status == http.StatusUnauthorized || status == http.StatusForbidden
+}
+
+type refreshOutput struct {
+	OK bool `json:"ok"`
+	// Renewed 區分「真的換到新一組」與「本來就沒到期、什麼都不用做」：
+	// App 排程拿它決定要不要記一次刷新事件，不能把空轉當成功。
+	Renewed bool   `json:"renewed"`
+	Error   string `json:"error,omitempty"`
+	Code    string `json:"code,omitempty"`
+}
+
+func emitRefresh(stdout io.Writer, out refreshOutput) int {
+	if err := json.NewEncoder(stdout).Encode(out); err != nil {
+		return 1
+	}
+	if !out.OK {
+		return 1
+	}
+	return 0
+}
+
+// runRefresh 是「主動續期」那條路：App 開機／進 Proton 頁時喊一次，
+// 把 access token 換到新的，而不是等 401 才被迫換。
+//
+// 為什麼要主動：401 才換在「清單剛好沒被讀到」的時候等於永不續期，而 Proton 的
+// refresh token 輪換（rotating）一旦斷檔，用戶就只能重登——那是 2026-10-13 那輪
+// 「工作階段一直被踢」的根因之一。
+//
+// 沒帶 RefreshToken 的狀態檔（舊版寫入的）回 errNoRefreshToken，讓 App 明確去重登，
+// 不能報成功。
+func runRefresh(args []string, stdout, stderr io.Writer) int {
+	command := flag.NewFlagSet("refresh", flag.ContinueOnError)
+	command.SetOutput(stderr)
+	statePath := command.String("state", "", "stored session to renew in place (required)")
+	apiURL := command.String("api-url", defaultProtonAPIURL, "API base URL")
+	timeoutSec := command.Int("timeout", 30, "overall deadline in seconds")
+	if err := command.Parse(args); err != nil {
+		return 2
+	}
+	if *statePath == "" {
+		fmt.Fprintln(stderr, "protonvpn: refresh: --state is required")
+		return 2
+	}
+	cred, err := readCredentialFile(*statePath)
+	if err != nil {
+		return emitRefresh(stdout, refreshOutput{Error: err.Error()})
+	}
+	if cred.RefreshToken == "" || cred.UID == "" {
+		return emitRefresh(stdout, refreshOutput{
+			Error: "stored session carries no refresh token, please log in again",
+			Code:  codeSessionExpired,
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSec)*time.Second)
+	defer cancel()
+
+	refreshed, err := refreshSession(ctx, *apiURL, *statePath, cred)
+	if err != nil {
+		code := ""
+		if isAuthRejection(err) {
+			code = codeSessionExpired
+		}
+		return emitRefresh(stdout, refreshOutput{Error: err.Error(), Code: code})
+	}
+	if refreshed.AccessToken == cred.AccessToken && refreshed.RefreshToken == cred.RefreshToken {
+		return emitRefresh(stdout, refreshOutput{OK: true})
+	}
+	return emitRefresh(stdout, refreshOutput{OK: true, Renewed: true})
 }

@@ -21,7 +21,6 @@
     <string name="theme_catppuccin">Catppuccin</string>
     <string name="theme_classic_colors">Alte Farben…</string>
     <string name="theme_classic_color_swatch">Farbthema %1$d</string>
-    <string name="document">Dokument</string>
     <string name="group_default">Nicht gruppiert</string>
     <string name="quick_toggle">Umschalten</string>
     <string name="quick_enable">Aktivieren</string>
@@ -305,7 +304,6 @@
     <string name="donate_info">Ich liebe Geld</string>
     <string name="ignore_battery_optimizations">Batterieoptimierungen ignorieren</string>
     <string name="ignore_battery_optimizations_sum">Einige Einschränkungen entfernen</string>
-    <string name="battery_optimization_enabled">Akku-Optimierung: an</string>
     <string name="battery_optimization_disabled">Akku-Optimierung: aus</string>
     <string name="plugin">Plugin</string>
     <string name="plugin_configure">Konfigurieren…</string>
@@ -447,7 +445,7 @@
     <string name="subscription_user_agent">UserAgent</string>
     <string name="confirm">Bestätigen</string>
     <string name="missing_plugin">Fehlendes Plugin</string>
-    <string name="profile_requiring_plugin">Profil %s benötigt das Plugin %s, aber es wurde nicht gefunden.</string>
+    <string name="profile_requiring_plugin" formatted="false">Profil %s benötigt das Plugin %s, aber es wurde nicht gefunden.</string>
     <string name="install_from_play_store">Aus dem Play Store installieren</string>
     <string name="install_from_fdroid">Aus F-Droid installieren</string>
     <string name="download">Herunterladen</string>
@@ -462,7 +460,7 @@
     <string name="server_dns_subscription_sum">Optionaler DNS nur zum Auflösen von Server-Domains dieses Abonnements.</string>
     <string name="server_dns_invalid">Eigener Server-DNS ungültig. Verwende https://, tls://, quic:// oder host[:port]</string>
     <string name="subscription_used">%s verbraucht</string>
-    <string name="subscription_traffic">%s verbraucht / %s verbleibend</string>
+    <string name="subscription_traffic" formatted="false">%s verbraucht / %s verbleibend</string>
     <string name="subscription_expire">Läuft ab: %s</string>
     <string name="subscription_import">Abonnement importieren</string>
     <string name="subscription_import_message">Abonnement %s wirklich importieren? Wenn du von</string>
@@ -485,7 +483,7 @@
     <string name="group_order_origin">Original</string>
     <string name="group_order_by_name">Nach Name</string>
     <string name="group_order_by_delay">Nach Latenz</string>
-    <string name="plugin_exists_but_on_shit_system">Profil %s benötigt das Plugin %s, aber deine proprietäre Ausrüstung</string>
+    <string name="plugin_exists_but_on_shit_system" formatted="false">Profil %s benötigt das Plugin %s, aber deine proprietäre Ausrüstung</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs (Shadowsocks-Android-Plugin)</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray (Shadowsocks-Android-Plugin)</string>
     <string name="tcp_connections">%d TCP-Verbindungen</string>
@@ -943,6 +941,7 @@
     <string name="proton_added">%s hinzugefügt</string>
     <string name="proton_no_nodes">Keine nutzbaren Server</string>
     <string name="proton_node_count">%1$d Server, %2$d übersprungen</string>
+    <string name="proton_filtered_by_tier">Nach Kontostufe %1$d gefiltert</string>
     <string name="proton_sidecar_missing">Dieser Build enthält keinen Proton-Helfer.</string>
     <string name="proton_2fa_required">Dieses Konto benötigt einen 2FA-Code.</string>
     <string name="proton_auto_login">Automatische Anmeldung</string>
@@ -1082,8 +1081,6 @@
     <string name="mtu_help">Die Option lang gedrückt halten, um einen eigenen MTU festzulegen.</string>
     <string name="ooc_subscription_token_invalid">Ungültiges OOCv1-Token</string>
     <string name="pinned_certchain_sha256">SHA256 des angehefteten Zertifikats</string>
-    <string name="please_update" formatted="false">Ihre App ist zu alt (%s). Sie funktioniert ab %s nicht mehr. Bitte aktualisieren!</string>
-    <string name="please_update_force" formatted="false">Ihre App ist zu alt (%s). Sie funktioniert seit %s nicht mehr. Bitte aktualisieren!</string>
     <string name="port_out_of_range">Der Port muss im Bereich 1–65535 liegen.</string>
     <string name="proton_session_expired">Ihre Proton-Sitzung wurde abgelehnt. Bitte erneut anmelden.</string>
     <string name="proxy_password">Proxy-Passwort</string>
@@ -1103,4 +1100,24 @@
     <string name="ua_updated_toast">UA aktualisiert</string>
     <string name="udp_over_tcp">UDP über TCP</string>
     <string name="update_existing_subscriptions_ua">UA vorhandener Abonnements aktualisieren</string>
+    <string name="amoled_theme">AMOLED-Dunkeldesign</string>
+    <string name="amoled_theme_summary">Reines Schwarz im Dunkelmodus</string>
+    <string name="app_theme">Akzentfarbe</string>
+    <string name="authenticated_http_proxy_unavailable">Der Android-VPN-HTTP-Proxy unterstützt das erforderliche Benutzername/Passwort nicht.</string>
+    <string name="backup_decrypt_failed">Falsches Passwort oder beschädigtes Backup. Es wurde nichts wiederhergestellt.</string>
+    <string name="backup_encryption_password">Backup-Passwort (optional)</string>
+    <string name="backup_encryption_summary">Mindestens 8 Zeichen schützen exportierte, geteilte und WebDAV-Backups. Leer lassen für ein unverschlüsseltes Backup. Das Passwort wird nicht gespeichert.</string>
+    <string name="backup_password_short">Verwenden Sie mindestens 8 Zeichen für das Backup-Passwort.</string>
+    <string name="clash_api_token">Clash-API-Token</string>
+    <string name="clash_api_token_summary">Dashboard-Zugriffstoken anzeigen oder kopieren</string>
+    <string name="confirm_clear_cache">Proxy stoppen, Core-Cache leeren und App neu starten?</string>
+    <string name="confirm_stop_service">Laufenden Proxy stoppen?</string>
+    <string name="downloads_proxy_only">Updates nur über Proxy</string>
+    <string name="downloads_proxy_only_summary">Abonnement- und GeoIP/GeoSite-Updates benötigen den laufenden lokalen SOCKS-Proxy. Direkter Fallback ist deaktiviert.</string>
+    <string name="enable_clash_api">Clash-API aktivieren</string>
+    <string name="enable_clash_api_summary">Stellt Clash API und yacd-Dashboard unter 127.0.0.1:9090 bereit</string>
+    <string name="subscription_custom_hwid_params">Benutzerdefinierte HWID-Parameter</string>
+    <string name="subscription_custom_hwid_params_summary">Format: hwid=wert,os=wert,osVersion=wert,model=wert. Leer lassen, um die Werte dieses Geräts zu verwenden; bei Angabe werden nur die aufgelisteten Werte gesendet.</string>
+    <string name="subscription_send_hwid">HWID senden</string>
+    <string name="subscription_send_hwid_summary">HWID, Android-Version und Gerätemodell beim Aktualisieren dieses Abonnements senden</string>
 </resources>

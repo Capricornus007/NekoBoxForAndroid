@@ -16,32 +16,21 @@ import (
 	proton "github.com/ProtonMail/go-proton-api"
 )
 
-// protonAppVersion 是 x-pm-appversion 的內容。Proton 的正式閘門有兩種合法寫法：
-// 「<平台>-<產品>@<版本>」（官方客戶端）與「other_<版本>」（放行第三方客戶端），
-// 用錯分隔符會被逐段糾正（2026-10-08 用公開端點 /auth/v4/info 逐個字串量測得來，
-// 該端點在驗 token 之前就會先過版本閘門，所以不需要帳密）：
+// protonAppVersion 是 x-pm-appversion 的內容，決定 Proton 把 NB4A 當成哪個客戶端身分。
 //
-//	"NB4A_1.0.0"                  -> 400/5002 Invalid app version
-//	"NB4A@1.0.0"                  -> 400/2064 Application platform and product must be separated by a dash
-//	"android-nb4a@1.0.0"          -> 400/2064 Product `nb4a` is not valid
-//	"NB4A-android@1.0.0"          -> 400/2064 Application name must be in lowercase
-//	"Otherx_1.0.0"                -> 400/5002 Invalid app version（底線寫法只認 other 這個字）
-//	"android-vpn@1.0.0"           -> 422/5003 This version of the app is no longer supported
-//	"android-vpn@5.20.57.0"       -> 401 Invalid access token
-//	"android-vpn@99.0.0"          -> 401 Invalid access token
-//	"windows-vpn@5.20.57.0"       -> 200
-//	"Other_1.0.0" / "other_1.0.0" -> 200（other 這條不比較版本號）
+// Proton 的閘門會隨時間移動，2026-10-26 晚間電腦側實測矩號（POST/GET 公測端點、假帳號）：
 //
-// 那兩記 401 是這版的死因：`android-vpn` 這組合被 Proton 在路由層整個拒掉（官方 VPN App
-// 已改走免密碼的 session 流程），跟我們的 token 無關——連不存在的用戶名都吃 401，而且換成
-// 99.0.0 也一樣；同一支產品換成 windows-vpn 就 200，所以擋的不是 product=vpn 整個類別。
-// 因此改用專門留給第三方客戶端的 other_<版本>：不冒充官方身分，也不會跟著官方的版本淘汰
-// 跑步機過期（上面那條 5003 就是會過期的常數會遇到的事）。
+//	"Other_1.0.0"           -> GET /auth/v4/modulus = 200（匿名可取）；
+//	                          POST /auth/v4/ SRP 走到「422 username does not exist」= 全鏈路通
+//	"android-vpn@5.20.98.0" -> GET /auth/v4/modulus = 401 Invalid access token——
+//	                          官方 Android 身分現在要求持 token 才能開始 SRP，
+//	                          首次登錄（無 token）被鎖死，第三方不可用
+//	"web-vpn@5.20.74.0"     -> 400/5002 Invalid app version
 //
-// 格式與值取自 Proton 公開源碼與 go-proton-api 的第三方用法；官方 Android 客戶端的身分是
-//
-//	app/src/main/java/com/protonvpn/android/utils/Constants.kt:73  MOBILE_CLIENT_ID = "android-vpn"
-//	app/src/main/java/com/protonvpn/android/api/VpnApiClient.kt:49 "${clientId}@" + versionName()
+// 先前（2026-10-26 白天）把身分改成 android-vpn 的依據是在 /auth/v4/info 端點上的量測，
+// 該端點的門與 SRP 登錄鏈的門不是同一道；晚間沿 SRP 實鏈重測後結論反轉：
+// 登錄鏈唯一可走通的是 Other_1.0.0。若 Proton 之後把 Other 的 SRP 也閘掉，
+// 就得回到這層做「modulus 用 Other、SRP/後續用 android-vpn」的混合身分。
 const protonAppVersion = "Other_1.0.0"
 
 const defaultProtonAPIURL = "https://api.protonmail.ch"
@@ -61,6 +50,10 @@ type loginInput struct {
 
 type storedCredential struct {
 	UID          string `json:"uid"`
+	// Username 是登入時那個帳號名。存進狀態檔是為了「登一次就夠」：OpenVPN 的
+	// auth-user-pass 要填帳號名，不能回頭叫用戶再打一次（App 那邊登完就把密碼欄清空，
+	// 也不該再問）。舊狀態檔沒這欄時為空字串，呼叫端退回自己的記錄值。
+	Username     string `json:"username,omitempty"`
 	UserID       string `json:"userId"`
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
@@ -162,6 +155,7 @@ func runLogin(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 
 	cred := storedCredential{
 		UID:          auth.UID,
+		Username:     in.Username,
 		UserID:       auth.UserID,
 		AccessToken:  auth.AccessToken,
 		RefreshToken: auth.RefreshToken,

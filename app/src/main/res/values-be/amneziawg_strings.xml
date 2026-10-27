@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="amneziawg_range_hint" tools:ignore="TypographyDashes">Колькасць або дыяпазон, напрымер 25 або 25-30. Пустое поле — значэнне прадокола па змаўчанні. Час у секундах; MaxHandshakeAttempts — колькасць попыток; ContentPaddingAddition — байты.</string>
+    <string name="amneziawg_header_key_hint">Ключ сервера длиной 32 байта (Base64 або HEX). для абароны заголовков S1, S2, S3 і S4 должны быть не менш 12 байт.</string>
+    <string name="amneziawg_random_trailers_hint">Случайные дополнения к пакетам (AWG 3.1).</string>
+    <string name="amneziawg_disable_cookies_hint">Адключить cookies прадокола. Включайте толькі калі гэтага требует канфігурацыя сервера.</string>
+</resources>

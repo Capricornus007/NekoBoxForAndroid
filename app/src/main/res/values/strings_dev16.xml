@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="route_check_overlaps">Check overlapping rules</string>
+    <string name="route_check_no_overlaps">No obvious overlaps found. Custom JSON and complex address/rule-set conditions require runtime verification.</string>
+    <string name="route_overlap_duplicate">%1$s: duplicates %2$s</string>
+    <string name="route_overlap_shadowed">%1$s: covered by %2$s</string>
+    <string name="route_overlap_open">Open rule</string>
+    <string name="fastest_health_check">Check DNS and HTTPS</string>
+    <string name="fastest_health_check_hint">Require a usable reply from the configured remote DNS and a verified HTTPS response. Up to 18 seconds per node; three concurrent checks.</string>
+    <string name="fastest_health_url">HTTPS control URL</string>
+    <string name="fastest_health_invalid_url">Enter an HTTPS URL without credentials or a fragment.</string>
+    <string name="fastest_failure_cooldown">Temporarily exclude failing nodes</string>
+    <string name="fastest_failure_cooldown_hint">After three failed checks, pause retries for 30 seconds to 10 minutes. Retry on the next scheduled check. Reset results when the network changes.</string>
+</resources>

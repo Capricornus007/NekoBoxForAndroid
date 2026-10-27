@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="direct_fallback">Резервный проксі для прямых маршрутаў</string>
+    <string name="direct_fallback_summary">Калі кантрольны сайт недаступны напрамую, прамыя маршруты ідуць праз выбраны проксі. пры аднаўленні вяртаецца прамае злучэнне. Лакальная сетка застаецца прамы. Бягучыя злучэнні перападлучаюцца.</string>
+    <string name="direct_fallback_url">Кантрольныя сайты</string>
+    <string name="direct_fallback_url_summary">По одному HTTP(S) URL на строку, да 8. Правяраецца доступ напрамую; пераключэнне залежыць ад числа даступныях сайтаў і паслядоўных проверок.</string>
+    <string name="direct_fallback_interval">Інтэрвал праверкі (секунды)</string>
+    <string name="direct_fallback_invalid_url">Увядзіце карэктны HTTP- або HTTPS-URL без уліковых даных і фрагмента.</string>
+    <string name="direct_fallback_invalid_interval">Інтэрвал праверкі павінен быть ад 5 да 3600 секунд.</string>
+    <string name="dns_server_input_help">local або localhost — сістэмны DNS Android у асноўнай сеткі. Калі DNS-сервер запушчаны на самом прыладзе, укажыце яўна udp://127.0.0.1:53.</string>
+</resources>

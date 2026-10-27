@@ -22,9 +22,12 @@ import io.github.rosemoe.sora.widget.subscribeAlways
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
+import io.nekohasekai.sagernet.database.NetworkSettingsHistory
 import io.nekohasekai.sagernet.databinding.LayoutEditConfigBinding
 import io.nekohasekai.sagernet.ktx.getColorAttr
+import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.readableMessage
+import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.toStringPretty
 import io.nekohasekai.sagernet.ui.ThemedActivity
 import io.nekohasekai.sagernet.utils.Theme
@@ -182,11 +185,21 @@ class ConfigEditActivity : ThemedActivity() {
     }
 
     fun saveAndExit() {
-        formatText()?.let {
+        formatText()?.let { text ->
             if (useConfigStore) {
-                DataStore.configurationStore.putString(key, it)
+                if (key == Key.GLOBAL_CUSTOM_CONFIG && DataStore.configurationStore.getString(key).orEmpty() != text) {
+                    // capture() 查 PublicDatabase（阻塞 DAO、主線會被自己的 catch 吞掉）。
+                    // 快照必須排在寫入之前，所以整段放同一個背景作業。
+                    runOnDefaultDispatcher {
+                        NetworkSettingsHistory.capture()
+                        DataStore.configurationStore.putString(key, text)
+                        onMainDispatcher { finish() }
+                    }
+                    return
+                }
+                DataStore.configurationStore.putString(key, text)
             } else {
-                DataStore.profileCacheStore.putString(key, it)
+                DataStore.profileCacheStore.putString(key, text)
             }
             finish()
         }

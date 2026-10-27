@@ -14,7 +14,6 @@
     <string name="theme">Тема</string>
     <string name="use_system_theme">Використовувати системну тему</string>
     <string name="use_system_theme_summary">Використовувати системні кольори Monet (Android 12+)</string>
-    <string name="document">Документ</string>
     <string name="group_default">Без групи</string>
     <string name="quick_toggle">Переключити</string>
     <string name="quick_enable">Увімкнути</string>
@@ -490,8 +489,6 @@
     <string name="tuic_disable_sni">Вимкнути SNI</string>
     <string name="tuic_reduce_rtt">Увімкнути 0-RTT QUIC рукостискання</string>
     <string name="pinned_certchain_sha256">Закріплений сертифікат SHA256</string>
-    <string name="please_update" formatted="false">Ваш ДОДАТОК занадто старий (%s). І перестане працювати %s. Будь ласка,\n        оновіть!</string>
-    <string name="please_update_force" formatted="false">Ваш ДОДАТОК занадто старий (%s). І перестав працювати %s.\n        Будь ласка, оновіть!</string>
     <string name="connection_test_delete_unavailable">Очистити недоступні</string>
     <string name="move">Перемістити</string>
     <string name="exe_prefer_provider">Бажаний постачальник плагінів</string>
@@ -663,7 +660,6 @@
     <string name="balancer_use_front_proxy">Використовувати початковий проксі</string>
     <string name="balancer_use_landing_proxy">Використовувати кінцевий проксі</string>
     <string name="battery_optimization_disabled">Вимкнено - торкніться, щоб дозволити фонову активність</string>
-    <string name="battery_optimization_enabled">Увімкнено - додаток може працювати без обмежень у фоновому режимі</string>
     <string name="bottomsheet_drag_handle_clicked">bottomsheet drag handle clicked</string>
     <string name="concurrent_dial">Одночасне встановлення з\'єднання</string>
     <string name="concurrent_dial_summary">Увімкнути одночасні з\'єднання для швидшого встановлення мережі, може збільшити споживання батареї</string>
@@ -1038,6 +1034,7 @@
     <string name="proton_added">Додано: %s</string>
     <string name="proton_no_nodes">Немає придатних серверів</string>
     <string name="proton_node_count">Серверів: %1$d, пропущено: %2$d</string>
+    <string name="proton_filtered_by_tier">Відфільтровано за рівнем облікового запису %1$d</string>
     <string name="proton_sidecar_missing">Ця збірка не містить допоміжного модуля Proton.</string>
     <string name="proton_2fa_required">Для цього облікового запису потрібен код 2FA.</string>
     <string name="proton_auto_login">Автоувхід</string>
@@ -1136,4 +1133,42 @@
     <string name="openvpn_tls_version_min">Мінімальна версія TLS</string>
     <string name="openvpn_topology">Топологія</string>
     <string name="openvpn_transport">Протокол</string>
+    <string name="adaptive_traffic_polling">Адаптивне опитування трафіку</string>
+    <string name="adaptive_traffic_polling_summary">Рідше опитуйте лічильники трафіку у фоновому режимі або коли екран вимкнено.</string>
+    <string name="amoled_theme">Темна тема AMOLED</string>
+    <string name="amoled_theme_summary">Чисто чорний фон у темному режимі</string>
+    <string name="app_theme">Акцентний колір</string>
+    <string name="authenticated_http_proxy_unavailable">HTTP-проксі Android VPN не підтримує необхідні ім\'я користувача та пароль.</string>
+    <string name="backup_decrypt_failed">Неправильний пароль або пошкоджений резервний файл. Нічого не відновлено.</string>
+    <string name="backup_encryption_password">Пароль резервної копії (необов\'язково)</string>
+    <string name="backup_encryption_summary">Щонайменше 8 символів захищають експортовані, спільні та WebDAV резервні копії. Залиште порожнім для незашифрованої резервної копії. Пароль не зберігається.</string>
+    <string name="backup_password_short">Використовуйте щонайменше 8 символів для пароля резервної копії.</string>
+    <string name="clash_api_token">Токен Clash API</string>
+    <string name="clash_api_token_summary">Показати або скопіювати токен доступу до панелі</string>
+    <string name="close">Закрити</string>
+    <string name="confirm_clear_cache">Зупинити проксі, очистити кеш ядра та перезапустити застосунок?</string>
+    <string name="confirm_stop_service">Зупинити запущене проксі?</string>
+    <string name="copy_current_link">Копіювати посилання</string>
+    <string name="downloads_proxy_only">Оновлення лише через проксі</string>
+    <string name="downloads_proxy_only_summary">Оновлення підписок і GeoIP/GeoSite вимагають запущеного локального SOCKS-проксі. Прямий резервний варіант вимкнено.</string>
+    <string name="enable_clash_api">Увімкнути Clash API</string>
+    <string name="enable_clash_api_summary">Надає Clash API та панель yacd на 127.0.0.1:9090</string>
+    <string name="format_snlink_lower">snlink</string>
+    <string name="format_snlink_upper">SNLINK</string>
+    <string name="local_proxy_settings">Налаштування локального проксі</string>
+    <string name="port_out_of_range">Порт має бути в діапазоні 1–65535</string>
+    <string name="proton_session_expired">Вашу сесію Proton відхилено. Увійдіть ще раз.</string>
+    <string name="proxy_password">Пароль проксі</string>
+    <string name="proxy_username">Ім\'я користувача проксі</string>
+    <string name="qrcode_format_sn">SN-посилання</string>
+    <string name="qrcode_format_standard">Стандартний</string>
+    <string name="qrcode_sn_hint">Власне серіалізоване посилання Sing-box &amp; Neko (sn://)</string>
+    <string name="qrcode_standard_hint">Стандартний формат URI (сумісний із звичайними клієнтами)</string>
+    <string name="socks_port">Порт SOCKS5-проксі</string>
+    <string name="subscription_custom_hwid_params">Власні параметри HWID</string>
+    <string name="subscription_custom_hwid_params_summary">Формат: hwid=значення,os=значення,osVersion=значення,model=значення. Залиште порожнім, щоб використати значення цього пристрою; якщо заповнено, надсилаються лише вказані значення.</string>
+    <string name="subscription_direct_fallback">Резервне пряме з\'єднання для підписок</string>
+    <string name="subscription_direct_fallback_summary">Повторіть спробу підписки напряму, якщо локальне проксі не працює. Уникайте, якщо URL містить токен.</string>
+    <string name="subscription_send_hwid">Надсилати HWID</string>
+    <string name="subscription_send_hwid_summary">Надсилати HWID, версію Android і модель пристрою під час оновлення цієї підписки</string>
 </resources>

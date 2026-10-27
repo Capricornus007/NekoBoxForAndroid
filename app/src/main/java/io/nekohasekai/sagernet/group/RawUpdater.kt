@@ -1,17 +1,22 @@
 package io.nekohasekai.sagernet.group
 
 import android.annotation.SuppressLint
+import android.os.Build
+import android.provider.Settings
 import androidx.core.net.toUri
+import androidx.room.withTransaction
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SubscriptionFilterMode
 import io.nekohasekai.sagernet.database.*
 import io.nekohasekai.sagernet.fmt.AbstractBean
+import io.nekohasekai.sagernet.fmt.KryoConverters
 import io.nekohasekai.sagernet.fmt.amneziawg.AmneziaWGBean
 import io.nekohasekai.sagernet.fmt.amneziawg.toAmneziaWGBean
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.hysteria.HysteriaBean
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria1Json
 import io.nekohasekai.sagernet.fmt.hysteria.parseHysteria2Json
+import io.nekohasekai.sagernet.fmt.internal.ChainBean
 import io.nekohasekai.sagernet.fmt.juicity.JuicityBean
 import io.nekohasekai.sagernet.fmt.openvpn.parseOpenVPNConfig
 import io.nekohasekai.sagernet.fmt.parseSingBoxEndpoint
@@ -64,6 +69,50 @@ object RawUpdater : GroupUpdater() {
      * subscription that labels its nodes "Hong Kong" - and a pattern the regex engine
      * rejects is logged and skipped instead of aborting the whole update.
      */
+    // isai：訂閱請求的 HWID/自訂 header 支援。
+    // ANDROID_ID 是訂閱端拿來辨識裝置的既有協議，不是廣告追蹤；HardwareIds 規則屬誤報。
+    @SuppressLint("HardwareIds")
+    private fun buildHwidHeaders(customParams: String?): Map<String, String> {
+        val params = if (customParams.isNullOrBlank()) {
+            mapOf(
+                "hwid" to (Settings.Secure.getString(app.contentResolver, Settings.Secure.ANDROID_ID) ?: ""),
+                "os" to "Android",
+                "osversion" to Build.VERSION.RELEASE.orEmpty(),
+                "model" to listOf(Build.MANUFACTURER, Build.MODEL)
+                    .filter { it.isNotBlank() }
+                    .joinToString(" "),
+            )
+        } else {
+            buildMap {
+                customParams.split(',', '\n').forEach { pair ->
+                    val trimmed = pair.trim()
+                    val separator = trimmed.indexOf('=')
+                    if (separator <= 0) return@forEach
+                    val key = trimmed.substring(0, separator).trim().lowercase()
+                    val value = trimmed.substring(separator + 1).trim()
+                    if (key in allowedHwidParams && value.isValidHeaderValue()) {
+                        put(key, value)
+                    }
+                }
+            }
+        }
+        return buildMap {
+            params["hwid"]?.takeIf { it.isNotBlank() }?.let { put("x-hwid", it) }
+            params["os"]?.takeIf { it.isNotBlank() }?.let { put("x-device-os", it) }
+            params["osversion"]?.takeIf { it.isNotBlank() }?.let { put("x-ver-os", it) }
+            params["model"]?.takeIf { it.isNotBlank() }?.let { put("x-device-model", it) }
+        }
+    }
+
+    private val allowedHwidParams = setOf("hwid", "os", "osversion", "model")
+
+    private fun String.isValidHeaderValue(): Boolean = isNotEmpty() && length < 1000 && none { it == '\n' || it == '\r' }
+
+    /**
+     * Apply the subscription name filter. Matching ignores case - people type "hk" for a
+     * subscription that labels its nodes "Hong Kong" - and a pattern the regex engine
+     * rejects is logged and skipped instead of aborting the whole update.
+     */
     internal fun applySubscriptionFilter(
         proxies: List<AbstractBean>,
         filterMode: Int,
@@ -105,6 +154,10 @@ object RawUpdater : GroupUpdater() {
         val existsBean = entity.requireBean()
         bean.customOutboundJson = existsBean.customOutboundJson
         bean.customConfigJson = existsBean.customConfigJson
+        // isai：匯入 WG 的 useConfigRoutes 是使用者選擇，訂閱更新不得覆蓋。
+        if (bean is WireGuardBean && existsBean is WireGuardBean) {
+            bean.useConfigRoutes = existsBean.useConfigRoutes
+        }
 
         val contentChanged = existsBean != bean
         val orderChanged = entity.userOrder != userOrder
@@ -125,6 +178,7 @@ object RawUpdater : GroupUpdater() {
         userInterface: GroupManager.Interface?,
         byUser: Boolean,
     ) {
+        val groupSnapshot = KryoConverters.serialize(proxyGroup)
         val link = subscription.link
         var proxies: List<AbstractBean>
         var rawText: String? = null
@@ -159,6 +213,13 @@ object RawUpdater : GroupUpdater() {
                             ?: DataStore.spoofUserAgent.takeIf { it.isNotBlank() }
                             ?: USER_AGENT,
                     )
+                    // isai：訂閱附 HWID/自訂 header。
+                    if (subscription.sendHwid == true) {
+                        for ((key, value) in buildHwidHeaders(subscription.customHwidParams)) {
+                            setHeader(key, value)
+                        }
+                    }
+                    parseSubscriptionHeaders(subscription.customHeaders.orEmpty()).forEach { (key, value) -> setHeader(key, value) }
                 }.execute()
             }
             // 訂閱流量走本地 mixed 入站，所以代理沒起來或壞掉時「更新訂閱」會整批失敗，
@@ -173,8 +234,10 @@ object RawUpdater : GroupUpdater() {
             }
             val content = Util.getStringBox(response.getContentStringLimited(10L * 1024 * 1024))
             rawText = content
-            proxies = parseRaw(content)
-                ?: error(app.getString(R.string.no_proxies_found))
+            // isai：空回應/HTML 錯誤頁/壞 JSON 給出可讀的失敗原因。
+            subscriptionResponseProblem(content)?.let { throw subscriptionResponseError(it) }
+            proxies = parseRaw(content)?.takeIf { it.isNotEmpty() }
+                ?: throw subscriptionResponseError(SubscriptionResponseProblem.UNSUPPORTED)
 
             var userinfo = Util.getStringBox(response.getHeader("Subscription-Userinfo"))
             if (userinfo.isBlank()) {
@@ -220,8 +283,8 @@ object RawUpdater : GroupUpdater() {
         val filterActive = subscriptionFilterActive(filterMode, filterRegex)
         proxies = applySubscriptionFilter(proxies, filterMode, filterRegex)
 
-        val exists = SagerDatabase.proxyDao.getByGroup(proxyGroup.id)
         val duplicate = ArrayList<String>()
+        val exists = SagerDatabase.proxyDao.getByGroup(proxyGroup.id)
         if (subscription.deduplication) {
             Logs.d("Before deduplication: ${proxies.size}")
             val uniqueProxies = LinkedHashSet<Protocols.Deduplication>()
@@ -389,6 +452,17 @@ object RawUpdater : GroupUpdater() {
 
     fun findBodyHeader(content: String, name: String): String? = Regex("(?m)^\\s*#$name:\\s*(.+)$", RegexOption.IGNORE_CASE)
         .find(content)?.groupValues?.get(1)?.trim()
+
+    // isai：訂閱回應問題轉可讀錯誤。
+    private fun subscriptionResponseError(problem: SubscriptionResponseProblem): SubscriptionResponseException {
+        val resource = when (problem) {
+            SubscriptionResponseProblem.EMPTY -> R.string.subscription_response_empty
+            SubscriptionResponseProblem.HTML -> R.string.subscription_response_html
+            SubscriptionResponseProblem.JSON_ERROR -> R.string.subscription_response_json_error
+            SubscriptionResponseProblem.UNSUPPORTED -> R.string.subscription_response_unsupported
+        }
+        return SubscriptionResponseException(problem, app.getString(resource))
+    }
 
     fun parseBodyProfileTitle(content: String): String = decodeProfileTitle(findBodyHeader(content, "profile-title") ?: "")
 
@@ -603,6 +677,9 @@ object RawUpdater : GroupUpdater() {
     }
 
     suspend fun parseRaw(text: String, fileName: String = "", rawDepth: Int = 0): List<AbstractBean>? {
+        // isai：超大訂閱直接拒絕，避免解析階段吃光記憶體。
+        require(text.length <= MAX_SUBSCRIPTION_BYTES) { "Subscription is too large" }
+
         val proxies = mutableListOf<AbstractBean>()
 
         // `.ovpn` 檔案匯入：核心把 OpenVPN 做成 endpoint，一個檔案就是一個剖面，

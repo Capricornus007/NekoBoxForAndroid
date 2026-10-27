@@ -18,8 +18,7 @@ import java.io.File
 fun recoverVlessTlsStateAndRestart(activity: Activity) {
     runOnDefaultDispatcher {
         try {
-            SagerNet.stopService()
-            Thread.sleep(300)
+            awaitServiceStopped(activity)
 
             clearSingBoxPersistentCacheDb()
 
@@ -40,6 +39,34 @@ fun recoverVlessTlsStateAndRestart(activity: Activity) {
                 ).show()
                 activity.finish()
             }
+        }
+    }
+}
+
+private suspend fun awaitServiceStopped(activity: Activity) {
+    val ready = kotlinx.coroutines.CompletableDeferred<io.nekohasekai.sagernet.aidl.ISagerNetService>()
+    val connection = io.nekohasekai.sagernet.bg.SagerConnection(io.nekohasekai.sagernet.bg.SagerConnection.CONNECTION_ID_SHORTCUT, true)
+    val callback = object : io.nekohasekai.sagernet.bg.SagerConnection.Callback {
+        override fun onServiceConnected(service: io.nekohasekai.sagernet.aidl.ISagerNetService) {
+            ready.complete(service)
+        }
+        override fun stateChanged(state: io.nekohasekai.sagernet.bg.BaseService.State, profileName: String?, msg: String?) {}
+        override fun onBinderDied() {
+            ready.completeExceptionally(IllegalStateException("Service disconnected during recovery"))
+        }
+    }
+    try {
+        onMainDispatcher { connection.connect(activity, callback) }
+        val service = kotlinx.coroutines.withTimeout(10_000) { ready.await() }
+        SagerNet.stopService()
+        kotlinx.coroutines.withTimeout(15_000) {
+            while (service.state != io.nekohasekai.sagernet.bg.BaseService.State.Stopped.ordinal) {
+                kotlinx.coroutines.delay(100)
+            }
+        }
+    } finally {
+        kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable + kotlinx.coroutines.Dispatchers.Main.immediate) {
+            connection.disconnect(activity)
         }
     }
 }
@@ -74,10 +101,6 @@ private val CACHE_DB_BASENAME = Regex("^cache(?:_\\d+)?\\.db$")
 
 private fun deleteCacheDbFamily(base: File) {
     listOf(base, File(base.path + "-wal"), File(base.path + "-shm")).forEach { file ->
-        runCatching {
-            if (file.exists()) {
-                file.delete()
-            }
-        }
+        check(!file.exists() || file.delete()) { "Could not delete ${file.name}" }
     }
 }
