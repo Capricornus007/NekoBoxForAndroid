@@ -1343,6 +1343,8 @@ public class SingBoxOptions {
 
     public static class RouteOptions extends SingBoxOption {
 
+        public DomainResolveOptions default_domain_resolver;
+
         public List<Rule> rules;
 
         public List<RuleSet> rule_set;

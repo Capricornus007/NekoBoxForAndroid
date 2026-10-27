@@ -361,7 +361,7 @@ fun parseOpenVPNConfig(
  * 而核心對未知欄位是直接報錯，所以這裡寧可少發也不能發錯名字）。
  */
 fun buildSingBoxEndpointOpenVPNBean(bean: OpenVPNBean): SingBoxOptions.Endpoint_OpenVPNOptions = SingBoxOptions.Endpoint_OpenVPNOptions().apply {
-    type = "openvpn"
+    type = "openvpn-client"
     mode = bean.mode.ifBlank { null }
     network = bean.transport.ifBlank { null }
     val serverList = bean.servers.lineSequence().map(String::trim)
@@ -386,9 +386,21 @@ fun buildSingBoxEndpointOpenVPNBean(bean: OpenVPNBean): SingBoxOptions.Endpoint_
     if (bean.staticChallengeEcho) static_challenge_echo = true
     bean.staticKey.ifBlank { null }?.let { static_key = listOf(it) }
     bean.keyDirection.ifBlank { null }?.let { key_direction = it }
-    bean.cipher.ifBlank { null }?.let { cipher = it }
-    bean.dataCiphers.listByLineOrComma().takeIf { it.isNotEmpty() }
-        ?.let { data_ciphers = it }
+    // 核心的規矩：`cipher`（單一、OpenVPN 2.4 以前的名字）**只**能用在不走 TLS 的
+    // 靜態金鑰模式；TLS 模式下要放 `data_ciphers`。實測（2026-10-27 手機）把 Proton
+    // 那份含 tls-crypt 的剖面直接送 `cipher` 進去，box 啟動時直接
+    // 「`cipher` is only supported in `static_key` mode; use `data_ciphers`…」。
+    val ciphersFromSingle = bean.cipher.listByLineOrComma()
+    val ciphersFromList = bean.dataCiphers.listByLineOrComma()
+    if (bean.staticKey.isBlank()) {
+        // 沒有靜態金鑰＝這條線走 TLS 控制通道，`cipher` 在核心裡是不合法的欄位名，
+        // 併進 data_ciphers。
+        (ciphersFromList + ciphersFromSingle).distinct()
+            .takeIf { it.isNotEmpty() }?.let { data_ciphers = it }
+    } else {
+        bean.cipher.ifBlank { null }?.let { cipher = it }
+        ciphersFromList.takeIf { it.isNotEmpty() }?.let { data_ciphers = it }
+    }
     bean.dataCiphersFallback.ifBlank { null }?.let { data_ciphers_fallback = it }
     bean.auth.ifBlank { null }?.let { auth = it }
     bean.mssFix?.takeIf { it > 0 }?.let { mss_fix = it }

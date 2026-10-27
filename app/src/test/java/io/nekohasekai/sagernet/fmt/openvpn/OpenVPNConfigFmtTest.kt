@@ -73,7 +73,9 @@ class OpenVPNConfigFmtTest {
     fun mapsRemotesToServersAndNetwork() {
         val result = parseOpenVPNConfig(protonLike())
         val endpoint = result.endpoint()
-        assertEquals("openvpn", endpoint.getString("type"))
+        // 核心註冊的是 "openvpn-client"（C.TypeOpenVPNClient）；寫成 "openvpn" 會在
+        // box 啟動時 unknown endpoint type，這條釘住它。
+        assertEquals("openvpn-client", endpoint.getString("type"))
         assertEquals("tls", endpoint.getString("mode"))
         assertEquals("udp", endpoint.getString("network"))
         assertTrue(endpoint.getBoolean("remote_random"))
@@ -152,7 +154,9 @@ class OpenVPNConfigFmtTest {
         assertEquals("77s", endpoint.getString("handshake_window"))
         assertEquals(1400, endpoint.getInt("mss_fix"))
         assertEquals(3, endpoint.getInt("explicit_exit_notify"))
-        assertEquals("AES-256-GCM", endpoint.getString("cipher"))
+        // 這份剖面容走 TLS（有 tls-crypt），所以密碼清單要落在 data_ciphers——
+        // 核心在 TLS 模式下不收 `cipher`（實測會直接讓 box 啟動失敗）。
+        assertEquals("AES-256-GCM", endpoint.getJSONArray("data_ciphers").getString(0))
         assertEquals("SHA512", endpoint.getString("auth"))
         assertEquals("server", endpoint.getJSONObject("tls").getString("remote_certificate_tls"))
     }
@@ -321,7 +325,9 @@ class OpenVPNConfigFmtTest {
     fun parserDoesNotInventTags() {
         val endpoint = parseOpenVPNConfig("remote example.com 1194").endpoint()
         assertFalse(endpoint.has("tag"))
-        assertEquals("openvpn", endpoint.getString("type"))
+        // 核心註冊的是 "openvpn-client"（C.TypeOpenVPNClient）；寫成 "openvpn" 會在
+        // box 啟動時 unknown endpoint type，這條釘住它。
+        assertEquals("openvpn-client", endpoint.getString("type"))
     }
 
     /** 產物必須是可直接塞進 `endpoints` 陣列的 JSON，不含核心不收的未知欄位。 */
@@ -329,9 +335,10 @@ class OpenVPNConfigFmtTest {
     fun outputIsValidSingleEndpointObject() {
         val endpoint = parseOpenVPNConfig(protonLike()).endpoint()
         val array = JSONObject().put("endpoints", org.json.JSONArray().put(endpoint))
-        assertTrue(array.toString().contains("\"type\":\"openvpn\""))
+        assertTrue(array.toString().contains("\"type\":\"openvpn-client\""))
         val allowed = setOf(
-            "type", "tag", "mode", "network", "servers", "remote_random", "cipher", "auth",
+            "type", "tag", "mode", "network", "servers", "remote_random", "auth",
+            "data_ciphers", "data_ciphers_fallback",
             "mss_fix", "explicit_exit_notify", "ping_interval", "ping_restart",
             "handshake_window", "renegotiate_disabled", "replay_window", "tls",
         )

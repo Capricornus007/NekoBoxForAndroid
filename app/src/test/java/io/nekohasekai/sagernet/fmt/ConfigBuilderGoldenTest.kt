@@ -494,14 +494,15 @@ class ConfigBuilderGoldenTest {
 
         val root = JSONObject(build(reloaded, forTest = true).config)
         val endpoints = objects(root.getJSONArray("endpoints"))
-        val endpoint = endpoints.single { it.getString("type") == "openvpn" }
+        // 核心的 OpenVPN endpoint 型別是 "openvpn-client"（C.TypeOpenVPNClient）。
+        val endpoint = endpoints.single { it.getString("type") == "openvpn-client" }
         assertTrue(
-            "openvpn 不能留在 outbounds",
-            objects(root.getJSONArray("outbounds")).none { it.optString("type") == "openvpn" },
+            "openvpn-client 不能留在 outbounds",
+            objects(root.getJSONArray("outbounds")).none { it.optString("type") == "openvpn-client" },
         )
 
         for (key in listOf(
-            "tag", "mode", "network", "servers", "remote_random", "cipher", "auth",
+            "tag", "mode", "network", "servers", "remote_random", "data_ciphers", "auth",
             "ping_interval", "ping_restart", "renegotiate_disabled", "username", "password", "tls",
         )) {
             assertTrue("missing endpoint key: $key", endpoint.has(key))

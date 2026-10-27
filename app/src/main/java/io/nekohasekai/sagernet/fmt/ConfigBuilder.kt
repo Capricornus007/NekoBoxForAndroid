@@ -106,7 +106,10 @@ internal fun SingBoxOption.applyDomainStrategyIfSupported(domainStrategy: String
     }
 }
 
-private val ENDPOINT_TYPES = setOf("wireguard", "awg", "tailscale", "openvpn")
+// 核心註冊的 OpenVPN endpoint 型別是 "openvpn-client"（sing-box 的
+// C.TypeOpenVPNClient），不是 "openvpn"——寫成後者會在 box 啟動時直接
+// 「unknown endpoint type」，這裡與 buildSingBoxEndpointOpenVPNBean 必須一致。
+private val ENDPOINT_TYPES = setOf("wireguard", "awg", "tailscale", "openvpn-client")
 
 private fun SingBoxOption.isGeneratedEndpoint(): Boolean = this is Endpoint && type in ENDPOINT_TYPES
 
@@ -701,6 +704,12 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
             override_android_vpn = true
             rules = mutableListOf()
             rule_set = mutableListOf()
+            // 全域預設域名解析器。endpoint（OpenVPN）在連線前要先把伺服器域名解成
+            // IP，核心在這一步沒有 resolver 就直接拒啟動：
+            // 「missing domain resolver for domain server address」（2026-10-27 實測）。
+            // dns-local 是本地系統解析器、走 direct 出站——隧道還沒起來時只能用這種，
+            // 用遠端 DNS 會變成「繞著自己解析自己要連的位址」。
+            default_domain_resolver = DomainResolveOptions().apply { server = "dns-local" }
 
             // 「停用 IPv6」的語意是不要用 IPv6，不是讓 IPv6 裸奔出實體網卡。VpnService 現在
             // 一律下發 v6 位址與路由（否則 v6 流量根本不進 VPN），所以改由這裡明確拒掉。
