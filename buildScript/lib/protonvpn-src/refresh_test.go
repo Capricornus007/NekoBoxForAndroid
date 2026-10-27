@@ -54,7 +54,7 @@ func renewingServer(t *testing.T, newToken, newRef string) (*httptest.Server, *i
 			_, _ = w.Write([]byte(`{"UID":"uid-test","AccessToken":"` + newToken +
 				`","RefreshToken":"` + newRef + `"}`))
 			return
-		case "/vpn/logicals":
+		case logicalsV2Path, legacyLogicalsPath:
 			logicalHits++
 			if got := r.Header.Get("Authorization"); got != "Bearer "+newToken {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -62,6 +62,11 @@ func renewingServer(t *testing.T, newToken, newRef string) (*httptest.Server, *i
 				return
 			}
 			_, _ = w.Write([]byte(serverListFixture))
+			return
+		case clientConfigPath:
+			// nodes 現在會順帶要一份預設埠；這條路不是本測試的重點，給一個最小可用的
+			// 回包就好（真給錯也不該讓清單失敗，那是 openvpn_servers_test.go 的工作）。
+			_, _ = w.Write([]byte(`{"Code":1000,"DefaultPorts":{"OpenVPN":{"UDP":[1194],"TCP":[443]}}}`))
 			return
 		}
 		t.Errorf("unexpected path %q", r.URL.Path)

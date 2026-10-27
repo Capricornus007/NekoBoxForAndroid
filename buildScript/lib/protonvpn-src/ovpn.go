@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -102,11 +103,7 @@ func fetchOpenVPNCertificate(ctx context.Context, apiURL string, cred storedCred
 	if err != nil {
 		return certAPIResponse{}, err
 	}
-	req.Header.Set("Authorization", "Bearer "+cred.AccessToken)
-	req.Header.Set("x-pm-uid", cred.UID)
-	req.Header.Set("x-pm-appversion", protonAppVersion)
-	req.Header.Set("x-pm-apiversion", protonAPIVersion)
-	req.Header.Set("Accept", protonAccept)
+	applyProtonAuthHeaders(req, cred)
 	req.Header.Set("Content-Type", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
@@ -139,13 +136,29 @@ func fetchOpenVPNCertificate(ctx context.Context, apiURL string, cred storedCred
 // <tls-crypt>），因為 nb4a 的解析器本來就吃這些區塊（fmt/openvpn/
 // OpenVPNConfigFmt.kt 的 MATERIAL_BLOCKS），自包含一份就好帶、也好核；
 // 同時仍把四份材料寫檔，讓用戶能把同一份憑證拿去別處用。
-// remote 的 host/埠/協定由呼叫端從 /vpn/v2/logicals 那台的 EntryPerProtocol 挑。
-// username 為空時不寫 auth-user-pass：官方 Windows 端 ConfigTemplate.cs:55-57 就是
+// remote 的 host 由呼叫端從 logicals 那台的 EntryPerProtocol[OpenVPN*] 挑（每協定一條
+// relay，不能用 WireGuard 那個 EntryIP），埠則是 **[port] 整份清單**：官方那兩支
+// 客戶端都是把整份埠清單寫成多條 remote 再配 remote-random（python
+// backend/networkmanager/protocol/openvpn/openvpn.py 的 OPENVPN_V2_TEMPLATE 逐字就是
+// 這個結構；win-app 的 OpenVpnEndpointArguments.cs 用 --remote 加單一埠，但它外面
+// 有一層 VpnEndpointScanner 會逐埠去試）。多條 remote 對 nb4a 也是安全的：
+// OpenVPNConfigFmt.kt 的 "remote" 分支是累加进 servers 清單，不是「只取第一條」。
+// 這樣做的理由很實際——Proton 的 OpenVPN 就是靠「同一個中繼換埠重試」活下來的，
+// 只給一個埠的剖面在封埠的網路（用户的公司／校園熱點）會直接连不上。
+// username 為空時不寫 auth-user-pass：官方 Windows 端 ConfigTemplate.cs 就是
 // 「帳號與密碼都有值才加這條」，憑證式連線不假設一定要帳密。nb4a 的解析器也照這個
 // 語意走（沒這條就不會要求補密碼）。
-func openvpnConfig(host string, port int, proto, privPEM, certPEM, username string) string {
+func openvpnConfig(host string, ports []int, proto, privPEM, certPEM, username string) string {
 	var b strings.Builder
-	b.WriteString("client\ndev tun\nremote " + host + " " + fmt.Sprint(port) + " " + proto + "\n")
+	b.WriteString("client\ndev tun\n")
+	for _, port := range ports {
+		b.WriteString("remote " + host + " " + fmt.Sprint(port) + " " + proto + "\n")
+	}
+	// 兩個以上埠才需要 random：只有一條時 remote-random 是廢話，寫了反而讓人以為
+	// 這份剖面有別的地方可以退。
+	if len(ports) > 1 {
+		b.WriteString("remote-random\n")
+	}
 	b.WriteString("proto " + proto + "\n")
 	b.WriteString("resolv-retry infinite\ncipher AES-256-GCM\nverb 3\n")
 	b.WriteString("tun-mtu 1500\ntun-mtu-extra 32\nmssfix 1450\n")
@@ -171,6 +184,7 @@ type ovpnOutput struct {
 	TLSKeyPath string `json:"tlsKeyPath,omitempty"`
 	Host       string `json:"host,omitempty"`
 	Port       int    `json:"port,omitempty"`
+	Ports      []int  `json:"ports,omitempty"`
 	Proto      string `json:"proto,omitempty"`
 	ExpiresAt  int64  `json:"expiresAt,omitempty"`
 	Error      string `json:"error,omitempty"`
@@ -201,7 +215,8 @@ func runOvpn(args []string, stdout, stderr io.Writer) int {
 	statePath := command.String("state", "", "stored session to read (required)")
 	outDir := command.String("out-dir", "", "directory to write key/cert into (required)")
 	host := command.String("host", "", "server hostname to dial (required)")
-	port := command.Int("port", 0, "port to dial (required)")
+	port := command.Int("port", 0, "port to dial (required unless --ports is given)")
+	portsCSV := command.String("ports", "", "comma separated port list; Proton's own clients ship a whole port list per server and let OpenVPN retry across it")
 	proto := command.String("proto", "udp", "udp or tcp")
 	username := command.String("username", "", "account name for auth-user-pass; empty falls back to the login name in the session file")
 	duration := command.String("duration", "", `certificate duration, e.g. "6000000 min" (empty = API default)`)
@@ -210,8 +225,15 @@ func runOvpn(args []string, stdout, stderr io.Writer) int {
 	if err := command.Parse(args); err != nil {
 		return 2
 	}
-	if *statePath == "" || *outDir == "" || *host == "" || *port <= 0 {
-		fmt.Fprintln(stderr, "protonvpn: ovpn: --state, --out-dir, --host and --port are required")
+	// 埠的來源有兩層：--ports（清單，App 那側從 logicals 的 EntryPerProtocol 拿到的）
+	// 優先，--port 是舊呼叫端與「上游沒給埠」時的單一值。兩個都沒給就是用法錯誤——
+	// 寧可拒絕，也不要生一份「隱形用 1194」的剖面：那種埠用戶跟我都查不出來。
+	ports := parsePortList(*portsCSV)
+	if len(ports) == 0 && *port > 0 {
+		ports = []int{*port}
+	}
+	if *statePath == "" || *outDir == "" || *host == "" || len(ports) == 0 {
+		fmt.Fprintln(stderr, "protonvpn: ovpn: --state, --out-dir, --host and at least one port (--port or --ports) are required")
 		return 2
 	}
 	switch *proto {
@@ -267,10 +289,28 @@ func runOvpn(args []string, stdout, stderr io.Writer) int {
 	}
 
 	return emitOvpn(stdout, ovpnOutput{
-		OK: true, Config: openvpnConfig(*host, *port, *proto, privPEM, cert.Certificate, name),
+		OK: true, Config: openvpnConfig(*host, ports, *proto, privPEM, cert.Certificate, name),
 		KeyPath: keyPath, CertPath: certPath, CAPath: caPath, TLSKeyPath: tlsKeyPath,
-		Host: *host, Port: *port, Proto: *proto, ExpiresAt: cert.ExpirationTime,
+		Host: *host, Port: ports[0], Ports: ports, Proto: *proto, ExpiresAt: cert.ExpirationTime,
 	})
+}
+
+// parsePortList 讀 --ports 那串（"1194,4569,80"）。留空/非數字/越界的一律丢掉，
+// 因為 OpenVPN 拿一個 0 或 70000 的埠只會在那條 remote 上白重試一次。
+func parsePortList(raw string) []int {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return nil
+	}
+	var ports []int
+	for _, part := range strings.Split(raw, ",") {
+		value, err := strconv.Atoi(strings.TrimSpace(part))
+		if err != nil {
+			continue
+		}
+		ports = append(ports, value)
+	}
+	return sanitizePorts(ports)
 }
 
 // hostnameForDevice 給憑證一個可辨識但不外洩路徑的 CN。Proton 在網頁端會把它列成

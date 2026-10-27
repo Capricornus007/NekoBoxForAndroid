@@ -78,9 +78,17 @@ func mockServer(t *testing.T, body string, status int) (*httptest.Server, func()
 			_, _ = w.Write([]byte(`{"Code":10013,"Error":"Invalid refresh token"}`))
 			return
 		}
+		// clientconfig 是 best-effort 的第二個請求（openvpn_servers.go）：這裡故意回
+		// 「不是 JSON 的東西」，測試同時驗到「它壞了不影響清單」。要給它正確答案的
+		// 測試自己另開 server。
+		if r.URL.Path == clientConfigPath {
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(body))
+			return
+		}
 		hits++
-		if r.URL.Path != "/vpn/logicals" {
-			t.Errorf("path = %q, want /vpn/logicals", r.URL.Path)
+		if r.URL.Path != logicalsV2Path && r.URL.Path != legacyLogicalsPath {
+			t.Errorf("path = %q, want %q", r.URL.Path, logicalsV2Path)
 		}
 		if got := r.Header.Get("Authorization"); got != "Bearer token-test" {
 			t.Errorf("Authorization = %q, want the bearer form of the stored token", got)
@@ -309,11 +317,16 @@ func serverWithID(t *testing.T, servers []nodeView, id string) nodeView {
 	return nodeView{}
 }
 
-// 協定能力就藏在 EntryPerProtocol 的鍵裡，而官方 APK（ch.protonvpn.android 5.20.74.0）的
-// ProtocolSelection.getApiName() 是「VPN 名＋傳輸名」串接，鍵名是大寫開頭的
-// WireGuardUDP／WireGuardTCP／WireGuardTLS 這一型；STEALTH = WireGuard + TLS，
-// 所以尾端的 TLS 要另外算一份 stealth。這條釘住三件事：
-// wireguard、openvpn、stealth 必須同時出現，且 WG 的位址/埠要吃到帶後綴那把鍵。
+// 協定能力就藏在 EntryPerProtocol 的鍵裡，官方客戶端的鍵名是大寫開頭的「VPN 名＋傳輸名」
+// （android ProtocolSelection.apiName、win-app EntryPerProtocolResponse 的
+// WireGuardUDP／WireGuardTCP／WireGuardTLS／OpenVPNUDP／OpenVPNTCP 五把）；
+// STEALTH = WireGuard + TLS，所以尾端的 TLS 要另外算一份 stealth。
+//
+// 這一條釘的是**拆列之後**的 WG 那列：openvpn 族現在歸自己那一列
+// （見 openvpn_servers_test.go 的「同一台兩協定」那條），WG 列不能再宣稱 openvpn，
+// 否則 UI 按 OpenVPN 筛出來的列點下去生的是 WireGuard 剖面。這裡的 OpenVPNTLS
+// 既不能把 WG 列的協定清單灌水，也不該另外生一列——TLS 後綴的 OpenVPN 不是我方那份
+// .ovpn 模板能拨的（理由見 openvpn_servers.go 檔頭第 4 點）。
 func TestNodesReportsProtocolsFromThePerProtocolKeys(t *testing.T) {
 	const payload = `{"LogicalServers":[
 	 {"ID":"31","Name":"HK#31 多協定","Tier":2,"State":"up","ExitCountry":"hk","City":"Hong Kong",
@@ -332,9 +345,9 @@ func TestNodesReportsProtocolsFromThePerProtocolKeys(t *testing.T) {
 		t.Fatalf("nodes failed: code=%d out=%+v", code, out)
 	}
 	got := out.Servers[0]
-	want := []string{protocolWireGuardName, protocolStealthName, protocolOpenVPNName}
+	want := []string{protocolWireGuardName}
 	if !slices.Equal(got.Protocols, want) {
-		t.Errorf("protocols = %v, want %v (order is fixed so the UI can compare)", got.Protocols, want)
+		t.Errorf("protocols = %v, want %v (openvpn 是另一列的事)", got.Protocols, want)
 	}
 	if !got.SecureCore {
 		t.Error("Features bit 1 should surface as secureCore=true (isSecureCoreServer in the official client)")
@@ -346,6 +359,9 @@ func TestNodesReportsProtocolsFromThePerProtocolKeys(t *testing.T) {
 	}
 	if got.PublicKey != "GGGGAl==" {
 		t.Errorf("public key = %q, want the WG key carried through as usual", got.PublicKey)
+	}
+	if got.Transport != "" || len(got.Ports) != 1 || got.Ports[0] != 51820 {
+		t.Errorf("transport/ports = %q/%v, want WG 列不帶傳輸、埠原樣帶出 [51820]", got.Transport, got.Ports)
 	}
 }
 

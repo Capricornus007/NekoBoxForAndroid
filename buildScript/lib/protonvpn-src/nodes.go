@@ -68,7 +68,7 @@ const featureSecureCore = 1
 type connectingDomain struct {
 	EntryIP          string                     `json:"EntryIP"`
 	Domain           string                     `json:"Domain"`
-	Status           *int                       `json:"Status"`
+	Status           *entryStatus               `json:"Status"`
 	X25519PublicKey  string                     `json:"X25519PublicKey"`
 	EntryPerProtocol map[string]serverEntryInfo `json:"EntryPerProtocol"`
 }
@@ -143,19 +143,30 @@ func splitProtocolKey(key string) (vpn string, transport string) {
 }
 
 // protocolCaps 從一台伺服器的 per-protocol 鍵推導協定集合，順帶取出 Secure-Core。
-// 三個刻意的设计：
+// 這是「不分族」的版本（舊簽名，供單元測試與全量查看使用）；實際產清單時走
+// protocolCapsFor，因為同一台機器現在會拆成 WG 一列、OpenVPN 一列，
+// 每列只能宣稱自己那一族真的能用的協定。
+func protocolCaps(d connectingDomain, ls logicalServer) ([]string, bool) {
+	return protocolCapsFor(d, ls, func(string, string) bool { return true })
+}
+
+// protocolCapsFor 同上，但只統計 keep(vpn 名, 傳輸後綴) 為真的鍵。
+// 三個刻意的设计（與舊版一致）：
 //  1. X25519PublicKey 有值但 EntryPerProtocol 沒帶 WireGuard 鍵時也算 wireguard——
 //     舊形狀的 payload（只有公鑰、沒有 per-protocol 表）不能退化成「這台沒有 WG」。
+//     這條只对還收 raw wireguard 鍵的那一族生效（OpenVPN 列永遠不能宣稱有 WG 金鑰，
+//     否則 Kotlin 那側「有沒有公鑰」的分支會把 OpenVPN 列送去建 WireGuard 剖面）。
 //  2. 尾端是 TLS 的鍵除了它自己的 VPN 名以外，還算一份 stealth（見上方 transportTLS 的證據）。
 //  3. 結果去重、依 protocolOrder 排序；不認識的鍵名以小寫原樣排在最後。
-func protocolCaps(d connectingDomain, ls logicalServer) ([]string, bool) {
+func protocolCapsFor(d connectingDomain, ls logicalServer, keep func(vpn, transport string) bool) ([]string, bool) {
 	seen := make(map[string]bool, len(d.EntryPerProtocol)+1)
-	if d.X25519PublicKey != "" {
+	wireGuardKept := keep(protocolWireGuardName, "")
+	if d.X25519PublicKey != "" && wireGuardKept {
 		seen[protocolWireGuardName] = true
 	}
 	for key := range d.EntryPerProtocol {
 		vpn, transport := splitProtocolKey(key)
-		if vpn == "" {
+		if vpn == "" || !keep(vpn, transport) {
 			continue
 		}
 		seen[vpn] = true
@@ -244,9 +255,10 @@ func (d connectingDomain) protocolEntryNamed(name string) (serverEntryInfo, bool
 // dialProtocolOrder 是「這條線要實際拨出去」時挑協定記錄的順序，與 protocolOrder（報能力
 // 用的順序）不同：stealth 擺最後，因為它的 per-protocol 記錄其實是上面某個協定的 TLS 變體
 // （WireGuardTLS／OpenVPNTLS），基礎協定那把先選得到才輪到它。
+// openvpn 不在這一張表裡：現在它有自己的列（buildOpenVpnRow），位址與埠都要用它那一族的
+// 條目，混進 WG 列就會出現「列上寫 WireGuard、實際生的是 OpenVPN 的 relay」那種錯位。
 var dialProtocolOrder = []string{
 	protocolWireGuardName,
-	protocolOpenVPNName,
 	protocolProTunName,
 	protocolSmartName,
 	protocolStealthName,
@@ -254,6 +266,16 @@ var dialProtocolOrder = []string{
 
 type logicalServersResp struct {
 	LogicalServers []logicalServer `json:"LogicalServers"`
+	// StatusID 給後續的二進位狀態輪詢用（官方 android 的 getBinaryStatus、python 的
+	// MixinEndpointV2.STATUS 都以它為入口），這裡先讀起來留著，不要讓它變成隱形的欄位。
+	StatusID string `json:"StatusID"`
+	// ResponseMetadata.ListIsTruncated：v2 在回應太大時會只給清單的一部分（官方兩支
+	// 客戶端都用 x-pm-response-truncation-permitted 明確宣告吃得下截断，再用
+	// IncludeID[] 補補漏）。我方沒有那條補漏的路，所以至少要讓呼叫端看得见「這不是全部」，
+	// 不能把「被截斷的 1588 台」當成「這帳號就這些機器」。
+	ResponseMetadata struct {
+		ListIsTruncated bool `json:"ListIsTruncated"`
+	} `json:"ResponseMetadata"`
 }
 
 type nodeView struct {
@@ -275,8 +297,20 @@ type nodeView struct {
 	// （wireguard／stealth／openvpn／protun／smart，上游不認識的鍵名原樣小寫送出），
 	// UI 的「依協定篩選」就以這欄為準；wgPublicKey 留空但 Protocols 有值的那種，
 	// 就是「這台只能走別協定」而不是「壞掉的節點」。
+	//
+	// 現在一台機器可能出兩列：WireGuard 一列（id 原樣）與 OpenVPN 一列
+	// （id 帶 "#openvpn" 後綴、wgPublicKey 一定留空）。每列的 Protocols 只寫**它自己
+	// 那一族真的能拨的**協定，所以「按協定篩選」選 OpenVPN 點下去就會匯入 OpenVPN，
+	// 不會出现「列出來的是 WG 剖面」那種錯位（用戶要的正是這個）。
 	Protocols  []string `json:"protocols,omitempty"`
 	SecureCore bool     `json:"secureCore,omitempty"`
+	// Ports 與 Transport 必須跟在 SecureCore 之後（同上：位置構造物件的呼叫端）。
+	// Ports 是這一列真的能拨的埠清單（OpenVPN 的 remote 清單，順序不具意義，
+	// 官方模板也是配 remote-random 一起用）；Port 只留給「取第一個」的舊呼叫端。
+	// Transport 是該列的傳輸（udp／tcp），OpenVPN 那一列一定要有，Kotlin 才知道
+	// 該把 .ovpn 的 proto 寫成什麼；WireGuard 列留空（WG 的傳輸由埠決定）。
+	Ports     []int  `json:"ports,omitempty"`
+	Transport string `json:"transport,omitempty"`
 }
 
 type nodesOutput struct {
@@ -296,6 +330,10 @@ type nodesOutput struct {
 	// (and Proton rewords things), so "route the user back to sign-in" must never be
 	// decided by matching an English sentence. Only session_expired exists today.
 	Code string `json:"code,omitempty"`
+	// Truncated 是上游自己說的「這次只給了一部分」（ResponseMetadata.ListIsTruncated）。
+	// 帶上 WithEntriesForProtocols 之後回應比以前大得多，這個分支真的可能發生；
+	// 不報出來就會讓 UI 把「被截斷的清單」講成「這個帳號的節點」。
+	Truncated bool `json:"truncated,omitempty"`
 }
 
 // codeSessionExpired means the stored uid/token was rejected outright. The one and
@@ -332,11 +370,7 @@ func fetchVPNInfo(ctx context.Context, apiURL string, cred storedCredential) (vp
 	if err != nil {
 		return vpnInfo{}, err
 	}
-	req.Header.Set("Authorization", "Bearer "+cred.AccessToken)
-	req.Header.Set("x-pm-uid", cred.UID)
-	req.Header.Set("x-pm-appversion", protonAppVersion)
-	req.Header.Set("x-pm-apiversion", protonAPIVersion)
-	req.Header.Set("Accept", protonAccept)
+	applyProtonAuthHeaders(req, cred)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -430,6 +464,9 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 	tier := command.Int("tier", 0, "drop servers above this plan tier (0 = do not filter)")
 	apiURL := command.String("api-url", defaultProtonAPIURL, "API base URL")
 	timeoutSec := command.Int("timeout", 30, "overall deadline in seconds")
+	entries := command.String("with-entries-for-protocols", strings.Join(logicalsProtocolEntries, ","),
+		"comma separated protocol keys to ask Proton for in the server list; empty = the old shape without entries")
+	openVpn := command.Bool("openvpn", true, "emit one extra row per server for its OpenVPN entry")
 	if err := command.Parse(args); err != nil {
 		return 2
 	}
@@ -446,7 +483,8 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(*timeoutSec)*time.Second)
 	defer cancel()
 
-	resp, err := fetchLogicalServers(ctx, *apiURL, cred)
+	requested := splitProtocolList(*entries)
+	resp, err := fetchLogicalServers(ctx, *apiURL, cred, requested)
 	if err != nil && errors.Is(err, errSessionExpired) {
 		// 401/403 先當作「access token 到期」處理：用存著的 RefreshToken 換一張再試一次，
 		// 換到的寫回狀態檔。只有連換都換不到、或換完仍然被拒，才是真的要重登。
@@ -459,7 +497,7 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 		case rerr != nil:
 			return emitNodes(stdout, nodesOutput{Error: errSessionExpired.Error(), Code: codeSessionExpired})
 		default:
-			resp, err = fetchLogicalServers(ctx, *apiURL, refreshed)
+			resp, err = fetchLogicalServers(ctx, *apiURL, refreshed, requested)
 		}
 	}
 	if err != nil {
@@ -469,7 +507,18 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 		return emitNodes(stdout, nodesOutput{Error: err.Error()})
 	}
 
-	servers, dropped := selectNodes(resp, *country, *limit, *tier)
+	// 預設埠是「那台機器自己沒給埠」時的備援，不是必要條件：clientconfig 拿不到
+	// （離線、401 已經在上一條路處理過、上游改 shape）時照樣只用人家自己带的埠，
+	// 兩邊都沒有就留 0 讓 App 决定，不憑空捏一個。
+	defaults := clientConfigResponse{}
+	if *openVpn {
+		if cfg, cfgErr := fetchClientConfig(ctx, *apiURL, cred); cfgErr == nil {
+			defaults = cfg
+		}
+	}
+
+	servers, dropped := selectNodes(resp, *country, *limit, *tier, defaults, *openVpn)
+	truncated := resp.ResponseMetadata.ListIsTruncated
 	if len(servers) == 0 {
 		// Reporting an empty success would let the UI say "this account has no
 		// servers", which is a different claim from "nothing in the list was usable".
@@ -478,24 +527,60 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 			tierNote = fmt.Sprintf(" for plan tier %d", *tier)
 		}
 		return emitNodes(stdout, nodesOutput{
-			Dropped: dropped,
-			MaxTier: *tier,
-			Error:   fmt.Sprintf("no usable servers in the response (%d dropped)%s", dropped, tierNote),
+			Dropped:   dropped,
+			MaxTier:   *tier,
+			Truncated: truncated,
+			Error:     fmt.Sprintf("no usable servers in the response (%d dropped)%s", dropped, tierNote),
 		})
 	}
-	return emitNodes(stdout, nodesOutput{OK: true, Servers: servers, Dropped: dropped, MaxTier: *tier})
+	return emitNodes(stdout, nodesOutput{
+		OK: true, Servers: servers, Dropped: dropped, MaxTier: *tier, Truncated: truncated,
+	})
 }
 
-func fetchLogicalServers(ctx context.Context, apiURL string, cred storedCredential) (*logicalServersResp, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, strings.TrimRight(apiURL, "/")+"/vpn/logicals", nil)
+// splitProtocolList 把 --with-entries-for-protocols 那串拆乾淨：空字串代表「照舊形狀問」
+// （不帶 WithEntriesForProtocols，等於退回舊行為），其餘項目去空白、丟掉空項。
+func splitProtocolList(raw string) []string {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return nil
+	}
+	parts := strings.Split(raw, ",")
+	out := make([]string, 0, len(parts))
+	for _, part := range parts {
+		if part = strings.TrimSpace(part); part != "" {
+			out = append(out, part)
+		}
+	}
+	return out
+}
+
+// fetchLogicalServers 打官方目前兩支客戶端用的那一條：GET /vpn/v2/logicals 加上
+// WithEntriesForProtocols（OpenVPN 的條目只在這條路上會出現，證據見 openvpn_servers.go
+// 檔頭）。v2 被改路徑或拒收參數（404/405/400）時退回舊的 /vpn/logicals：那樣就沒有
+// per-protocol 條目、OpenVPN 列會消失，但 WireGuard 清單還在，比整條功能紅掉好。
+// 401/403 與 422 不能算「路徑被拒」：那些要嘛是工作階段、要嘛是驗證碼，得原樣上傳
+// 給呼叫端走既有的換 token／提示重登的路徑。
+func fetchLogicalServers(ctx context.Context, apiURL string, cred storedCredential, entries []string) (*logicalServersResp, error) {
+	resp, err := requestLogicalServers(ctx, apiURL, cred, logicalsV2Path, logicalsQuery(entries))
+	if err != nil && len(entries) > 0 && rejectedPath(err) {
+		return requestLogicalServers(ctx, apiURL, cred, legacyLogicalsPath, "")
+	}
+	return resp, err
+}
+
+func requestLogicalServers(
+	ctx context.Context, apiURL string, cred storedCredential, path string, query string,
+) (*logicalServersResp, error) {
+	endpoint := strings.TrimRight(apiURL, "/") + path
+	if query != "" {
+		endpoint += "?" + query
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Bearer "+cred.AccessToken)
-	req.Header.Set("x-pm-uid", cred.UID)
-	req.Header.Set("x-pm-appversion", protonAppVersion)
-	req.Header.Set("x-pm-apiversion", protonAPIVersion)
-	req.Header.Set("Accept", protonAccept)
+	applyProtonAuthHeaders(req, cred)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -520,6 +605,11 @@ func fetchLogicalServers(ctx context.Context, apiURL string, cred storedCredenti
 			return nil, errors.New("Proton wants a CAPTCHA for this network before listing servers: sign in again from the Proton page")
 		}
 		return nil, fmt.Errorf("API returned HTTP %d (code %d)", res.StatusCode, api.Code)
+	case res.StatusCode == http.StatusNotFound, res.StatusCode == http.StatusMethodNotAllowed,
+		res.StatusCode == http.StatusBadRequest:
+		// 讓上層分辨得出來「這條路徑/這組參數不存在」，那種情況才值得退回舊路徑；
+		// 5xx 不能退（退過去也只是再錯一次，而且會蓋掉真正的錯誤）。
+		return nil, &errUpstreamRejectedPath{status: res.StatusCode}
 	case res.StatusCode != http.StatusOK:
 		return nil, fmt.Errorf("API returned HTTP %d", res.StatusCode)
 	}
@@ -539,10 +629,19 @@ func fetchLogicalServers(ctx context.Context, apiURL string, cred storedCredenti
 // 「只有 OpenVPN／ProTun」的伺服器要照常進清單（wgPublicKey 留空），不能算丟棄——
 // Dropped 這欄的用途還是讓 UI 分得出「節點少」與「回應壞了」。
 //
+// 一台機器現在最多出兩列：
+//   - WireGuard 列（id 原樣）：跟舊行為同一條選域邏輯，只是 Protocols 不再包含 openvpn
+//     那族（那是另一列的事），這樣 UI 選「OpenVPN」筛出來的每一列點下去都是 OpenVPN。
+//   - OpenVPN 列（id 加 "#openvpn"、wgPublicKey 一定空）：見 buildOpenVpnRow。
+//     includeOpenVpn=false（--openvpn=false）時不生這一列，等於完全回到舊形狀。
+//
 // maxTier 是帳號層級上限（免費＝1）：Tier 高於它的伺服器是「這帳號連不上」的付費節點，
 // 匯進來只會製造連不上的節點，一律丟棄（計進 dropped）。maxTier <= 0 表示不知道層級、
-// 不過濾。
-func selectNodes(resp *logicalServersResp, country string, limit int, maxTier int) ([]nodeView, int) {
+// 不過濾。層級／國家過濾發生在生列之前，所以兩種來源受同一條規則管。
+func selectNodes(
+	resp *logicalServersResp, country string, limit int, maxTier int,
+	defaults clientConfigResponse, includeOpenVpn bool,
+) ([]nodeView, int) {
 	var usable []nodeView
 	dropped := 0
 
@@ -558,81 +657,20 @@ func selectNodes(resp *logicalServersResp, country string, limit int, maxTier in
 		if country != "" && !strings.EqualFold(ls.Country, country) {
 			continue
 		}
-		var chosen *connectingDomain
-		wireGuardChosen := false
-		for i := range ls.Servers {
-			d := &ls.Servers[i]
-			if d.X25519PublicKey == "" {
-				continue
-			}
-			// A missing Status must not hide a node, so only an explicit 0 rejects it.
-			if d.Status != nil && *d.Status == 0 {
-				continue
-			}
-			chosen = d
-			wireGuardChosen = true
-			break
-		}
-		if chosen == nil {
-			// 沒有可用的 WG domain 不等於這台不能用：退而選「有 per-protocol 條目、
-			// 也講得出位址、又沒被明確標成離線」的那一台，靠 Protocols 說明它能用什麼。
-			for i := range ls.Servers {
-				d := &ls.Servers[i]
-				if len(d.EntryPerProtocol) == 0 {
-					continue
-				}
-				if d.Status != nil && *d.Status == 0 {
-					continue
-				}
-				if d.EntryIP == "" && d.Domain == "" {
-					continue
-				}
-				chosen = d
-				break
-			}
-		}
-		if chosen == nil {
+		wgRow, hasWireGuard := wireGuardRow(ls)
+		ovpnRow, hasOpenVpn := buildOpenVpnRow(ls, defaults)
+		if !hasWireGuard && !hasOpenVpn {
 			dropped++
 			continue
 		}
-		protocols, secureCore := protocolCaps(*chosen, ls)
-		entry, hasEntry := chosen.wireGuardEntry()
-		if !hasEntry && !wireGuardChosen {
-			// 非 WG 那條路：位址與埠要用它自己協定協商出來的記錄，不能沿用 EntryIP＋51820。
-			// 依 dialProtocolOrder 挑（stealth 是別的協定的 TLS 變體，排最後）；上游塞了
-			// 不認識的協定名時再照 protocols 的順序補一次，別靜默退回 EntryIP。
-			for _, name := range dialProtocolOrder {
-				if e, ok := chosen.protocolEntryNamed(name); ok {
-					entry, hasEntry = e, true
-					break
-				}
-			}
-			if !hasEntry {
-				for _, name := range protocols {
-					if e, ok := chosen.protocolEntryNamed(name); ok {
-						entry, hasEntry = e, true
-						break
-					}
-				}
-			}
+		if hasWireGuard {
+			usable = append(usable, wgRow)
 		}
-		usable = append(usable, nodeView{
-			ID:         ls.ID,
-			Name:       ls.Name,
-			Load:       ls.Load,
-			Score:      ls.Score,
-			Penalty:    ls.StatusReference.Penalty,
-			Tier:       ls.Tier,
-			IPv6:       ls.Features&featureIPv6 != 0,
-			Country:    ls.Country,
-			City:       ls.City,
-			Endpoint:   chosen.entry(entry, hasEntry),
-			Domain:     chosen.Domain,
-			PublicKey:  chosen.X25519PublicKey,
-			Port:       chosen.port(entry, hasEntry, wireGuardChosen),
-			Protocols:  protocols,
-			SecureCore: secureCore,
-		})
+		// --openvpn=false 只是不出那一列，不改變「這台到底能不能用」的判定：
+		// 把纯 OpenVPN 的機器計進 dropped 會讓 UI 誤解成「回應裡有壞掉的」。
+		if hasOpenVpn && includeOpenVpn {
+			usable = append(usable, ovpnRow)
+		}
 	}
 
 	// Load is the utilisation number Proton shows users (0-100), and Score is the
@@ -650,10 +688,110 @@ func selectNodes(resp *logicalServersResp, country string, limit int, maxTier in
 		}
 		return usable[i].Penalty < usable[j].Penalty
 	})
+	// limit 數的是**列**不是台：一台兩協定就是兩列。App 那側目前不帶 --limit
+	// （清單要全量），所以這不是用戶看得見的差異，但改這裡的人必須知道。
 	if limit > 0 && len(usable) > limit {
 		usable = usable[:limit]
 	}
 	return usable, dropped
+}
+
+// nodeViewFromServer 把一台 logical server 的「跟協定無關」那部分資料抄進一列。
+// WG 列與 OpenVPN 列共用它，兩边才不會出現「同一台機器在清單上層級/空閒度不一樣」這種事。
+func nodeViewFromServer(ls logicalServer) nodeView {
+	return nodeView{
+		ID:         ls.ID,
+		Name:       ls.Name,
+		Load:       ls.Load,
+		Score:      ls.Score,
+		Penalty:    ls.StatusReference.Penalty,
+		Tier:       ls.Tier,
+		IPv6:       ls.Features&featureIPv6 != 0,
+		Country:    ls.Country,
+		City:       ls.City,
+		SecureCore: ls.Features&featureSecureCore != 0,
+	}
+}
+
+// wireGuardRow 生「WireGuard 那一列」，選域規則與舊碼一致：
+//  1. 先找有 X25519 公鑰、又沒被明確標成離線的 domain；
+//  2. 找不到就退而選「有 per-protocol 條目、講得出位址、沒被標離線」的那台
+//     （protun／smart／上游新增的陌生協定名都走這條，資訊保留下來而不是靜默丢掉）。
+//     唯一被挪出去的是 openvpn 那一族——它現在由 buildOpenVpnRow 單獨生一列，
+//     否則同一台機器會在清單上被宣稱成「能用 OpenVPN」的 WG 剖面。
+//
+// 回 false 代表這台真的沒有 WG 側可用的 domain（不是錯誤）。
+func wireGuardRow(ls logicalServer) (nodeView, bool) {
+	var chosen *connectingDomain
+	wireGuardChosen := false
+	for i := range ls.Servers {
+		d := &ls.Servers[i]
+		if d.X25519PublicKey == "" {
+			continue
+		}
+		// A missing Status must not hide a node, so only an explicit false/0 rejects it.
+		if d.Status.offline() {
+			continue
+		}
+		chosen = d
+		wireGuardChosen = true
+		break
+	}
+	if chosen == nil {
+		for i := range ls.Servers {
+			d := &ls.Servers[i]
+			if len(d.EntryPerProtocol) == 0 {
+				continue
+			}
+			if d.Status.offline() {
+				continue
+			}
+			if d.EntryIP == "" && d.Domain == "" {
+				continue
+			}
+			// 只有 OpenVPN 鍵的 domain 不在這裡接手：那是另一列的工作。
+			if caps, _ := protocolCapsFor(*d, ls, isWireGuardFamily); len(caps) == 0 {
+				continue
+			}
+			chosen = d
+			break
+		}
+	}
+	if chosen == nil {
+		return nodeView{}, false
+	}
+	protocols, secureCore := protocolCapsFor(*chosen, ls, isWireGuardFamily)
+	entry, hasEntry := chosen.wireGuardEntry()
+	if !hasEntry && !wireGuardChosen {
+		// 非 WG 那條路：位址與埠要用它自己協定協商出來的記錄，不能沿用 EntryIP＋51820。
+		// 依 dialProtocolOrder 挑（stealth 是別的協定的 TLS 變體，排最後）；上游塞了
+		// 不認識的協定名時再照 protocols 的順序補一次，別靜默退回 EntryIP。
+		for _, name := range dialProtocolOrder {
+			if e, ok := chosen.protocolEntryNamed(name); ok {
+				entry, hasEntry = e, true
+				break
+			}
+		}
+		if !hasEntry {
+			for _, name := range protocols {
+				if e, ok := chosen.protocolEntryNamed(name); ok {
+					entry, hasEntry = e, true
+					break
+				}
+			}
+		}
+	}
+	view := nodeViewFromServer(ls)
+	view.Endpoint = chosen.entry(entry, hasEntry)
+	view.Domain = chosen.Domain
+	view.PublicKey = chosen.X25519PublicKey
+	view.Port = chosen.port(entry, hasEntry, wireGuardChosen)
+	view.Protocols = protocols
+	view.SecureCore = secureCore
+	if ports := chosen.portsOf(entry, hasEntry); len(ports) > 0 {
+		view.Ports = ports
+	}
+	return view, true
 }
 
 // entry prefers the per-protocol IPv4, then the plain EntryIP, then the domain.
@@ -665,6 +803,15 @@ func (d connectingDomain) entry(entry serverEntryInfo, hasEntry bool) string {
 		return d.EntryIP
 	}
 	return d.Domain
+}
+
+// portsOf 給 WG 列也帶上整份埠清單（與 OpenVPN 列同一個欄位語意：Port 只是第一個）。
+// 沒協商出條目時回空，由 port() 那條 fallback 决定埠。
+func (d connectingDomain) portsOf(entry serverEntryInfo, hasEntry bool) []int {
+	if !hasEntry {
+		return nil
+	}
+	return sanitizePorts(entry.Ports)
 }
 
 // port 取協定協商出來的埠。51820 是 WireGuard 的慣用預設埠，只有真的按 WG 選中時

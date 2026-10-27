@@ -150,7 +150,7 @@ func TestOvpnCommandReportsExpiryWhenSessionRejected(t *testing.T) {
 // TestOvpnConfigOmitsAuthUserPassWithoutUsername 釘住官方模板的條件式寫法：
 // 沒有帳密就不發 auth-user-pass，避免把「一定要密碼」這個假設塞進剖面。
 func TestOvpnConfigOmitsAuthUserPassWithoutUsername(t *testing.T) {
-	cfg := openvpnConfig("nl-001.protonvpn.net", 443, "tcp", "PRIV", "CERT", "")
+	cfg := openvpnConfig("nl-001.protonvpn.net", []int{443}, "tcp", "PRIV", "CERT", "")
 	if strings.Contains(cfg, "auth-user-pass") || strings.Contains(cfg, "setenv USERNAME") {
 		t.Errorf("config without username still carries auth-user-pass:\n%s", cfg)
 	}

@@ -144,7 +144,7 @@ func TestHVTransportAttachesHeadersOnlyOnAuthRoutes(t *testing.T) {
 			seen = append(seen, [2]string{
 				r.Header.Get(hvTokenHeader), r.Header.Get(hvTypeHeader),
 			})
-		case r.URL.Path == "/vpn/logicals":
+		case strings.HasPrefix(r.URL.Path, "/vpn/"):
 			seenOnOther = r.Header.Get(hvTokenHeader)
 		}
 		_, _ = w.Write([]byte(`{"Code":1000}`))
@@ -157,7 +157,7 @@ func TestHVTransportAttachesHeadersOnlyOnAuthRoutes(t *testing.T) {
 		attach:    &hvSolution{Token: "HV1:solved"},
 		challenge: &challenge,
 	}
-	for _, path := range []string{"/auth/v4", "/auth/v4/info", "/vpn/logicals"} {
+	for _, path := range []string{"/auth/v4", "/auth/v4/info", logicalsV2Path} {
 		req, err := http.NewRequest(http.MethodPost, srv.URL+path, nil)
 		if err != nil {
 			t.Fatalf("new request: %v", err)
