@@ -35,141 +35,6 @@ import java.util.Locale
  *     failures[] / warnings[]。
  * 兩種形都認，判準同一個：required_failures > 0（= Go 側 RequiredFailures()）。
  */
-/**
- * eBPF 探針 detail 的繁中對照表。
- *
- * 為什麼要這張表：detail 是 Go 側 kernel_probe.go 產生的英文診斷句，會直接顯示在設定頁
- * 那一行（例如 `all  ✗  Stores redirect and flow state.`）。使用者看不懂英文，但這些是
- * 核心回傳的技術資料、不是 app 自己的文案；塞進 strings.xml 會讓 19 個語系都要維護同一批
- * 技術句，翻譯品質也難保證。
- *
- * 策略：
- *   - 只在中文語系（zh-*）套用；其他語系保留英文原文（技術診斷資料本來就以英文為準）。
- *   - 精確比對不到就用前綴／樣式比對（含內核版本、位元組數那些動態句）。
- *   - 全都對不到就原樣回傳——寧可顯示英文，也不要顯示錯誤的翻譯。
- *   - 之後新增 detail 只要往 TABLE 補一行，不必動任何 res/values-*。
- */
-internal object EbpfDetailZh {
-
-    private val TABLE: Map<String, String> = mapOf(
-        // ── common scope ──
-        "The process has UID 0. Direct probes below still detect capability, LSM, or seccomp restrictions." to
-            "行程以 UID 0 執行。下方的直接探測仍會檢查 capability、LSM 與 seccomp 限制。",
-        "Run as root or grant the BPF, system-administration, and network-administration capabilities required by the selected data path." to
-            "請以 root 執行，或授予所選資料路徑所需的 BPF、系統管理與網路管理 capability。",
-        "Stores redirect and flow state." to
-            "儲存轉發與連線流程狀態。",
-        "Stores runtime controls and counters." to
-            "儲存執行期控制項與計數器。",
-        "Stores bounded socket, UDP, fragment, and bypass caches." to
-            "儲存有上限的 socket、UDP、分片與繞過快取。",
-        "Stores UID and CIDR policies. Linux 6.6.0-6.6.46 policy updates remain blocked separately unless the upstream fix is detected." to
-            "儲存 UID 與 CIDR 策略。在偵測到上游修正前，Linux 6.6.0–6.6.46 的策略更新仍會被單獨阻擋。",
-        "RLIMIT_MEMLOCK is unlimited after automatic adjustment." to
-            "自動調整後 RLIMIT_MEMLOCK 已無上限。",
-        // ── local scope ──
-        "Implements TCP connect interception and UDP sendmsg/recvmsg address translation." to
-            "實作 TCP connect 攔截與 UDP sendmsg/recvmsg 位址轉譯。",
-        "Required for local TCP." to
-            "本機 TCP 必需。",
-        "Required for connected local UDP." to
-            "已連線的本機 UDP 必需。",
-        "Required for local TCP. Also covers IPv4-mapped dual-stack sockets." to
-            "本機 TCP 必需，同時涵蓋 IPv4-mapped 雙棧 socket。",
-        "Required for connected local UDP. Also covers IPv4-mapped dual-stack sockets." to
-            "已連線的本機 UDP 必需，同時涵蓋 IPv4-mapped 雙棧 socket。",
-        "Required to redirect unconnected IPv4 UDP." to
-            "轉發未連線的 IPv4 UDP 必需。",
-        "Required to redirect unconnected IPv6 and IPv4-mapped UDP." to
-            "轉發未連線的 IPv6 與 IPv4-mapped UDP 必需。",
-        "Required to restore the original IPv4 UDP peer. Upstream Linux added recvmsg hooks in 5.2." to
-            "還原原始 IPv4 UDP 對端必需。上游 Linux 5.2 才加入 recvmsg hook。",
-        "Required to restore the original IPv6 or IPv4-mapped UDP peer. Upstream Linux added recvmsg hooks in 5.2." to
-            "還原原始 IPv6 或 IPv4-mapped UDP 對端必需。上游 Linux 5.2 才加入 recvmsg hook。",
-        "Reads policy, protection, redirect, and UDP state." to
-            "讀取策略、自我保護、轉發與 UDP 狀態。",
-        "Creates redirect, token, peer, and flow state." to
-            "建立轉發、token、對端與連線流程狀態。",
-        "Reclaims or replaces UDP state." to
-            "回收或取代 UDP 狀態。",
-        "Identifies UDP sockets and provides self-protection fallback." to
-            "辨識 UDP socket，並提供自我保護的備援路徑。",
-        "Enforces UID and Android package policy when configured." to
-            "設定後強制執行 UID 與 Android 套件策略。",
-        "Timestamps TCP redirect state." to
-            "為 TCP 轉發狀態打時間戳。",
-        "Provides the fast sing-box self-bypass path; socket-cookie protection is the fallback." to
-            "提供 sing-box 自身繞過的快速路徑；socket-cookie 保護是備援。",
-        "Enables exact connected-UDP cleanup. Bounded LRU maps and a reduced UDP cache are used when unavailable." to
-            "啟用已連線 UDP 的精確清理。不可用時改用有上限的 LRU map 與縮減的 UDP 快取。",
-        // ── shared-network scope ──
-        "Implements TC ingress and egress interception, policy, token rewriting, and reply restoration." to
-            "實作 TC 入口／出口攔截、策略、token 改寫與回覆還原。",
-        "Provides lock-free per-CPU packet parsing scratch space." to
-            "提供免鎖的 per-CPU 封包解析暫存區。",
-        "Reads controls, policy, and flow state." to
-            "讀取控制項、策略與連線流程狀態。",
-        "Creates proxy, reply, bypass, and fragment state." to
-            "建立代理、回覆、繞過與分片狀態。",
-        "Removes expired or conflicting flow state." to
-            "移除過期或衝突的連線流程狀態。",
-        "Applies UDP, TCP, fragment, and bypass cache lifetimes." to
-            "套用 UDP、TCP、分片與繞過快取的生命週期。",
-        "Makes packet headers linear and writable." to
-            "讓封包標頭連續且可寫。",
-        "Rewrites token and original addresses and ports." to
-            "改寫 token 與原始位址、埠號。",
-        "Calculates IPv4 and IPv6 checksum deltas." to
-            "計算 IPv4 與 IPv6 校驗和差值。",
-        "Updates the IPv4 header checksum." to
-            "更新 IPv4 標頭校驗和。",
-        "Updates TCP and UDP checksums." to
-            "更新 TCP 與 UDP 校驗和。",
-        "Used on modern kernels for qdisc-independent ingress attachment; clsact is the fallback." to
-            "較新內核用於不依賴 qdisc 的入口掛載；clsact 是備援。",
-        "Used on modern kernels for qdisc-independent egress attachment; clsact is the fallback." to
-            "較新內核用於不依賴 qdisc 的出口掛載；clsact 是備援。",
-        // ── cgroup 路徑 ──
-        "The configured path is not a directory." to
-            "設定的路徑不是目錄。",
-    )
-
-    /** 動態句的前綴對照：值是「英文前綴 → 中文前綴」，後面的原文照原樣接上。 */
-    private val PREFIX: List<Pair<String, String>> = listOf(
-        "The running kernel version could not be read: " to "讀不到執行中的內核版本：",
-        "The path is not below the detected cgroup v2 mount " to "此路徑不在偵測到的 cgroup v2 掛載點之下：",
-        "The process limit could not be read: " to "讀不到行程的記憶體上限：",
-        "Automatic adjustment left RLIMIT_MEMLOCK at " to "自動調整後 RLIMIT_MEMLOCK 為 ",
-    )
-
-    fun translate(detail: String): String {
-        if (detail.isEmpty()) return detail
-        // 只有中文語系套用；其他語系保留核心原文（技術診斷資料以英文為準）。
-        if (!Locale.getDefault().language.equals("zh", ignoreCase = true)) return detail
-
-        TABLE[detail]?.let { return it }
-
-        for ((en, zh) in PREFIX) {
-            if (detail.startsWith(en)) return zh + detail.removePrefix(en)
-        }
-
-        // 「執行中的內核為 X；本實作要求 Linux 4.19 以上」／「…以各項功能探測為準」兩種尾句。
-        val kernelPrefix = "The running kernel reports "
-        if (detail.startsWith(kernelPrefix)) {
-            val rest = detail.removePrefix(kernelPrefix)
-            val version = rest.substringBefore(';').substringBefore(". ")
-            return if (rest.contains("4.19 or newer")) {
-                "執行中的內核為 $version；本實作要求 Linux 4.19 以上。"
-            } else {
-                "執行中的內核為 $version。對廠商自訂內核，仍以各項功能探測結果為準。"
-            }
-        }
-
-        // 對不到就原樣回傳——寧可顯示英文，也不要給錯的翻譯。
-        return detail
-    }
-}
-
 object EbpfProbe {
 
     enum class Mode(val wire: String) {
@@ -472,4 +337,139 @@ object EbpfProbe {
 
     private const val RESULT_SUPPORTED = "supported"
     private const val RESULT_INCONCLUSIVE = "inconclusive"
+}
+
+/**
+ * eBPF 探針 detail 的繁中對照表。
+ *
+ * 為什麼要這張表：detail 是 Go 側 kernel_probe.go 產生的英文診斷句，會直接顯示在設定頁
+ * 那一行（例如 `all  ✗  Stores redirect and flow state.`）。使用者看不懂英文，但這些是
+ * 核心回傳的技術資料、不是 app 自己的文案；塞進 strings.xml 會讓 19 個語系都要維護同一批
+ * 技術句，翻譯品質也難保證。
+ *
+ * 策略：
+ *   - 只在中文語系（zh-*）套用；其他語系保留英文原文（技術診斷資料本來就以英文為準）。
+ *   - 精確比對不到就用前綴／樣式比對（含內核版本、位元組數那些動態句）。
+ *   - 全都對不到就原樣回傳——寧可顯示英文，也不要顯示錯誤的翻譯。
+ *   - 之後新增 detail 只要往 TABLE 補一行，不必動任何 res/values-*。
+ */
+internal object EbpfDetailZh {
+
+    private val TABLE: Map<String, String> = mapOf(
+        // ── common scope ──
+        "The process has UID 0. Direct probes below still detect capability, LSM, or seccomp restrictions." to
+            "行程以 UID 0 執行。下方的直接探測仍會檢查 capability、LSM 與 seccomp 限制。",
+        "Run as root or grant the BPF, system-administration, and network-administration capabilities required by the selected data path." to
+            "請以 root 執行，或授予所選資料路徑所需的 BPF、系統管理與網路管理 capability。",
+        "Stores redirect and flow state." to
+            "儲存轉發與連線流程狀態。",
+        "Stores runtime controls and counters." to
+            "儲存執行期控制項與計數器。",
+        "Stores bounded socket, UDP, fragment, and bypass caches." to
+            "儲存有上限的 socket、UDP、分片與繞過快取。",
+        "Stores UID and CIDR policies. Linux 6.6.0-6.6.46 policy updates remain blocked separately unless the upstream fix is detected." to
+            "儲存 UID 與 CIDR 策略。在偵測到上游修正前，Linux 6.6.0–6.6.46 的策略更新仍會被單獨阻擋。",
+        "RLIMIT_MEMLOCK is unlimited after automatic adjustment." to
+            "自動調整後 RLIMIT_MEMLOCK 已無上限。",
+        // ── local scope ──
+        "Implements TCP connect interception and UDP sendmsg/recvmsg address translation." to
+            "實作 TCP connect 攔截與 UDP sendmsg/recvmsg 位址轉譯。",
+        "Required for local TCP." to
+            "本機 TCP 必需。",
+        "Required for connected local UDP." to
+            "已連線的本機 UDP 必需。",
+        "Required for local TCP. Also covers IPv4-mapped dual-stack sockets." to
+            "本機 TCP 必需，同時涵蓋 IPv4-mapped 雙棧 socket。",
+        "Required for connected local UDP. Also covers IPv4-mapped dual-stack sockets." to
+            "已連線的本機 UDP 必需，同時涵蓋 IPv4-mapped 雙棧 socket。",
+        "Required to redirect unconnected IPv4 UDP." to
+            "轉發未連線的 IPv4 UDP 必需。",
+        "Required to redirect unconnected IPv6 and IPv4-mapped UDP." to
+            "轉發未連線的 IPv6 與 IPv4-mapped UDP 必需。",
+        "Required to restore the original IPv4 UDP peer. Upstream Linux added recvmsg hooks in 5.2." to
+            "還原原始 IPv4 UDP 對端必需。上游 Linux 5.2 才加入 recvmsg hook。",
+        "Required to restore the original IPv6 or IPv4-mapped UDP peer. Upstream Linux added recvmsg hooks in 5.2." to
+            "還原原始 IPv6 或 IPv4-mapped UDP 對端必需。上游 Linux 5.2 才加入 recvmsg hook。",
+        "Reads policy, protection, redirect, and UDP state." to
+            "讀取策略、自我保護、轉發與 UDP 狀態。",
+        "Creates redirect, token, peer, and flow state." to
+            "建立轉發、token、對端與連線流程狀態。",
+        "Reclaims or replaces UDP state." to
+            "回收或取代 UDP 狀態。",
+        "Identifies UDP sockets and provides self-protection fallback." to
+            "辨識 UDP socket，並提供自我保護的備援路徑。",
+        "Enforces UID and Android package policy when configured." to
+            "設定後強制執行 UID 與 Android 套件策略。",
+        "Timestamps TCP redirect state." to
+            "為 TCP 轉發狀態打時間戳。",
+        "Provides the fast sing-box self-bypass path; socket-cookie protection is the fallback." to
+            "提供 sing-box 自身繞過的快速路徑；socket-cookie 保護是備援。",
+        "Enables exact connected-UDP cleanup. Bounded LRU maps and a reduced UDP cache are used when unavailable." to
+            "啟用已連線 UDP 的精確清理。不可用時改用有上限的 LRU map 與縮減的 UDP 快取。",
+        // ── shared-network scope ──
+        "Implements TC ingress and egress interception, policy, token rewriting, and reply restoration." to
+            "實作 TC 入口／出口攔截、策略、token 改寫與回覆還原。",
+        "Provides lock-free per-CPU packet parsing scratch space." to
+            "提供免鎖的 per-CPU 封包解析暫存區。",
+        "Reads controls, policy, and flow state." to
+            "讀取控制項、策略與連線流程狀態。",
+        "Creates proxy, reply, bypass, and fragment state." to
+            "建立代理、回覆、繞過與分片狀態。",
+        "Removes expired or conflicting flow state." to
+            "移除過期或衝突的連線流程狀態。",
+        "Applies UDP, TCP, fragment, and bypass cache lifetimes." to
+            "套用 UDP、TCP、分片與繞過快取的生命週期。",
+        "Makes packet headers linear and writable." to
+            "讓封包標頭連續且可寫。",
+        "Rewrites token and original addresses and ports." to
+            "改寫 token 與原始位址、埠號。",
+        "Calculates IPv4 and IPv6 checksum deltas." to
+            "計算 IPv4 與 IPv6 校驗和差值。",
+        "Updates the IPv4 header checksum." to
+            "更新 IPv4 標頭校驗和。",
+        "Updates TCP and UDP checksums." to
+            "更新 TCP 與 UDP 校驗和。",
+        "Used on modern kernels for qdisc-independent ingress attachment; clsact is the fallback." to
+            "較新內核用於不依賴 qdisc 的入口掛載；clsact 是備援。",
+        "Used on modern kernels for qdisc-independent egress attachment; clsact is the fallback." to
+            "較新內核用於不依賴 qdisc 的出口掛載；clsact 是備援。",
+        // ── cgroup 路徑 ──
+        "The configured path is not a directory." to
+            "設定的路徑不是目錄。",
+    )
+
+    /** 動態句的前綴對照：值是「英文前綴 → 中文前綴」，後面的原文照原樣接上。 */
+    private val PREFIX: List<Pair<String, String>> = listOf(
+        "The running kernel version could not be read: " to "讀不到執行中的內核版本：",
+        "The path is not below the detected cgroup v2 mount " to "此路徑不在偵測到的 cgroup v2 掛載點之下：",
+        "The process limit could not be read: " to "讀不到行程的記憶體上限：",
+        "Automatic adjustment left RLIMIT_MEMLOCK at " to "自動調整後 RLIMIT_MEMLOCK 為 ",
+    )
+
+    fun translate(detail: String): String {
+        if (detail.isEmpty()) return detail
+        // 只有中文語系套用；其他語系保留核心原文（技術診斷資料以英文為準）。
+        if (!Locale.getDefault().language.equals("zh", ignoreCase = true)) return detail
+
+        TABLE[detail]?.let { return it }
+
+        for ((en, zh) in PREFIX) {
+            if (detail.startsWith(en)) return zh + detail.removePrefix(en)
+        }
+
+        // 「執行中的內核為 X；本實作要求 Linux 4.19 以上」／「…以各項功能探測為準」兩種尾句。
+        val kernelPrefix = "The running kernel reports "
+        if (detail.startsWith(kernelPrefix)) {
+            val rest = detail.removePrefix(kernelPrefix)
+            val version = rest.substringBefore(';').substringBefore(". ")
+            return if (rest.contains("4.19 or newer")) {
+                "執行中的內核為 $version；本實作要求 Linux 4.19 以上。"
+            } else {
+                "執行中的內核為 $version。對廠商自訂內核，仍以各項功能探測結果為準。"
+            }
+        }
+
+        // 對不到就原樣回傳——寧可顯示英文，也不要給錯的翻譯。
+        return detail
+    }
 }
