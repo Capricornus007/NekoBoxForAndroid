@@ -24,6 +24,22 @@
             app:key="appLanguage"
             app:title="@string/language"
             app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:key="confirmProfileDelete"
+            app:defaultValue="true"
+            app:title="@string/confirm_profile_delete" />
+        <SwitchPreferenceCompat
+            app:icon="@drawable/ic_baseline_center_focus_weak_24"
+            app:key="alwaysShowAddress"
+            app:summary="@string/always_show_address_sum"
+            app:title="@string/always_show_address" />
+        <SwitchPreferenceCompat
+            app:key="maskAddress"
+            app:summary="@string/mask_address_sum"
+            app:title="@string/mask_address" />
+        <SwitchPreferenceCompat
+            app:key="showBottomBar"
+            app:title="@string/show_bottom_bar" />
     </io.nekohasekai.sagernet.widget.CollapsibleCategory>
     <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/general_settings">
         <SwitchPreferenceCompat
@@ -49,15 +65,6 @@
                   eBPF inbound 並把 COMMIT_SING_BOX 抬到含 protocol/ebpf 的版（任務 #151/#161），
                   現在生成的東西核心認不得，只會讓連線在解 config 時就失敗。
              沒有 root 的機器這兩項照樣顯示、照樣可按：按下去要講得出「為什麼現在不行」。 -->
-        <Preference
-            app:icon="@drawable/ic_device_developer_mode"
-            app:key="ebpfDiagnostics"
-            app:summary="@string/ebpf_diagnostics_summary_idle"
-            app:title="@string/ebpf_diagnostics" />
-        <Preference
-            app:icon="@drawable/ic_content_copy"
-            app:key="ebpfDiagnosticsCopy"
-            app:title="@string/ebpf_diagnostics_copy" />
         <SwitchPreferenceCompat
             app:defaultValue="false"
             app:icon="@drawable/ic_communication_phonelink_ring"
@@ -121,19 +128,6 @@
             app:key="showGroupInNotification"
             app:title="@string/show_group_in_notification" />
         <SwitchPreferenceCompat
-            app:key="confirmProfileDelete"
-            app:defaultValue="true"
-            app:title="@string/confirm_profile_delete" />
-        <SwitchPreferenceCompat
-            app:icon="@drawable/ic_baseline_center_focus_weak_24"
-            app:key="alwaysShowAddress"
-            app:summary="@string/always_show_address_sum"
-            app:title="@string/always_show_address" />
-        <SwitchPreferenceCompat
-            app:key="maskAddress"
-            app:summary="@string/mask_address_sum"
-            app:title="@string/mask_address" />
-        <SwitchPreferenceCompat
             app:icon="@drawable/ic_device_data_usage"
             app:key="meteredNetwork"
             app:summary="@string/metered_summary"
@@ -147,19 +141,6 @@
             app:key="hideFromRecentApps"
             app:summary="@string/hide_from_recent_apps_summary"
             app:title="@string/hide_from_recent_apps" />
-        <moe.matsuri.nb4a.ui.LongClickListPreference
-            app:defaultValue="0"
-            app:entries="@array/log_level"
-            app:entryValues="@array/int_array_5"
-            app:icon="@drawable/ic_baseline_bug_report_24"
-            app:key="logLevel"
-            app:title="@string/log_level"
-            app:useSimpleSummaryProvider="true" />
-        <moe.matsuri.nb4a.ui.EditConfigPreference
-            app:icon="@drawable/ic_baseline_layers_24"
-            app:key="globalCustomConfig"
-            app:title="@string/custom_config"
-            app:useSimpleSummaryProvider="true" />
     </io.nekohasekai.sagernet.widget.CollapsibleCategory>
 
     <io.nekohasekai.sagernet.widget.CollapsibleCategory app:title="@string/cag_route">
@@ -437,9 +418,6 @@
             app:icon="@drawable/ic_baseline_http_24"
             app:key="defaultSubscriptionUserAgent"
             app:title="@string/default_subscription_user_agent" />
-        <SwitchPreferenceCompat
-            app:key="showBottomBar"
-            app:title="@string/show_bottom_bar" />
         <Preference
             app:key="restoreNetworkSettings"
             app:icon="@drawable/baseline_undo_24"
@@ -458,6 +436,28 @@
             app:key="createClearCacheShortcut"
             app:title="@string/create_shortcut"
             app:summary="@string/create_clear_cache_shortcut_summary" />
+        <Preference
+            app:icon="@drawable/ic_device_developer_mode"
+            app:key="ebpfDiagnostics"
+            app:summary="@string/ebpf_diagnostics_summary_idle"
+            app:title="@string/ebpf_diagnostics" />
+        <Preference
+            app:icon="@drawable/ic_content_copy"
+            app:key="ebpfDiagnosticsCopy"
+            app:title="@string/ebpf_diagnostics_copy" />
+        <moe.matsuri.nb4a.ui.LongClickListPreference
+            app:defaultValue="0"
+            app:entries="@array/log_level"
+            app:entryValues="@array/int_array_5"
+            app:icon="@drawable/ic_baseline_bug_report_24"
+            app:key="logLevel"
+            app:title="@string/log_level"
+            app:useSimpleSummaryProvider="true" />
+        <moe.matsuri.nb4a.ui.EditConfigPreference
+            app:icon="@drawable/ic_baseline_layers_24"
+            app:key="globalCustomConfig"
+            app:title="@string/custom_config"
+            app:useSimpleSummaryProvider="true" />
     </io.nekohasekai.sagernet.widget.CollapsibleCategory>
 
 </PreferenceScreen>
