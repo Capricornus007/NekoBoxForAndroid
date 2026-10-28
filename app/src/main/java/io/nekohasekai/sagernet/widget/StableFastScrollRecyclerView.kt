@@ -1,188 +1,23 @@
 package io.nekohasekai.sagernet.widget
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Rect
 import android.util.AttributeSet
-import android.view.MotionEvent
-import androidx.core.view.ViewCompat
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
-import com.simplecityapps.recyclerview_fastscroll.views.FastScroller
 
-/** Reuses the existing thumb, animations and section popup, with variable-height row geometry. */
+/**
+ * 2026-10-28：原本繼承 FastScrollRecyclerView、自己再畫一條 FastScroller。
+ *
+ * 使用者實測右側邊緣一直有多條滾動條（2 黃 + 1 灰）：主列表是 ViewPager2 分組分頁，
+ * offscreenPageLimit=2 會把相鄰頁一起畫出來，每頁各畫一條；而父類即使呼叫
+ * super.setFastScrollEnabled(false) 仍會 draw 自己的 FastScroller（庫內部行為），
+ * 曾試過「可見寬度」「視窗座標」「反射把 thumb 設成 (-1,-1)」都擋不住。
+ *
+ * 使用者裁定「全部不保留也罷」，所以簡化成純 RecyclerView：不畫任何滾動條，
+ * 也一併失去拖動 thumb 與字母索引（那兩項依賴 FastScroller 的繪製）。
+ * 類名保留，所有 layout 引用不用跟著改。
+ */
 class StableFastScrollRecyclerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FastScrollRecyclerView(context, attrs, defStyleAttr) {
-    private val scrollbar: FastScroller
-    private val bounds = Rect()
-    private var downX = 0
-    private var downY = 0
-    private var lastY = 0
-    private var thumbX = -1
-    private var thumbY = -1
-    private var thumbGesture = false
-    private var pendingSeek: Pair<Int, Float>? = null
-
-    init {
-        // 2.0.1 keeps its renderer private; replace its scroll listener before adding our renderer.
-        super.setFastScrollEnabled(false)
-        super.setAutoHideEnabled(false)
-        clearOnScrollListeners()
-        scrollbar = FastScroller(context, this, attrs)
-    }
-
-    private fun rowOf(position: Int): Int {
-        val grid = layoutManager as? GridLayoutManager ?: return position
-        return grid.spanSizeLookup.getSpanGroupIndex(position, grid.spanCount)
-    }
-
-    private fun rowPosition(row: Int): Int {
-        val grid = layoutManager as? GridLayoutManager ?: return row
-        // All current grids have uniform spans; also keep this correct for a future header span.
-        var low = 0
-        var high = (adapter?.itemCount ?: 1) - 1
-        while (low < high) {
-            val mid = (low + high) ushr 1
-            if (grid.spanSizeLookup.getSpanGroupIndex(mid, grid.spanCount) < row) {
-                low = mid + 1
-            } else {
-                high = mid
-            }
-        }
-        return low
-    }
-
-    private fun rowBounds(row: Int): Pair<Int, Int>? {
-        val manager = layoutManager ?: return null
-        var top = Int.MAX_VALUE
-        var bottom = Int.MIN_VALUE
-        for (index in 0 until childCount) {
-            val child = getChildAt(index)
-            val position = getChildAdapterPosition(child)
-            if (position == NO_POSITION || rowOf(position) != row) continue
-            manager.getDecoratedBoundsWithMargins(child, bounds)
-            top = minOf(top, bounds.top)
-            bottom = maxOf(bottom, bounds.bottom)
-        }
-        return if (bottom > top) top to bottom else null
-    }
-
-    override fun onUpdateScrollbar() {
-        val manager = layoutManager as? LinearLayoutManager ?: return
-        val count = adapter?.itemCount ?: 0
-        val first = manager.findFirstVisibleItemPosition()
-        val last = manager.findLastVisibleItemPosition()
-        if (count == 0 || first == NO_POSITION || last == NO_POSITION ||
-            height - paddingTop - paddingBottom <= scrollbar.thumbHeight ||
-            (!canScrollVertically(-1) && !canScrollVertically(1))
-        ) {
-            thumbX = -1
-            thumbY = -1
-            scrollbar.setThumbPosition(-1, -1)
-            return
-        }
-        val firstRow = rowOf(first)
-        val lastRow = rowOf(last)
-        val start = rowBounds(firstRow) ?: return
-        val end = rowBounds(lastRow) ?: return
-        val before = firstRow + ((paddingTop - start.first).toFloat() / (start.second - start.first)).coerceIn(0f, 1f)
-        val after = rowOf(count - 1) - lastRow +
-            ((end.second - (height - paddingBottom)).toFloat() / (end.second - end.first)).coerceIn(0f, 1f)
-        val progress = when {
-            !canScrollVertically(-1) -> 0f
-            !canScrollVertically(1) -> 1f
-            else -> FastScrollGeometry.progress(before, after)
-        }
-        thumbX = if (ViewCompat.getLayoutDirection(this) == ViewCompat.LAYOUT_DIRECTION_RTL) 0 else width - scrollbar.width
-        thumbY = FastScrollGeometry.thumbTop(progress, height, scrollbar.thumbHeight, paddingTop, paddingBottom)
-        scrollbar.setThumbPosition(thumbX, thumbY)
-    }
-
-    override fun draw(canvas: Canvas) {
-        super.draw(canvas)
-        // 2026-10-28 使用者回報右側邊緣有多條滾動條：主列表是 ViewPager2 分組分頁，
-        // offscreenPageLimit=2 會把相鄰頁一起畫出來，相鄰頁的 FastScroller 也跟著畫。
-        // 上一版用「可見寬度」判斷不準（被平移的頁面仍算整頁可見），改成看視窗座標：
-        // 只有貼齊視窗左緣（loc[0] == 0）的那一頁才是當前頁。
-        val loc = IntArray(2)
-        getLocationInWindow(loc)
-        if (loc[0] != 0) {
-            return
-        }
-        // 2026-10-28（第二次修）：ViewPager2 預載相鄰頁時，FastScroller 會在多個頁面上
-        // 各畫一條，用 loc[0] 判斷仍擋不住（相鄰頁的視窗座標不一定非零）。這裡乾脆不畫，
-        // 改用系統滾動條（layout 的 scrollbars/scrollbarSize 控制），靜態只會有一條。
-        // FastScroller 的拖動手勢與字母索引仍保留（它們不依賴繪製）。
-        onUpdateScrollbar()
-    }
-
-    override fun showScrollbar() = scrollbar.show()
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        val (row, progress) = pendingSeek ?: return
-        pendingSeek = null
-        val rowBounds = rowBounds(row) ?: return
-        val rows = rowOf((adapter?.itemCount ?: 1) - 1) + 1
-        val (_, offset) = FastScrollGeometry.target(
-            progress,
-            rows,
-            height - paddingTop - paddingBottom,
-            rowBounds.second - rowBounds.first,
-        )
-        // Align using the actual laid-out height, including margins, before the frame is drawn.
-        scrollBy(0, rowBounds.first - paddingTop - offset)
-    }
-
-    override fun onInterceptTouchEvent(rv: RecyclerView, event: MotionEvent): Boolean = handleThumbTouch(event)
-
-    override fun onTouchEvent(rv: RecyclerView, event: MotionEvent) {
-        handleThumbTouch(event)
-    }
-
-    private fun handleThumbTouch(event: MotionEvent): Boolean {
-        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-            onUpdateScrollbar()
-            downX = event.x.toInt()
-            downY = event.y.toInt()
-            lastY = downY
-            val inset = 24 * resources.displayMetrics.density
-            val visibleX = thumbX + scrollbar.offsetX
-            thumbGesture = thumbX >= 0 && thumbY >= 0 &&
-                event.x >= visibleX - inset && event.x <= visibleX + scrollbar.width + inset &&
-                event.y >= thumbY - inset && event.y <= thumbY + scrollbar.thumbHeight + inset
-            // Claim a thumb gesture before ViewPager2 can turn it into a group swipe.
-            if (thumbGesture) parent?.requestDisallowInterceptTouchEvent(true)
-        } else if (event.actionMasked == MotionEvent.ACTION_MOVE) {
-            lastY = event.y.toInt()
-        }
-        if (!thumbGesture) return false
-        scrollbar.handleTouchEvent(event, downX, downY, lastY, null)
-        if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) {
-            thumbGesture = false
-            parent?.requestDisallowInterceptTouchEvent(false)
-        }
-        return scrollbar.isDragging
-    }
-
-    override fun scrollToPositionAtProgress(touchFraction: Float): String {
-        val manager = layoutManager as? LinearLayoutManager ?: return ""
-        val count = adapter?.itemCount ?: 0
-        if (count == 0 || height <= paddingTop + paddingBottom) return ""
-        val progress = FastScrollGeometry.dragProgress(touchFraction, height, scrollbar.thumbHeight, paddingTop, paddingBottom)
-        val rows = rowOf(count - 1) + 1
-        val targetRow = (progress * rows).toInt().coerceIn(0, rows - 1)
-        val viewport = height - paddingTop - paddingBottom
-        val position = rowPosition(targetRow)
-        stopScroll()
-        pendingSeek = targetRow to progress
-        // Keep the requested row visible so onLayout can use its real height, even for a tall rule.
-        manager.scrollToPositionWithOffset(position, (progress * (viewport - 1)).toInt())
-        return (adapter as? SectionedAdapter)?.getSectionName(position).orEmpty()
-    }
-}
+) : RecyclerView(context, attrs, defStyleAttr)
