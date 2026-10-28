@@ -128,7 +128,6 @@ class ProtonServersActivity : ThemedActivity() {
         if (!ProtonSidecar.isAvailable()) {
             binding.status.setText(R.string.proton_sidecar_missing)
             binding.refreshLayout.isEnabled = false
-            binding.refreshHint.visibility = View.GONE
             return
         }
 
@@ -243,6 +242,9 @@ class ProtonServersActivity : ThemedActivity() {
         if (state.dropped > 0) {
             Logs.d("proton: dropped ${state.dropped} servers while building the list")
         }
+        // 2026-10-28 使用者裁定：保留「更新於多久前」，與「下拉可更新清單」合成一行、
+        // 置中（佈局的 status 已設 gravity=center）。原本那兩行是分開的兩個 TextView。
+        val pullHint = getString(R.string.proton_pull_to_refresh)
         binding.status.text = if (fromCache) {
             getString(
                 R.string.proton_cached_at,
@@ -251,9 +253,9 @@ class ProtonServersActivity : ThemedActivity() {
                     System.currentTimeMillis(),
                     DateUtils.MINUTE_IN_MILLIS,
                 ),
-            )
+            ) + " · " + pullHint
         } else {
-            ""
+            pullHint
         }
         renderNodes()
     }
@@ -339,7 +341,6 @@ class ProtonServersActivity : ThemedActivity() {
         binding.placeFilterRow.visibility = if (hasList) View.VISIBLE else View.GONE
         binding.protocolFilterRow.visibility = if (hasList) View.VISIBLE else View.GONE
         binding.sortFilterRow.visibility = if (hasList) View.VISIBLE else View.GONE
-        binding.refreshHint.visibility = if (hasList) View.VISIBLE else View.GONE
         for (node in visible.take(shownLimit)) {
             val button = MaterialButton(
                 this,
@@ -347,7 +348,12 @@ class ProtonServersActivity : ThemedActivity() {
                 com.google.android.material.R.attr.materialButtonOutlinedStyle,
             )
             button.isSingleLine = true
-            button.ellipsize = TextUtils.TruncateAt.END
+            // 2026-10-28 使用者裁定：長名稱（例如「NL-FREE#230 阿姆斯特丹」）用滾動而不是
+            // 截斷加省略號，也不要換成兩行。marquee 的必要條件是 View 處於 selected 狀態，
+            // 只設 ellipsize=MARQUEE 不會動（Android 的老規定），所以下面要 isSelected=true。
+            button.ellipsize = TextUtils.TruncateAt.MARQUEE
+            button.marqueeRepeatLimit = -1
+            button.isSelected = true
             button.layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT,
