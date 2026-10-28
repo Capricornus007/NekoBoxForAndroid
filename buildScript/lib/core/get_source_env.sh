@@ -71,7 +71,7 @@
 # ContextWithIsExternalConnection 在 alpha.13 起需 isExternal 參數，libcore 4 處調用
 # 已改為 (ctx, true)——見 commit 1d2360c1d。基號換到 alpha.13（上游 tag v1.15.0-alpha.13
 # 自 7fc12b8f4 起在我方歷史裡）。
-export COMMIT_SING_BOX="c3b55c0e9658c2f652d5f1674a69caa4f4949168"
+export COMMIT_SING_BOX="7ed3015650201b405cad2c844d1f1ffb9942935f"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
