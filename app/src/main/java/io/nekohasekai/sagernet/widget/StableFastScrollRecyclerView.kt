@@ -114,8 +114,11 @@ class StableFastScrollRecyclerView @JvmOverloads constructor(
         if (loc[0] != 0) {
             return
         }
+        // 2026-10-28（第二次修）：ViewPager2 預載相鄰頁時，FastScroller 會在多個頁面上
+        // 各畫一條，用 loc[0] 判斷仍擋不住（相鄰頁的視窗座標不一定非零）。這裡乾脆不畫，
+        // 改用系統滾動條（layout 的 scrollbars/scrollbarSize 控制），靜態只會有一條。
+        // FastScroller 的拖動手勢與字母索引仍保留（它們不依賴繪製）。
         onUpdateScrollbar()
-        scrollbar.draw(canvas)
     }
 
     override fun showScrollbar() = scrollbar.show()
