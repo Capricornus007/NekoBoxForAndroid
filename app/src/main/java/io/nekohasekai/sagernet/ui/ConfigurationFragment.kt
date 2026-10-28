@@ -315,6 +315,10 @@ class ConfigurationFragment @JvmOverloads constructor(
         syncProfileState()
 
         val recyclerView = groupPager.getChildAt(0) as? androidx.recyclerview.widget.RecyclerView
+        // 2026-10-28：ViewPager2 內層的 RecyclerView 自己也會畫系統滾動條，跟我們在頁面裡
+        // 自繪的 FastScroller 疊在一起（使用者回報右側邊緣有一條灰色的）。關掉它。
+        recyclerView?.isVerticalScrollBarEnabled = false
+        recyclerView?.isHorizontalScrollBarEnabled = false
         recyclerView?.addOnItemTouchListener(object : androidx.recyclerview.widget.RecyclerView.OnItemTouchListener {
             private var startX = 0f
             override fun onInterceptTouchEvent(
