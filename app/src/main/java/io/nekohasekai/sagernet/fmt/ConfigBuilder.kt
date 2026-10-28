@@ -82,6 +82,9 @@ const val TAG_MIXED = "mixed-in"
 // 進程的連線是在內核裡被 cgroup/connect4 與 TC 改寫後送進這個入站的。
 const val TAG_EBPF = "ebpf-in"
 
+// eBPF 模式（tproxy 版）core 要監聽的埠；RootTProxyRules 裝的規則會把流量導到這裡。
+const val EBPF_TPROXY_PORT = 15345
+
 const val TAG_PROXY = "proxy"
 const val TAG_DIRECT = "direct"
 const val TAG_BYPASS = "bypass"
@@ -640,24 +643,18 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
         if (!forTest) {
             if (isEBPF) {
-                // 2026-10-28：eBPF 模式原本只換了路由標籤、沒有真的生成入站（舊註解說
-                // 「等上游支援」），所以選了這個模式等於流量根本進不來。實查上游
-                // protocol/ebpf 早有 RegisterInbound（include/registry.go:65），
-                // 選項就是 Inbound_EBPFOptions ⇒ 這裡補上。
-                // mode=local 走 cgroup/connect4 + TC 改寫，需要 root（應用已在 MODE_EBPF
-                // 入口檢查）。per-app 白名單留空＝全機流量；要篩選時由 local.include_package
-                // 帶入，對應 Android 的 uid 查詢由 sidecar 內 core 處理。
+                // 2026-10-28：改成 tproxy 入站，不是 `type: ebpf`。
+                // sing-box 的 ebpf 入站要自己操作 cgroup v2／TC，需要「執行 core 的進程」
+                // 有 CAP_NET_ADMIN；本專案的 core 是 libcore(gomobile) 跑在 app 進程內，
+                // app 永遠是 u0_axxx（folkpatch/apatch 給的是 su，只對它起的新進程生效）。
+                // 所以 core 用普通 tproxy 入站，root 那一次由 RootTProxyRules 用 su 裝
+                // iptables/ip rule，把流量導到這個埠。
                 inbounds.add(
-                    Inbound_EBPFOptions().apply {
-                        type = "ebpf"
+                    Inbound_TProxyOptions().apply {
+                        type = "tproxy"
                         tag = TAG_EBPF
-                        mode = "local"
-                        local = EBPFLocalOptions().apply {
-                            cgroup_path = "/sys/fs/cgroup"
-                            if (ipv6Mode == IPv6Mode.DISABLE) {
-                                ipv6_mode = "disable"
-                            }
-                        }
+                        listen = LOCALHOST
+                        listen_port = EBPF_TPROXY_PORT
                     },
                 )
             } else if (isVPN && !DataStore.enableHevTun) {

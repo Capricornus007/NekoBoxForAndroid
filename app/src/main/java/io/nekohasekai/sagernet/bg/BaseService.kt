@@ -10,6 +10,7 @@ import android.os.*
 import android.widget.Toast
 import io.nekohasekai.sagernet.Action
 import io.nekohasekai.sagernet.BootReceiver
+import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.aidl.ISagerNetService
@@ -203,9 +204,30 @@ class BaseService {
             if (state == s && msg == null) return
             if (s == State.Stopping || s == State.Stopped) {
                 stopGate.onEnterStopState()
+                // eBPF（tproxy 版）：停止流程一定會經過這裡，比 onDestroy 可靠。
+                if (DataStore.serviceMode == Key.MODE_EBPF) {
+                    kotlin.concurrent.thread(name = "ebpf-tproxy-uninstall") {
+                        io.nekohasekai.sagernet.root.RootTProxyRules.uninstall()
+                    }
+                }
             }
             if (s == State.Connecting || s == State.Stopping) TailscaleSessionController.stopAllAdmission()
             state = s
+            if (s == State.Connected && DataStore.serviceMode == Key.MODE_EBPF) {
+                // core 已起來、tproxy 埠已在監聽，這時才裝規則；反過來（先裝規則）會把
+                // 封包丟進還沒人接的埠。RootShell 會阻塞，所以丟到背景執行緒。
+                kotlin.concurrent.thread(name = "ebpf-tproxy-install") {
+                    if (!io.nekohasekai.sagernet.root.RootTProxyRules.install(
+                            io.nekohasekai.sagernet.fmt.EBPF_TPROXY_PORT,
+                        )
+                    ) {
+                        // 裝不上＝沒有流量，必須留下原因（多半是 root 沒授權或 TPROXY 模組缺失）
+                        io.nekohasekai.sagernet.ktx.Logs.e(
+                            "eBPF: failed to install tproxy rules; traffic will not be captured",
+                        )
+                    }
+                }
+            }
             if (s == State.Connected || s == State.Stopped) TailscaleSessionController.resumeAllAdmission()
             DataStore.serviceState = s
             binder.stateChanged(s, msg)
