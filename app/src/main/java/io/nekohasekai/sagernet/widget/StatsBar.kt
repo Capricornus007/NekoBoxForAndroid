@@ -54,7 +54,9 @@ class StatsBar @JvmOverloads constructor(
         }
 
     var allowShow = true
-    private var hideOnScroll = true
+
+    // 2026-10-28 使用者裁定：FAB 固定，不隨列表滾動隱藏。
+    private var hideOnScroll = false
 
     // Ported from own/7343f15a9: service/binder callbacks can reach this view off the
     // main thread; touch the view tree only when we are really on it.

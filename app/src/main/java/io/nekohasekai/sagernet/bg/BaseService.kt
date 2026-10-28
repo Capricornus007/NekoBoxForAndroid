@@ -1100,7 +1100,12 @@ class BaseService {
                 } catch (_: UnknownHostException) {
                     stopRunner(false, getString(R.string.invalid_server))
                 } catch (e: PluginManager.PluginNotFoundException) {
-                    Toast.makeText(this@Interface, e.readableMessage, Toast.LENGTH_SHORT).show()
+                    // 2026-10-28：這段 catch 跑在背景執行緒，直接 Toast 會擲
+                    // 「Can't toast on a thread that has not called Looper.prepare()」，
+                    // 使用者只看到那句崩潰、看不到真正缺哪個插件。丟回主執行緒再彈。
+                    runOnMainDispatcher {
+                        Toast.makeText(this@Interface, e.readableMessage, Toast.LENGTH_SHORT).show()
+                    }
                     Logs.w(e)
                     data.binder.missingPlugin(e.plugin)
                     stopRunner(false, null)

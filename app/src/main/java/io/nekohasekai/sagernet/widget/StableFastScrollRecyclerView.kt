@@ -105,6 +105,13 @@ class StableFastScrollRecyclerView @JvmOverloads constructor(
 
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
+        // 2026-10-28 使用者回報畫面右側有兩條黃色滾動條：主列表是 ViewPager2（分組分頁），
+        // offscreenPageLimit=2 會把相鄰頁一起畫出來，相鄰頁的 FastScroller 也跟著畫在
+        // 畫面邊緣。這裡只讓「實際佔到半個螢幕以上」的那一頁畫滾動條。
+        val visible = Rect()
+        if (!getGlobalVisibleRect(visible) || visible.width() < resources.displayMetrics.widthPixels / 2) {
+            return
+        }
         onUpdateScrollbar()
         scrollbar.draw(canvas)
     }
