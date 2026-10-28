@@ -323,9 +323,11 @@ type nodesOutput struct {
 	// "broken response" without hiding perfectly dialable servers.
 	Dropped int    `json:"dropped"`
 	Error   string `json:"error,omitempty"`
-	// MaxTier 是這次過濾用的帳號層級上限（0＝沒過濾）。UI 拿它決定要不要在清單上
-	// 註明「已按免費層過濾」，也免得再用「少掉的節點＝壞了」來解讀 dropped。
-	MaxTier int `json:"maxTier,omitempty"`
+	// MaxTier 是這次過濾用的帳號層級上限（-1＝沒過濾；0 是免費層的真值）。UI 拿它決定
+	// 要不要在清單上註明「已按層級過濾」，也免得再用「少掉的節點＝壞了」來解讀 dropped。
+	// 這欄位不準加 omitempty：0 一旦被吞掉，Kotlin 那側的預設值就會把「只給免費層」
+	// 讀成「沒過濾」——那正是 2026-10-28 修掉的 bug 的形狀。
+	MaxTier int `json:"maxTier"`
 	// Code is the machine-readable twin of Error. Error is prose meant for a human
 	// (and Proton rewords things), so "route the user back to sign-in" must never be
 	// decided by matching an English sentence. Only session_expired exists today.
@@ -394,7 +396,7 @@ func fetchVPNInfo(ctx context.Context, apiURL string, cred storedCredential) (vp
 
 type tierOutput struct {
 	OK      bool   `json:"ok"`
-	MaxTier int    `json:"maxTier,omitempty"`
+	MaxTier int    `json:"maxTier"`
 	Plan    string `json:"plan,omitempty"`
 	Error   string `json:"error,omitempty"`
 	Code    string `json:"code,omitempty"`
@@ -461,7 +463,7 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 	statePath := command.String("state", "", "stored session to read (required)")
 	limit := command.Int("limit", 0, "return at most this many usable nodes")
 	country := command.String("country", "", "only this exit country, e.g. JP")
-	tier := command.Int("tier", 0, "drop servers above this plan tier (0 = do not filter)")
+	tier := command.Int("tier", -1, "drop servers above this plan tier; 0 is a real ceiling (free plan), negative = do not filter")
 	apiURL := command.String("api-url", defaultProtonAPIURL, "API base URL")
 	timeoutSec := command.Int("timeout", 30, "overall deadline in seconds")
 	entries := command.String("with-entries-for-protocols", strings.Join(logicalsProtocolEntries, ","),
@@ -525,7 +527,7 @@ func runNodes(args []string, stdout, stderr io.Writer) int {
 		// Reporting an empty success would let the UI say "this account has no
 		// servers", which is a different claim from "nothing in the list was usable".
 		tierNote := ""
-		if *tier > 0 {
+		if *tier >= 0 {
 			tierNote = fmt.Sprintf(" for plan tier %d", *tier)
 		}
 		return emitNodes(stdout, nodesOutput{
@@ -637,9 +639,11 @@ func requestLogicalServers(
 //   - OpenVPN 列（id 加 "#openvpn"、wgPublicKey 一定空）：見 buildOpenVpnRow。
 //     includeOpenVpn=false（--openvpn=false）時不生這一列，等於完全回到舊形狀。
 //
-// maxTier 是帳號層級上限（免費＝1）：Tier 高於它的伺服器是「這帳號連不上」的付費節點，
-// 匯進來只會製造連不上的節點，一律丟棄（計進 dropped）。maxTier <= 0 表示不知道層級、
-// 不過濾。層級／國家過濾發生在生列之前，所以兩種來源受同一條規則管。
+// maxTier 是帳號層級上限。Proton 的伺服器 Tier 從 0 起算，**免費層的 MaxTier 就是 0**
+// （實測 /vpn/v2 回 PlanName=free、MaxTier=0、Groups=[vpn-free]），所以 0 是一個要照辦的
+// 真值、不是「不知道」：拿 0 當哨兵會讓免費帳號看到整份付費清單（2026-10-28 實測 1350 台
+// 裡 1315 台是 tier 2，匯進去全部連不上）。Tier 高於上限的伺服器一律丟棄（計進 dropped）；
+// 「不知道層級、不過濾」改用負數表示。層級／國家過濾發生在生列之前，兩種來源受同一條規則管。
 func selectNodes(
 	resp *logicalServersResp, country string, limit int, maxTier int,
 	defaults clientConfigResponse, includeOpenVpn bool, openVpnDomainFallback bool,
@@ -673,7 +677,7 @@ func selectNodes(
 			dropped++
 			continue
 		}
-		if maxTier > 0 && ls.Tier > maxTier {
+		if maxTier >= 0 && ls.Tier > maxTier {
 			dropped++
 			continue
 		}

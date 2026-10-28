@@ -589,3 +589,39 @@ func TestTierReportsAccountMaxTier(t *testing.T) {
 		t.Fatalf("missing MaxTier gave code=%d out=%+v, want a loud error", code, out)
 	}
 }
+
+// 免費層的 MaxTier 就是 0（實測 /vpn/v2 回 PlanName=free、MaxTier=0），它是一個要照辦的
+// 上限、不是「不知道層級」。舊實作把 0 當哨兵 ⇒ 免費帳號拿到整份付費清單（用戶 2026-10-28
+// 實測 1350 台裡 1315 台是 tier 2，匯進去全部連不上）。fixture 裡兩台 tier 0 分別因為
+// 沒有公鑰與 State=down 不成列，所以「上限 0」的正確結果是一列都不給、並把原因講出來。
+func TestNodesTreatsFreePlanTierZeroAsARealCeiling(t *testing.T) {
+	srv, _ := mockServer(t, serverListFixture, http.StatusOK)
+	defer srv.Close()
+	statePath := writeTestSession(t, t.TempDir())
+
+	unfiltered, _ := runNodesWith(t, srv.URL, statePath)
+	if len(unfiltered.Servers) == 0 {
+		t.Fatalf("fixture gave nothing even unfiltered: %+v", unfiltered)
+	}
+	if unfiltered.MaxTier != -1 {
+		t.Errorf("default MaxTier = %d, want -1 (no filtering)", unfiltered.MaxTier)
+	}
+
+	out, _ := runNodesWith(t, srv.URL, statePath, "--tier", "0")
+	for _, n := range out.Servers {
+		if n.Tier > 0 {
+			t.Errorf("tier %d server %q survived a tier-0 ceiling", n.Tier, n.Name)
+		}
+	}
+	if out.OK {
+		t.Fatalf("tier 0 accepted %d rows, want none: %+v", len(out.Servers), out.Servers)
+	}
+	// 回顯必須是 0 而不是被 omitempty 吞掉：吞掉時 App 的預設值會讀成「沒過濾」。
+	raw, err := json.Marshal(out)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if !strings.Contains(string(raw), `"maxTier":0`) {
+		t.Errorf("tier-0 echo missing from payload: %s", raw)
+	}
+}

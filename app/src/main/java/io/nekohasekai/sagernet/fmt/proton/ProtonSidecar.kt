@@ -182,8 +182,10 @@ class ProtonRefreshState(
 
 class ProtonTierState(
     val ok: Boolean,
-    // 帳號可用的節點層級上限：免費＝1、Plus＝2、Visionary/Business＝3；0＝不知道。
-    val maxTier: Int = 0,
+    // 帳號可用的節點層級上限。Proton 的伺服器 Tier 從 0 起算，**免費層的上限就是 0**
+    // （實測 /vpn/v2 回 PlanName=free、MaxTier=0），所以 0 是要照辦的真值；
+    // -1 才是「不知道層級、不過濾」。
+    val maxTier: Int = -1,
     val plan: String = "",
     val error: String = "",
     val code: String = "",
@@ -200,9 +202,9 @@ class ProtonNodesState(
     // 原始 payload 只從網路那條路帶回來，給磁碟快取用：存解析後的物件會逼這裡
     // 再實作一套序列化，而讀回來時又得走第二套解析，兩套不一致最難查。
     val raw: String = "",
-    // 這次清單是按第幾層過濾過的（0＝沒過濾）。清單頁拿它標「已按免費層過濾」，
+    // 這次清單是按第幾層過濾過的（-1＝沒過濾）。清單頁拿它標「已按免費層過濾」，
     // 免得用戶把「少掉的節點」看成「壞掉的回應」。
-    val maxTier: Int = 0,
+    val maxTier: Int = -1,
     // 上游自己說的「這次只給了一部分」（sidecar 轉出的 truncated）。帶上
     // WithEntriesForProtocols 之後回應比以前大得多，這個分支真的可能發生；
     // 現階段只進日誌（要讓用戶看得見就得加新語系字串），但不能當成「這帳號就這些機器」。
@@ -290,7 +292,7 @@ object ProtonJson {
         }
         return ProtonTierState(
             ok = true,
-            maxTier = obj.optInt("maxTier"),
+            maxTier = obj.optInt("maxTier", -1),
             plan = obj.optString("plan", ""),
         )
     }
@@ -378,7 +380,7 @@ object ProtonJson {
             ok = nodes.isNotEmpty(),
             nodes = nodes,
             dropped = obj.optInt("dropped"),
-            maxTier = obj.optInt("maxTier"),
+            maxTier = obj.optInt("maxTier", -1),
             truncated = obj.optBoolean("truncated"),
             error = if (nodes.isEmpty()) obj.optString("error", "no usable servers") else "",
             raw = text,
@@ -590,7 +592,7 @@ object ProtonSidecar {
         }
     }
 
-    suspend fun nodes(country: String = "", limit: Int = 0, maxTier: Int = 0): ProtonNodesState = withContext(Dispatchers.IO) {
+    suspend fun nodes(country: String = "", limit: Int = 0, maxTier: Int = -1): ProtonNodesState = withContext(Dispatchers.IO) {
         if (!sessionFile.exists()) {
             return@withContext ProtonNodesState(false, error = "not logged in")
         }
@@ -600,7 +602,10 @@ object ProtonSidecar {
         args += "--openvpn-domain-fallback"
         if (country.isNotEmpty()) args += listOf("--country", country)
         if (limit > 0) args += listOf("--limit", limit.toString())
-        if (maxTier > 0) args += listOf("--tier", maxTier.toString())
+        // 一律照傳：免費層的 MaxTier 就是 0，用「>0 才傳」會讓免費帳號拿到整份付費清單
+        // （2026-10-28 實測：1350 台裡 1315 台是 tier 2，匯進去全部連不上）。
+        // 不過濾時傳負數，別讓 sidecar 的預設值變成第二個真相來源。
+        args += listOf("--tier", maxTier.toString())
         when (val result = runSidecar(args, null)) {
             is ProtonOutcome.Success -> ProtonJson.parseNodes(result.json)
 
