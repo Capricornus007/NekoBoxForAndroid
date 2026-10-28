@@ -92,7 +92,7 @@ export COMMIT_LIBNEKO="1dad84547be59ff2ec5ed7bd2339b0441929edfd"
 # API），而 sing-box/go.mod 那側的 replace 本來就指到 aceae72d —— 這個 pin 留在 1eabb449 會造成
 # 「本機用 sibling checkout 編得過、CI 用這個 commit 編不過」（CI 實測報 q.peer.WritePackets undefined）。
 # 兩邊必須是同一個 commit。
-export COMMIT_WIREGUARD_GO="4261874ba2bdac6db349856c258b357e28ed7ce4"
+export COMMIT_WIREGUARD_GO="cb3f78f1915c2b2a5c44413482c7ade64b99bdf0"
 # 歷史：2026-09-27 曾推到 d5db986（吃下 upstream/dev 的 client API（SetKeepIdleConnections /
 # CloseIdleConnections / ContextWithKeepSession），現值見下方 export。上游 6a3a24d 那個 port hopping 修復我方早已以
 # 32c2895 合併、又在 a8f70b4 把目的地判斷從 IsFqdn 改成 IsDomain，所以 hop.go 那處衝突保留我方。
