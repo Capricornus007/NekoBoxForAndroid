@@ -160,6 +160,27 @@
                             android:maxLines="1" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- 2026-10-28：付費帳號的等級選擇。免費層（MaxTier=0）沒有可選範圍，
+                         由程式設成 GONE；付費帳號可在此把清單限制在自己要的等級以下。 -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tierLayout"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:visibility="gone"
+                        android:hint="@string/proton_tier">
+
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/tierFilter"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:inputType="none"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
                     <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/ipv6Only"
                         android:layout_width="wrap_content"

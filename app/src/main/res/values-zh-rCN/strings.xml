@@ -1170,4 +1170,8 @@
     <string name="backup_decrypt_failed">密码错误或备份已损坏，未还原任何内容。</string>
     <string name="subscription_custom_hwid_params">自定义 HWID 参数</string>
     <string name="subscription_custom_hwid_params_summary">格式：hwid=值,os=值,osVersion=值,model=值。留空则使用本机值；填入时只会发送列出的值。</string>
+    <string name="proton_node_count_simple">%1$d 个服务器</string>
+    <string name="proton_tier">等级</string>
+    <string name="proton_tier_all">全部等级</string>
+    <string name="proton_tier_level">等级 %1$d</string>
 </resources>

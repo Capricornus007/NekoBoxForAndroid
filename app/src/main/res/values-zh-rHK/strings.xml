@@ -1173,4 +1173,8 @@ www.example.com 1.1.1.1 1.1.1.2</string>
     <string name="backup_decrypt_failed">密碼錯誤或備份已損壞，未還原任何內容。</string>
     <string name="subscription_custom_hwid_params">自訂 HWID 參數</string>
     <string name="subscription_custom_hwid_params_summary">格式：hwid=值,os=值,osVersion=值,model=值。留空則使用本機值；填入時只會傳送列出的值。</string>
+    <string name="proton_node_count_simple">%1$d 個伺服器</string>
+    <string name="proton_tier">等級</string>
+    <string name="proton_tier_all">全部等級</string>
+    <string name="proton_tier_level">等級 %1$d</string>
 </resources>

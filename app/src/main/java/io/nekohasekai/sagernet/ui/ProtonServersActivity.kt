@@ -47,6 +47,9 @@ class ProtonServersActivity : ThemedActivity() {
     private var query = ""
     private var shownLimit = nodePage
     private var filter = ProtonFilter()
+
+    // 付費帳號的等級上限（-1＝全部）；免費層這個下拉整個隱藏。
+    private var tierCap: Int = -1
     private var countryOptions = listOf<ProtonFilter.Option>()
     private var cityOptions = listOf<ProtonFilter.Option>()
     private var protocolOptions = listOf<ProtonFilter.Option>()
@@ -213,9 +216,35 @@ class ProtonServersActivity : ThemedActivity() {
         nodes = state.nodes
         shownLimit = nodePage
         refreshFilterOptions()
-        val count = getString(R.string.proton_node_count, state.nodes.size, state.dropped)
+        // 付費帳號才顯示等級下拉：免費層（MaxTier=0）沒有可選範圍，硬塞一個只有
+        // 「等級 0」的下拉等於多一格雜訊。
+        if (state.maxTier > 0) {
+            val tierOptions = listOf(-1 to getString(R.string.proton_tier_all)) +
+                (0..state.maxTier).map { it to getString(R.string.proton_tier_level, it) }
+            if (tierCap > state.maxTier) tierCap = -1
+            binding.tierLayout.visibility = View.VISIBLE
+            binding.tierFilter.setSimpleItems(tierOptions.map { it.second }.toTypedArray())
+            binding.tierFilter.setText(
+                tierOptions.first { it.first == tierCap }.second,
+                false,
+            )
+            binding.tierFilter.setOnItemClickListener { _, _, position, _ ->
+                tierCap = tierOptions[position].first
+                shownLimit = nodePage
+                renderNodes()
+            }
+        } else {
+            binding.tierLayout.visibility = View.GONE
+            tierCap = -1
+        }
+        // 2026-10-28 使用者裁定：狀態列不再顯示任何計數（「N 個伺服器／略過 M 個」都拿掉），
+        // 因為協定下拉的每個選項旁邊已經有各自的數量，重複展示只是把畫面塞滿。
+        // 只剩「快取時間」有資訊價值；沒快取時整行留空（高度固定，不會跳）。
+        if (state.dropped > 0) {
+            Logs.d("proton: dropped ${state.dropped} servers while building the list")
+        }
         binding.status.text = if (fromCache) {
-            count + " · " + getString(
+            getString(
                 R.string.proton_cached_at,
                 DateUtils.getRelativeTimeSpanString(
                     ProtonNodeCache.savedAt(cacheDir),
@@ -224,18 +253,17 @@ class ProtonServersActivity : ThemedActivity() {
                 ),
             )
         } else {
-            count
-        }
-        // 有過濾就要講：不然「少了幾百台」看起來像回應壞了，而不是層級不夠。
-        // 0 是免費層的真值，所以判據是「非負」而不是「大於 0」。
-        if (state.maxTier >= 0) {
-            binding.status.text = binding.status.text.toString() + " · " +
-                getString(R.string.proton_filtered_by_tier, state.maxTier)
+            ""
         }
         renderNodes()
     }
 
-    private fun visibleNodes(): List<ProtonNode> = filter.copy(query = query).apply(nodes)
+    private fun visibleNodes(): List<ProtonNode> {
+        val base = filter.copy(query = query).apply(nodes)
+        // 2026-10-28：付費帳號的等級上限篩選（-1＝全部）。免費層沒有可選範圍，
+        // 下拉整個隱藏，tierCap 保持 -1。
+        return if (tierCap >= 0) base.filter { it.tier <= tierCap } else base
+    }
 
     private fun labels(options: List<ProtonFilter.Option>) = OptionAdapter(options)
 
@@ -287,13 +315,16 @@ class ProtonServersActivity : ThemedActivity() {
         binding.sortFilter.setAdapter(labels(sortItems))
         binding.countryFilter.setText(optionText(filter.country, countryOptions), false)
         binding.cityFilter.setText(optionText(filter.city, cityOptions), false)
-        // 協定那格按「全部節點」計數（跟國家一樣不隨已選的國家縮），否則選了某個國家之後
-        // 數字會跟著跳，看起來像篩選壞了。
-        protocolOptions = listOf(
-            ProtonFilter.Option(ProtonFilter.ALL, nodes.size, getString(R.string.proton_all_protocols)),
-        ) + ProtonFilter.protocols(nodes)
-        if (filter.protocol != ProtonFilter.ALL && !ProtonFilter.hasProtocol(nodes, filter.protocol)) {
-            filter = filter.copy(protocol = ProtonFilter.ALL)
+        // 2026-10-28 使用者裁定：協議下拉不再有「全部協定」。
+        // 原因：sidecar 對同一台伺服器會產 WG 與 OpenVPN 兩列，選「全部」時清單等於每台
+        // 機器出現兩次（一行帶「· OpenVPN」後綴、一行不帶），看起來很亂。預設直接選
+        // WireGuard（ProtonFilter 的預設值），清單就只剩一種協定。
+        protocolOptions = ProtonFilter.protocols(nodes)
+        if (!ProtonFilter.hasProtocol(nodes, filter.protocol)) {
+            // 這個帳號沒有任何 WireGuard 節點時，退到第一個實際可用的協定，不要留空清單。
+            filter = filter.copy(
+                protocol = protocolOptions.firstOrNull()?.key ?: ProtonFilter.ALL,
+            )
         }
         binding.protocolFilter.setAdapter(labels(protocolOptions))
         binding.protocolFilter.setText(optionText(filter.protocol, protocolOptions), false)

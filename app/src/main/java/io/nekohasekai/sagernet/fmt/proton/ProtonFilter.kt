@@ -15,7 +15,7 @@ data class ProtonFilter(
     // protun／smart，外加上游不認識的鍵名）。ALL 必須是「不加這一維」，
     // 絕不能偷偷當成 wireguard：否則只讲 OpenVPN 的那批機器會整個從清單消失，
     // 而那正是這支功能要解決的問題。
-    val protocol: String = ALL,
+    val protocol: String = ProtonNode.PROTOCOL_WIREGUARD,
     val secureCoreOnly: Boolean = false,
     val sort: Sort = Sort.IDLE,
 ) {
@@ -105,7 +105,7 @@ data class ProtonFilter(
             val keys = LinkedHashSet(ProtonNode.PROTOCOL_ORDER)
             nodes.forEach { keys.addAll(it.protocols.map { name -> name.lowercase() }) }
             return keys.map { key -> Option(key, nodes.count { it.canUse(key) }, ProtonNode.protocolLabel(key)) }
-                .filter { it.count > 0 }
+                .filter { it.count > 0 && it.key != ALL }
         }
 
         fun hasProtocol(nodes: List<ProtonNode>, key: String) = nodes.any { it.canUse(key.trim().lowercase()) }
