@@ -245,18 +245,20 @@ class ProtonServersActivity : ThemedActivity() {
         // 2026-10-28 使用者裁定：保留「更新於多久前」，與「下拉可更新清單」合成一行、
         // 置中（佈局的 status 已設 gravity=center）。原本那兩行是分開的兩個 TextView。
         val pullHint = getString(R.string.proton_pull_to_refresh)
-        binding.status.text = if (fromCache) {
-            getString(
-                R.string.proton_cached_at,
+        // 即時拉取也要有「更新於」——使用者 2026-10-28 明確要求不要隱藏這一段。
+        val updated = getString(
+            R.string.proton_cached_at,
+            if (fromCache) {
                 DateUtils.getRelativeTimeSpanString(
                     ProtonNodeCache.savedAt(cacheDir),
                     System.currentTimeMillis(),
                     DateUtils.MINUTE_IN_MILLIS,
-                ),
-            ) + " · " + pullHint
-        } else {
-            pullHint
-        }
+                )
+            } else {
+                getString(R.string.proton_just_now)
+            },
+        )
+        binding.status.text = updated + " · " + pullHint
         renderNodes()
     }
 

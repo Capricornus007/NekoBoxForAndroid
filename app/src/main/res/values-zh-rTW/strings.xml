@@ -1223,4 +1223,5 @@
     <string name="proton_tier">等級</string>
     <string name="proton_tier_all">全部等級</string>
     <string name="proton_tier_level">等級 %1$d</string>
+    <string name="proton_just_now">剛剛</string>
 </resources>
