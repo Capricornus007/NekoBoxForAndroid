@@ -26,6 +26,10 @@ class SagerConnection(
         val serviceClass
             get() = when (DataStore.serviceMode) {
                 Key.MODE_PROXY -> ProxyService::class
+                // 2026-10-28：eBPF 模式沒有 VpnService（沒有 tun），沿用一般前台服務承載
+                // core；流量由內核的 cgroup/TC 程式改寫後送進 type=ebpf 入站。
+                // 之前這裡只有 vpn/proxy 兩支，選 eBPF 會落到 else 直接 UnknownError。
+                Key.MODE_EBPF -> ProxyService::class
                 Key.MODE_VPN -> VpnService::class
                 else -> throw UnknownError()
             }.java

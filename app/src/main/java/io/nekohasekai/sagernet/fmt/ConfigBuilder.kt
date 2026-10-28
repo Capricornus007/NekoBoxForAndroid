@@ -639,7 +639,28 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         inbounds = mutableListOf()
 
         if (!forTest) {
-            if (isVPN && !DataStore.enableHevTun) {
+            if (isEBPF) {
+                // 2026-10-28：eBPF 模式原本只換了路由標籤、沒有真的生成入站（舊註解說
+                // 「等上游支援」），所以選了這個模式等於流量根本進不來。實查上游
+                // protocol/ebpf 早有 RegisterInbound（include/registry.go:65），
+                // 選項就是 Inbound_EBPFOptions ⇒ 這裡補上。
+                // mode=local 走 cgroup/connect4 + TC 改寫，需要 root（應用已在 MODE_EBPF
+                // 入口檢查）。per-app 白名單留空＝全機流量；要篩選時由 local.include_package
+                // 帶入，對應 Android 的 uid 查詢由 sidecar 內 core 處理。
+                inbounds.add(
+                    Inbound_EBPFOptions().apply {
+                        type = "ebpf"
+                        tag = TAG_EBPF
+                        mode = "local"
+                        local = EBPFLocalOptions().apply {
+                            cgroup_path = "/sys/fs/cgroup"
+                            if (ipv6Mode == IPv6Mode.DISABLE) {
+                                ipv6_mode = "disable"
+                            }
+                        }
+                    },
+                )
+            } else if (isVPN && !DataStore.enableHevTun) {
                 inbounds.add(
                     Inbound_TunOptions().apply {
                         type = "tun"
