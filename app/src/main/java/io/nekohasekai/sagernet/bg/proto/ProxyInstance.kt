@@ -8,7 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.runBlocking
 
-class ProxyInstance(
+// open：eBPF 模式的 RootProxyInstance 要繼承本類（core 由 root 外置二進制承載，不啟 libcore）。
+open class ProxyInstance(
     profile: ProxyEntity,
     var service: BaseService.Interface? = null,
     initialDisplayProfileName: String = profile.displayName(),
