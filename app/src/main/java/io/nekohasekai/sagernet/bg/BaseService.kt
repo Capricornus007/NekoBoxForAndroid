@@ -407,7 +407,8 @@ class BaseService {
             check(android.os.Binder.getCallingUid() == android.os.Process.myUid()) { "Caller is not the application" }
             val proxy = data?.proxy ?: return "{\"groups\":[]}"
             if (!proxy.isInitialized()) return "{\"groups\":[]}"
-            return proxy.box.runtimeDiagnostics(historyQuery)
+            return proxy.safeBox?.runtimeDiagnostics(historyQuery)
+                ?: error("eBPF mode: core diagnostics not available")
         }
 
         override fun networkProbe(expectedProfileId: Long, direct: Boolean, domain: String, dnsTarget: String): String {
@@ -422,7 +423,8 @@ class BaseService {
             } else {
                 proxy.config.profileTagMap[proxy.profile.id] ?: error("Proxy outbound is unavailable")
             }
-            return proxy.box.networkProbe(tag, domain, dnsTarget)
+            return proxy.safeBox?.networkProbe(tag, domain, dnsTarget)
+                ?: error("eBPF mode: network probe not available")
         }
 
         override fun configuredProbe(expectedProfileId: Long, tag: String, dnsTag: String, httpsUrl: String): String {
@@ -430,7 +432,8 @@ class BaseService {
             val current = data ?: error("Service is unavailable")
             val proxy = current.proxy ?: error("Core is not running")
             check(current.state == State.Connected && proxy.isInitialized() && DataStore.currentProfile == expectedProfileId) { "Profile is no longer active" }
-            return proxy.box.configuredProbe(tag, dnsTag, httpsUrl)
+            return proxy.safeBox?.configuredProbe(tag, dnsTag, httpsUrl)
+                ?: error("eBPF mode: configured probe not available")
         }
 
         fun stateChanged(s: State, msg: String?) = launch {
