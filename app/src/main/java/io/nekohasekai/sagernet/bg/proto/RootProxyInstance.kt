@@ -59,7 +59,10 @@ class RootProxyInstance(
     }
 
     private fun isPortOpen(port: Int): Boolean = try {
-        Socket().use { it.connect(InetSocketAddress(LOOPBACK, port), 300); true }
+        Socket().use {
+            it.connect(InetSocketAddress(LOOPBACK, port), 300)
+            true
+        }
     } catch (_: Exception) {
         false
     }

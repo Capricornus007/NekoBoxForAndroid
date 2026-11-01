@@ -644,7 +644,7 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
         if (!forTest) {
             if (isEBPF) {
                 // 2026-11-01：改回真 eBPF——eBPF 模式改用「root 外置 sing-box 二進制」跑 core
-                //（見 RootCoreRunner），root 進程有 CAP_NET_ADMIN，`type: ebpf`（內核 cgroup/TC
+                // （見 RootCoreRunner），root 進程有 CAP_NET_ADMIN，`type: ebpf`（內核 cgroup/TC
                 // 程式）可正常 attach；之前「tproxy 入站不需要 root」的假設是錯的，
                 // in-process libcore 綁 tproxy 埠會 EPERM（#83）。
                 inbounds.add(
