@@ -16,6 +16,7 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.aidl.ISagerNetService
 import io.nekohasekai.sagernet.aidl.ISagerNetServiceCallback
 import io.nekohasekai.sagernet.bg.proto.ProxyInstance
+import io.nekohasekai.sagernet.bg.proto.RootProxyInstance
 import io.nekohasekai.sagernet.bg.proto.TAILSCALE_READY_TIMEOUT_MS
 import io.nekohasekai.sagernet.bg.proto.configuredProbe
 import io.nekohasekai.sagernet.bg.proto.networkProbe
@@ -149,9 +150,9 @@ class BaseService {
                     // startup would throw UninitializedPropertyAccessException.
                     if (state == State.Connected) {
                         if (SagerNet.power.isDeviceIdleMode) {
-                            proxy?.box?.sleep()
+                            proxy?.safeBox?.sleep()
                         } else {
-                            proxy?.box?.wake()
+                            proxy?.safeBox?.wake()
                             if (DataStore.wakeResetConnections) {
                                 Libcore.resetAllConnections(true)
                             }
@@ -197,37 +198,18 @@ class BaseService {
             // 探針暫停走 IsaiProbeStubs（核心未移植，安全無操作）；
             // fork 的 TrafficLooper 沒有 isai 的 onPowerChanged 鉤子（輪詢節奏
             // 由 fork 自己的 pollDelayMs 管），這行不接。
-            proxy?.box?.setProbesPaused(powerRestricted)
+            proxy?.safeBox?.setProbesPaused(powerRestricted)
         }
 
         fun changeState(s: State, msg: String? = null) {
             if (state == s && msg == null) return
             if (s == State.Stopping || s == State.Stopped) {
                 stopGate.onEnterStopState()
-                // eBPF（tproxy 版）：停止流程一定會經過這裡，比 onDestroy 可靠。
-                if (DataStore.serviceMode == Key.MODE_EBPF) {
-                    kotlin.concurrent.thread(name = "ebpf-tproxy-uninstall") {
-                        io.nekohasekai.sagernet.root.RootTProxyRules.uninstall()
-                    }
-                }
+                // 2026-11-01：改回真 eBPF（type:ebpf）後，流量由內核 eBPF 程式在 cgroup 層
+                // 捕獲，不再需要 RootTProxyRules 的 TPROXY 規則（裝了反而把流量導向沒人聽的埠）。
             }
             if (s == State.Connecting || s == State.Stopping) TailscaleSessionController.stopAllAdmission()
             state = s
-            if (s == State.Connected && DataStore.serviceMode == Key.MODE_EBPF) {
-                // core 已起來、tproxy 埠已在監聽，這時才裝規則；反過來（先裝規則）會把
-                // 封包丟進還沒人接的埠。RootShell 會阻塞，所以丟到背景執行緒。
-                kotlin.concurrent.thread(name = "ebpf-tproxy-install") {
-                    if (!io.nekohasekai.sagernet.root.RootTProxyRules.install(
-                            io.nekohasekai.sagernet.fmt.EBPF_TPROXY_PORT,
-                        )
-                    ) {
-                        // 裝不上＝沒有流量，必須留下原因（多半是 root 沒授權或 TPROXY 模組缺失）
-                        io.nekohasekai.sagernet.ktx.Logs.e(
-                            "eBPF: failed to install tproxy rules; traffic will not be captured",
-                        )
-                    }
-                }
-            }
             if (s == State.Connected || s == State.Stopped) TailscaleSessionController.resumeAllAdmission()
             DataStore.serviceState = s
             binder.stateChanged(s, msg)
@@ -347,7 +329,7 @@ class BaseService {
         }
 
         override fun urlTest(): Int {
-            val box = data?.proxy?.box ?: error("core not started")
+            val box = data?.proxy?.safeBox ?: error("core not started")
             return try {
                 Libcore.urlTest(
                     box,
@@ -374,7 +356,7 @@ class BaseService {
                     check(data?.state == State.Connected && data?.proxy === proxy) { "core not started" }
                     try {
                         Libcore.tailscaleWaitReady(
-                            proxy.box,
+                            proxy.safeBox ?: error("core not started"),
                             endpoint.tag,
                             proxy.tailscaleReadiness.get(nodeId, endpoint.waitForExitNode),
                             1_000,
@@ -395,7 +377,7 @@ class BaseService {
                 ?: error(PROFILE_NOT_RUNNING)
             return try {
                 awaitTailscaleNodes(proxy, profileId)
-                Libcore.urlTestOutbound(proxy.box, tag, DataStore.connectionTestURL, DataStore.connectionTestTimeout)
+                Libcore.urlTestOutbound(proxy.safeBox ?: error("core not started"), tag, DataStore.connectionTestURL, DataStore.connectionTestTimeout)
             } catch (e: Exception) {
                 error(Protocols.genFriendlyMsg(e.readableMessage))
             }
@@ -406,8 +388,8 @@ class BaseService {
             val endpoint = proxy.config.tailscaleEndpoints[profileId] ?: error(PROFILE_NOT_RUNNING)
             // Only the login matters for listing peers; the exit node may be the one being replaced.
             return try {
-                Libcore.tailscaleWaitReady(proxy.box, endpoint.tag, false, TAILSCALE_READY_TIMEOUT_MS)
-                Libcore.tailscalePeers(proxy.box, endpoint.tag)
+                Libcore.tailscaleWaitReady(proxy.safeBox ?: error("core not started"), endpoint.tag, false, TAILSCALE_READY_TIMEOUT_MS)
+                Libcore.tailscalePeers(proxy.safeBox ?: error("core not started"), endpoint.tag)
             } catch (e: Exception) {
                 error(e.readableMessage)
             }
@@ -610,7 +592,7 @@ class BaseService {
         }
 
         private suspend fun isConnectionAlive(): Boolean {
-            val box = data.proxy?.box ?: return false
+            val box = data.proxy?.safeBox ?: return false
             return try {
                 // 外層包一層比 native 更宽的超时：native 自己有 3s，但取消不了它的話
                 // 至少不會把這條監控永久卡死在一次呼叫上。
@@ -1043,7 +1025,13 @@ class BaseService {
                 return null
             }
 
-            val proxy = ProxyInstance(profile, this)
+            val proxy = if (DataStore.serviceMode == Key.MODE_EBPF) {
+                // 2026-11-01：eBPF 用 root 外置 core（真 eBPF，type:ebpf）；
+                // in-process libcore 是 u0_axxx，綁埠會 EPERM（#83）。
+                RootProxyInstance(profile, this)
+            } else {
+                ProxyInstance(profile, this)
+            }
             data.proxy = proxy
             BootReceiver.enabled = DataStore.persistAcrossReboot
 

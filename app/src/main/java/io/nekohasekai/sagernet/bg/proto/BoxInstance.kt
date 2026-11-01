@@ -71,6 +71,11 @@ abstract class BoxInstance(
 
     fun isInitialized(): Boolean = ::config.isInitialized && ::box.isInitialized
 
+    // eBPF（RootProxyInstance）模式下 libcore box 永不初始化；需要摸 box 的呼叫端
+    // 一律走這個可空存取器，直接讀 lateinit 屬性會拋 UninitializedPropertyAccessException。
+    val safeBox: libcore.BoxInstance?
+        get() = if (::box.isInitialized) box else null
+
     // config 是 lateinit：核心還沒起就讀它會拋 UninitializedPropertyAccessException。
     // 硬關機路徑（persistStats）與選節點回調都可能落在這個時機，呼叫端一律走這個 nullable 版。
     val safeConfig: ConfigBuildResult?

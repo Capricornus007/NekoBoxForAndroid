@@ -643,18 +643,14 @@ fun buildConfig(proxy: ProxyEntity, forTest: Boolean = false, forExport: Boolean
 
         if (!forTest) {
             if (isEBPF) {
-                // 2026-10-28：改成 tproxy 入站，不是 `type: ebpf`。
-                // sing-box 的 ebpf 入站要自己操作 cgroup v2／TC，需要「執行 core 的進程」
-                // 有 CAP_NET_ADMIN；本專案的 core 是 libcore(gomobile) 跑在 app 進程內，
-                // app 永遠是 u0_axxx（folkpatch/apatch 給的是 su，只對它起的新進程生效）。
-                // 所以 core 用普通 tproxy 入站，root 那一次由 RootTProxyRules 用 su 裝
-                // iptables/ip rule，把流量導到這個埠。
+                // 2026-11-01：改回真 eBPF——eBPF 模式改用「root 外置 sing-box 二進制」跑 core
+                //（見 RootCoreRunner），root 進程有 CAP_NET_ADMIN，`type: ebpf`（內核 cgroup/TC
+                // 程式）可正常 attach；之前「tproxy 入站不需要 root」的假設是錯的，
+                // in-process libcore 綁 tproxy 埠會 EPERM（#83）。
                 inbounds.add(
-                    Inbound_TProxyOptions().apply {
-                        type = "tproxy"
+                    Inbound_EBPFOptions().apply {
+                        type = "ebpf"
                         tag = TAG_EBPF
-                        listen = LOCALHOST
-                        listen_port = EBPF_TPROXY_PORT
                     },
                 )
             } else if (isVPN && !DataStore.enableHevTun) {
