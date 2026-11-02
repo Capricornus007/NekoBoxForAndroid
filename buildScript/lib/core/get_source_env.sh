@@ -71,7 +71,12 @@
 # ContextWithIsExternalConnection 在 alpha.13 起需 isExternal 參數，libcore 4 處調用
 # 已改為 (ctx, true)——見 commit 1d2360c1d。基號換到 alpha.13（上游 tag v1.15.0-alpha.13
 # 自 7fc12b8f4 起在我方歷史裡）。
-export COMMIT_SING_BOX="fd35b022fb1e4fff2f0ecebf89913d6c3ce6efec"
+# 2026-11-02：抬到 1.15.x 尖端 e7935488e。Update sing-box core #85 紅在
+# `sing-box/adapter/network.go:35: undefined: tun.RoutedPort`——bot 每天只抬
+# COMMIT_SING_BOX，不會抬 libcore/go.mod 的 sibling replace，所以 sing-box 一旦
+# 用上 sing-tun 的新符號（上游 5b0a1a7「Add routed port support」）就必炸。
+# 這輪把 libcore 的 sing-tun replace 一起對到 fork tag …0.20261101060007。
+export COMMIT_SING_BOX="e7935488e19085af8fc30b44742a0675f3313755"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
@@ -82,7 +87,7 @@ export COMMIT_SING_BOX="fd35b022fb1e4fff2f0ecebf89913d6c3ce6efec"
 # SINGBOX_VERSION 要一起改，scripts/check-core-pins.sh 段 1c 就是抓這個的——
 # 「Update sing-box core」那條 bot 只会盲目 +1 計數（它上一輪還寫 alpha.11-mod.41，
 # 就是沒跟上基號換代），換代要人對。
-export VERSION_SING_BOX="1.15.0-alpha.13-mod.7"
+export VERSION_SING_BOX="1.15.0-alpha.13-mod.8"
 export COMMIT_LIBNEKO="1dad84547be59ff2ec5ed7bd2339b0441929edfd"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
