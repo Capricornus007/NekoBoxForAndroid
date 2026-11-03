@@ -6,6 +6,7 @@ import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.database.ProxyEntity
 import io.nekohasekai.sagernet.ktx.Logs
 import io.nekohasekai.sagernet.root.RootShell
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import libcore.Libcore
 import moe.matsuri.nb4a.net.LocalResolverImpl
@@ -151,6 +152,9 @@ class RootProxyInstance(
 
     override suspend fun closeAndPersist() {
         try {
+            // 先把還活著的連線結轉进總量，再讓 TrafficLooper 停下來寫 DB；
+            // 順序反了的話最後一段在途位元組會留在 live 裡沒人結轉。
+            runCatching { trafficTracker.flush() }
             super.closeAndPersist()
         } finally {
             stopRootProcess()
@@ -169,7 +173,10 @@ class RootProxyInstance(
     // eBPF 模式刻意不建 in-process core（#83：u0_axxx 綁 tproxy/ebpf 埠會 EPERM），
     // 所以 box 永遠不初始化。原先 isInitialized() 只認 box，於是 runningProxy() 直接
     // 拋「core not started」，測速與連線狀態全線失敗——外置 core 明明在跑也一樣。
-    override fun isInitialized(): Boolean = isConfigReady() && rootProcess?.isAlive == true
+    // 不用 Process.isAlive：那要 API 26，本包 minSdk 更低，lint 的 NewApi 直接擋下來；
+    // exitValue() 在進程還活著時抛 IllegalThreadStateException，這是 API 1 就有的行為。
+    override fun isInitialized(): Boolean =
+        isConfigReady() && rootProcess?.let { processExitCode(it) == null } == true
 
     // 測速改問外置 core 自己，不假造一個 box：
     //   * 指定節點／分組：Clash API 的 /proxies/<tag>/delay（9090，帶 lazy 生成的 secret）
@@ -208,9 +215,17 @@ class RootProxyInstance(
     }
 
     override fun launch() {
-        // The external process owns the core. TrafficLooper still depends on a gomobile BoxInstance,
-        // so it remains disabled until the Clash API-backed traffic adapter is installed.
-        looper = null
+        looper = service?.let { TrafficLooper(it.data, GlobalScope) }
+        looper?.start()
+    }
+
+    // 外置 core 沒有 in-process 計數器，流量改由它自己開的 Clash API 供；回 null 才會走
+    // 原本 box.queryStats 那條路，所以只在外置 core 真的活著時接管。
+    override fun trafficQueryOverride(): ((String, String) -> Long)? =
+        if (isInitialized()) trafficTracker::queryStats else null
+
+    private val trafficTracker by lazy {
+        ClashTrafficTracker(port = CLASH_PORT, secret = { DataStore.clashApiSecret })
     }
 
     companion object {

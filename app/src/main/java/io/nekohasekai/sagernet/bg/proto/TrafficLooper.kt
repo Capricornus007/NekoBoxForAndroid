@@ -283,11 +283,15 @@ class TrafficLooper(
                     applySelect(proxy.config.mainEntId)
                 }
                 //
-                trafficUpdater = TrafficUpdater(
-                    box = proxy.box,
-                    items = idMap.values.toList(),
-                )
-                proxy.box.setV2rayStats(tags.joinToString("\n"))
+                val queryOverride = proxy.trafficQueryOverride()
+                val items = idMap.values.toList()
+                trafficUpdater = if (queryOverride != null) {
+                    TrafficUpdater(items = items, query = queryOverride)
+                } else {
+                    // setV2rayStats 只在 in-process core 有意義：外置 core 的計數來自 Clash API。
+                    proxy.box.setV2rayStats(tags.joinToString("\n"))
+                    TrafficUpdater(box = proxy.box, items = items)
+                }
 
                 // For balancer: set child's tag to "proxy" so updateAll() adds delta to both
                 try {

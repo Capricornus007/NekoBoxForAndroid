@@ -73,6 +73,9 @@ abstract class BoxInstance(
     // 「設定已生成且外置 root core 活著」，所以這條得讓子類改寫。
     open fun isInitialized(): Boolean = ::config.isInitialized && ::box.isInitialized
 
+    // open：流量來源的可插入點。回 null 走 box.queryStats；外置 core 回它自己的輪詢實作。
+    open fun trafficQueryOverride(): ((String, String) -> Long)? = null
+
     // Kotlin 只允許在宣告 lateinit 的同一個類/檔案裡用 `::config.isInitialized`
     // （backing field 對子類不可見），所以子類要問「設定好了沒」得走這個存取器。
     protected fun isConfigReady(): Boolean = ::config.isInitialized
