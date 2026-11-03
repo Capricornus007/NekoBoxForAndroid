@@ -178,41 +178,39 @@ class SagerNet :
 
     // 更新通知頻道，確保 VPN 服務可正確發佈前景通知。
     private fun updateNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Channel creation is idempotent. Never delete live foreground-service channels from
-            // Application.onCreate(): main and :bg processes can start concurrently, and one
-            // process deleting the other's active channel makes startForeground() fail.
-            notification.createNotificationChannels(
-                listOf(
-                    NotificationChannel(
-                        "service-vpn",
-                        application.getText(R.string.service_vpn),
-                        NotificationManager.IMPORTANCE_LOW,
-                    ),
-                    NotificationChannel(
-                        "service-proxy",
-                        application.getText(R.string.service_proxy),
-                        NotificationManager.IMPORTANCE_LOW,
-                    ),
-                    NotificationChannel(
-                        "service-subscription",
-                        application.getText(R.string.service_subscription),
-                        NotificationManager.IMPORTANCE_DEFAULT,
-                    ),
-                    NotificationChannel(
-                        "connection-test",
-                        application.getText(R.string.connection_test),
-                        NotificationManager.IMPORTANCE_DEFAULT,
-                    ),
-                    // Login prompts the core asks for (Tailscale interactive login).
-                    NotificationChannel(
-                        CORE_NOTIFICATION_CHANNEL,
-                        application.getText(R.string.core_notifications),
-                        NotificationManager.IMPORTANCE_HIGH,
-                    ),
+        // Channel creation is idempotent. Never delete live foreground-service channels from
+        // Application.onCreate(): main and :bg processes can start concurrently, and one
+        // process deleting the other's active channel makes startForeground() fail.
+        notification.createNotificationChannels(
+            listOf(
+                NotificationChannel(
+                    "service-vpn",
+                    application.getText(R.string.service_vpn),
+                    NotificationManager.IMPORTANCE_LOW,
                 ),
-            )
-        }
+                NotificationChannel(
+                    "service-proxy",
+                    application.getText(R.string.service_proxy),
+                    NotificationManager.IMPORTANCE_LOW,
+                ),
+                NotificationChannel(
+                    "service-subscription",
+                    application.getText(R.string.service_subscription),
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                ),
+                NotificationChannel(
+                    "connection-test",
+                    application.getText(R.string.connection_test),
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                ),
+                // Login prompts the core asks for (Tailscale interactive login).
+                NotificationChannel(
+                    CORE_NOTIFICATION_CHANNEL,
+                    application.getText(R.string.core_notifications),
+                    NotificationManager.IMPORTANCE_HIGH,
+                ),
+            ),
+        )
     }
 
     @SuppressLint("InlinedApi")
@@ -289,7 +287,6 @@ class SagerNet :
         var underlyingNetwork: Network? = null
 
         fun isPrivateDnsActiveOnUnderlyingNetwork(): Boolean {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return false
             val network = underlyingNetwork ?: connectivity.activeNetwork ?: return false
             val linkProperties: LinkProperties = connectivity.getLinkProperties(network) ?: return false
             return linkProperties.isPrivateDnsActive

@@ -1,8 +1,0 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- API-specific system bar behavior on the single M3 theme. -->
-    <style name="Theme.SagerNet" parent="Theme.SagerNet.Expressive">
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:enforceNavigationBarContrast" tools:targetApi="29">false</item>
-    </style>
-</resources>

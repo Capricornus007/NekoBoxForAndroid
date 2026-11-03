@@ -5,7 +5,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ProviderInfo
 import android.net.Uri
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
@@ -153,11 +152,8 @@ object Plugins {
         .build()
 
     private fun getExtPluginOld(pluginId: String): List<ProviderInfo> {
-        var flags = PackageManager.GET_META_DATA
-        if (Build.VERSION.SDK_INT >= 24) {
-            flags =
-                flags or PackageManager.MATCH_DIRECT_BOOT_UNAWARE or PackageManager.MATCH_DIRECT_BOOT_AWARE
-        }
+        var flags = PackageManager.GET_META_DATA or
+            PackageManager.MATCH_DIRECT_BOOT_UNAWARE or PackageManager.MATCH_DIRECT_BOOT_AWARE
         val list1 = SagerNet.application.packageManager.queryIntentContentProviders(
             Intent(ACTION_NATIVE_PLUGIN, buildUri(pluginId, "io.nekohasekai.sagernet")),
             flags,

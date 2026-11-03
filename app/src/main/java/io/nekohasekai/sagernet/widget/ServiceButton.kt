@@ -3,7 +3,6 @@ package io.nekohasekai.sagernet.widget
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.util.AttributeSet
 import android.view.PointerIcon
 import android.view.View
@@ -143,12 +142,10 @@ class ServiceButton @JvmOverloads constructor(
         // 不依赖 binder；若服务实际在运行，重复 start 会被 onStartCommand 忽略
         val enabled = state.canStop || state == BaseService.State.Stopped || state == BaseService.State.Idle
         isEnabled = enabled
-        if (Build.VERSION.SDK_INT >= 24) {
-            pointerIcon = PointerIcon.getSystemIcon(
-                context,
-                if (enabled) PointerIcon.TYPE_HAND else PointerIcon.TYPE_WAIT,
-            )
-        }
+        pointerIcon = PointerIcon.getSystemIcon(
+            context,
+            if (enabled) PointerIcon.TYPE_HAND else PointerIcon.TYPE_WAIT,
+        )
     }
 
     private fun applyStateTint(state: BaseService.State) {

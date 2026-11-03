@@ -3,7 +3,6 @@ package io.nekohasekai.sagernet.ui.profile
 import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -172,7 +171,7 @@ abstract class ProfileSettingsActivity<T : AbstractBean>(
             isVisible = DataStore.editingId != 0L && canMoveToOtherBasicGroup
         }
         menu.findItem(R.id.action_create_shortcut)?.apply {
-            if (Build.VERSION.SDK_INT >= 26 && DataStore.editingId != 0L) {
+            if (DataStore.editingId != 0L) {
                 isVisible = true // not new profile
             }
         }

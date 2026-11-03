@@ -1,8 +1,6 @@
 package io.nekohasekai.sagernet.plugin
 
 import android.content.pm.PackageManager
-import android.os.Build
-import androidx.annotation.RequiresApi
 import java.security.MessageDigest
 import java.util.LinkedHashSet
 
@@ -118,17 +116,12 @@ object PluginTrust {
     }
 
     fun readSignerRecord(packageManager: PackageManager, packageName: String): SignerRecord? = try {
-        val raw = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            readModernSignerData(packageManager, packageName)
-        } else {
-            readLegacySignerData(packageManager, packageName)
-        }
+        val raw = readModernSignerData(packageManager, packageName)
         toSignerRecord(packageName, raw)
     } catch (_: Exception) {
         null
     }
 
-    @RequiresApi(Build.VERSION_CODES.P)
     private fun readModernSignerData(packageManager: PackageManager, packageName: String): RawSignerData? {
         val packageInfo =
             packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES)
@@ -143,18 +136,6 @@ object PluginTrust {
                 signingInfo.signingCertificateHistory?.map { it.toByteArray() }
             },
             hasMultipleCurrentSigners = hasMultipleSigners,
-        )
-    }
-
-    @Suppress("DEPRECATION")
-    private fun readLegacySignerData(packageManager: PackageManager, packageName: String): RawSignerData {
-        val packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
-        val signatures = packageInfo.signatures?.map { it.toByteArray() }
-        return RawSignerData(
-            packageName = packageInfo.packageName,
-            current = signatures,
-            history = emptyList(),
-            hasMultipleCurrentSigners = signatures?.size?.let { it > 1 } == true,
         )
     }
 

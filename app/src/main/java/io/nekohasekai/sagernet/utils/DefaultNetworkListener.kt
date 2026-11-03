@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
-import androidx.annotation.RequiresApi
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.ktx.Logs
 import kotlinx.coroutines.CompletableDeferred
@@ -206,10 +205,6 @@ object DefaultNetworkListener {
     private val request = NetworkRequest.Builder().apply {
         addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-        if (Build.VERSION.SDK_INT == 23) { // workarounds for OEM bugs
-            removeCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-            removeCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL)
-        }
     }.build()
     private val mainHandler = Handler(Looper.getMainLooper())
 
@@ -223,12 +218,6 @@ object DefaultNetworkListener {
      *
      * Source: https://android.googlesource.com/platform/frameworks/base/+/2df4c7d/services/core/java/com/android/server/ConnectivityService.java#887
      */
-    // ktlint 1.8 的 standard:annotation 要求「最後一個註解後面要換行」，而
-    // standard:curly-spacing 又要求「{ 前面不許有換行」。@RequiresApi(n) 直接貼在
-    // when 分支的 block 上會同時踩到兩條，--format 跑四轮只在這兩條之間來回、永遠收不斂。
-    // 只對這個函式關掉這兩條，保留 @RequiresApi 的原形態；要根治得把四個分支拆成本地函式，
-    // 那會改變 Android lint 對 NewApi 的判定，不混在排版修正裡做。
-    @Suppress("ktlint:standard:annotation", "ktlint:standard:curly-spacing")
     private fun register() {
         if (callbackRegistration.requiresFallback) {
             callbackRegistration.unregister {
@@ -243,39 +232,15 @@ object DefaultNetworkListener {
         }
         fallback = false
         callbackRegistration.register {
-            when (Build.VERSION.SDK_INT) {
-                in 31..Int.MAX_VALUE ->
-                    @RequiresApi(31)
-                    {
-                        SagerNet.connectivity.registerBestMatchingNetworkCallback(
-                            request,
-                            Callback,
-                            mainHandler,
-                        )
-                    }
-
-                in 28 until 31 ->
-                    @RequiresApi(28)
-                    { // we want REQUEST here instead of LISTEN
-                        SagerNet.connectivity.requestNetwork(request, Callback, mainHandler)
-                    }
-
-                in 26 until 28 ->
-                    @RequiresApi(26)
-                    {
-                        SagerNet.connectivity.registerDefaultNetworkCallback(Callback, mainHandler)
-                    }
-
-                in 24 until 26 ->
-                    @RequiresApi(24)
-                    {
-                        SagerNet.connectivity.registerDefaultNetworkCallback(Callback)
-                    }
-
-                else -> {
-                    SagerNet.connectivity.requestNetwork(request, Callback)
-                    // known bug on API 23: https://stackoverflow.com/a/33509180/2245107
-                }
+            if (Build.VERSION.SDK_INT >= 31) {
+                SagerNet.connectivity.registerBestMatchingNetworkCallback(
+                    request,
+                    Callback,
+                    mainHandler,
+                )
+            } else {
+                // we want REQUEST here instead of LISTEN
+                SagerNet.connectivity.requestNetwork(request, Callback, mainHandler)
             }
         }.onFailure {
             Logs.w(it)

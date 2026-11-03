@@ -9,10 +9,8 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
 import android.os.Build
-import android.os.Build.VERSION_CODES
 import android.os.SystemClock
 import android.system.OsConstants
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -63,12 +61,11 @@ class NativeInterface :
         return DataStore.vpnService!!.startVpn(singTunOptionsJson, tunPlatformOptionsJson).toLong()
     }
 
-    override fun useProcFS(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+    override fun useProcFS(): Boolean = false
 
     // own f1ac98919：部分 ROM（MIUI 等）在連線已結束／無權限查證時會直接從這個 binder 回調拋
     // SecurityException／IllegalState，原本會一路頂進核心的路由層。查不到就回 -1（未知擁有者），
     // 由呼叫端優雅降級，不把「查不到」升級成崩潰。
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun findConnectionOwner(ipProto: Int, srcIp: String, srcPort: Int, destIp: String, destPort: Int): Int = try {
         SagerNet.connectivity.getConnectionOwnerUid(
             ipProto,
@@ -108,12 +105,7 @@ class NativeInterface :
         val cached = PackageCache[packageName]
         if (cached != null) return cached
         return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                SagerNet.application.packageManager.getPackageUid(packageName, 0)
-            } else {
-                @Suppress("DEPRECATION")
-                SagerNet.application.packageManager.getApplicationInfo(packageName, 0).uid
-            }
+            SagerNet.application.packageManager.getPackageUid(packageName, 0)
         } catch (e: Throwable) {
             -1
         }

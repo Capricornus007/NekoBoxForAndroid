@@ -1,7 +1,6 @@
 package io.nekohasekai.sagernet.database
 
 import android.os.Binder
-import android.os.Build
 import androidx.preference.PreferenceDataStore
 import io.nekohasekai.sagernet.BuildConfig
 import io.nekohasekai.sagernet.GroupType
@@ -247,7 +246,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
                 // Android Q+ (the system HTTP proxy cannot supply credentials).
                 (
                     serviceMode == Key.MODE_VPN &&
-                        !(appendHttpProxy && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        !appendHttpProxy
                     ) ||
                 // Proxy service mode loopback inbound: optionally authenticate too
                 // (issue #1197 residual gap). Off by default to preserve the

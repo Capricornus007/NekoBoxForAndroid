@@ -176,7 +176,7 @@ class VpnService :
         }
 
         updateUnderlyingNetwork(builder)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) builder.setMetered(metered)
+        builder.setMetered(metered)
 
         // app route
         run {
@@ -257,7 +257,7 @@ class VpnService :
                 }
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && DataStore.appendHttpProxy) {
+        if (DataStore.appendHttpProxy) {
             if (DataStore.allowAccess) {
                 // When LAN access is enabled the mixed inbound requires authentication
                 // (see DataStore.mixedInboundNeedsAuth). Android's system HTTP proxy
@@ -285,7 +285,7 @@ class VpnService :
         }
 
         metered = DataStore.meteredNetwork
-        if (Build.VERSION.SDK_INT >= 29) builder.setMetered(metered)
+        builder.setMetered(metered)
         conn = builder.establish() ?: throw NullConnectionException()
 
         return conn!!.fd

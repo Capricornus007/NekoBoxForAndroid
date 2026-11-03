@@ -269,11 +269,7 @@ class ServiceNotification(
 
     fun destroy() {
         destroyed = true
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            (service as Service).stopForeground(Service.STOP_FOREGROUND_REMOVE)
-        } else {
-            (service as Service).stopForeground(true)
-        }
+        (service as Service).stopForeground(Service.STOP_FOREGROUND_REMOVE)
         // own 618f7b169 在這裡還多補了兩刀 NotificationManager.cancel(notificationId)，我方不收：
         // 那是要清掉 Android 16 promoted 實況膠囊（我方沒有），而 stopForeground(REMOVE) 本來就移除了
         // 前台通知；多那一刀會在「舊執行緒延後跑 destroy、新連線已貼上通知」時誤殺新通知。

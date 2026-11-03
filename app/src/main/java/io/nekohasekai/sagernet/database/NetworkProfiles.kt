@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
-import android.os.Build
 import androidx.core.content.ContextCompat
 import com.google.gson.reflect.TypeToken
 import io.nekohasekai.sagernet.SagerNet
@@ -58,7 +57,7 @@ object NetworkProfiles {
             else -> "other"
         }
         val ssidAccess = ContextCompat.checkSelfPermission(SagerNet.application, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            (Build.VERSION.SDK_INT < 29 || ContextCompat.checkSelfPermission(SagerNet.application, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            ContextCompat.checkSelfPermission(SagerNet.application, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
         val ssid = if (transport == "wifi" && ssidAccess) {
             runCatching { (SagerNet.application.getApplicationContext().getSystemService(Context.WIFI_SERVICE) as WifiManager).connectionInfo?.ssid }
                 .getOrNull()?.removeSurrounding("\"")?.takeUnless { it == WifiManager.UNKNOWN_SSID || it.isBlank() }

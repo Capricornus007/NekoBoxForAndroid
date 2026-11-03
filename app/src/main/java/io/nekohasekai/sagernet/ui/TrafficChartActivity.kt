@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
-import android.os.Build
 import android.os.Bundle
 import android.system.OsConstants
 import android.text.format.Formatter
@@ -346,28 +345,26 @@ class TrafficChartActivity : ThemedActivity() {
         var resolvedUid = -1
 
         // Method 1: Android 10+ ConnectivityManager.getConnectionOwnerUid
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            try {
-                val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
-                if (cm != null && sourceIP.isNotEmpty() && destIP.isNotEmpty() && destPort > 0) {
-                    val proto = if (network.equals(
-                            "UDP",
-                            ignoreCase = true,
-                        )
-                    ) {
-                        OsConstants.IPPROTO_UDP
-                    } else {
-                        OsConstants.IPPROTO_TCP
-                    }
-                    val srcAddr = InetSocketAddress(InetAddress.getByName(sourceIP), sourcePort)
-                    val dstAddr = InetSocketAddress(InetAddress.getByName(destIP), destPort)
-                    val ownerUid = cm.getConnectionOwnerUid(proto, srcAddr, dstAddr)
-                    if (ownerUid > 0) {
-                        resolvedUid = ownerUid
-                    }
+        try {
+            val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+            if (cm != null && sourceIP.isNotEmpty() && destIP.isNotEmpty() && destPort > 0) {
+                val proto = if (network.equals(
+                        "UDP",
+                        ignoreCase = true,
+                    )
+                ) {
+                    OsConstants.IPPROTO_UDP
+                } else {
+                    OsConstants.IPPROTO_TCP
                 }
-            } catch (_: Throwable) {
+                val srcAddr = InetSocketAddress(InetAddress.getByName(sourceIP), sourcePort)
+                val dstAddr = InetSocketAddress(InetAddress.getByName(destIP), destPort)
+                val ownerUid = cm.getConnectionOwnerUid(proto, srcAddr, dstAddr)
+                if (ownerUid > 0) {
+                    resolvedUid = ownerUid
+                }
             }
+        } catch (_: Throwable) {
         }
 
         // Method 2: Fallback to /proc/net/tcp & /proc/net/tcp6

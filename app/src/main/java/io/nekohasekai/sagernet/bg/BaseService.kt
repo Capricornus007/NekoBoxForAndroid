@@ -713,11 +713,7 @@ class BaseService {
 
         fun startRunner() {
             this as Context
-            if (Build.VERSION.SDK_INT >= 26) {
-                startForegroundService(Intent(this, javaClass))
-            } else {
-                startService(Intent(this, javaClass))
-            }
+            startForegroundService(Intent(this, javaClass))
         }
 
         suspend fun killProcesses() {
@@ -863,11 +859,8 @@ class BaseService {
                     append('|').append(link.dnsServers.map { it.hostAddress }.sortedBy { it })
                     append('|').append(link.routes.map { it.toString() }.sorted())
                     append('|').append(link.domains).append('|')
-                    // LinkProperties#getMtu 是 API 29；舊機簽名用固定 0，不影響比對語義。
-                    append(if (Build.VERSION.SDK_INT >= 29) link.mtu else 0)
-                    if (Build.VERSION.SDK_INT >= 28) {
-                        append('|').append(link.isPrivateDnsActive).append('|').append(link.privateDnsServerName)
-                    }
+                    append('|').append(link.mtu)
+                    append('|').append(link.isPrivateDnsActive).append('|').append(link.privateDnsServerName)
                 }
                 val oldName = data.networkSignature
                 data.networkSignature = newName

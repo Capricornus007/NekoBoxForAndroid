@@ -19,10 +19,8 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.SpeedTestSettings
 import io.nekohasekai.sagernet.bg.RuleAssetUpdater
 import io.nekohasekai.sagernet.database.DataStore
-import io.nekohasekai.sagernet.database.InitialConfiguration
 import io.nekohasekai.sagernet.database.NetworkSettingsHistory
 import io.nekohasekai.sagernet.database.preference.EditTextPreferenceModifiers
-import io.nekohasekai.sagernet.database.preference.PublicDatabase
 import io.nekohasekai.sagernet.fmt.directFallbackConfig
 import io.nekohasekai.sagernet.ktx.*
 import io.nekohasekai.sagernet.root.EbpfProbe
@@ -390,10 +388,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
                 Toast.makeText(requireContext(), R.string.speed_test_timeout_invalid, Toast.LENGTH_SHORT).show()
             }
             valid
-        }
-        val metedNetwork = findPreference<Preference>(Key.METERED_NETWORK)!!
-        if (Build.VERSION.SDK_INT < 28) {
-            metedNetwork.remove()
         }
 
         isProxyApps = findPreference(Key.PROXY_APPS)!!

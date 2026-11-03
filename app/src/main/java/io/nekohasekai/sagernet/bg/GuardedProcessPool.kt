@@ -1,9 +1,6 @@
 package io.nekohasekai.sagernet.bg
 
-import android.os.Build
 import android.os.SystemClock
-import android.system.ErrnoException
-import android.system.Os
 import android.system.OsConstants
 import androidx.annotation.MainThread
 import io.nekohasekai.sagernet.SagerNet
@@ -118,29 +115,11 @@ class GuardedProcessPool(private val onFatal: suspend (IOException) -> Unit) : C
             }
         }
 
-        private fun signalProcess(signal: Int) {
-            try {
-                Os.kill(pid.get(process) as Int, signal)
-            } catch (e: ErrnoException) {
-                if (e.errno != OsConstants.ESRCH) Logs.w(e)
-            } catch (e: ReflectiveOperationException) {
-                Logs.w(e)
-            }
-        }
-
         private suspend fun terminateProcess(exitChannel: Channel<Int>): Int? = withContext(NonCancellable) {
             exitChannel.tryReceive().getOrNull()?.let { return@withContext it }
-            if (Build.VERSION.SDK_INT < 24) {
-                signalProcess(OsConstants.SIGTERM)
-                withTimeoutOrNull(500) { exitChannel.receive() }?.let { return@withContext it }
-            }
             process.destroy()
             withTimeoutOrNull(1000) { exitChannel.receive() }?.let { return@withContext it }
-            if (Build.VERSION.SDK_INT >= 26) {
-                process.destroyForcibly()
-            } else {
-                signalProcess(OsConstants.SIGKILL)
-            }
+            process.destroyForcibly()
             withTimeoutOrNull(1000) { exitChannel.receive() }
         }
 

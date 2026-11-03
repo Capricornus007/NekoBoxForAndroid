@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.ViewGroup
@@ -63,10 +62,6 @@ class NetworkProfilesActivity : ThemedActivity() {
         render()
         if (DataStore.networkProfilesEnabled && DataStore.serviceState.started) SagerNet.reloadService(true)
     }
-    private val backgroundPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        render()
-        if (DataStore.networkProfilesEnabled && DataStore.serviceState.started) SagerNet.reloadService(true)
-    }
     private val permissionSettings = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         render()
         if (DataStore.networkProfilesEnabled && DataStore.serviceState.started) SagerNet.reloadService(true)
@@ -76,20 +71,18 @@ class NetworkProfilesActivity : ThemedActivity() {
             permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
             return
         }
-        if (Build.VERSION.SDK_INT < 29 || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, R.string.network_profiles_ssid_ready, Toast.LENGTH_LONG).show()
             return
         }
-        val label = if (Build.VERSION.SDK_INT >= 30) packageManager.backgroundPermissionOptionLabel.toString() else getString(R.string.network_profiles_always)
+        val label = packageManager.backgroundPermissionOptionLabel.toString()
         MaterialAlertDialogBuilder(this).setTitle(R.string.network_profiles_ssid_permission)
             .setMessage(getString(R.string.network_profiles_background_reason, label))
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                if (Build.VERSION.SDK_INT == 29) {
-                    backgroundPermission.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                } else {
-                    permissionSettings.launch(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "package:$packageName".toUri()))
-                }
+                permissionSettings.launch(
+                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "package:$packageName".toUri()),
+                )
             }.show()
     }
     private val selectProfile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

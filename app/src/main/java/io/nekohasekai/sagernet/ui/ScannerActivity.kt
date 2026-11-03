@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ShortcutManager
 import android.graphics.ImageDecoder
-import android.os.Build
 import android.os.Bundle
 import android.util.Size
 import android.view.Menu
@@ -70,7 +69,7 @@ class ScannerActivity : ThemedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (Build.VERSION.SDK_INT >= 25) getSystemService<ShortcutManager>()!!.reportShortcutUsed("scan")
+        getSystemService<ShortcutManager>()!!.reportShortcutUsed("scan")
         binding = LayoutScannerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
@@ -244,37 +243,19 @@ class ScannerActivity : ThemedActivity() {
      * Arbitrary gallery images can be huge; decoding at full resolution risks an OOM
      * before any exception handler runs. ML Kit detects QR codes fine at this size.
      */
-    private fun decodeBoundedBitmap(uri: android.net.Uri): android.graphics.Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        ImageDecoder.decodeBitmap(
-            ImageDecoder.createSource(contentResolver, uri),
-        ) { decoder, info, _ ->
-            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-            decoder.isMutableRequired = true
-            val longer = maxOf(info.size.width, info.size.height)
-            if (longer > MAX_IMPORT_DIMEN) {
-                val scale = MAX_IMPORT_DIMEN.toFloat() / longer
-                decoder.setTargetSize(
-                    (info.size.width * scale).toInt().coerceAtLeast(1),
-                    (info.size.height * scale).toInt().coerceAtLeast(1),
-                )
-            }
+    private fun decodeBoundedBitmap(uri: android.net.Uri): android.graphics.Bitmap = ImageDecoder.decodeBitmap(
+        ImageDecoder.createSource(contentResolver, uri),
+    ) { decoder, info, _ ->
+        decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+        decoder.isMutableRequired = true
+        val longer = maxOf(info.size.width, info.size.height)
+        if (longer > MAX_IMPORT_DIMEN) {
+            val scale = MAX_IMPORT_DIMEN.toFloat() / longer
+            decoder.setTargetSize(
+                (info.size.width * scale).toInt().coerceAtLeast(1),
+                (info.size.height * scale).toInt().coerceAtLeast(1),
+            )
         }
-    } else {
-        // Pre-P: read bounds first, then decode with an inSampleSize so the full-res
-        // bitmap is never materialized.
-        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        contentResolver.openInputStream(uri)?.use {
-            android.graphics.BitmapFactory.decodeStream(it, null, bounds)
-        }
-        var sample = 1
-        val longer = maxOf(bounds.outWidth, bounds.outHeight)
-        while (longer / sample > MAX_IMPORT_DIMEN) sample *= 2
-        val opts = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
-        (
-            contentResolver.openInputStream(uri)?.use {
-                android.graphics.BitmapFactory.decodeStream(it, null, opts)
-            }
-            ) ?: error("Cannot decode image")
     }
 
     /**

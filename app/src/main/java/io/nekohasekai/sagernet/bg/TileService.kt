@@ -2,7 +2,6 @@ package io.nekohasekai.sagernet.bg
 
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
-import androidx.annotation.RequiresApi
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.aidl.ISagerNetService
@@ -11,7 +10,6 @@ import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.ktx.runOnMainDispatcher
 import android.service.quicksettings.TileService as BaseTileService
 
-@RequiresApi(24)
 class TileService :
     BaseTileService(),
     SagerConnection.Callback {

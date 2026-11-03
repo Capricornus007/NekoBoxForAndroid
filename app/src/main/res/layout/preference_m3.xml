@@ -20,7 +20,6 @@
         android:paddingVertical="10dp">
 
         <FrameLayout
-            tools:targetApi="24"
             android:id="@android:id/icon_frame"
             android:layout_width="48dp"
             android:layout_height="48dp"
