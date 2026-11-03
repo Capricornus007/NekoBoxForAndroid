@@ -16,7 +16,7 @@ require (
 	github.com/sagernet/sing v0.9.7-0.20261022215834-56e8e9fb54a4
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-snell v0.0.0-20260904135315-bc5a12ac736f
-	github.com/sagernet/sing-tun v0.9.7-0.20261022224154-1af57d7f3a23
+	github.com/sagernet/sing-tun v0.9.7-0.20261103032840-7ac0256fa09d
 	github.com/sagernet/tailscale v1.102.1-sing-box-1.14-mod.5.0.20260925112514-35e61219dedd
 	github.com/ulikunitz/xz v0.5.15
 	github.com/xchacha20-poly1305/sing-trusttunnel v0.3.0-beta.6
@@ -209,7 +209,7 @@ replace github.com/sagernet/sing-quic => github.com/Capricornus007/sing-quic v0.
 // sing-quic: SagerNet 版には sing-box 1.14.x が必要とする realm PortMapping が含まれる。
 // replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260630192917-42e8810bc4b8
 
-replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.6-sing-box-fork.0.20261101060007
+replace github.com/sagernet/sing-tun => github.com/Capricornus007/sing-tun v0.9.6-sing-box-fork.0.20261103042502
 
 replace github.com/sagernet/quic-go => github.com/Capricornus007/quic-go v0.61.0-sing-box-mod.9.0.20261023034407-c7b0124a13f8
 
