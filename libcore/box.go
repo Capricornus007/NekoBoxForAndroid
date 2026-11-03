@@ -154,6 +154,42 @@ func NewTestSingBoxInstance(config string, localTransport LocalDNSTransport) (b 
 	return newSingBoxInstance(config, localTransport, false)
 }
 
+// PrepareExternalSingBoxConfig applies the same config decoding, validation, and local
+// geoip:/geosite: rule-set conversion as NewSingBoxInstance, but returns JSON for the
+// standalone root core used by Android eBPF mode. Without this, the binary interprets
+// `geosite:cn` as a literal file path and exits before opening its readiness ports.
+func PrepareExternalSingBoxConfig(config string, localTransport LocalDNSTransport) (prepared string, err error) {
+	defer device.DeferPanicToError("PrepareExternalSingBoxConfig", func(err_ error) { err = err_ })
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	ctx = box.Context(ctx,
+		nekoboxAndroidInboundRegistry(), nekoboxAndroidOutboundRegistry(), nekoboxAndroidEndpointRegistry(),
+		nekoboxAndroidDNSTransportRegistry(localTransport), nekoboxAndroidServiceRegistry(),
+		nekoboxAndroidCertificateProviderRegistry(),
+	)
+	ctx = service.ContextWithDefaultRegistry(ctx)
+	ctx = service.ContextWith[adapter.PlatformInterface](ctx, newBoxPlatformInterfaceWrapper())
+
+	var options option.Options
+	if err = options.UnmarshalJSONContext(ctx, []byte(config)); err != nil {
+		return "", fmt.Errorf("decode config: %v", err)
+	}
+	if err = validateByeDPIOptions(options); err != nil {
+		return "", fmt.Errorf("validate config: %v", err)
+	}
+	if options.Route != nil {
+		if err = prepareLocalGeoRuleSets(options.Route.RuleSet); err != nil {
+			return "", fmt.Errorf("prepare geo rule-sets: %v", err)
+		}
+	}
+	content, err := options.MarshalJSONContext(ctx)
+	if err != nil {
+		return "", fmt.Errorf("encode prepared config: %v", err)
+	}
+	return string(content), nil
+}
+
 func newSingBoxInstance(config string, localTransport LocalDNSTransport, platformLog bool) (b *BoxInstance, err error) {
 	defer device.DeferPanicToError("NewSingBoxInstance", func(err_ error) { err = err_ })
 

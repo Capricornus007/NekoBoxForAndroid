@@ -21,6 +21,7 @@ import (
 	"github.com/sagernet/sing-box/protocol/anytls"
 	"github.com/sagernet/sing-box/protocol/block"
 	"github.com/sagernet/sing-box/protocol/direct"
+	"github.com/sagernet/sing-box/protocol/ebpf"
 	protocolDns "github.com/sagernet/sing-box/protocol/dns"
 	"github.com/sagernet/sing-box/protocol/group"
 	"github.com/sagernet/sing-box/protocol/http"
@@ -64,6 +65,12 @@ func nekoboxAndroidInboundRegistry() *inbound.Registry {
 	socks.RegisterInbound(registry)
 	http.RegisterInbound(registry)
 	mixed.RegisterInbound(registry)
+
+	// 上游 include/registry.go:65 也是無條件呼叫：protocol/ebpf 有兩面——inbound.go
+	// （with_ebpf && linux||android）註冊真實作，inbound_stub.go 註冊同一個 C.TypeEBPF
+	// 但建立時回「requires the with_ebpf build tag」。少了這一行，AAR 連型號都不認得，
+	// 報的是「unknown inbound type: ebpf」，把真正的訊息蓋掉。
+	ebpf.RegisterInbound(registry)
 
 	return registry
 }
