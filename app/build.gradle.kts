@@ -49,8 +49,9 @@ android {
     // 末尾の lint ブロック：プロパティ名を修正
     lint {
         abortOnError = true
-        // GradleDependency 检查会提示依赖有更新版本，但 navigation 2.10.0 要求 minSdk 24
-        // （本项目 minSdk 23），无法升级。禁用该检查避免 CI 误报。
+        // 原本禁用是因为 navigation 2.10.0 要求 minSdk 24 而本项目 minSdk 23；minSdk 抬到
+        // 31 之后这个理由消失了，但该检查会对每个依赖版本各报一条 warning，直接把 lint
+        // baseline（scripts/check-lint-baseline.sh 只准降不准升）撑爆，所以继续关着。
         disable += "GradleDependency"
     }
 }
