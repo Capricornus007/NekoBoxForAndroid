@@ -57,7 +57,7 @@ abstract class BoxInstance(
     private var cacheFiles = ArrayList<File>()
 
     // isai：取消進行中的核心啟動（stopRunner 對 in-flight start 用）。
-    fun cancelStart() {
+    open fun cancelStart() {
         if (::box.isInitialized) box.cancelStart()
     }
 
@@ -69,7 +69,13 @@ abstract class BoxInstance(
         recoveryEnabled = enableOlcrtcRecovery,
     )
 
-    fun isInitialized(): Boolean = ::config.isInitialized && ::box.isInitialized
+    // open：eBPF 模式（RootProxyInstance）沒有 in-process box，它的「已初始化」定義是
+    // 「設定已生成且外置 root core 活著」，所以這條得讓子類改寫。
+    open fun isInitialized(): Boolean = ::config.isInitialized && ::box.isInitialized
+
+    // Kotlin 只允許在宣告 lateinit 的同一個類/檔案裡用 `::config.isInitialized`
+    // （backing field 對子類不可見），所以子類要問「設定好了沒」得走這個存取器。
+    protected fun isConfigReady(): Boolean = ::config.isInitialized
 
     // eBPF（RootProxyInstance）模式下 libcore box 永不初始化；需要摸 box 的呼叫端
     // 一律走這個可空存取器，直接讀 lateinit 屬性會拋 UninitializedPropertyAccessException。

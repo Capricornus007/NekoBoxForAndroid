@@ -67,7 +67,7 @@ open class ProxyInstance(
         looper?.start()
     }
 
-    suspend fun closeAndPersist() = runRequiredCompletion(
+    open suspend fun closeAndPersist() = runRequiredCompletion(
         after = {
             try {
                 looper?.stop()

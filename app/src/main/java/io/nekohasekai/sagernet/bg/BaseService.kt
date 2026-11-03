@@ -329,7 +329,16 @@ class BaseService {
         }
 
         override fun urlTest(): Int {
-            val box = data?.proxy?.safeBox ?: error("core not started")
+            val proxy = data?.proxy
+            // eBPF 模式沒有 in-process box，改走外置 core 的 mixed 入口實測。
+            if (proxy is RootProxyInstance) {
+                return try {
+                    proxy.mixedDelay(DataStore.connectionTestURL, DataStore.connectionTestTimeout)
+                } catch (e: Exception) {
+                    error(Protocols.genFriendlyMsg(e.readableMessage))
+                }
+            }
+            val box = proxy?.safeBox ?: error("core not started")
             return try {
                 Libcore.urlTest(
                     box,
@@ -376,6 +385,10 @@ class BaseService {
                 ?: proxy.config.tailscaleEndpoints[profileId]?.tag
                 ?: error(PROFILE_NOT_RUNNING)
             return try {
+                if (proxy is RootProxyInstance) {
+                    // 同上：外置 core 的節點延遲由 Clash API 回報，不碰 box。
+                    return proxy.clashDelay(tag, DataStore.connectionTestURL, DataStore.connectionTestTimeout)
+                }
                 awaitTailscaleNodes(proxy, profileId)
                 Libcore.urlTestOutbound(proxy.safeBox ?: error("core not started"), tag, DataStore.connectionTestURL, DataStore.connectionTestTimeout)
             } catch (e: Exception) {

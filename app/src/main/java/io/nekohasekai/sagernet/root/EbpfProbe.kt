@@ -10,17 +10,15 @@ import java.util.Locale
 /**
  * 用 root 叫 **sidecar** 跑 `ebpf-probe`，問這台機器的內核到底能不能跑 eBPF 入站。
  *
- * 為什麼不走 aar（`Libcore.EBPFProbeKernel`）：
- *   1. aar 的 build tags（libcore/build.sh）**沒有 with_ebpf**，Kotlin 那側拿到的只會是
- *      experimental/libbox/ebpf_stub.go 的回錯版本；
- *   2. 更要緊的是「說支援的」與「真要跑的」必須是同一顆 binary。eBPF 模式實際執行的是
- *      nativeLibraryDir 裡的 libsingbox.so（由 buildScript/lib/singbox-sidecar.sh 帶
- *      with_ebpf 編出，並在 CI 用 cilium/ebpf 字串驗產物）。讓那顆自己去答能力問題，
- *      才不會出現「aar 說行、sidecar 沒編進去」這種假訊號。
- *   3. 第三層理由：JNI 橋是在 app 自己的行程裡跑的，那個行程是 app uid，不是 root。
- *      ProbeKernel 的權限檢查（kernel_probe.go 的 probeCommonCapabilities）在無特權時回
- *      UNKNOWN，結果就變成 inconclusive —— 換句話說 aar 那條路**天生答不出能力問題**，
- *      只有 su 起的 sidecar 才有答案。
+ * 為什麼仍不走 aar（`Libcore.EBPFProbeKernel`）：
+ *   1. aar 現在也帶 `with_ebpf`，用途是讓 gomobile 的 config parser 能辨識外置 core 的
+ *      `type: ebpf` 並準備 geo rule-set；這不代表 app uid 可以載入或 attach eBPF 程式。
+ *   2. 「說支援的」與「真要跑的」必須是同一顆 binary。eBPF 模式實際執行的是
+ *      nativeLibraryDir 裡的 libsingbox.so（由 buildScript/lib/singbox-sidecar.sh 讀同一串
+ *      tags 編出，並在 CI 用 cilium/ebpf 字串驗產物）。讓那顆自己去答能力問題，才不會
+ *      出現「aar 說行、sidecar 產物壞了」這種假訊號。
+ *   3. JNI 橋是在 app 自己的行程裡跑的，那個行程是 app uid，不是 root。ProbeKernel 的
+ *      權限檢查在無特權時只會回 UNKNOWN；只有 su 起的 sidecar 才能給出真實答案。
  *
  * 為什麼要逐 mode 問：`local` 要 cgroup/connect4（4.17+），`shared-network` 只要
  * TC classifier（4.16+），兩者會分開成敗——「只能共網、不能本機」是真實存在的中間態。
@@ -30,9 +28,8 @@ import java.util.Locale
  *   CLI 形（現行走的就是這條）：cmd/sing-box/cmd_ebpf_probe.go → common/ebpf/
  *     kernel_probe_render.go 的 WriteKernelProbeReportJSON，**縮排多行**、snake_case，
  *     欄位是 result / kernel_release / findings[] / summary.required_failures。
- *   橋形（目前 aar 拿不到，留著以防哪天改走 JNI）：sing-box 的
- *     experimental/libbox/ebpf.go，單行 camelCase，欄位是 supported / kernelRelease /
- *     failures[] / warnings[]。
+ *   橋形（aar 有實作但本類別刻意不走 JNI）：sing-box 的 experimental/libbox/ebpf.go，
+ *     單行 camelCase，欄位是 supported / kernelRelease / failures[] / warnings[]。
  * 兩種形都認，判準同一個：required_failures > 0（= Go 側 RequiredFailures()）。
  */
 object EbpfProbe {
