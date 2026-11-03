@@ -175,8 +175,7 @@ class RootProxyInstance(
     // 拋「core not started」，測速與連線狀態全線失敗——外置 core 明明在跑也一樣。
     // 不用 Process.isAlive：那要 API 26，本包 minSdk 更低，lint 的 NewApi 直接擋下來；
     // exitValue() 在進程還活著時抛 IllegalThreadStateException，這是 API 1 就有的行為。
-    override fun isInitialized(): Boolean =
-        isConfigReady() && rootProcess?.let { processExitCode(it) == null } == true
+    override fun isInitialized(): Boolean = isConfigReady() && rootProcess?.let { processExitCode(it) == null } == true
 
     // 測速改問外置 core 自己，不假造一個 box：
     //   * 指定節點／分組：Clash API 的 /proxies/<tag>/delay（9090，帶 lazy 生成的 secret）
@@ -221,8 +220,7 @@ class RootProxyInstance(
 
     // 外置 core 沒有 in-process 計數器，流量改由它自己開的 Clash API 供；回 null 才會走
     // 原本 box.queryStats 那條路，所以只在外置 core 真的活著時接管。
-    override fun trafficQueryOverride(): ((String, String) -> Long)? =
-        if (isInitialized()) trafficTracker::queryStats else null
+    override fun trafficQueryOverride(): ((String, String) -> Long)? = if (isInitialized()) trafficTracker::queryStats else null
 
     private val trafficTracker by lazy {
         ClashTrafficTracker(port = CLASH_PORT, secret = { DataStore.clashApiSecret })
