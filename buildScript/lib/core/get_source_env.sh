@@ -82,7 +82,7 @@
 # 修法是把上游那兩行原值補回（不是跑 go mod tidy——tidy 會順帶刪掉我方 fork replace 的條目）。
 # 補完雜湊後換成「updates to go.mod needed」：同一組 tag 用 -mod=mod 解圖，Go 把 x/tools 抬到
 # v0.52.0（合併後的圖裡有人要求它），所以 1572fe6ab 那筆同時把它寫進 go.mod/go.sum。
-export COMMIT_SING_BOX="1572fe6abe20babb213c2ab1b16a18f5d35c7984"
+export COMMIT_SING_BOX="813b346b9c08752d5f3273a4e8657aa6eaa59c16"
 # Human-readable sing-box version for the About screen. Pinned alongside the commit so the
 # build does not depend on tags being present in the CI clone (git describe there only
 # resolves a bare hash). Update this together with COMMIT_SING_BOX.
@@ -93,7 +93,7 @@ export COMMIT_SING_BOX="1572fe6abe20babb213c2ab1b16a18f5d35c7984"
 # SINGBOX_VERSION 要一起改，scripts/check-core-pins.sh 段 1c 就是抓這個的——
 # 「Update sing-box core」那條 bot 只会盲目 +1 計數（它上一輪還寫 alpha.11-mod.41，
 # 就是沒跟上基號換代），換代要人對。
-export VERSION_SING_BOX="1.15.0-alpha.13-mod.10"
+export VERSION_SING_BOX="1.15.0-alpha.13-mod.11"
 export COMMIT_LIBNEKO="1dad84547be59ff2ec5ed7bd2339b0441929edfd"
 # wireguard-go includes the fd-path I/O activity callback API used by newer
 # sing-quic/quic-go integrations. This fork branch also fixes the callback to
