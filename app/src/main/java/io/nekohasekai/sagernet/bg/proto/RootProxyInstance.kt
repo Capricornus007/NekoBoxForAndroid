@@ -201,6 +201,22 @@ class RootProxyInstance(
 
     fun mixedDelay(url: String, timeoutMs: Int): Int {
         val conn = URL(url).openConnection(Proxy(Proxy.Type.HTTP, InetSocketAddress(LOOPBACK, MIXED_PORT)))
+        // VPN/eBPF 模式下 mixed 入口默认要认证（DataStore.mixedInboundNeedsAuth），
+        // 这里不预先带上 Proxy-Authorization 就会吃 407，Android 的 HttpURLConnection
+        // （平台内建 OkHttp）直接把错抛成「Failed to authenticate with proxy」，
+        // 总连接测试于是恒失败（外置 core 明明跑得好好的）。凭据与 ConfigBuilder 里
+        // 写进混合入站的 users 完全同源，改一处必须同步另一处。
+        if (DataStore.mixedInboundNeedsAuth) {
+            val user = DataStore.mixedInboundUser
+            val pass = DataStore.mixedInboundPass
+            if (user.isNotEmpty()) {
+                val token = android.util.Base64.encodeToString(
+                    "$user:$pass".toByteArray(Charsets.UTF_8),
+                    android.util.Base64.NO_WRAP,
+                )
+                conn.setRequestProperty("Proxy-Authorization", "Basic $token")
+            }
+        }
         conn.connectTimeout = timeoutMs
         conn.readTimeout = timeoutMs
         val started = System.currentTimeMillis()
