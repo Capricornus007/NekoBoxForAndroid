@@ -12,8 +12,8 @@ require (
 	github.com/matsuridayo/libneko v0.0.0-00010101000000-000000000000
 	github.com/miekg/dns v1.1.73
 	github.com/oschwald/maxminddb-golang v1.13.1
-	github.com/sagernet/quic-go v0.61.0-sing-box-mod.12
-	github.com/sagernet/sing v0.9.7-0.20261023115510-03a6cce64bf7
+	github.com/sagernet/quic-go v0.61.0-sing-box-mod.14
+	github.com/sagernet/sing v0.9.7-0.20261110095940-27b73774b240
 	github.com/sagernet/sing-box v1.0.0 // replaced
 	github.com/sagernet/sing-snell v0.0.0-20260904135315-bc5a12ac736f
 	github.com/sagernet/sing-tun v0.9.7-0.20261103032840-7ac0256fa09d
@@ -21,8 +21,8 @@ require (
 	github.com/ulikunitz/xz v0.5.15
 	github.com/xchacha20-poly1305/sing-trusttunnel v0.3.0-beta.6
 	golang.org/x/mobile v0.0.0-20261011034528-197770444867
-	golang.org/x/net v0.61.0
-	golang.org/x/sys v0.49.0
+	golang.org/x/net v0.63.1-0.20261119175338-fd4c9ad54137
+	golang.org/x/sys v0.50.1-0.20261120131340-d4690d67735d
 )
 
 require (
@@ -72,8 +72,8 @@ require (
 	github.com/huin/goupnp v1.3.0 // indirect
 	github.com/jackpal/go-nat-pmp v1.1.0 // indirect
 	github.com/jsimonetti/rtnetlink v1.4.2 // indirect
-	github.com/klauspost/compress v1.20.3 // indirect
-	github.com/klauspost/cpuid/v2 v2.4.1 // indirect
+	github.com/klauspost/compress v1.20.6-0.20261123150203-3457d7fdcc5a // indirect
+	github.com/klauspost/cpuid/v2 v2.4.2 // indirect
 	github.com/koron/go-ssdp v0.9.1 // indirect
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/libdns/acmedns v0.5.0 // indirect
@@ -166,13 +166,13 @@ require (
 	go.uber.org/zap/exp v0.3.0 // indirect
 	go4.org/mem v0.0.0-20240501181205-ae6ca9944745 // indirect
 	go4.org/netipx v0.0.0-20260823151212-3075585bcbeb // indirect
-	golang.org/x/crypto v0.58.0 // indirect
-	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e // indirect
-	golang.org/x/mod v0.42.0 // indirect
-	golang.org/x/oauth2 v0.37.0 // indirect
-	golang.org/x/sync v0.24.0 // indirect
-	golang.org/x/term v0.47.0 // indirect
-	golang.org/x/text v0.43.0 // indirect
+	golang.org/x/crypto v0.59.1-0.20261123192653-4dc4fb521066 // indirect
+	golang.org/x/exp v0.0.0-20261124000051-d6646c509b6d // indirect
+	golang.org/x/mod v0.43.1-0.20261112161916-2b553c8b61bf // indirect
+	golang.org/x/oauth2 v0.38.0 // indirect
+	golang.org/x/sync v0.25.0 // indirect
+	golang.org/x/term v0.48.0 // indirect
+	golang.org/x/text v0.44.1-0.20261117190556-9e7a977af666 // indirect
 	golang.org/x/time v0.16.0 // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	golang.zx2c4.com/wireguard/windows v1.1.1 // indirect
